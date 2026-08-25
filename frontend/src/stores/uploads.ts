@@ -40,6 +40,7 @@ export interface FileUploader {
   aggregatedUploadProgress: Map<string, AggregatedUploadProgress>;
   totalUploadProgress: number;
   uploadFiles: (files: File[]) => Promise<void>;
+  uploadFilesToDirectory: (directory: string, files: File[]) => Promise<void>;
   cancelFileUpload: (fileKey: string) => void;
   cancelFolderUpload: (folderName: string) => void;
   cancelAllUploads: () => void;

@@ -14,51 +14,76 @@ import downloadFiles from '@/api/server/files/downloadFiles.ts';
 import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
+import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
+type FileEntry = z.infer<typeof serverDirectoryEntrySchema>;
+
 interface FileMassContextMenuProps {
+  directory?: string;
+  files?: FileEntry[];
+  writableDirectory?: boolean;
   children: (props: { massItems: ContextMenuItem[]; openMassMenu: (x: number, y: number) => void }) => React.ReactNode;
 }
 
 const registryProps = {};
 
-export default function FileMassContextMenu({ children }: FileMassContextMenuProps) {
+export default function FileMassContextMenu({
+  directory,
+  files,
+  writableDirectory,
+  children,
+}: FileMassContextMenuProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
   const actingMode = useFileManagerStore((state) => state.actingMode);
+  const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
   const browsingWritableDirectory = useFileManagerStore((state) => state.browsingWritableDirectory);
   const canReadContent = useServerCan('files.read-content');
   const canCreate = useServerCan('files.create');
   const canArchive = useServerCan('files.archive');
   const canUpdate = useServerCan('files.update');
   const canDelete = useServerCan('files.delete');
+  const activeDirectory = directory ?? browsingDirectory;
+  const activeWritableDirectory = writableDirectory ?? browsingWritableDirectory;
+  const getActiveFiles = useCallback(() => files ?? store.getState().selectedFiles.values(), [files, store]);
+  const prepareFileManager = useCallback(() => {
+    const state = store.getState();
+    state.setBrowsingContext({ directory: activeDirectory, writable: activeWritableDirectory });
+    if (files) state.doSelectFiles(files);
+  }, [activeDirectory, activeWritableDirectory, files, store]);
+  const withActiveFiles = useCallback(
+    (callback: (activeFiles: FileEntry[]) => void) => {
+      prepareFileManager();
+      callback(getActiveFiles());
+    },
+    [getActiveFiles, prepareFileManager],
+  );
 
   const doDownload = useCallback(
     (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-      const { selectedFiles, browsingDirectory } = store.getState();
-
-      downloadFiles(
-        server.uuid,
-        browsingDirectory,
-        selectedFiles.keys(),
-        selectedFiles.size === 1 ? selectedFiles.values()[0].directory : false,
-        archiveFormat,
-      )
-        .then(({ url }) => {
-          addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-          window.location.href = url;
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        });
+      withActiveFiles((activeFiles) => {
+        downloadFiles(
+          server.uuid,
+          activeDirectory,
+          activeFiles.map((file) => file.name),
+          activeFiles.length === 1 ? activeFiles[0].directory : false,
+          archiveFormat,
+        )
+          .then(({ url }) => {
+            addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
+            window.location.href = url;
+          })
+          .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
+      });
     },
-    [store, server.uuid, t, addToast],
+    [activeDirectory, addToast, server.uuid, t, withActiveFiles],
   );
 
   const items = useMemo<ContextMenuItem[]>(
@@ -83,10 +108,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         icon: faClone,
         label: t('pages.server.files.button.remoteCopy', {}),
         hidden: !!actingMode,
-        onClick: () => {
-          const state = store.getState();
-          store.getState().doOpenModal('copy-remote', state.selectedFiles.values());
-        },
+        onClick: () => withActiveFiles((activeFiles) => store.getState().doOpenModal('copy-remote', activeFiles)),
         color: 'gray',
         canAccess: canReadContent,
       },
@@ -95,11 +117,12 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         icon: faCopy,
         label: t('pages.server.files.button.copy', {}),
         hidden: !!actingMode,
-        onClick: () => {
-          const state = store.getState();
-          state.doActFiles('copy', state.selectedFiles.values());
-          state.doSelectFiles([]);
-        },
+        onClick: () =>
+          withActiveFiles((activeFiles) => {
+            const state = store.getState();
+            state.doActFiles('copy', activeFiles);
+            state.doSelectFiles([]);
+          }),
         color: 'gray',
         canAccess: canCreate,
       },
@@ -107,11 +130,8 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         type: 'action',
         icon: faFileZipper,
         label: t('pages.server.files.button.archive', {}),
-        hidden: !!actingMode || !browsingWritableDirectory,
-        onClick: () => {
-          const state = store.getState();
-          state.doOpenModal('archive', state.selectedFiles.values());
-        },
+        hidden: !!actingMode || !activeWritableDirectory,
+        onClick: () => withActiveFiles((activeFiles) => store.getState().doOpenModal('archive', activeFiles)),
         color: 'gray',
         canAccess: canArchive,
       },
@@ -119,11 +139,8 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         type: 'action',
         icon: faPen,
         label: t('pages.server.files.button.rename', {}),
-        hidden: !!actingMode || !browsingWritableDirectory,
-        onClick: () => {
-          const state = store.getState();
-          state.doOpenModal('mass-rename', state.selectedFiles.values());
-        },
+        hidden: !!actingMode || !activeWritableDirectory,
+        onClick: () => withActiveFiles((activeFiles) => store.getState().doOpenModal('mass-rename', activeFiles)),
         color: 'gray',
         canAccess: canUpdate,
       },
@@ -131,12 +148,13 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         type: 'action',
         icon: faAnglesUp,
         label: t('common.button.move', {}),
-        hidden: !!actingMode || !browsingWritableDirectory,
-        onClick: () => {
-          const state = store.getState();
-          state.doActFiles('move', state.selectedFiles.values());
-          state.doSelectFiles([]);
-        },
+        hidden: !!actingMode || !activeWritableDirectory,
+        onClick: () =>
+          withActiveFiles((activeFiles) => {
+            const state = store.getState();
+            state.doActFiles('move', activeFiles);
+            state.doSelectFiles([]);
+          }),
         color: 'gray',
         canAccess: canUpdate,
       },
@@ -144,11 +162,8 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
         type: 'action',
         icon: faTrash,
         label: t('common.button.delete', {}),
-        hidden: !!actingMode || !browsingWritableDirectory,
-        onClick: () => {
-          const state = store.getState();
-          state.doOpenModal('delete', state.selectedFiles.values());
-        },
+        hidden: !!actingMode || !activeWritableDirectory,
+        onClick: () => withActiveFiles((activeFiles) => store.getState().doOpenModal('delete', activeFiles)),
         color: 'red',
         canAccess: canDelete,
       },
@@ -156,7 +171,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
     [
       t,
       actingMode,
-      browsingWritableDirectory,
+      activeWritableDirectory,
       canReadContent,
       canCreate,
       canArchive,
@@ -164,6 +179,7 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
       canDelete,
       store,
       doDownload,
+      withActiveFiles,
     ],
   );
 
@@ -173,7 +189,15 @@ export default function FileMassContextMenu({ children }: FileMassContextMenuPro
       registry={window.extensionContext.extensionRegistry.pages.server.files.fileMassContextMenu}
       registryProps={registryProps}
     >
-      {({ openMenu, items }) => children({ massItems: items, openMassMenu: openMenu })}
+      {({ openMenu, items }) =>
+        children({
+          massItems: items,
+          openMassMenu: (x, y) => {
+            prepareFileManager();
+            openMenu(x, y);
+          },
+        })
+      }
     </ContextMenu>
   );
 }

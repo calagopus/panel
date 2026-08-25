@@ -75,6 +75,10 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
   }, [uploadingFiles]);
 
   const doUploadFiles = useCallback((files: File[]) => uploadFiles(getDestinationRef.current(), files), []);
+  const doUploadFilesToDirectory = useCallback((directory: string, files: File[]) => {
+    const destination = getDestinationRef.current();
+    return uploadFiles({ ...destination, directory }, files);
+  }, []);
 
   const doCancelFileUpload = useCallback((fileKey: string) => cancelFileUpload(fileKey), []);
   const doCancelFolderUpload = useCallback((folderName: string) => cancelFolderUpload(scope, folderName), [scope]);
@@ -104,6 +108,7 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
       aggregatedUploadProgress,
       totalUploadProgress,
       uploadFiles: doUploadFiles,
+      uploadFilesToDirectory: doUploadFilesToDirectory,
       cancelFileUpload: doCancelFileUpload,
       cancelFolderUpload: doCancelFolderUpload,
       cancelAllUploads: doCancelAllUploads,
@@ -115,6 +120,7 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
       aggregatedUploadProgress,
       totalUploadProgress,
       doUploadFiles,
+      doUploadFilesToDirectory,
       doCancelFileUpload,
       doCancelFolderUpload,
       doCancelAllUploads,

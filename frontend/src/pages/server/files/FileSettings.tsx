@@ -29,7 +29,7 @@ export default function FileSettings() {
     <Popover position='bottom' withArrow shadow='md'>
       <Popover.Target>
         <Tooltip label={t('pages.server.files.tooltip.settings', {})}>
-          <Button variant='transparent' size='compact-xs'>
+          <Button variant='transparent' size='compact-xs' aria-label={t('pages.server.files.tooltip.settings', {})}>
             <FontAwesomeIcon size='lg' icon={faCog} />
           </Button>
         </Tooltip>

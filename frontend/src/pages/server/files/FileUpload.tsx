@@ -4,7 +4,7 @@ import { useFileDragAndDrop } from '@/pages/server/files/hooks/useFileDragAndDro
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 
-export default function FileUpload() {
+export default function FileUpload({ showOverlay = true }: { showOverlay?: boolean }) {
   const { uploadFiles, handleFileSelect, handleFolderSelect, browsingWritableDirectory, fileInputRef, folderInputRef } =
     useFileManager(
       useShallow((state) => ({
@@ -42,7 +42,7 @@ export default function FileUpload() {
         {...{ webkitdirectory: '', directory: '' }}
       />
 
-      <FileUploadOverlay visible={isDragging && browsingWritableDirectory && canCreate} />
+      <FileUploadOverlay visible={showOverlay && isDragging && browsingWritableDirectory && canCreate} />
     </>
   );
 }

@@ -2164,7 +2164,7 @@ const baseTranslations = defineTranslations({
             deleteSelection: 'Delete Selection',
           },
           dropzone: {
-            title: 'Drop files here to upload',
+            title: 'Drop files or folders here to upload',
             subtitle: 'Release to start uploading',
           },
           toast: {
@@ -4637,6 +4637,32 @@ const baseTranslations = defineTranslations({
         },
         files: {
           title: 'Files',
+          view: {
+            files: 'Files',
+            editor: 'Editor',
+          },
+          tree: {
+            empty: 'This folder is empty',
+            loadMore: 'Load more',
+            retry: 'Retry',
+            reload: 'Reload files',
+            show: 'Show file tree',
+            hide: 'Hide file tree',
+            searchPlaceholder: 'Search files...',
+            noSearchResults: 'No matching files',
+            upload: 'Upload',
+            uploadFromComputer: 'Upload from computer',
+            uploadFromUrl: 'Upload from URL',
+            selectItem: 'Select {name}',
+            deselectItem: 'Deselect {name}',
+            selectFileToOpen: 'Select a file from the tree to open it.',
+            noEditorAvailable: 'No editor is available for this file type.',
+            editorTabsLabel: 'Open files',
+            closeEditorTab: 'Close {name}',
+            unsavedTab: '{name} has unsaved changes',
+            dropToSplit: 'Drop to open in a new editor pane',
+            resizeEditorPanes: 'Resize editor panes',
+          },
           titleEditorViewing: 'Viewing {file}',
           titleEditorPlaying: 'Playing {file}',
           titleEditorEditing: 'Editing {file}',
@@ -4777,6 +4803,7 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             settings: 'Settings',
+            advancedSearch: 'Advanced search',
             fileHistory: 'File History',
             revertToDisk: 'Discard changes and load the file from disk',
             collabEditing: '{user} is editing this file',
@@ -4789,6 +4816,7 @@ const baseTranslations = defineTranslations({
             pause: 'Pause',
             mute: 'Mute',
             unmute: 'Unmute',
+            playbackRate: 'Playback speed',
           },
           drawer: {
             revisions: {

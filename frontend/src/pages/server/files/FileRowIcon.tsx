@@ -28,6 +28,7 @@ import { FileManagerStore, useFileManagerApi } from '@/stores/fileManager.ts';
 function getFileIcon(
   file: z.infer<typeof serverDirectoryEntrySchema>,
   fileManagerContext: FileManagerStore,
+  openable?: boolean,
 ): IconDefinition {
   for (const handler of window.extensionContext.extensionRegistry.pages.server.files.fileIconHandlers) {
     const icon = handler(file, fileManagerContext);
@@ -52,7 +53,7 @@ function getFileIcon(
     return faFolderTree;
   } else if (isSqliteDatabase(file)) {
     return faDatabase;
-  } else if (isOpenableFile(file, fileManagerContext).openable) {
+  } else if (openable ?? isOpenableFile(file, fileManagerContext).openable) {
     return faFilePen;
   }
 
@@ -63,25 +64,37 @@ function FileRowIcon({
   file,
   className,
   directory,
+  openable,
 }: {
   file?: z.infer<typeof serverDirectoryEntrySchema> | null;
   className?: string;
   directory?: boolean;
+  openable?: boolean;
 }) {
   const { t } = useTranslations();
   const store = useFileManagerApi();
   const isDirectory = directory || file?.directory;
-  const iconColor = isDirectory ? 'text-yellow-400' : 'text-(--mantine-color-dimmed)';
-  const iconDefinition = file ? getFileIcon(file, store.getState()) : directory ? faFolder : faFile;
+  const iconColor = isDirectory ? 'file-manager-folder-icon' : 'file-manager-file-icon';
+  const iconDefinition = file ? getFileIcon(file, store.getState(), openable) : directory ? faFolder : faFile;
 
   if (!file?.virtual) {
-    return <FontAwesomeIcon className={classNames(iconColor, className)} icon={iconDefinition} />;
+    return (
+      <FontAwesomeIcon
+        data-file-manager-icon={isDirectory ? 'folder' : 'file'}
+        className={classNames(iconColor, className)}
+        icon={iconDefinition}
+      />
+    );
   }
 
   return (
     <Tooltip label={t('pages.server.files.tooltip.virtual', {})}>
       <span className={classNames('relative inline-flex', className)}>
-        <FontAwesomeIcon className={iconColor} icon={iconDefinition} />
+        <FontAwesomeIcon
+          data-file-manager-icon={isDirectory ? 'folder' : 'file'}
+          className={iconColor}
+          icon={iconDefinition}
+        />
         <span className='absolute -top-1 -right-1 h-1.5 w-1.5 rounded-full bg-(--mantine-color-blue-5) ring-1 ring-(--mantine-color-body)' />
       </span>
     </Tooltip>

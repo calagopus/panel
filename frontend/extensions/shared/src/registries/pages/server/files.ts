@@ -39,26 +39,46 @@ interface FileEditorActionBase {
   };
 }
 
+export interface FileEditorActionContext {
+  surface: 'page' | 'inline';
+  directory: string;
+  file: string;
+  path: string;
+  params: Readonly<Record<string, string>>;
+  workspace?: {
+    paneId: string;
+    paneIndex: number;
+    paneCount: number;
+    active: boolean;
+  };
+}
+
+export interface FileEditorStringContentProps {
+  content: string;
+  setContent: (content: string) => void;
+  dirty: boolean;
+  setDirty: (dirty: boolean) => void;
+  context?: FileEditorActionContext;
+}
+
+export interface FileEditorBlobContentProps {
+  content: Blob;
+  setContent: (content: Blob) => void;
+  dirty: boolean;
+  setDirty: (dirty: boolean) => void;
+  context?: FileEditorActionContext;
+}
+
 type FileEditorActionContent =
   | {
       contentType: 'string';
 
-      content: React.FC<{
-        content: string;
-        setContent: (content: string) => void;
-        dirty: boolean;
-        setDirty: (dirty: boolean) => void;
-      }>;
+      content: React.FC<FileEditorStringContentProps>;
     }
   | {
       contentType: 'blob';
 
-      content: React.FC<{
-        content: Blob;
-        setContent: (content: Blob) => void;
-        dirty: boolean;
-        setDirty: (dirty: boolean) => void;
-      }>;
+      content: React.FC<FileEditorBlobContentProps>;
     };
 
 type FileIconHandler = (
@@ -71,11 +91,18 @@ type FileOpenableHandler = (
 ) => FileOpenMode;
 type FileEditorAction = FileEditorActionBase & FileEditorActionContent;
 
+export interface FileContextMenuProps {
+  file: z.infer<typeof serverDirectoryEntrySchema>;
+  directory: string;
+  surface: 'table' | 'tree';
+}
+
 export class FilesRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.container.mergeFrom(other.container);
     this.editorContainer.mergeFrom(other.editorContainer);
     this.fileToolbar.mergeFrom(other.fileToolbar);
+    this.fileTreeToolbar.mergeFrom(other.fileTreeToolbar);
     this.fileActionBar.mergeFrom(other.fileActionBar);
     this.fileOperationsProgress.mergeFrom(other.fileOperationsProgress);
     this.fileSettings.mergeFrom(other.fileSettings);
@@ -83,6 +110,7 @@ export class FilesRegistry implements Registry {
     this.fileImageViewerSettings.mergeFrom(other.fileImageViewerSettings);
     this.newFileContextMenu.mergeFrom(other.newFileContextMenu);
     this.fileContextMenu.mergeFrom(other.fileContextMenu);
+    this.fileMassContextMenu.mergeFrom(other.fileMassContextMenu);
 
     this.fileIconHandlers.push(...other.fileIconHandlers);
     this.fileOpenableHandlers.push(...other.fileOpenableHandlers);
@@ -94,14 +122,14 @@ export class FilesRegistry implements Registry {
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
   public editorContainer: ContainerRegistry<ContainerProps> = new ContainerRegistry();
   public fileToolbar: ComponentListRegistry = new ComponentListRegistry();
+  public fileTreeToolbar: ComponentListRegistry = new ComponentListRegistry();
   public fileActionBar: ComponentListRegistry = new ComponentListRegistry();
   public fileOperationsProgress: ComponentListRegistry = new ComponentListRegistry();
   public fileSettings: ComponentListRegistry = new ComponentListRegistry();
   public fileEditorSettings: ComponentListRegistry = new ComponentListRegistry();
   public fileImageViewerSettings: ComponentListRegistry = new ComponentListRegistry();
   public newFileContextMenu: ContextMenuRegistry = new ContextMenuRegistry();
-  public fileContextMenu: ContextMenuRegistry<{ file: z.infer<typeof serverDirectoryEntrySchema> }> =
-    new ContextMenuRegistry();
+  public fileContextMenu: ContextMenuRegistry<FileContextMenuProps> = new ContextMenuRegistry();
   public fileMassContextMenu: ContextMenuRegistry = new ContextMenuRegistry();
 
   public fileIconHandlers: FileIconHandler[] = [];
@@ -138,6 +166,11 @@ export class FilesRegistry implements Registry {
     return this;
   }
 
+  public enterFileTreeToolbar(callback: (registry: ComponentListRegistry) => unknown): this {
+    callback(this.fileTreeToolbar);
+    return this;
+  }
+
   public enterFileActionBar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileActionBar);
     return this;
@@ -168,9 +201,7 @@ export class FilesRegistry implements Registry {
     return this;
   }
 
-  public enterFileContextMenu(
-    callback: (registry: ContextMenuRegistry<{ file: z.infer<typeof serverDirectoryEntrySchema> }>) => unknown,
-  ): this {
+  public enterFileContextMenu(callback: (registry: ContextMenuRegistry<FileContextMenuProps>) => unknown): this {
     callback(this.fileContextMenu);
     return this;
   }

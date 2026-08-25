@@ -12,6 +12,7 @@ interface FormattedTimestampProps {
   autoUpdate?: boolean;
   precise?: boolean;
   showNA?: boolean;
+  withTooltip?: boolean;
 }
 
 function FormattedTimestamp({
@@ -22,6 +23,7 @@ function FormattedTimestamp({
   autoUpdate = true,
   precise,
   showNA = false,
+  withTooltip = true,
 }: FormattedTimestampProps) {
   const { t } = useTranslations();
 
@@ -58,14 +60,20 @@ function FormattedTimestamp({
     return <span className={className}>{t('common.na', {})}</span>;
   }
 
-  return (
+  const formatted = (
+    <span className={classNames(withTooltip && 'cursor-help', className)}>{formatTimestamp(timestamp)}</span>
+  );
+
+  return withTooltip ? (
     <Tooltip
       label={formatDateTime(timestamp, precise, false)}
       className={tooltipClassName}
       innerClassName={tooltipInnerClassName}
     >
-      <span className={classNames('cursor-help', className)}>{formatTimestamp(timestamp)}</span>
+      {formatted}
     </Tooltip>
+  ) : (
+    formatted
   );
 }
 

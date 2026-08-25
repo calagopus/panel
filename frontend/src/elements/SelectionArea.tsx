@@ -27,10 +27,7 @@ interface SelectionAreaProps<T> {
   style?: CSSProperties;
   disabled?: boolean;
   fireEvents?: boolean;
-}
-
-interface SelectionAreaState {
-  isSelecting: boolean;
+  deferSelection?: boolean;
 }
 
 interface SelectableProps<T> {
@@ -43,6 +40,9 @@ interface CachedRect<T> {
   right: number;
   top: number;
   bottom: number;
+  checkbox: HTMLInputElement | null;
+  initiallySelected: boolean;
+  element: HTMLElement;
   item: T;
 }
 
@@ -52,6 +52,8 @@ interface SimpleBounds {
   top: number;
   bottom: number;
 }
+
+type SelectionMode = 'replace' | 'add' | 'toggle';
 
 let selectableIdCounter = 0;
 
@@ -100,7 +102,7 @@ class Selectable<T> extends PureComponent<SelectableProps<T>> {
   };
 }
 
-class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaState> {
+class SelectionArea<T> extends Component<SelectionAreaProps<T>> {
   static Selectable = Selectable;
 
   private containerRef = createRef<HTMLDivElement>();
@@ -111,9 +113,12 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
   private pendingSelectables = new Set<string>();
 
   private currentlySelected: T[] = [];
+  private previewedElements = new Set<HTMLElement>();
   private startPoint = { x: 0, y: 0 };
   private endPoint = { x: 0, y: 0 };
   private mouseDown = false;
+  private selectionStarted = false;
+  private selectionMode: SelectionMode = 'replace';
   private readonly SELECTION_THRESHOLD = 5;
 
   private lastClientX = 0;
@@ -121,30 +126,25 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
   private lastMouseEvent: MouseEvent | ReactMouseEvent | null = null;
 
   private rAFId: number | null = null;
-
-  constructor(props: SelectionAreaProps<T>) {
-    super(props);
-    this.state = {
-      isSelecting: false,
-    };
-  }
+  private contextValue: SelectionContextType<unknown> | null = null;
 
   componentWillUnmount(): void {
     window.removeEventListener('mousemove', this.handleMouseMove);
     window.removeEventListener('mouseup', this.handleMouseUp);
     window.removeEventListener('scroll', this.handleScroll, { capture: true });
     if (this.rAFId !== null) cancelAnimationFrame(this.rAFId);
+    this.clearSelectionPreview();
   }
 
   render(): ReactNode {
     const { children, className = '', style = {} } = this.props;
-    const contextValue: SelectionContextType<unknown> = {
+    this.contextValue ??= {
       registerSelectable: this.registerSelectable as never,
       unregisterSelectable: this.unregisterSelectable,
     };
 
     return (
-      <SelectionContext.Provider value={contextValue}>
+      <SelectionContext.Provider value={this.contextValue}>
         <div
           ref={this.containerRef}
           className={`selection-area ${className}`}
@@ -188,11 +188,19 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
     if (!element.isConnected) return;
 
     const rect = element.getBoundingClientRect();
+    const checkbox = element.matches('input[type="checkbox"]')
+      ? (element as HTMLInputElement)
+      : element.querySelector<HTMLInputElement>('input[type="checkbox"]');
     this.cachedItems.set(item, {
       left: rect.left - containerRect.left + container.scrollLeft,
       right: rect.right - containerRect.left + container.scrollLeft,
       top: rect.top - containerRect.top + container.scrollTop,
       bottom: rect.bottom - containerRect.top + container.scrollTop,
+      checkbox,
+      initiallySelected:
+        checkbox?.checked ??
+        (element.matches('[aria-selected="true"]') || !!element.querySelector('[aria-selected="true"]')),
+      element,
       item,
     });
   }
@@ -218,8 +226,12 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
     const container = this.containerRef.current!;
     const containerRect = container.getBoundingClientRect();
 
+    this.clearSelectionPreview();
     this.cachedItems.clear();
     this.pendingSelectables.clear();
+    this.currentlySelected = [];
+    this.selectionStarted = false;
+    this.selectionMode = e.ctrlKey || e.metaKey ? 'toggle' : e.shiftKey ? 'add' : 'replace';
     this.selectablesMap.forEach(({ element, item }) => {
       this.cacheSelectable(container, containerRect, element, item);
     });
@@ -279,14 +291,14 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
     const dx = Math.abs(x - this.startPoint.x);
     const dy = Math.abs(y - this.startPoint.y);
 
-    if (!this.state.isSelecting && (dx > this.SELECTION_THRESHOLD || dy > this.SELECTION_THRESHOLD)) {
-      this.setState({ isSelecting: true });
+    if (!this.selectionStarted && (dx > this.SELECTION_THRESHOLD || dy > this.SELECTION_THRESHOLD)) {
+      this.selectionStarted = true;
       if (originalEvent) {
         this.props.onSelectedStart?.(originalEvent);
       }
     }
 
-    if (this.state.isSelecting || dx > this.SELECTION_THRESHOLD || dy > this.SELECTION_THRESHOLD) {
+    if (this.selectionStarted) {
       this.endPoint = { x, y };
 
       const left = Math.min(this.startPoint.x, this.endPoint.x);
@@ -310,11 +322,14 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
         bottom: top + height,
       };
 
-      const newlySelectedItems = this.getSelectedItems(selectionBounds);
+      const previewedElements = this.props.deferSelection ? new Set<HTMLElement>() : undefined;
+      const newlySelectedItems = this.getSelectedItems(selectionBounds, previewedElements);
+
+      if (previewedElements) this.updateSelectionPreview(previewedElements);
 
       if (hasSelectionChanged(this.currentlySelected, newlySelectedItems)) {
         this.currentlySelected = newlySelectedItems;
-        this.props.onSelected?.(newlySelectedItems);
+        if (!this.props.deferSelection) this.props.onSelected?.(newlySelectedItems);
       }
     }
   }
@@ -324,12 +339,12 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
     window.removeEventListener('mouseup', this.handleMouseUp);
     window.removeEventListener('scroll', this.handleScroll, { capture: true });
 
-    if (this.rAFId !== null) {
-      cancelAnimationFrame(this.rAFId);
-      this.rAFId = null;
-    }
+    if (this.rAFId !== null) cancelAnimationFrame(this.rAFId);
+    this.rAFId = null;
+    this.measurePendingSelectables();
+    if (this.mouseDown) this.updateSelection(e.clientX, e.clientY, e);
 
-    if (!this.props.disabled && !this.state.isSelecting && this.mouseDown && this.props.fireEvents) {
+    if (!this.props.disabled && !this.selectionStarted && this.mouseDown && this.props.fireEvents) {
       const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
       if (target && !(target instanceof HTMLInputElement)) {
         const newEvent = new MouseEvent('click', {
@@ -352,16 +367,22 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
       this.selectionBoxRef.current.style.display = 'none';
     }
 
+    const committed = !this.props.disabled && this.selectionStarted && this.props.deferSelection;
+    if (committed) {
+      this.props.onSelected?.(this.currentlySelected);
+    }
+
+    this.clearSelectionPreview(!committed);
     this.cachedItems.clear();
     this.pendingSelectables.clear();
 
-    this.setState({ isSelecting: false });
     this.mouseDown = false;
+    this.selectionStarted = false;
     this.lastMouseEvent = null;
     this.props.onSelectedEnd?.();
   };
 
-  private getSelectedItems(selectionBounds: SimpleBounds): T[] {
+  private getSelectedItems(selectionBounds: SimpleBounds, previewedElements?: Set<HTMLElement>): T[] {
     const selected: CachedRect<T>[] = [];
 
     this.cachedItems.forEach((cached) => {
@@ -374,12 +395,48 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
         )
       ) {
         selected.push(cached);
+        previewedElements?.add(cached.element);
       }
     });
 
     selected.sort((a, b) => a.top - b.top || a.left - b.left);
 
     return selected.map((cached) => cached.item);
+  }
+
+  private updateSelectionPreview(elements: Set<HTMLElement>): void {
+    const next = new Set<HTMLElement>();
+
+    for (const cached of this.cachedItems.values()) {
+      const hit = elements.has(cached.element);
+      const selected =
+        this.selectionMode === 'add'
+          ? cached.initiallySelected || hit
+          : this.selectionMode === 'toggle'
+            ? cached.initiallySelected !== hit
+            : hit;
+
+      if (selected) next.add(cached.element);
+      if (cached.checkbox && cached.checkbox.checked !== selected) cached.checkbox.checked = selected;
+    }
+
+    for (const element of this.previewedElements) {
+      if (!next.has(element)) element.classList.remove('selection-area-preview');
+    }
+    for (const element of next) {
+      if (!this.previewedElements.has(element)) element.classList.add('selection-area-preview');
+    }
+    this.previewedElements = next;
+  }
+
+  private clearSelectionPreview(restoreCheckboxes = true): void {
+    for (const element of this.previewedElements) element.classList.remove('selection-area-preview');
+    if (restoreCheckboxes) {
+      for (const cached of this.cachedItems.values()) {
+        if (cached.checkbox) cached.checkbox.checked = cached.initiallySelected;
+      }
+    }
+    this.previewedElements.clear();
   }
 }
 

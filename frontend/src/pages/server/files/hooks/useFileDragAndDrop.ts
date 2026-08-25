@@ -5,41 +5,67 @@ interface UseFileDragAndDropOptions {
   enabled?: boolean;
 }
 
+const withRelativePath = (file: File, relativePath: string) => {
+  Object.defineProperty(file, 'webkitRelativePath', { configurable: true, value: relativePath });
+  return file;
+};
+
 async function traverseDirectory(entry: FileSystemDirectoryEntry, files: File[], path: string = ''): Promise<void> {
   return new Promise((resolve) => {
     const reader = entry.createReader();
 
     const readEntries = () => {
-      reader.readEntries(async (entries) => {
-        if (entries.length === 0) {
-          resolve();
-          return;
-        }
-
-        for (const entry of entries) {
-          if (entry.isFile) {
-            const fileEntry = entry as FileSystemFileEntry;
-            await new Promise<void>((resolveFile) => {
-              fileEntry.file((file) => {
-                const newFile = new File([file], `${path}/${file.name}`, {
-                  type: file.type,
-                  lastModified: file.lastModified,
-                });
-                files.push(newFile);
-                resolveFile();
-              });
-            });
-          } else if (entry.isDirectory) {
-            await traverseDirectory(entry as FileSystemDirectoryEntry, files, `${path}/${entry.name}`);
+      reader.readEntries(
+        async (entries) => {
+          if (entries.length === 0) {
+            resolve();
+            return;
           }
-        }
 
-        readEntries();
-      });
+          await Promise.all(
+            entries.map((entry) =>
+              entry.isFile
+                ? new Promise<void>((resolveFile) =>
+                    (entry as FileSystemFileEntry).file(
+                      (file) => {
+                        files.push(withRelativePath(file, `${path}/${file.name}`));
+                        resolveFile();
+                      },
+                      () => resolveFile(),
+                    ),
+                  )
+                : traverseDirectory(entry as FileSystemDirectoryEntry, files, `${path}/${entry.name}`),
+            ),
+          );
+
+          readEntries();
+        },
+        () => resolve(),
+      );
     };
 
     readEntries();
   });
+}
+
+export async function getFilesFromDataTransfer(dataTransfer: DataTransfer): Promise<File[]> {
+  const entries = Array.from(dataTransfer.items)
+    .filter((item) => item.kind === 'file')
+    .map((item) => ({
+      entry: item.webkitGetAsEntry?.() ?? null,
+      file: item.getAsFile(),
+    }));
+  const files: File[] = [];
+
+  for (const { entry, file } of entries) {
+    if (entry?.isDirectory) {
+      await traverseDirectory(entry as FileSystemDirectoryEntry, files, entry.name);
+    } else if (file) {
+      files.push(file);
+    }
+  }
+
+  return files.length > 0 ? files : Array.from(dataTransfer.files);
 }
 
 export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDropOptions) {
@@ -56,31 +82,7 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
 
       if (!enabled) return;
 
-      const items = Array.from(e.dataTransfer?.items || []);
-
-      const entries: Array<{ entry: FileSystemEntry | null; file: File | null }> = [];
-      for (const item of items) {
-        if (item.kind === 'file') {
-          entries.push({
-            entry: item.webkitGetAsEntry?.() ?? null,
-            file: item.getAsFile(),
-          });
-        }
-      }
-
-      const files: File[] = [];
-
-      for (const { entry, file } of entries) {
-        if (entry) {
-          if (entry.isDirectory) {
-            await traverseDirectory(entry as FileSystemDirectoryEntry, files, entry.name);
-          } else if (file) {
-            files.push(file);
-          }
-        } else if (file) {
-          files.push(file);
-        }
-      }
+      const files = e.dataTransfer ? await getFilesFromDataTransfer(e.dataTransfer) : [];
 
       if (files.length > 0) {
         await onDrop(files);

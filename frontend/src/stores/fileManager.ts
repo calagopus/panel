@@ -21,6 +21,7 @@ import {
   setUserSettingLocal,
   subscribeUserSetting,
 } from '@/lib/userSettings.ts';
+import type { FileMoveGroup } from '@/pages/server/files/fileMove.ts';
 import { FileUploader } from '@/stores/uploads.ts';
 
 export type ModalType =
@@ -57,6 +58,13 @@ export interface FileManagerExternals {
   directoryData: DirectoryResponse | null;
 }
 
+export interface FileManagerBrowsingContext {
+  directory: string;
+  primary?: boolean;
+  writable?: boolean;
+  fast?: boolean;
+}
+
 export interface FileManagerStore {
   externals: FileManagerExternals;
   isLoading: boolean;
@@ -68,11 +76,13 @@ export interface FileManagerStore {
   actingFilesSource: string | null;
   draggingFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
   draggingFilesSource: string | null;
+  draggingFileGroups: FileMoveGroup[];
   draggingTarget: string | null;
   selectedFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
   browsingBackup: z.infer<typeof serverBackupSchema> | null;
   browsingDirectory: string;
   setBrowsingDirectory: (directory: string) => void;
+  setBrowsingContext: (context: FileManagerBrowsingContext) => void;
   browsingEntries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>;
   setBrowsingEntries: (entries: Pagination<z.infer<typeof serverDirectoryEntrySchema>>) => void;
   browsingError: string | null;
@@ -117,11 +127,13 @@ export interface FileManagerStore {
   setAudioPlayerPlaybackRate: (rate: number) => void;
 
   resetEntries: () => void;
-  invalidateFilemanager: () => void;
+  invalidateFilemanager: (notifyListeners?: boolean) => void;
+  registerRefreshListener: (listener: () => void) => () => void;
   fileUploader: FileUploader;
   doActFiles: (mode: ActingFileMode | null, files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
   clearActingFiles: () => void;
   doDragFiles: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
+  doDragFileGroups: (groups: FileMoveGroup[]) => void;
   clearDraggingFiles: () => void;
   setDraggingTarget: (directory: string | null) => void;
   doSelectFiles: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
@@ -141,6 +153,7 @@ const noopFileUploader: FileUploader = {
   aggregatedUploadProgress: new Map(),
   totalUploadProgress: 0,
   uploadFiles: async () => undefined,
+  uploadFilesToDirectory: async () => undefined,
   cancelFileUpload: () => undefined,
   cancelFolderUpload: () => undefined,
   cancelAllUploads: () => undefined,
@@ -236,6 +249,7 @@ export const createFileManagerStore = (
 ) =>
   create<FileManagerStore>()((set, get) => {
     let selectionAnchor: z.infer<typeof serverDirectoryEntrySchema> | null = null;
+    const refreshListeners = new Set<() => void>();
 
     return {
       externals: initialExternals,
@@ -248,6 +262,7 @@ export const createFileManagerStore = (
       actingFilesSource: null,
       draggingFiles: new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
       draggingFilesSource: null,
+      draggingFileGroups: [],
       draggingTarget: null,
       selectedFiles: new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
       browsingBackup: null,
@@ -258,6 +273,18 @@ export const createFileManagerStore = (
 
           selectionAnchor = null;
           return { browsingDirectory: directory, selectedFiles: new ObjectSet('name') };
+        }),
+      setBrowsingContext: ({ directory, primary, writable, fast }) =>
+        set((state) => {
+          const next: Partial<FileManagerStore> = { browsingDirectory: directory };
+          if (state.browsingDirectory !== directory) {
+            selectionAnchor = null;
+            next.selectedFiles = new ObjectSet('name');
+          }
+          if (primary !== undefined) next.browsingPrimaryFilesystem = primary;
+          if (writable !== undefined) next.browsingWritableDirectory = writable;
+          if (fast !== undefined) next.browsingFastDirectory = fast;
+          return next;
         }),
       browsingEntries: getEmptyPaginationSet<z.infer<typeof serverDirectoryEntrySchema>>(),
       setBrowsingEntries: (entries) => set({ browsingEntries: entries }),
@@ -340,9 +367,11 @@ export const createFileManagerStore = (
 
         set({ browsingEntries: directoryData.entries });
       },
-      invalidateFilemanager: () => {
-        const { searchInfo, browsingDirectory, sortMode, doSelectFiles, clearActingFiles } = get();
-        const { serverUuid, queryClient } = get().externals;
+      invalidateFilemanager: (notifyListeners = true) => {
+        if (notifyListeners) refreshListeners.forEach((listener) => listener());
+
+        const { searchInfo, browsingDirectory, sortMode, doSelectFiles, clearActingFiles, externals } = get();
+        const { serverUuid, queryClient } = externals;
 
         if (searchInfo) {
           searchFiles(serverUuid, { root: browsingDirectory, ...searchInfo.filters }).then((entries) => {
@@ -374,6 +403,10 @@ export const createFileManagerStore = (
           })
           .catch((e) => console.error(e));
       },
+      registerRefreshListener: (listener) => {
+        refreshListeners.add(listener);
+        return () => refreshListeners.delete(listener);
+      },
       fileUploader: noopFileUploader,
       doActFiles: (mode, files) =>
         set((state) => ({
@@ -387,16 +420,26 @@ export const createFileManagerStore = (
           actingFiles: new ObjectSet('name'),
           actingFilesSource: null,
         }),
-      doDragFiles: (files) =>
-        set((state) => ({
-          draggingFiles: new ObjectSet('name', files),
-          draggingFilesSource: state.browsingDirectory,
-          draggingTarget: null,
-        })),
+      doDragFiles: (files) => get().doDragFileGroups([{ sourceDirectory: get().browsingDirectory, files }]),
+      doDragFileGroups: (groups) =>
+        set(() => {
+          const populatedGroups = groups.filter((group) => group.files.length > 0);
+
+          return {
+            draggingFiles: new ObjectSet(
+              'name',
+              populatedGroups.flatMap((group) => group.files),
+            ),
+            draggingFilesSource: populatedGroups.length === 1 ? populatedGroups[0].sourceDirectory : null,
+            draggingFileGroups: populatedGroups,
+            draggingTarget: null,
+          };
+        }),
       clearDraggingFiles: () =>
         set({
           draggingFiles: new ObjectSet('name'),
           draggingFilesSource: null,
+          draggingFileGroups: [],
           draggingTarget: null,
         }),
       setDraggingTarget: (directory) =>

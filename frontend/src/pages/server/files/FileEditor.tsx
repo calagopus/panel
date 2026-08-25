@@ -1,18 +1,10 @@
-import {
-  faArrowsRotate,
-  faClockRotateLeft,
-  faFileCirclePlus,
-  faFloppyDisk,
-  faTriangleExclamation,
-} from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faClockRotateLeft, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Audio } from '@gfazioli/mantine-audio';
 import { AvatarGroup } from '@mantine/core';
 import { type OnMount } from '@monaco-editor/react';
 import { join } from 'pathe';
-import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFileContent from '@/api/server/files/getFileContent.ts';
@@ -24,7 +16,6 @@ import Button from '@/elements/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
-import Select from '@/elements/input/Select.tsx';
 import MonacoEditor, { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -33,11 +24,9 @@ import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Title from '@/elements/Title.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { visualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -49,56 +38,16 @@ import FileBreadcrumbs from './FileBreadcrumbs.tsx';
 import FileConnectButton from './FileConnectButton.tsx';
 import FileEditorSettings from './FileEditorSettings.tsx';
 import FileImageViewerSettings from './FileImageViewerSettings.tsx';
+import { FileAudioPreview, FileImagePreview } from './FileMediaPreview.tsx';
+import { FileDraft, fileDraftKey, hashFileContent, purgeExpiredFileDrafts } from './fileEditorDrafts.ts';
 import useFileCollab from './hooks/useFileCollab.ts';
 import FileNameModal from './modals/FileNameModal.tsx';
-
-interface FileDraft {
-  content: string;
-  originalHash: string;
-  savedAt: number;
-}
-
-const DRAFT_KEY_PREFIX = 'panel:file-draft:';
-const DRAFT_TTL_MS = 3 * 24 * 60 * 60 * 1000;
-
-function hashContent(s: string): string {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) {
-    h = ((h << 5) + h + s.charCodeAt(i)) | 0;
-  }
-  return (h >>> 0).toString(16);
-}
-
-function draftKey(serverUuid: string, filePath: string): string {
-  return `${DRAFT_KEY_PREFIX}${serverUuid}:${filePath}`;
-}
-
-function purgeExpiredDrafts(): void {
-  const now = Date.now();
-  for (let i = localStorage.length - 1; i >= 0; i--) {
-    const key = localStorage.key(i);
-    if (!key?.startsWith(DRAFT_KEY_PREFIX)) continue;
-    try {
-      const draft: FileDraft = JSON.parse(localStorage.getItem(key)!);
-      if (now - draft.savedAt > DRAFT_TTL_MS) localStorage.removeItem(key);
-    } catch {
-      localStorage.removeItem(key);
-    }
-  }
-}
+import { findFileEditorAction, useFileEditorTitle } from './useFileEditorPresentation.ts';
+import useFileEditorQuickActions from './useFileEditorQuickActions.tsx';
 
 function FileEditorComponent() {
   const params = useParams<'action'>();
-
-  const matchedFileEditorAction = useMemo(() => {
-    if (!params.action) return null;
-
-    return (
-      window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions.find(
-        (action) => action.name === params.action,
-      ) || null
-    );
-  }, [params.action]);
+  const matchedFileEditorAction = findFileEditorAction(params.action);
 
   const { t } = useTranslations();
   const [searchParams, _] = useSearchParams();
@@ -111,11 +60,6 @@ function FileEditorComponent() {
     editorLineOverflow,
     editorFontSize,
     editorEngine,
-    imageViewerSmoothing,
-    audioPlayerVolume,
-    audioPlayerPlaybackRate,
-    setAudioPlayerVolume,
-    setAudioPlayerPlaybackRate,
     browsingPrimaryFilesystem,
     browsingWritableDirectory,
     browsingDirectory,
@@ -126,11 +70,6 @@ function FileEditorComponent() {
       editorLineOverflow: state.editorLineOverflow,
       editorFontSize: state.editorFontSize,
       editorEngine: state.editorEngine,
-      imageViewerSmoothing: state.imageViewerSmoothing,
-      audioPlayerVolume: state.audioPlayerVolume,
-      audioPlayerPlaybackRate: state.audioPlayerPlaybackRate,
-      setAudioPlayerVolume: state.setAudioPlayerVolume,
-      setAudioPlayerPlaybackRate: state.setAudioPlayerPlaybackRate,
       browsingPrimaryFilesystem: state.browsingPrimaryFilesystem,
       browsingWritableDirectory: state.browsingWritableDirectory,
       browsingDirectory: state.browsingDirectory,
@@ -198,7 +137,7 @@ function FileEditorComponent() {
         setPendingDraft(null);
       } else {
         savedContentRef.current = hasEditor() ? getEditorValue() : savedContentRef.current;
-        originalHashRef.current = hashContent(savedContentRef.current);
+        originalHashRef.current = hashFileContent(savedContentRef.current);
       }
       setDirty(dirty);
     },
@@ -207,8 +146,8 @@ function FileEditorComponent() {
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
       setDirty(false);
       savedContentRef.current = hasEditor() ? getEditorValue() : savedContentRef.current;
-      originalHashRef.current = hashContent(savedContentRef.current);
-      localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
+      originalHashRef.current = hashFileContent(savedContentRef.current);
+      localStorage.removeItem(fileDraftKey(server.uuid, join(browsingDirectory, fileName)));
 
       if (collabSavingRef.current) {
         collabSavingRef.current = false;
@@ -245,7 +184,7 @@ function FileEditorComponent() {
   }, [searchParams]);
 
   useEffect(() => {
-    purgeExpiredDrafts();
+    purgeExpiredFileDrafts();
   }, []);
 
   useEffect(() => {
@@ -280,9 +219,9 @@ function FileEditorComponent() {
             savedContentRef.current = content;
 
             if (params.action === 'edit') {
-              const hash = hashContent(content);
+              const hash = hashFileContent(content);
               originalHashRef.current = hash;
-              const key = draftKey(server.uuid, join(browsingDirectory, fileName));
+              const key = fileDraftKey(server.uuid, join(browsingDirectory, fileName));
               const stored = localStorage.getItem(key);
               if (stored) {
                 try {
@@ -448,7 +387,7 @@ function FileEditorComponent() {
           originalHash: originalHashRef.current,
           savedAt: Date.now(),
         };
-        localStorage.setItem(draftKey(server.uuid, path), JSON.stringify(draft));
+        localStorage.setItem(fileDraftKey(server.uuid, path), JSON.stringify(draft));
       }, 1000);
     }
   };
@@ -457,7 +396,7 @@ function FileEditorComponent() {
     const path = join(browsingDirectory, fileName);
 
     if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-    localStorage.removeItem(draftKey(server.uuid, path));
+    localStorage.removeItem(fileDraftKey(server.uuid, path));
     setPendingDraft(null);
 
     if (collabActiveRef.current && collab.reload()) {
@@ -472,7 +411,7 @@ function FileEditorComponent() {
         if (draftPathRef.current !== path || !hasEditor()) return;
 
         savedContentRef.current = text;
-        originalHashRef.current = hashContent(text);
+        originalHashRef.current = hashFileContent(text);
         setEditorValue(text);
         setDirty(false);
       })
@@ -529,9 +468,9 @@ function FileEditorComponent() {
         });
 
         savedContentRef.current = currentContent;
-        originalHashRef.current = hashContent(currentContent);
+        originalHashRef.current = hashFileContent(currentContent);
         if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-        localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, name ?? fileName)));
+        localStorage.removeItem(fileDraftKey(server.uuid, join(browsingDirectory, name ?? fileName)));
         addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
 
         if (name) {
@@ -559,47 +498,22 @@ function FileEditorComponent() {
     };
   });
 
-  useQuickActions([
-    {
-      id: 'files.editor.save',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.quickAction.saveFile', {}),
-      icon: <FontAwesomeIcon icon={faFloppyDisk} />,
-      permission: collab.active ? 'files.update' : 'files.create',
-      isVisible: () => params.action === 'edit' && !!fileName && browsingWritableDirectory && !saving,
-      perform: () => saveFile(),
-    },
-    {
-      id: 'files.editor.create',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.quickAction.createFile', {}),
-      icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
-      permission: 'files.create',
-      isVisible: () => params.action === 'new' && browsingWritableDirectory && !saving,
-      perform: () => setNameModalOpen(true),
-    },
-    {
-      id: 'files.editor.revisions',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.tooltip.fileHistory', {}),
-      keywords: ['revisions', 'versions'],
-      icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
-      permission: 'files.read-content',
-      isVisible: () => params.action === 'edit' && !!fileName && browsingPrimaryFilesystem,
-      perform: () => setRevisionsOpen(true),
-    },
-    {
-      id: 'files.editor.revertToDisk',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.tooltip.revertToDisk', {}),
-      keywords: ['revert', 'discard'],
-      icon: <FontAwesomeIcon icon={faArrowsRotate} />,
-      permission: collab.active ? 'files.update' : 'files.read-content',
-      isVisible: () =>
-        dirty && params.action === 'edit' && !!fileName && browsingWritableDirectory && !collab.conflict?.deleted,
-      perform: () => setRevertConfirm(true),
-    },
-  ]);
+  useFileEditorQuickActions({
+    action: params.action,
+    fileName,
+    writable: browsingWritableDirectory,
+    primary: browsingPrimaryFilesystem,
+    saving,
+    dirty,
+    collaborationActive: collab.active,
+    collaborationDeleted: !!collab.conflict?.deleted,
+    onSave: () => saveFile(),
+    onCreate: () => setNameModalOpen(true),
+    onShowRevisions: () => setRevisionsOpen(true),
+    onRevert: () => setRevertConfirm(true),
+  });
+
+  const title = useFileEditorTitle(params.action, fileName, matchedFileEditorAction?.title(fileName));
 
   if (!matchedFileEditorAction && !['new', 'edit', 'image', 'audio'].includes(params.action!)) {
     return (
@@ -608,16 +522,6 @@ function FileEditorComponent() {
       </ServerContentContainer>
     );
   }
-
-  const title = matchedFileEditorAction
-    ? matchedFileEditorAction.title(fileName)
-    : fileName
-      ? params.action === 'image'
-        ? t('pages.server.files.titleEditorViewing', { file: fileName })
-        : params.action === 'audio'
-          ? t('pages.server.files.titleEditorPlaying', { file: fileName })
-          : t('pages.server.files.titleEditorEditing', { file: fileName })
-      : t('pages.server.files.titleEditorNew', {});
 
   const showRevertAction =
     (collab.active ? canUpdate : canReadContent) &&
@@ -711,7 +615,7 @@ function FileEditorComponent() {
         title={t('pages.server.files.modal.draftRestore.title', {})}
         opened={pendingDraft !== null}
         onClose={() => {
-          localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
+          localStorage.removeItem(fileDraftKey(server.uuid, join(browsingDirectory, fileName)));
           setPendingDraft(null);
         }}
       >
@@ -738,7 +642,7 @@ function FileEditorComponent() {
           <Button
             variant='default'
             onClick={() => {
-              localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
+              localStorage.removeItem(fileDraftKey(server.uuid, join(browsingDirectory, fileName)));
               setPendingDraft(null);
             }}
           >
@@ -844,7 +748,7 @@ function FileEditorComponent() {
         opened={blocker.state === 'blocked'}
         onClose={() => blocker.reset()}
         onConfirmed={() => {
-          localStorage.removeItem(draftKey(server.uuid, join(browsingDirectory, fileName)));
+          localStorage.removeItem(fileDraftKey(server.uuid, join(browsingDirectory, fileName)));
           blocker.proceed();
         }}
         confirm={t('common.button.leavePage', {})}
@@ -929,71 +833,9 @@ function FileEditorComponent() {
                   setDirty={setDirty}
                 />
               ) : params.action === 'image' ? (
-                <div className='h-full w-full flex flex-row justify-center'>
-                  <TransformWrapper minScale={0.5} centerOnInit>
-                    <TransformComponent wrapperClass='w-[calc(100%-4rem)]! h-7/8! rounded-md'>
-                      <img
-                        src={content}
-                        alt={fileName}
-                        style={{
-                          imageRendering: imageViewerSmoothing ? undefined : 'pixelated',
-                        }}
-                      />
-                    </TransformComponent>
-                  </TransformWrapper>
-                </div>
+                <FileImagePreview src={content} name={fileName} />
               ) : params.action === 'audio' ? (
-                <div className='h-full w-full flex flex-row justify-center items-center'>
-                  <Audio
-                    size='xl'
-                    w='50%'
-                    src={content}
-                    volume={audioPlayerVolume}
-                    onVolumeChange={(volume) => setAudioPlayerVolume(volume)}
-                    playbackRate={audioPlayerPlaybackRate}
-                    onError={(err) => (err ? addToast(err.message, 'error') : null)}
-                  >
-                    <Audio.Waveform height={120} mirrorGap={2} />
-                    <Audio.Controls>
-                      <Audio.SkipButton
-                        seconds={-15}
-                        label={t('pages.server.files.tooltip.back', {
-                          seconds: 15,
-                        })}
-                      />
-                      <Audio.PlayButton
-                        playLabel={t('pages.server.files.tooltip.play', {})}
-                        pauseLabel={t('pages.server.files.tooltip.pause', {})}
-                      />
-                      <Audio.SkipButton
-                        seconds={15}
-                        label={t('pages.server.files.tooltip.forward', {
-                          seconds: 15,
-                        })}
-                      />
-                      <Audio.Timeline />
-                      <Audio.TimeDisplay />
-                      <Audio.MuteButton
-                        muteLabel={t('pages.server.files.tooltip.mute', {})}
-                        unmuteLabel={t('pages.server.files.tooltip.unmute', {})}
-                      />
-                      <Audio.VolumeSlider />
-                      <Select
-                        value={audioPlayerPlaybackRate.toString()}
-                        onChange={(value) => setAudioPlayerPlaybackRate(Number(value))}
-                        data={[
-                          { value: '0.5', label: '0.5x' },
-                          { value: '0.75', label: '0.75x' },
-                          { value: '1', label: '1x' },
-                          { value: '1.25', label: '1.25x' },
-                          { value: '1.5', label: '1.5x' },
-                          { value: '2', label: '2x' },
-                        ]}
-                        style={{ width: 80 }}
-                      />
-                    </Audio.Controls>
-                  </Audio>
-                </div>
+                <FileAudioPreview src={content} />
               ) : editorEngine === 'pierre' ? (
                 <PierreEditor
                   height='100%'

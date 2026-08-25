@@ -1,12 +1,14 @@
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faCode, faFolderOpen, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useIntersection, useMergedRef } from '@mantine/hooks';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { join } from 'pathe';
 import {
+  lazy,
   memo,
   type Ref,
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -20,13 +22,16 @@ import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
+import ActionIcon from '@/elements/ActionIcon.tsx';
 import Card from '@/elements/Card.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
+import SegmentedControl from '@/elements/SegmentedControl.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Table, { TableData, TableHeaderProps, TableRow } from '@/elements/Table.tsx';
 import Title from '@/elements/Title.tsx';
+import Tooltip from '@/elements/Tooltip.tsx';
 import { isOpenableFile } from '@/lib/files.ts';
 import { serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
 import FileActionBar from '@/pages/server/files/FileActionBar.tsx';
@@ -151,7 +156,7 @@ const SelectableFileRow = memo(function SelectableFileRow({
   );
 });
 
-function ServerFilesComponent() {
+function FileBrowser() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
   const { addToast } = useToast();
@@ -425,22 +430,6 @@ function ServerFilesComponent() {
 
   return (
     <div className='h-fit relative'>
-      <FileModals />
-      <FileUpload />
-      <FileActionBar />
-
-      <Group justify='space-between' align='center' mb='md'>
-        <Group>
-          <Title order={1}>{t('pages.server.files.title', {})}</Title>
-
-          <FileSettings />
-        </Group>
-        <Group>
-          <FileOperationsProgress />
-          <FileToolbar />
-        </Group>
-      </Group>
-
       <FileDiskUsageBar />
 
       <Card mb='sm'>
@@ -454,6 +443,7 @@ function ServerFilesComponent() {
           <SelectionArea
             onSelectedStart={onSelectedStart}
             onSelected={onSelected}
+            deferSelection
             fireEvents={false}
             className='h-full'
             disabled={anyActing}
@@ -504,6 +494,120 @@ function ServerFilesComponent() {
           </SelectionArea>
         )}
       </FileMassContextMenu>
+    </div>
+  );
+}
+
+type FileManagerView = 'files' | 'editor';
+const FileTreeWorkspace = lazy(() => import('@/pages/server/files/FileTreeWorkspace.tsx'));
+const FILE_MANAGER_VIEW_STORAGE_KEY = 'file_manager_view';
+const fileTreeVisibilityStorageKey = (serverUuid: string) => `file_manager_tree_visible:${serverUuid}`;
+
+const getStoredFileManagerView = (): FileManagerView =>
+  localStorage.getItem(FILE_MANAGER_VIEW_STORAGE_KEY) === 'editor' ? 'editor' : 'files';
+
+const getStoredFileTreeVisibility = (serverUuid: string) =>
+  localStorage.getItem(fileTreeVisibilityStorageKey(serverUuid)) !== 'false';
+
+function ServerFilesComponent() {
+  const { t } = useTranslations();
+  const serverUuid = useServerStore((state) => state.server.uuid);
+  const doOpenModal = useFileManagerStore((state) => state.doOpenModal);
+  const [view, setView] = useState<FileManagerView>(getStoredFileManagerView);
+  const [fileTreeVisible, setFileTreeVisible] = useState(() => getStoredFileTreeVisibility(serverUuid));
+
+  useEffect(() => setFileTreeVisible(getStoredFileTreeVisibility(serverUuid)), [serverUuid]);
+
+  const changeView = (value: string) => {
+    if (value !== 'files' && value !== 'editor') return;
+
+    localStorage.setItem(FILE_MANAGER_VIEW_STORAGE_KEY, value);
+    setView(value);
+  };
+
+  const toggleFileTree = () => {
+    setFileTreeVisible((visible) => {
+      localStorage.setItem(fileTreeVisibilityStorageKey(serverUuid), String(!visible));
+      return !visible;
+    });
+  };
+
+  return (
+    <div data-file-manager-page className='flex w-full min-w-0 flex-col'>
+      <FileModals />
+      <FileUpload showOverlay={view === 'files'} />
+      <FileActionBar />
+
+      <Group justify='space-between' align='center' mb='md'>
+        <Group>
+          <Title order={1}>
+            {t(view === 'editor' ? 'pages.server.files.view.editor' : 'pages.server.files.view.files', {})}
+          </Title>
+          <FileSettings />
+        </Group>
+
+        <Group>
+          {view === 'editor' && (
+            <Tooltip label={t('pages.server.files.tooltip.advancedSearch', {})}>
+              <ActionIcon
+                type='button'
+                variant='subtle'
+                color='gray'
+                aria-label={t('pages.server.files.tooltip.advancedSearch', {})}
+                onClick={() => doOpenModal('search')}
+              >
+                <FontAwesomeIcon icon={faSearch} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+
+          <SegmentedControl
+            value={view}
+            onChange={changeView}
+            data={[
+              {
+                value: 'files',
+                label: (
+                  <FontAwesomeIcon
+                    icon={faFolderOpen}
+                    title={t('pages.server.files.view.files', {})}
+                    aria-label={t('pages.server.files.view.files', {})}
+                    fixedWidth
+                  />
+                ),
+              },
+              {
+                value: 'editor',
+                label: (
+                  <FontAwesomeIcon
+                    icon={faCode}
+                    title={t('pages.server.files.view.editor', {})}
+                    aria-label={t('pages.server.files.view.editor', {})}
+                    fixedWidth
+                  />
+                ),
+              },
+            ]}
+          />
+
+          <FileOperationsProgress />
+          <FileToolbar />
+        </Group>
+      </Group>
+
+      {view === 'files' ? (
+        <FileBrowser />
+      ) : (
+        <Suspense
+          fallback={
+            <div className='flex justify-center py-16'>
+              <Spinner size={48} />
+            </div>
+          }
+        >
+          <FileTreeWorkspace key={serverUuid} fileTreeVisible={fileTreeVisible} onToggleFileTree={toggleFileTree} />
+        </Suspense>
+      )}
     </div>
   );
 }

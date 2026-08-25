@@ -1,5 +1,18 @@
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
+let relativeTimeLanguage = '';
+let relativeTimeFormatter: Intl.RelativeTimeFormat | null = null;
+
+function getRelativeTimeFormatter(): Intl.RelativeTimeFormat {
+  const language = getTranslations().language;
+  if (!relativeTimeFormatter || relativeTimeLanguage !== language) {
+    relativeTimeLanguage = language;
+    relativeTimeFormatter = new Intl.RelativeTimeFormat(language, { numeric: 'auto' });
+  }
+
+  return relativeTimeFormatter;
+}
+
 export function formatMilliseconds(uptime: number, short = true, withSeconds = true) {
   const uptimeSeconds = Math.floor(uptime / 1000);
 
@@ -71,7 +84,7 @@ export function formatTimestamp(timestamp: string | number | Date) {
     return formatDateTime(timestamp);
   }
 
-  const rtf = new Intl.RelativeTimeFormat(getTranslations().language, { numeric: 'auto' });
+  const rtf = getRelativeTimeFormatter();
 
   if (absSeconds < 60) {
     return rtf.format(diffSeconds, 'second');
