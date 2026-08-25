@@ -102,49 +102,11 @@
   --file-manager-workspace-height: calc(100dvh - 8rem);
   --file-manager-workspace-min-height: 42rem;
   --file-manager-workspace-gap: 0.75rem;
-  --file-manager-workspace-divider-color: var(--mantine-color-default-border);
   --file-manager-tree-width: 20rem;
   --file-manager-tree-collapsed-width: 2.75rem;
-  --file-manager-tree-transition-duration: 180ms;
-  --file-manager-tree-fade-duration: 120ms;
   --file-manager-tree-min-content-width: 39rem;
   --file-manager-tree-columns: 20rem 6.5rem 8.5rem 2rem;
   --file-manager-editor-min-width: 40rem;
-  --file-manager-editor-pane-min-width: 30rem;
-  --file-manager-editor-resize-handle-width: 0.75rem;
-  --file-manager-editor-resize-divider-width: 2px;
-  --file-manager-editor-active-pane-border-color: transparent;
-  --file-manager-audio-max-width: 42rem;
-  --file-manager-tree-row-height: 32px;
-  --file-manager-tree-scrollbar-size: 0.5rem;
-  --file-manager-toolbar-height: 2.75rem;
-  --file-manager-toolbar-padding-inline: 0.5rem;
-  --file-manager-row-padding-inline: 0.625rem;
-  --file-manager-row-gap: 0.5rem;
-  --file-manager-column-gap: 0.5rem;
-  --file-manager-tab-height: 2.625rem;
-  --file-manager-tab-scrollbar-height: 0.75rem;
-  --file-manager-tab-max-width: 14rem;
-  --file-manager-tab-gap: 0.5rem;
-  --file-manager-tab-padding-inline: 1rem;
-  --file-manager-tab-close-margin: 0.375rem;
-  --file-manager-active-tab-border-width: 2px;
-  --file-manager-editor-header-height: 3rem;
-  --file-manager-editor-header-gap: 0.75rem;
-  --file-manager-editor-header-padding-inline: 0.75rem;
-  --file-manager-folder-color: var(--mantine-color-yellow-5);
-  --file-manager-file-color: var(--mantine-color-dimmed);
-  --file-manager-selection-background: var(--mantine-color-blue-light);
-  --file-manager-selection-border-color: var(--mantine-color-blue-5);
-  --file-manager-selection-border-width: 3px;
-}
-
-.file-manager-workspace {
-  align-self: stretch;
-  width: 100%;
-  max-width: none;
-  overflow-x: auto;
-  overflow-y: hidden;
 }
 
 .file-manager-workspace-grid {
@@ -168,32 +130,13 @@
   grid-template-columns: var(--file-manager-tree-collapsed-width) minmax(var(--file-manager-editor-min-width), 1fr);
 }
 
-.file-manager-tree-shell {
-  width: var(--file-manager-tree-width);
-  height: var(--file-manager-workspace-height);
-  min-height: var(--file-manager-workspace-min-height);
-  min-width: 0;
-  overflow: hidden;
-  transition: width var(--file-manager-tree-transition-duration) ease;
-}
-
-.file-manager-tree-shell[data-file-manager-tree-collapsed="true"] {
-  width: var(--file-manager-tree-collapsed-width);
-}
-
-.file-manager-tree-panel,
-.file-manager-editor-panel {
-  height: var(--file-manager-workspace-height);
-  min-height: var(--file-manager-workspace-min-height);
-}
-
 [data-file-manager-tree-header],
 [data-file-manager-tree-table],
 [data-file-manager-tree-selection-control],
 [data-file-manager-tree-actions] {
   opacity: 1;
   visibility: visible;
-  transition: opacity var(--file-manager-tree-fade-duration) ease;
+  transition: opacity 120ms ease;
 }
 
 .file-manager-tree-shell[data-file-manager-tree-collapsed="true"] [data-file-manager-tree-header],
@@ -204,35 +147,17 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--file-manager-tree-fade-duration) ease,
-    visibility 0s linear var(--file-manager-tree-fade-duration);
-}
-
-.file-manager-editor-panel {
-  width: 100%;
-  min-width: var(--file-manager-editor-min-width);
-}
-
-.file-manager-editor-pane {
-  height: 100%;
-}
-
-.file-manager-editor-pane-active {
-  box-shadow: inset 0 0 0 1px var(--file-manager-editor-active-pane-border-color);
-}
-
-.file-manager-editor-resize-handle {
-  position: relative;
-  width: var(--file-manager-editor-resize-handle-width);
+    opacity 120ms ease,
+    visibility 0s linear 120ms;
 }
 
 .file-manager-editor-resize-handle::after {
   position: absolute;
   inset-block: 0.5rem;
   left: 50%;
-  width: var(--file-manager-editor-resize-divider-width);
+  width: 2px;
   border-radius: var(--mantine-radius-xl);
-  background-color: var(--file-manager-workspace-divider-color);
+  background-color: var(--mantine-color-default-border);
   content: "";
   transform: translateX(-50%);
   transition: background-color 120ms ease;
@@ -243,54 +168,17 @@
   background-color: var(--mantine-primary-color-filled);
 }
 
-.file-manager-tree-columns,
-.file-manager-tree-row {
-  grid-template-columns: var(--file-manager-tree-columns);
-  column-gap: var(--file-manager-column-gap);
-}
-
-.file-manager-tree-columns {
-  height: var(--file-manager-tree-row-height);
-}
-
-.file-manager-tree-row {
-  contain: layout paint;
-}
-
 .selection-area-preview {
-  background-color: var(--file-manager-selection-background) !important;
+  background-color: var(--mantine-color-blue-light) !important;
 }
 
-.selection-area-preview > .file-manager-tree-row {
-  background-color: var(--file-manager-selection-background) !important;
-  box-shadow: inset var(--file-manager-selection-border-width) 0 0 var(--file-manager-selection-border-color) !important;
-}
-
-.file-manager-editor-tabs,
-.file-manager-editor-tab {
-  min-height: var(--file-manager-tab-height);
-}
-
-.file-manager-editor-tabs {
-  height: calc(var(--file-manager-tab-height) + var(--file-manager-tab-scrollbar-height));
+.selection-area-preview > [data-file-manager-tree-row] {
+  background-color: var(--mantine-color-blue-light) !important;
+  box-shadow: inset 3px 0 0 var(--mantine-color-blue-5) !important;
 }
 
 .file-manager-editor-tabs::-webkit-scrollbar {
-  height: var(--file-manager-tab-scrollbar-height);
-}
-
-.file-manager-editor-tab {
-  height: var(--file-manager-tab-height);
-  gap: var(--file-manager-tab-gap);
-  border-bottom-width: var(--file-manager-active-tab-border-width);
-}
-
-.file-manager-folder-icon {
-  color: var(--file-manager-folder-color);
-}
-
-.file-manager-file-icon {
-  color: var(--file-manager-file-color);
+  height: 0.75rem;
 }
 
 @media (max-width: 47.999rem) {
@@ -299,19 +187,9 @@
     grid-template-columns: minmax(var(--file-manager-tree-min-content-width), 1fr);
     min-width: max(var(--file-manager-tree-min-content-width), var(--file-manager-editor-min-width));
   }
-
-  .file-manager-tree-shell[data-file-manager-tree-collapsed="true"] {
-    height: var(--file-manager-toolbar-height);
-    min-height: var(--file-manager-toolbar-height);
-  }
-
-  .file-manager-tree-shell {
-    width: 100%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .file-manager-tree-shell,
   [data-file-manager-tree-header],
   [data-file-manager-tree-table],
   [data-file-manager-tree-selection-control],

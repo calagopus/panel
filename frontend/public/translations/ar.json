@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "الملفات",
+          "editorNotFound": {
+            "title": "غير موجود",
+            "content": "لم يتم العثور على المحرر."
+          },
+          "view": {
+            "files": "الملفات",
+            "editor": "المحرر"
+          },
+          "tree": {
+            "empty": "هذا المجلد فارغ",
+            "loadMore": "تحميل المزيد",
+            "retry": "إعادة المحاولة",
+            "reload": "إعادة تحميل الملفات",
+            "show": "إظهار شجرة الملفات",
+            "hide": "إخفاء شجرة الملفات",
+            "searchPlaceholder": "البحث في الملفات...",
+            "noSearchResults": "لا توجد ملفات مطابقة",
+            "upload": "رفع",
+            "uploadFromComputer": "رفع من الكمبيوتر",
+            "uploadFromUrl": "رفع من رابط",
+            "selectItem": "تحديد {name}",
+            "deselectItem": "إلغاء تحديد {name}",
+            "selectFileToOpen": "اختر ملفًا من الشجرة لفتحه.",
+            "noEditorAvailable": "لا يتوفر محرر لهذا النوع من الملفات.",
+            "editorTabsLabel": "الملفات المفتوحة",
+            "closeEditorTab": "إغلاق {name}",
+            "unsavedTab": "يحتوي {name} على تغييرات غير محفوظة",
+            "dropToSplit": "أفلت لفتحه في جزء محرر جديد",
+            "resizeEditorPanes": "تغيير حجم أجزاء المحرر"
+          },
           "titleEditorViewing": "عرض {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "تعديل {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "أفلت الملفات هنا للرفع",
+            "title": "أفلت الملفات أو المجلدات هنا لرفعها",
             "subtitle": "أفلت لبدء الرفع"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "البحث المتقدم",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "سرعة التشغيل"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "فلاتر متقدمة",
               "pathPatterns": "أنماط المسار",
               "include": "تضمين",
+              "includePlaceholder": "مثال: *.js، src/**",
               "exclude": "استبعاد",
+              "excludePlaceholder": "مثال: node_modules/**",
               "fileContent": "محتوى الملف",
               "searchText": "نص البحث",
+              "contentPlaceholder": "النص المراد البحث عنه في الملفات",
               "maxFileSize": "الحد الأقصى لحجم الملف",
               "includeOversized": "تضمين الملفات الكبيرة جداً",
               "includeOversizedDescription": "يتضمن الملفات التي تطابق المرشحات الأخرى ولكنها كبيرة جدًا للبحث فيها.",

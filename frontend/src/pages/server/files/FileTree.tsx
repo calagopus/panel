@@ -19,11 +19,11 @@ import {
   EMPTY_DIRECTORY_STATE,
   FileTreeProps,
   FileTreeRow as FileTreeRowData,
-  getFileTreeRowHeight,
   groupTreeItems,
   identifyTreeItem,
   isExternalFileDrag,
   ROOT_DIRECTORY,
+  TREE_ROW_HEIGHT,
   TreeDirectoryCapabilities,
   TreeSelectionItem,
 } from '@/pages/server/files/fileTreeData.ts';
@@ -346,7 +346,7 @@ function FileTree({ onOpenFile, collapsed, onToggleCollapsed }: FileTreeProps) {
       ? isDirectoryWritable(selectedItems[0].path, selectedItems[0].parent, selectedItems[0].entry.virtual)
       : (directories[createTarget]?.writable ?? false);
   const treeLoading = Object.values(directories).some((directory) => directory.loading);
-  const rowHeight = useMemo(getFileTreeRowHeight, []);
+  const rowHeight = TREE_ROW_HEIGHT;
   const massSelectionDirectory =
     selectedItems.length > 1 && selectedItems.every((item) => item.parent === selectedItems[0].parent)
       ? selectedItems[0].parent
@@ -656,7 +656,7 @@ function FileTree({ onOpenFile, collapsed, onToggleCollapsed }: FileTreeProps) {
         <Card
           ref={treeRef}
           p={0}
-          className='file-manager-tree-panel flex w-full flex-col overflow-hidden transition-colors'
+          className='flex h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) w-full flex-col overflow-hidden transition-colors'
           data-file-manager-tree
           data-file-tree-directory={ROOT_DIRECTORY}
           data-file-tree-drop-target={ROOT_DIRECTORY}
@@ -712,9 +712,9 @@ function FileTree({ onOpenFile, collapsed, onToggleCollapsed }: FileTreeProps) {
             ref={headerRef}
             role='row'
             data-file-manager-tree-header
-            className='file-manager-tree-columns grid min-w-(--file-manager-tree-min-content-width) shrink-0 items-center border-b border-(--mantine-color-default-border) text-xs font-medium text-(--mantine-color-dimmed) will-change-transform'
+            className='grid h-8 min-w-(--file-manager-tree-min-content-width) shrink-0 grid-cols-(--file-manager-tree-columns) items-center gap-x-2 border-b border-(--mantine-color-default-border) text-xs font-medium text-(--mantine-color-dimmed) will-change-transform'
           >
-            <span className='pl-(--file-manager-row-padding-inline)'>{t('common.table.columns.name', {})}</span>
+            <span className='pl-2.5'>{t('common.table.columns.name', {})}</span>
             <span>{t('common.table.columns.size', {})}</span>
             <span>{t('pages.server.files.table.columns.modified', {})}</span>
             <span aria-hidden='true' />

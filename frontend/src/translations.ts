@@ -4637,6 +4637,10 @@ const baseTranslations = defineTranslations({
         },
         files: {
           title: 'Files',
+          editorNotFound: {
+            title: 'Not Found',
+            content: 'Editor not found.',
+          },
           view: {
             files: 'Files',
             editor: 'Editor',
@@ -4755,7 +4759,7 @@ const baseTranslations = defineTranslations({
             cancelAllOperations: 'Cancel All Operations',
           },
           dropzone: {
-            title: 'Drop files here to upload',
+            title: 'Drop files or folders here to upload',
             subtitle: 'Release to start uploading',
           },
           settings: {
@@ -5014,9 +5018,12 @@ const baseTranslations = defineTranslations({
               advancedFilters: 'Advanced Filters',
               pathPatterns: 'Path Patterns',
               include: 'Include',
+              includePlaceholder: 'e.g., *.js, src/**',
               exclude: 'Exclude',
+              excludePlaceholder: 'e.g., node_modules/**',
               fileContent: 'File Content',
               searchText: 'Search text',
+              contentPlaceholder: 'Text to find in files',
               maxFileSize: 'Max file size',
               includeOversized: 'Include oversized files',
               includeOversizedDescription: 'Includes files that match other filters but are too large to search.',

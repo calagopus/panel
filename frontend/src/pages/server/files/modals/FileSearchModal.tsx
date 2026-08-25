@@ -188,7 +188,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                 icon={faSliders}
                 size='xs'
                 style={{
-                  color: activeFiltersCount > 0 ? '#fff' : 'var(--mantine-color-dimmed)',
+                  color: activeFiltersCount > 0 ? 'var(--mantine-color-white)' : 'var(--mantine-color-dimmed)',
                 }}
               />
             </Box>
@@ -203,7 +203,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                   padding: '2px 8px',
                   fontSize: 11,
                   fontWeight: 600,
-                  color: '#fff',
+                  color: 'var(--mantine-color-white)',
                 }}
               >
                 {activeFiltersCount}
@@ -236,7 +236,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                 <Group grow align='start'>
                   <TagsInput
                     label={t('pages.server.files.modal.searchFiles.include', {})}
-                    placeholder='e.g., *.js, src/**'
+                    placeholder={t('pages.server.files.modal.searchFiles.includePlaceholder', {})}
                     value={form.values.pathFilter?.include ?? []}
                     onChange={(value) =>
                       form.setFieldValue('pathFilter', {
@@ -248,7 +248,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                   />
                   <TagsInput
                     label={t('pages.server.files.modal.searchFiles.exclude', {})}
-                    placeholder='e.g., node_modules/**'
+                    placeholder={t('pages.server.files.modal.searchFiles.excludePlaceholder', {})}
                     value={form.values.pathFilter?.exclude ?? []}
                     onChange={(value) =>
                       form.setFieldValue('pathFilter', {
@@ -296,7 +296,7 @@ export default function FileSearchModal({ ...props }: ModalProps) {
                   <Group grow align='start'>
                     <TextInput
                       label={t('pages.server.files.modal.searchFiles.searchText', {})}
-                      placeholder='Text to find in files'
+                      placeholder={t('pages.server.files.modal.searchFiles.contentPlaceholder', {})}
                       size='sm'
                       {...form.getInputProps('contentFilter.query')}
                     />

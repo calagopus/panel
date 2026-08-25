@@ -83,7 +83,7 @@ function TreemapCell({
         textAnchor='middle'
         dominantBaseline='middle'
         clipPath={`url(#${clipId})`}
-        fill='white'
+        fill='var(--mantine-color-white)'
         fontSize={12}
         fontWeight={500}
         style={{ pointerEvents: 'none', userSelect: 'none' }}

@@ -158,8 +158,8 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>> {
             style={{
               display: 'none',
               position: 'absolute',
-              backgroundColor: 'rgba(0, 123, 255, 0.2)',
-              border: '1px solid rgba(0, 123, 255, 0.5)',
+              backgroundColor: 'var(--mantine-color-blue-light)',
+              border: '1px solid var(--mantine-color-blue-5)',
               pointerEvents: 'none',
               zIndex: 1000,
               willChange: 'top, left, width, height',

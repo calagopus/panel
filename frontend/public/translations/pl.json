@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Pliki",
+          "editorNotFound": {
+            "title": "Nie znaleziono",
+            "content": "Nie znaleziono edytora."
+          },
+          "view": {
+            "files": "Pliki",
+            "editor": "Edytor"
+          },
+          "tree": {
+            "empty": "Ten folder jest pusty",
+            "loadMore": "Wczytaj więcej",
+            "retry": "Spróbuj ponownie",
+            "reload": "Odśwież pliki",
+            "show": "Pokaż drzewo plików",
+            "hide": "Ukryj drzewo plików",
+            "searchPlaceholder": "Wyszukaj pliki...",
+            "noSearchResults": "Brak pasujących plików",
+            "upload": "Prześlij",
+            "uploadFromComputer": "Prześlij z komputera",
+            "uploadFromUrl": "Prześlij z adresu URL",
+            "selectItem": "Zaznacz {name}",
+            "deselectItem": "Odznacz {name}",
+            "selectFileToOpen": "Wybierz plik z drzewa, aby go otworzyć.",
+            "noEditorAvailable": "Brak edytora dla tego typu pliku.",
+            "editorTabsLabel": "Otwarte pliki",
+            "closeEditorTab": "Zamknij {name}",
+            "unsavedTab": "{name} ma niezapisane zmiany",
+            "dropToSplit": "Upuść, aby otworzyć w nowym panelu edytora",
+            "resizeEditorPanes": "Zmień rozmiar paneli edytora"
+          },
           "titleEditorViewing": "Viewing {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Editing {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Upuść pliki tutaj, aby przesłać",
+            "title": "Upuść tutaj pliki lub foldery, aby je przesłać",
             "subtitle": "Puść aby rozpocząć przesyłanie"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Wyszukiwanie zaawansowane",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Odtwórz",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "Prędkość odtwarzania"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Filtry zaawansowane",
               "pathPatterns": "Path Patterns",
               "include": "Uwzględnij",
+              "includePlaceholder": "np. *.js, src/**",
               "exclude": "Wyklucz",
+              "excludePlaceholder": "np. node_modules/**",
               "fileContent": "Zawartość pliku",
               "searchText": "Search text",
+              "contentPlaceholder": "Tekst do wyszukania w plikach",
               "maxFileSize": "Maksymalny rozmiar pliku",
               "includeOversized": "Uwzględnij nadwymiarowe pliki",
               "includeOversizedDescription": "Uwzględnia pliki, które pasują do innych filtrów, ale są zbyt duże, aby je przeszukać.",

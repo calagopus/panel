@@ -86,7 +86,7 @@ export default function FileTreeToolbar({
 
   return (
     <div data-file-manager-tree-toolbar className='shrink-0 border-b border-(--mantine-color-default-border)'>
-      <div className='flex h-(--file-manager-toolbar-height) items-center justify-between px-(--file-manager-toolbar-padding-inline)'>
+      <div className='flex h-11 items-center justify-between px-2'>
         <div className='flex shrink-0 items-center gap-1'>
           <ActionIcon
             type='button'
@@ -244,7 +244,7 @@ export default function FileTreeToolbar({
       </div>
 
       <Collapse expanded={searchOpen && !collapsed}>
-        <div data-file-manager-tree-search className='px-(--file-manager-toolbar-padding-inline) pb-2'>
+        <div data-file-manager-tree-search className='px-2 pb-2'>
           <TextInput
             ref={searchInputRef}
             size='xs'

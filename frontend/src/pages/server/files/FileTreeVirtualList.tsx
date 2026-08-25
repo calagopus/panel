@@ -120,7 +120,7 @@ export default function FileTreeVirtualList({
           role='tree'
           data-file-manager-tree-table
           className='relative min-w-(--file-manager-tree-min-content-width)'
-          style={{ height: `calc(${virtualizer.getTotalSize()}px + var(--file-manager-tree-scrollbar-size))` }}
+          style={{ height: virtualizer.getTotalSize() + 8 }}
         >
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];

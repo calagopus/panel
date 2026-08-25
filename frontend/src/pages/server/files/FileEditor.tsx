@@ -517,8 +517,8 @@ function FileEditorComponent() {
 
   if (!matchedFileEditorAction && !['new', 'edit', 'image', 'audio'].includes(params.action!)) {
     return (
-      <ServerContentContainer title='Not found' hideTitleComponent>
-        <ScreenBlock title='404' content='Editor not found' />
+      <ServerContentContainer title={t('pages.server.files.editorNotFound.title', {})} hideTitleComponent>
+        <ScreenBlock title='404' content={t('pages.server.files.editorNotFound.content', {})} />
       </ServerContentContainer>
     );
   }

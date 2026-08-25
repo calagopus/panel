@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { FILE_TREE_EDITOR_DRAG_TYPE, FILE_TREE_EDITOR_TAB_DRAG_TYPE } from '@/pages/server/files/fileTreeEditor.ts';
 import { FileTreeEditorPaneState } from '@/pages/server/files/fileTreeWorkspaceState.ts';
@@ -159,7 +158,7 @@ export default function FileTreeEditorSplit({
     <div
       data-file-manager-editor-split
       data-pane-count={panes.length}
-      className='file-manager-editor-panel flex min-w-0 overflow-x-auto overflow-y-hidden'
+      className='flex h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) w-full min-w-(--file-manager-editor-min-width) overflow-x-auto overflow-y-hidden'
     >
       {panes.map((pane, index) => {
         const nextPane = panes[index + 1];
@@ -174,10 +173,7 @@ export default function FileTreeEditorSplit({
               }}
               data-file-manager-editor-pane
               data-active={active || undefined}
-              className={classNames(
-                'file-manager-editor-pane relative flex min-w-(--file-manager-editor-pane-min-width) overflow-hidden',
-                active && 'file-manager-editor-pane-active',
-              )}
+              className='relative flex h-full min-w-[30rem] overflow-hidden'
               style={panes.length === 1 ? { flex: '1 0 100%', width: '100%' } : { flex: `${pane.size} 1 0` }}
               onPointerDownCapture={() => onActivatePane(pane.id)}
               onFocusCapture={() => onActivatePane(pane.id)}
@@ -213,7 +209,7 @@ export default function FileTreeEditorSplit({
                 aria-orientation='vertical'
                 aria-label={resizeLabel}
                 data-file-manager-editor-resize-handle
-                className='file-manager-editor-resize-handle shrink-0 cursor-col-resize focus-visible:outline-none'
+                className='file-manager-editor-resize-handle relative w-3 shrink-0 cursor-col-resize focus-visible:outline-none'
                 onPointerDown={(event) => startResize(event, pane, nextPane)}
                 onPointerMove={resize}
                 onPointerUp={finishResize}

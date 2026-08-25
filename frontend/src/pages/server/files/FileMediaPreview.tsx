@@ -76,7 +76,8 @@ export function FileAudioPreview({ src }: FileAudioPreviewProps) {
     >
       <Audio
         size='xl'
-        w='min(100%, var(--file-manager-audio-max-width))'
+        w='100%'
+        maw='42rem'
         src={src}
         volume={volume}
         onVolumeChange={setVolume}

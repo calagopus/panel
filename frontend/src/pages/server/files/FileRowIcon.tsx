@@ -74,7 +74,7 @@ function FileRowIcon({
   const { t } = useTranslations();
   const store = useFileManagerApi();
   const isDirectory = directory || file?.directory;
-  const iconColor = isDirectory ? 'file-manager-folder-icon' : 'file-manager-file-icon';
+  const iconColor = isDirectory ? 'text-(--mantine-color-yellow-5)' : 'text-(--mantine-color-dimmed)';
   const iconDefinition = file ? getFileIcon(file, store.getState(), openable) : directory ? faFolder : faFile;
 
   if (!file?.virtual) {

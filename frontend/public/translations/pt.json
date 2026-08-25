@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Files",
+          "editorNotFound": {
+            "title": "Não encontrado",
+            "content": "Editor não encontrado."
+          },
+          "view": {
+            "files": "Arquivos",
+            "editor": "Editor"
+          },
+          "tree": {
+            "empty": "Esta pasta está vazia",
+            "loadMore": "Carregar mais",
+            "retry": "Tentar novamente",
+            "reload": "Recarregar arquivos",
+            "show": "Mostrar árvore de arquivos",
+            "hide": "Ocultar árvore de arquivos",
+            "searchPlaceholder": "Pesquisar arquivos...",
+            "noSearchResults": "Nenhum arquivo correspondente",
+            "upload": "Enviar",
+            "uploadFromComputer": "Enviar do computador",
+            "uploadFromUrl": "Enviar por URL",
+            "selectItem": "Selecionar {name}",
+            "deselectItem": "Desmarcar {name}",
+            "selectFileToOpen": "Selecione um arquivo na árvore para abri-lo.",
+            "noEditorAvailable": "Nenhum editor disponível para este tipo de arquivo.",
+            "editorTabsLabel": "Arquivos abertos",
+            "closeEditorTab": "Fechar {name}",
+            "unsavedTab": "{name} tem alterações não salvas",
+            "dropToSplit": "Solte para abrir em um novo painel do editor",
+            "resizeEditorPanes": "Redimensionar painéis do editor"
+          },
           "titleEditorViewing": "Viewing {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Editing {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Drop files here to upload",
+            "title": "Solte arquivos ou pastas aqui para enviar",
             "subtitle": "Release to start uploading"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Pesquisa avançada",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "Velocidade de reprodução"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Advanced Filters",
               "pathPatterns": "Path Patterns",
               "include": "Include",
+              "includePlaceholder": "por exemplo, *.js, src/**",
               "exclude": "Exclude",
+              "excludePlaceholder": "por exemplo, node_modules/**",
               "fileContent": "File Content",
               "searchText": "Search text",
+              "contentPlaceholder": "Texto a procurar nos arquivos",
               "maxFileSize": "Max file size",
               "includeOversized": "Include oversized files",
               "includeOversizedDescription": "Includes files that match other filters but are too large to search.",

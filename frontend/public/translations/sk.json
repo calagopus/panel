@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Súbory",
+          "editorNotFound": {
+            "title": "Nenájdené",
+            "content": "Editor sa nenašiel."
+          },
+          "view": {
+            "files": "Súbory",
+            "editor": "Editor"
+          },
+          "tree": {
+            "empty": "Tento priečinok je prázdny",
+            "loadMore": "Načítať ďalšie",
+            "retry": "Skúsiť znova",
+            "reload": "Znova načítať súbory",
+            "show": "Zobraziť strom súborov",
+            "hide": "Skryť strom súborov",
+            "searchPlaceholder": "Hľadať súbory...",
+            "noSearchResults": "Žiadne zodpovedajúce súbory",
+            "upload": "Nahrať",
+            "uploadFromComputer": "Nahrať z počítača",
+            "uploadFromUrl": "Nahrať z URL",
+            "selectItem": "Vybrať {name}",
+            "deselectItem": "Zrušiť výber {name}",
+            "selectFileToOpen": "Vyberte súbor zo stromu, aby ste ho otvorili.",
+            "noEditorAvailable": "Pre tento typ súboru nie je dostupný editor.",
+            "editorTabsLabel": "Otvorené súbory",
+            "closeEditorTab": "Zavrieť {name}",
+            "unsavedTab": "{name} má neuložené zmeny",
+            "dropToSplit": "Pustením otvoríte v novom paneli editora",
+            "resizeEditorPanes": "Zmeniť veľkosť panelov editora"
+          },
           "titleEditorViewing": "Zobrazuje sa {file}",
           "titleEditorPlaying": "Prehráva sa {file}",
           "titleEditorEditing": "Úprava {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Sem presuňte súbory na nahranie",
+            "title": "Sem presuňte súbory alebo priečinky na nahranie",
             "subtitle": "Uvoľnením spustíte nahrávanie"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Rozšírené vyhľadávanie",
             "fileHistory": "História súborov",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Prehrať",
             "pause": "Pauza",
             "mute": "Stlmiť",
-            "unmute": "Zapnúť zvuk"
+            "unmute": "Zapnúť zvuk",
+            "playbackRate": "Rýchlosť prehrávania"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Pokročilé filtre",
               "pathPatterns": "Vzory ciest",
               "include": "Zahrnúť",
+              "includePlaceholder": "napr. *.js, src/**",
               "exclude": "Vylúčiť",
+              "excludePlaceholder": "napr. node_modules/**",
               "fileContent": "Obsah súboru",
               "searchText": "Hľadaný text",
+              "contentPlaceholder": "Text, ktorý sa má vyhľadať v súboroch",
               "maxFileSize": "Maximálna veľkosť súboru",
               "includeOversized": "Zahrnúť príliš veľké súbory",
               "includeOversizedDescription": "Zahŕňa súbory, ktoré zodpovedajú iným filtrom, ale sú príliš veľké na vyhľadávanie.",

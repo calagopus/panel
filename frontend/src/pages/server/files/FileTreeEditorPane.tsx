@@ -364,7 +364,7 @@ export default function FileTreeEditorPane({
 
       <div
         data-file-manager-editor-header
-        className='flex min-h-(--file-manager-editor-header-height) shrink-0 items-center justify-between gap-(--file-manager-editor-header-gap) border-b border-(--mantine-color-default-border) px-(--file-manager-editor-header-padding-inline)'
+        className='flex min-h-12 shrink-0 items-center justify-between gap-3 border-b border-(--mantine-color-default-border) px-3'
       >
         <Group wrap='nowrap' gap='xs' className='min-w-0'>
           <Title order={3} className='truncate! text-base!'>

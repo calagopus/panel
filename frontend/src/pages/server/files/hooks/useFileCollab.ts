@@ -37,7 +37,9 @@ interface UseFileCollabOptions {
 
 const UPDATE_CHUNK_SIZE = 16 * 1024;
 
-const CURSOR_COLORS = ['#e03131', '#c2255c', '#9c36b5', '#3b5bdb', '#1971c2', '#099268', '#e8590c', '#f08c00'];
+const CURSOR_COLORS = ['red', 'pink', 'grape', 'indigo', 'blue', 'teal', 'orange', 'yellow'].map(
+  (color) => `var(--mantine-color-${color}-6)`,
+);
 
 function toBase64(data: Uint8Array): string {
   let binary = '';
@@ -75,10 +77,10 @@ function updateCursorStyles(styleEl: HTMLStyleElement, awareness: Awareness): vo
     const name = (user?.name ?? '').replace(/["\\]/g, '');
 
     rules.push(
-      `.yRemoteSelection-${clientId} { background-color: ${color}44; }`,
+      `.yRemoteSelection-${clientId} { background-color: color-mix(in srgb, ${color} 27%, transparent); }`,
       `.yRemoteSelectionHead-${clientId} { position: absolute; border-left: 2px solid ${color}; height: 100%; }`,
       `.yRemoteSelectionHead-${clientId}::after { content: "${name}"; position: absolute; top: -1.2em; left: -2px;` +
-        ` background-color: ${color}; color: white; font-size: 10px; line-height: 1.2; padding: 0 3px;` +
+        ` background-color: ${color}; color: var(--mantine-color-white); font-size: 10px; line-height: 1.2; padding: 0 3px;` +
         ` border-radius: 2px; white-space: nowrap; pointer-events: none; }`,
     );
   });

@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Dosyalar",
+          "editorNotFound": {
+            "title": "Bulunamadı",
+            "content": "Düzenleyici bulunamadı."
+          },
+          "view": {
+            "files": "Dosyalar",
+            "editor": "Düzenleyici"
+          },
+          "tree": {
+            "empty": "Bu klasör boş",
+            "loadMore": "Daha fazla yükle",
+            "retry": "Tekrar dene",
+            "reload": "Dosyaları yeniden yükle",
+            "show": "Dosya ağacını göster",
+            "hide": "Dosya ağacını gizle",
+            "searchPlaceholder": "Dosyalarda ara...",
+            "noSearchResults": "Eşleşen dosya yok",
+            "upload": "Yükle",
+            "uploadFromComputer": "Bilgisayardan yükle",
+            "uploadFromUrl": "URL'den yükle",
+            "selectItem": "{name} seç",
+            "deselectItem": "{name} seçimini kaldır",
+            "selectFileToOpen": "Açmak için ağaçtan bir dosya seçin.",
+            "noEditorAvailable": "Bu dosya türü için kullanılabilir bir düzenleyici yok.",
+            "editorTabsLabel": "Açık dosyalar",
+            "closeEditorTab": "{name} dosyasını kapat",
+            "unsavedTab": "{name} kaydedilmemiş değişiklikler içeriyor",
+            "dropToSplit": "Yeni bir düzenleyici bölmesinde açmak için bırakın",
+            "resizeEditorPanes": "Düzenleyici bölmelerini yeniden boyutlandır"
+          },
           "titleEditorViewing": "{file} Görüntüleniyor",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "{file} Düzenleniyor",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Yüklemek için dosyaları buraya bırakın",
+            "title": "Yüklemek için dosyaları veya klasörleri buraya bırakın",
             "subtitle": "Yüklemeyi başlatmak için bırakın"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Gelişmiş arama",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "Oynatma hızı"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Gelişmiş Filtreler",
               "pathPatterns": "Yol Desenleri",
               "include": "Dahil Et",
+              "includePlaceholder": "örn. *.js, src/**",
               "exclude": "Hariç Tut",
+              "excludePlaceholder": "örn. node_modules/**",
               "fileContent": "Dosya İçeriği",
               "searchText": "Metni ara",
+              "contentPlaceholder": "Dosyalarda aranacak metin",
               "maxFileSize": "Maksimum dosya boyutu",
               "includeOversized": "Aşırı büyük dosyaları dahil et",
               "includeOversizedDescription": "Diğer filtrelerle eşleşen ancak aranamayacak kadar büyük olan dosyaları içerir.",

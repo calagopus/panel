@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Filer",
+          "editorNotFound": {
+            "title": "Hittades inte",
+            "content": "Redigeraren hittades inte."
+          },
+          "view": {
+            "files": "Filer",
+            "editor": "Redigerare"
+          },
+          "tree": {
+            "empty": "Den här mappen är tom",
+            "loadMore": "Läs in fler",
+            "retry": "Försök igen",
+            "reload": "Läs in filer på nytt",
+            "show": "Visa filträdet",
+            "hide": "Dölj filträdet",
+            "searchPlaceholder": "Sök efter filer...",
+            "noSearchResults": "Inga matchande filer",
+            "upload": "Ladda upp",
+            "uploadFromComputer": "Ladda upp från dator",
+            "uploadFromUrl": "Ladda upp från URL",
+            "selectItem": "Välj {name}",
+            "deselectItem": "Avmarkera {name}",
+            "selectFileToOpen": "Välj en fil i trädet för att öppna den.",
+            "noEditorAvailable": "Ingen redigerare är tillgänglig för den här filtypen.",
+            "editorTabsLabel": "Öppna filer",
+            "closeEditorTab": "Stäng {name}",
+            "unsavedTab": "{name} har osparade ändringar",
+            "dropToSplit": "Släpp för att öppna i en ny redigeringspanel",
+            "resizeEditorPanes": "Ändra storlek på redigeringspaneler"
+          },
           "titleEditorViewing": "Visa {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Redigera {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Släpp filer här för att ladda upp",
+            "title": "Släpp filer eller mappar här för att ladda upp",
             "subtitle": "Släpp för att börja ladda upp"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Avancerad sökning",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "Uppspelningshastighet"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Avancerade filter",
               "pathPatterns": "Sökvägsmönster",
               "include": "Inkludera",
+              "includePlaceholder": "t.ex. *.js, src/**",
               "exclude": "Exkludera",
+              "excludePlaceholder": "t.ex. node_modules/**",
               "fileContent": "Filinnehåll",
               "searchText": "Söktext",
+              "contentPlaceholder": "Text att söka efter i filer",
               "maxFileSize": "Max filstorlek",
               "includeOversized": "Inkludera oversized filer",
               "includeOversizedDescription": "Inkluderar filer som matchar andra filter men är för stora för att sökas igenom.",

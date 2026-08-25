@@ -371,7 +371,7 @@ export default function FileTreeWorkspace({ fileTreeVisible, onToggleFileTree }:
 
   return (
     <>
-      <div data-file-manager-workspace className='file-manager-workspace'>
+      <div data-file-manager-workspace className='w-full max-w-none self-stretch overflow-x-auto overflow-y-hidden'>
         <div
           data-file-manager-workspace-grid
           data-file-manager-tree-visible={fileTreeVisible}
@@ -380,7 +380,11 @@ export default function FileTreeWorkspace({ fileTreeVisible, onToggleFileTree }:
           <div
             data-file-manager-tree-shell
             data-file-manager-tree-collapsed={!fileTreeVisible}
-            className='file-manager-tree-shell'
+            className={`file-manager-tree-shell h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) min-w-0 overflow-hidden transition-[width] duration-[180ms] [transition-timing-function:ease] motion-reduce:transition-none max-[47.999rem]:w-full ${
+              fileTreeVisible
+                ? 'w-(--file-manager-tree-width)'
+                : 'w-(--file-manager-tree-collapsed-width) max-[47.999rem]:h-11 max-[47.999rem]:min-h-11'
+            }`}
           >
             <FileTree collapsed={!fileTreeVisible} onToggleCollapsed={onToggleFileTree} onOpenFile={openFile} />
           </div>

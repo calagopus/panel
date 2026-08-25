@@ -92,16 +92,6 @@ export const EMPTY_DIRECTORY_STATE: DirectoryState = {
   error: null,
 };
 
-export const getFileTreeRowHeight = () => {
-  if (typeof window === 'undefined') return TREE_ROW_HEIGHT;
-
-  const configured = Number.parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--file-manager-tree-row-height'),
-  );
-
-  return Number.isFinite(configured) && configured > 0 ? configured : TREE_ROW_HEIGHT;
-};
-
 export const truncateFileTreeName = (name: string, directory: boolean, maxLength = 30) => {
   if (name.length <= maxLength) return name;
 

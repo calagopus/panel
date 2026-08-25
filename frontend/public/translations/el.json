@@ -4617,6 +4617,36 @@
         },
         "files": {
           "title": "Files",
+          "editorNotFound": {
+            "title": "Δεν βρέθηκε",
+            "content": "Ο επεξεργαστής δεν βρέθηκε."
+          },
+          "view": {
+            "files": "Αρχεία",
+            "editor": "Επεξεργαστής"
+          },
+          "tree": {
+            "empty": "Αυτός ο φάκελος είναι κενός",
+            "loadMore": "Φόρτωση περισσότερων",
+            "retry": "Δοκιμάστε ξανά",
+            "reload": "Επαναφόρτωση αρχείων",
+            "show": "Εμφάνιση δέντρου αρχείων",
+            "hide": "Απόκρυψη δέντρου αρχείων",
+            "searchPlaceholder": "Αναζήτηση αρχείων...",
+            "noSearchResults": "Δεν υπάρχουν αρχεία που να ταιριάζουν",
+            "upload": "Μεταφόρτωση",
+            "uploadFromComputer": "Μεταφόρτωση από υπολογιστή",
+            "uploadFromUrl": "Μεταφόρτωση από URL",
+            "selectItem": "Επιλογή {name}",
+            "deselectItem": "Αποεπιλογή {name}",
+            "selectFileToOpen": "Επιλέξτε ένα αρχείο από το δέντρο για να το ανοίξετε.",
+            "noEditorAvailable": "Δεν υπάρχει διαθέσιμος επεξεργαστής για αυτόν τον τύπο αρχείου.",
+            "editorTabsLabel": "Ανοιχτά αρχεία",
+            "closeEditorTab": "Κλείσιμο {name}",
+            "unsavedTab": "Το {name} έχει μη αποθηκευμένες αλλαγές",
+            "dropToSplit": "Απόθεση για άνοιγμα σε νέο τμήμα επεξεργαστή",
+            "resizeEditorPanes": "Αλλαγή μεγέθους τμημάτων επεξεργαστή"
+          },
           "titleEditorViewing": "Viewing {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Editing {file}",
@@ -4709,7 +4739,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Drop files here to upload",
+            "title": "Αποθέστε αρχεία ή φακέλους εδώ για μεταφόρτωση",
             "subtitle": "Release to start uploading"
           },
           "settings": {
@@ -4757,6 +4787,7 @@
           },
           "tooltip": {
             "settings": "Settings",
+            "advancedSearch": "Σύνθετη αναζήτηση",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4768,7 +4799,8 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute"
+            "unmute": "Unmute",
+            "playbackRate": "Ταχύτητα αναπαραγωγής"
           },
           "drawer": {
             "revisions": {
@@ -4962,9 +4994,12 @@
               "advancedFilters": "Advanced Filters",
               "pathPatterns": "Path Patterns",
               "include": "Include",
+              "includePlaceholder": "π.χ. *.js, src/**",
               "exclude": "Exclude",
+              "excludePlaceholder": "π.χ. node_modules/**",
               "fileContent": "File Content",
               "searchText": "Search text",
+              "contentPlaceholder": "Κείμενο για αναζήτηση στα αρχεία",
               "maxFileSize": "Max file size",
               "includeOversized": "Include oversized files",
               "includeOversizedDescription": "Includes files that match other filters but are too large to search.",

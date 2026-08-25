@@ -123,22 +123,20 @@ function FileTreeRow({
           onOpen(item);
         }}
         className={classNames(
-          'file-manager-tree-row grid w-full cursor-default items-center text-left text-sm hover:bg-(--mantine-color-default-hover)! focus-visible:outline-2 focus-visible:outline-(--mantine-primary-color-filled)',
+          'grid w-full cursor-default grid-cols-(--file-manager-tree-columns) items-center gap-x-2 text-left text-sm [contain:layout_paint] hover:bg-(--mantine-color-default-hover)! focus-visible:outline-2 focus-visible:outline-(--mantine-primary-color-filled)',
           clickOnce && 'cursor-pointer',
           dragged && 'opacity-60',
         )}
         style={{
           height: rowHeight,
-          backgroundColor: selected ? 'var(--file-manager-selection-background)' : undefined,
-          boxShadow: selected
-            ? 'inset var(--file-manager-selection-border-width) 0 0 var(--file-manager-selection-border-color)'
-            : undefined,
+          backgroundColor: selected ? 'var(--mantine-color-blue-light)' : undefined,
+          boxShadow: selected ? 'inset 3px 0 0 var(--mantine-color-blue-5)' : undefined,
         }}
       >
         <div
           data-file-manager-tree-name
-          className='flex min-w-0 items-center gap-(--file-manager-row-gap)'
-          style={{ paddingLeft: `calc(var(--file-manager-row-padding-inline) + ${row.depth * 16}px)` }}
+          className='flex min-w-0 items-center gap-2'
+          style={{ paddingLeft: 10 + row.depth * 16 }}
         >
           <Checkbox
             size='xs'
@@ -169,10 +167,7 @@ function FileTreeRow({
             onMouseDown={(event) => event.stopPropagation()}
             onDragStart={(event) => onStartDrag(event, item)}
             onDragEnd={onDragEnd}
-            className={classNames(
-              'flex min-w-0 items-center gap-(--file-manager-row-gap)',
-              canDrag && 'cursor-grab active:cursor-grabbing',
-            )}
+            className={classNames('flex min-w-0 items-center gap-2', canDrag && 'cursor-grab active:cursor-grabbing')}
           >
             <FileRowIcon file={row.entry} openable={openMode.openable} className='w-4 shrink-0' />
             <FileTreeName name={row.entry.name} directory={row.entry.directory} className='flex-1' />
