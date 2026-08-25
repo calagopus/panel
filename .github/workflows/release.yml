@@ -242,7 +242,7 @@ jobs:
           path: artifacts
 
       - name: Create Draft Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ needs.release-info.outputs.version }}
           draft: true
