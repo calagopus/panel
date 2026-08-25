@@ -176,6 +176,7 @@
         "enable": "Activer",
         "disable": "Désactiver",
         "disableTwoFactor": "Disable Two-Factor",
+        "verify": "Verify",
         "update": "Mettre à jour",
         "close": "Fermer",
         "cancel": "Annuler",
@@ -250,6 +251,17 @@
           "noMatches": "No matches",
           "exception": "Exception",
           "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day",
+            "month": "Month",
+            "weekday": "Weekday"
+          },
+          "nextRun": "Next run is {timestamp}."
         }
       },
       "modal": {
@@ -262,6 +274,22 @@
       },
       "toast": {
         "duplicated": "{resource} duplicated."
+      },
+      "settingScope": {
+        "account": "Sync With Account",
+        "device": "Only This Device",
+        "useAccountValue": "Use the Account Value",
+        "saveToAccount": "Save This Value to My Account",
+        "stateAccount": "Account",
+        "stateDevice": "This Device",
+        "tooltip": {
+          "account": "This setting is synced with your account.",
+          "device": "This setting is overridden on this device only."
+        },
+        "toast": {
+          "saved": "Setting saved to your account.",
+          "saveFailed": "Failed to save this setting to your account."
+        }
       },
       "tooltip": {
         "resetToDefault": "Réinitialiser à la valeur par défaut",
@@ -611,7 +639,8 @@
           "theme": "Thème",
           "themeAuto": "Automatique",
           "themeDark": "Sombre",
-          "themeLight": "Clair"
+          "themeLight": "Clair",
+          "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },
         "modal": {
           "logout": {
@@ -1079,6 +1108,16 @@
                 "useTotp": "Utiliser le TOTP"
               }
             },
+            "email": {
+              "subtitle": "We can email you a one-time code to finish signing in.",
+              "enterCode": "Enter the 6-digit code we sent to your email address",
+              "button": {
+                "useEmail": "Email me a code",
+                "sendCode": "Send Code",
+                "resend": "Resend Code",
+                "resendIn": "Resend Code ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "Entrez un code de récupération",
               "form": {
@@ -1112,6 +1151,14 @@
             "request": "Demander la réinitialisation du mot de passe"
           },
           "success": "Un e-mail vous a été envoyé avec les instructions pour réinitialiser votre mot de passe."
+        },
+        "verifyEmail": {
+          "title": "Verify Email",
+          "success": "Your email address **{email}** has been verified.",
+          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
+          "button": {
+            "continue": "Continue"
+          }
         },
         "resetPassword": {
           "title": "Réinitialiser le mot de passe",
@@ -1186,6 +1233,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Already in this group",
+                      "description": "This server is already part of {group}."
+                    },
+                    "groupFull": {
+                      "title": "Group is full",
+                      "description": "A group cannot hold more than {max} servers."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server moved to {group}."
+                  }
+                },
                 "noGroups": "Pas de groupes trouvés, créez-en un."
               }
             },
@@ -1226,6 +1288,14 @@
               "title": "Authentification à deux facteurs requise",
               "description": "L'authentification à deux facteurs est requise pour votre compte. Veuillez la mettre en place ci-dessus pour continuer à utiliser le panel."
             },
+            "verifyEmail": {
+              "title": "Email Verification Required",
+              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
+              "sent": "Verification email sent to {email}.",
+              "button": {
+                "resend": "Resend Verification Email"
+              }
+            },
             "frozen": {
               "title": "Compte gelé",
               "description": "Votre compte a été gelé. Vous ne pouvez pas apporter de modifications à votre compte tant qu'il n'est pas dégelé. Veuillez contacter un administrateur pour plus d'informations."
@@ -1245,7 +1315,8 @@
             "email": {
               "title": "Adresse e-mail",
               "toast": {
-                "updated": "Adresse e-mail mise à jour avec succès."
+                "updated": "Adresse e-mail mise à jour avec succès.",
+                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
               },
               "form": {
                 "newEmail": "Nouvelle adresse e-mail"
@@ -1273,20 +1344,68 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "Configurer l'authentification à deux facteurs"
+                "setupTwoFactor": "Configurer l'authentification à deux facteurs",
+                "enableEmail": "Enable Email",
+                "disableEmail": "Disable Email",
+                "securityKeys": "Security Keys"
               },
-              "twoFactorEnabled": "La vérification à deux facteurs est actuellement activée.",
-              "twoFactorDisabled": "La vérification à deux facteurs n'est pas activée pour votre compte. Cliquez sur le bouton ci-dessous pour commencer à la configurer.",
-              "twoFactorLastUsed": "Dernière utilisation : {timestamp}"
+              "twoFactorLastUsed": "Dernière utilisation : {timestamp}",
+              "none": "No second factor is set up on your account yet.",
+              "requirementMet": "Your account meets the two-factor requirement.",
+              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
+              "method": {
+                "totp": "Authenticator App",
+                "securityKey": "Security Key",
+                "email": "Email"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Email two-factor disabled successfully."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Enable Email Two-Factor",
+                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
+                },
+                "disable": {
+                  "title": "Disable Email Two-Factor",
+                  "description": "Disabling email two-factor will make your account less secure."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Password Login",
+              "enabled": "You can sign in with your password.",
+              "disabled": "Password login is turned off. Only your security keys can sign you in.",
+              "toast": {
+                "updated": "Password login updated successfully."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Add a security key before turning off password login."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Disable Password Login",
+                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
+                },
+                "enable": {
+                  "title": "Enable Password Login",
+                  "description": "Your password will be able to sign you in again."
+                }
+              }
             },
             "account": {
               "title": "Détails du compte",
               "toast": {
                 "updated": "Détails du compte mis à jour avec succès."
-              },
+              }
+            },
+            "preferences": {
+              "title": "Preferences",
               "form": {
-                "toastPosition": "Position du toast",
-                "startOnGroupedServers": "Commencer sur la page des serveurs groupés"
+                "toastPosition": "Toast Position",
+                "startOnGroupedServers": "Start on the Grouped Servers page"
               }
             },
             "avatar": {
@@ -1546,6 +1665,10 @@
               "expires": "Expiration"
             }
           },
+          "toast": {
+            "enabled": "API key enabled.",
+            "disabled": "API key disabled."
+          },
           "modal": {
             "createApiKey": {
               "title": "Créer une clé API",
@@ -1766,11 +1889,22 @@
                   "sessionCookie": "Cookie de session",
                   "sessionDurationSeconds": "Durée de session (secondes)",
                   "twoFactorRequirement": "Exigence d'authentification à deux facteurs",
+                  "emailTwoFactorEnabled": "Email Two-Factor",
+                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
+                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
+                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
+                  "emailVerificationRequired": "Require Email Verification",
+                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "Activer la télémétrie",
                   "telemetryEnabledDescription": "Autoriser Calagopus à collecter des données d'utilisation limitées et anonymes pour aider à améliorer l'application.",
                   "registrationEnabled": "Activer l'inscription"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator App (TOTP)",
+                    "securityKey": "Security Key",
+                    "email": "Email"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Administrateurs",
                     "allUsers": "Tous les utilisateurs",
@@ -1986,6 +2120,8 @@
                   "maxCommandSnippetCount": "Nombre max. d'extraits de commande",
                   "maxSecurityKeyCount": "Nombre max. de clés de sécurité",
                   "maxSshKeyCount": "Nombre max. de clés SSH",
+                  "maxSettingsCount": "Max Synced Settings",
+                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "Autoriser le changement de langue",
                   "allowChangingLanguageDescription": "Si activé, les utilisateurs pourront modifier leurs préférences de langue."
                 },
@@ -2125,6 +2261,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2274,7 @@
             "retryBuild": "Retry build",
             "cancelBuild": "Cancel build",
             "configure": "Configurer",
+            "restart": "Restart the panel",
             "back": "Retour aux extensions",
             "accept": "Accepter",
             "decline": "Refuser"
@@ -2144,7 +2285,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Une extension backend est requise pour configurer cette extension.",
             "noConfigurationPage": "Cette extension n'a pas de page de configuration définie.",
-            "removeExtension": "Retirer l'extension"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Retirer l'extension",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2306,9 @@
             "frontendMissing": "Frontend manquant",
             "backendMissing": "Backend manquant",
             "pendingBuild": "Compilation en attente",
-            "pendingRemoval": "Retrait en attente"
+            "pendingRemoval": "Retrait en attente",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Version",
@@ -2182,7 +2328,10 @@
             "buildFailed": "Extension build failed: {reason}",
             "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Extension `{packageName}` ajoutée avec succès.",
-            "removed": "Extension `{packageName}` supprimée avec succès."
+            "removed": "Extension `{packageName}` supprimée avec succès.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Extension introuvable",
@@ -2249,6 +2398,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Envoyer un e-mail de réinitialisation du mot de passe",
+                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "Usurper"
                 },
                 "form": {
@@ -2264,6 +2414,13 @@
                   "delete": {
                     "title": "Confirmer la suppression de l'utilisateur",
                     "content": "Êtes-vous sûr de vouloir supprimer **{username}** ?"
+                  },
+                  "verifyEmail": {
+                    "title": "Mark Email Verified",
+                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
+                    "toast": {
+                      "verified": "Email marked as verified."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Désactiver l'authentification à deux facteurs de l'utilisateur",
@@ -3855,8 +4012,8 @@
                   "nameLastPath": "Chemin du nom de famille",
                   "nameLastPathDescription": "Le chemin utilisé pour extraire le nom de famille depuis la réponse de l'URL d'info (https://serdejsonpath.live).",
                   "loginOnly": "Autoriser uniquement la connexion",
-                  "loginBypass2fa": "Contourner la 2FA à la connexion",
-                  "loginBypass2faDescription": "Permet aux utilisateurs se connectant avec ce fournisseur de contourner leur 2FA du panel.",
+                  "loginBypassTwoFactor": "Bypass 2FA on Login",
+                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "Lien visible par l'utilisateur",
                   "linkViewableDescription": "Permet à l'utilisateur de voir la connexion et son identifiant dans l'interface client.",
                   "userManageable": "Lien gérable par l'utilisateur",

@@ -9,44 +9,44 @@
       "other": "{count} Bytes"
     },
     "user": {
-      "zero": "{count} Users",
-      "one": "{count} User",
-      "two": "{count} Users",
-      "few": "{count} Users",
-      "many": "{count} Users",
-      "other": "{count} Users"
+      "zero": "{count} Usuários",
+      "one": "{count} Usuário",
+      "two": "{count} Usuários",
+      "few": "{count} Usuários",
+      "many": "{count} Usuários",
+      "other": "{count} Usuários"
     },
     "file": {
-      "zero": "{count} Files",
-      "one": "{count} File",
-      "two": "{count} Files",
-      "few": "{count} Files",
-      "many": "{count} Files",
-      "other": "{count} Files"
+      "zero": "{count} Arquivos",
+      "one": "{count} Arquivo",
+      "two": "{count} Arquivos",
+      "few": "{count} Arquivos",
+      "many": "{count} Arquivos",
+      "other": "{count} Arquivos"
     },
     "directory": {
-      "zero": "{count} Directories",
-      "one": "{count} Directory",
-      "two": "{count} Directories",
-      "few": "{count} Directories",
-      "many": "{count} Directories",
-      "other": "{count} Directories"
+      "zero": "{count} Pastas",
+      "one": "{count} Pasta",
+      "two": "{count} Pastas",
+      "few": "{count} Pastas",
+      "many": "{count} Pastas",
+      "other": "{count} Pastas"
     },
     "server": {
-      "zero": "{count} Servers",
-      "one": "{count} Server",
-      "two": "{count} Servers",
-      "few": "{count} Servers",
-      "many": "{count} Servers",
-      "other": "{count} Servers"
+      "zero": "{count} Servidores",
+      "one": "{count} Servidor",
+      "two": "{count} Servidores",
+      "few": "{count} Servidores",
+      "many": "{count} Servidores",
+      "other": "{count} Servidores"
     },
     "sshKey": {
-      "zero": "{count} SSH Keys",
-      "one": "{count} SSH Key",
-      "two": "{count} SSH Keys",
-      "few": "{count} SSH Keys",
-      "many": "{count} SSH Keys",
-      "other": "{count} SSH Keys"
+      "zero": "{count} Chaves SSH",
+      "one": "{count} Chave SSH",
+      "two": "{count} Chaves SSH",
+      "few": "{count} Chaves SSH",
+      "many": "{count} Chaves SSH",
+      "other": "{count} Chaves SSH"
     },
     "asset": {
       "zero": "{count} Assets",
@@ -65,20 +65,20 @@
       "other": "{count} Nodes"
     },
     "databaseAgentHost": {
-      "zero": "{count} Database Agent Hosts",
-      "one": "{count} Database Agent Host",
-      "two": "{count} Database Agent Hosts",
-      "few": "{count} Database Agent Hosts",
-      "many": "{count} Database Agent Hosts",
-      "other": "{count} Database Agent Hosts"
+      "zero": "{count} Hosts com Agentes de Banco de Dados",
+      "one": "{count} Host com Agente de Banco de Dados",
+      "two": "{count} Hosts com Agentes de Banco de Dados",
+      "few": "{count} Host com Agente de Banco de Dados",
+      "many": "{count} Hosts com Agentes de Banco de Dados",
+      "other": "{count} Hosts com Agente de Banco de Dados"
     },
     "allocation": {
-      "zero": "{count} Node Allocations",
-      "one": "{count} Node Allocation",
-      "two": "{count} Node Allocations",
-      "few": "{count} Node Allocations",
-      "many": "{count} Node Allocations",
-      "other": "{count} Node Allocations"
+      "zero": "{count} Nodes alocados",
+      "one": "{count} Nodes alocado",
+      "two": "{count} Nodes alocados",
+      "few": "{count} Nodes alocados",
+      "many": "{count} Nodes alocados",
+      "other": "{count} Nodes alocados"
     },
     "egg": {
       "zero": "{count} Eggs",
@@ -89,36 +89,36 @@
       "other": "{count} Eggs"
     },
     "instance": {
-      "zero": "{count} Instances",
-      "one": "{count} Instance",
-      "two": "{count} Instances",
-      "few": "{count} Instances",
-      "many": "{count} Instances",
-      "other": "{count} Instances"
+      "zero": "{count} Instâncias",
+      "one": "{count} Instância",
+      "two": "{count} Instâncias",
+      "few": "{count} Instâncias",
+      "many": "{count} Instâncias",
+      "other": "{count} Instâncias"
     },
     "shortcut": {
-      "zero": "{count} Shortcuts",
-      "one": "{count} Shortcut",
-      "two": "{count} Shortcuts",
-      "few": "{count} Shortcuts",
-      "many": "{count} Shortcuts",
-      "other": "{count} Shortcuts"
+      "zero": "{count} Atalhos",
+      "one": "{count} Atalho",
+      "two": "{count} Atalhos",
+      "few": "{count} Atalhos",
+      "many": "{count} Atalhos",
+      "other": "{count} Atalhos"
     },
     "line": {
-      "zero": "{count} Lines",
-      "one": "{count} Line",
-      "two": "{count} Lines",
-      "few": "{count} Lines",
-      "many": "{count} Lines",
-      "other": "{count} Lines"
+      "zero": "{count} Linhas",
+      "one": "{count} Linha",
+      "two": "{count} Linhas",
+      "few": "{count} Linhas",
+      "many": "{count} Linhas",
+      "other": "{count} Linhas"
     },
     "header": {
-      "zero": "{count} Headers",
-      "one": "{count} Header",
-      "two": "{count} Headers",
-      "few": "{count} Headers",
-      "many": "{count} Headers",
-      "other": "{count} Headers"
+      "zero": "{count} Cabeçalhos",
+      "one": "{count} Cabeçalho",
+      "two": "{count} Cabeçalhos",
+      "few": "{count} Cabeçalhos",
+      "many": "{count} Cabeçalhos",
+      "other": "{count} Cabeçalhos"
     },
     "backup": {
       "zero": "{count} Backups",
@@ -129,74 +129,75 @@
       "other": "{count} Backups"
     },
     "day": {
-      "zero": "{count} Days",
-      "one": "{count} Day",
-      "two": "{count} Days",
-      "few": "{count} Days",
-      "many": "{count} Days",
-      "other": "{count} Days"
+      "zero": "{count} Dias",
+      "one": "{count} Dia",
+      "two": "{count} Dias",
+      "few": "{count} Dias",
+      "many": "{count} Dias",
+      "other": "{count} Dias"
     },
     "row": {
-      "zero": "{count} Rows",
-      "one": "{count} Row",
-      "two": "{count} Rows",
-      "few": "{count} Rows",
-      "many": "{count} Rows",
-      "other": "{count} Rows"
+      "zero": "{count} Linhas",
+      "one": "{count} Linha",
+      "two": "{count} Linhas",
+      "few": "{count} Linhas",
+      "many": "{count} Linhas",
+      "other": "{count} Linhas"
     },
     "change": {
-      "zero": "{count} Changes",
-      "one": "{count} Change",
-      "two": "{count} Changes",
-      "few": "{count} Changes",
-      "many": "{count} Changes",
-      "other": "{count} Changes"
+      "zero": "{count} Alterações",
+      "one": "{count} Alteração",
+      "two": "{count} Alterações",
+      "few": "{count} Alterações",
+      "many": "{count} Alterações",
+      "other": "{count} Alterações"
     },
     "session": {
-      "zero": "{count} Sessions",
-      "one": "{count} Session",
-      "two": "{count} Sessions",
-      "few": "{count} Sessions",
-      "many": "{count} Sessions",
-      "other": "{count} Sessions"
+      "zero": "{count} Sessões",
+      "one": "{count} Sessão",
+      "two": "{count} Sessões",
+      "few": "{count} Sessões",
+      "many": "{count} Sessões",
+      "other": "{count} Sessões"
     }
   },
   "translations": {
     "common": {
       "button": {
-        "create": "Create",
-        "add": "Add",
-        "addDefaultPort": "Add :{port}",
-        "save": "Save",
-        "saveAndStay": "Save & Stay",
-        "edit": "Edit",
-        "duplicate": "Duplicate",
-        "delete": "Delete",
-        "remove": "Remove",
-        "enable": "Enable",
-        "disable": "Disable",
-        "disableTwoFactor": "Disable Two-Factor",
-        "update": "Update",
-        "close": "Close",
-        "cancel": "Cancel",
-        "continue": "Continue",
-        "skip": "Skip",
+        "create": "Criar",
+        "add": "Adicionar",
+        "addDefaultPort": "Adicionar :{port}",
+        "save": "Salvar",
+        "saveAndStay": "Salvar & Ficar",
+        "edit": "Editar",
+        "duplicate": "Duplicar",
+        "delete": "Excluir",
+        "remove": "Remover",
+        "enable": "Ligar",
+        "disable": "Desligar",
+        "disableTwoFactor": "Desligar Autenticação de Dois Fatores",
+        "verify": "Verify",
+        "update": "Atualizar",
+        "close": "Fechar",
+        "cancel": "Cancelar",
+        "continue": "Continuar",
+        "skip": "Pular",
         "okay": "Okay",
-        "back": "Back",
-        "next": "Next",
-        "install": "Install",
-        "selectAll": "Select All",
-        "deselectAll": "Deselect All",
-        "restore": "Restore",
-        "discard": "Discard",
-        "download": "Download",
-        "downloadAs": "Download as {format}",
-        "export": "Export",
-        "exportAs": "Export as {format}",
-        "recreate": "Recreate",
-        "move": "Move",
-        "transfer": "Transfer",
-        "reattach": "Reattach",
+        "back": "Voltar",
+        "next": "Próximo",
+        "install": "Instalar",
+        "selectAll": "Selecionar Tudo",
+        "deselectAll": "Desselecionar tudo",
+        "restore": "Restaurar",
+        "discard": "Descartar",
+        "download": "Baixar",
+        "downloadAs": "Baixar como {format}",
+        "export": "Exportar",
+        "exportAs": "Exportar como {format}",
+        "recreate": "Recriar",
+        "move": "Mover",
+        "transfer": "Transferir",
+        "reattach": "Reanexar",
         "detach": "Detach",
         "send": "Send",
         "reset": "Reset",
@@ -250,6 +251,17 @@
           "noMatches": "No matches",
           "exception": "Exception",
           "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day",
+            "month": "Month",
+            "weekday": "Weekday"
+          },
+          "nextRun": "Next run is {timestamp}."
         }
       },
       "modal": {
@@ -262,6 +274,22 @@
       },
       "toast": {
         "duplicated": "{resource} duplicated."
+      },
+      "settingScope": {
+        "account": "Sync With Account",
+        "device": "Only This Device",
+        "useAccountValue": "Use the Account Value",
+        "saveToAccount": "Save This Value to My Account",
+        "stateAccount": "Account",
+        "stateDevice": "This Device",
+        "tooltip": {
+          "account": "This setting is synced with your account.",
+          "device": "This setting is overridden on this device only."
+        },
+        "toast": {
+          "saved": "Setting saved to your account.",
+          "saveFailed": "Failed to save this setting to your account."
+        }
       },
       "tooltip": {
         "resetToDefault": "Reset to default",
@@ -277,56 +305,56 @@
         "newName": "New Name",
         "description": "Description",
         "author": "Author",
-        "type": "Type",
-        "password": "Password",
+        "type": "Tipo",
+        "password": "Senha",
         "host": "Host",
-        "username": "Username",
-        "usernameOrEmail": "Username/Email",
-        "server": "Server",
+        "username": "Nome de Usuário",
+        "usernameOrEmail": "Usuário/Email",
+        "server": "Servidor",
         "url": "URL",
         "email": "Email",
-        "path": "Path",
-        "port": "Port",
-        "provider": "Provider",
-        "command": "Command",
-        "fromAddress": "From Address",
-        "fromName": "From Name",
-        "siteKey": "Site Key",
-        "secretKey": "Secret Key",
-        "apiKey": "API Key",
-        "accessKey": "Access Key",
-        "bucket": "Bucket",
-        "region": "Region",
+        "path": "Caminho",
+        "port": "Porta",
+        "provider": "Provedor",
+        "command": "Comando",
+        "fromAddress": "De Endereço",
+        "fromName": "De Nome",
+        "siteKey": "Chave do Site",
+        "secretKey": "Chave Secreta",
+        "apiKey": "Chave da API",
+        "accessKey": "Chave de Acesso",
+        "bucket": "Balde",
+        "region": "Região",
         "endpoint": "Endpoint",
-        "publicUrl": "Public URL",
-        "firstName": "First Name",
-        "lastName": "Last Name",
-        "language": "Language",
-        "identifier": "Identifier",
-        "enabled": "Enabled",
-        "disabled": "Disabled",
-        "title": "Title",
-        "content": "Content",
-        "backupConfiguration": "Backup Configuration",
-        "fileName": "File Name",
-        "sftpPort": "SFTP Port",
-        "sftpHost": "SFTP Host",
-        "dockerImage": "Docker Image",
-        "memory": "Memory",
-        "disk": "Disk",
-        "serverName": "Server Name",
-        "startupCommand": "Startup Command",
-        "archiveName": "Archive Name",
-        "archiveFormat": "Archive Format",
-        "compressionLevel": "Compression Level",
+        "publicUrl": "URL Pública",
+        "firstName": "Primeiro Nome",
+        "lastName": "Último Nome",
+        "language": "Língua",
+        "identifier": "Identificador",
+        "enabled": "Ativar",
+        "disabled": "Desativar",
+        "title": "Título",
+        "content": "Conteúdo",
+        "backupConfiguration": "Configuração do Backup",
+        "fileName": "Nome do Arquivo",
+        "sftpPort": "Porta SFTP",
+        "sftpHost": "Host SFTP",
+        "dockerImage": "Imagem Docker",
+        "memory": "Memória",
+        "disk": "Disco",
+        "serverName": "Nome do Servidor",
+        "startupCommand": "Comando de Inicialização",
+        "archiveName": "Nome do Arquivo",
+        "archiveFormat": "Formato do Arquivo",
+        "compressionLevel": "Nível de Compressão",
         "multiplexChannels": "Multiplex Channels",
-        "multiplexChannelsDescription": "Add additional HTTP connections (and therefore also threads) for transferring split archives, total streams is 1 + multiplex channels.",
-        "deleteSourceBackups": "Delete source backups",
-        "deleteSourceBackupsDescription": "Deletes the transferred backups on the source node once transfer finishes.",
+        "multiplexChannelsDescription": "",
+        "deleteSourceBackups": "Excluir backups de origem",
+        "deleteSourceBackupsDescription": "Excluir os backups transferidos do Node de origem quando a transferência terminar.",
         "node": "Node",
-        "location": "Location",
-        "primaryAllocation": "Primary Allocation",
-        "additionalAllocations": "Additional Allocations",
+        "location": "Local",
+        "primaryAllocation": "Endereço de Ip Principal",
+        "additionalAllocations": "Endereços de Ip adicionais",
         "externalId": "External ID",
         "mount": "Mount",
         "nest": "Nest",
@@ -611,7 +639,8 @@
           "theme": "Theme",
           "themeAuto": "Auto",
           "themeDark": "Dark",
-          "themeLight": "Light"
+          "themeLight": "Light",
+          "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },
         "modal": {
           "logout": {
@@ -1079,6 +1108,16 @@
                 "useTotp": "Use TOTP"
               }
             },
+            "email": {
+              "subtitle": "We can email you a one-time code to finish signing in.",
+              "enterCode": "Enter the 6-digit code we sent to your email address",
+              "button": {
+                "useEmail": "Email me a code",
+                "sendCode": "Send Code",
+                "resend": "Resend Code",
+                "resendIn": "Resend Code ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "Enter a recovery code",
               "form": {
@@ -1112,6 +1151,14 @@
             "request": "Request Password Reset"
           },
           "success": "An email has been sent to you with instructions on how to reset your password."
+        },
+        "verifyEmail": {
+          "title": "Verify Email",
+          "success": "Your email address **{email}** has been verified.",
+          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
+          "button": {
+            "continue": "Continue"
+          }
         },
         "resetPassword": {
           "title": "Reset Password",
@@ -1186,6 +1233,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Already in this group",
+                      "description": "This server is already part of {group}."
+                    },
+                    "groupFull": {
+                      "title": "Group is full",
+                      "description": "A group cannot hold more than {max} servers."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server moved to {group}."
+                  }
+                },
                 "noGroups": "No Groups could be found, time to create one?"
               }
             },
@@ -1226,6 +1288,14 @@
               "title": "Two-Factor Authentication Required",
               "description": "Two-Factor Authentication is required on your account. Please set it up below to continue using the panel."
             },
+            "verifyEmail": {
+              "title": "Email Verification Required",
+              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
+              "sent": "Verification email sent to {email}.",
+              "button": {
+                "resend": "Resend Verification Email"
+              }
+            },
             "frozen": {
               "title": "Account Frozen",
               "description": "Your account has been frozen. You cannot make changes to your account until it is unfrozen. Please contact an administrator for more information."
@@ -1245,7 +1315,8 @@
             "email": {
               "title": "Email",
               "toast": {
-                "updated": "Email updated successfully."
+                "updated": "Email updated successfully.",
+                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
               },
               "form": {
                 "newEmail": "New Email"
@@ -1273,17 +1344,65 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "Setup Two-Factor"
+                "setupTwoFactor": "Setup Two-Factor",
+                "enableEmail": "Enable Email",
+                "disableEmail": "Disable Email",
+                "securityKeys": "Security Keys"
               },
-              "twoFactorEnabled": "Two-Factor Verification is currently enabled.",
-              "twoFactorDisabled": "You do not currently have two-factor verification enabled on your account. Click the button below to begin configuring it.",
-              "twoFactorLastUsed": "Last used: {timestamp}"
+              "twoFactorLastUsed": "Last used: {timestamp}",
+              "none": "No second factor is set up on your account yet.",
+              "requirementMet": "Your account meets the two-factor requirement.",
+              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
+              "method": {
+                "totp": "Authenticator App",
+                "securityKey": "Security Key",
+                "email": "Email"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Email two-factor disabled successfully."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Enable Email Two-Factor",
+                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
+                },
+                "disable": {
+                  "title": "Disable Email Two-Factor",
+                  "description": "Disabling email two-factor will make your account less secure."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Password Login",
+              "enabled": "You can sign in with your password.",
+              "disabled": "Password login is turned off. Only your security keys can sign you in.",
+              "toast": {
+                "updated": "Password login updated successfully."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Add a security key before turning off password login."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Disable Password Login",
+                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
+                },
+                "enable": {
+                  "title": "Enable Password Login",
+                  "description": "Your password will be able to sign you in again."
+                }
+              }
             },
             "account": {
               "title": "Account Details",
               "toast": {
                 "updated": "Account details updated successfully."
-              },
+              }
+            },
+            "preferences": {
+              "title": "Preferences",
               "form": {
                 "toastPosition": "Toast Position",
                 "startOnGroupedServers": "Start on the Grouped Servers page"
@@ -1546,6 +1665,10 @@
               "expires": "Expires"
             }
           },
+          "toast": {
+            "enabled": "API key enabled.",
+            "disabled": "API key disabled."
+          },
           "modal": {
             "createApiKey": {
               "title": "Create API Key",
@@ -1766,11 +1889,22 @@
                   "sessionCookie": "Session Cookie",
                   "sessionDurationSeconds": "Session Duration (seconds)",
                   "twoFactorRequirement": "Two-Factor Authentication Requirement",
+                  "emailTwoFactorEnabled": "Email Two-Factor",
+                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
+                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
+                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
+                  "emailVerificationRequired": "Require Email Verification",
+                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "Enable Telemetry",
                   "telemetryEnabledDescription": "Allow Calagopus to collect limited and anonymous usage data to help improve the application.",
                   "registrationEnabled": "Enable Registration"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator App (TOTP)",
+                    "securityKey": "Security Key",
+                    "email": "Email"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Admins",
                     "allUsers": "All Users",
@@ -1986,6 +2120,8 @@
                   "maxCommandSnippetCount": "Max Command Snippets",
                   "maxSecurityKeyCount": "Max Security Keys",
                   "maxSshKeyCount": "Max SSH Keys",
+                  "maxSettingsCount": "Max Synced Settings",
+                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "Allow Changing Language",
                   "allowChangingLanguageDescription": "If enabled, users will be able to change their language preferences."
                 },
@@ -2125,6 +2261,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2274,7 @@
             "retryBuild": "Retry build",
             "cancelBuild": "Cancel build",
             "configure": "Configure",
+            "restart": "Restart the panel",
             "back": "Back to Extensions",
             "accept": "Accept",
             "decline": "Decline"
@@ -2144,7 +2285,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Backend extension is required to configure this extension.",
             "noConfigurationPage": "This extension does not have a configuration page defined.",
-            "removeExtension": "Remove extension"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Remove extension",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2306,9 @@
             "frontendMissing": "Frontend missing",
             "backendMissing": "Backend missing",
             "pendingBuild": "Pending build",
-            "pendingRemoval": "Pending removal"
+            "pendingRemoval": "Pending removal",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Version",
@@ -2182,7 +2328,10 @@
             "buildFailed": "Extension build failed: {reason}",
             "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Extension `{packageName}` added successfully.",
-            "removed": "Extension `{packageName}` removed successfully."
+            "removed": "Extension `{packageName}` removed successfully.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Extension Not Found",
@@ -2249,6 +2398,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Send Password Reset Email",
+                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "Impersonate"
                 },
                 "form": {
@@ -2264,6 +2414,13 @@
                   "delete": {
                     "title": "Confirm User Deletion",
                     "content": "Are you sure you want to delete **{username}**?"
+                  },
+                  "verifyEmail": {
+                    "title": "Mark Email Verified",
+                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
+                    "toast": {
+                      "verified": "Email marked as verified."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Disable User Two Factor",
@@ -3855,8 +4012,8 @@
                   "nameLastPath": "Last Name Path",
                   "nameLastPathDescription": "The path used to extract the last name from the Info URL response (https://serdejsonpath.live).",
                   "loginOnly": "Only allow Login",
-                  "loginBypass2fa": "Bypass 2FA on Login",
-                  "loginBypass2faDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
+                  "loginBypassTwoFactor": "Bypass 2FA on Login",
+                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "Link Viewable to User",
                   "linkViewableDescription": "Allows the user to see the connection and its identifier in the client UI.",
                   "userManageable": "Link Manageable by User",
