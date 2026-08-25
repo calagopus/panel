@@ -33,7 +33,7 @@ jobs:
         run: echo "<meta http-equiv=\"refresh\" content=\"0; url=shared/index.html\">" > target/doc/index.html
 
       - name: Deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -71,7 +71,7 @@ jobs:
 #          pnpm build:docs
 #
 #      - name: Deploy Frontend Docs
-#        uses: cloudflare/wrangler-action@v3
+#        uses: cloudflare/wrangler-action@v4
 #        with:
 #          apiToken: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_TOKEN }}
 #          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
