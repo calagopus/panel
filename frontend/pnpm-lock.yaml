@@ -298,36 +298,6 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(vite@8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  extensions/dev_wdt_crisp_chat:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
-
-  extensions/dev_wdt_fivem_oxmysql:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
-
-  extensions/dev_wdt_gamequery:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
-
-  extensions/dev_wdt_phpmyadmin_sso:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
-
-  extensions/dev_wdt_shadcn_theme:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
-
   extensions/shared: {}
 
 packages:
