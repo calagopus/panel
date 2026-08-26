@@ -1,7 +1,8 @@
-import { faChevronDown, faChevronRight, faFile, faFolder } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { bytesToString } from '@/lib/size.ts';
+import FileRowIcon from '@/pages/server/files/browser/FileRowIcon.tsx';
 import FileTreeName from '@/pages/server/files/workspace/FileTreeName.tsx';
 import { FileTreeRow as FileTreeRowData } from '@/pages/server/files/workspace/fileTreeData.ts';
 
@@ -52,13 +53,7 @@ export default function FileTreeScrollingRow({
         ) : (
           <span className='w-2.5 shrink-0' />
         )}
-        <FontAwesomeIcon
-          icon={row.entry.directory ? faFolder : faFile}
-          className={classNames(
-            'w-4 shrink-0',
-            row.entry.directory ? 'text-(--mantine-color-yellow-5)' : 'text-(--mantine-color-dimmed)',
-          )}
-        />
+        <FileRowIcon file={row.entry} className='w-4 shrink-0' />
         <FileTreeName name={row.entry.name} directory={row.entry.directory} className='flex-1' />
       </div>
       <span className='truncate text-xs text-(--mantine-color-dimmed)'>
