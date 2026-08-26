@@ -1202,12 +1202,25 @@ const baseTranslations = defineTranslations({
           containers: {
             password: {
               title: 'Password',
+              button: {
+                logOutOthers: 'Log Out Others',
+              },
               toast: {
                 updated: 'Password updated successfully.',
               },
               form: {
                 newPassword: 'New Password',
                 confirmNewPassword: 'Confirm New Password',
+              },
+              modal: {
+                logOutOtherSessions: {
+                  title: 'Log Out Other Sessions',
+                  content:
+                    'Your password has been updated. Do you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.',
+                  toast: {
+                    deleted: '{sessions} deleted.',
+                  },
+                },
               },
             },
             email: {

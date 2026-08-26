@@ -1,18 +1,22 @@
 import { faUserLock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
+import { useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updatePassword from '@/api/me/account/updatePassword.ts';
+import deleteSessions from '@/api/me/sessions/deleteSessions.ts';
 import Button from '@/elements/Button.tsx';
 import Group from '@/elements/Group.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { dashboardPasswordSchema } from '@/lib/schemas/dashboard.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -20,11 +24,13 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { AccountCardProps } from './DashboardAccount.tsx';
 
 export default function PasswordContainer({ requireTwoFactorActivation }: AccountCardProps) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState<'logOutOtherSessions' | null>(null);
 
   const form = useForm<z.infer<typeof dashboardPasswordSchema>>({
     initialValues: {
@@ -57,11 +63,25 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
 
         addToast(t('pages.account.account.containers.password.toast.updated', {}), 'success');
         form.reset();
+        setOpenModal('logOutOtherSessions');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       })
       .finally(() => setLoading(false));
+  };
+
+  const doLogOutOtherSessions = async () => {
+    const { deleted } = await deleteSessions();
+
+    setOpenModal(null);
+    queryClient.invalidateQueries({ queryKey: queryKeys.user.sessions.all() });
+    addToast(
+      t('pages.account.account.containers.password.modal.logOutOtherSessions.toast.deleted', {
+        sessions: tItem('session', deleted),
+      }),
+      'success',
+    );
   };
 
   if (!user) {
@@ -74,6 +94,16 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
       icon={<FontAwesomeIcon icon={faUserLock} />}
       className={classNames('h-full order-10', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
+      <ConfirmationModal
+        opened={openModal === 'logOutOtherSessions'}
+        onClose={() => setOpenModal(null)}
+        title={t('pages.account.account.containers.password.modal.logOutOtherSessions.title', {})}
+        confirm={t('pages.account.account.containers.password.button.logOutOthers', {})}
+        onConfirmed={doLogOutOtherSessions}
+      >
+        {t('pages.account.account.containers.password.modal.logOutOtherSessions.content', {}).md()}
+      </ConfirmationModal>
+
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           {user.hasPassword && (

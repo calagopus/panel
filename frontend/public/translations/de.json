@@ -1282,12 +1282,24 @@
           "containers": {
             "password": {
               "title": "Passwort",
+              "button": {
+                "logOutOthers": "Andere abmelden"
+              },
               "toast": {
                 "updated": "Passwort erfolgreich aktualisiert."
               },
               "form": {
                 "newPassword": "Neues Passwort",
                 "confirmNewPassword": "Neues Passwort bestätigen"
+              },
+              "modal": {
+                "logOutOtherSessions": {
+                  "title": "Andere Sitzungen abmelden",
+                  "content": "Dein Passwort wurde aktualisiert. Möchtest du alle Sitzungen außer der aktuell genutzten abmelden? Jedes andere Gerät, das in deinem Account angemeldet ist, muss sich erneut anmelden.",
+                  "toast": {
+                    "deleted": "{sessions} gelöscht."
+                  }
+                }
               }
             },
             "email": {
