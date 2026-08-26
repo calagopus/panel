@@ -117,16 +117,16 @@ export default function FileTreeVirtualList({
     },
     [headerRef],
   );
-  // This pane owns its scroll viewport, so use the element virtualizer and keep scroll-only updates out of React.
+  // This pane owns its scroll viewport. Keep scroll-only movement out of React, but commit range jumps immediately.
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement,
     estimateSize: estimateRowSize,
     getItemKey: getRowKey,
-    overscan: 8,
+    overscan: 15,
     paddingEnd: 8,
     directDomUpdates: true,
-    useFlushSync: false,
+    useFlushSync: true,
   });
   const virtualRows = useSyncExternalStore(
     () => () => undefined,
