@@ -55,6 +55,16 @@ export default function FileTreeEditorTabs({
             data-dirty={dirty || undefined}
             draggable
             onDragStart={(event) => setFileTreeEditorTabDragData(event.dataTransfer, { tabId, paneId })}
+            onMouseDown={(event) => {
+              if (event.button === 1) event.preventDefault();
+            }}
+            onAuxClick={(event) => {
+              if (event.button !== 1) return;
+
+              event.preventDefault();
+              event.stopPropagation();
+              onClose(tabId);
+            }}
             className={classNames(
               'group flex h-[2.625rem] min-h-[2.625rem] min-w-0 max-w-56 shrink-0 cursor-grab items-center gap-2 overflow-hidden border-r border-b-2 border-(--mantine-color-default-border) active:cursor-grabbing',
               active
