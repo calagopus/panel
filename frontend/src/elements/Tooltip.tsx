@@ -7,7 +7,7 @@ const Tooltip = forwardRef<HTMLDivElement, TooltipProps & { innerClassName?: str
   ({ children, className, innerClassName, ...rest }, ref) => {
     return (
       <MantineTooltip ref={ref} className={classNames(className, 'w-fit leading-none')} {...rest}>
-        <div className={innerClassName}>{children}</div>
+        <span className={classNames(innerClassName, 'inline-block')}>{children}</span>
       </MantineTooltip>
     );
   },

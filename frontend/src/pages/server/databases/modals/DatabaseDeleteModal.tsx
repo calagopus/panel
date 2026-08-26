@@ -46,7 +46,9 @@ export default function DatabaseDeleteModal({ database, ...props }: Props) {
       onSubmit={handleSubmit}
     >
       <Stack>
-        <Text>{t('pages.server.databases.modal.deleteDatabase.content', { name: database.name }).md()}</Text>
+        <Text component='div'>
+          {t('pages.server.databases.modal.deleteDatabase.content', { name: database.name }).md()}
+        </Text>
 
         <TextInput
           withAsterisk

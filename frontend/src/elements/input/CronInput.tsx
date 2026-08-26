@@ -126,7 +126,7 @@ export default function CronInput({
       </Popover>
 
       {(cronDescription || nextRun) && (
-        <Text c='dimmed' size='sm'>
+        <Text component='div' c='dimmed' size='sm'>
           {cronDescription && `${cronDescription} · `}
           {nextRun &&
             tReact('common.elements.cronInput.nextRun', {

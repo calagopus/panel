@@ -34,7 +34,7 @@ export const TableHeader = ({ name, rightSection, onClick }: TableHeaderProps) =
   return (
     <MantineTable.Th className='font-normal! text-nowrap' onClick={onClick}>
       <div className='flex flex-row items-center gap-2'>
-        <p>{resolvedName}</p> {rightSection}
+        <span>{resolvedName}</span> {rightSection}
       </div>
     </MantineTable.Th>
   );

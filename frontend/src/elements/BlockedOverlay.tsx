@@ -40,8 +40,10 @@ const BlockedOverlay = forwardRef<HTMLDivElement, BlockedOverlayProps>(
             style={{ color: `var(--mantine-color-${color}-filled)` }}
           />
           <div className='flex flex-col min-w-0'>
-            <p className='font-semibold leading-tight'>{title}</p>
-            {description && <p className='text-sm text-(--mantine-color-dimmed) leading-tight mt-1'>{description}</p>}
+            <div className='font-semibold leading-tight'>{title}</div>
+            {description && (
+              <div className='text-sm text-(--mantine-color-dimmed) leading-tight mt-1'>{description}</div>
+            )}
           </div>
         </div>
       </div>

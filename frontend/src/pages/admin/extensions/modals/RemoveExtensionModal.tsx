@@ -19,11 +19,11 @@ export default function RemoveExtensionModal({ extension, onRemove, ...props }: 
 
   return (
     <Modal title={t('pages.admin.extensions.modal.remove.title', {})} {...props}>
-      <p>
+      <div>
         {t('pages.admin.extensions.modal.remove.content', {
           packageName: extension?.metadataToml.packageName || '',
         }).md()}
-      </p>
+      </div>
 
       <Stack mt='md'>
         <Switch
