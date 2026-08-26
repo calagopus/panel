@@ -181,6 +181,31 @@
   height: 0.75rem;
 }
 
+.file-manager-tree-viewport {
+  scrollbar-color: var(--mantine-color-default-border) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+
+.file-manager-tree-viewport::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.file-manager-tree-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.file-manager-tree-viewport::-webkit-scrollbar-thumb {
+  border-radius: var(--mantine-radius-xl);
+  background-color: var(--mantine-color-default-border);
+}
+
+.file-manager-tree-viewport::-webkit-scrollbar-thumb:hover {
+  background-color: var(--mantine-color-dimmed);
+}
+
 @media (max-width: 47.999rem) {
   .file-manager-workspace-grid,
   .file-manager-workspace-grid[data-file-manager-tree-visible="false"] {

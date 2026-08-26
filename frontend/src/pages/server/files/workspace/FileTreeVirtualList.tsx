@@ -4,11 +4,11 @@ import { useMergedRef } from '@mantine/hooks';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
 import { ReactNode, Ref, RefObject, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import ScrollArea from '@/elements/ScrollArea.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import UnstyledButton from '@/elements/UnstyledButton.tsx';
 import FileTreeRow from '@/pages/server/files/workspace/FileTreeRow.tsx';
+import FileTreeScrollingRow from '@/pages/server/files/workspace/FileTreeScrollingRow.tsx';
 import {
   FileTreeRow as FileTreeRowData,
   TreeDirectoryCapabilities,
@@ -117,30 +117,33 @@ export default function FileTreeVirtualList({
     },
     [headerRef],
   );
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      syncScrollPosition({ x: event.currentTarget.scrollLeft, y: event.currentTarget.scrollTop });
+    },
+    [syncScrollPosition],
+  );
   // This pane owns its scroll viewport. Keep scroll-only movement out of React, but commit range jumps immediately.
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement,
     estimateSize: estimateRowSize,
     getItemKey: getRowKey,
-    overscan: 15,
+    overscan: 6,
     paddingEnd: 8,
     directDomUpdates: true,
+    isScrollingResetDelay: 80,
+    useScrollendEvent: true,
     useFlushSync: true,
   });
   const virtualRows = useSyncExternalStore(
     () => () => undefined,
     () => virtualizer.getVirtualItems(),
   );
+  const scrolling = virtualizer.isScrolling;
 
   return (
-    <ScrollArea
-      viewportRef={viewportRef}
-      type='auto'
-      scrollbarSize={8}
-      className='min-h-0 flex-1'
-      onScrollPositionChange={syncScrollPosition}
-    >
+    <div ref={viewportRef} className='file-manager-tree-viewport min-h-0 flex-1 overflow-auto' onScroll={handleScroll}>
       <SelectionArea<TreeSelectionItem>
         onSelectedStart={onSelectedStart}
         onSelected={onSelected}
@@ -216,8 +219,9 @@ export default function FileTreeVirtualList({
             const item = itemsByPath.get(row.path);
             if (!item) return null;
 
-            const useMassMenu = !!massSelectionDirectory && selectedPaths.has(row.path);
-            const parentCapabilities = getDirectoryCapabilities(row.parent);
+            const selected = selectedPaths.has(row.path);
+            const useMassMenu = !scrolling && !!massSelectionDirectory && selected;
+            const parentCapabilities = scrolling ? null : getDirectoryCapabilities(row.parent);
 
             return (
               <SelectionArea.Selectable key={row.key} item={item}>
@@ -228,27 +232,36 @@ export default function FileTreeVirtualList({
                     measureElement={virtualizer.measureElement}
                     selectionRef={innerRef}
                   >
-                    <FileTreeRow
-                      item={item}
-                      row={row}
-                      rowHeight={rowHeight}
-                      selected={selectedPaths.has(row.path)}
-                      dragged={draggedPaths.has(row.path)}
-                      moving={moving}
-                      canUpdateFiles={canUpdateFiles}
-                      parentWritable={parentCapabilities.writable}
-                      parentFast={parentCapabilities.fast}
-                      directoryWritable={isDirectoryWritable(row.path, row.parent, row.entry.virtual)}
-                      preferPhysicalSize={preferPhysicalSize}
-                      useMassMenu={useMassMenu}
-                      menuPosition={menuRequest?.path === row.path ? menuRequest : null}
-                      openMassMenu={openMassMenu}
-                      onOpenContextMenu={openRowContextMenu}
-                      onOpen={onOpen}
-                      onToggleSelection={onToggleSelection}
-                      onStartDrag={onStartDrag}
-                      onDragEnd={onDragEnd}
-                    />
+                    {scrolling ? (
+                      <FileTreeScrollingRow
+                        row={row}
+                        rowHeight={rowHeight}
+                        selected={selected}
+                        preferPhysicalSize={preferPhysicalSize}
+                      />
+                    ) : (
+                      <FileTreeRow
+                        item={item}
+                        row={row}
+                        rowHeight={rowHeight}
+                        selected={selected}
+                        dragged={draggedPaths.has(row.path)}
+                        moving={moving}
+                        canUpdateFiles={canUpdateFiles}
+                        parentWritable={parentCapabilities!.writable}
+                        parentFast={parentCapabilities!.fast}
+                        directoryWritable={isDirectoryWritable(row.path, row.parent, row.entry.virtual)}
+                        preferPhysicalSize={preferPhysicalSize}
+                        useMassMenu={useMassMenu}
+                        menuPosition={menuRequest?.path === row.path ? menuRequest : null}
+                        openMassMenu={openMassMenu}
+                        onOpenContextMenu={openRowContextMenu}
+                        onOpen={onOpen}
+                        onToggleSelection={onToggleSelection}
+                        onStartDrag={onStartDrag}
+                        onDragEnd={onDragEnd}
+                      />
+                    )}
                   </VirtualTreeRowContainer>
                 )}
               </SelectionArea.Selectable>
@@ -256,6 +269,6 @@ export default function FileTreeVirtualList({
           })}
         </div>
       </SelectionArea>
-    </ScrollArea>
+    </div>
   );
 }
