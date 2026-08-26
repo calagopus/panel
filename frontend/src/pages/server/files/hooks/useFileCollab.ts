@@ -1,12 +1,12 @@
 import { type OnMount } from '@monaco-editor/react';
 import { type EditorChangeEvent } from '@pierre/diffs/edit';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MonacoBinding } from 'y-monaco';
 import { Awareness, applyAwarenessUpdate, encodeAwarenessUpdate } from 'y-protocols/awareness';
 import * as Y from 'yjs';
 import { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
 import {
   bindPierreEditor,
+  createMonacoBinding,
   cursorColor,
   fromBase64,
   normalizePath,
@@ -171,7 +171,7 @@ export default function useFileCollab({
           },
         );
 
-        bindingRef.current = new MonacoBinding(text, model, new Set([monacoEditor]), awareness);
+        bindingRef.current = createMonacoBinding(text, model, new Set([monacoEditor]), awareness);
         awarenessRef.current = awareness;
         styleRef.current = styleEl;
 

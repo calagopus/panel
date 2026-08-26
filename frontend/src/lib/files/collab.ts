@@ -1,7 +1,29 @@
+import { type OnMount } from '@monaco-editor/react';
 import { type EditorChangeEvent } from '@pierre/diffs/edit';
+import { MonacoBinding } from 'y-monaco';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
 import { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
+
+type MonacoEditor = Parameters<OnMount>[0];
+type MonacoModel = NonNullable<ReturnType<MonacoEditor['getModel']>>;
+
+export function createMonacoBinding(
+  ytext: Y.Text,
+  monacoModel: MonacoModel,
+  editors: Set<MonacoEditor>,
+  awareness?: Awareness | null,
+): { destroy: () => void } {
+  const binding = new MonacoBinding(ytext, monacoModel, editors, awareness ?? undefined);
+  let destroyed = false;
+  const originalDestroy = binding.destroy.bind(binding);
+  binding.destroy = () => {
+    if (destroyed) return;
+    destroyed = true;
+    originalDestroy();
+  };
+  return binding;
+}
 
 const CURSOR_COLORS = ['#e03131', '#c2255c', '#9c36b5', '#3b5bdb', '#1971c2', '#099268', '#e8590c', '#f08c00'];
 
@@ -123,8 +145,11 @@ export function bindPierreEditor(
     }, 'pierre-local');
   };
 
+  let destroyed = false;
   return {
     destroy: () => {
+      if (destroyed) return;
+      destroyed = true;
       ytext.unobserve(observer);
       changeHandlerRef.current = null;
     },
