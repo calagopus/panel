@@ -1,20 +1,9 @@
-import {
-  faChevronDown,
-  faFileDownload,
-  faFileText,
-  faLink,
-  faMinus,
-  faPlay,
-  faPlus,
-  faRefresh,
-  faStop,
-  faUpload,
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { dump, load } from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
@@ -26,14 +15,10 @@ import updateEgg from '@/api/admin/nests/eggs/updateEgg.ts';
 import updateEggUsingImport from '@/api/admin/nests/eggs/updateEggUsingImport.ts';
 import updateEggUsingRepository from '@/api/admin/nests/eggs/updateEggUsingRepository.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Card from '@/elements/Card.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Group from '@/elements/Group.tsx';
-import JsonInput from '@/elements/input/JsonInput.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -43,7 +28,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
-import { processConfigurationParserLabelMapping } from '@/lib/enums.ts';
+import { downloadTextFile } from '@/lib/download.ts';
 import { toPterodactylEgg } from '@/lib/pterodactylEgg.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
@@ -53,6 +38,8 @@ import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { EggExportMenu, EggUpdateFromMenu } from './EggActionsMenu.tsx';
+import EggConfigFilesEditor from './EggConfigFilesEditor.tsx';
 import EggDuplicateModal from './modals/EggDuplicateModal.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
 import EggUpdateUrlModal from './modals/EggUpdateUrlModal.tsx';
@@ -72,8 +59,6 @@ export default function EggCreateOrUpdate({
   const [selectedEggRepositoryUuid, setSelectedEggRepositoryUuid] = useState<string>(
     contextEgg?.eggRepositoryEgg?.eggRepository.uuid ?? '',
   );
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<z.infer<typeof adminEggUpdateSchema>>({
     mode: 'uncontrolled',
@@ -176,30 +161,9 @@ export default function EggCreateOrUpdate({
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.exported', {}), 'success');
 
         if (fileType === 'json') {
-          const jsonData = JSON.stringify(data, undefined, 2);
-          const fileURL = URL.createObjectURL(new Blob([jsonData], { type: 'text/plain' }));
-          const downloadLink = document.createElement('a');
-          downloadLink.href = fileURL;
-          downloadLink.download = `egg-${contextEgg!.uuid}.json`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-
-          URL.revokeObjectURL(fileURL);
-          downloadLink.remove();
+          downloadTextFile(JSON.stringify(data, undefined, 2), `egg-${contextEgg!.uuid}.json`);
         } else {
-          const yamlData = dump(data, {
-            flowLevel: -1,
-            forceQuotes: true,
-          });
-          const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
-          const downloadLink = document.createElement('a');
-          downloadLink.href = fileURL;
-          downloadLink.download = `egg-${contextEgg!.uuid}.yml`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-
-          URL.revokeObjectURL(fileURL);
-          downloadLink.remove();
+          downloadTextFile(dump(data, { flowLevel: -1, forceQuotes: true }), `egg-${contextEgg!.uuid}.yml`);
         }
       })
       .catch((msg) => {
@@ -461,200 +425,7 @@ export default function EggCreateOrUpdate({
             </Group>
           </TitleCard>
 
-          <TitleCard
-            title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.configFiles', {})}
-            icon={<FontAwesomeIcon icon={faFileText} size='sm' />}
-          >
-            {form.getValues().configFiles.length === 0 ? (
-              <p className='mb-2'>{t('pages.admin.nests.tabs.eggs.page.tabs.general.page.emptyConfigFiles', {})}</p>
-            ) : (
-              form.getValues().configFiles.map((_, index) => (
-                <Card key={index} className='flex flex-row! justify-between mb-2'>
-                  <Stack w='100%'>
-                    <Group grow>
-                      <TextInput
-                        withAsterisk
-                        label={t('common.form.filePath', {})}
-                        key={form.key(`configFiles.${index}.file`)}
-                        {...form.getInputProps(`configFiles.${index}.file`)}
-                      />
-                      <Select
-                        withAsterisk
-                        label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.parser', {})}
-                        data={Object.entries(processConfigurationParserLabelMapping).map(([value, label]) => ({
-                          label,
-                          value,
-                        }))}
-                        key={form.key(`configFiles.${index}.parser`)}
-                        {...form.getInputProps(`configFiles.${index}.parser`)}
-                      />
-                    </Group>
-
-                    <Switch
-                      label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.createNewFile', {})}
-                      description={t(
-                        'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.createNewFileDescription',
-                        {},
-                      )}
-                      key={form.key(`configFiles.${index}.createNew`)}
-                      {...form.getInputProps(`configFiles.${index}.createNew`, {
-                        type: 'checkbox',
-                      })}
-                    />
-
-                    <div className='flex flex-col'>
-                      {form.getValues().configFiles[index].replace.length === 0 ? (
-                        <p className='mb-2'>
-                          {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.emptyReplacements', {})}
-                        </p>
-                      ) : (
-                        form.getValues().configFiles[index].replace.map((_, replaceIndex) => (
-                          <Card key={replaceIndex} className='flex flex-row! mb-2'>
-                            <div className='flex flex-col w-full'>
-                              <Group grow w='100%' align='flex-start'>
-                                <TextInput
-                                  withAsterisk
-                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.match', {})}
-                                  key={form.key(`configFiles.${index}.replace.${replaceIndex}.match`)}
-                                  {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.match`)}
-                                />
-                                <TextInput
-                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.ifValue', {})}
-                                  key={form.key(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
-                                  {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.ifValue`)}
-                                />
-                                <JsonInput
-                                  withAsterisk
-                                  label={t('common.form.replaceWith', {})}
-                                  key={form.key(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
-                                  {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.replaceWith`)}
-                                />
-                              </Group>
-                              <Group grow mt='md'>
-                                <Switch
-                                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.insertNew', {})}
-                                  description={t(
-                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.insertNewDescription',
-                                    {},
-                                  )}
-                                  key={form.key(`configFiles.${index}.replace.${replaceIndex}.insertNew`)}
-                                  {...form.getInputProps(`configFiles.${index}.replace.${replaceIndex}.insertNew`, {
-                                    type: 'checkbox',
-                                  })}
-                                />
-                                <Switch
-                                  label={t(
-                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.updateExisting',
-                                    {},
-                                  )}
-                                  description={t(
-                                    'pages.admin.nests.tabs.eggs.page.tabs.general.page.form.updateExistingDescription',
-                                    {},
-                                  )}
-                                  key={form.key(`configFiles.${index}.replace.${replaceIndex}.updateExisting`)}
-                                  {...form.getInputProps(
-                                    `configFiles.${index}.replace.${replaceIndex}.updateExisting`,
-                                    { type: 'checkbox' },
-                                  )}
-                                />
-                              </Group>
-                            </div>
-
-                            <ActionIcon
-                              color='red'
-                              variant='light'
-                              size='input-md'
-                              className='ml-4'
-                              onClick={() =>
-                                form.setValues({
-                                  ...form.getValues(),
-                                  configFiles: form.getValues().configFiles.map((configFile, i) => {
-                                    if (i !== index) return configFile;
-                                    return {
-                                      ...configFile,
-                                      replace: configFile.replace.filter((_, j) => j !== replaceIndex),
-                                    };
-                                  }),
-                                })
-                              }
-                            >
-                              <FontAwesomeIcon icon={faMinus} />
-                            </ActionIcon>
-                          </Card>
-                        ))
-                      )}
-
-                      <Button
-                        variant='light'
-                        onClick={() =>
-                          form.setValues({
-                            ...form.getValues(),
-                            configFiles: form.getValues().configFiles.map((configFile, i) => {
-                              if (i !== index) return configFile;
-                              return {
-                                ...configFile,
-                                replace: [
-                                  ...configFile.replace,
-                                  {
-                                    match: '',
-                                    insertNew: false,
-                                    updateExisting: true,
-                                    ifValue: null,
-                                    replaceWith: '',
-                                  },
-                                ],
-                              };
-                            }),
-                          })
-                        }
-                        className='w-fit!'
-                        leftSection={<FontAwesomeIcon icon={faPlus} />}
-                      >
-                        {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.addReplacement', {})}
-                      </Button>
-                    </div>
-                  </Stack>
-
-                  <ActionIcon
-                    color='red'
-                    variant='light'
-                    size='input-md'
-                    className='ml-4'
-                    onClick={() =>
-                      form.setValues({
-                        ...form.getValues(),
-                        configFiles: form.getValues().configFiles.filter((_, i) => i !== index),
-                      })
-                    }
-                  >
-                    <FontAwesomeIcon icon={faMinus} />
-                  </ActionIcon>
-                </Card>
-              ))
-            )}
-
-            <Button
-              variant='light'
-              onClick={() =>
-                form.setValues({
-                  ...form.getValues(),
-                  configFiles: [
-                    ...form.getValues().configFiles,
-                    {
-                      file: '',
-                      parser: 'file',
-                      createNew: true,
-                      replace: [],
-                    },
-                  ],
-                })
-              }
-              className='w-fit!'
-              leftSection={<FontAwesomeIcon icon={faPlus} />}
-            >
-              {t('pages.admin.nests.tabs.eggs.page.tabs.general.page.button.addConfigFile', {})}
-            </Button>
-          </TitleCard>
+          <EggConfigFilesEditor form={form} />
 
           <MultiKeyValueInput
             label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupCommands', {})}
@@ -705,102 +476,16 @@ export default function EggCreateOrUpdate({
               {t('common.button.save', {})}
             </Button>
             {contextEgg && (
-              <>
-                <ContextMenu
-                  menuProps={{ position: 'top', offset: 40 }}
-                  items={[
-                    {
-                      type: 'action',
-                      icon: faUpload,
-                      label: t('pages.admin.nests.tabs.eggs.page.button.fromFile', {}),
-                      onClick: () => fileInputRef.current?.click(),
-                      color: 'gray',
-                    },
-                    {
-                      type: 'action',
-                      icon: faLink,
-                      label: t('pages.admin.nests.tabs.eggs.page.button.fromUrl', {}),
-                      onClick: () => setOpenModal('updateUrl'),
-                      color: 'gray',
-                    },
-                    {
-                      type: 'action',
-                      icon: faRefresh,
-                      label: t('pages.admin.nests.tabs.eggs.page.button.fromRepository', {}),
-                      disabled: !contextEgg.eggRepositoryEgg,
-                      onClick: doRepositoryUpdate,
-                      color: 'gray',
-                    },
-                  ]}
-                >
-                  {({ openMenu }) => (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        openMenu(rect.left, rect.bottom);
-                      }}
-                      loading={loading}
-                      variant='outline'
-                      rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                    >
-                      {t('common.button.update', {})}
-                    </Button>
-                  )}
-                </ContextMenu>
-                <input
-                  type='file'
-                  accept='.json,.yml,.yaml'
-                  ref={fileInputRef}
-                  className='hidden'
-                  onChange={handleFileUpload}
-                />
-              </>
+              <EggUpdateFromMenu
+                hasEggRepositoryEgg={!!contextEgg.eggRepositoryEgg}
+                loading={loading}
+                onFromUrl={() => setOpenModal('updateUrl')}
+                onFromRepository={doRepositoryUpdate}
+                onFileUpload={handleFileUpload}
+              />
             )}
           </AdminCan>
-          {contextEgg && (
-            <ContextMenu
-              menuProps={{ position: 'top', offset: 40 }}
-              items={[
-                {
-                  type: 'action',
-                  icon: faFileDownload,
-                  label: t('common.button.exportAs', { format: 'JSON' }),
-                  onClick: () => doExport('calagopus', 'json'),
-                  color: 'gray',
-                },
-                {
-                  type: 'action',
-                  icon: faFileDownload,
-                  label: t('common.button.exportAs', { format: 'YAML' }),
-                  onClick: () => doExport('calagopus', 'yaml'),
-                  color: 'gray',
-                },
-                {
-                  type: 'action',
-                  icon: faFileDownload,
-                  label: t('common.button.exportAs', { format: 'Pterodactyl' }),
-                  onClick: () => doExport('pterodactyl', 'json'),
-                  color: 'gray',
-                },
-              ]}
-            >
-              {({ openMenu }) => (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    openMenu(rect.left, rect.bottom);
-                  }}
-                  loading={loading}
-                  variant='outline'
-                  rightSection={<FontAwesomeIcon icon={faChevronDown} />}
-                >
-                  {t('common.button.export', {})}
-                </Button>
-              )}
-            </ContextMenu>
-          )}
+          {contextEgg && <EggExportMenu loading={loading} onExport={doExport} />}
           {contextEgg && (
             <AdminCan action='eggs.update'>
               <Button variant='outline' onClick={() => setOpenModal('move')} loading={loading}>

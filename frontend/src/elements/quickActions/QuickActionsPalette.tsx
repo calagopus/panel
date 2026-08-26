@@ -1,17 +1,20 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Combobox, useCombobox } from '@mantine/core';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { AdminRouteDefinition, RouteDefinition, ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
 import getServers from '@/api/server/getServers.ts';
 import Group from '@/elements/Group.tsx';
 import Kbd from '@/elements/Kbd.tsx';
-import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Text from '@/elements/Text.tsx';
+import { useLogoutConfirmation } from '@/elements/useLogoutConfirmation.tsx';
+import { resolveString } from '@/lib/lazy.ts';
+import { isAdmin } from '@/lib/permissions.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   buildCoreQuickActionCategories,
   buildServerQuickActionItem,
@@ -19,11 +22,8 @@ import {
   useCoreQuickActionDefinitions,
   useCoreQuickActionModes,
   useServerQuickActionTarget,
-} from '@/lib/coreQuickActions.tsx';
-import { resolveString } from '@/lib/lazy.ts';
-import { isAdmin } from '@/lib/permissions.ts';
-import { queryKeys } from '@/lib/queryKeys.ts';
-import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions.ts';
+} from '@/lib/quickActions/coreQuickActions.tsx';
+import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
@@ -89,7 +89,8 @@ export default function QuickActionsPalette() {
 function Palette() {
   const { t } = useTranslations();
   const navigate = useNavigate();
-  const { user, impersonating, doLogout } = useAuth();
+  const { user } = useAuth();
+  const { confirmLogout, logoutModal } = useLogoutConfirmation();
 
   const open = useQuickActionsStore((state) => state.open);
   const setOpen = useQuickActionsStore((state) => state.setOpen);
@@ -105,8 +106,6 @@ function Palette() {
   useKeyboardShortcuts({
     shortcuts: [{ id: 'general.quickActions', callback: () => setOpen(true) }],
   });
-
-  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const combobox = useCombobox();
   const comboboxRef = useRef(combobox);
@@ -134,17 +133,19 @@ function Palette() {
 
   const close = () => setOpen(false);
   const serverTarget = useServerQuickActionTarget();
-  const coreDefinitions = useCoreQuickActionDefinitions(() =>
-    impersonating ? doLogout() : setLogoutConfirmOpen(true),
-  );
+  const coreDefinitions = useCoreQuickActionDefinitions(confirmLogout);
   const scopeRoutes = useScopeRoutes(scope, open);
 
-  const modes = [
-    ...useCoreQuickActionModes(),
-    ...modeProviders.flatMap((provider) => provider()),
-    ...window.extensionContext.extensionRegistry.quickActions.modes,
-  ];
-  const mode = modes.find((m) => query.startsWith(m.prefix));
+  const coreModes = useCoreQuickActionModes();
+  const modes = useMemo(
+    () => [
+      ...coreModes,
+      ...modeProviders.flatMap((provider) => provider()),
+      ...window.extensionContext.extensionRegistry.quickActions.modes,
+    ],
+    [coreModes, modeProviders],
+  );
+  const mode = useMemo(() => modes.find((m) => query.startsWith(m.prefix)), [modes, query]);
 
   useEffect(() => {
     if (!mode) servers.setSearch(query);
@@ -152,188 +153,231 @@ function Palette() {
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const serverPermissions =
-    scope === 'server' ? [...(server?.permissions || []), ...(user?.role?.serverPermissions || [])] : [];
-
-  const canServer = (action: string | string[], matchAny = true) => {
-    if (serverPermissions.includes('*')) return true;
-    const matrix = checkPermissions(serverPermissions, action);
-    return matchAny ? matrix.some(Boolean) : matrix.every(Boolean);
-  };
-
-  const canAdminRoute = (permission?: string | string[] | null) => {
-    if (!permission) return true;
-    if (user?.admin) return true;
-    return checkPermissions(user?.role?.adminPermissions ?? [], permission).some(Boolean);
-  };
-
-  const actionItems: QuickActionItem[] = [
-    ...coreDefinitions,
-    ...actionProviders.flatMap((provider) => provider()),
-    ...window.extensionContext.extensionRegistry.quickActions.definitions,
-  ]
-    .filter((definition) => !definition.scopes || definition.scopes.includes(scope))
-    .filter((definition) => !definition.permission || canServer(definition.permission))
-    .filter(
-      (definition) =>
-        definition.adminPermission === undefined ||
-        isAdmin(user, definition.adminPermission === true ? undefined : definition.adminPermission),
-    )
-    .filter((definition) => !definition.isVisible || definition.isVisible())
-    .map((definition) => ({
-      key: `action:${definition.id}`,
-      category: definition.category,
-      label: resolveString(definition.label),
-      description: resolveString(definition.description),
-      content: definition.content,
-      path: definition.path,
-      keywords: definition.keywords,
-      icon: definition.icon,
-      danger: definition.danger,
-      onSelect: () => {
-        close();
-        definition.perform();
-      },
-    }));
-
-  let navItems: QuickActionItem[] = [];
-
-  if (scope === 'dashboard') {
-    const routes = [...(scopeRoutes ?? []), ...window.extensionContext.extensionRegistry.routes.accountRoutes];
-    for (const interceptor of window.extensionContext.extensionRegistry.routes.accountRouteInterceptors) {
-      interceptor(routes);
-    }
-
-    const accessibleRoutePaths = getAccessibleRoutePaths(routes, userRouteOrder);
-
-    navItems = routes
-      .filter((route) => route.name && (!route.filter || route.filter()))
-      .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
-      .map((route) => {
-        const path = to(route.path, '/account');
-
-        return {
-          key: `nav:${route.path}`,
-          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
-          label: resolveString(route.name)!,
-          path,
-          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
-          onSelect: () => {
-            close();
-            navigate(path);
-          },
-        };
-      });
-  } else if (serverId) {
-    const routes = [
-      ...((scopeRoutes ?? []) as ServerRouteDefinition[]),
-      ...window.extensionContext.extensionRegistry.routes.serverRoutes,
-    ];
-    for (const interceptor of window.extensionContext.extensionRegistry.routes.serverRouteInterceptors) {
-      interceptor(routes);
-    }
-
-    const accessibleRoutePaths = getAccessibleRoutePaths(routes, server?.eggConfiguration?.routeOrder);
-
-    navItems = routes
-      .filter((route) => route.name && (!route.filter || route.filter()))
-      .filter((route) => !route.permission || canServer(route.permission))
-      .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
-      .map((route) => {
-        const path = to(route.path, `/server/${serverId}`);
-
-        return {
-          key: `nav:${route.path}`,
-          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
-          label: resolveString(route.name)!,
-          path,
-          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
-          onSelect: () => {
-            close();
-            navigate(path);
-          },
-        };
-      });
-  } else if (scope === 'admin') {
-    const routes = [
-      ...((scopeRoutes ?? []) as AdminRouteDefinition[]),
-      ...window.extensionContext.extensionRegistry.routes.adminRoutes,
-    ];
-    for (const interceptor of window.extensionContext.extensionRegistry.routes.adminRouteInterceptors) {
-      interceptor(routes);
-    }
-
-    navItems = routes
-      .filter((route) => route.name && (!route.filter || route.filter()))
-      .filter((route) => canAdminRoute(route.permission))
-      .map((route) => {
-        const path = to(route.path, '/admin');
-
-        return {
-          key: `nav:${route.path}`,
-          category: CORE_QUICK_ACTION_CATEGORIES.navigation,
-          label: resolveString(route.name)!,
-          path,
-          icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
-          onSelect: () => {
-            close();
-            navigate(path);
-          },
-        };
-      });
-  }
-
-  const matchesQuery = (item: QuickActionItem) => {
-    if (!normalizedQuery) return true;
-    if (item.label.toLowerCase().includes(normalizedQuery)) return true;
-    return item.keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedQuery)) ?? false;
-  };
-
-  const serverItems: QuickActionItem[] =
-    scope === 'dashboard' && !mode
-      ? servers.items
-          .filter((s) => !normalizedQuery || s.name.toLowerCase().includes(normalizedQuery))
-          .slice(0, 6)
-          .map((s) => buildServerQuickActionItem(s, navigate, close, serverTarget(s)))
-      : [];
-
-  const allItems = mode
-    ? [
-        ...(mode.items ?? []),
-        ...[...actionItems, ...navItems].map((item) => mode.map?.(item) ?? null).filter((item) => item !== null),
-      ]
-    : [...actionItems, ...navItems].filter(matchesQuery).concat(serverItems);
-
-  const categories: Record<string, QuickActionCategory> = {
-    ...buildCoreQuickActionCategories(),
-    ...window.extensionContext.extensionRegistry.quickActions.categories,
-  };
-
-  const categoryLabel = (id: string) => resolveString(categories[id]?.label) ?? id;
-  const categoryIconOf = (id: string): ReactNode => categories[id]?.icon;
-
-  const byCategory = new Map<string, QuickActionItem[]>();
-  for (const item of allItems) {
-    const list = byCategory.get(item.category) ?? [];
-    list.push(item);
-    byCategory.set(item.category, list);
-  }
-
-  const categoryOrder = (id: string) => categories[id]?.order ?? DEFAULT_CATEGORY_ORDER;
-
-  const orderedCategoryIds = Array.from(byCategory.keys()).sort(
-    (a, b) => categoryOrder(a) - categoryOrder(b) || categoryLabel(a).localeCompare(categoryLabel(b)),
+  const serverPermissions = useMemo(
+    () => (scope === 'server' ? [...(server?.permissions || []), ...(user?.role?.serverPermissions || [])] : []),
+    [scope, server?.permissions, user?.role?.serverPermissions],
   );
 
-  const grouped = orderedCategoryIds.map((id) => ({
-    id,
-    label: categoryLabel(id),
-    icon: categoryIconOf(id),
-    items: byCategory.get(id)!,
-  }));
+  const canServer = useCallback(
+    (action: string | string[], matchAny = true) => {
+      if (serverPermissions.includes('*')) return true;
+      const matrix = checkPermissions(serverPermissions, action);
+      return matchAny ? matrix.some(Boolean) : matrix.every(Boolean);
+    },
+    [serverPermissions],
+  );
 
-  const flatItems = grouped.flatMap((group) => group.items);
-  const itemsKey = flatItems.map((item) => item.key).join('|');
+  const canAdminRoute = useCallback(
+    (permission?: string | string[] | null) => {
+      if (!permission) return true;
+      if (user?.admin) return true;
+      return checkPermissions(user?.role?.adminPermissions ?? [], permission).some(Boolean);
+    },
+    [user?.admin, user?.role?.adminPermissions],
+  );
+
+  const actionItems: QuickActionItem[] = useMemo(
+    () =>
+      [
+        ...coreDefinitions,
+        ...actionProviders.flatMap((provider) => provider()),
+        ...window.extensionContext.extensionRegistry.quickActions.definitions,
+      ]
+        .filter((definition) => !definition.scopes || definition.scopes.includes(scope))
+        .filter((definition) => !definition.permission || canServer(definition.permission))
+        .filter(
+          (definition) =>
+            definition.adminPermission === undefined ||
+            isAdmin(user, definition.adminPermission === true ? undefined : definition.adminPermission),
+        )
+        .filter((definition) => !definition.isVisible || definition.isVisible())
+        .map((definition) => ({
+          key: `action:${definition.id}`,
+          category: definition.category,
+          label: resolveString(definition.label),
+          description: resolveString(definition.description),
+          content: definition.content,
+          path: definition.path,
+          keywords: definition.keywords,
+          icon: definition.icon,
+          danger: definition.danger,
+          onSelect: () => {
+            setOpen(false);
+            definition.perform();
+          },
+        })),
+    [coreDefinitions, actionProviders, scope, user, canServer, setOpen],
+  );
+
+  const navItems: QuickActionItem[] = useMemo(() => {
+    if (scope === 'dashboard') {
+      const routes = [...(scopeRoutes ?? []), ...window.extensionContext.extensionRegistry.routes.accountRoutes];
+      for (const interceptor of window.extensionContext.extensionRegistry.routes.accountRouteInterceptors) {
+        interceptor(routes);
+      }
+
+      const accessibleRoutePaths = getAccessibleRoutePaths(routes, userRouteOrder);
+
+      return routes
+        .filter((route) => route.name && (!route.filter || route.filter()))
+        .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
+        .map((route) => {
+          const path = to(route.path, '/account');
+
+          return {
+            key: `nav:${route.path}`,
+            category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+            label: resolveString(route.name)!,
+            path,
+            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            onSelect: () => {
+              setOpen(false);
+              navigate(path);
+            },
+          };
+        });
+    } else if (serverId) {
+      const routes = [
+        ...((scopeRoutes ?? []) as ServerRouteDefinition[]),
+        ...window.extensionContext.extensionRegistry.routes.serverRoutes,
+      ];
+      for (const interceptor of window.extensionContext.extensionRegistry.routes.serverRouteInterceptors) {
+        interceptor(routes);
+      }
+
+      const accessibleRoutePaths = getAccessibleRoutePaths(routes, server?.eggConfiguration?.routeOrder);
+
+      return routes
+        .filter((route) => route.name && (!route.filter || route.filter()))
+        .filter((route) => !route.permission || canServer(route.permission))
+        .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
+        .map((route) => {
+          const path = to(route.path, `/server/${serverId}`);
+
+          return {
+            key: `nav:${route.path}`,
+            category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+            label: resolveString(route.name)!,
+            path,
+            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            onSelect: () => {
+              setOpen(false);
+              navigate(path);
+            },
+          };
+        });
+    } else if (scope === 'admin') {
+      const routes = [
+        ...((scopeRoutes ?? []) as AdminRouteDefinition[]),
+        ...window.extensionContext.extensionRegistry.routes.adminRoutes,
+      ];
+      for (const interceptor of window.extensionContext.extensionRegistry.routes.adminRouteInterceptors) {
+        interceptor(routes);
+      }
+
+      return routes
+        .filter((route) => route.name && (!route.filter || route.filter()))
+        .filter((route) => canAdminRoute(route.permission))
+        .map((route) => {
+          const path = to(route.path, '/admin');
+
+          return {
+            key: `nav:${route.path}`,
+            category: CORE_QUICK_ACTION_CATEGORIES.navigation,
+            label: resolveString(route.name)!,
+            path,
+            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            onSelect: () => {
+              setOpen(false);
+              navigate(path);
+            },
+          };
+        });
+    }
+
+    return [];
+  }, [
+    scope,
+    serverId,
+    scopeRoutes,
+    userRouteOrder,
+    server?.eggConfiguration?.routeOrder,
+    setOpen,
+    navigate,
+    canServer,
+    canAdminRoute,
+  ]);
+
+  const matchesQuery = useCallback(
+    (item: QuickActionItem) => {
+      if (!normalizedQuery) return true;
+      if (item.label.toLowerCase().includes(normalizedQuery)) return true;
+      return item.keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedQuery)) ?? false;
+    },
+    [normalizedQuery],
+  );
+
+  const serverItems: QuickActionItem[] = useMemo(
+    () =>
+      scope === 'dashboard' && !mode
+        ? servers.items
+            .filter((s) => !normalizedQuery || s.name.toLowerCase().includes(normalizedQuery))
+            .slice(0, 6)
+            .map((s) => buildServerQuickActionItem(s, navigate, () => setOpen(false), serverTarget(s)))
+        : [],
+    [scope, mode, servers.items, normalizedQuery, navigate, setOpen, serverTarget],
+  );
+
+  const allItems = useMemo(
+    () =>
+      mode
+        ? [
+            ...(mode.items ?? []),
+            ...[...actionItems, ...navItems].map((item) => mode.map?.(item) ?? null).filter((item) => item !== null),
+          ]
+        : [...actionItems, ...navItems].filter(matchesQuery).concat(serverItems),
+    [mode, actionItems, navItems, serverItems, matchesQuery],
+  );
+
+  const categories: Record<string, QuickActionCategory> = useMemo(
+    () => ({
+      ...buildCoreQuickActionCategories(),
+      ...window.extensionContext.extensionRegistry.quickActions.categories,
+    }),
+    [],
+  );
+
+  const categoryLabel = useCallback((id: string) => resolveString(categories[id]?.label) ?? id, [categories]);
+  const categoryIconOf = useCallback((id: string): ReactNode => categories[id]?.icon, [categories]);
+
+  const { grouped, flatItems, flatItemIndex } = useMemo(() => {
+    const byCategory = new Map<string, QuickActionItem[]>();
+    for (const item of allItems) {
+      const list = byCategory.get(item.category) ?? [];
+      list.push(item);
+      byCategory.set(item.category, list);
+    }
+
+    const categoryOrder = (id: string) => categories[id]?.order ?? DEFAULT_CATEGORY_ORDER;
+
+    const orderedCategoryIds = Array.from(byCategory.keys()).sort(
+      (a, b) => categoryOrder(a) - categoryOrder(b) || categoryLabel(a).localeCompare(categoryLabel(b)),
+    );
+
+    const groupedResult = orderedCategoryIds.map((id) => ({
+      id,
+      label: categoryLabel(id),
+      icon: categoryIconOf(id),
+      items: byCategory.get(id)!,
+    }));
+
+    const flatItemsResult = groupedResult.flatMap((group) => group.items);
+    const flatItemIndexResult = new Map(flatItemsResult.map((item, index) => [item.key, index]));
+
+    return { grouped: groupedResult, flatItems: flatItemsResult, flatItemIndex: flatItemIndexResult };
+  }, [allItems, categories]);
+
+  const itemsKey = useMemo(() => flatItems.map((item) => item.key).join('|'), [flatItems]);
 
   useEffect(() => {
     if (open) comboboxRef.current.selectFirstOption();
@@ -404,7 +448,7 @@ function Palette() {
                   }
                 >
                   {group.items.map((item) => {
-                    const index = flatItems.indexOf(item);
+                    const index = flatItemIndex.get(item.key)!;
                     const isSelected = index === combobox.selectedOptionIndex;
 
                     return (
@@ -470,18 +514,7 @@ function Palette() {
         </Combobox>
       </Modal>
 
-      <ConfirmationModal
-        opened={logoutConfirmOpen}
-        onClose={() => setLogoutConfirmOpen(false)}
-        title={t('elements.sidebar.modal.logout.title', {})}
-        confirm={t('elements.sidebar.button.logout', {})}
-        onConfirmed={() => {
-          setLogoutConfirmOpen(false);
-          doLogout();
-        }}
-      >
-        {t('elements.sidebar.modal.logout.content', {})}
-      </ConfirmationModal>
+      {logoutModal}
     </>
   );
 }

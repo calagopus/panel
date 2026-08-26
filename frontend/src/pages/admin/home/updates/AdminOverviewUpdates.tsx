@@ -38,6 +38,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import DatabaseAgentHostRow from '../../databaseAgentHosts/DatabaseAgentHostRow.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
+import OutdatedResourceCard from './OutdatedResourceCard.tsx';
 
 export default function AdminOverviewUpdates() {
   const { addToast } = useToast();
@@ -300,81 +301,50 @@ export default function AdminOverviewUpdates() {
           )}
         </TitleCard>
         <AdminCan action='nodes.read'>
-          <TitleCard
+          <OutdatedResourceCard
             title={t('pages.admin.home.tabs.updates.page.card.outdatedNodes', {})}
             icon={<FontAwesomeIcon icon={faServer} />}
+            table={{ loading, error, data: nodes?.outdatedNodes, columns: nodeTableColumns(), onPageSelect: setPage }}
+            status={{
+              upToDate: t('pages.admin.home.tabs.updates.page.nodesUpToDate', { failed: nodes?.failedNodes ?? 0 }),
+              outdated: t('pages.admin.home.tabs.updates.page.nodesOutdated', {
+                latest: updateInformation?.latestWingsVersion || unknownLabel,
+                outdated: nodes?.outdatedNodes.total ?? 0,
+                failed: nodes?.failedNodes ?? 0,
+              }).md(),
+            }}
           >
-            {loading || !nodes?.outdatedNodes ? (
-              <Spinner.Centered />
-            ) : !nodes?.outdatedNodes.total ? (
-              <>
-                <FontAwesomeIcon icon={faCheck} />{' '}
-                {t('pages.admin.home.tabs.updates.page.nodesUpToDate', { failed: nodes?.failedNodes ?? 0 })}
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faExclamationTriangle} />{' '}
-                {t('pages.admin.home.tabs.updates.page.nodesOutdated', {
-                  latest: updateInformation?.latestWingsVersion || unknownLabel,
-                  outdated: nodes?.outdatedNodes.total ?? 0,
-                  failed: nodes?.failedNodes ?? 0,
-                }).md()}
-                <div className='mt-4' />
-                <Table
-                  columns={nodeTableColumns()}
-                  loading={loading}
-                  error={error}
-                  pagination={nodes.outdatedNodes}
-                  onPageSelect={setPage}
-                >
-                  {nodes.outdatedNodes.data.map((node) => (
-                    <NodeRow key={node.node.uuid} node={node.node} />
-                  ))}
-                </Table>
-              </>
-            )}
-          </TitleCard>
+            {nodes?.outdatedNodes?.data.map((node) => (
+              <NodeRow key={node.node.uuid} node={node.node} />
+            ))}
+          </OutdatedResourceCard>
         </AdminCan>
         <AdminCan action='database-agent-hosts.read'>
-          <TitleCard
+          <OutdatedResourceCard
             title={t('pages.admin.home.tabs.updates.page.card.outdatedDatabaseAgentHosts', {})}
             icon={<FontAwesomeIcon icon={faServer} />}
+            table={{
+              loading: databaseAgentHostsLoading,
+              error: databaseAgentHostsError,
+              data: databaseAgentHosts?.outdatedDatabaseAgentHosts,
+              columns: databaseAgentHostTableColumns(),
+              onPageSelect: setDatabaseAgentHostsPage,
+            }}
+            status={{
+              upToDate: t('pages.admin.home.tabs.updates.page.databaseAgentHostsUpToDate', {
+                failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
+              }),
+              outdated: t('pages.admin.home.tabs.updates.page.databaseAgentHostsOutdated', {
+                latest: updateInformation?.latestDbAgentVersion || unknownLabel,
+                outdated: databaseAgentHosts?.outdatedDatabaseAgentHosts.total ?? 0,
+                failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
+              }).md(),
+            }}
           >
-            {databaseAgentHostsLoading || !databaseAgentHosts?.outdatedDatabaseAgentHosts ? (
-              <Spinner.Centered />
-            ) : !databaseAgentHosts?.outdatedDatabaseAgentHosts.total ? (
-              <>
-                <FontAwesomeIcon icon={faCheck} />{' '}
-                {t('pages.admin.home.tabs.updates.page.databaseAgentHostsUpToDate', {
-                  failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
-                })}
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faExclamationTriangle} />{' '}
-                {t('pages.admin.home.tabs.updates.page.databaseAgentHostsOutdated', {
-                  latest: updateInformation?.latestDbAgentVersion || unknownLabel,
-                  outdated: databaseAgentHosts?.outdatedDatabaseAgentHosts.total ?? 0,
-                  failed: databaseAgentHosts?.failedDatabaseAgentHosts ?? 0,
-                }).md()}
-                <div className='mt-4' />
-                <Table
-                  columns={databaseAgentHostTableColumns()}
-                  loading={databaseAgentHostsLoading}
-                  error={databaseAgentHostsError}
-                  pagination={databaseAgentHosts.outdatedDatabaseAgentHosts}
-                  onPageSelect={setDatabaseAgentHostsPage}
-                >
-                  {databaseAgentHosts.outdatedDatabaseAgentHosts.data.map((host) => (
-                    <DatabaseAgentHostRow
-                      key={host.databaseAgentHost.uuid}
-                      databaseAgentHost={host.databaseAgentHost}
-                    />
-                  ))}
-                </Table>
-              </>
-            )}
-          </TitleCard>
+            {databaseAgentHosts?.outdatedDatabaseAgentHosts?.data.map((host) => (
+              <DatabaseAgentHostRow key={host.databaseAgentHost.uuid} databaseAgentHost={host.databaseAgentHost} />
+            ))}
+          </OutdatedResourceCard>
         </AdminCan>
 
         {window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.appendedComponents.map(

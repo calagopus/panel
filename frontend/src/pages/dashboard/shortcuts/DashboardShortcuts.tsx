@@ -10,23 +10,23 @@ import Text from '@/elements/Text.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
-import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/coreShortcuts.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { handleRawPasteFromClipboard } from '@/lib/paste.ts';
-import { UserSettingValue } from '@/lib/schemas/user/settings.ts';
+import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/quickActions/coreShortcuts.tsx';
 import {
   importShortcutOverrides,
   resetAllShortcuts,
   SHORTCUT_OVERRIDES_KEY,
   useShortcutOverrides,
-} from '@/lib/shortcutOverrides.ts';
+} from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   effectiveBinding,
   parseShortcuts,
   ShortcutCategory,
   ShortcutDefinition,
   serializeShortcuts,
-} from '@/lib/shortcuts.ts';
+} from '@/lib/quickActions/shortcuts.ts';
+import { UserSettingValue } from '@/lib/schemas/user/settings.ts';
 import { useUserSettingScope } from '@/lib/userSettings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

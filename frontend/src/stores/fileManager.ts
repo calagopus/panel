@@ -21,7 +21,7 @@ import {
   setUserSettingLocal,
   subscribeUserSetting,
 } from '@/lib/userSettings.ts';
-import type { FileMoveGroup } from '@/pages/server/files/fileMove.ts';
+import type { FileMoveGroup } from '@/pages/server/files/browser/fileMove.ts';
 import { FileUploader } from '@/stores/uploads.ts';
 
 export type ModalType =

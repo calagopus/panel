@@ -9,7 +9,7 @@ import getServers from '@/api/admin/servers/getServers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
-import DirectoryBrowser from '@/elements/DirectoryBrowser.tsx';
+import DirectoryBrowser from '@/elements/files/DirectoryBrowser.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';

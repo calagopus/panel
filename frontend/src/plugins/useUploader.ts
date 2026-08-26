@@ -5,7 +5,7 @@ import {
   cancelFolderUpload,
   getFolderFileCount,
   uploadFiles,
-} from '@/lib/uploadManager.ts';
+} from '@/lib/files/uploadManager.ts';
 import {
   AggregatedUploadProgress,
   FileUploader,

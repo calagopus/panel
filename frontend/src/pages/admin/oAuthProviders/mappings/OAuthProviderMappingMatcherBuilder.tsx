@@ -8,7 +8,7 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
-import { oauthProviderMappingMatcherLabelMapping } from '@/lib/enums.ts';
+import { mappingToSelectData, oauthProviderMappingMatcherLabelMapping } from '@/lib/enums.ts';
 import { AdminOAuthProviderMappingMatcher } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -89,12 +89,9 @@ export default function OAuthProviderMappingMatcherBuilder({ matcher, onChange, 
           label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.matcherType', {})}
           value={matcher.type}
           onChange={(value) => value && handleTypeChange(value)}
-          data={Object.entries(oauthProviderMappingMatcherLabelMapping)
-            .map(([value, label]) => ({
-              value,
-              label: label(),
-            }))
-            .filter((m) => depth < maxMatcherDepth || !['and', 'or', 'not'].includes(m.value))}
+          data={mappingToSelectData(oauthProviderMappingMatcherLabelMapping).filter(
+            (m) => depth < maxMatcherDepth || !['and', 'or', 'not'].includes(m.value),
+          )}
         />
 
         {matcher.type === 'scopes' && (

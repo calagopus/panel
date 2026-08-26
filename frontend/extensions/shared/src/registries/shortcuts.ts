@@ -1,5 +1,5 @@
 import { Registry } from 'shared';
-import type { ShortcutCategory, ShortcutDefinition } from '@/lib/shortcuts.ts';
+import type { ShortcutCategory, ShortcutDefinition } from '@/lib/quickActions/shortcuts.ts';
 
 export class ShortcutRegistry implements Registry {
   public mergeFrom(other: this): this {

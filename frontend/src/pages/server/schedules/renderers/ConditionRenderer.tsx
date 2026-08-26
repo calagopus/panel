@@ -11,7 +11,7 @@ import { serverScheduleConditionSchema } from '@/lib/schemas/server/schedules.ts
 import { bytesToString } from '@/lib/size.ts';
 import { formatMilliseconds } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import ScheduleDynamicParameterRenderer from '../ScheduleDynamicParameterRenderer.tsx';
+import ScheduleDynamicParameterRenderer from '../renderers/ScheduleDynamicParameterRenderer.tsx';
 
 type Condition = z.infer<typeof serverScheduleConditionSchema>;
 

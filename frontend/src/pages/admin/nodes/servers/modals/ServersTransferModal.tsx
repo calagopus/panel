@@ -12,7 +12,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
-import { compressionLevelLabelMapping, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { compressionLevelLabelMapping, mappingToSelectData, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { MAX_TRANSFER_MULTIPLEX_CHANNELS } from '@/lib/node.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -210,10 +210,7 @@ export default function ServersTransferModal({
             value={compressionLevel}
             onChange={(value) => setCompressionLevel(value as z.infer<typeof compressionLevelEnum>)}
             disabled={archiveFormat === 'tar' || archiveFormat === 'itaf'}
-            data={Object.entries(compressionLevelLabelMapping).map(([value, label]) => ({
-              value,
-              label: label(),
-            }))}
+            data={mappingToSelectData(compressionLevelLabelMapping)}
           />
 
           <NumberInput

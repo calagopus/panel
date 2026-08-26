@@ -15,6 +15,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import MonacoEditor from '@/elements/MonacoEditor.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { stripAnsi } from '@/lib/ansi.ts';
+import { downloadBlob } from '@/lib/download.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useWebsocket } from '@/plugins/useWebsocket.ts';
@@ -101,15 +102,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
 
     downloadNodeLog(node.uuid, selectedLog.name, lines)
       .then((blob) => {
-        const fileURL = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = fileURL;
-        downloadLink.download = selectedLog.name.endsWith('.gz') ? selectedLog.name.slice(0, -3) : selectedLog.name;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-
-        URL.revokeObjectURL(fileURL);
-        downloadLink.remove();
+        downloadBlob(blob, selectedLog.name.endsWith('.gz') ? selectedLog.name.slice(0, -3) : selectedLog.name);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
-import type { QuickActionDefinition, QuickActionMode, QuickActionScope } from '@/lib/quickActions.ts';
+import type { QuickActionDefinition, QuickActionMode, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { getQuickActionsStore, useQuickActionsStore } from '@/stores/quickActions.ts';
 

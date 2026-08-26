@@ -10,9 +10,9 @@ import AccountContentContainer from '@/elements/containers/AccountContentContain
 import { DndBoard, DndSortableList, SortableItem } from '@/elements/DragAndDrop.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
-import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { SERVER_GROUPS_CONTAINER_ID, useServerGroupsDnd } from '@/plugins/useServerGroupsDnd.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';

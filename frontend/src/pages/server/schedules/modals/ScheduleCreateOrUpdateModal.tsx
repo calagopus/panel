@@ -18,7 +18,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
-import { scheduleTriggerDefaultMapping, scheduleTriggerLabelMapping } from '@/lib/enums.ts';
+import { mappingToSelectData, scheduleTriggerDefaultMapping, scheduleTriggerLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema, serverScheduleUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
@@ -123,10 +123,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
                 <Select
                   label={t('pages.server.schedules.form.triggerNumber', { number: index + 1 })}
                   className='flex-1'
-                  data={Object.entries(scheduleTriggerLabelMapping).map(([value, label]) => ({
-                    value,
-                    label: label(),
-                  }))}
+                  data={mappingToSelectData(scheduleTriggerLabelMapping)}
                   {...form.getInputProps(`triggers.${index}.type`)}
                 />
 

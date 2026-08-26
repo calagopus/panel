@@ -5,10 +5,10 @@ import Title from '@/elements/Title.tsx';
 import { useVisualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import Console from './Console.tsx';
-import ServerDetails from './ServerDetails.tsx';
-import ServerPowerControls from './ServerPowerControls.tsx';
-import ServerStats from './ServerStats.tsx';
+import ServerDetails from './stats/ServerDetails.tsx';
+import ServerPowerControls from './stats/ServerPowerControls.tsx';
+import ServerStats from './stats/ServerStats.tsx';
+import Console from './terminal/Console.tsx';
 
 export default function ServerConsole() {
   const { t } = useTranslations();

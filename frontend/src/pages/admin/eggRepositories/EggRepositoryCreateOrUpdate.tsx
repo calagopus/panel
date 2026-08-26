@@ -16,7 +16,7 @@ import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine
 import Group from '@/elements/Group.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { eggRepositoryCredentialTypeLabelMapping } from '@/lib/enums.ts';
+import { eggRepositoryCredentialTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminEggRepositoryCredentialsPasswordSchema,
@@ -126,10 +126,7 @@ export default function EggRepositoryCreateOrUpdate({
           <Select
             withAsterisk
             label={t('pages.admin.eggRepositories.tabs.general.page.form.credentialType', {})}
-            data={Object.entries(eggRepositoryCredentialTypeLabelMapping).map(([value, label]) => ({
-              value,
-              label: label(),
-            }))}
+            data={mappingToSelectData(eggRepositoryCredentialTypeLabelMapping)}
             key={f.key('credentials.type')}
             {...f.getInputProps('credentials.type')}
           />

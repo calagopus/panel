@@ -6,7 +6,7 @@ import {
   FileMoveGroup,
   moveFileGroupsToDirectory,
   restoreFileGroupsFromDirectory,
-} from '@/pages/server/files/fileMove.ts';
+} from '@/pages/server/files/browser/fileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';

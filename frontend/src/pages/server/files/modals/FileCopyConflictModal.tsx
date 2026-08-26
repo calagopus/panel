@@ -14,7 +14,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import FileRowIcon from '../FileRowIcon.tsx';
+import FileRowIcon from '../browser/FileRowIcon.tsx';
 
 export interface FileConflict {
   from: string;

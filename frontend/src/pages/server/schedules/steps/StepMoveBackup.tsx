@@ -10,7 +10,7 @@ import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.t
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import BackupSelectorInput from '../BackupSelectorInput.tsx';
+import BackupSelectorInput from '../forms/BackupSelectorInput.tsx';
 
 export default function StepMoveBackup({
   form,

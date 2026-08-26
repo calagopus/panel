@@ -1,7 +1,7 @@
 import { type DependencyList, useEffect, useRef } from 'react';
-import { getShortcutDefinition } from '@/lib/coreShortcuts.tsx';
-import { getShortcutOverrides } from '@/lib/shortcutOverrides.ts';
-import { effectiveBinding, eventMatchesBinding, ModifierKey, ShortcutBinding } from '@/lib/shortcuts.ts';
+import { getShortcutDefinition } from '@/lib/quickActions/coreShortcuts.tsx';
+import { getShortcutOverrides } from '@/lib/quickActions/shortcutOverrides.ts';
+import { effectiveBinding, eventMatchesBinding, ModifierKey, ShortcutBinding } from '@/lib/quickActions/shortcuts.ts';
 
 export type { ModifierKey };
 

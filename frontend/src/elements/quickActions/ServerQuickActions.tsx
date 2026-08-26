@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

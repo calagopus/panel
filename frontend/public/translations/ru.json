@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "Файлы",
-          "editorNotFound": {
-            "title": "Не найдено",
-            "content": "Редактор не найден."
-          },
-          "view": {
-            "files": "Файлы",
-            "editor": "Редактор"
-          },
-          "tree": {
-            "empty": "Эта папка пуста",
-            "loadMore": "Загрузить ещё",
-            "retry": "Повторить",
-            "reload": "Обновить файлы",
-            "show": "Показать дерево файлов",
-            "hide": "Скрыть дерево файлов",
-            "searchPlaceholder": "Поиск файлов...",
-            "noSearchResults": "Подходящие файлы не найдены",
-            "upload": "Загрузить",
-            "uploadFromComputer": "Загрузить с компьютера",
-            "uploadFromUrl": "Загрузить по URL",
-            "selectItem": "Выбрать {name}",
-            "deselectItem": "Снять выделение с {name}",
-            "selectFileToOpen": "Выберите файл в дереве, чтобы открыть его.",
-            "noEditorAvailable": "Для этого типа файлов нет доступного редактора.",
-            "editorTabsLabel": "Открытые файлы",
-            "closeEditorTab": "Закрыть {name}",
-            "unsavedTab": "{name} содержит несохранённые изменения",
-            "dropToSplit": "Перетащите, чтобы открыть в новой панели редактора",
-            "resizeEditorPanes": "Изменить размер панелей редактора"
-          },
           "titleEditorViewing": "Просмотр {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Редактирование {file}",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Перетащите сюда файлы или папки для загрузки",
+            "title": "Перетащите файлы сюда для загрузки",
             "subtitle": "Отпустите, чтобы начать загрузку"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Settings",
-            "advancedSearch": "Расширенный поиск",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4799,8 +4768,7 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute",
-            "playbackRate": "Скорость воспроизведения"
+            "unmute": "Unmute"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "Расширенные фильтры",
               "pathPatterns": "Шаблоны путей",
               "include": "Включить",
-              "includePlaceholder": "например, *.js, src/**",
               "exclude": "Исключить",
-              "excludePlaceholder": "например, node_modules/**",
               "fileContent": "Содержимое файла",
               "searchText": "Текст поиска",
-              "contentPlaceholder": "Текст для поиска в файлах",
               "maxFileSize": "Макс. размер файла",
               "includeOversized": "Включить слишком большие файлы",
               "includeOversizedDescription": "Включает файлы, которые соответствуют другим фильтрам, но слишком велики для поиска.",

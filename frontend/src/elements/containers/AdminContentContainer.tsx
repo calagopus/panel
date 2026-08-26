@@ -1,13 +1,10 @@
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Text, Title, TitleOrder } from '@mantine/core';
+import { TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import TextInput from '../input/TextInput.tsx';
 import ContentContainer from './ContentContainer.tsx';
+import ContentContainerHeader from './ContentContainerHeader.tsx';
 
 export interface Props {
   title: string;
@@ -48,7 +45,6 @@ function AdminContentContainer(props: Props) {
     children,
   } = modifiedProps;
 
-  const { t } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
   const { id } = useCurrentWindow();
 
@@ -59,49 +55,15 @@ function AdminContentContainer(props: Props) {
           <Component key={`prepended-${index}`} {...modifiedProps} />
         ))}
 
-        {hideTitleComponent ? null : setSearch ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>
-              <TextInput
-                placeholder={t('common.input.search', {})}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                leftSection={<FontAwesomeIcon icon={faSearch} />}
-                w={250}
-              />
-              {contentRight}
-            </Group>
-          </Group>
-        ) : contentRight ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>{contentRight}</Group>
-          </Group>
-        ) : (
-          <div className='mb-4'>
-            <Title order={titleOrder}>{title}</Title>
-            {subtitle ? (
-              <Text size='xs' c='dimmed'>
-                {subtitle}
-              </Text>
-            ) : null}
-          </div>
-        )}
+        <ContentContainerHeader
+          title={title}
+          subtitle={subtitle}
+          hideTitleComponent={hideTitleComponent}
+          titleOrder={titleOrder}
+          search={search}
+          setSearch={setSearch}
+          contentRight={contentRight}
+        />
         {registry?.prependedContentComponents.map((Component, index) => (
           <Component key={`prepended-content-${index}`} {...modifiedProps} />
         ))}

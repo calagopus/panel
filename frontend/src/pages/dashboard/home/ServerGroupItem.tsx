@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ComponentProps, memo, useMemo, useState } from 'react';
+import { ComponentProps, memo, useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import deleteServerGroup from '@/api/me/servers/groups/deleteServerGroup.ts';
@@ -51,6 +51,45 @@ import ServerGroupEditModal from './modals/ServerGroupEditModal.tsx';
 const expandedSchema = z.boolean();
 
 const MemoizedServerItem = memo(ServerItem);
+
+function ServerGroupServerRow({
+  server,
+  to,
+  isSelected,
+  onServerSelectionChange,
+  onServerClick,
+  sKeyPressedRef,
+  onRemoveRequested,
+}: {
+  server: z.infer<typeof serverSchema>;
+  to?: string;
+  isSelected?: boolean;
+  onServerSelectionChange?: (server: z.infer<typeof serverSchema>, selected: boolean) => void;
+  onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
+  sKeyPressedRef: React.RefObject<boolean>;
+  onRemoveRequested: (server: z.infer<typeof serverSchema>) => void;
+}) {
+  const handleSelectionChange = useCallback(
+    (selected: boolean) => onServerSelectionChange?.(server, selected),
+    [onServerSelectionChange, server],
+  );
+  const handleClick = useCallback((event: React.MouseEvent) => onServerClick?.(server, event), [onServerClick, server]);
+  const handleGroupRemove = useCallback(() => onRemoveRequested(server), [onRemoveRequested, server]);
+
+  return (
+    <MemoizedServerItem
+      server={server}
+      to={to}
+      showContextMenu
+      isSelected={isSelected}
+      onSelectionChange={onServerSelectionChange ? handleSelectionChange : undefined}
+      showForeignServerBadge
+      onClick={onServerClick ? handleClick : undefined}
+      onGroupRemove={handleGroupRemove}
+      sKeyPressedRef={sKeyPressedRef}
+    />
+  );
+}
 
 export default function ServerGroupItem({
   serverGroup,
@@ -185,6 +224,11 @@ export default function ServerGroupItem({
   const serverDndIds = useMemo(() => dndServers.map((item) => item.dndId), [dndServers]);
 
   const serverCount = servers.total;
+
+  const handleRemoveRequested = useCallback((server: z.infer<typeof serverSchema>) => {
+    setServerToRemove({ server });
+    setOpenModal('remove-server');
+  }, []);
 
   return (
     <>
@@ -383,21 +427,14 @@ export default function ServerGroupItem({
                 <div className='gap-3 grid md:grid-cols-2 auto-rows-[minmax(8.5rem,auto)]'>
                   {dndServers.map(({ server, dndId }) => (
                     <SortableItem key={dndId} id={dndId} data={{ server }}>
-                      <MemoizedServerItem
+                      <ServerGroupServerRow
                         server={server}
                         to={getServerTo?.(server)}
-                        showContextMenu
                         isSelected={selectedServers?.has(server)}
-                        onSelectionChange={
-                          onServerSelectionChange ? (selected) => onServerSelectionChange(server, selected) : undefined
-                        }
-                        showForeignServerBadge
-                        onClick={onServerClick ? (event) => onServerClick(server, event) : undefined}
-                        onGroupRemove={() => {
-                          setServerToRemove({ server });
-                          setOpenModal('remove-server');
-                        }}
+                        onServerSelectionChange={onServerSelectionChange}
+                        onServerClick={onServerClick}
                         sKeyPressedRef={sKeyPressedRef}
+                        onRemoveRequested={handleRemoveRequested}
                       />
                     </SortableItem>
                   ))}

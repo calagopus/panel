@@ -17,12 +17,12 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Card from '@/elements/Card.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Divider from '@/elements/Divider.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -82,14 +82,62 @@ export default function ServerItem({
     () => new Set([...server.permissions, ...(user?.role?.serverPermissions ?? [])]),
     [server.permissions, user?.role?.serverPermissions],
   );
-  const canPower = (action: string) => permissionSet.has('*') || permissionSet.has(action);
+  const canPower = useCallback(
+    (action: string) => permissionSet.has('*') || permissionSet.has(action),
+    [permissionSet],
+  );
 
-  const doPowerAction = (action: z.infer<typeof serverPowerAction>) => handleBulkPowerAction([server.uuid], action);
+  const doPowerAction = useCallback(
+    (action: z.infer<typeof serverPowerAction>) => handleBulkPowerAction([server.uuid], action),
+    [handleBulkPowerAction, server.uuid],
+  );
 
   const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : t('common.unlimited', {});
   const memoryLimit =
     server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : t('common.unlimited', {});
   const cpuLimit = server.limits.cpu !== 0 ? `${server.limits.cpu}%` : t('common.unlimited', {});
+
+  const contextMenuItems: ContextMenuItem[] = useMemo(
+    () => [
+      {
+        type: 'action' as const,
+        icon: faPlay,
+        label: t('common.enum.serverPowerAction.start', {}),
+        color: 'gray',
+        canAccess: canPower('control.start'),
+        disabled: powerBlocked || bulkActionLoading !== null || state !== 'offline',
+        onClick: () => doPowerAction('start'),
+      },
+      {
+        type: 'action' as const,
+        icon: faRotateRight,
+        label: t('common.enum.serverPowerAction.restart', {}),
+        canAccess: canPower('control.restart'),
+        disabled: powerBlocked || bulkActionLoading !== null || !state,
+        onClick: () => doPowerAction('restart'),
+      },
+      {
+        type: 'action' as const,
+        icon: faStop,
+        label: t('common.enum.serverPowerAction.stop', {}),
+        color: 'red',
+        canAccess: canPower('control.stop'),
+        disabled: powerBlocked || bulkActionLoading !== null || !state || state === 'offline',
+        onClick: () => doPowerAction('stop'),
+      },
+      {
+        type: 'action' as const,
+        icon: faSkull,
+        label: t('common.enum.serverPowerAction.kill', {}),
+        color: 'red',
+        hidden: state !== 'stopping',
+        canAccess: canPower('control.stop'),
+        disabled: powerBlocked || bulkActionLoading !== null,
+        onClick: () => setOpenModal('kill'),
+      },
+    ],
+    [t, doPowerAction, canPower, powerBlocked, bulkActionLoading, state],
+  );
 
   return (
     <>
@@ -105,47 +153,7 @@ export default function ServerItem({
         {t('pages.server.console.power.modal.forceStop.content', {}).md()}
       </ConfirmationModal>
 
-      <ContextMenu
-        enabled={showContextMenu}
-        items={[
-          {
-            type: 'action',
-            icon: faPlay,
-            label: t('common.enum.serverPowerAction.start', {}),
-            color: 'gray',
-            canAccess: canPower('control.start'),
-            disabled: powerBlocked || bulkActionLoading !== null || state !== 'offline',
-            onClick: () => doPowerAction('start'),
-          },
-          {
-            type: 'action',
-            icon: faRotateRight,
-            label: t('common.enum.serverPowerAction.restart', {}),
-            canAccess: canPower('control.restart'),
-            disabled: powerBlocked || bulkActionLoading !== null || !state,
-            onClick: () => doPowerAction('restart'),
-          },
-          {
-            type: 'action',
-            icon: faStop,
-            label: t('common.enum.serverPowerAction.stop', {}),
-            color: 'red',
-            canAccess: canPower('control.stop'),
-            disabled: powerBlocked || bulkActionLoading !== null || !state || state === 'offline',
-            onClick: () => doPowerAction('stop'),
-          },
-          {
-            type: 'action',
-            icon: faSkull,
-            label: t('common.enum.serverPowerAction.kill', {}),
-            color: 'red',
-            hidden: state !== 'stopping',
-            canAccess: canPower('control.stop'),
-            disabled: powerBlocked || bulkActionLoading !== null,
-            onClick: () => setOpenModal('kill'),
-          },
-        ]}
-      >
+      <ContextMenu enabled={showContextMenu} items={contextMenuItems}>
         {({ items, openMenu }) => (
           <div className='min-w-0'>
             <div

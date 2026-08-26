@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "Archivos",
-          "editorNotFound": {
-            "title": "No encontrado",
-            "content": "Editor no encontrado."
-          },
-          "view": {
-            "files": "Archivos",
-            "editor": "Editor"
-          },
-          "tree": {
-            "empty": "Esta carpeta está vacía",
-            "loadMore": "Cargar más",
-            "retry": "Reintentar",
-            "reload": "Recargar archivos",
-            "show": "Mostrar árbol de archivos",
-            "hide": "Ocultar árbol de archivos",
-            "searchPlaceholder": "Buscar archivos...",
-            "noSearchResults": "No hay archivos coincidentes",
-            "upload": "Subir",
-            "uploadFromComputer": "Subir desde el ordenador",
-            "uploadFromUrl": "Subir desde URL",
-            "selectItem": "Seleccionar {name}",
-            "deselectItem": "Deseleccionar {name}",
-            "selectFileToOpen": "Selecciona un archivo del árbol para abrirlo.",
-            "noEditorAvailable": "No hay ningún editor disponible para este tipo de archivo.",
-            "editorTabsLabel": "Archivos abiertos",
-            "closeEditorTab": "Cerrar {name}",
-            "unsavedTab": "{name} tiene cambios sin guardar",
-            "dropToSplit": "Suelta para abrir en un nuevo panel del editor",
-            "resizeEditorPanes": "Cambiar el tamaño de los paneles del editor"
-          },
           "titleEditorViewing": "Viendo {file}",
           "titleEditorPlaying": "Playing {file}",
           "titleEditorEditing": "Editando {file}",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Suelta archivos o carpetas aquí para subirlos",
+            "title": "Suelta archivos aquí para subirlos",
             "subtitle": "Suelta para empezar a subir"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Settings",
-            "advancedSearch": "Búsqueda avanzada",
             "fileHistory": "File History",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4799,8 +4768,7 @@
             "play": "Play",
             "pause": "Pause",
             "mute": "Mute",
-            "unmute": "Unmute",
-            "playbackRate": "Velocidad de reproducción"
+            "unmute": "Unmute"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "Filtros avanzados",
               "pathPatterns": "Patrones de ruta",
               "include": "Incluir",
-              "includePlaceholder": "p. ej., *.js, src/**",
               "exclude": "Excluir",
-              "excludePlaceholder": "p. ej., node_modules/**",
               "fileContent": "Contenido del archivo",
               "searchText": "Texto de búsqueda",
-              "contentPlaceholder": "Texto que buscar en los archivos",
               "maxFileSize": "Tamaño máximo de archivo",
               "includeOversized": "Incluir archivos demasiado grandes",
               "includeOversizedDescription": "Incluye archivos que coinciden con otros filtros pero son demasiado grandes para buscar.",

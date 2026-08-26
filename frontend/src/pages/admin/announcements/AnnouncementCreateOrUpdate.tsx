@@ -16,7 +16,7 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { announcementTypeLabelMapping } from '@/lib/enums.ts';
+import { announcementTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminAnnouncementCreateSchema,
@@ -166,7 +166,7 @@ export default function AnnouncementCreateOrUpdate({
       name: 'type',
       label: t('common.form.type', {}),
       required: true,
-      options: Object.entries(announcementTypeLabelMapping).map(([value, label]) => ({ value, label: label() })),
+      options: mappingToSelectData(announcementTypeLabelMapping),
     },
     {
       type: 'localizedtext',

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { QuickActionDefinition, QuickActionMode } from '@/lib/quickActions.ts';
+import type { QuickActionDefinition, QuickActionMode } from '@/lib/quickActions/quickActions.ts';
 
 /** Read lazily on every palette render so providers keep seeing fresh state. */
 export type QuickActionProvider = () => QuickActionDefinition[];

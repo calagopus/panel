@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "檔案",
-          "editorNotFound": {
-            "title": "找不到",
-            "content": "找不到編輯器。"
-          },
-          "view": {
-            "files": "檔案",
-            "editor": "編輯器"
-          },
-          "tree": {
-            "empty": "此資料夾是空的",
-            "loadMore": "載入更多",
-            "retry": "重試",
-            "reload": "重新載入檔案",
-            "show": "顯示檔案樹",
-            "hide": "隱藏檔案樹",
-            "searchPlaceholder": "搜尋檔案...",
-            "noSearchResults": "沒有相符的檔案",
-            "upload": "上傳",
-            "uploadFromComputer": "從電腦上傳",
-            "uploadFromUrl": "從 URL 上傳",
-            "selectItem": "選取 {name}",
-            "deselectItem": "取消選取 {name}",
-            "selectFileToOpen": "從檔案樹中選取要開啟的檔案。",
-            "noEditorAvailable": "此檔案類型沒有可用的編輯器。",
-            "editorTabsLabel": "開啟的檔案",
-            "closeEditorTab": "關閉 {name}",
-            "unsavedTab": "{name} 有未儲存的變更",
-            "dropToSplit": "拖放以在新的編輯器窗格中開啟",
-            "resizeEditorPanes": "調整編輯器窗格大小"
-          },
           "titleEditorViewing": "正在檢視 {file}",
           "titleEditorPlaying": "正在播放 {file}",
           "titleEditorEditing": "正在編輯 {file}",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "將檔案或資料夾拖放到此處以上傳",
+            "title": "將檔案拖放到此處以上傳",
             "subtitle": "放開即可開始上傳"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Settings",
-            "advancedSearch": "進階搜尋",
             "fileHistory": "檔案歷史",
             "revertToDisk": "捨棄變更並從磁碟重新載入檔案",
             "collabEditing": "{user} 正在編輯此檔案",
@@ -4799,8 +4768,7 @@
             "play": "播放",
             "pause": "暫停",
             "mute": "靜音",
-            "unmute": "取消靜音",
-            "playbackRate": "播放速度"
+            "unmute": "取消靜音"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "進階篩選",
               "pathPatterns": "路徑模式",
               "include": "包含",
-              "includePlaceholder": "例如：*.js、src/**",
               "exclude": "排除",
-              "excludePlaceholder": "例如：node_modules/**",
               "fileContent": "檔案內容",
               "searchText": "搜尋文字",
-              "contentPlaceholder": "要在檔案中尋找的文字",
               "maxFileSize": "最大檔案大小",
               "includeOversized": "包含超大檔案",
               "includeOversizedDescription": "包含匹配其他筛选条件但过大而无法搜索的文件。",

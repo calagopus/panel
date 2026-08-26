@@ -5,13 +5,13 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import decompressFile from '@/api/server/files/decompressFile.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
-import DirectoryBrowser from '@/elements/DirectoryBrowser.tsx';
+import DirectoryBrowser from '@/elements/files/DirectoryBrowser.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { serverDirectoryEntrySchema, serverFilesExtractSchema } from '@/lib/schemas/server/files.ts';
+import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -73,13 +73,10 @@ export default function FileExtractModal({ file, ...props }: Props) {
         <TextInput label={t('common.form.destinationDirectory', {})} {...form.getInputProps('destination')} />
       </Stack>
 
-      <p className='mt-2 text-sm md:text-base break-all'>
-        <span>{t('pages.server.files.modal.extractFile.extractedTo', { file: file?.name ?? '' })}</span>
-        <Code>
-          /home/container/
-          <span className='text-cyan-200'>{form.values.destination.replace(/^(\.\.\/|\/)+/, '')}</span>
-        </Code>
-      </p>
+      <FilePathPreview
+        label={t('pages.server.files.modal.extractFile.extractedTo', { file: file?.name ?? '' })}
+        path={form.values.destination}
+      />
 
       <ModalFooter>
         <Button type='submit' loading={loading}>

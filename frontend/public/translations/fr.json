@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "Fichiers",
-          "editorNotFound": {
-            "title": "Introuvable",
-            "content": "Éditeur introuvable."
-          },
-          "view": {
-            "files": "Fichiers",
-            "editor": "Éditeur"
-          },
-          "tree": {
-            "empty": "Ce dossier est vide",
-            "loadMore": "Charger plus",
-            "retry": "Réessayer",
-            "reload": "Recharger les fichiers",
-            "show": "Afficher l’arborescence des fichiers",
-            "hide": "Masquer l’arborescence des fichiers",
-            "searchPlaceholder": "Rechercher des fichiers...",
-            "noSearchResults": "Aucun fichier correspondant",
-            "upload": "Téléverser",
-            "uploadFromComputer": "Téléverser depuis l’ordinateur",
-            "uploadFromUrl": "Téléverser depuis une URL",
-            "selectItem": "Sélectionner {name}",
-            "deselectItem": "Désélectionner {name}",
-            "selectFileToOpen": "Sélectionnez un fichier dans l’arborescence pour l’ouvrir.",
-            "noEditorAvailable": "Aucun éditeur n’est disponible pour ce type de fichier.",
-            "editorTabsLabel": "Fichiers ouverts",
-            "closeEditorTab": "Fermer {name}",
-            "unsavedTab": "{name} contient des modifications non enregistrées",
-            "dropToSplit": "Déposez pour ouvrir dans un nouveau volet de l’éditeur",
-            "resizeEditorPanes": "Redimensionner les volets de l’éditeur"
-          },
           "titleEditorViewing": "Affichage de {file}",
           "titleEditorPlaying": "Lecture de {file}",
           "titleEditorEditing": "Modification de {file}",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Déposez des fichiers ou dossiers ici pour les téléverser",
+            "title": "Déposez les fichiers ici pour les téléverser",
             "subtitle": "Relâchez pour démarrer le téléversement"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Settings",
-            "advancedSearch": "Recherche avancée",
             "fileHistory": "Historique du fichier",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4799,8 +4768,7 @@
             "play": "Lecture",
             "pause": "Pause",
             "mute": "Couper le son",
-            "unmute": "Activer le son",
-            "playbackRate": "Vitesse de lecture"
+            "unmute": "Activer le son"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "Filtres avancés",
               "pathPatterns": "Motifs de chemins",
               "include": "Inclure",
-              "includePlaceholder": "p. ex., *.js, src/**",
               "exclude": "Exclure",
-              "excludePlaceholder": "p. ex., node_modules/**",
               "fileContent": "Contenu du fichier",
               "searchText": "Chercher texte",
-              "contentPlaceholder": "Texte à rechercher dans les fichiers",
               "maxFileSize": "Taille de fichier maximale",
               "includeOversized": "Inclure fichiers surdimensionnés",
               "includeOversizedDescription": "Inclut les fichiers qui correspondent à d'autres filtres mais sont trop volumineux pour être recherchés.",

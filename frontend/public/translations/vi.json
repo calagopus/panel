@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "Tệp",
-          "editorNotFound": {
-            "title": "Không tìm thấy",
-            "content": "Không tìm thấy trình chỉnh sửa."
-          },
-          "view": {
-            "files": "Tệp",
-            "editor": "Trình chỉnh sửa"
-          },
-          "tree": {
-            "empty": "Thư mục này trống",
-            "loadMore": "Tải thêm",
-            "retry": "Thử lại",
-            "reload": "Tải lại tệp",
-            "show": "Hiện cây tệp",
-            "hide": "Ẩn cây tệp",
-            "searchPlaceholder": "Tìm kiếm tệp...",
-            "noSearchResults": "Không có tệp phù hợp",
-            "upload": "Tải lên",
-            "uploadFromComputer": "Tải lên từ máy tính",
-            "uploadFromUrl": "Tải lên từ URL",
-            "selectItem": "Chọn {name}",
-            "deselectItem": "Bỏ chọn {name}",
-            "selectFileToOpen": "Chọn một tệp từ cây để mở.",
-            "noEditorAvailable": "Không có trình chỉnh sửa cho loại tệp này.",
-            "editorTabsLabel": "Tệp đang mở",
-            "closeEditorTab": "Đóng {name}",
-            "unsavedTab": "{name} có thay đổi chưa lưu",
-            "dropToSplit": "Thả để mở trong ngăn chỉnh sửa mới",
-            "resizeEditorPanes": "Thay đổi kích thước các ngăn chỉnh sửa"
-          },
           "titleEditorViewing": "Xem {file}",
           "titleEditorPlaying": "Đang phát {file}",
           "titleEditorEditing": "Chỉnh Sửa {file}",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Hủy tất cả hoạt động"
           },
           "dropzone": {
-            "title": "Thả tệp hoặc thư mục vào đây để tải lên",
+            "title": "Thả tệp ở đây để tải lên",
             "subtitle": "Thả để bắt đầu tải lên"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Cài đặt",
-            "advancedSearch": "Tìm kiếm nâng cao",
             "fileHistory": "Lịch Sử Tệp",
             "revertToDisk": "Bỏ qua",
             "collabEditing": "{user} đang chỉnh sửa tệp này",
@@ -4799,8 +4768,7 @@
             "play": "Phát",
             "pause": "Tạm Dừng",
             "mute": "Tắt Tiếng",
-            "unmute": "Bật Tiếng",
-            "playbackRate": "Tốc độ phát"
+            "unmute": "Bật Tiếng"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "Bộ Lọc Nâng Cao",
               "pathPatterns": "Mẫu Đường Dẫn",
               "include": "Bao Gồm",
-              "includePlaceholder": "ví dụ: *.js, src/**",
               "exclude": "Loại Trừ",
-              "excludePlaceholder": "ví dụ: node_modules/**",
               "fileContent": "Nội Dung Tệp",
               "searchText": "Văn Bản Tìm Kiếm",
-              "contentPlaceholder": "Văn bản cần tìm trong tệp",
               "maxFileSize": "Kích Thước Tệp Tối Đa",
               "includeOversized": "Bao Gồm Tệp Quá Lớn",
               "includeOversizedDescription": "Bao gồm các tệp khớp với các bộ lọc khác nhưng quá lớn để tìm kiếm.",

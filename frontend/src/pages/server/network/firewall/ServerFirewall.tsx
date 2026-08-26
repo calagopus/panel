@@ -114,9 +114,9 @@ export default function ServerFirewall() {
       firewall.invalidate();
     } catch (error) {
       addToast(httpErrorToHuman(error), 'error');
-    } finally {
-      setSaving(false);
     }
+
+    setSaving(false);
   };
 
   const appendRule = (rule: Rule) => replace([...rules, { id: `rule-new-${crypto.randomUUID()}`, rule }]);

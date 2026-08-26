@@ -4617,36 +4617,6 @@
         },
         "files": {
           "title": "Bestanden",
-          "editorNotFound": {
-            "title": "Niet gevonden",
-            "content": "Editor niet gevonden."
-          },
-          "view": {
-            "files": "Bestanden",
-            "editor": "Editor"
-          },
-          "tree": {
-            "empty": "Deze map is leeg",
-            "loadMore": "Meer laden",
-            "retry": "Opnieuw proberen",
-            "reload": "Bestanden opnieuw laden",
-            "show": "Bestandsstructuur tonen",
-            "hide": "Bestandsstructuur verbergen",
-            "searchPlaceholder": "Bestanden zoeken...",
-            "noSearchResults": "Geen overeenkomende bestanden",
-            "upload": "Uploaden",
-            "uploadFromComputer": "Uploaden vanaf computer",
-            "uploadFromUrl": "Uploaden vanaf URL",
-            "selectItem": "{name} selecteren",
-            "deselectItem": "{name} deselecteren",
-            "selectFileToOpen": "Selecteer een bestand in de structuur om het te openen.",
-            "noEditorAvailable": "Geen editor beschikbaar voor dit bestandstype.",
-            "editorTabsLabel": "Geopende bestanden",
-            "closeEditorTab": "{name} sluiten",
-            "unsavedTab": "{name} bevat niet-opgeslagen wijzigingen",
-            "dropToSplit": "Sleep hierheen om in een nieuw editorpaneel te openen",
-            "resizeEditorPanes": "Editorpanelen vergroten of verkleinen"
-          },
           "titleEditorViewing": "{file} bekijken",
           "titleEditorPlaying": "{file} afspelen",
           "titleEditorEditing": "{file} bewerken",
@@ -4739,7 +4709,7 @@
             "cancelAllOperations": "Cancel All Operations"
           },
           "dropzone": {
-            "title": "Sleep bestanden of mappen hierheen om ze te uploaden",
+            "title": "Bestanden hier neerzetten om te uploaden",
             "subtitle": "Loslaten om te beginnen met uploaden"
           },
           "settings": {
@@ -4787,7 +4757,6 @@
           },
           "tooltip": {
             "settings": "Settings",
-            "advancedSearch": "Geavanceerd zoeken",
             "fileHistory": "Bestandsgeschiedenis",
             "revertToDisk": "Discard changes and load the file from disk",
             "collabEditing": "{user} is editing this file",
@@ -4799,8 +4768,7 @@
             "play": "Afspelen",
             "pause": "Pauzeren",
             "mute": "Dempen",
-            "unmute": "Dempen opheffen",
-            "playbackRate": "Afspeelsnelheid"
+            "unmute": "Dempen opheffen"
           },
           "drawer": {
             "revisions": {
@@ -4994,12 +4962,9 @@
               "advancedFilters": "Geavanceerde filters",
               "pathPatterns": "Padpatronen",
               "include": "Opnemen",
-              "includePlaceholder": "bijv. *.js, src/**",
               "exclude": "Uitsluiten",
-              "excludePlaceholder": "bijv. node_modules/**",
               "fileContent": "Bestandsinhoud",
               "searchText": "Zoektekst",
-              "contentPlaceholder": "Tekst om in bestanden te zoeken",
               "maxFileSize": "Maximale bestandsgrootte",
               "includeOversized": "Te grote bestanden opnemen",
               "includeOversizedDescription": "Bevat bestanden die overeenkomen met andere filters maar te groot zijn om te doorzoeken.",

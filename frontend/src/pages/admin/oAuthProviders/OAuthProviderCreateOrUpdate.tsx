@@ -18,6 +18,7 @@ import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
 import { serializeForApi } from '@/lib/api-transform.ts';
+import { downloadTextFile } from '@/lib/download.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import OAuthProviderDuplicateModal from '@/pages/admin/oAuthProviders/modals/OAuthProviderDuplicateModal.tsx';
@@ -120,15 +121,7 @@ export default function OAuthProviderCreateOrUpdate({
 
     const contents =
       format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
-    const fileURL = URL.createObjectURL(new Blob([contents], { type: 'text/plain' }));
-    const downloadLink = document.createElement('a');
-    downloadLink.href = fileURL;
-    downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    URL.revokeObjectURL(fileURL);
-    downloadLink.remove();
+    downloadTextFile(contents, `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`);
   };
 
   const fieldsTop: FieldDef<OAuthFormValues>[] = [

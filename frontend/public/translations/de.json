@@ -4606,36 +4606,6 @@
         },
         "files": {
           "title": "Dateien",
-          "editorNotFound": {
-            "title": "Nicht gefunden",
-            "content": "Editor nicht gefunden."
-          },
-          "view": {
-            "files": "Dateien",
-            "editor": "Editor"
-          },
-          "tree": {
-            "empty": "Dieser Ordner ist leer",
-            "loadMore": "Mehr laden",
-            "retry": "Erneut versuchen",
-            "reload": "Dateien neu laden",
-            "show": "Dateibaum anzeigen",
-            "hide": "Dateibaum ausblenden",
-            "searchPlaceholder": "Dateien durchsuchen...",
-            "noSearchResults": "Keine passenden Dateien",
-            "upload": "Hochladen",
-            "uploadFromComputer": "Vom Computer hochladen",
-            "uploadFromUrl": "Von URL hochladen",
-            "selectItem": "{name} auswählen",
-            "deselectItem": "Auswahl von {name} aufheben",
-            "selectFileToOpen": "Wähle eine Datei im Baum aus, um sie zu öffnen.",
-            "noEditorAvailable": "Für diesen Dateityp ist kein Editor verfügbar.",
-            "editorTabsLabel": "Geöffnete Dateien",
-            "closeEditorTab": "{name} schließen",
-            "unsavedTab": "{name} enthält ungespeicherte Änderungen",
-            "dropToSplit": "Ablegen, um in einem neuen Editorbereich zu öffnen",
-            "resizeEditorPanes": "Editorbereiche skalieren"
-          },
           "titleEditorViewing": "Betrachte {file}",
           "titleEditorPlaying": "Spiele {file} ab",
           "titleEditorEditing": "Bearbeite {file}",
@@ -4728,7 +4698,7 @@
             "cancelAllOperations": "Alle Vorgänge abbrechen"
           },
           "dropzone": {
-            "title": "Dateien oder Ordner zum Hochladen hier ablegen",
+            "title": "Dateien hier ablegen, um sie hochzuladen",
             "subtitle": "Loslassen, um den Upload zu starten"
           },
           "settings": {
@@ -4775,7 +4745,6 @@
           },
           "tooltip": {
             "settings": "Einstellungen",
-            "advancedSearch": "Erweiterte Suche",
             "fileHistory": "Dateiverlauf",
             "revertToDisk": "Änderungen verwerfen und Datei von der Festplatte laden",
             "collabEditing": "{user} bearbeitet diese Datei",
@@ -4787,8 +4756,7 @@
             "play": "Abspielen",
             "pause": "Pausieren",
             "mute": "Stummschalten",
-            "unmute": "Stummschaltung aufheben",
-            "playbackRate": "Wiedergabegeschwindigkeit"
+            "unmute": "Stummschaltung aufheben"
           },
           "drawer": {
             "revisions": {
@@ -4982,12 +4950,9 @@
               "advancedFilters": "Erweiterte Filter",
               "pathPatterns": "Pfadmuster",
               "include": "Einschließen",
-              "includePlaceholder": "z. B. *.js, src/**",
               "exclude": "Ausschließen",
-              "excludePlaceholder": "z. B. node_modules/**",
               "fileContent": "Dateiinhalte",
               "searchText": "Suchtext",
-              "contentPlaceholder": "In Dateien zu suchender Text",
               "maxFileSize": "Maximale Dateigröße",
               "includeOversized": "Übergroße einschließen",
               "includeOversizedDescription": "Schließt Dateien ein, die auf andere Filter passen, aber zu groß zum Durchsuchen sind.",

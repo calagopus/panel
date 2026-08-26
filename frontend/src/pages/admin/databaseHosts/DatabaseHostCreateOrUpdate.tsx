@@ -20,7 +20,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
-import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping } from '@/lib/enums.ts';
+import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminDatabaseCredentialsConnectionStringSchema,
@@ -155,10 +155,7 @@ export default function DatabaseHostCreateOrUpdate({
           <Select
             withAsterisk
             label={t('pages.admin.databaseHosts.tabs.general.page.form.credentialType', {})}
-            data={Object.entries(databaseCredentialTypeLabelMapping).map(([value, label]) => ({
-              value,
-              label: label(),
-            }))}
+            data={mappingToSelectData(databaseCredentialTypeLabelMapping)}
             key={f.key('credentials.type')}
             {...f.getInputProps('credentials.type')}
           />

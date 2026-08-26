@@ -20,14 +20,14 @@ import KbdKey from '@/elements/KbdKey.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
-import { disableShortcut, resetShortcut, setShortcutBinding } from '@/lib/shortcutOverrides.ts';
+import { disableShortcut, resetShortcut, setShortcutBinding } from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   bindingFromEvent,
   ModifierKey,
   ShortcutBinding,
   ShortcutDefinition,
   shortcutDescription,
-} from '@/lib/shortcuts.ts';
+} from '@/lib/quickActions/shortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const ARROW_ICONS: Record<string, IconDefinition> = {

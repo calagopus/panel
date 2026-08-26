@@ -88,6 +88,13 @@ import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts
 import { adminEggRepositoryCredentialsSchema } from './schemas/admin/eggRepositories.ts';
 import { announcementType } from './schemas/announcements.ts';
 
+export function mappingToSelectData<T extends string>(mapping: Record<T, () => string>): { value: T; label: string }[] {
+  return Object.entries(mapping).map(([value, label]) => ({
+    value: value as T,
+    label: (label as () => string)(),
+  }));
+}
+
 export const captchaProviderTypeLabelMapping: Record<
   z.infer<typeof publicSettingsCaptchaProviderSchema>['type'],
   string

@@ -2,9 +2,9 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/elements/Button.tsx';
 import Kbd from '@/elements/Kbd.tsx';
-import { getShortcutDefinition } from '@/lib/coreShortcuts.tsx';
-import { useShortcutOverrides } from '@/lib/shortcutOverrides.ts';
-import { effectiveBinding, ModifierKey, ShortcutBinding } from '@/lib/shortcuts.ts';
+import { getShortcutDefinition } from '@/lib/quickActions/coreShortcuts.tsx';
+import { useShortcutOverrides } from '@/lib/quickActions/shortcutOverrides.ts';
+import { effectiveBinding, ModifierKey, ShortcutBinding } from '@/lib/quickActions/shortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 
