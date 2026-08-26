@@ -1,8 +1,9 @@
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useMergedRef } from '@mantine/hooks';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import classNames from 'classnames';
-import { CSSProperties, Ref, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, Ref, RefObject, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import ScrollArea from '@/elements/ScrollArea.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -37,6 +38,30 @@ interface FileTreeVirtualListProps {
   onStartDrag: (event: React.DragEvent, item: TreeSelectionItem) => void;
   onDragEnd: () => void;
   onLoadPage: (directory: string, page: number) => Promise<void>;
+}
+
+interface VirtualTreeRowContainerProps {
+  index: number;
+  height: number;
+  measureElement: (node: HTMLDivElement | null) => void;
+  selectionRef?: Ref<HTMLElement>;
+  children: ReactNode;
+}
+
+function VirtualTreeRowContainer({
+  index,
+  height,
+  measureElement,
+  selectionRef,
+  children,
+}: VirtualTreeRowContainerProps) {
+  const ref = useMergedRef<HTMLDivElement>(selectionRef as Ref<HTMLDivElement>, measureElement);
+
+  return (
+    <div ref={ref} data-index={index} className='absolute left-0 top-0 w-full will-change-transform' style={{ height }}>
+      {children}
+    </div>
+  );
 }
 
 export default function FileTreeVirtualList({
@@ -92,13 +117,21 @@ export default function FileTreeVirtualList({
     },
     [headerRef],
   );
+  // This pane owns its scroll viewport, so use the element virtualizer and keep scroll-only updates out of React.
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement,
     estimateSize: estimateRowSize,
     getItemKey: getRowKey,
-    overscan: 5,
+    overscan: 8,
+    paddingEnd: 8,
+    directDomUpdates: true,
+    useFlushSync: false,
   });
+  const virtualRows = useSyncExternalStore(
+    () => () => undefined,
+    () => virtualizer.getVirtualItems(),
+  );
 
   return (
     <ScrollArea
@@ -117,23 +150,24 @@ export default function FileTreeVirtualList({
         disabled={moving}
       >
         <div
+          ref={virtualizer.containerRef}
           role='tree'
           data-file-manager-tree-table
           className='relative min-w-(--file-manager-tree-min-content-width)'
-          style={{ height: virtualizer.getTotalSize() + 8 }}
         >
-          {virtualizer.getVirtualItems().map((virtualRow) => {
+          {virtualRows.map((virtualRow) => {
             const row = rows[virtualRow.index];
-            const virtualStyle: CSSProperties = {
-              height: virtualRow.size,
-              transform: `translateY(${virtualRow.start}px)`,
-            };
 
             if (row.type !== 'entry') {
               const inset = 36 + row.depth * 16;
 
               return (
-                <div key={row.key} className='absolute left-0 top-0 w-full' style={virtualStyle}>
+                <VirtualTreeRowContainer
+                  key={row.key}
+                  index={virtualRow.index}
+                  height={virtualRow.size}
+                  measureElement={virtualizer.measureElement}
+                >
                   {row.type === 'loading' ? (
                     <div className='flex items-center' style={{ height: rowHeight, paddingLeft: inset }}>
                       <Spinner size={14} />
@@ -175,7 +209,7 @@ export default function FileTreeVirtualList({
                       </UnstyledButton>
                     </div>
                   )}
-                </div>
+                </VirtualTreeRowContainer>
               );
             }
 
@@ -188,10 +222,11 @@ export default function FileTreeVirtualList({
             return (
               <SelectionArea.Selectable key={row.key} item={item}>
                 {(innerRef: Ref<HTMLElement>) => (
-                  <div
-                    ref={innerRef as Ref<HTMLDivElement>}
-                    className='absolute left-0 top-0 w-full'
-                    style={virtualStyle}
+                  <VirtualTreeRowContainer
+                    index={virtualRow.index}
+                    height={virtualRow.size}
+                    measureElement={virtualizer.measureElement}
+                    selectionRef={innerRef}
                   >
                     <FileTreeRow
                       item={item}
@@ -214,7 +249,7 @@ export default function FileTreeVirtualList({
                       onStartDrag={onStartDrag}
                       onDragEnd={onDragEnd}
                     />
-                  </div>
+                  </VirtualTreeRowContainer>
                 )}
               </SelectionArea.Selectable>
             );
