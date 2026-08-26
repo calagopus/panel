@@ -20,6 +20,7 @@ interface FileTreeRowProps {
   item: TreeSelectionItem;
   row: EntryRow;
   rowHeight: number;
+  active: boolean;
   selected: boolean;
   dragged: boolean;
   moving: boolean;
@@ -50,6 +51,7 @@ function FileTreeRow({
   item,
   row,
   rowHeight,
+  active,
   selected,
   dragged,
   moving,
@@ -100,7 +102,9 @@ function FileTreeRow({
         tabIndex={0}
         aria-level={row.depth + 1}
         aria-expanded={row.entry.directory ? row.expanded : undefined}
+        aria-current={active ? 'true' : undefined}
         aria-selected={selected}
+        data-active-file={active || undefined}
         data-file-manager-tree-row
         data-file-tree-directory={row.entry.directory ? row.path : undefined}
         data-file-tree-drop-target={row.entry.directory ? row.path : row.parent}
@@ -123,8 +127,16 @@ function FileTreeRow({
         )}
         style={{
           height: rowHeight,
-          backgroundColor: selected ? 'var(--mantine-color-blue-light)' : undefined,
-          boxShadow: selected ? 'inset 3px 0 0 var(--mantine-color-blue-5)' : undefined,
+          backgroundColor: active
+            ? 'var(--mantine-color-default-hover)'
+            : selected
+              ? 'var(--mantine-color-blue-light)'
+              : undefined,
+          boxShadow: active
+            ? 'inset 3px 0 0 var(--mantine-primary-color-filled)'
+            : selected
+              ? 'inset 3px 0 0 var(--mantine-color-blue-5)'
+              : undefined,
         }}
       >
         <div

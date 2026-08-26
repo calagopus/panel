@@ -38,7 +38,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
-function FileTree({ onOpenFile, collapsed, onToggleCollapsed }: FileTreeProps) {
+function FileTree({ onOpenFile, activePath, collapsed, onToggleCollapsed }: FileTreeProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -735,6 +735,7 @@ function FileTree({ onOpenFile, collapsed, onToggleCollapsed }: FileTreeProps) {
               <FileTreeVirtualList
                 rows={rows}
                 itemsByPath={itemsByPath}
+                activePath={activePath}
                 selectedPaths={selectedPaths}
                 draggedPaths={draggedPaths}
                 rowHeight={rowHeight}

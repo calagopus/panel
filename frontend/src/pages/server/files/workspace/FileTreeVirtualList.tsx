@@ -19,6 +19,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 interface FileTreeVirtualListProps {
   rows: FileTreeRowData[];
   itemsByPath: ReadonlyMap<string, TreeSelectionItem>;
+  activePath: string | null;
   selectedPaths: ReadonlySet<string>;
   draggedPaths: ReadonlySet<string>;
   rowHeight: number;
@@ -67,6 +68,7 @@ function VirtualTreeRowContainer({
 export default function FileTreeVirtualList({
   rows,
   itemsByPath,
+  activePath,
   selectedPaths,
   draggedPaths,
   rowHeight,
@@ -220,6 +222,7 @@ export default function FileTreeVirtualList({
             if (!item) return null;
 
             const selected = selectedPaths.has(row.path);
+            const active = row.path === activePath;
             const useMassMenu = !scrolling && !!massSelectionDirectory && selected;
             const parentCapabilities = scrolling ? null : getDirectoryCapabilities(row.parent);
 
@@ -236,6 +239,7 @@ export default function FileTreeVirtualList({
                       <FileTreeScrollingRow
                         row={row}
                         rowHeight={rowHeight}
+                        active={active}
                         selected={selected}
                         preferPhysicalSize={preferPhysicalSize}
                       />
@@ -244,6 +248,7 @@ export default function FileTreeVirtualList({
                         item={item}
                         row={row}
                         rowHeight={rowHeight}
+                        active={active}
                         selected={selected}
                         dragged={draggedPaths.has(row.path)}
                         moving={moving}

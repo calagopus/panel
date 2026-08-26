@@ -11,6 +11,7 @@ type EntryTreeRow = Extract<FileTreeRowData, { type: 'entry' }>;
 interface FileTreeScrollingRowProps {
   row: EntryTreeRow;
   rowHeight: number;
+  active: boolean;
   selected: boolean;
   preferPhysicalSize: boolean;
 }
@@ -18,6 +19,7 @@ interface FileTreeScrollingRowProps {
 export default function FileTreeScrollingRow({
   row,
   rowHeight,
+  active,
   selected,
   preferPhysicalSize,
 }: FileTreeScrollingRowProps) {
@@ -26,13 +28,23 @@ export default function FileTreeScrollingRow({
       role='treeitem'
       aria-level={row.depth + 1}
       aria-expanded={row.entry.directory ? row.expanded : undefined}
+      aria-current={active ? 'true' : undefined}
       aria-selected={selected}
+      data-active-file={active || undefined}
       data-file-manager-tree-row
       className='pointer-events-none grid w-full grid-cols-(--file-manager-tree-columns) items-center gap-x-2 text-left text-sm [contain:layout_paint]'
       style={{
         height: rowHeight,
-        backgroundColor: selected ? 'var(--mantine-color-blue-light)' : undefined,
-        boxShadow: selected ? 'inset 3px 0 0 var(--mantine-color-blue-5)' : undefined,
+        backgroundColor: active
+          ? 'var(--mantine-color-default-hover)'
+          : selected
+            ? 'var(--mantine-color-blue-light)'
+            : undefined,
+        boxShadow: active
+          ? 'inset 3px 0 0 var(--mantine-primary-color-filled)'
+          : selected
+            ? 'inset 3px 0 0 var(--mantine-color-blue-5)'
+            : undefined,
       }}
     >
       <div className='flex min-w-0 items-center gap-2' style={{ paddingLeft: 10 + row.depth * 16 }}>

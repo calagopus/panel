@@ -386,7 +386,12 @@ export default function FileTreeWorkspace({ fileTreeVisible, onToggleFileTree }:
                 : 'w-(--file-manager-tree-collapsed-width) max-[47.999rem]:h-11 max-[47.999rem]:min-h-11'
             }`}
           >
-            <FileTree collapsed={!fileTreeVisible} onToggleCollapsed={onToggleFileTree} onOpenFile={openFile} />
+            <FileTree
+              activePath={activeSelection ? join(activeSelection.directory, activeSelection.file.name) : null}
+              collapsed={!fileTreeVisible}
+              onToggleCollapsed={onToggleFileTree}
+              onOpenFile={openFile}
+            />
           </div>
           <FileTreeEditorSplit
             panes={workspace.panes}
