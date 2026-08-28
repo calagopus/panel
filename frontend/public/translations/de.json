@@ -2616,7 +2616,7 @@
                   "verify": "Verbindung verifizieren"
                 },
                 "description": {
-                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/pterodactyl/config.yml` ein oder führe aus",
+                  "placeFile": "Füge dies in die Konfigurationsdatei unter `/etc/calagopus-wings/config.yml` ein oder führe aus",
                   "settings": "Diese Werte werden verwendet, um die untenstehende Wings-Konfiguration zu generieren.",
                   "verify": "Prüft, ob sowohl das Panel (Backend) als auch dein Browser (Frontend) Wings erreichen können."
                 },

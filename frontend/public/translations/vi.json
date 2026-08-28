@@ -2623,7 +2623,7 @@
                   "verify": "Xác minh kết nối"
                 },
                 "description": {
-                  "placeFile": "Đặt nội dung này vào tệp cấu hình tại `/etc/pterodactyl/config.yml` hoặc chạy",
+                  "placeFile": "Đặt nội dung này vào tệp cấu hình tại `/etc/calagopus-wings/config.yml` hoặc chạy",
                   "settings": "Các giá trị này được dùng để tạo cấu hình wings bên dưới.",
                   "verify": "Kiểm tra cả panel (backend) và trình duyệt của bạn (frontend) đều có thể kết nối tới wings."
                 },

@@ -2623,7 +2623,7 @@
                   "verify": "Verify Connection"
                 },
                 "description": {
-                  "placeFile": "Umiestnite to do konfiguračného súboru na `/etc/pterodactyl/config.yml` alebo spustite",
+                  "placeFile": "Umiestnite to do konfiguračného súboru na `/etc/calagopus-wings/config.yml` alebo spustite",
                   "settings": "These values are used to generate the wings configuration below.",
                   "verify": "Checks that both the panel (backend) and your browser (frontend) can reach wings."
                 },

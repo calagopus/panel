@@ -139,7 +139,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
             </HljsCode>
 
             <div className='mt-2'>
-              {t('pages.oobe.nodeConfiguration.configurationDescription', { file: '/etc/pterodactyl/config.yml' }).md()}
+              {t('pages.oobe.nodeConfiguration.configurationDescription', { file: '/etc/calagopus-wings/config.yml' }).md()}
               <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
                 <Code block className='flex-1 overflow-x-auto'>
                   {command}

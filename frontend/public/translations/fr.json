@@ -2623,7 +2623,7 @@
                   "verify": "Vérifier la Connexion"
                 },
                 "description": {
-                  "placeFile": "Placez ceci dans le fichier de configuration à `/etc/pterodactyl/config.yml` ou exécutez",
+                  "placeFile": "Placez ceci dans le fichier de configuration à `/etc/calagopus-wings/config.yml` ou exécutez",
                   "settings": "These values are used to generate the wings configuration below.",
                   "verify": "Checks that both the panel (backend) and your browser (frontend) can reach wings."
                 },

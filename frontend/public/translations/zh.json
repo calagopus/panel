@@ -2623,7 +2623,7 @@
                   "verify": "驗證連線"
                 },
                 "description": {
-                  "placeFile": "將此內容放入 `/etc/pterodactyl/config.yml` 設定檔中，或執行",
+                  "placeFile": "將此內容放入 `/etc/calagopus-wings/config.yml` 設定檔中，或執行",
                   "settings": "這些數值將用於產生下方的 Wings 設定。",
                   "verify": "檢查面板（後端）與您的瀏覽器（前端）是否都能連線至 Wings。"
                 },

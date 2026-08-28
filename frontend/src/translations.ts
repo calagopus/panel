@@ -2586,7 +2586,7 @@ const baseTranslations = defineTranslations({
                   verify: 'Verify Connection',
                 },
                 description: {
-                  placeFile: 'Place this into the configuration file at `/etc/pterodactyl/config.yml` or run',
+                  placeFile: 'Place this into the configuration file at `/etc/calagopus-wings/config.yml` or run',
                   settings: 'These values are used to generate the wings configuration below.',
                   verify: 'Checks that both the panel (backend) and your browser (frontend) can reach wings.',
                 },
