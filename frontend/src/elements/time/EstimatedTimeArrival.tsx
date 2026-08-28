@@ -5,72 +5,85 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import Tooltip from '../Tooltip.tsx';
 
 interface EstimatedTimeArrivalProps {
-  progress: number;
-  total: number;
+  progress?: number;
+  total?: number;
   className?: string;
   autoUpdate?: boolean;
 }
 
-function EstimatedTimeArrival({ progress, total, className, autoUpdate = true }: EstimatedTimeArrivalProps) {
+interface Sample {
+  time: number;
+  progress: number;
+}
+
+function EstimatedTimeArrival({ progress = 0, total = 0, className, autoUpdate = true }: EstimatedTimeArrivalProps) {
   const { t } = useTranslations();
   const progressRef = useRef(progress);
-  const [history, setHistory] = useState<{ t: number; p: number }[]>([]);
-  const [hasStartedProgress, setHasStartedProgress] = useState(false);
+  const totalRef = useRef(total);
+  const samplesRef = useRef<Sample[]>([]);
+  const [estimate, setEstimate] = useState<{ remainingMs: number; targetDate: number } | null>(null);
 
   useEffect(() => {
     progressRef.current = progress;
-  }, [progress]);
+    totalRef.current = total;
+  }, [progress, total]);
+
+  const isComplete = total > 0 && progress >= total;
 
   useEffect(() => {
-    if (!autoUpdate || progress >= total) return;
+    if (!autoUpdate || isComplete) return;
 
-    setHistory((prev) => (prev.length === 0 ? [{ t: Date.now(), p: progress }] : prev));
+    samplesRef.current = [{ time: Date.now(), progress: progressRef.current }];
 
     const intervalId = setInterval(() => {
       const now = Date.now();
-      setHistory((prev) => [...prev, { t: now, p: progressRef.current }].filter((entry) => now - entry.t <= 30_000));
+      const currentProgress = progressRef.current;
+      const currentTotal = totalRef.current;
+      const samples = samplesRef.current;
+      const lastSample = samples[samples.length - 1];
+
+      if (lastSample && currentProgress < lastSample.progress) {
+        samplesRef.current = [{ time: now, progress: currentProgress }];
+        setEstimate(null);
+        return;
+      }
+
+      samples.push({ time: now, progress: currentProgress });
+      const cutoff = now - 30_000;
+      while (samples.length > 2 && samples[0].time < cutoff) {
+        samples.shift();
+      }
+
+      if (samples.length >= 2 && currentTotal > 0) {
+        const oldestSample = samples[0];
+        const newestSample = samples[samples.length - 1];
+        const deltaProgress = newestSample.progress - oldestSample.progress;
+        const deltaTime = newestSample.time - oldestSample.time;
+
+        if (deltaProgress > 0 && deltaTime > 0) {
+          const remainingMs = Math.max(0, ((currentTotal - currentProgress) * deltaTime) / deltaProgress);
+          setEstimate({ remainingMs, targetDate: now + remainingMs });
+          return;
+        }
+      }
+
+      setEstimate((prev) =>
+        prev ? { remainingMs: Math.max(0, prev.targetDate - now), targetDate: prev.targetDate } : null,
+      );
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [autoUpdate, total, progress]);
+  }, [autoUpdate, isComplete]);
 
-  let remainingMs = Infinity;
-  let targetDate: number | null = null;
+  const active = isComplete ? { remainingMs: 0, targetDate: Date.now() } : estimate;
 
-  if (history.length > 1 && progress < total) {
-    const oldest = history[0];
-    const newest = history[history.length - 1];
+  const tooltipLabel = active?.targetDate
+    ? t('elements.estimatedTimeArrival.tooltip.estimated', { time: formatDateTime(active.targetDate) })
+    : t('elements.estimatedTimeArrival.tooltip.estimating', {});
 
-    const deltaProgress = newest.p - oldest.p;
-    const deltaTime = newest.t - oldest.t;
-
-    if (deltaProgress > 0) {
-      setHasStartedProgress(true);
-    }
-
-    if (deltaProgress > 0 && deltaTime > 0) {
-      const msPerUnit = deltaTime / deltaProgress;
-      remainingMs = msPerUnit * (total - newest.p);
-      targetDate = Date.now() + remainingMs;
-    }
-  } else if (progress >= total) {
-    remainingMs = 0;
-    targetDate = Date.now();
-  }
-
-  const displayDuration =
-    hasStartedProgress && isFinite(remainingMs)
-      ? t('elements.estimatedTimeArrival.calculated', {
-          time: formatMilliseconds(remainingMs),
-        })
-      : t('elements.estimatedTimeArrival.calculating', {});
-
-  let tooltipLabel = t('elements.estimatedTimeArrival.tooltip.estimating', {});
-  if (targetDate && hasStartedProgress && isFinite(remainingMs)) {
-    tooltipLabel = t('elements.estimatedTimeArrival.tooltip.estimated', {
-      time: formatDateTime(targetDate),
-    });
-  }
+  const displayDuration = active
+    ? t('elements.estimatedTimeArrival.calculated', { time: formatMilliseconds(active.remainingMs) })
+    : t('elements.estimatedTimeArrival.calculating', {});
 
   return (
     <Tooltip label={tooltipLabel}>
