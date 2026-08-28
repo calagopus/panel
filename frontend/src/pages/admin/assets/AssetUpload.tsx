@@ -2,7 +2,7 @@ import { faFileUpload, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, RefObject, useRef } from 'react';
 import Button from '@/elements/Button.tsx';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
 import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

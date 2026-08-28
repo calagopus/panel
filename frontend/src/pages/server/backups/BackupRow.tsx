@@ -42,6 +42,8 @@ import BackupEditModal from './modals/BackupEditModal.tsx';
 import BackupExportModal from './modals/BackupExportModal.tsx';
 import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
 
+const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);
+
 export default function BackupRow({
   backup,
   readOnly,
@@ -60,7 +62,6 @@ export default function BackupRow({
   const queryClient = useQueryClient();
 
   const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);
-  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
@@ -140,7 +141,7 @@ export default function BackupRow({
         opened={openModal === 'metadata'}
         size='lg'
       >
-        <HljsCode languageName='json' language={jsonLanguage}>
+        <HljsCode languageName='json' language={loadJsonLanguage}>
           {metadataJson}
         </HljsCode>
 

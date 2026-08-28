@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { nullableString } from '@/lib/transformers.ts';
 
 export const authForgotPasswordSchema = z.object({
   email: z.email(),
@@ -11,8 +12,8 @@ export const authRegisterSchema = z.object({
     .max(15)
     .regex(/^[a-zA-Z0-9_]+$/),
   email: z.email(),
-  nameFirst: z.string().min(1).max(255),
-  nameLast: z.string().min(1).max(255),
+  nameFirst: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  nameLast: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   password: z.string().min(8).max(512),
 });
 

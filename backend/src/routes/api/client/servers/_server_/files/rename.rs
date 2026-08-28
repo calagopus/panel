@@ -56,20 +56,22 @@ mod put {
                 .files
                 .into_iter()
                 .filter(|f| {
-                    !server.is_ignored(Path::new(&data.root).join(&f.from), false)
-                        && !server.is_ignored(Path::new(&data.root).join(&f.to), false)
+                    !server.is_ignored_either(Path::new(&data.root).join(&f.from))
+                        && !server.is_ignored_either(Path::new(&data.root).join(&f.to))
                 })
                 .collect(),
             root: data.root,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         let data = match server
+            .0
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .put_servers_server_files_rename(server.uuid, &request_body)
+            .put_servers_server_files_rename(server.0.uuid, &request_body)
             .await
         {
             Ok(data) => data,

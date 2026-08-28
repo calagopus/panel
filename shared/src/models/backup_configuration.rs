@@ -1,4 +1,5 @@
 use crate::{
+    censor::{CENSORED_PLACEHOLDER, Censor},
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
@@ -72,10 +73,6 @@ impl BackupConfigsS3 {
         }
 
         Ok(())
-    }
-
-    pub fn censor(&mut self) {
-        self.secret_key = "".into();
     }
 
     pub fn into_client(self) -> (S3Client, compact_str::CompactString) {
@@ -152,14 +149,6 @@ impl BackupConfigsRestic {
         }
 
         Ok(())
-    }
-
-    pub fn censor(&mut self) {
-        for (key, value) in self.environment.iter_mut() {
-            if key == "RESTIC_PASSWORD" || key == "AWS_SECRET_ACCESS_KEY" {
-                *value = "".into();
-            }
-        }
     }
 
     pub fn into_wings_configuration(self) -> wings_api::ResticBackupConfiguration {
@@ -270,10 +259,6 @@ impl BackupConfigsPbs {
 
         Ok(())
     }
-
-    pub fn censor(&mut self) {
-        self.token_secret = "".into();
-    }
 }
 
 fn validate_kopia_username(
@@ -359,10 +344,6 @@ impl BackupConfigKopia {
 
         Ok(())
     }
-
-    pub fn censor(&mut self) {
-        self.password = "".into();
-    }
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Default, Validate, Clone)]
@@ -417,20 +398,41 @@ impl BackupConfigs {
 
         Ok(())
     }
+}
 
-    pub fn censor(&mut self) {
-        if let Some(s3) = &mut self.s3 {
-            s3.censor();
+impl Censor for BackupConfigsS3 {
+    fn censor(&mut self) {
+        self.secret_key = CENSORED_PLACEHOLDER.into();
+    }
+}
+
+impl Censor for BackupConfigsRestic {
+    fn censor(&mut self) {
+        // Mirrors `encrypt`/`decrypt`, which treat every environment value as a secret.
+        for value in self.environment.values_mut() {
+            *value = CENSORED_PLACEHOLDER.into();
         }
-        if let Some(restic) = &mut self.restic {
-            restic.censor();
-        }
-        if let Some(pbs) = &mut self.pbs {
-            pbs.censor();
-        }
-        if let Some(kopia) = &mut self.kopia {
-            kopia.censor();
-        }
+    }
+}
+
+impl Censor for BackupConfigsPbs {
+    fn censor(&mut self) {
+        self.token_secret = CENSORED_PLACEHOLDER.into();
+    }
+}
+
+impl Censor for BackupConfigKopia {
+    fn censor(&mut self) {
+        self.password = CENSORED_PLACEHOLDER.into();
+    }
+}
+
+impl Censor for BackupConfigs {
+    fn censor(&mut self) {
+        self.s3.censor();
+        self.restic.censor();
+        self.pbs.censor();
+        self.kopia.censor();
     }
 }
 

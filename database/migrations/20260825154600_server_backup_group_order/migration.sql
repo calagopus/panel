@@ -1,0 +1,1 @@
+ALTER TABLE "server_backup_groups" ADD COLUMN "order_" smallint DEFAULT 0 NOT NULL;

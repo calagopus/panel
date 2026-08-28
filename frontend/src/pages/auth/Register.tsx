@@ -49,13 +49,12 @@ export default function Register() {
     setLoading(true);
     try {
       const token = await captcha.getToken();
-      const response = await register({ ...form.values, captcha: token });
+      const response = await register({ ...authRegisterSchema.parse(form.values), captcha: token });
       doLogin(response.user!);
     } catch (err) {
       setError(httpErrorToHuman(err));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

@@ -1,6 +1,7 @@
 import { ModalProps } from '@mantine/core';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -8,7 +9,7 @@ import exportBackup from '@/api/server/backups/exportBackup.ts';
 import queryBackup from '@/api/server/backups/queryBackup.ts';
 import Button from '@/elements/Button.tsx';
 import Code from '@/elements/Code.tsx';
-import DirectoryBrowser from '@/elements/DirectoryBrowser.tsx';
+import DirectoryBrowser from '@/elements/files/DirectoryBrowser.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -47,6 +48,13 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       name: backup.name,
       format: 'tar_gz',
     },
+    validate: zod4Resolver(
+      z.object({
+        directory: z.string().min(1).max(255),
+        name: z.string().min(1).max(255),
+        format: streamingArchiveFormat,
+      }),
+    ),
     onClose: props.onClose,
     onSubmit: async (values) => {
       await exportBackup(server.uuid, backup.uuid, {
@@ -80,11 +88,8 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
   }, [props.opened, backup.uuid, server.uuid]);
 
-  const extension = useMemo(
-    () =>
-      forcedFormat ? archiveFormatLabelMapping[forcedFormat] : streamingArchiveFormatLabelMapping[form.values.format],
-    [forcedFormat, form.values.format],
-  );
+  const format = form.values.format;
+  const extension = forcedFormat ? archiveFormatLabelMapping[forcedFormat] : streamingArchiveFormatLabelMapping[format];
 
   return (
     <FormModal
@@ -147,7 +152,7 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       </p>
 
       <ModalFooter>
-        <Button type='submit' loading={loading}>
+        <Button type='submit' loading={loading} disabled={!form.isValid()}>
           {t('common.button.export', {})}
         </Button>
         <Button variant='default' onClick={handleClose}>

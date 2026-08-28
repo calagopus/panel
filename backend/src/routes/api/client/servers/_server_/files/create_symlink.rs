@@ -66,12 +66,10 @@ mod post {
 
         let target = Path::new(data.target.as_str());
         let target = match target.strip_prefix("/") {
-            Ok(target) => CapFilesystem::resolve_path(&Path::new("/").join(target)),
-            Err(_) => {
-                CapFilesystem::resolve_path(&link.parent().unwrap_or(Path::new("/")).join(target))
-            }
+            Ok(target) => Path::new("/").join(target),
+            Err(_) => link.parent().unwrap_or(Path::new("/")).join(target),
         };
-        if server.is_ignored(&target, false) {
+        if server.is_ignored_either(&target) {
             return ApiResponse::error("target not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .ok();
@@ -81,15 +79,17 @@ mod post {
             root: data.root,
             link: data.link,
             target: data.target,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         match server
+            .0
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_create_symlink(server.uuid, &request_body)
+            .post_servers_server_files_create_symlink(server.0.uuid, &request_body)
             .await
         {
             Ok(_) => {}

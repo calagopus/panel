@@ -1,7 +1,7 @@
 import { type DependencyList, useEffect, useRef } from 'react';
-import { getShortcutDefinition } from '@/lib/coreShortcuts.tsx';
-import { effectiveBinding, eventMatchesBinding, ModifierKey, ShortcutBinding } from '@/lib/shortcuts.ts';
-import { getGlobalStore } from '@/stores/global.ts';
+import { getShortcutDefinition } from '@/lib/quickActions/coreShortcuts.tsx';
+import { getShortcutOverrides } from '@/lib/quickActions/shortcutOverrides.ts';
+import { effectiveBinding, eventMatchesBinding, ModifierKey, ShortcutBinding } from '@/lib/quickActions/shortcuts.ts';
 
 export type { ModifierKey };
 
@@ -41,7 +41,7 @@ function resolveShortcut(shortcut: ShortcutConfig): ResolvedShortcut {
   if (shortcut.id !== undefined) {
     const definition = getShortcutDefinition(shortcut.id);
     return {
-      binding: definition ? effectiveBinding(definition, getGlobalStore().shortcutOverrides) : null,
+      binding: definition ? effectiveBinding(definition, getShortcutOverrides()) : null,
       allowWhenInputFocused: shortcut.allowWhenInputFocused ?? definition?.allowWhenInputFocused ?? false,
       preventDefault: shortcut.preventDefault ?? definition?.preventDefault ?? true,
     };
@@ -94,7 +94,10 @@ function isInputFocused(): boolean {
 
 export function useKeyboardShortcuts({ shortcuts, enabled = true, deps = [] }: UseKeyboardShortcutsOptions) {
   const shortcutsRef = useRef(shortcuts);
-  shortcutsRef.current = shortcuts;
+
+  useEffect(() => {
+    shortcutsRef.current = shortcuts;
+  });
 
   useEffect(() => {
     if (!enabled) return;
@@ -150,6 +153,6 @@ export function matchesShortcut(event: KeyboardEvent, id: string): boolean {
   const definition = getShortcutDefinition(id);
   if (!definition) return false;
 
-  const binding = effectiveBinding(definition, getGlobalStore().shortcutOverrides);
+  const binding = effectiveBinding(definition, getShortcutOverrides());
   return binding ? eventMatchesBinding(event, binding) : false;
 }

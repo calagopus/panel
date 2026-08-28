@@ -69,23 +69,25 @@ mod post {
                 .files
                 .into_iter()
                 .filter(|f| {
-                    !server.is_ignored(Path::new(&data.root).join(&f.from), false)
-                        && !server.is_ignored(Path::new(&data.root).join(&f.to), false)
+                    !server.is_ignored_either(Path::new(&data.root).join(&f.from))
+                        && !server.is_ignored_either(Path::new(&data.root).join(&f.to))
                 })
                 .collect(),
             root: data.root,
             overwrite: data.overwrite,
             foreground: data.foreground,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         tokio::spawn(async move {
             let response = match server
+                .0
                 .node
                 .fetch_cached(&state.database)
                 .await?
                 .api_client(&state.database)
                 .await?
-                .post_servers_server_files_copy_many(server.uuid, &request_body)
+                .post_servers_server_files_copy_many(server.0.uuid, &request_body)
                 .await
             {
                 Ok(wings_api::servers_server_files_copy_many::post::Response::Ok(data)) => {

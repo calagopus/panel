@@ -72,9 +72,8 @@ export default function OobeRepositories({ onNext, onBack, canGoBack, skipFrom, 
       onNext();
     } catch (msg) {
       setError(httpErrorToHuman(msg));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const hasSelection = selectedRepos.length > 0;

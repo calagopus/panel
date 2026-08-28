@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 const hexChars = '0123456789ABCDEFabcdef';
 
 export function isFullyHex(hex: string): boolean {
@@ -109,4 +111,58 @@ export function resolvePorts(ports: string[]): ResolvedPorts {
   }
 
   return { resolved: Array.from(resolved), toRemove };
+}
+
+function ipv6Bytes(address: string): number[] {
+  const [head, tail] = address.split('::');
+
+  const expand = (groups: string[]): number[] => {
+    const bytes: number[] = [];
+
+    for (const group of groups) {
+      if (group.includes('.')) {
+        bytes.push(...group.split('.').map(Number));
+      } else {
+        const int = parseInt(group, 16);
+        bytes.push(int >> 8, int & 0xff);
+      }
+    }
+
+    return bytes;
+  };
+
+  const headBytes = expand(head ? head.split(':') : []);
+  const tailBytes = expand(tail ? tail.split(':') : []);
+
+  return [...headBytes, ...new Array(16 - headBytes.length - tailBytes.length).fill(0), ...tailBytes];
+}
+
+function hasZeroedHostBits(bytes: number[], length: number): boolean {
+  for (let i = 0; i < bytes.length; i++) {
+    const networkBits = i * 8;
+
+    if (networkBits >= length) {
+      if (bytes[i] !== 0) return false;
+    } else if (networkBits + 8 > length) {
+      if ((bytes[i] & (0xff >> (length - networkBits))) !== 0) return false;
+    }
+  }
+
+  return true;
+}
+
+export function isNetwork(value: string): boolean {
+  const [address, prefix, ...rest] = value.split('/');
+  if (rest.length > 0) return false;
+
+  const family = z.ipv4().safeParse(address).success ? 'v4' : z.ipv6().safeParse(address).success ? 'v6' : null;
+  if (!family) return false;
+  if (prefix === undefined) return true;
+
+  if (!/^\d+$/.test(prefix)) return false;
+
+  const length = Number(prefix);
+  if (length > (family === 'v4' ? 32 : 128)) return false;
+
+  return hasZeroedHostBits(family === 'v4' ? address.split('.').map(Number) : ipv6Bytes(address), length);
 }

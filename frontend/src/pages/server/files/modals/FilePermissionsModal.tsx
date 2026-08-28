@@ -12,7 +12,8 @@ import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Title from '@/elements/Title.tsx';
-import { permissionStringToNumber } from '@/lib/files.ts';
+import { permissionStringToNumber } from '@/lib/files/files.ts';
+import { createUndoAction } from '@/lib/files/undoableFileMutation.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -158,24 +159,22 @@ export default function FilePermissionsModal({ file, ...props }: Props) {
           const undo =
             wasRecursive || oldMode === newPermissions.toString()
               ? null
-              : () =>
-                  chmodFiles({
-                    uuid: server.uuid,
-                    root: directory,
-                    files: [{ file: fileName, mode: oldMode, recursive: false }],
-                  })
-                    .then(({ updated: restored }) => {
-                      if (restored < 1) {
-                        addToast(t('pages.server.files.toast.permissionsCouldNotBeRestored', {}), 'error');
-                        return;
-                      }
-
-                      addToast(t('pages.server.files.toast.permissionsRestored', {}), 'success');
-                      invalidateFilemanager();
-                    })
-                    .catch((msg) => {
-                      addToast(httpErrorToHuman(msg), 'error');
-                    });
+              : createUndoAction(
+                  () =>
+                    chmodFiles({
+                      uuid: server.uuid,
+                      root: directory,
+                      files: [{ file: fileName, mode: oldMode, recursive: false }],
+                    }),
+                  (result) => result.updated,
+                  {
+                    addToast,
+                    invalidateFilemanager,
+                    cannotUndoMessage: t('pages.server.files.toast.permissionsCouldNotBeRestored', {}),
+                    undoneMessage: t('pages.server.files.toast.permissionsRestored', {}),
+                    onError: (msg) => addToast(httpErrorToHuman(msg), 'error'),
+                  },
+                );
 
           if (updated === 1) {
             addUndoableToast(t('pages.server.files.toast.permissionsUpdated', {}), undo);

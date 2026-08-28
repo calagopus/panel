@@ -1,11 +1,13 @@
 use super::{
-    ExplorerConnection, QUERY_STATEMENT_TIMEOUT_MS, QueryColumn, QueryResultSet, QueryValue,
-    ResultCollector, SchemaColumn, SchemaTable, Statement, TENANT_POOL_ACQUIRE_TIMEOUT,
-    TENANT_POOL_IDLE_TIMEOUT, TENANT_POOL_MAX_CONNECTIONS, display, query_error, render_type,
+    DatabaseSchema, ExplorerConnection, QUERY_STATEMENT_TIMEOUT_MS, QueryColumn, QueryResultSet,
+    QueryValue, ResultCollector, SCHEMA_MAX_TABLES, SchemaColumn, SchemaTable, Statement,
+    TENANT_POOL_ACQUIRE_TIMEOUT, TENANT_POOL_IDLE_TIMEOUT, TENANT_POOL_MAX_CONNECTIONS, display,
+    query_error, render_type,
 };
 use compact_str::CompactString;
 use futures_util::StreamExt;
 use sqlx::{Column, Connection, Decode, Either, Executor, MySql, Row, TypeInfo, mysql::MySqlRow};
+use std::collections::HashMap;
 
 pub(super) struct MysqlExplorer {
     pub(super) connection: sqlx::pool::PoolConnection<MySql>,
@@ -97,17 +99,12 @@ fn mysql_row(row: &MySqlRow) -> Vec<QueryValue> {
                 Err(_) => return QueryValue::Null,
             };
 
-            let Some(bytes) = <&[u8] as Decode<MySql>>::decode(value)
-                .ok()
-                .map(<[u8]>::to_vec)
-            else {
+            let Some(bytes) = <&[u8] as Decode<MySql>>::decode(value).ok() else {
                 return QueryValue::Null;
             };
 
             if mysql_type_is_binary(column.type_info().name()) {
-                return QueryValue::Binary {
-                    value: hex::encode(bytes),
-                };
+                return QueryValue::binary(bytes);
             }
 
             QueryValue::from_bytes(Some(bytes))
@@ -117,7 +114,7 @@ fn mysql_row(row: &MySqlRow) -> Vec<QueryValue> {
 
 const MYSQL_TABLES: &str = "SELECT TABLE_NAME, TABLE_TYPE,
     CAST(TABLE_ROWS AS SIGNED) AS row_estimate
-    FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME";
+    FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME LIMIT ?";
 
 const MYSQL_COLUMNS: &str = "SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, COLUMN_DEFAULT,
     CAST(IS_NULLABLE = 'YES' AS SIGNED) AS nullable,
@@ -127,7 +124,8 @@ const MYSQL_COLUMNS: &str = "SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, COLUMN
         AS is_generated,
     CAST(DATA_TYPE IN ('binary', 'varbinary', 'bit', 'geometry') OR DATA_TYPE LIKE '%blob' AS SIGNED)
         AS binary_data
-    FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION";
+    FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME <= ?
+    ORDER BY TABLE_NAME, ORDINAL_POSITION";
 
 const MYSQL_TABLE_COLUMNS: &str = "SELECT COLUMN_NAME, COLUMN_TYPE, COLUMN_DEFAULT,
     CAST(IS_NULLABLE = 'YES' AS SIGNED) AS nullable,
@@ -253,18 +251,17 @@ impl ExplorerConnection for MysqlExplorer {
         MYSQL_INTEGER_TYPES.contains(&base)
     }
 
-    async fn schema_tables(&mut self) -> Result<Vec<SchemaTable>, anyhow::Error> {
-        let tables = sqlx::query(MYSQL_TABLES)
+    async fn schema_tables(&mut self) -> Result<DatabaseSchema, anyhow::Error> {
+        let rows = sqlx::query(MYSQL_TABLES)
             .bind(&self.database)
-            .fetch_all(&mut *self.connection)
-            .await?;
-        let columns = sqlx::query(MYSQL_COLUMNS)
-            .bind(&self.database)
+            .bind(SCHEMA_MAX_TABLES as i64 + 1)
             .fetch_all(&mut *self.connection)
             .await?;
 
-        let mut tables: Vec<SchemaTable> = tables
+        let truncated = rows.len() > SCHEMA_MAX_TABLES;
+        let mut tables: Vec<SchemaTable> = rows
             .into_iter()
+            .take(SCHEMA_MAX_TABLES)
             .map(|row| {
                 Ok(SchemaTable {
                     schema: None,
@@ -276,16 +273,31 @@ impl ExplorerConnection for MysqlExplorer {
             })
             .collect::<Result<_, sqlx::Error>>()?;
 
+        let Some(last) = tables.last().map(|table| table.name.clone()) else {
+            return Ok(DatabaseSchema { tables, truncated });
+        };
+
+        let columns = sqlx::query(MYSQL_COLUMNS)
+            .bind(&self.database)
+            .bind(last.as_str())
+            .fetch_all(&mut *self.connection)
+            .await?;
+
+        let mut index: HashMap<CompactString, usize> = HashMap::with_capacity(tables.len());
+        for (at, table) in tables.iter().enumerate() {
+            index.insert(table.name.clone(), at);
+        }
+
         for row in columns {
             let table_name: CompactString = row.try_get("TABLE_NAME")?;
-            let Some(table) = tables.iter_mut().find(|table| table.name == table_name) else {
+            let Some(table) = index.get(&table_name).map(|at| &mut tables[*at]) else {
                 continue;
             };
 
             table.columns.push(mysql_column(&row)?);
         }
 
-        Ok(tables)
+        Ok(DatabaseSchema { tables, truncated })
     }
 
     async fn table_columns(
@@ -331,18 +343,32 @@ impl ExplorerConnection for MysqlExplorer {
             .collect()
     }
 
-    async fn fetch_unprepared(&mut self, sql: String) -> Result<QueryResultSet, anyhow::Error> {
-        let rows = sqlx::raw_sql(sqlx::AssertSqlSafe(sql))
-            .fetch_all(&mut *self.connection)
-            .await
-            .map_err(query_error)?;
+    async fn fetch_unprepared(
+        &mut self,
+        sql: String,
+        max_rows: usize,
+    ) -> Result<QueryResultSet, anyhow::Error> {
+        let mut collector = ResultCollector::new(max_rows);
+        let mut stream = sqlx::raw_sql(sqlx::AssertSqlSafe(sql)).fetch_many(&mut *self.connection);
 
-        Ok(QueryResultSet {
-            columns: rows.first().map(mysql_columns).unwrap_or_default(),
-            rows: rows.iter().map(mysql_row).collect(),
-            rows_affected: 0,
-            truncated: false,
-        })
+        while let Some(item) = stream.next().await {
+            if let Either::Right(row) = item.map_err(query_error)? {
+                collector.push(|| mysql_columns(&row), || mysql_row(&row));
+            }
+        }
+
+        drop(stream);
+
+        Ok(collector
+            .into_results()
+            .into_iter()
+            .next()
+            .unwrap_or_else(|| QueryResultSet {
+                columns: Vec::new(),
+                rows: Vec::new(),
+                rows_affected: 0,
+                truncated: false,
+            }))
     }
 
     async fn run_query(
@@ -357,7 +383,7 @@ impl ExplorerConnection for MysqlExplorer {
         while let Some(item) = stream.next().await {
             match item.map_err(query_error)? {
                 Either::Left(result) => collector.finish_set(result.rows_affected()),
-                Either::Right(row) => collector.push(|| mysql_columns(&row), mysql_row(&row)),
+                Either::Right(row) => collector.push(|| mysql_columns(&row), || mysql_row(&row)),
             }
         }
 
@@ -381,7 +407,7 @@ impl ExplorerConnection for MysqlExplorer {
             }
 
             let result = transaction.execute(query).await.map_err(query_error)?;
-            if expects_single_row && result.rows_affected() != 1 {
+            if result.rows_affected() > 1 || (expects_single_row && result.rows_affected() != 1) {
                 transaction.rollback().await?;
 
                 return Err(display(

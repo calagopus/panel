@@ -1,4 +1,6 @@
-use crate::routes::api::auth::login::checkpoint::TwoFactorRequiredJwt;
+use crate::routes::api::auth::login::checkpoint::{
+    TwoFactorRequiredJwt, available_methods, two_factor_unprovable,
+};
 
 use super::State;
 use axum::{
@@ -279,7 +281,22 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
 
                         apply_oauth_provider_mappings(&state, &oauth_provider, user.uuid, &token, &info).await;
 
-                        if user.totp_enabled && !oauth_provider.login_bypass_2fa {
+                        let settings = state.settings.get().await?;
+                        let methods = available_methods(&user, &settings);
+
+                        if two_factor_unprovable(&user, &settings) && !oauth_provider.login_bypass_two_factor {
+                            let app_url = settings.app.url.clone();
+                            drop(settings);
+
+                            return ApiResponse::new(Body::empty())
+                                .with_header("Location", format!("{}/auth/login?error=security_key_required", app_url.trim_end_matches('/')))
+                                .with_status(StatusCode::TEMPORARY_REDIRECT)
+                                .ok();
+                        }
+
+                        drop(settings);
+
+                        if !methods.is_empty() && !oauth_provider.login_bypass_two_factor {
                             if let Err(err) = UserActivity::create(
                                 &state,
                                 shared::models::user_activity::CreateUserActivityOptions {
@@ -326,6 +343,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             let auth_info = serde_json::json!({
                                 "user": user.into_api_object(&state, &state.storage.retrieve_urls().await?).await?,
                                 "token": token,
+                                "methods": methods,
                             });
                             let auth_info = BASE64_ENGINE.encode(serde_json::to_string(&auth_info)?.as_bytes());
                             let auth_info = urlencoding::encode(&auth_info);
@@ -410,8 +428,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
 
                         let username = oauth_provider.extract_username(&info)?.into();
                         let email = oauth_provider.extract_email(&info)?.into();
-                        let name_first = oauth_provider.extract_name_first(&info)?.into();
-                        let name_last = oauth_provider.extract_name_last(&info)?.into();
+                        let name_first = oauth_provider.extract_name_first(&info)?.map(Into::into);
+                        let name_last = oauth_provider.extract_name_last(&info)?.map(Into::into);
 
                         let options = shared::models::user::CreateUserOptions {
                             role_uuid: None,
@@ -424,6 +442,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             admin: false,
                             frozen: false,
                             suspended: false,
+                            verify_email: false,
                             send_email: false,
                             language: settings.app.language.clone(),
                         };

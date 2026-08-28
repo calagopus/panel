@@ -80,6 +80,7 @@ mod post {
                 &wings_api::servers_server_files_write::post::Query {
                     file: Some(params.file.clone()),
                     user: Some(user.uuid),
+                    ignored: server.0.subuser_ignored_files,
                     ..Default::default()
                 },
             )

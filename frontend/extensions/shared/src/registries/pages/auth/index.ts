@@ -6,6 +6,7 @@ import { LoginRegistry } from './login.ts';
 import { OAuthRegistry } from './oauth.ts';
 import { RegisterRegistry } from './register.ts';
 import { ResetPasswordRegistry } from './resetPassword.ts';
+import { VerifyEmailRegistry } from './verifyEmail.ts';
 
 export class AuthRegistry implements Registry {
   public mergeFrom(other: this): this {
@@ -13,6 +14,7 @@ export class AuthRegistry implements Registry {
     this.register.mergeFrom(other.register);
     this.forgotPassword.mergeFrom(other.forgotPassword);
     this.resetPassword.mergeFrom(other.resetPassword);
+    this.verifyEmail.mergeFrom(other.verifyEmail);
     this.checkpoint.mergeFrom(other.checkpoint);
     this.oauth.mergeFrom(other.oauth);
 
@@ -26,6 +28,7 @@ export class AuthRegistry implements Registry {
   public register: RegisterRegistry = new RegisterRegistry();
   public forgotPassword: ForgotPasswordRegistry = new ForgotPasswordRegistry();
   public resetPassword: ResetPasswordRegistry = new ResetPasswordRegistry();
+  public verifyEmail: VerifyEmailRegistry = new VerifyEmailRegistry();
   public checkpoint: CheckpointRegistry = new CheckpointRegistry();
   public oauth: OAuthRegistry = new OAuthRegistry();
 
@@ -49,6 +52,11 @@ export class AuthRegistry implements Registry {
 
   public enterResetPassword(callback: (registry: ResetPasswordRegistry) => unknown): this {
     callback(this.resetPassword);
+    return this;
+  }
+
+  public enterVerifyEmail(callback: (registry: VerifyEmailRegistry) => unknown): this {
+    callback(this.verifyEmail);
     return this;
   }
 

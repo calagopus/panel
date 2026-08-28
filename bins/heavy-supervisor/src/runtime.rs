@@ -9,9 +9,11 @@ use std::{
     path::{Path, PathBuf},
     process::{ExitStatus, Stdio},
     sync::Arc,
+    time::Duration,
 };
 
 const RESTART_QUEUE: usize = 4;
+const REQUESTED_RESTART_GRACE: Duration = Duration::from_millis(500);
 
 pub async fn run(config: Config) -> anyhow::Result<()> {
     let shutdown = watch_signals()?;
@@ -287,6 +289,8 @@ impl Supervisor<'_> {
                         }
                         Wake::Restart => {
                             tracing::info!("restarting the panel on request");
+                            tokio::time::sleep(REQUESTED_RESTART_GRACE).await;
+
                             let stopped = process.stop(shutdown).await;
                             tracing::info!("the outgoing panel was {stopped:?}");
 

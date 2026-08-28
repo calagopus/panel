@@ -28,7 +28,6 @@ export interface AddToast {
 
 interface ToastContextType {
   toastPosition: z.infer<typeof userToastPosition>;
-  setToastPosition: (position: z.infer<typeof userToastPosition>) => void;
 
   addToast: AddToast;
   dismissToast: (id: number) => void;

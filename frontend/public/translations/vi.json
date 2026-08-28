@@ -153,12 +153,12 @@
       "other": "{count} Thay đổi"
     },
     "session": {
-      "zero": "{count} Sessions",
-      "one": "{count} Session",
-      "two": "{count} Sessions",
-      "few": "{count} Sessions",
-      "many": "{count} Sessions",
-      "other": "{count} Sessions"
+      "zero": "{count} phiên",
+      "one": "{count} phiên",
+      "two": "{count} phiên",
+      "few": "{count} phiên",
+      "many": "{count} phiên",
+      "other": "{count} phiên"
     }
   },
   "translations": {
@@ -166,7 +166,7 @@
       "button": {
         "create": "Tạo",
         "add": "Thêm",
-        "addDefaultPort": "{count} Hàng",
+        "addDefaultPort": "Thêm :{port}",
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
         "edit": "Chỉnh sửa",
@@ -175,7 +175,8 @@
         "remove": "Gỡ bỏ",
         "enable": "Kích hoạt",
         "disable": "Vô hiệu hóa",
-        "disableTwoFactor": "Disable Two-Factor",
+        "disableTwoFactor": "Tắt Xác thực Hai Lớp",
+        "verify": "Verify",
         "update": "Cập nhật",
         "close": "Đóng",
         "cancel": "Hủy",
@@ -250,6 +251,17 @@
           "noMatches": "Không có kết quả khớp",
           "exception": "Ngoại lệ",
           "tooManyPatterns": "Không tự động đếm số khớp khi có hơn {max} pattern."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day",
+            "month": "Month",
+            "weekday": "Weekday"
+          },
+          "nextRun": "Next run is {timestamp}."
         }
       },
       "modal": {
@@ -257,11 +269,27 @@
           "title": "Nhân bản {resource}"
         },
         "delete": {
-          "content": "Are you sure you want to delete **{name}**?"
+          "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
         }
       },
       "toast": {
         "duplicated": "Đã nhân bản {resource}."
+      },
+      "settingScope": {
+        "account": "Sync With Account",
+        "device": "Only This Device",
+        "useAccountValue": "Use the Account Value",
+        "saveToAccount": "Save This Value to My Account",
+        "stateAccount": "Account",
+        "stateDevice": "This Device",
+        "tooltip": {
+          "account": "This setting is synced with your account.",
+          "device": "This setting is overridden on this device only."
+        },
+        "toast": {
+          "saved": "Setting saved to your account.",
+          "saveFailed": "Failed to save this setting to your account."
+        }
       },
       "tooltip": {
         "resetToDefault": "Đặt lại về mặc định",
@@ -340,14 +368,14 @@
         "destination": "Đích Đến",
         "destinationDirectory": "Thư mục đích",
         "directoryName": "Tên Thư Mục",
-        "symlinkName": "Symlink Name",
-        "symlinkTarget": "Symlink Target",
+        "symlinkName": "Tên Symlink",
+        "symlinkTarget": "Mục tiêu Symlink",
         "locked": "Khóa",
         "portRanges": "Dãi cổng",
         "portRangesPlaceholder": "Dãi cổng (vd. 3000-4000)",
         "currentPassword": "Mật khẩu Hiện tại",
         "confirmPassword": "Xác nhận Mật khẩu",
-        "passwordRequired": "Password is required",
+        "passwordRequired": "Yêu cầu mật khẩu",
         "authenticationCode": "Mã Xác thực",
         "restoreStartup": "Khôi phục lệnh khởi động, hình ảnh và các biến từ bản sao lưu này.",
         "lineContains": "Dòng chứa",
@@ -360,10 +388,10 @@
         "yourControlPanelPassword": "Mật Khẩu Bảng Điều Khiển Của Bạn",
         "deploymentEnabled": "Bật Triển Khai",
         "maintenanceEnabled": "Bật Bảo Trì",
-        "source": "Source",
-        "target": "Target",
-        "replaceWith": "Replace With",
-        "caseInsensitive": "Case Insensitive",
+        "source": "Nguồn",
+        "target": "Đích",
+        "replaceWith": "Thay thế bằng",
+        "caseInsensitive": "Không phân biệt chữ hoa/thường",
         "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác."
       },
       "table": {
@@ -414,15 +442,15 @@
       },
       "stat": {
         "cpu": "CPU",
-        "cpuLoad": "CPU Load",
-        "memoryUsage": "Memory Usage",
-        "memoryLoad": "Memory Load",
-        "diskUsage": "Disk Usage",
-        "network": "Network",
-        "inbound": "Inbound",
-        "outbound": "Outbound",
-        "uptime": "Uptime",
-        "resources": "Resources"
+        "cpuLoad": "Tải CPU",
+        "memoryUsage": "Sử Dụng Bộ Nhớ",
+        "memoryLoad": "Tải Bộ Nhớ",
+        "diskUsage": "Dung Lượng Đĩa Đã Dùng",
+        "network": "Mạng",
+        "inbound": "Băng thông vào",
+        "outbound": "Băng thông ra",
+        "uptime": "Thời gian hoạt động",
+        "resources": "Tài nguyên"
       },
       "badge": {
         "active": "Đang hoạt động",
@@ -450,7 +478,7 @@
           "restoringBackup": "Khôi phục Backup",
           "installing": "Đang cài đặt",
           "installFailed": "Lỗi cài đặt máy chủ",
-          "backupRestoreFailed": "{count} Egg"
+          "backupRestoreFailed": "Backup Restore Failed"
         }
       },
       "enum": {
@@ -513,7 +541,7 @@
         }
       },
       "unlimited": "Không giới hạn",
-      "readOnly": "Read Only",
+      "readOnly": "Chỉ Đọc",
       "na": "N/A",
       "never": "Không bao giờ",
       "none": "Không có",
@@ -611,7 +639,8 @@
           "theme": "Giao diện",
           "themeAuto": "Tự động",
           "themeDark": "Tối",
-          "themeLight": "Sáng"
+          "themeLight": "Sáng",
+          "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },
         "modal": {
           "logout": {
@@ -818,7 +847,7 @@
           "paused": "Đã tạm dừng"
         },
         "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
-        "cancelAllUploads": "Cancel All Uploads",
+        "cancelAllUploads": "Hủy tất cả lượt tải lên",
         "modal": {
           "cancelAllUploads": {
             "content": "Bạn có chắc chắn muốn hủy tất cả các lượt tải lên đang hoạt động không? Các tệp đang tải lên dở dang sẽ bị hủy bỏ."
@@ -905,7 +934,7 @@
           "allocationsTitle": "Cấu hình Phân bổ",
           "form": {
             "namePlaceholder": "Máy chủ của tôi",
-            "urlDescription": "Used for internal communication with the node.",
+            "urlDescription": "Được sử dụng để liên lạc nội bộ với node.",
             "publicUrlDescription": "Được sử dụng cho websocket/downloads",
             "ip": "IP"
           },
@@ -1079,6 +1108,16 @@
                 "useTotp": "Sử dụng TOTP"
               }
             },
+            "email": {
+              "subtitle": "We can email you a one-time code to finish signing in.",
+              "enterCode": "Enter the 6-digit code we sent to your email address",
+              "button": {
+                "useEmail": "Email me a code",
+                "sendCode": "Gửi mã",
+                "resend": "Resend Code",
+                "resendIn": "Resend Code ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "Vui lòng nhập một trong các mã khôi phục của bạn để tiếp tục. Mỗi mã chỉ có thể sử dụng một lần.",
               "form": {
@@ -1092,11 +1131,11 @@
           "title": "Đăng ký",
           "subtitle": "Vui lòng nhập thông tin của bạn để đăng ký một tài khoản mới.",
           "form": {
-            "usernamePlaceholder": "Your username",
-            "emailPlaceholder": "you@example.com",
-            "firstNamePlaceholder": "Your first name",
-            "lastNamePlaceholder": "Your last name",
-            "passwordPlaceholder": "Enter a strong password"
+            "usernamePlaceholder": "Tên đăng nhập",
+            "emailPlaceholder": "admin@example.vn",
+            "firstNamePlaceholder": "Tên của bạn",
+            "lastNamePlaceholder": "Họ của bạn",
+            "passwordPlaceholder": "Nhập mật khẩu mạnh"
           },
           "button": {
             "register": "Đăng ký"
@@ -1106,19 +1145,27 @@
           "title": "Quên Mật khẩu",
           "subtitle": "Nhập địa chỉ email của bạn để nhận hướng dẫn đặt lại mật khẩu",
           "form": {
-            "emailPlaceholder": "you@example.com"
+            "emailPlaceholder": "you@example.vn"
           },
           "button": {
             "request": "Yêu cầu Đặt Lại Mật khẩu"
           },
           "success": "Một email đã được gửi đến bạn với hướng dẫn về cách đặt lại mật khẩu."
         },
+        "verifyEmail": {
+          "title": "Verify Email",
+          "success": "Your email address **{email}** has been verified.",
+          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
+          "button": {
+            "continue": "Continue"
+          }
+        },
         "resetPassword": {
           "title": "Đặt Lại Mật khẩu",
           "subtitle": "Vui lòng nhập mật khẩu mới của bạn",
           "form": {
-            "passwordPlaceholder": "Enter a strong password",
-            "confirmPasswordPlaceholder": "Re-enter your password"
+            "passwordPlaceholder": "Nhập mật khẩu mạnh",
+            "confirmPasswordPlaceholder": "Xác nhận mật khẩu"
           },
           "button": {
             "reset": "Đặt Lại Mật khẩu"
@@ -1186,6 +1233,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Already in this group",
+                      "description": "This server is already part of {group}."
+                    },
+                    "groupFull": {
+                      "title": "Group is full",
+                      "description": "A group cannot hold more than {max} servers."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server moved to {group}."
+                  }
+                },
                 "noGroups": "Chà có vẻ không có nhóm nào hãy thử tạo một nhóm mới?"
               }
             },
@@ -1226,6 +1288,14 @@
               "title": "Yêu cầu Xác thực Hai Lớp",
               "description": "Để cải thiện bảo mật tài khoản của bạn, chúng tôi yêu cầu bạn kích hoạt xác thực hai lớp. Vui lòng thiết lập xác thực hai lớp để tiếp tục sử dụng tài khoản của bạn."
             },
+            "verifyEmail": {
+              "title": "Email Verification Required",
+              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
+              "sent": "Verification email sent to {email}.",
+              "button": {
+                "resend": "Resend Verification Email"
+              }
+            },
             "frozen": {
               "title": "Tài Khoản Bị Đóng Băng",
               "description": "Tài khoản của bạn đã bị đóng băng. Bạn không thể thực hiện thay đổi tài khoản cho đến khi được mở đóng băng. Vui lòng liên hệ quản trị viên để biết thêm thông tin."
@@ -1245,7 +1315,8 @@
             "email": {
               "title": "Email",
               "toast": {
-                "updated": "Email đã được cập nhật thành công."
+                "updated": "Email đã được cập nhật thành công.",
+                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
               },
               "form": {
                 "newEmail": "Email Mới"
@@ -1273,20 +1344,68 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "Thiết lập Xác thực Hai Lớp"
+                "setupTwoFactor": "Thiết lập Xác thực Hai Lớp",
+                "enableEmail": "Enable Email",
+                "disableEmail": "Disable Email",
+                "securityKeys": "Security Keys"
               },
-              "twoFactorEnabled": "Xác thực Hai Lớp hiện đang được bật.",
-              "twoFactorDisabled": "Bạn hiện không có xác thực hai lớp được bật trên tài khoản của mình. Nhấp vào nút bên dưới để bắt đầu cấu hình.",
-              "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}"
+              "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}",
+              "none": "No second factor is set up on your account yet.",
+              "requirementMet": "Your account meets the two-factor requirement.",
+              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
+              "method": {
+                "totp": "Authenticator App",
+                "securityKey": "Security Key",
+                "email": "Email"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Email two-factor disabled successfully."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Enable Email Two-Factor",
+                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
+                },
+                "disable": {
+                  "title": "Disable Email Two-Factor",
+                  "description": "Disabling email two-factor will make your account less secure."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Password Login",
+              "enabled": "You can sign in with your password.",
+              "disabled": "Password login is turned off. Only your security keys can sign you in.",
+              "toast": {
+                "updated": "Password login updated successfully."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Add a security key before turning off password login."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Disable Password Login",
+                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
+                },
+                "enable": {
+                  "title": "Enable Password Login",
+                  "description": "Your password will be able to sign you in again."
+                }
+              }
             },
             "account": {
               "title": "Chi tiết Tài khoản",
               "toast": {
                 "updated": "Chi tiết tài khoản đã được cập nhật thành công."
-              },
+              }
+            },
+            "preferences": {
+              "title": "Preferences",
               "form": {
-                "toastPosition": "Vị trí Thông báo",
-                "startOnGroupedServers": "Bắt đầu trên trang Nhóm Máy Chủ"
+                "toastPosition": "Toast Position",
+                "startOnGroupedServers": "Start on the Grouped Servers page"
               }
             },
             "avatar": {
@@ -1294,7 +1413,7 @@
               "toast": {
                 "updated": "Hình đại diện đã được cập nhật thành công.",
                 "removed": "Hình đại diện đã được xóa thành công.",
-                "loadFailed": "Failed to load image preview. Please ensure the file is a valid image."
+                "loadFailed": "Tải hình ảnh xem trước thất bại bạn hãy chắc rằng hình ảnh là 1 tệp hợp lệ."
               },
               "form": {
                 "avatar": "Hình Đại Diện"
@@ -1346,7 +1465,7 @@
         "sessions": {
           "title": "Phiên Làm Việc",
           "button": {
-            "deleteOthers": "Log Out Others"
+            "deleteOthers": "Đăng xuất tất cả"
           },
           "table": {
             "columns": {
@@ -1363,10 +1482,10 @@
               }
             },
             "deleteOtherSessions": {
-              "title": "Confirm Session Deletion",
-              "content": "Are you sure you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.",
+              "title": "Xác nhận Xóa Phiên Làm Việc",
+              "content": "Bạn có chắc chắn muốn đăng xuất khỏi tất cả các phiên đăng nhập, ngoại trừ phiên bạn đang sử dụng không? Mọi thiết bị khác đang đăng nhập vào tài khoản của bạn sẽ phải đăng nhập lại.",
               "toast": {
-                "deleted": "{sessions} deleted."
+                "deleted": "{sessions} đã được xóa."
               }
             }
           }
@@ -1545,6 +1664,10 @@
               "permissions": "Quyền Người Dùng / Máy Chủ / Admin",
               "expires": "Hết Hạn"
             }
+          },
+          "toast": {
+            "enabled": "API key enabled.",
+            "disabled": "API key disabled."
           },
           "modal": {
             "createApiKey": {
@@ -1766,11 +1889,22 @@
                   "sessionCookie": "Cookie Phiên",
                   "sessionDurationSeconds": "Thời Lượng Phiên (giây)",
                   "twoFactorRequirement": "Yêu Cầu Xác Thực Hai Lớp",
+                  "emailTwoFactorEnabled": "Email Two-Factor",
+                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
+                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
+                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
+                  "emailVerificationRequired": "Require Email Verification",
+                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "Bật Đo Lường",
                   "telemetryEnabledDescription": "Cho phép Calagopus thu thập dữ liệu sử dụng ẩn danh và hạn chế để giúp cải thiện ứng dụng.",
                   "registrationEnabled": "Bật Đăng Ký"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator App (TOTP)",
+                    "securityKey": "Security Key",
+                    "email": "Email"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Quản Trị Viên",
                     "allUsers": "Tất Cả Người Dùng",
@@ -1986,6 +2120,8 @@
                   "maxCommandSnippetCount": "Số Đoạn Lệnh Tối Đa",
                   "maxSecurityKeyCount": "Số Khóa Bảo Mật Tối Đa",
                   "maxSshKeyCount": "Số Khóa SSH Tối Đa",
+                  "maxSettingsCount": "Max Synced Settings",
+                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "Cho Phép Thay Đổi Ngôn Ngữ",
                   "allowChangingLanguageDescription": "Nếu bật, người dùng sẽ có thể thay đổi tùy chọn ngôn ngữ."
                 },
@@ -2125,6 +2261,10 @@
             "buildFailed": {
               "title": "Lần cuối biên dịch tiện ích mở rộng thất bại",
               "content": "Các tiện ích này sẽ không được biên dịch lại cho đến khi có sự thay đổi, hoặc cho đến khi bạn chủ động thực hiện lại quá trình biên dịch."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2274,7 @@
             "retryBuild": "Thử lại quá trình build",
             "cancelBuild": "Hủy quá trình build",
             "configure": "Cấu Hình",
+            "restart": "Khởi động lại panel",
             "back": "Quay Lại Tiện Ích",
             "accept": "Chấp Nhận",
             "decline": "Từ Chối"
@@ -2144,7 +2285,10 @@
             "cancelling": "Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "noBackend": "Cần tiện ích backend để cấu hình tiện ích này.",
             "noConfigurationPage": "Tiện ích này không có trang cấu hình.",
-            "removeExtension": "Xóa tiện ích"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Xóa tiện ích",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Đang trong hàng đợi…",
@@ -2162,7 +2306,9 @@
             "frontendMissing": "Thiếu frontend",
             "backendMissing": "Thiếu backend",
             "pendingBuild": "Đang chờ build",
-            "pendingRemoval": "Đang chờ xóa"
+            "pendingRemoval": "Đang chờ xóa",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Phiên Bản",
@@ -2182,7 +2328,10 @@
             "buildFailed": "Build tiện ích mở rộng thất bại: {reason}",
             "cancelRequested": "Đã yêu cầu hủy. Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "added": "Tiện ích `{packageName}` đã được thêm thành công.",
-            "removed": "Tiện ích `{packageName}` đã được xóa thành công."
+            "removed": "Tiện ích `{packageName}` đã được xóa thành công.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Không Tìm Thấy Tiện Ích",
@@ -2249,6 +2398,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Gửi Email Đặt Lại Mật Khẩu",
+                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "Mạo Danh"
                 },
                 "form": {
@@ -2264,6 +2414,13 @@
                   "delete": {
                     "title": "Xác Nhận Xóa Người Dùng",
                     "content": "Bạn có chắc muốn xóa **{username}** không?"
+                  },
+                  "verifyEmail": {
+                    "title": "Mark Email Verified",
+                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
+                    "toast": {
+                      "verified": "Email marked as verified."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Tắt Xác Thực Hai Lớp Người Dùng",
@@ -2911,7 +3068,7 @@
                   "memoryOverheadDescription": "Bộ nhớ ẩn sẽ được thêm vào container.",
                   "diskSpace": "Dung Lượng Đĩa",
                   "diskSpaceDescription": "Giới hạn đĩa của máy chủ.",
-                  "diskSpaceTooltip": "0 sẽ không đặt giới hạn. Đây là giới hạn mềm trừ khi bộ giới hạn đĩa được cấu hình trên Wings.",
+                  "diskSpaceTooltip": "0 sẽ không đặt giới hạn. Đây là giới hạn mềm trừ khi bộ giới hạn ổ đĩa được cấu hình trên Wings.",
                   "ioWeight": "Trọng Số IO",
                   "ioWeightDescription": "Trọng số IO tương đối của container máy chủ so với các container khác.",
                   "ioWeightTooltip": "0-1000. Có thể không hoạt động trên tất cả hệ thống.",
@@ -3163,14 +3320,14 @@
                 },
                 "button": {
                   "updateFromRepository": "Cập Nhật Từ Kho Lưu Trữ",
-                  "fromFile": "from File",
-                  "fromUrl": "from URL",
-                  "fromRepository": "from Repository"
+                  "fromFile": "từ Tệp",
+                  "fromUrl": "từ URL",
+                  "fromRepository": "từ Kho Lưu Trữ"
                 },
                 "toast": {
                   "imported": "Egg đã được nhập.",
-                  "importedBulk": "{eggs} imported.",
-                  "importFailed": "Failed to import {url}: {error}",
+                  "importedBulk": "{eggs} đã được nhập.",
+                  "importFailed": "Thất bại khi nhập {url} với lỗi {error}",
                   "moved": "Egg đã được di chuyển.",
                   "movedBulk": "{eggs} đã được di chuyển.",
                   "deletedBulk": "{eggs} đã được xóa.",
@@ -3179,14 +3336,14 @@
                 },
                 "modal": {
                   "importUrl": {
-                    "title": "Import Eggs from URL",
+                    "title": "Nhập Eggs từ URL",
                     "urls": "URLs",
-                    "urlsDescription": "Direct links to exported eggs in JSON or YAML format."
+                    "urlsDescription": "Các liên kết trực tiếp đến dữ liệu trứng đã xuất ở định dạng JSON hoặc YAML."
                   },
                   "updateUrl": {
-                    "title": "Update Egg from URL",
+                    "title": "Cập nhật Eggs từ URL",
                     "url": "URL",
-                    "urlDescription": "Direct link to an exported egg in JSON or YAML format."
+                    "urlDescription": "Liên kết trực tiếp đến tệp đã xuất ở định dạng JSON hoặc YAML."
                   },
                   "move": {
                     "title": "Di Chuyển Egg"
@@ -3280,7 +3437,7 @@
                     "page": {
                       "title": "Biến Egg",
                       "aria": {
-                        "reorder": "Reorder variable"
+                        "reorder": "Sắp xếp lại biến"
                       },
                       "form": {
                         "supportsMarkdown": "Hỗ trợ định dạng Markdown.",
@@ -3493,7 +3650,7 @@
         },
         "databaseHosts": {
           "title": "Máy Chủ Cơ Sở Dữ Liệu",
-          "resourceName": "Database Host",
+          "resourceName": "Máy Chủ Cơ Sở Dữ Liệu",
           "tabs": {
             "general": {
               "page": {
@@ -3549,7 +3706,7 @@
         },
         "databaseAgentHosts": {
           "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
-          "resourceName": "Database Agent Host",
+          "resourceName": "Máy Chủ Agent Cơ Sở Dữ Liệu",
           "tabs": {
             "general": {
               "page": {
@@ -3734,7 +3891,7 @@
         },
         "databaseAgentTemplates": {
           "title": "Mẫu Agent Cơ Sở Dữ Liệu",
-          "resourceName": "Database Agent Template",
+          "resourceName": "Mẫu Agent Cơ Sở Dữ Liệu",
           "dropzone": {
             "title": "Thả một số tệp vào đây để nhập làm Mẫu Agent Cơ Sở Dữ Liệu",
             "subtitle": "Thả ra để bắt đầu nhập"
@@ -3855,8 +4012,8 @@
                   "nameLastPath": "Đường Dẫn Họ",
                   "nameLastPathDescription": "Đường dẫn dùng để trích xuất họ từ phản hồi URL Thông Tin (https://serdejsonpath.live).",
                   "loginOnly": "Chỉ Cho Phép Đăng Nhập",
-                  "loginBypass2fa": "Bỏ Qua 2FA Khi Đăng Nhập",
-                  "loginBypass2faDescription": "Cho phép người dùng đăng nhập bằng nhà cung cấp này bỏ qua 2FA panel.",
+                  "loginBypassTwoFactor": "Bypass 2FA on Login",
+                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "Hiển Thị Liên Kết Cho Người Dùng",
                   "linkViewableDescription": "Cho phép người dùng xem kết nối và mã định danh trong giao diện client.",
                   "userManageable": "Người Dùng Quản Lý Liên Kết",
@@ -3978,7 +4135,7 @@
         },
         "backupConfigurations": {
           "title": "Cấu Hình Sao Lưu",
-          "resourceName": "Backup Configuration",
+          "resourceName": "Cấu Hinh Sao Lưu",
           "table": {
             "columns": {
               "disk": "Đĩa"
@@ -4115,7 +4272,7 @@
         },
         "systemBackupPolicies": {
           "title": "Các chính sách sao lưu hệ thống",
-          "resourceName": "System Backup Policy",
+          "resourceName": "Chính sách sao lưu hệ thống",
           "badge": {
             "runPending": "Đang chờ chạy"
           },
@@ -4549,7 +4706,7 @@
             "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
             "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển",
             "exportingBackup": "Đang xuất bản sao lưu tới {destination}",
-            "cancelAllOperations": "Cancel All Operations"
+            "cancelAllOperations": "Hủy tất cả hoạt động"
           },
           "dropzone": {
             "title": "Thả tệp ở đây để tải lên",
@@ -4599,13 +4756,13 @@
             "fileTooLargeToOpen": "Tệp này quá lớn để mở trong trình quản lý tệp."
           },
           "tooltip": {
-            "settings": "Settings",
+            "settings": "Cài đặt",
             "fileHistory": "Lịch Sử Tệp",
             "revertToDisk": "Bỏ qua",
             "collabEditing": "{user} đang chỉnh sửa tệp này",
             "largestDirectories": "Phân tích kích thước thư mục",
             "dragToMove": "Kéo để di chuyển",
-            "virtual": "Sao chép {files}",
+            "virtual": "This item is virtual and does not exist on disk",
             "back": "Lùi {seconds} giây",
             "forward": "Tiến {seconds} giây",
             "play": "Phát",
@@ -4669,10 +4826,10 @@
               "createdAs": "Thư mục này sẽ được tạo dưới dạng "
             },
             "createSymlink": {
-              "title": "Create Symlink",
-              "targetDescription": "Relative to the directory the symlink is created in.",
-              "createdAs": "This symlink will be created as ",
-              "pointsTo": "It will point to "
+              "title": "Tạo Symlink",
+              "targetDescription": "Tính theo thư mục nơi liên kết tượng trưng được tạo.",
+              "createdAs": "Liên kết tượng trưng này sẽ được tạo như sau ",
+              "pointsTo": "Nó sẽ chỉ ra "
             },
             "copyFile": {
               "title": "Sao Chép Tệp",
@@ -4886,7 +5043,7 @@
             "modal": {
               "deleteRows": {
                 "title": "Xác Nhận Xóa Hàng",
-                "content": "Bạn có chắc chắn muốn xóa người dùng **{rows}** không? Hành động này không thể hoàn tác."
+                "content": "Bạn có chắc chắn muốn xóa {rows} khỏi **{table}** không? Thao tác này không thể hoàn tác được."
               },
               "createTable": {
                 "title": "Tạo bảng",
@@ -5035,10 +5192,10 @@
               "modal": {
                 "createDatabase": {
                   "title": "Tạo Cơ Sở Dữ Liệu",
-                  "content": "Creates a new database inside this managed database instance.",
+                  "content": "Tạo một cơ sở dữ liệu mới bên trong phiên bản cơ sở dữ liệu được quản lý này.",
                   "form": {
-                    "createUser": "Create a user for this database",
-                    "createUserHint": "Creates a user named after the database, grants it access and shows its credentials once the database is created."
+                    "createUser": "Tạo người dùng cho cơ sở dữ liệu này",
+                    "createUserHint": "Tạo một người dùng có tên trùng với tên cơ sở dữ liệu, cấp quyền truy cập và hiển thị thông tin xác thực sau khi cơ sở dữ liệu được tạo."
                   }
                 },
                 "deleteDatabase": {
@@ -5092,26 +5249,26 @@
               "title": "Người dùng",
               "subtitle": "Đã tạo {current} trên tối đa {max} người dùng.",
               "button": {
-                "permissions": "Permissions"
+                "permissions": "Quyền"
               },
               "tooltip": {
-                "offline": "The instance must be running to create users.",
+                "offline": "Instance phải đang chạy để tạo người dùng.",
                 "limitReached": "Phiên bản này bị giới hạn ở {max} người dùng."
               },
               "enum": {
                 "permission": {
-                  "none": "No Access",
-                  "readOnly": "Read Only",
-                  "readWrite": "Read & Write"
+                  "none": "Không có quyền truy cập",
+                  "readOnly": "Chỉ Đọc",
+                  "readWrite": "Đọc & Ghi"
                 }
               },
               "form": {
-                "databases": "Database Access",
-                "noDatabases": "This instance has no databases yet."
+                "databases": "Quyền cơ sở dữ liệu",
+                "noDatabases": "Phiên bản này chưa có cơ sở dữ liệu nào."
               },
               "table": {
                 "columns": {
-                  "databases": "Databases"
+                  "databases": "Cơ sở dữ liệu"
                 }
               },
               "modal": {
@@ -5120,8 +5277,8 @@
                   "content": "Tạo một người dùng mới bên trong phiên bản cơ sở dữ liệu được quản lý này. Thông tin đăng nhập sẽ được hiển thị trong bảng sau đó."
                 },
                 "permissions": {
-                  "title": "Database Permissions",
-                  "content": "Controls which databases **{username}** can access, and what it may do in them."
+                  "title": "Phân quyền Cơ Sở Dữ Liệu",
+                  "content": "Kiểm soát các cơ sở dữ liệu mà **{username}** có thể truy cập và các thao tác được phép thực hiện trên đó."
                 },
                 "deleteUser": {
                   "title": "Xác nhận Xóa Người Dùng",
@@ -5131,7 +5288,7 @@
               "toast": {
                 "created": "Đã tạo người dùng.",
                 "deleted": "Đã xóa người dùng.",
-                "permissionsUpdated": "User permissions updated."
+                "permissionsUpdated": "Quyền của người dùng đã được cập nhật."
               }
             },
             "power": {
@@ -5155,7 +5312,7 @@
             },
             "operations": {
               "remoteImport": "Đang nhập {database} từ {source}",
-              "cancelAllOperations": "Cancel All Operations"
+              "cancelAllOperations": "Hủy tất cả hoạt động"
             },
             "toast": {
               "operationCancelled": "Hoạt động đã bị hủy",
@@ -5203,7 +5360,7 @@
                 "title": "Thông Tin Đăng Nhập Cơ Sở Dữ Liệu",
                 "form": {
                   "database": "Cơ sở dữ liệu",
-                  "databaseHint": "The database the connection string below points at.",
+                  "databaseHint": "Cơ sở dữ liệu mà chuỗi kết nối dưới đây trỏ tới.",
                   "jdbcConnectionString": "Chuỗi Kết Nối JDBC"
                 }
               },
@@ -5354,7 +5511,7 @@
             },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
-              "content": "Are you sure you want to delete **{name}** from this server?"
+              "content": "Bạn có chắc muốn xóa **{name}** khỏi máy chủ này không?"
             },
             "createStep": {
               "title": "Tạo Bước Lịch Trình"

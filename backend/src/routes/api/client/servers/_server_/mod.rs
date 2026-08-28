@@ -23,6 +23,7 @@ mod backups;
 mod command;
 mod databases;
 mod files;
+mod firewall;
 mod logs;
 mod mounts;
 mod power;
@@ -89,12 +90,7 @@ pub async fn auth(
         }
     }
 
-    req.extensions_mut().insert(
-        permissions
-            .0
-            .set_user_server_owner(user.uuid == server.owner.uuid)
-            .add_subuser_permissions(server.subuser_permissions.clone()),
-    );
+    req.extensions_mut().insert(permissions.for_server(&server));
     req.extensions_mut().insert(ServerActivityLogger {
         state: Arc::clone(&state),
         server_uuid: server.uuid,
@@ -163,6 +159,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/subusers", subusers::router(state))
         .nest("/backups", backups::router(state))
         .nest("/allocations", allocations::router(state))
+        .nest("/firewall", firewall::router(state))
         .nest("/databases", databases::router(state))
         .nest("/mounts", mounts::router(state))
         .nest("/schedules", schedules::router(state))

@@ -1,4 +1,5 @@
 use crate::{
+    censor::{CENSORED_PLACEHOLDER, Censor},
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
@@ -186,17 +187,6 @@ impl DatabaseCredentials {
         Ok(())
     }
 
-    pub fn censor(&mut self) {
-        match self {
-            DatabaseCredentials::ConnectionString { connection_string } => {
-                *connection_string = "".into();
-            }
-            DatabaseCredentials::Details { password, .. } => {
-                *password = "".into();
-            }
-        }
-    }
-
     pub async fn parse_connection_details(
         &self,
         database: &crate::database::Database,
@@ -230,6 +220,19 @@ impl DatabaseCredentials {
                 port: *port,
                 username: username.clone(),
             }),
+        }
+    }
+}
+
+impl Censor for DatabaseCredentials {
+    fn censor(&mut self) {
+        match self {
+            DatabaseCredentials::ConnectionString { connection_string } => {
+                *connection_string = CENSORED_PLACEHOLDER.into();
+            }
+            DatabaseCredentials::Details { password, .. } => {
+                *password = CENSORED_PLACEHOLDER.into();
+            }
         }
     }
 }

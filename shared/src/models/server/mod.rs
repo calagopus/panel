@@ -1,6 +1,6 @@
 use crate::{
     State,
-    models::{InsertQueryBuilder, UpdateQueryBuilder, user::GetAuthMethod},
+    models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
     response::DisplayError,
 };
@@ -18,8 +18,30 @@ use utoipa::ToSchema;
 mod events;
 pub use events::ServerEvent;
 
+pub mod firewall;
+
 pub type GetServer = crate::extract::ConsumingExtension<Server>;
 pub type GetServerActivityLogger = crate::extract::ConsumingExtension<ServerActivityLogger>;
+
+/// The path is resolved before matching so that alternative spellings of the same file
+/// (`/./x`, `//x`, `/a/../x`) cannot slip past an anchored pattern, since wings collapses
+/// those components before touching the filesystem.
+fn is_path_ignored(
+    overrides: &ignore::overrides::Override,
+    path: impl AsRef<std::path::Path>,
+    is_dir: bool,
+) -> bool {
+    let path = crate::cap::CapFilesystem::resolve_path(path.as_ref());
+
+    if path == std::path::Path::new("/")
+        || path == std::path::Path::new("")
+        || path == std::path::Path::new(".")
+    {
+        return false;
+    }
+
+    overrides.matched(path, is_dir).is_whitelist()
+}
 
 #[derive(Clone)]
 pub struct ServerActivityLogger {
@@ -1410,85 +1432,20 @@ impl Server {
         Ok(())
     }
 
-    pub fn wings_permissions<'a>(
-        &'a self,
-        settings: &crate::settings::AppSettings,
-        user: &super::user::User,
-        auth: Option<&'a GetAuthMethod>,
-    ) -> Vec<&'a str> {
-        let scope = crate::utils::api_key_scope(auth);
-        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
-
-        if user.admin {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-            permissions.push("admin.websocket.errors");
-            permissions.push("admin.websocket.install");
-            permissions.push("admin.websocket.transfer");
-
-            return permissions;
-        }
-
-        if let Some(subuser_permissions) = &self.subuser_permissions {
-            permissions.reserve(subuser_permissions.len());
-
-            for permission in subuser_permissions.iter() {
-                if scope.is_some_and(|s| !s.contains(permission)) {
-                    continue;
-                }
-
-                if permission == "control.read-console" {
-                    if settings.server.allow_viewing_installation_logs {
-                        permissions.push("admin.websocket.install");
-                    }
-                    if settings.server.allow_viewing_transfer_progress {
-                        permissions.push("admin.websocket.transfer");
-                    }
-                }
-
-                permissions.push(permission.as_str());
-            }
-        } else {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 2);
-
-            if settings.server.allow_viewing_installation_logs {
-                permissions.push("admin.websocket.install");
-            }
-            if settings.server.allow_viewing_transfer_progress {
-                permissions.push("admin.websocket.transfer");
-            }
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-        }
-
-        permissions
+    fn scope_allows_console_streams(scope: Option<&[compact_str::CompactString]>) -> bool {
+        scope.is_none_or(|scope| scope.iter().any(|p| p == "control.read-console"))
     }
 
-    pub fn wings_subuser_permissions<'a>(
-        &self,
+    fn push_granted_permissions<'a>(
+        permissions: &mut Vec<&'a str>,
+        granted: impl Iterator<Item = &'a compact_str::CompactString>,
+        scope: Option<&[compact_str::CompactString]>,
         settings: &crate::settings::AppSettings,
-        subuser: &'a super::server_subuser::ServerSubuser,
-        auth: Option<&'a GetAuthMethod>,
-    ) -> Vec<&'a str> {
-        let scope = crate::utils::api_key_scope(auth);
-        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
-
-        if subuser.user.admin {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-            permissions.push("admin.websocket.errors");
-            permissions.push("admin.websocket.install");
-            permissions.push("admin.websocket.transfer");
-
-            return permissions;
-        }
-
-        permissions.reserve(subuser.permissions.len() + 1);
-
-        for permission in subuser.permissions.iter() {
-            if scope.is_some_and(|s| !s.contains(permission)) {
+    ) {
+        for permission in granted {
+            if scope.is_some_and(|scope| !scope.contains(permission))
+                || permissions.contains(&permission.as_str())
+            {
                 continue;
             }
 
@@ -1503,6 +1460,110 @@ impl Server {
 
             permissions.push(permission.as_str());
         }
+    }
+
+    pub fn wings_permissions<'a>(
+        &'a self,
+        settings: &crate::settings::AppSettings,
+        user: &'a super::user::User,
+        scope: &'a crate::models::user::CredentialScope,
+    ) -> Vec<&'a str> {
+        let scope = scope.server_permissions();
+        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
+
+        if user.admin {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            if Self::scope_allows_console_streams(scope) {
+                permissions.push("admin.websocket.errors");
+                permissions.push("admin.websocket.install");
+                permissions.push("admin.websocket.transfer");
+            }
+
+            return permissions;
+        }
+
+        if self.owner.uuid == user.uuid {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 2);
+
+            if Self::scope_allows_console_streams(scope) {
+                if settings.server.allow_viewing_installation_logs {
+                    permissions.push("admin.websocket.install");
+                }
+                if settings.server.allow_viewing_transfer_progress {
+                    permissions.push("admin.websocket.transfer");
+                }
+            }
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            return permissions;
+        }
+
+        // anyone else reaches this server through their role, their subuser entry, or both, and
+        // holds exactly what those grant. this has to mirror
+        // `PermissionManager::has_server_permission`, otherwise the token authorizes more than
+        // the rest api would.
+        let role_permissions = user
+            .role
+            .as_ref()
+            .map_or(&[][..], |role| role.server_permissions.as_slice());
+        let subuser_permissions = self
+            .subuser_permissions
+            .iter()
+            .flat_map(|permissions| permissions.iter());
+
+        permissions.reserve(
+            role_permissions.len() + self.subuser_permissions.as_ref().map_or(0, |p| p.len()),
+        );
+        Self::push_granted_permissions(
+            &mut permissions,
+            role_permissions.iter().chain(subuser_permissions),
+            scope,
+            settings,
+        );
+
+        permissions
+    }
+
+    pub fn wings_subuser_permissions<'a>(
+        &self,
+        settings: &crate::settings::AppSettings,
+        subuser: &'a super::server_subuser::ServerSubuser,
+        scope: &'a crate::models::user::CredentialScope,
+    ) -> Vec<&'a str> {
+        let scope = scope.server_permissions();
+        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
+
+        if subuser.user.admin {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            if Self::scope_allows_console_streams(scope) {
+                permissions.push("admin.websocket.errors");
+                permissions.push("admin.websocket.install");
+                permissions.push("admin.websocket.transfer");
+            }
+
+            return permissions;
+        }
+
+        let role_permissions = subuser
+            .user
+            .role
+            .as_ref()
+            .map_or(&[][..], |role| role.server_permissions.as_slice());
+
+        permissions.reserve(subuser.permissions.len() + role_permissions.len() + 1);
+        Self::push_granted_permissions(
+            &mut permissions,
+            role_permissions.iter().chain(subuser.permissions.iter()),
+            scope,
+            settings,
+        );
 
         permissions
     }
@@ -1557,14 +1618,8 @@ impl Server {
 
     pub fn is_ignored(&mut self, path: impl AsRef<std::path::Path>, is_dir: bool) -> bool {
         if let Some(ignored_files) = &self.subuser_ignored_files {
-            if path.as_ref() == std::path::Path::new("/")
-                || path.as_ref() == std::path::Path::new("")
-                || path.as_ref() == std::path::Path::new(".")
-            {
-                return false;
-            }
             if let Some(overrides) = &self.subuser_ignored_files_overrides {
-                return overrides.matched(path, is_dir).is_whitelist();
+                return is_path_ignored(overrides, path, is_dir);
             }
 
             let mut override_builder = ignore::overrides::OverrideBuilder::new("/");
@@ -1573,15 +1628,32 @@ impl Server {
                 override_builder.add(file).ok();
             }
 
-            if let Ok(override_builder) = override_builder.build() {
-                let ignored = override_builder.matched(path, is_dir).is_whitelist();
-                self.subuser_ignored_files_overrides = Some(Box::new(override_builder));
+            match override_builder.build() {
+                Ok(overrides) => {
+                    let ignored = is_path_ignored(&overrides, path, is_dir);
+                    self.subuser_ignored_files_overrides = Some(Box::new(overrides));
 
-                return ignored;
+                    return ignored;
+                }
+                Err(err) => {
+                    tracing::error!(
+                        server = %self.uuid,
+                        "failed to compile subuser ignored files, denying access: {:#?}",
+                        err
+                    );
+
+                    return true;
+                }
             }
         }
 
         false
+    }
+
+    pub fn is_ignored_either(&mut self, path: impl AsRef<std::path::Path>) -> bool {
+        let path = path.as_ref();
+
+        self.is_ignored(path, false) || self.is_ignored(path, true)
     }
 
     #[inline]
@@ -1589,7 +1661,7 @@ impl Server {
         self,
         database: &crate::database::Database,
     ) -> Result<RemoteApiServer, anyhow::Error> {
-        let (variables, backups, schedules, mounts, allocations) = tokio::try_join!(
+        let (variables, backups, schedules, mounts, allocations, firewall_rules) = tokio::try_join!(
             sqlx::query!(
                 "SELECT nest_egg_variables.env_variable, COALESCE(server_variables.value, nest_egg_variables.default_value) AS value
                 FROM nest_egg_variables
@@ -1629,6 +1701,7 @@ impl Server {
                 self.uuid
             )
             .fetch_all(database.read()),
+            firewall::fetch_raw_rules(database, self.uuid),
         )?;
 
         let mut futures = Vec::new();
@@ -1751,6 +1824,10 @@ impl Server {
                         read_only: m.read_only,
                     })
                     .collect(),
+                firewall: firewall::decode_rules(firewall_rules)?
+                    .into_iter()
+                    .map(Into::into)
+                    .collect(),
                 egg: wings_api::ServerConfigurationEgg {
                     id: self.egg.uuid,
                     file_denylist: self.egg.file_denylist,
@@ -1766,6 +1843,10 @@ impl Server {
                 },
                 auto_kill: self.auto_kill,
                 auto_start_behavior: self.auto_start_behavior.into(),
+                features: wings_api::ServerConfigurationFeatures {
+                    startup_cpu_boost: None,
+                    runtime_cpu_boost: None,
+                },
             },
             process_configuration: super::nest_egg::ProcessConfiguration {
                 startup: self.egg.config_startup,
@@ -1926,6 +2007,7 @@ impl super::IntoApiObject for Server {
                     self.subuser_permissions
                         .map_or_else(|| vec!["*".into()], |p| p.to_vec())
                 },
+                ignored_files: self.subuser_ignored_files.unwrap_or_default(),
                 location_uuid: node.location.uuid,
                 location_name: node.location.name,
                 location_flag: node.location.flag,
@@ -2804,6 +2886,7 @@ pub struct ApiServer {
     pub is_suspended: bool,
     pub is_transferring: bool,
     pub permissions: Vec<compact_str::CompactString>,
+    pub ignored_files: Vec<compact_str::CompactString>,
 
     pub location_uuid: uuid::Uuid,
     pub location_name: compact_str::CompactString,
@@ -2831,4 +2914,73 @@ pub struct ApiServer {
     pub timezone: Option<compact_str::CompactString>,
 
     pub created: chrono::DateTime<chrono::Utc>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_path_ignored;
+
+    fn overrides(patterns: &[&str]) -> ignore::overrides::Override {
+        let mut builder = ignore::overrides::OverrideBuilder::new("/");
+
+        for pattern in patterns {
+            builder.add(pattern).unwrap();
+        }
+
+        builder.build().unwrap()
+    }
+
+    #[test]
+    fn an_anchored_pattern_matches_every_spelling_of_the_path() {
+        let overrides = overrides(&["/config/secrets.yml"]);
+
+        for path in [
+            "/config/secrets.yml",
+            "/./config/secrets.yml",
+            "/config//secrets.yml",
+            "/config/./secrets.yml",
+            "/config/../config/secrets.yml",
+            "/../config/secrets.yml",
+            "config/secrets.yml",
+        ] {
+            assert!(is_path_ignored(&overrides, path, false), "{path}");
+        }
+
+        assert!(!is_path_ignored(&overrides, "/config/public.yml", false));
+    }
+
+    #[test]
+    fn appending_a_list_keeps_everything_it_hid_hidden() {
+        // Last-match-wins, so reordering the same set flips the verdict - which is why
+        // the grant routes require a suffix rather than a subset.
+        let caller = ["!/a/b", "/a/**"];
+
+        assert!(is_path_ignored(&overrides(&caller), "/a/b", false));
+        assert!(!is_path_ignored(
+            &overrides(&["/a/**", "!/a/b"]),
+            "/a/b",
+            false
+        ));
+
+        for granted in [
+            vec!["!/a/b", "/a/**"],
+            vec!["/a/**", "!/a/b", "!/a/b", "/a/**"],
+            vec!["!/a/**", "!/a/b", "/a/**"],
+        ] {
+            assert!(granted.ends_with(&caller));
+            assert!(
+                is_path_ignored(&overrides(&granted), "/a/b", false),
+                "{granted:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_server_root_is_never_ignored() {
+        let overrides = overrides(&["*"]);
+
+        for path in ["/", "", ".", "/.", "/config/.."] {
+            assert!(!is_path_ignored(&overrides, path, true), "{path}");
+        }
+    }
 }

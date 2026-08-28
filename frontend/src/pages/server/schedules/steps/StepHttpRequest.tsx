@@ -13,7 +13,7 @@ import Title from '@/elements/Title.tsx';
 import { scheduleHttpMethodLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleStepHttpRequestSchema, serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
+import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
 
 export default function StepHttpRequest({
   form,

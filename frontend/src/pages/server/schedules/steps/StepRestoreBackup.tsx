@@ -6,7 +6,7 @@ import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import BackupSelectorInput from '../BackupSelectorInput.tsx';
+import BackupSelectorInput from '../forms/BackupSelectorInput.tsx';
 
 export default function StepRestoreBackup({
   form,

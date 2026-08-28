@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { nullableString } from '@/lib/transformers.ts';
 
 export const dashboardAccountSchema = z.object({
   username: z
@@ -6,11 +7,9 @@ export const dashboardAccountSchema = z.object({
     .min(3)
     .max(15)
     .regex(/^[a-zA-Z0-9_]+$/),
-  nameFirst: z.string().min(1).max(255),
-  nameLast: z.string().min(1).max(255),
+  nameFirst: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  nameLast: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   language: z.string(),
-  toastPosition: z.enum(['top_left', 'top_center', 'top_right', 'bottom_left', 'bottom_center', 'bottom_right']),
-  startOnGroupedServers: z.boolean(),
 });
 
 export const dashboardEmailSchema = z.object({
@@ -36,5 +35,13 @@ export const dashboardTwoFactorEnableSchema = z.object({
 
 export const dashboardTwoFactorDisableSchema = z.object({
   code: z.string().min(6).max(10),
+  password: z.string().max(512),
+});
+
+export const dashboardEmailTwoFactorToggleSchema = z.object({
+  password: z.string().max(512),
+});
+
+export const dashboardPasswordLoginSchema = z.object({
   password: z.string().max(512),
 });

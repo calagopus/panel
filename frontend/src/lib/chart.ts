@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { bytesToString } from '@/lib/size.ts';
 
 export const CHART_WINDOW = 20_000;
@@ -85,12 +85,12 @@ function seriesDash(index: number, total: number): string | undefined {
 }
 
 export function useStreamChart({ series: labels, format, scale = 'decimal', min = 0 }: UseStreamChartOptions) {
-  const samples = useRef<Sample[]>([]);
-  const ceiling = useRef(0);
+  const [samples, setSamples] = useState<Sample[]>([]);
   const [end, setEnd] = useState(() => Date.now() - CHART_DELAY);
   const [hidden, setHidden] = useState(NO_HIDDEN_SERIES);
   const [highlighted, setHighlighted] = useState<string | null>(null);
-  const previousHidden = useRef(hidden);
+  const [ceiling, setCeiling] = useState(0);
+  const [previousHidden, setPreviousHidden] = useState<ReadonlySet<string>>(NO_HIDDEN_SERIES);
 
   useEffect(() => {
     const interval = setInterval(() => setEnd(Date.now() - CHART_DELAY), CHART_TICK);
@@ -100,18 +100,18 @@ export function useStreamChart({ series: labels, format, scale = 'decimal', min 
 
   const push = useCallback((values: number | null | (number | null)[]) => {
     const now = Date.now();
-
-    samples.current.push({ t: now, values: Array.isArray(values) ? values : [values] });
-
     const oldest = now - (CHART_WINDOW + CHART_DELAY + 4 * CHART_TICK);
-    while (samples.current.length > 0 && samples.current[0].t < oldest) {
-      samples.current.shift();
-    }
+
+    setSamples((current) => {
+      const next = [...current, { t: now, values: Array.isArray(values) ? values : [values] }];
+
+      return next.filter((sample) => sample.t >= oldest);
+    });
   }, []);
 
   const clear = useCallback(() => {
-    samples.current = [];
-    ceiling.current = 0;
+    setSamples([]);
+    setCeiling(0);
     setEnd(Date.now() - CHART_DELAY);
   }, []);
 
@@ -134,45 +134,39 @@ export function useStreamChart({ series: labels, format, scale = 'decimal', min 
     [labels.length],
   );
 
-  const { data, ticks, yMax, values } = useMemo(() => {
-    const start = end - CHART_WINDOW;
-    const visible = samples.current.filter((sample) => sample.t >= start - 2 * CHART_TICK);
+  const start = end - CHART_WINDOW;
+  const visible = samples.filter((sample) => sample.t >= start - 2 * CHART_TICK);
 
-    let peak = min;
-    for (const sample of visible) {
-      for (let i = 0; i < sample.values.length; i++) {
-        const value = sample.values[i];
-        if (value !== null && value > peak && !hidden.has(`v${i}`)) {
-          peak = value;
-        }
+  let peak = min;
+  for (const sample of visible) {
+    for (let i = 0; i < sample.values.length; i++) {
+      const value = sample.values[i];
+      if (value !== null && value > peak && !hidden.has(`v${i}`)) {
+        peak = value;
       }
     }
+  }
 
-    if (previousHidden.current !== hidden) {
-      previousHidden.current = hidden;
-      ceiling.current = 0;
+  const wanted = niceCeil(peak * 1.25, scale);
+
+  if (previousHidden !== hidden) {
+    setPreviousHidden(hidden);
+    setCeiling(wanted);
+  } else if (wanted > ceiling || wanted <= ceiling / 2) {
+    setCeiling(wanted);
+  }
+
+  const nextCeiling = previousHidden !== hidden ? wanted : wanted > ceiling || wanted <= ceiling / 2 ? wanted : ceiling;
+
+  const data = visible.map((sample) => {
+    const row: Record<string, number | null> = { t: sample.t };
+    for (let i = 0; i < labels.length; i++) {
+      row[`v${i}`] = sample.values[i] ?? null;
     }
-
-    const wanted = niceCeil(peak * 1.25, scale);
-    if (wanted > ceiling.current || wanted <= ceiling.current / 2) {
-      ceiling.current = wanted;
-    }
-
-    const height = ceiling.current;
-
-    return {
-      data: visible.map((sample) => {
-        const row: Record<string, number | null> = { t: sample.t };
-        for (let i = 0; i < labels.length; i++) {
-          row[`v${i}`] = sample.values[i] ?? null;
-        }
-        return row;
-      }),
-      ticks: Array.from({ length: CHART_TICKS }, (_, i) => (height * i) / (CHART_TICKS - 1)),
-      yMax: height,
-      values: samples.current.at(-1)?.values ?? [],
-    };
-  }, [end, labels, min, scale, hidden]);
+    return row;
+  });
+  const ticks = Array.from({ length: CHART_TICKS }, (_, i) => (nextCeiling * i) / (CHART_TICKS - 1));
+  const values = samples.at(-1)?.values ?? [];
 
   const series = useMemo<StreamChartSeries[]>(
     () =>
@@ -198,7 +192,7 @@ export function useStreamChart({ series: labels, format, scale = 'decimal', min 
       data,
       domain: [end - CHART_WINDOW, end] as [number, number],
       ticks,
-      yMax,
+      yMax: nextCeiling,
       series,
       format,
       highlighted,

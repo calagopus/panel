@@ -2,7 +2,7 @@ import { faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import deleteServerAllocation from '@/api/admin/servers/allocations/deleteServerAllocation.ts';
 import updateServerAllocation from '@/api/admin/servers/allocations/updateServerAllocation.ts';
@@ -35,27 +35,28 @@ export default function ServerAllocationRow({
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');
 
+  const setDebouncedNotes = useMemo(
+    () =>
+      debounce((notes: string) => {
+        updateServerAllocation(server.uuid, allocation.uuid, {
+          notes: notes || null,
+        })
+          .then(() => {
+            addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
+            queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+          })
+          .catch((msg) => {
+            addToast(httpErrorToHuman(msg), 'error');
+          });
+      }, 500),
+    [server.uuid, allocation.uuid, t, addToast, queryClient],
+  );
+
   useEffect(() => {
     if (notes !== (allocation.notes ?? '')) {
       setDebouncedNotes(notes);
     }
   }, [notes]);
-
-  const setDebouncedNotes = useCallback(
-    debounce((notes: string) => {
-      updateServerAllocation(server.uuid, allocation.uuid, {
-        notes: notes || null,
-      })
-        .then(() => {
-          addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
-          queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
-        })
-        .catch((msg) => {
-          addToast(httpErrorToHuman(msg), 'error');
-        });
-    }, 500),
-    [],
-  );
 
   const doSetPrimary = () => {
     updateServerAllocation(server.uuid, allocation.uuid, { primary: true })

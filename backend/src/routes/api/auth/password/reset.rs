@@ -9,6 +9,7 @@ mod post {
         ApiError, GetState,
         models::{
             CreatableModel, user_activity::UserActivity, user_password_reset::UserPasswordReset,
+            user_session::UserSession,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -97,6 +98,17 @@ mod post {
             .user
             .update_password(&state.database, Some(&data.new_password))
             .await?;
+
+        UserSession::delete_by_user_uuid_except(&state.database, token.user.uuid, None).await?;
+
+        sqlx::query!(
+            "UPDATE users
+            SET email_verified = true
+            WHERE users.uuid = $1",
+            token.user.uuid
+        )
+        .execute(state.database.write())
+        .await?;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

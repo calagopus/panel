@@ -34,7 +34,7 @@ pub struct OAuthProvider {
 
     pub enabled: bool,
     pub login_only: bool,
-    pub login_bypass_2fa: bool,
+    pub login_bypass_two_factor: bool,
     pub link_viewable: bool,
     pub user_manageable: bool,
     pub basic_auth: bool,
@@ -128,8 +128,8 @@ impl BaseModel for OAuthProvider {
                 compact_str::format_compact!("{prefix}login_only"),
             ),
             (
-                "oauth_providers.login_bypass_2fa",
-                compact_str::format_compact!("{prefix}login_bypass_2fa"),
+                "oauth_providers.login_bypass_two_factor",
+                compact_str::format_compact!("{prefix}login_bypass_two_factor"),
             ),
             (
                 "oauth_providers.link_viewable",
@@ -177,8 +177,9 @@ impl BaseModel for OAuthProvider {
                 .try_get(compact_str::format_compact!("{prefix}name_last_path").as_str())?,
             enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
             login_only: row.try_get(compact_str::format_compact!("{prefix}login_only").as_str())?,
-            login_bypass_2fa: row
-                .try_get(compact_str::format_compact!("{prefix}login_bypass_2fa").as_str())?,
+            login_bypass_two_factor: row.try_get(
+                compact_str::format_compact!("{prefix}login_bypass_two_factor").as_str(),
+            )?,
             link_viewable: row
                 .try_get(compact_str::format_compact!("{prefix}link_viewable").as_str())?,
             user_manageable: row
@@ -316,48 +317,40 @@ impl OAuthProvider {
         )
     }
 
-    pub fn extract_name_first(&self, value: &serde_json::Value) -> Result<String, anyhow::Error> {
-        Ok(
-            match serde_json_path::JsonPath::parse(match &self.name_first_path {
-                Some(path) => path,
-                None => return Ok("First".to_string()),
-            })?
-            .query(value)
-            .first()
-            .ok_or_else(|| {
-                crate::response::DisplayError::new(format!(
-                    "unable to extract first name from {:?}",
-                    value
-                ))
-            })? {
-                serde_json::Value::String(string) => {
-                    crate::utils::truncate_up_to(string.clone(), 255)
+    fn extract_optional_name(
+        path: Option<&String>,
+        value: &serde_json::Value,
+    ) -> Result<Option<String>, anyhow::Error> {
+        let path = match path {
+            Some(path) => serde_json_path::JsonPath::parse(path)?,
+            None => return Ok(None),
+        };
+
+        Ok(match path.query(value).first() {
+            None | Some(serde_json::Value::Null) => None,
+            Some(serde_json::Value::String(string)) => {
+                if string.is_empty() {
+                    None
+                } else {
+                    Some(crate::utils::truncate_up_to(string.clone(), 255))
                 }
-                val => crate::utils::truncate_up_to(val.to_string(), 255),
-            },
-        )
+            }
+            Some(val) => Some(crate::utils::truncate_up_to(val.to_string(), 255)),
+        })
     }
 
-    pub fn extract_name_last(&self, value: &serde_json::Value) -> Result<String, anyhow::Error> {
-        Ok(
-            match serde_json_path::JsonPath::parse(match &self.name_last_path {
-                Some(path) => path,
-                None => return Ok("Last".to_string()),
-            })?
-            .query(value)
-            .first()
-            .ok_or_else(|| {
-                crate::response::DisplayError::new(format!(
-                    "unable to extract last name from {:?}",
-                    value
-                ))
-            })? {
-                serde_json::Value::String(string) => {
-                    crate::utils::truncate_up_to(string.clone(), 255)
-                }
-                val => crate::utils::truncate_up_to(val.to_string(), 255),
-            },
-        )
+    pub fn extract_name_first(
+        &self,
+        value: &serde_json::Value,
+    ) -> Result<Option<String>, anyhow::Error> {
+        Self::extract_optional_name(self.name_first_path.as_ref(), value)
+    }
+
+    pub fn extract_name_last(
+        &self,
+        value: &serde_json::Value,
+    ) -> Result<Option<String>, anyhow::Error> {
+        Self::extract_optional_name(self.name_last_path.as_ref(), value)
     }
 }
 
@@ -391,7 +384,7 @@ impl IntoAdminApiObject for OAuthProvider {
                 name_last_path: self.name_last_path,
                 enabled: self.enabled,
                 login_only: self.login_only,
-                login_bypass_2fa: self.login_bypass_2fa,
+                login_bypass_two_factor: self.login_bypass_two_factor,
                 link_viewable: self.link_viewable,
                 user_manageable: self.user_manageable,
                 basic_auth: self.basic_auth,
@@ -486,7 +479,7 @@ pub struct CreateOAuthProviderOptions {
     #[garde(skip)]
     pub login_only: bool,
     #[garde(skip)]
-    pub login_bypass_2fa: bool,
+    pub login_bypass_two_factor: bool,
     #[garde(skip)]
     pub link_viewable: bool,
     #[garde(skip)]
@@ -591,7 +584,7 @@ impl CreatableModel for OAuthProvider {
             .set("name_last_path", &options.name_last_path)
             .set("enabled", options.enabled)
             .set("login_only", options.login_only)
-            .set("login_bypass_2fa", options.login_bypass_2fa)
+            .set("login_bypass_two_factor", options.login_bypass_two_factor)
             .set("link_viewable", options.link_viewable)
             .set("user_manageable", options.user_manageable)
             .set("basic_auth", options.basic_auth);
@@ -626,7 +619,7 @@ pub struct UpdateOAuthProviderOptions {
     #[garde(skip)]
     pub login_only: Option<bool>,
     #[garde(skip)]
-    pub login_bypass_2fa: Option<bool>,
+    pub login_bypass_two_factor: Option<bool>,
     #[garde(skip)]
     pub link_viewable: Option<bool>,
     #[garde(skip)]
@@ -773,7 +766,7 @@ impl UpdatableModel for OAuthProvider {
             )
             .set("enabled", options.enabled)
             .set("login_only", options.login_only)
-            .set("login_bypass_2fa", options.login_bypass_2fa)
+            .set("login_bypass_two_factor", options.login_bypass_two_factor)
             .set("link_viewable", options.link_viewable)
             .set("user_manageable", options.user_manageable)
             .set("basic_auth", options.basic_auth)
@@ -793,8 +786,8 @@ impl UpdatableModel for OAuthProvider {
         if let Some(login_only) = options.login_only {
             self.login_only = login_only;
         }
-        if let Some(login_bypass_2fa) = options.login_bypass_2fa {
-            self.login_bypass_2fa = login_bypass_2fa;
+        if let Some(login_bypass_two_factor) = options.login_bypass_two_factor {
+            self.login_bypass_two_factor = login_bypass_two_factor;
         }
         if let Some(link_viewable) = options.link_viewable {
             self.link_viewable = link_viewable;
@@ -932,7 +925,7 @@ impl DuplicableModel for OAuthProvider {
             .set("name_last_path", &self.name_last_path)
             .set("enabled", self.enabled)
             .set("login_only", self.login_only)
-            .set("login_bypass_2fa", self.login_bypass_2fa)
+            .set("login_bypass_two_factor", self.login_bypass_two_factor)
             .set("link_viewable", self.link_viewable)
             .set("user_manageable", self.user_manageable)
             .set("basic_auth", self.basic_auth);
@@ -987,7 +980,7 @@ pub struct AdminApiOAuthProvider {
 
     pub enabled: bool,
     pub login_only: bool,
-    pub login_bypass_2fa: bool,
+    pub login_bypass_two_factor: bool,
     pub link_viewable: bool,
     pub user_manageable: bool,
     pub basic_auth: bool,

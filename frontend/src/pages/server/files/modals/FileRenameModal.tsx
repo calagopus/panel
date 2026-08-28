@@ -9,6 +9,7 @@ import Button from '@/elements/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
+import { createUndoAction } from '@/lib/files/undoableFileMutation.ts';
 import { serverDirectoryEntrySchema, serverFilesNameSchema } from '@/lib/schemas/server/files.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
@@ -66,30 +67,29 @@ export default function FileRenameModal({ file, ...props }: Props) {
         return;
       }
 
-      addUndoableToast(t('pages.server.files.toast.fileRenamed', {}), () =>
-        renameFiles({
-          uuid: server.uuid,
-          root: directory,
-          files: [{ from: newName, to: oldName }],
-        })
-          .then(({ renamed: undone }) => {
-            if (undone < 1) {
-              addToast(t('pages.server.files.toast.renameCouldNotBeUndone', {}), 'error');
-              return;
-            }
-
-            addToast(t('pages.server.files.toast.renameUndone', {}), 'success');
-            invalidateFilemanager();
-          })
-          .catch((msg) => {
-            addToast(httpErrorToHuman(msg), 'error');
-          }),
+      addUndoableToast(
+        t('pages.server.files.toast.fileRenamed', {}),
+        createUndoAction(
+          () =>
+            renameFiles({
+              uuid: server.uuid,
+              root: directory,
+              files: [{ from: newName, to: oldName }],
+            }),
+          (result) => result.renamed,
+          {
+            addToast,
+            invalidateFilemanager,
+            cannotUndoMessage: t('pages.server.files.toast.renameCouldNotBeUndone', {}),
+            undoneMessage: t('pages.server.files.toast.renameUndone', {}),
+            onError: (msg) => addToast(httpErrorToHuman(msg), 'error'),
+          },
+        ),
       );
       invalidateFilemanager();
       if (store.getState().selectedFiles.has(file)) {
         removeSelectedFile(file);
-        file.name = newName;
-        addSelectedFile(file);
+        addSelectedFile({ ...file, name: newName });
       }
     },
   });

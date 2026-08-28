@@ -7,7 +7,10 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{ByUuid, CreatableModel, user::User, user_session::UserSession},
+        models::{
+            ByUuid, CreatableModel, user::User, user_email_verification::UserEmailVerification,
+            user_session::UserSession,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use tower_cookies::Cookies;
@@ -18,16 +21,16 @@ mod post {
         #[garde(length(chars, min = 3, max = 15), pattern("^[a-zA-Z0-9_]+$"))]
         #[schema(min_length = 3, max_length = 15)]
         #[schema(pattern = "^[a-zA-Z0-9_]+$")]
-        username: String,
+        username: compact_str::CompactString,
         #[garde(email)]
         #[schema(format = "email")]
-        email: String,
+        email: compact_str::CompactString,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_first: String,
+        name_first: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_last: String,
+        name_last: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 8, max = 512))]
         #[schema(min_length = 8, max_length = 512)]
         password: String,
@@ -83,12 +86,12 @@ mod post {
                 .ok();
         }
 
-        let user = match User::create_automatic_admin(
+        let mut user = match User::create_automatic_admin(
             &state.database,
             &data.username,
             &data.email,
-            &data.name_first,
-            &data.name_last,
+            data.name_first.as_deref(),
+            data.name_last.as_deref(),
             &data.password,
         )
         .await
@@ -107,6 +110,44 @@ mod post {
                     .ok();
             }
         };
+
+        if user.admin {
+            sqlx::query!(
+                "UPDATE users
+                SET email_verified = true
+                WHERE users.uuid = $1",
+                user.uuid
+            )
+            .execute(state.database.write())
+            .await?;
+
+            user.email_verified = true;
+        } else if state
+            .settings
+            .get_as(|s| s.app.email_verification_required)
+            .await?
+        {
+            match UserEmailVerification::create(&state.database, user.uuid, &user.email).await {
+                Ok(token) => {
+                    if let Err(err) =
+                        UserEmailVerification::send(&state, &user, &user.email, &token).await
+                    {
+                        tracing::error!(
+                            user = %user.uuid,
+                            "failed to send email verification: {:#?}",
+                            err
+                        );
+                    }
+                }
+                Err(err) => {
+                    tracing::error!(
+                        user = %user.uuid,
+                        "failed to create email verification: {:#?}",
+                        err
+                    );
+                }
+            }
+        }
 
         let key = UserSession::create(
             &state,

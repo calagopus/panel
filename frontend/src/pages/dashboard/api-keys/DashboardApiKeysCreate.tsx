@@ -71,6 +71,7 @@ export default function DashboardApiKeysCreate() {
     createApiKey({
       name: form.values.name,
       allowedIps: [],
+      enabled: true,
       ...requestedPermissions,
       expires: null,
     })

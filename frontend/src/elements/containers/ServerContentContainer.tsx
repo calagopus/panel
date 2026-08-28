@@ -37,16 +37,16 @@ export interface Props {
 }
 
 function ServerContentContainer(props: Props) {
-  props = useMemo(() => {
-    let modifiedProps = props;
+  const modifiedProps = useMemo(() => {
+    let currentProps = props;
 
     if (props.registry) {
       for (const interceptor of props.registry.propsInterceptors) {
-        modifiedProps = interceptor(modifiedProps);
+        currentProps = interceptor(currentProps);
       }
     }
 
-    return modifiedProps;
+    return currentProps;
   }, [props]);
 
   const {
@@ -60,7 +60,7 @@ function ServerContentContainer(props: Props) {
     registry,
     children,
     fullscreen = false,
-  } = props;
+  } = modifiedProps;
 
   const { t, tItem } = useTranslations();
   const {
@@ -74,6 +74,7 @@ function ServerContentContainer(props: Props) {
     transferProgressTotal,
     transferProgressFiles,
     backupRestoreFiles,
+    installProgress,
   } = useServerStore(
     useShallow((state) => ({
       server: state.server,
@@ -86,6 +87,7 @@ function ServerContentContainer(props: Props) {
       transferProgressTotal: state.transferProgressTotal,
       transferProgressFiles: state.transferProgressFiles,
       backupRestoreFiles: state.backupRestoreFiles,
+      installProgress: state.installProgress,
     })),
   );
   const { user } = useAuth();
@@ -204,7 +206,15 @@ function ServerContentContainer(props: Props) {
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>
             <div className='flex flex-row items-center justify-between'>
-              {t('pages.server.console.notification.installing', {})}
+              <span className='flex flex-col md:flex-row md:items-center gap-1'>
+                {t('pages.server.console.notification.installing', {})}
+                {installProgress?.label ? (
+                  <Text size='sm' c='dimmed'>
+                    {installProgress.label}
+                  </Text>
+                ) : null}
+              </span>
+
               <ServerCan action='settings.cancel-install'>
                 <Button
                   className='ml-4 min-w-fit'
@@ -217,6 +227,17 @@ function ServerContentContainer(props: Props) {
                 </Button>
               </ServerCan>
             </div>
+
+            {installProgress === null ? null : installProgress.total === 100 ? (
+              <Progress value={installProgress.progress} />
+            ) : (
+              <Tooltip
+                label={bytesProgressString(installProgress.progress, installProgress.total)}
+                innerClassName='w-full'
+              >
+                <Progress value={(installProgress.progress / installProgress.total) * 100} />
+              </Tooltip>
+            )}
           </Notification>
         </div>
       ) : server.nodeMaintenanceEnabled ? (
@@ -231,7 +252,7 @@ function ServerContentContainer(props: Props) {
 
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
         {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} {...props} />
+          <Component key={`prepended-${index}`} {...modifiedProps} />
         ))}
 
         {hideTitleComponent ? null : setSearch ? (
@@ -278,13 +299,13 @@ function ServerContentContainer(props: Props) {
           </div>
         )}
         {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} {...props} />
+          <Component key={`prepended-content-${index}`} {...modifiedProps} />
         ))}
 
         {children}
 
         {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} {...props} />
+          <Component key={`appended-content-${index}`} {...modifiedProps} />
         ))}
       </div>
     </ContentContainer>

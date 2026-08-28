@@ -12,7 +12,7 @@ import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.t
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
+import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
 
 export default function StepCreateBackup({
   form,

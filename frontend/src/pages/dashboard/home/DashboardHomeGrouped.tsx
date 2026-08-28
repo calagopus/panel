@@ -7,13 +7,14 @@ import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import updateServerGroupsOrder from '@/api/me/servers/groups/updateServerGroupsOrder.ts';
 import Button from '@/elements/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
+import { DndBoard, DndSortableList, SortableItem } from '@/elements/DragAndDrop.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
+import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
-import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
+import { SERVER_GROUPS_CONTAINER_ID, useServerGroupsDnd } from '@/plugins/useServerGroupsDnd.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
@@ -21,12 +22,10 @@ import BulkActionBar from './BulkActionBar.tsx';
 import DashboardHomeTitle from './DashboardHomeTitle.tsx';
 import ServerGroupCreateModal from './modals/ServerGroupCreateModal.tsx';
 import ServerGroupItem from './ServerGroupItem.tsx';
-
-interface DndServerGroup extends z.infer<typeof userServerGroupSchema>, DndItem {
-  id: string;
-}
+import ServerItem from './ServerItem.tsx';
 
 const MemoizedServerGroupItem = memo(ServerGroupItem);
+const MemoizedServerItem = memo(ServerItem);
 
 export default function DashboardHomeGrouped() {
   const { t } = useTranslations();
@@ -112,10 +111,36 @@ export default function DashboardHomeGrouped() {
 
   const sortedServerGroups = useMemo(() => [...serverGroups].sort((a, b) => a.order - b.order), [serverGroups]);
 
-  const dndServerGroups: DndServerGroup[] = useMemo(
-    () => sortedServerGroups.map((g) => ({ ...g, id: g.uuid })),
-    [sortedServerGroups],
+  const serverGroupUuids = useMemo(() => sortedServerGroups.map((g) => g.uuid), [sortedServerGroups]);
+
+  const onGroupsReorder = useCallback(
+    async (reordered: z.infer<typeof userServerGroupSchema>[]) => {
+      const previousServerGroups = serverGroups;
+
+      startTransition(() => {
+        setServerGroups(reordered.map((g, i) => ({ ...g, order: i })));
+      });
+
+      await updateServerGroupsOrder(reordered.map((g) => g.uuid)).catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+        setServerGroups(previousServerGroups);
+      });
+    },
+    [addToast, serverGroups, setServerGroups],
   );
+
+  const {
+    collisionDetection,
+    describeItem,
+    activeServerGroup,
+    activeServer,
+    activeServerDndId,
+    activeServerSourceUuid,
+    blockedTarget,
+    placement,
+    pendingMove,
+    ...dndHandlers
+  } = useServerGroupsDnd({ onGroupsReorder });
 
   return (
     <AccountContentContainer
@@ -140,42 +165,40 @@ export default function DashboardHomeGrouped() {
           {t('pages.account.home.tabs.groupedServers.page.noGroups', {})}
         </p>
       ) : (
-        <DndContainer
-          items={dndServerGroups}
-          callbacks={{
-            onDragEnd: async (items) => {
-              const reorderedGroups = items.map((g, i) => ({ ...g, order: i }));
-
-              startTransition(() => {
-                setServerGroups(reorderedGroups);
-              });
-
-              await updateServerGroupsOrder(items.map((g) => g.uuid)).catch((err) => {
-                addToast(httpErrorToHuman(err), 'error');
-                setServerGroups(serverGroups);
-              });
-            },
-          }}
-          renderOverlay={(activeItem) =>
-            activeItem ? (
+        <DndBoard
+          collisionDetection={collisionDetection}
+          describeItem={describeItem}
+          {...dndHandlers}
+          renderOverlay={() =>
+            activeServerGroup ? (
               <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
                 <MemoizedServerGroupItem
-                  serverGroup={activeItem}
+                  serverGroup={activeServerGroup}
                   dragHandleProps={{
                     style: { cursor: 'grabbing' },
                   }}
                   sKeyPressedRef={sKeyPressedRef}
                 />
               </div>
+            ) : activeServer ? (
+              <div style={{ cursor: 'grabbing' }} className='shadow-xl rounded-xl'>
+                <MemoizedServerItem
+                  server={activeServer}
+                  showContextMenu
+                  showForeignServerBadge
+                  isSelected={selectedServers.has(activeServer)}
+                  onGroupRemove={() => null}
+                />
+              </div>
             ) : null
           }
         >
-          {(items) => (
+          <DndSortableList id={SERVER_GROUPS_CONTAINER_ID} items={serverGroupUuids}>
             <div className='flex flex-col gap-3'>
-              {items.map((serverGroup) => (
+              {sortedServerGroups.map((serverGroup) => (
                 <SortableItem
-                  key={serverGroup.id}
-                  id={serverGroup.id}
+                  key={serverGroup.uuid}
+                  id={serverGroup.uuid}
                   renderItem={({ dragHandleProps }) => (
                     <MemoizedServerGroupItem
                       serverGroup={serverGroup}
@@ -184,13 +207,22 @@ export default function DashboardHomeGrouped() {
                       onServerSelectionChange={handleServerSelectionChange}
                       onServerClick={handleServerClick}
                       sKeyPressedRef={sKeyPressedRef}
+                      isDropTarget={
+                        blockedTarget?.groupUuid === serverGroup.uuid || placement?.groupUuid === serverGroup.uuid
+                      }
+                      dropBlockedReason={blockedTarget?.groupUuid === serverGroup.uuid ? blockedTarget.reason : null}
+                      adoptedServer={placement?.groupUuid === serverGroup.uuid ? activeServer : null}
+                      adoptedDndId={placement?.groupUuid === serverGroup.uuid ? activeServerDndId : null}
+                      adoptedIndex={placement?.groupUuid === serverGroup.uuid ? placement.index : null}
+                      hiddenDndId={placement && activeServerSourceUuid === serverGroup.uuid ? activeServerDndId : null}
+                      pendingServer={pendingMove?.groupUuid === serverGroup.uuid ? pendingMove.server : null}
                     />
                   )}
                 />
               ))}
             </div>
-          )}
-        </DndContainer>
+          </DndSortableList>
+        </DndBoard>
       )}
 
       <div className='flex justify-center mt-4'>

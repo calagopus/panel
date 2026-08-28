@@ -50,7 +50,7 @@ function StatBox({ label, value, icon }: { label: string; value: React.ReactNode
           {label}
         </Text>
       </Group>
-      <Text size='lg' fw={700}>
+      <Text component='div' size='lg' fw={700}>
         {value}
       </Text>
     </Card>
@@ -114,7 +114,9 @@ export default function ServerOverview({ server }: { server: Server }) {
             <Stack gap={0}>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.user', {})}>
                 <TableLink to={`/admin/users/${server.owner.uuid}`}>
-                  {server.owner.nameFirst} {server.owner.nameLast} ({server.owner.username})
+                  {server.owner.nameFirst || server.owner.nameLast
+                    ? `${[server.owner.nameFirst, server.owner.nameLast].filter(Boolean).join(' ')} (${server.owner.username})`
+                    : server.owner.username}
                 </TableLink>
               </InfoRow>
               <InfoRow label={t('common.form.language', {})}>

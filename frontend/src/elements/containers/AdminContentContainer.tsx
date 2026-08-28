@@ -1,13 +1,10 @@
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Text, Title, TitleOrder } from '@mantine/core';
+import { TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import TextInput from '../input/TextInput.tsx';
 import ContentContainer from './ContentContainer.tsx';
+import ContentContainerHeader from './ContentContainerHeader.tsx';
 
 export interface Props {
   title: string;
@@ -23,16 +20,16 @@ export interface Props {
 }
 
 function AdminContentContainer(props: Props) {
-  props = useMemo(() => {
-    let modifiedProps = props;
+  const modifiedProps = useMemo(() => {
+    let currentProps = props;
 
     if (props.registry) {
       for (const interceptor of props.registry.propsInterceptors) {
-        modifiedProps = interceptor(modifiedProps);
+        currentProps = interceptor(currentProps);
       }
     }
 
-    return modifiedProps;
+    return currentProps;
   }, [props]);
 
   const {
@@ -46,9 +43,8 @@ function AdminContentContainer(props: Props) {
     registry,
     fullscreen = false,
     children,
-  } = props;
+  } = modifiedProps;
 
-  const { t } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
   const { id } = useCurrentWindow();
 
@@ -56,60 +52,26 @@ function AdminContentContainer(props: Props) {
     <ContentContainer title={`${title} | ${settings.app.name}`}>
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
         {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} {...props} />
+          <Component key={`prepended-${index}`} {...modifiedProps} />
         ))}
 
-        {hideTitleComponent ? null : setSearch ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>
-              <TextInput
-                placeholder={t('common.input.search', {})}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                leftSection={<FontAwesomeIcon icon={faSearch} />}
-                w={250}
-              />
-              {contentRight}
-            </Group>
-          </Group>
-        ) : contentRight ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>{contentRight}</Group>
-          </Group>
-        ) : (
-          <div className='mb-4'>
-            <Title order={titleOrder}>{title}</Title>
-            {subtitle ? (
-              <Text size='xs' c='dimmed'>
-                {subtitle}
-              </Text>
-            ) : null}
-          </div>
-        )}
+        <ContentContainerHeader
+          title={title}
+          subtitle={subtitle}
+          hideTitleComponent={hideTitleComponent}
+          titleOrder={titleOrder}
+          search={search}
+          setSearch={setSearch}
+          contentRight={contentRight}
+        />
         {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} {...props} />
+          <Component key={`prepended-content-${index}`} {...modifiedProps} />
         ))}
 
         {children}
 
         {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} {...props} />
+          <Component key={`appended-content-${index}`} {...modifiedProps} />
         ))}
       </div>
     </ContentContainer>

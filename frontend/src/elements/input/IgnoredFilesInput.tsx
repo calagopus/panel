@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Input, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { ReactNode, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { ReactNode, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import searchFiles from '@/api/server/files/searchFiles.ts';
 import Button from '@/elements/Button.tsx';
+import IgnoredFilesBrowser from '@/elements/files/IgnoredFilesBrowser.tsx';
 import Group from '@/elements/Group.tsx';
-import IgnoredFilesBrowser from '@/elements/IgnoredFilesBrowser.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -171,10 +171,7 @@ export default function IgnoredFilesInput({ serverUuid, label, description, valu
   const focused = useRef(false);
   const gutterRef = useRef<HTMLDivElement>(null);
 
-  const updateSettledText = useCallback(
-    debounce((next: string) => setSettledText(next), 600),
-    [],
-  );
+  const updateSettledText = useMemo(() => debounce((next: string) => setSettledText(next), 600), []);
 
   useEffect(() => {
     updateSettledText(text);

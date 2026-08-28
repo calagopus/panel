@@ -140,6 +140,15 @@ mod patch {
                 }
             };
 
+        if data.enabled == Some(false)
+            && let AuthMethod::ApiKey(auth_api_key) = &**auth
+            && auth_api_key.uuid == api_key.uuid
+        {
+            return ApiResponse::error("unable to disable the api key currently in use")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         match api_key.update(&state, data).await {
             Ok(_) => {}
             Err(err) if err.is_unique_violation() => {
@@ -158,6 +167,7 @@ mod patch {
                     "identifier": api_key.key_start,
                     "name": api_key.name,
                     "allowed_ips": api_key.allowed_ips,
+                    "enabled": api_key.enabled,
                     "user_permissions": api_key.user_permissions,
                     "admin_permissions": api_key.admin_permissions,
                     "server_permissions": api_key.server_permissions,

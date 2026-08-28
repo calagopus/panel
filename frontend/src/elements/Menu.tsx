@@ -1,9 +1,11 @@
 import {
   Menu as MantineMenu,
+  MenuDivider as MantineMenuDivider,
   MenuDropdown as MantineMenuDropdown,
   MenuItem as MantineMenuItem,
   MenuLabel as MantineMenuLabel,
   MenuTarget as MantineMenuTarget,
+  MenuDividerProps,
   MenuDropdownProps,
   MenuItemProps,
   MenuLabelProps,
@@ -19,6 +21,10 @@ const MenuTarget = ({ ...rest }: MenuTargetProps) => {
 
 const MenuDropdown = forwardRef<HTMLDivElement, MenuDropdownProps>(({ ...rest }, ref) => {
   return <MantineMenuDropdown ref={ref} {...rest} />;
+});
+
+const MenuDivider = forwardRef<HTMLDivElement, MenuDividerProps>(({ ...rest }, ref) => {
+  return <MantineMenuDivider ref={ref} {...rest} />;
 });
 
 const MenuLabel = forwardRef<HTMLDivElement, MenuLabelProps>(({ ...rest }, ref) => {
@@ -38,6 +44,7 @@ const Menu = makeComponentHookable(
   {
     Target: makeComponentHookable(MenuTarget),
     Dropdown: makeComponentHookable(MenuDropdown),
+    Divider: makeComponentHookable(MenuDivider),
     Label: makeComponentHookable(MenuLabel),
     Item: makeComponentHookable(MenuItem),
   },

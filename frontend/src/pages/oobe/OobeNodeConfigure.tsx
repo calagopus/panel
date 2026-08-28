@@ -29,6 +29,8 @@ import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 
+const loadYamlLanguage = () => import('highlight.js/lib/languages/yaml').then((mod) => mod.default);
+
 export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { addToast } = useToast();
   const { t } = useTranslations();
@@ -132,10 +134,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
 
         {node && nodeConfiguration && command && (
           <div className='flex flex-col min-w-0'>
-            <HljsCode
-              languageName='yaml'
-              language={() => import('highlight.js/lib/languages/yaml').then((mod) => mod.default)}
-            >
+            <HljsCode languageName='yaml' language={loadYamlLanguage}>
               {dump(nodeConfiguration)}
             </HljsCode>
 

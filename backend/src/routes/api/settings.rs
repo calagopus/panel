@@ -19,6 +19,9 @@ mod get {
         name: &'a str,
         language: &'a str,
         registration_enabled: bool,
+        email_two_factor_enabled: bool,
+        email_verification_required: bool,
+        two_factor_accepted_methods: &'a [shared::settings::app::TwoFactorMethod],
         debug: bool,
     }
 
@@ -36,6 +39,8 @@ mod get {
         max_subuser_count: u64,
         max_schedule_step_count: u64,
         max_backup_group_count: u64,
+        max_firewall_rule_count: u64,
+        max_firewall_rule_source_count: u64,
         max_database_instance_database_count: u64,
         max_database_instance_user_count: u64,
 
@@ -96,6 +101,9 @@ mod get {
                 name: &settings.app.name,
                 language: &settings.app.language,
                 registration_enabled: settings.app.registration_enabled,
+                email_two_factor_enabled: settings.app.email_two_factor_enabled,
+                email_verification_required: settings.app.email_verification_required,
+                two_factor_accepted_methods: &settings.app.two_factor_accepted_methods,
                 debug: state.env.is_debug(),
             },
             webauthn: ResponseWebauthn {
@@ -111,6 +119,8 @@ mod get {
                 max_subuser_count: settings.server.max_subuser_count,
                 max_schedule_step_count: settings.server.max_schedule_step_count,
                 max_backup_group_count: settings.server.max_backup_group_count,
+                max_firewall_rule_count: settings.server.max_firewall_rule_count,
+                max_firewall_rule_source_count: settings.server.max_firewall_rule_source_count,
                 max_database_instance_database_count: settings
                     .server
                     .max_database_instance_database_count,

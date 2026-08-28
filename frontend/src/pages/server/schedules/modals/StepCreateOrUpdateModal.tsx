@@ -1,5 +1,3 @@
-import { faSave } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
@@ -225,7 +223,7 @@ export default function StepCreateOrUpdateModal({
         )}
 
         <ModalFooter>
-          <Button type='submit' leftSection={<FontAwesomeIcon icon={faSave} />} loading={loading}>
+          <Button type='submit' loading={loading}>
             {propStep ? t('common.button.update', {}) : t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>

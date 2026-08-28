@@ -11,7 +11,7 @@ use std::{
     path::PathBuf,
     sync::Arc,
 };
-use tokio::io::AsyncBufReadExt;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
 use tower::Layer;
 use tower_http::normalize_path::NormalizePathLayer;
 
@@ -215,7 +215,16 @@ async fn handle_aio_wings(
         );
     }
 
-    tokio::fs::write(&path, serde_norway::to_string(&wings_configuration)?).await?;
+    let mut options = tokio::fs::OpenOptions::new();
+    options.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    options.mode(0o600);
+
+    let mut file = options.open(&path).await?;
+    file.write_all(serde_norway::to_string(&wings_configuration)?.as_bytes())
+        .await?;
+    file.flush().await?;
+    drop(file);
 
     let wings_bin = bins::get_wings_bin_path().await?;
 

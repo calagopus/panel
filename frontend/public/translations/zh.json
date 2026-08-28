@@ -176,6 +176,7 @@
         "enable": "啟用",
         "disable": "停用",
         "disableTwoFactor": "Disable Two-Factor",
+        "verify": "Verify",
         "update": "更新",
         "close": "關閉",
         "cancel": "取消",
@@ -250,6 +251,17 @@
           "noMatches": "沒有相符項目",
           "exception": "例外",
           "tooManyPatterns": "超過 {max} 個模式時不會自動計算相符數量。"
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day",
+            "month": "Month",
+            "weekday": "Weekday"
+          },
+          "nextRun": "Next run is {timestamp}."
         }
       },
       "modal": {
@@ -262,6 +274,22 @@
       },
       "toast": {
         "duplicated": "{resource} 已複製。"
+      },
+      "settingScope": {
+        "account": "Sync With Account",
+        "device": "Only This Device",
+        "useAccountValue": "Use the Account Value",
+        "saveToAccount": "Save This Value to My Account",
+        "stateAccount": "Account",
+        "stateDevice": "This Device",
+        "tooltip": {
+          "account": "This setting is synced with your account.",
+          "device": "This setting is overridden on this device only."
+        },
+        "toast": {
+          "saved": "Setting saved to your account.",
+          "saveFailed": "Failed to save this setting to your account."
+        }
       },
       "tooltip": {
         "resetToDefault": "重設為預設值",
@@ -611,7 +639,8 @@
           "theme": "主題",
           "themeAuto": "自動",
           "themeDark": "深色",
-          "themeLight": "淺色"
+          "themeLight": "淺色",
+          "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },
         "modal": {
           "logout": {
@@ -1079,6 +1108,16 @@
                 "useTotp": "使用 TOTP"
               }
             },
+            "email": {
+              "subtitle": "We can email you a one-time code to finish signing in.",
+              "enterCode": "Enter the 6-digit code we sent to your email address",
+              "button": {
+                "useEmail": "Email me a code",
+                "sendCode": "Send Code",
+                "resend": "Resend Code",
+                "resendIn": "Resend Code ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "輸入復原代碼",
               "form": {
@@ -1112,6 +1151,14 @@
             "request": "要求重設密碼"
           },
           "success": "已寄出一封包含重設密碼指示的電子郵件給你。"
+        },
+        "verifyEmail": {
+          "title": "Verify Email",
+          "success": "Your email address **{email}** has been verified.",
+          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
+          "button": {
+            "continue": "Continue"
+          }
         },
         "resetPassword": {
           "title": "重設密碼",
@@ -1186,6 +1233,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Already in this group",
+                      "description": "This server is already part of {group}."
+                    },
+                    "groupFull": {
+                      "title": "Group is full",
+                      "description": "A group cannot hold more than {max} servers."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server moved to {group}."
+                  }
+                },
                 "noGroups": "找不到任何群組，要建立一個嗎？"
               }
             },
@@ -1226,6 +1288,14 @@
               "title": "需要雙因素驗證",
               "description": "你的帳戶需要雙因素驗證。請在下方設定後繼續使用面板。"
             },
+            "verifyEmail": {
+              "title": "Email Verification Required",
+              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
+              "sent": "Verification email sent to {email}.",
+              "button": {
+                "resend": "Resend Verification Email"
+              }
+            },
             "frozen": {
               "title": "帳戶已凍結",
               "description": "你的帳戶已被凍結，在解除凍結前無法對帳戶進行任何變更。請聯絡管理員以取得更多資訊。"
@@ -1245,7 +1315,8 @@
             "email": {
               "title": "電子郵件",
               "toast": {
-                "updated": "電子郵件已成功更新。"
+                "updated": "電子郵件已成功更新。",
+                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
               },
               "form": {
                 "newEmail": "新電子郵件"
@@ -1273,20 +1344,68 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "設定雙因素"
+                "setupTwoFactor": "設定雙因素",
+                "enableEmail": "Enable Email",
+                "disableEmail": "Disable Email",
+                "securityKeys": "Security Keys"
               },
-              "twoFactorEnabled": "目前已啟用雙因素驗證。",
-              "twoFactorDisabled": "你的帳戶目前尚未啟用雙因素驗證。請點選下方按鈕開始設定。",
-              "twoFactorLastUsed": "上次使用：{timestamp}"
+              "twoFactorLastUsed": "上次使用：{timestamp}",
+              "none": "No second factor is set up on your account yet.",
+              "requirementMet": "Your account meets the two-factor requirement.",
+              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
+              "method": {
+                "totp": "Authenticator App",
+                "securityKey": "Security Key",
+                "email": "Email"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Email two-factor disabled successfully."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Enable Email Two-Factor",
+                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
+                },
+                "disable": {
+                  "title": "Disable Email Two-Factor",
+                  "description": "Disabling email two-factor will make your account less secure."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Password Login",
+              "enabled": "You can sign in with your password.",
+              "disabled": "Password login is turned off. Only your security keys can sign you in.",
+              "toast": {
+                "updated": "Password login updated successfully."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Add a security key before turning off password login."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Disable Password Login",
+                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
+                },
+                "enable": {
+                  "title": "Enable Password Login",
+                  "description": "Your password will be able to sign you in again."
+                }
+              }
             },
             "account": {
               "title": "帳戶詳細資料",
               "toast": {
                 "updated": "帳戶詳細資料已成功更新。"
-              },
+              }
+            },
+            "preferences": {
+              "title": "Preferences",
               "form": {
-                "toastPosition": "通知位置",
-                "startOnGroupedServers": "從已分組伺服器頁面開始"
+                "toastPosition": "Toast Position",
+                "startOnGroupedServers": "Start on the Grouped Servers page"
               }
             },
             "avatar": {
@@ -1546,6 +1665,10 @@
               "expires": "到期"
             }
           },
+          "toast": {
+            "enabled": "API key enabled.",
+            "disabled": "API key disabled."
+          },
           "modal": {
             "createApiKey": {
               "title": "建立 API 金鑰",
@@ -1766,11 +1889,22 @@
                   "sessionCookie": "工作階段 Cookie",
                   "sessionDurationSeconds": "工作階段持續時間（秒）",
                   "twoFactorRequirement": "雙因素驗證需求",
+                  "emailTwoFactorEnabled": "Email Two-Factor",
+                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
+                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
+                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
+                  "emailVerificationRequired": "Require Email Verification",
+                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "啟用遙測",
                   "telemetryEnabledDescription": "允許 Calagopus 收集有限且匿名的使用資料以協助改善應用程式。",
                   "registrationEnabled": "啟用註冊"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator App (TOTP)",
+                    "securityKey": "Security Key",
+                    "email": "Email"
+                  },
                   "twoFactorRequirement": {
                     "admins": "管理員",
                     "allUsers": "所有使用者",
@@ -1986,6 +2120,8 @@
                   "maxCommandSnippetCount": "最大指令片段數",
                   "maxSecurityKeyCount": "最大安全性金鑰數",
                   "maxSshKeyCount": "最大 SSH 金鑰數",
+                  "maxSettingsCount": "Max Synced Settings",
+                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "允許變更語言",
                   "allowChangingLanguageDescription": "若啟用，使用者將能變更其語言偏好。"
                 },
@@ -2125,6 +2261,10 @@
             "buildFailed": {
               "title": "上一次擴充功能建置失敗",
               "content": "這些擴充功能在有變更之前不會重新建置，除非您手動重試建置。"
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2274,7 @@
             "retryBuild": "重試建置",
             "cancelBuild": "取消建置",
             "configure": "設定",
+            "restart": "Restart the panel",
             "back": "返回擴充功能",
             "accept": "接受",
             "decline": "拒絕"
@@ -2144,7 +2285,10 @@
             "cancelling": "建置將在目前步驟結束後停止。",
             "noBackend": "設定此擴充功能需要後端擴充功能。",
             "noConfigurationPage": "此擴充功能未定義設定頁面。",
-            "removeExtension": "移除擴充功能"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "移除擴充功能",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "排隊中…",
@@ -2162,7 +2306,9 @@
             "frontendMissing": "前端遺失",
             "backendMissing": "後端遺失",
             "pendingBuild": "待建置",
-            "pendingRemoval": "待移除"
+            "pendingRemoval": "待移除",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "版本",
@@ -2182,7 +2328,10 @@
             "buildFailed": "擴充套件建置失敗:{reason}",
             "cancelRequested": "已請求取消,建置將在目前步驟結束後停止。",
             "added": "擴充功能 `{packageName}` 已成功新增。",
-            "removed": "擴充功能 `{packageName}` 已成功移除。"
+            "removed": "擴充功能 `{packageName}` 已成功移除。",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "找不到擴充功能",
@@ -2249,6 +2398,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "傳送密碼重設郵件",
+                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "模擬身分"
                 },
                 "form": {
@@ -2264,6 +2414,13 @@
                   "delete": {
                     "title": "確認刪除使用者",
                     "content": "你確定要刪除 **{username}** 嗎？"
+                  },
+                  "verifyEmail": {
+                    "title": "Mark Email Verified",
+                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
+                    "toast": {
+                      "verified": "Email marked as verified."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "停用使用者雙因素驗證",
@@ -3855,8 +4012,8 @@
                   "nameLastPath": "姓氏路徑",
                   "nameLastPathDescription": "用於從資訊 URL 回應中擷取姓氏的路徑（https://serdejsonpath.live）。",
                   "loginOnly": "僅允許登入",
-                  "loginBypass2fa": "登入時略過 2FA",
-                  "loginBypass2faDescription": "允許使用此提供者登入的使用者略過面板 2FA。",
+                  "loginBypassTwoFactor": "Bypass 2FA on Login",
+                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "連結對使用者可見",
                   "linkViewableDescription": "允許使用者在客戶端 UI 中看到連線及其識別碼。",
                   "userManageable": "連結可由使用者管理",

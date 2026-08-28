@@ -31,12 +31,12 @@ function Rendered({ value }: { value: Value }) {
     return (
       <Code>
         0x{value.value.slice(0, BINARY_PREVIEW_CHARS)}
-        {value.value.length > BINARY_PREVIEW_CHARS ? '…' : ''}
+        {value.value.length > BINARY_PREVIEW_CHARS || value.truncated ? '…' : ''}
       </Code>
     );
   }
 
-  if (value.value === '') {
+  if (value.value === '' && !value.truncated) {
     return (
       <Text size='sm' c='dimmed' fs='italic'>
         {t('pages.server.databases.explorer.cell.empty', {})}
@@ -44,7 +44,12 @@ function Rendered({ value }: { value: Value }) {
     );
   }
 
-  return <span className='block truncate text-left'>{value.value.slice(0, TEXT_PREVIEW_CHARS)}</span>;
+  return (
+    <span className='block truncate text-left'>
+      {value.value.slice(0, TEXT_PREVIEW_CHARS)}
+      {value.truncated && '…'}
+    </span>
+  );
 }
 
 export default function DatabaseResultCell({
@@ -70,6 +75,9 @@ export default function DatabaseResultCell({
   const [draft, setDraft] = useState('');
   const draftRef = useRef('');
 
+  const truncated = value?.type !== 'null' && value?.truncated === true;
+  const canEdit = editable && !truncated;
+
   const updateDraft = (next: string) => {
     draftRef.current = next;
     setDraft(next);
@@ -88,18 +96,22 @@ export default function DatabaseResultCell({
 
     if (!value || value.type === 'null' ? next === '' : next === value.value) return;
 
-    onChange?.(value?.type === 'binary' ? { type: 'binary', value: next } : { type: 'text', value: next });
+    onChange?.(
+      value?.type === 'binary'
+        ? { type: 'binary', value: next, truncated: false }
+        : { type: 'text', value: next, truncated: false },
+    );
   };
 
   const cell = (
     <TableData
       className={classNames(
         'max-w-md',
-        editable && 'cursor-text',
+        canEdit && 'cursor-text',
         dirty && 'bg-(--mantine-color-yellow-light)',
         editing && 'bg-(--mantine-color-blue-light)',
       )}
-      onClick={editable && !editing ? () => onEditingChange?.(true) : undefined}
+      onClick={canEdit && !editing ? () => onEditingChange?.(true) : undefined}
     >
       <div className='flex items-center min-h-7.5'>
         {value ? (
@@ -112,6 +124,10 @@ export default function DatabaseResultCell({
       </div>
     </TableData>
   );
+
+  if (truncated) {
+    return <Tooltip label={t('pages.server.databases.explorer.cell.truncated', {})}>{cell}</Tooltip>;
+  }
 
   if (!editing) {
     return cell;

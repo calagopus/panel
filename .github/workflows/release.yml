@@ -13,6 +13,53 @@ env:
   DOCKERHUB_IMAGE: docker.io/${{ github.repository }}
 
 jobs:
+  release-info:
+    name: Determine Release Info
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.info.outputs.version }}
+      is_prerelease: ${{ steps.info.outputs.is_prerelease }}
+      is_latest_stable: ${{ steps.info.outputs.is_latest_stable }}
+      is_latest_overall: ${{ steps.info.outputs.is_latest_overall }}
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Determine version info
+        id: info
+        run: |
+          RAW_TAG="${{ github.ref_name }}"
+          VERSION="${RAW_TAG#release-}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # A tag is only allowed to move the "latest" markers if it is
+          # actually the newest published version.
+          LATEST_STABLE=$(git tag -l 'release-*' | sed 's/^release-//' | grep -vF -- '-' | sort -V | tail -n1)
+          LATEST_OVERALL=$(git tag -l 'release-*' | sed 's/^release-//' | sort -V | tail -n1)
+
+          if [[ "$VERSION" == *-* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "is_latest_stable=false" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            if [[ "$VERSION" == "$LATEST_STABLE" ]]; then
+              echo "is_latest_stable=true" >> $GITHUB_OUTPUT
+            else
+              echo "is_latest_stable=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+          if [[ "$VERSION" == "$LATEST_OVERALL" ]]; then
+            echo "is_latest_overall=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_latest_overall=false" >> $GITHUB_OUTPUT
+          fi
+
   generate-sbom:
     name: Generate SBOM
     runs-on: ubuntu-24.04
@@ -21,7 +68,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Generate source SBOM
         uses: anchore/sbom-action@v0
@@ -40,15 +87,15 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: 11
           run_install: false
@@ -112,7 +159,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download frontend build
         uses: actions/download-artifact@v8
@@ -183,7 +230,7 @@ jobs:
 
   publish-draft-release:
     name: Publish Draft Release
-    needs: [dist, generate-sbom]
+    needs: [dist, generate-sbom, release-info]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -194,26 +241,13 @@ jobs:
         with:
           path: artifacts
 
-      - name: Determine if pre-release and strip prefix
-        id: release_info
-        run: |
-          RAW_TAG="${{ github.ref_name }}"
-          VERSION="${RAW_TAG#release-}"
-
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-          if [[ "$VERSION" == *-* ]]; then
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Create Draft Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          name: ${{ steps.release_info.outputs.version }}
+          name: ${{ needs.release-info.outputs.version }}
           draft: true
-          prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
+          prerelease: ${{ needs.release-info.outputs.is_prerelease == 'true' }}
+          make_latest: ${{ needs.release-info.outputs.is_latest_stable }}
           generate_release_notes: true
           files: |
             artifacts/${{ env.PROJECT_NAME }}-*/*
@@ -221,7 +255,7 @@ jobs:
 
   create-multiarch-images:
     name: Create multi-arch ${{ matrix.variant }} Docker image
-    needs: [dist, generate-sbom]
+    needs: [dist, generate-sbom, release-info]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -243,7 +277,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Download source SBOM
         uses: actions/download-artifact@v8
@@ -292,16 +326,15 @@ jobs:
 
       - name: Determine tags
         run: |
-          VERSION="${{ github.ref_name }}"
-          VERSION="${VERSION#release-}"
+          VERSION="${{ needs.release-info.outputs.version }}"
           STABLE="${{ matrix.stable_tag }}"
 
           SUFFIXES=("${VERSION}${{ matrix.version_suffix }}")
-          if [[ "$VERSION" == *-* ]]; then
+          if [[ "${{ needs.release-info.outputs.is_latest_overall }}" == "true" ]]; then
             SUFFIXES+=("${STABLE}-pre")
-          else
+          fi
+          if [[ "${{ needs.release-info.outputs.is_latest_stable }}" == "true" ]]; then
             SUFFIXES+=("$STABLE")
-            SUFFIXES+=("${STABLE}-pre")
           fi
 
           IMAGE_TAGS=""
@@ -383,7 +416,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -418,7 +451,7 @@ jobs:
 
   merge-heavy-images:
     name: Merge Heavy ${{ matrix.variant }} Docker manifest
-    needs: [build-heavy-images]
+    needs: [build-heavy-images, release-info]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -445,15 +478,14 @@ jobs:
 
       - name: Extract version and determine tags
         run: |
-          RAW_TAG="${{ github.ref_name }}"
-          VERSION="${RAW_TAG#release-}"
+          VERSION="${{ needs.release-info.outputs.version }}"
 
           SUFFIXES=("${VERSION}-${{ matrix.variant }}")
-          if [[ "$VERSION" == *-* ]]; then
+          if [[ "${{ needs.release-info.outputs.is_latest_overall }}" == "true" ]]; then
             SUFFIXES+=("${{ matrix.variant }}-pre")
-          else
+          fi
+          if [[ "${{ needs.release-info.outputs.is_latest_stable }}" == "true" ]]; then
             SUFFIXES+=("${{ matrix.variant }}")
-            SUFFIXES+=("${{ matrix.variant }}-pre")
           fi
 
           GHCR_TAGS=""

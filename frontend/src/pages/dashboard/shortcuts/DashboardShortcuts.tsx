@@ -1,5 +1,5 @@
 import { faApple, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faCopy, faKeyboard, faPaste, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCloud, faCopy, faDesktop, faKeyboard, faPaste, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode, useState } from 'react';
 import Button from '@/elements/Button.tsx';
@@ -8,29 +8,36 @@ import Flex from '@/elements/Flex.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
 import TitleCard from '@/elements/TitleCard.tsx';
+import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { handleRawCopyToClipboard } from '@/lib/copy.ts';
-import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/coreShortcuts.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { handleRawPasteFromClipboard } from '@/lib/paste.ts';
+import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/quickActions/coreShortcuts.tsx';
+import {
+  importShortcutOverrides,
+  resetAllShortcuts,
+  SHORTCUT_OVERRIDES_KEY,
+  useShortcutOverrides,
+} from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   effectiveBinding,
   parseShortcuts,
   ShortcutCategory,
   ShortcutDefinition,
   serializeShortcuts,
-} from '@/lib/shortcuts.ts';
+} from '@/lib/quickActions/shortcuts.ts';
+import { UserSettingValue } from '@/lib/schemas/user/settings.ts';
+import { useUserSettingScope } from '@/lib/userSettings.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import EditableShortcutItem from './EditableShortcutItem.tsx';
 
 export default function DashboardShortcuts() {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const definitions = getShortcutDefinitions();
-  const overrides = useGlobalStore((state) => state.shortcutOverrides);
-  const resetAllShortcuts = useGlobalStore((state) => state.resetAllShortcuts);
-  const importShortcutOverrides = useGlobalStore((state) => state.importShortcutOverrides);
+  const overrides = useShortcutOverrides();
+  const shortcutsScope = useUserSettingScope(SHORTCUT_OVERRIDES_KEY);
   const [recordingId, setRecordingId] = useState<string | null>(null);
 
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -119,6 +126,16 @@ export default function DashboardShortcuts() {
           >
             {t('pages.account.shortcuts.button.resetAll', {})}
           </Button>
+          <UserSettingScopeMenu settingKey={SHORTCUT_OVERRIDES_KEY} value={{ ...overrides } as UserSettingValue} button>
+            <Flex align='center' gap='xs'>
+              <FontAwesomeIcon icon={shortcutsScope === 'device' ? faDesktop : faCloud} />
+              <Text size='sm'>
+                {shortcutsScope === 'device'
+                  ? t('common.settingScope.stateDevice', {})
+                  : t('common.settingScope.stateAccount', {})}
+              </Text>
+            </Flex>
+          </UserSettingScopeMenu>
           <Flex
             align='center'
             gap='xs'
@@ -126,7 +143,7 @@ export default function DashboardShortcuts() {
             h={32}
             style={{
               background: 'var(--mantine-color-default)',
-              borderRadius: 6,
+              borderRadius: 'var(--mantine-radius-default)',
               border: '1px solid var(--mantine-color-default-border)',
             }}
           >

@@ -45,6 +45,7 @@ const baseTranslations = defineTranslations({
         enable: 'Enable',
         disable: 'Disable',
         disableTwoFactor: 'Disable Two-Factor',
+        verify: 'Verify',
         update: 'Update',
         close: 'Close',
         cancel: 'Cancel',
@@ -121,6 +122,17 @@ const baseTranslations = defineTranslations({
           exception: 'Exception',
           tooManyPatterns: 'Matching is not counted automatically for more than {max} patterns.',
         },
+        cronInput: {
+          segments: {
+            second: 'Second',
+            minute: 'Minute',
+            hour: 'Hour',
+            day: 'Day',
+            month: 'Month',
+            weekday: 'Weekday',
+          },
+          nextRun: 'Next run is {timestamp}.',
+        },
       },
       modal: {
         duplicate: {
@@ -132,6 +144,22 @@ const baseTranslations = defineTranslations({
       },
       toast: {
         duplicated: '{resource} duplicated.',
+      },
+      settingScope: {
+        account: 'Sync With Account',
+        device: 'Only This Device',
+        useAccountValue: 'Use the Account Value',
+        saveToAccount: 'Save This Value to My Account',
+        stateAccount: 'Account',
+        stateDevice: 'This Device',
+        tooltip: {
+          account: 'This setting is synced with your account.',
+          device: 'This setting is overridden on this device only.',
+        },
+        toast: {
+          saved: 'Setting saved to your account.',
+          saveFailed: 'Failed to save this setting to your account.',
+        },
       },
       tooltip: {
         resetToDefault: 'Reset to default',
@@ -353,6 +381,10 @@ const baseTranslations = defineTranslations({
           finished: 'Finished',
           failed: 'Failed',
         },
+        serverFirewallRuleAction: {
+          allow: 'Allow',
+          deny: 'Deny',
+        },
         connectionStatus: {
           connected: 'Connected',
           offline: 'Offline',
@@ -487,6 +519,7 @@ const baseTranslations = defineTranslations({
           themeAuto: 'Auto',
           themeDark: 'Dark',
           themeLight: 'Light',
+          resetDeviceOverrides: 'Reset Device Overrides ({count})',
         },
         modal: {
           logout: {
@@ -907,6 +940,8 @@ const baseTranslations = defineTranslations({
             usernameRequired: 'Please enter a username',
             registrationDisabled: 'No matching Account could be found and registration is currently disabled.',
             userAlreadyExists: 'An account with this username or email already exists.',
+            securityKeyRequired:
+              'This account requires two-factor authentication, sign in with a security key instead.',
           },
           passkey: {
             error: {
@@ -970,6 +1005,16 @@ const baseTranslations = defineTranslations({
                 useTotp: 'Use TOTP',
               },
             },
+            email: {
+              subtitle: 'We can email you a one-time code to finish signing in.',
+              enterCode: 'Enter the 6-digit code we sent to your email address',
+              button: {
+                useEmail: 'Email me a code',
+                sendCode: 'Send Code',
+                resend: 'Resend Code',
+                resendIn: 'Resend Code ({seconds}s)',
+              },
+            },
             totpRecovery: {
               subtitle: 'Enter a recovery code',
               form: {
@@ -1003,6 +1048,14 @@ const baseTranslations = defineTranslations({
             request: 'Request Password Reset',
           },
           success: 'An email has been sent to you with instructions on how to reset your password.',
+        },
+        verifyEmail: {
+          title: 'Verify Email',
+          success: 'Your email address **{email}** has been verified.',
+          failed: 'This verification link is invalid or has expired. Request a new one and try again.',
+          button: {
+            continue: 'Continue',
+          },
         },
         resetPassword: {
           title: 'Reset Password',
@@ -1077,6 +1130,21 @@ const baseTranslations = defineTranslations({
                     },
                   },
                 },
+                drag: {
+                  blocked: {
+                    alreadyInGroup: {
+                      title: 'Already in this group',
+                      description: 'This server is already part of {group}.',
+                    },
+                    groupFull: {
+                      title: 'Group is full',
+                      description: 'A group cannot hold more than {max} servers.',
+                    },
+                  },
+                  toast: {
+                    moved: 'Server moved to {group}.',
+                  },
+                },
                 noGroups: 'No Groups could be found, time to create one?',
               },
             },
@@ -1118,6 +1186,15 @@ const baseTranslations = defineTranslations({
               description:
                 'Two-Factor Authentication is required on your account. Please set it up below to continue using the panel.',
             },
+            verifyEmail: {
+              title: 'Email Verification Required',
+              description:
+                'Please verify **{email}** to continue using the panel. Check your inbox for the verification link.',
+              sent: 'Verification email sent to {email}.',
+              button: {
+                resend: 'Resend Verification Email',
+              },
+            },
             frozen: {
               title: 'Account Frozen',
               description:
@@ -1127,6 +1204,9 @@ const baseTranslations = defineTranslations({
           containers: {
             password: {
               title: 'Password',
+              button: {
+                logOutOthers: 'Log Out Others',
+              },
               toast: {
                 updated: 'Password updated successfully.',
               },
@@ -1134,11 +1214,22 @@ const baseTranslations = defineTranslations({
                 newPassword: 'New Password',
                 confirmNewPassword: 'Confirm New Password',
               },
+              modal: {
+                logOutOtherSessions: {
+                  title: 'Log Out Other Sessions',
+                  content:
+                    'Your password has been updated. Do you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.',
+                  toast: {
+                    deleted: '{sessions} deleted.',
+                  },
+                },
+              },
             },
             email: {
               title: 'Email',
               toast: {
                 updated: 'Email updated successfully.',
+                pending: 'Confirmation link sent to {email}. Your address changes once you open it.',
               },
               form: {
                 newEmail: 'New Email',
@@ -1170,17 +1261,66 @@ const baseTranslations = defineTranslations({
               },
               button: {
                 setupTwoFactor: 'Setup Two-Factor',
+                enableEmail: 'Enable Email',
+                disableEmail: 'Disable Email',
+                securityKeys: 'Security Keys',
               },
-              twoFactorEnabled: 'Two-Factor Verification is currently enabled.',
-              twoFactorDisabled:
-                'You do not currently have two-factor verification enabled on your account. Click the button below to begin configuring it.',
               twoFactorLastUsed: 'Last used: {timestamp}',
+              none: 'No second factor is set up on your account yet.',
+              requirementMet: 'Your account meets the two-factor requirement.',
+              requirementUnmet: 'Your account does not meet the two-factor requirement yet.',
+              method: {
+                totp: 'Authenticator App',
+                securityKey: 'Security Key',
+                email: 'Email',
+              },
+            },
+            emailTwoFactor: {
+              toast: {
+                disabled: 'Email two-factor disabled successfully.',
+              },
+              modal: {
+                enable: {
+                  title: 'Enable Email Two-Factor',
+                  description:
+                    'A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you.',
+                },
+                disable: {
+                  title: 'Disable Email Two-Factor',
+                  description: 'Disabling email two-factor will make your account less secure.',
+                },
+              },
+            },
+            passwordLogin: {
+              title: 'Password Login',
+              enabled: 'You can sign in with your password.',
+              disabled: 'Password login is turned off. Only your security keys can sign you in.',
+              toast: {
+                updated: 'Password login updated successfully.',
+              },
+              tooltip: {
+                needsSecurityKey: 'Add a security key before turning off password login.',
+              },
+              modal: {
+                disable: {
+                  title: 'Disable Password Login',
+                  description:
+                    'Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing.',
+                },
+                enable: {
+                  title: 'Enable Password Login',
+                  description: 'Your password will be able to sign you in again.',
+                },
+              },
             },
             account: {
               title: 'Account Details',
               toast: {
                 updated: 'Account details updated successfully.',
               },
+            },
+            preferences: {
+              title: 'Preferences',
               form: {
                 toastPosition: 'Toast Position',
                 startOnGroupedServers: 'Start on the Grouped Servers page',
@@ -1247,6 +1387,9 @@ const baseTranslations = defineTranslations({
           button: {
             deleteOthers: 'Log Out Others',
           },
+          tooltip: {
+            noOtherSessions: 'There are no other sessions to log out.',
+          },
           table: {
             columns: {
               thisDevice: 'This Device?',
@@ -1297,6 +1440,7 @@ const baseTranslations = defineTranslations({
             title: 'General',
             undo: 'Undo the last action',
             quickActions: 'Open quick actions',
+            save: 'Save the current form',
           },
           fileManager: {
             title: 'File Manager',
@@ -1445,6 +1589,10 @@ const baseTranslations = defineTranslations({
               permissions: 'User / Server / Admin Permissions',
               expires: 'Expires',
             },
+          },
+          toast: {
+            enabled: 'API key enabled.',
+            disabled: 'API key disabled.',
           },
           modal: {
             createApiKey: {
@@ -1676,12 +1824,26 @@ const baseTranslations = defineTranslations({
                   sessionCookie: 'Session Cookie',
                   sessionDurationSeconds: 'Session Duration (seconds)',
                   twoFactorRequirement: 'Two-Factor Authentication Requirement',
+                  emailTwoFactorEnabled: 'Email Two-Factor',
+                  emailTwoFactorEnabledDescription:
+                    'Let users receive a one-time login code by email. Requires a configured mail transport.',
+                  twoFactorAcceptedMethods: 'Accepted Two-Factor Methods',
+                  twoFactorAcceptedMethodsDescription:
+                    'Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.',
+                  emailVerificationRequired: 'Require Email Verification',
+                  emailVerificationRequiredDescription:
+                    'New users must confirm their email address before they can use the panel. Requires a configured mail transport.',
                   telemetryEnabled: 'Enable Telemetry',
                   telemetryEnabledDescription:
                     'Allow Calagopus to collect limited and anonymous usage data to help improve the application.',
                   registrationEnabled: 'Enable Registration',
                 },
                 enum: {
+                  twoFactorMethod: {
+                    totp: 'Authenticator App (TOTP)',
+                    securityKey: 'Security Key',
+                    email: 'Email',
+                  },
                   twoFactorRequirement: {
                     admins: 'Admins',
                     allUsers: 'All Users',
@@ -1873,6 +2035,8 @@ const baseTranslations = defineTranslations({
                 form: {
                   maxFileManagerViewSize: 'Max File Manager View Size',
                   maxScheduleStepCount: 'Max Schedule Steps',
+                  maxFirewallRuleCount: 'Max Firewall Rules',
+                  maxFirewallRuleSourceCount: 'Max Firewall Rule Sources',
                   maxFileManagerContentSearchSize: 'Max File Manager Content Search Size',
                   maxFileManagerSearchResults: 'Max File Manager Search Results',
                   maxSubuserCount: 'Max Subuser Count',
@@ -1910,6 +2074,8 @@ const baseTranslations = defineTranslations({
                   maxCommandSnippetCount: 'Max Command Snippets',
                   maxSecurityKeyCount: 'Max Security Keys',
                   maxSshKeyCount: 'Max SSH Keys',
+                  maxSettingsCount: 'Max Synced Settings',
+                  maxSettingsValueBytes: 'Max Synced Setting Size (bytes)',
                   allowChangingLanguage: 'Allow Changing Language',
                   allowChangingLanguageDescription:
                     'If enabled, users will be able to change their language preferences.',
@@ -2193,6 +2359,7 @@ const baseTranslations = defineTranslations({
                 },
                 button: {
                   sendPasswordResetEmail: 'Send Password Reset Email',
+                  verifyEmail: 'Mark Email Verified',
                   impersonate: 'Impersonate',
                 },
                 form: {
@@ -2208,6 +2375,13 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm User Deletion',
                     content: 'Are you sure you want to delete **{username}**?',
+                  },
+                  verifyEmail: {
+                    title: 'Mark Email Verified',
+                    content: 'Are you sure you want to mark **{email}** as verified without confirmation?',
+                    toast: {
+                      verified: 'Email marked as verified.',
+                    },
                   },
                   disableTwoFactor: {
                     title: 'Disable User Two Factor',
@@ -3855,8 +4029,9 @@ const baseTranslations = defineTranslations({
                   nameLastPathDescription:
                     'The path used to extract the last name from the Info URL response (https://serdejsonpath.live).',
                   loginOnly: 'Only allow Login',
-                  loginBypass2fa: 'Bypass 2FA on Login',
-                  loginBypass2faDescription: 'Allows users logging in with this provider to bypass their panel 2FA.',
+                  loginBypassTwoFactor: 'Bypass 2FA on Login',
+                  loginBypassTwoFactorDescription:
+                    'Allows users logging in with this provider to bypass their panel 2FA.',
                   linkViewable: 'Link Viewable to User',
                   linkViewableDescription: 'Allows the user to see the connection and its identifier in the client UI.',
                   userManageable: 'Link Manageable by User',
@@ -4961,6 +5136,10 @@ const baseTranslations = defineTranslations({
               title: 'Tables',
               empty: 'This database has no tables yet.',
               noMatches: 'No tables match your search.',
+              noMatchesTruncated:
+                'No tables match your search. Only the first {tables} tables were loaded, so the rest cannot be searched.',
+              truncated: 'This database has too many tables to load. Only the first {tables} are shown.',
+              tableBeyondLimit: 'This table is outside the first {tables} tables, which is all this database can load.',
               rowEstimate: '~{rows}',
               badge: {
                 view: 'View',
@@ -5027,6 +5206,7 @@ const baseTranslations = defineTranslations({
               setNull: 'Set to NULL',
               null: 'NULL',
               empty: 'empty',
+              truncated: 'This value was too large to load in full and cannot be edited.',
               editorHint: '{enter} applies the value, {shiftEnter} inserts a new line.',
             },
           },
@@ -5968,6 +6148,8 @@ const baseTranslations = defineTranslations({
                 permissions: 'Permissions',
                 ignoredFilesDescription:
                   'Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude.',
+                ignoredFilesInherited:
+                  'The paths hidden from you are always applied on top of these, and cannot be granted away.',
               },
             },
             updateSubuser: {
@@ -6096,6 +6278,9 @@ const baseTranslations = defineTranslations({
         network: {
           title: 'Network',
           subtitle: '{current} of {max} maximum allocations assigned.',
+          allocations: {
+            title: 'Allocations',
+          },
           tooltip: {
             limitReached: 'This server is limited to {max} allocations.',
           },
@@ -6116,6 +6301,77 @@ const baseTranslations = defineTranslations({
             removeAllocation: {
               title: 'Confirm Allocation Removal',
               content: 'Are you sure you want to remove **{allocation}** from this server?',
+            },
+          },
+        },
+        firewall: {
+          title: 'Firewall',
+          subtitle: 'Rules are checked from top to bottom, the first one that matches decides.',
+          empty: {
+            title: 'No Firewall Rules',
+            description:
+              "Every connection to this server's allocations is allowed. Add a rule to start restricting who can reach it.",
+            descriptionReadOnly: "Every connection to this server's allocations is allowed.",
+          },
+          button: {
+            createFirstRule: 'Create Rule',
+            addRule: 'Add Rule',
+            addDenyAll: 'Deny Everything Else',
+          },
+          tooltip: {
+            limitReached: 'This server is limited to {max} firewall rules.',
+          },
+          rule: {
+            anySource: 'any source',
+            anyProtocol: 'TCP & UDP',
+            allAllocations: 'all allocations',
+            summary: '{protocols} from {sources} to {ports}',
+            aria: {
+              reorder: 'Reorder firewall rule {position}',
+            },
+          },
+          alert: {
+            fallthrough:
+              'Traffic that matches none of these rules is **allowed**. Add a deny rule at the bottom that matches everything to turn this into a default deny firewall.',
+            notEnforced:
+              'This node will not enforce firewall rules. Rules are saved but have no effect, and **this server may refuse to start while any are configured.**',
+            unallocatedPorts:
+              'These rules reference ports that are not allocated to this server: **{ports}**. The node ignores them until matching allocations exist.',
+            limitations:
+              'Rules cover traffic reaching this server from elsewhere, both through its published ports and directly on its container address. Connections opened by the node itself are not filtered.',
+            shadowed: 'Rule {position} can never match, an earlier rule already covers everything it does.',
+            unsaved: 'You have unsaved changes. Nothing is applied until you save.',
+          },
+          form: {
+            action: 'Action',
+            protocols: 'Protocols',
+            protocolsDescription: 'Leave empty to match both TCP and UDP.',
+            anyProtocol: 'TCP & UDP',
+            sources: 'Sources',
+            sourcesDescription:
+              'IP addresses or networks such as 10.0.0.0/8. A network must have its host bits zeroed. Leave empty to match any source.',
+            ports: 'Ports',
+            portsDescription:
+              'Allocation ports this rule applies to, ranges like 25565-25570 are expanded. Leave empty to match every allocation of the server.',
+            invalidSource: '{source} is not a valid IP address or network.',
+          },
+          toast: {
+            saved: 'Firewall rules saved.',
+          },
+          modal: {
+            unsavedChanges: {
+              title: 'Unsaved Changes',
+              content: 'You have unsaved firewall rules. Leaving this page now discards them.',
+            },
+            createRule: {
+              title: 'Create Firewall Rule',
+            },
+            editRule: {
+              title: 'Edit Firewall Rule',
+            },
+            removeRule: {
+              title: 'Confirm Rule Removal',
+              content: 'Are you sure you want to remove this firewall rule?',
             },
           },
         },

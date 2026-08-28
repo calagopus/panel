@@ -6,7 +6,12 @@ export default function AuthenticatedGuard() {
   const { user } = useAuth();
 
   if (!user) return <Navigate to='/auth/login' />;
-  if (pathname !== '/account' && !user.totpEnabled && user.requireTwoFactor) return <Navigate to='/account' />;
+  if (
+    pathname !== '/account' &&
+    pathname !== '/account/security-keys' &&
+    ((user.requireTwoFactor && !user.twoFactorSatisfied) || (user.requireEmailVerification && !user.emailVerified))
+  )
+    return <Navigate to='/account' />;
 
   return <Outlet />;
 }

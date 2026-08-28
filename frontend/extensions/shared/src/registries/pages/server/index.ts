@@ -6,7 +6,7 @@ import { ConsoleRegistry } from './console.ts';
 import { DatabasesRegistry } from './databases/index.ts';
 import { FilesRegistry } from './files.ts';
 import { MountsRegistry } from './mounts.ts';
-import { NetworkRegistry } from './network.ts';
+import { NetworkRegistry } from './network/index.ts';
 import { SettingsRegistry } from './settings.ts';
 import { StartupRegistry } from './startup.ts';
 import { SubusersRegistry } from './subusers.ts';

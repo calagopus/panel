@@ -1,6 +1,6 @@
 import { faPen, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet } from '@/api/axios.ts';
 import getBackupGroupBackups from '@/api/server/backups/groups/getBackupGroupBackups.ts';
@@ -24,7 +24,13 @@ import BackupGroupCard from './BackupGroupCard.tsx';
 import BackupGroupDeleteModal from './modals/BackupGroupDeleteModal.tsx';
 import BackupGroupEditModal from './modals/BackupGroupEditModal.tsx';
 
-export default function BackupGroupItem({ group }: { group: z.infer<typeof serverBackupGroupSchema> }) {
+export default function BackupGroupItem({
+  group,
+  dragHandleProps,
+}: {
+  group: z.infer<typeof serverBackupGroupSchema>;
+  dragHandleProps?: ComponentProps<'button'>;
+}) {
   const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
 
@@ -57,6 +63,7 @@ export default function BackupGroupItem({ group }: { group: z.infer<typeof serve
 
       <BackupGroupCard
         storageKey={group.uuid}
+        dragHandleProps={dragHandleProps}
         header={
           <>
             <span className='font-medium min-w-0 flex-1 text-left'>

@@ -40,6 +40,8 @@ import NodeBackupsExportModal from './modals/NodeBackupsExportModal.tsx';
 import NodeBackupsReattachModal from './modals/NodeBackupsReattachModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
+const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);
+
 export default function NodeBackupRow({
   node,
   backup,
@@ -54,7 +56,6 @@ export default function NodeBackupRow({
   const [openModal, setOpenModal] = useState<
     'restore' | 'export' | 'reattach' | 'detach' | 'delete' | 'metadata' | null
   >(null);
-  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
@@ -125,7 +126,7 @@ export default function NodeBackupRow({
         onClose={() => setOpenModal(null)}
         opened={openModal === 'metadata'}
       >
-        <HljsCode languageName='json' language={jsonLanguage}>
+        <HljsCode languageName='json' language={loadJsonLanguage}>
           {metadataJson}
         </HljsCode>
 

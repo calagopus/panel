@@ -65,14 +65,6 @@ export const backupDiskEnum = pgEnum('backup_disk', [
   'PROXMOX_BACKUP_SERVER',
   'KOPIA',
 ]);
-export const userToastPositionEnum = pgEnum('user_toast_position', [
-  'TOP_LEFT',
-  'TOP_CENTER',
-  'TOP_RIGHT',
-  'BOTTOM_LEFT',
-  'BOTTOM_CENTER',
-  'BOTTOM_RIGHT',
-]);
 export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 
 // Tables
@@ -138,8 +130,8 @@ export const usersTable = pgTable(
     avatar: varchar({ length: 255 }),
     username: varchar({ length: 15 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     email: varchar({ length: 255 }).notNull(),
-    name_first: varchar({ length: 255 }).notNull(),
-    name_last: varchar({ length: 255 }).notNull(),
+    name_first: varchar({ length: 255 }),
+    name_last: varchar({ length: 255 }),
     password: text(),
     admin: boolean().default(false).notNull(),
     frozen: boolean().default(false).notNull(),
@@ -147,9 +139,10 @@ export const usersTable = pgTable(
     totp_enabled: boolean().default(false).notNull(),
     totp_last_used: timestamp(),
     totp_secret: char({ length: 32 }),
+    email_two_factor_enabled: boolean().default(false).notNull(),
+    email_verified: boolean().default(false).notNull(),
+    password_login_disabled: boolean().default(false).notNull(),
     language: varchar({ length: 15 }).default('en').notNull(),
-    toast_position: userToastPositionEnum().default('BOTTOM_RIGHT').notNull(),
-    start_on_grouped_servers: boolean().default(false).notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
@@ -237,6 +230,14 @@ export const userRecoveryCodesTable = pgTable(
   ],
 );
 
+export const userSettingsTable = pgTable('user_settings', {
+  user_uuid: uuid()
+    .references(() => usersTable.uuid, { onDelete: 'cascade' })
+    .primaryKey()
+    .notNull(),
+  settings: jsonb().notNull(),
+});
+
 export const userPasswordResetsTable = pgTable(
   'user_password_resets',
   {
@@ -253,6 +254,39 @@ export const userPasswordResetsTable = pgTable(
     uniqueIndex('user_password_resets_token_idx').on(cols.token),
     index('user_password_resets_token_start_idx').on(cols.token_start),
   ],
+);
+
+export const userEmailVerificationsTable = pgTable(
+  'user_email_verifications',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    user_uuid: uuid()
+      .references(() => usersTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    email: varchar({ length: 255 }).notNull(),
+    token_start: char({ length: 16 }).notNull(),
+    token: text().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('user_email_verifications_user_uuid_idx').on(cols.user_uuid),
+    uniqueIndex('user_email_verifications_token_idx').on(cols.token),
+    index('user_email_verifications_token_start_idx').on(cols.token_start),
+  ],
+);
+
+export const userTwoFactorCodesTable = pgTable(
+  'user_two_factor_codes',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    user_uuid: uuid()
+      .references(() => usersTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    code: text().notNull(),
+    attempts: integer().default(0).notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [index('user_two_factor_codes_user_uuid_idx').on(cols.user_uuid)],
 );
 
 export const userSecurityKeysTable = pgTable(
@@ -307,6 +341,7 @@ export const userApiKeysTable = pgTable(
     key_start: char({ length: 16 }).notNull(),
     key: text().notNull(),
     allowed_ips: inet().array().default([]).notNull(),
+    enabled: boolean().default(true).notNull(),
     user_permissions: varchar({ length: 64 }).array().notNull(),
     admin_permissions: varchar({ length: 64 }).array().notNull(),
     server_permissions: varchar({ length: 64 }).array().notNull(),
@@ -412,7 +447,7 @@ export const oauthProvidersTable = pgTable(
     name_last_path: varchar({ length: 255 }),
     enabled: boolean().default(false).notNull(),
     login_only: boolean().default(false).notNull(),
-    login_bypass_2fa: boolean().default(true).notNull(),
+    login_bypass_two_factor: boolean().default(true).notNull(),
     link_viewable: boolean().default(false).notNull(),
     user_manageable: boolean().default(false).notNull(),
     basic_auth: boolean().default(false).notNull(),
@@ -999,6 +1034,14 @@ export const serverAllocationsTable = pgTable(
   ],
 );
 
+export const serverFirewallsTable = pgTable('server_firewalls', {
+  server_uuid: uuid()
+    .references(() => serversTable.uuid, { onDelete: 'cascade' })
+    .primaryKey()
+    .notNull(),
+  rules: jsonb().notNull(),
+});
+
 export const serverSubusersTable = pgTable(
   'server_subusers',
   {
@@ -1089,6 +1132,7 @@ export const serverBackupGroupsTable = pgTable(
       .references(() => serversTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    order_: smallint().default(0).notNull(),
     retention_count: integer(),
     retention_days: integer(),
     created: timestamp().defaultNow().notNull(),

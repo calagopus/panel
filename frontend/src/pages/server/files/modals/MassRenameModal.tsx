@@ -1,35 +1,18 @@
-import {
-  faArrowRight,
-  faFont,
-  faHashtag,
-  faMagnifyingGlass,
-  faTag,
-  faTriangleExclamation,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import renameFiles from '@/api/server/files/renameFiles.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
-import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import Group from '@/elements/Group.tsx';
-import Checkbox from '@/elements/input/Checkbox.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
-import Select from '@/elements/input/Select.tsx';
-import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import ScrollingText from '@/elements/ScrollingText.tsx';
 import SegmentedControl from '@/elements/SegmentedControl.tsx';
 import Stack from '@/elements/Stack.tsx';
-import Table, { TableData, TableRow } from '@/elements/Table.tsx';
 import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
-import { buildRenamePreview, MassRenameOptions, RenameCase, RenameScope, RenameStatus } from '@/lib/massRename.ts';
+import { buildRenamePreview, MassRenameOptions, RenameScope, RenameStatus } from '@/lib/files/massRename.ts';
+import { createUndoAction } from '@/lib/files/undoableFileMutation.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -37,6 +20,11 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import { fileManagerUndoScope } from '@/stores/undoHistory.ts';
+import MassRenameAffixSection from './MassRenameAffixSection.tsx';
+import MassRenameCaseSection from './MassRenameCaseSection.tsx';
+import MassRenameMatchSection from './MassRenameMatchSection.tsx';
+import MassRenameNumberSection from './MassRenameNumberSection.tsx';
+import MassRenamePreviewTable from './MassRenamePreviewTable.tsx';
 
 type Props = ModalProps & {
   files: z.infer<typeof serverDirectoryEntrySchema>[];
@@ -65,7 +53,7 @@ const defaultOptions: MassRenameOptions = {
 const blockingStatuses: RenameStatus[] = ['invalid', 'invalidRegex', 'conflict', 'duplicate'];
 
 export default function MassRenameModal({ files, ...props }: Props) {
-  const { t, tReact, tItem } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const addUndoableToast = useUndoableToast(fileManagerUndoScope(server.uuid));
@@ -137,33 +125,32 @@ export default function MassRenameModal({ files, ...props }: Props) {
         return;
       }
 
-      addUndoableToast(t('pages.server.files.toast.filesRenamed', { files: tItem('file', renamed) }), () =>
-        renameFiles({
-          uuid: server.uuid,
-          root: directory,
-          files: renames.map((rename) => ({ from: rename.to, to: rename.from })),
-        })
-          .then(({ renamed: undone }) => {
-            if (undone < 1) {
-              addToast(t('pages.server.files.toast.renameCouldNotBeUndone', {}), 'error');
-              return;
-            }
-
-            addToast(t('pages.server.files.toast.renameUndone', {}), 'success');
-            invalidateFilemanager();
-          })
-          .catch((err) => {
-            addToast(err instanceof Error ? err.message : String(err), 'error');
-          }),
+      addUndoableToast(
+        t('pages.server.files.toast.filesRenamed', { files: tItem('file', renamed) }),
+        createUndoAction(
+          () =>
+            renameFiles({
+              uuid: server.uuid,
+              root: directory,
+              files: renames.map((rename) => ({ from: rename.to, to: rename.from })),
+            }),
+          (result) => result.renamed,
+          {
+            addToast,
+            invalidateFilemanager,
+            cannotUndoMessage: t('pages.server.files.toast.renameCouldNotBeUndone', {}),
+            undoneMessage: t('pages.server.files.toast.renameUndone', {}),
+            onError: (err) => addToast(err instanceof Error ? err.message : String(err), 'error'),
+          },
+        ),
       );
       invalidateFilemanager();
       doSelectFiles([]);
       props.onClose();
     } catch (err) {
       addToast(err instanceof Error ? err.message : String(err), 'error');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const statusLabel: Partial<Record<RenameStatus, string>> = {
@@ -216,126 +203,33 @@ export default function MassRenameModal({ files, ...props }: Props) {
         </div>
 
         <Stack gap='xs'>
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}
-            title={t('pages.server.files.modal.massRename.section.matchOptions', {})}
+          <MassRenameMatchSection
+            options={options}
+            setOptions={setOptions}
             enabled={expanded === 'match'}
             onToggle={() => toggleSection('match')}
-          >
-            <Stack gap='sm'>
-              <Switch
-                label={t('pages.server.files.modal.massRename.option.regex', {})}
-                description={t('pages.server.files.modal.massRename.option.regexDescription', {})}
-                checked={options.regex}
-                onChange={(e) => setOptions((o) => ({ ...o, regex: e.target.checked }))}
-              />
-              <Group grow>
-                <Switch
-                  label={t('pages.server.files.modal.massRename.option.caseSensitive', {})}
-                  checked={options.caseSensitive}
-                  onChange={(e) => setOptions((o) => ({ ...o, caseSensitive: e.target.checked }))}
-                />
-                <Switch
-                  label={t('pages.server.files.modal.massRename.option.allOccurrences', {})}
-                  checked={options.allOccurrences}
-                  onChange={(e) => setOptions((o) => ({ ...o, allOccurrences: e.target.checked }))}
-                />
-              </Group>
-            </Stack>
-          </CollapsibleSection>
+          />
 
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faTag} />}
-            title={t('pages.server.files.modal.massRename.section.affixes', {})}
+          <MassRenameAffixSection
+            options={options}
+            setOptions={setOptions}
             enabled={expanded === 'affixes'}
             onToggle={() => toggleSection('affixes')}
-          >
-            <Stack gap='sm'>
-              <Group grow align='start'>
-                <TextInput
-                  label={t('pages.server.files.modal.massRename.affix.prefix', {})}
-                  value={options.prefix}
-                  onChange={(e) => setOptions((o) => ({ ...o, prefix: e.target.value }))}
-                />
-                <TextInput
-                  label={t('pages.server.files.modal.massRename.affix.suffix', {})}
-                  value={options.suffix}
-                  onChange={(e) => setOptions((o) => ({ ...o, suffix: e.target.value }))}
-                />
-              </Group>
-              <Text size='xs' c='dimmed'>
-                {tReact('pages.server.files.modal.massRename.affix.help', { token: <Code>{'{n}'}</Code> })}
-              </Text>
-            </Stack>
-          </CollapsibleSection>
+          />
 
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faFont} />}
-            title={t('pages.server.files.modal.massRename.section.caseConversion', {})}
+          <MassRenameCaseSection
+            options={options}
+            setOptions={setOptions}
             enabled={expanded === 'case'}
             onToggle={() => toggleSection('case')}
-          >
-            <Select
-              label={t('pages.server.files.modal.massRename.case.label', {})}
-              value={options.caseTransform}
-              onChange={(value) => setOptions((o) => ({ ...o, caseTransform: (value ?? 'none') as RenameCase }))}
-              data={[
-                { value: 'none', label: t('pages.server.files.modal.massRename.case.none', {}) },
-                { value: 'lower', label: t('pages.server.files.modal.massRename.case.lower', {}) },
-                { value: 'upper', label: t('pages.server.files.modal.massRename.case.upper', {}) },
-                { value: 'title', label: t('pages.server.files.modal.massRename.case.title', {}) },
-                { value: 'capitalize', label: t('pages.server.files.modal.massRename.case.capitalize', {}) },
-              ]}
-            />
-          </CollapsibleSection>
+          />
 
-          <CollapsibleSection
-            icon={<FontAwesomeIcon icon={faHashtag} />}
-            title={t('pages.server.files.modal.massRename.section.numbering', {})}
+          <MassRenameNumberSection
+            options={options}
+            setOptions={setOptions}
             enabled={expanded === 'number'}
             onToggle={() => toggleSection('number')}
-          >
-            <Stack gap='sm'>
-              <Switch
-                label={t('pages.server.files.modal.massRename.numbering.enable', {})}
-                checked={options.numbering.enabled}
-                onChange={(e) =>
-                  setOptions((o) => ({ ...o, numbering: { ...o.numbering, enabled: e.target.checked } }))
-                }
-              />
-              <Text size='xs' c='dimmed'>
-                {tReact('pages.server.files.modal.massRename.numbering.help', { token: <Code>{'{n}'}</Code> })}
-              </Text>
-              <Group grow>
-                <NumberInput
-                  label={t('pages.server.files.modal.massRename.numbering.start', {})}
-                  value={options.numbering.start}
-                  onChange={(value) =>
-                    setOptions((o) => ({ ...o, numbering: { ...o.numbering, start: Number(value) || 0 } }))
-                  }
-                />
-                <NumberInput
-                  label={t('pages.server.files.modal.massRename.numbering.step', {})}
-                  value={options.numbering.step}
-                  onChange={(value) =>
-                    setOptions((o) => ({ ...o, numbering: { ...o.numbering, step: Number(value) || 0 } }))
-                  }
-                />
-                <NumberInput
-                  label={t('pages.server.files.modal.massRename.numbering.padding', {})}
-                  min={1}
-                  max={10}
-                  value={options.numbering.padding}
-                  onChange={(value) =>
-                    setOptions((o) => ({
-                      ...o,
-                      numbering: { ...o.numbering, padding: Math.max(1, Number(value) || 1) },
-                    }))
-                  }
-                />
-              </Group>
-            </Stack>
-          </CollapsibleSection>
+          />
         </Stack>
 
         <div>
@@ -351,69 +245,13 @@ export default function MassRenameModal({ files, ...props }: Props) {
             </Text>
           </Group>
 
-          <div className='max-h-72 overflow-y-auto'>
-            <Table
-              allowSelect={false}
-              columns={[
-                { name: '' },
-                { name: t('pages.server.files.modal.massRename.preview.original', {}) },
-                { name: '' },
-                { name: t('common.form.newName', {}) },
-                { name: '' },
-              ]}
-            >
-              {files.length === 0 ? (
-                <TableRow>
-                  <TableData colSpan={5}>
-                    <Text size='sm' c='dimmed' className='text-center'>
-                      {t('pages.server.files.modal.massRename.preview.empty', {})}
-                    </Text>
-                  </TableData>
-                </TableRow>
-              ) : (
-                rows.map((row) => {
-                  const blocking = blockingStatuses.includes(row.status);
-
-                  return (
-                    <TableRow key={row.name} className={blocking ? 'bg-(--mantine-color-red-light)' : undefined}>
-                      <TableData className='w-px'>
-                        <Checkbox
-                          checked={row.included}
-                          disabled={row.status === 'unchanged' || blocking}
-                          onChange={() => toggleExcluded(row.name)}
-                        />
-                      </TableData>
-                      <TableData className='max-w-xs text-(--mantine-color-dimmed)'>
-                        <ScrollingText>{row.name}</ScrollingText>
-                      </TableData>
-                      <TableData className='w-px'>
-                        <FontAwesomeIcon icon={faArrowRight} className='w-3 h-3 text-(--mantine-color-dimmed)' />
-                      </TableData>
-                      <TableData
-                        className={`max-w-xs ${row.status === 'unchanged' ? 'text-(--mantine-color-dimmed)' : ''}`}
-                      >
-                        <ScrollingText>{row.status === 'invalidRegex' ? row.name : row.newName}</ScrollingText>
-                      </TableData>
-                      <TableData className='w-px whitespace-nowrap text-right'>
-                        {blocking && statusLabel[row.status] ? (
-                          <Tooltip label={statusLabel[row.status]!}>
-                            <FontAwesomeIcon
-                              icon={faTriangleExclamation}
-                              className='w-3.5 h-3.5 text-(--mantine-color-red-text)'
-                            />
-                          </Tooltip>
-                        ) : row.status === 'unchanged' ? (
-                          <Text size='xs' c='dimmed'>
-                            {statusLabel.unchanged}
-                          </Text>
-                        ) : null}
-                      </TableData>
-                    </TableRow>
-                  );
-                })
-              )}
-            </Table>
-          </div>
+          <MassRenamePreviewTable
+            files={files}
+            rows={rows}
+            blockingStatuses={blockingStatuses}
+            statusLabel={statusLabel}
+            toggleExcluded={toggleExcluded}
+          />
 
           {hasBlocking && changedRows.length > 0 && (
             <Text size='xs' c='red' mt={4}>

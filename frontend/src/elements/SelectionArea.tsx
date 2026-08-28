@@ -138,13 +138,9 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
 
   render(): ReactNode {
     const { children, className = '', style = {} } = this.props;
-    const contextValue: SelectionContextType<unknown> = {
-      registerSelectable: this.registerSelectable as never,
-      unregisterSelectable: this.unregisterSelectable,
-    };
 
     return (
-      <SelectionContext.Provider value={contextValue}>
+      <SelectionContext.Provider value={this.contextValue}>
         <div
           ref={this.containerRef}
           className={`selection-area ${className}`}
@@ -182,6 +178,11 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>, SelectionAreaSta
   private readonly unregisterSelectable = (id: string): void => {
     this.selectablesMap.delete(id);
     this.pendingSelectables.delete(id);
+  };
+
+  private readonly contextValue: SelectionContextType<unknown> = {
+    registerSelectable: this.registerSelectable as never,
+    unregisterSelectable: this.unregisterSelectable,
   };
 
   private cacheSelectable(container: HTMLDivElement, containerRect: DOMRect, element: HTMLElement, item: T): void {

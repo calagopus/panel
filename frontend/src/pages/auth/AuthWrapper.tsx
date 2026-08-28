@@ -12,19 +12,19 @@ export interface Props {
 }
 
 function AuthWrapper(props: Props) {
-  props = useMemo(() => {
-    let modifiedProps = props;
+  const modifiedProps = useMemo(() => {
+    let currentProps = props;
 
     if (props.registry) {
       for (const interceptor of props.registry.propsInterceptors) {
-        modifiedProps = interceptor(modifiedProps);
+        currentProps = interceptor(currentProps);
       }
     }
 
-    return modifiedProps;
+    return currentProps;
   }, [props]);
 
-  const { title, registry, children } = props;
+  const { title, registry, children } = modifiedProps;
 
   const settings = useGlobalStore((state) => state.settings);
   const authRegistry = window.extensionContext.extensionRegistry.pages.auth;
@@ -37,20 +37,20 @@ function AuthWrapper(props: Props) {
             <Component key={`auth-prepended-${index}`} />
           ))}
           {registry?.prependedComponents.map((Component, index) => (
-            <Component key={`prepended-${index}`} {...props} />
+            <Component key={`prepended-${index}`} {...modifiedProps} />
           ))}
 
           <AppIcon className='mb-5 w-full sm:w-fit' />
           {title && <h1 className='text-3xl font-bold mb-4'>{title}</h1>}
 
           {registry?.prependedContentComponents.map((Component, index) => (
-            <Component key={`prepended-content-${index}`} {...props} />
+            <Component key={`prepended-content-${index}`} {...modifiedProps} />
           ))}
 
           {children}
 
           {registry?.appendedContentComponents.map((Component, index) => (
-            <Component key={`appended-content-${index}`} {...props} />
+            <Component key={`appended-content-${index}`} {...modifiedProps} />
           ))}
 
           <Copyright className='mt-4 text-sm' />

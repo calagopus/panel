@@ -23,6 +23,47 @@ pub struct StorageAsset {
 
 const SEARCH_SCAN_LIMIT: usize = 10_000;
 
+/// The content type a stored file is served with, derived from its extension alone.
+pub fn content_type(path: impl AsRef<str>) -> &'static str {
+    let extension = match Path::new(path.as_ref())
+        .extension()
+        .and_then(|e| e.to_str())
+    {
+        Some(extension) => extension.to_ascii_lowercase(),
+        None => return "application/octet-stream",
+    };
+
+    match extension.as_str() {
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "gif" => "image/gif",
+        "webp" => "image/webp",
+        "avif" => "image/avif",
+        "bmp" => "image/bmp",
+        "ico" => "image/x-icon",
+        "svg" => "image/svg+xml",
+        "woff" => "font/woff",
+        "woff2" => "font/woff2",
+        "ttf" => "font/ttf",
+        "otf" => "font/otf",
+        "mp4" => "video/mp4",
+        "webm" => "video/webm",
+        "ogg" => "audio/ogg",
+        "mp3" => "audio/mpeg",
+        "wav" => "audio/wav",
+        "pdf" => "application/pdf",
+        "xml" => "application/xml",
+        "txt" | "csv" => "text/plain",
+        _ => "application/octet-stream",
+    }
+}
+
+/// Whether a [`content_type`] must never be rendered inline on the panel origin.
+#[inline]
+pub fn content_type_requires_attachment(content_type: &str) -> bool {
+    matches!(content_type, "image/svg+xml" | "application/xml")
+}
+
 fn get_s3_client(
     access_key: &str,
     secret_key: &str,

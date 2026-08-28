@@ -9,17 +9,17 @@ function def<T>(schema: AnySchema): T {
   return schema._zod.def as unknown as T;
 }
 
-const snakeCaseOverrides: Record<string, string> = {
-  loginBypass2fa: 'login_bypass_2fa',
-};
+// camel->snake is lossy around digits (`some_2x_key` and `some2x_key` both camelize to
+// `some2xKey`); any backend key with a digit directly after an underscore needs an entry here.
+const snakeCaseOverrides: Record<string, string> = {};
 
 function toSnakeCase(key: string): string {
   return snakeCaseOverrides[key] ?? key.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
 // camelCase conversion mirrors the backend's snake_case keys. camel->snake is lossy around
-// digits (`login_bypass_2fa` and `login_bypass2fa` both camelize to `loginBypass2fa`), so
-// incoming responses are matched by camelizing the raw keys rather than snake-casing schema keys.
+// digits, so incoming responses are matched by camelizing the raw keys rather than snake-casing
+// schema keys.
 function toCamelCase(key: string): string {
   return key.replace(/_([a-z0-9])/gi, (_, letter: string) => letter.toUpperCase());
 }

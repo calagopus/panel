@@ -7,6 +7,7 @@ import ActionIcon from '@/elements/ActionIcon.tsx';
 import Notification from '@/elements/Notification.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
+import { useToastPosition } from '@/plugins/useToastPosition.ts';
 import { Toast, ToastAction, ToastContext, ToastType, toastTimeout } from '@/providers/contexts/toastContext.ts';
 
 const ToastActionButton: FC<{ action: ToastAction }> = ({ action }) => {
@@ -95,7 +96,7 @@ const getToastPositionInitial = (position: z.infer<typeof userToastPosition>) =>
 };
 
 const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [toastPosition, setToastPosition] = useState<z.infer<typeof userToastPosition>>('bottom_right');
+  const [toastPosition] = useToastPosition();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(1);
 
@@ -123,11 +124,10 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       toastPosition,
-      setToastPosition,
       addToast,
       dismissToast,
     }),
-    [toastPosition, setToastPosition, addToast, dismissToast],
+    [toastPosition, addToast, dismissToast],
   );
 
   return (

@@ -208,14 +208,12 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
   }, [language]);
 
   const contextValue = useMemo(() => {
-    let numberFormat: Intl.NumberFormat | null = null;
+    const numberFormat = new Intl.NumberFormat(language, { maximumFractionDigits: 20 });
 
     const formatValue = (value: unknown): string => {
       if (typeof value !== 'number') {
         return String(value);
       }
-
-      numberFormat ??= new Intl.NumberFormat(language, { maximumFractionDigits: 20 });
 
       return numberFormat.format(value);
     };

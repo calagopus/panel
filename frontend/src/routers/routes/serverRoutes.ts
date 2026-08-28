@@ -21,9 +21,10 @@ import DatabaseInstanceExplorerView from '@/pages/server/databases/instances/Dat
 import DatabaseInstanceView from '@/pages/server/databases/instances/DatabaseInstanceView.tsx';
 import ServerDatabaseInstances from '@/pages/server/databases/instances/ServerDatabaseInstances.tsx';
 import ServerDatabases from '@/pages/server/databases/ServerDatabases.tsx';
-import FileSqliteQuery from '@/pages/server/files/FileSqliteQuery.tsx';
-import ServerFiles from '@/pages/server/files/ServerFiles.tsx';
+import ServerFiles from '@/pages/server/files/browser/ServerFiles.tsx';
+import FileSqliteQuery from '@/pages/server/files/editor/FileSqliteQuery.tsx';
 import ServerMounts from '@/pages/server/mounts/ServerMounts.tsx';
+import ServerFirewall from '@/pages/server/network/firewall/ServerFirewall.tsx';
 import ServerNetwork from '@/pages/server/network/ServerNetwork.tsx';
 import ScheduleView from '@/pages/server/schedules/ScheduleView.tsx';
 import ServerSchedules from '@/pages/server/schedules/ServerSchedules.tsx';
@@ -33,8 +34,8 @@ import ServerSubusers from '@/pages/server/subusers/ServerSubusers.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 const ServerConsole = lazy(() => import('@/pages/server/console/ServerConsole.tsx'));
-const ServerFilesEditor = lazy(() => import('@/pages/server/files/FileEditor.tsx'));
-const FileRevisionDiff = lazy(() => import('@/pages/server/files/FileRevisionDiff.tsx'));
+const ServerFilesEditor = lazy(() => import('@/pages/server/files/editor/FileEditor.tsx'));
+const FileRevisionDiff = lazy(() => import('@/pages/server/files/editor/FileRevisionDiff.tsx'));
 
 const routes: ServerRouteDefinition[] = [
   {
@@ -139,7 +140,13 @@ const routes: ServerRouteDefinition[] = [
     icon: faNetworkWired,
     path: '/network',
     element: ServerNetwork,
-    permission: 'allocations.read',
+    permission: ['allocations.read', 'firewall.read'],
+  },
+  {
+    name: undefined,
+    path: '/network/firewall',
+    element: ServerFirewall,
+    permission: 'firewall.read',
   },
   {
     name: () => getTranslations().t('pages.server.startup.title', {}),

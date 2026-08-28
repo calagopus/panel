@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { load } from 'js-yaml';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import updateNodesConfig from '@/api/admin/nodes/updateNodesConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -55,7 +55,9 @@ export default function NodesBulkConfigModal({
       .finally(() => setLoading(false));
   };
 
-  doApplyRef.current = doApply;
+  useEffect(() => {
+    doApplyRef.current = doApply;
+  });
 
   return (
     <Modal
@@ -85,8 +87,7 @@ export default function NodesBulkConfigModal({
               codeLens: false,
               scrollBeyondLastLine: false,
               smoothScrolling: false,
-              // @ts-expect-error this is valid
-              touchScrollEnabled: true,
+              inertialScroll: true,
             }}
           />
         </div>

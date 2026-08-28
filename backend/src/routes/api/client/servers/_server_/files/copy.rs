@@ -58,14 +58,14 @@ mod post {
     ) -> ApiResponseResult {
         permissions.has_server_permission("files.create")?;
 
-        if server.is_ignored(&data.path, false) {
+        if server.is_ignored_either(&data.path) {
             return ApiResponse::error("file not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .ok();
         }
 
         if let Some(destination) = &data.destination
-            && server.is_ignored(destination, false)
+            && server.is_ignored_either(destination)
         {
             return ApiResponse::error("file not found")
                 .with_status(StatusCode::NOT_FOUND)
@@ -77,16 +77,18 @@ mod post {
             name: data.destination,
             overwrite: data.overwrite,
             foreground: data.foreground,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         tokio::spawn(async move {
             let response = match server
+                .0
                 .node
                 .fetch_cached(&state.database)
                 .await?
                 .api_client(&state.database)
                 .await?
-                .post_servers_server_files_copy(server.uuid, &request_body)
+                .post_servers_server_files_copy(server.0.uuid, &request_body)
                 .await
             {
                 Ok(wings_api::servers_server_files_copy::post::Response::Ok(data)) => {

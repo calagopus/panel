@@ -5,7 +5,9 @@ pub mod checkpoint;
 mod security_key;
 
 mod post {
-    use crate::routes::api::auth::login::checkpoint::TwoFactorRequiredJwt;
+    use crate::routes::api::auth::login::checkpoint::{
+        TwoFactorRequiredJwt, available_methods, two_factor_unprovable,
+    };
     use axum::http::StatusCode;
     use compact_str::ToCompactString;
     use garde::Validate;
@@ -18,6 +20,7 @@ mod post {
             user_session::UserSession,
         },
         response::{ApiResponse, ApiResponseResult},
+        settings::app::TwoFactorMethod,
     };
     use tower_cookies::Cookies;
     use utoipa::ToSchema;
@@ -43,6 +46,7 @@ mod post {
         TwoFactorRequired {
             user: Box<shared::models::user::ApiUser>,
             token: String,
+            methods: Vec<TwoFactorMethod>,
         },
     }
 
@@ -100,7 +104,26 @@ mod post {
             }
         };
 
-        if user.totp_enabled {
+        if user.password_login_disabled {
+            return ApiResponse::error("password login is disabled for this account")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        let settings = state.settings.get().await?;
+        let methods = available_methods(&user, &settings);
+
+        if two_factor_unprovable(&user, &settings) {
+            return ApiResponse::error(
+                "two-factor authentication is required for this account, sign in with a security key",
+            )
+            .with_status(StatusCode::BAD_REQUEST)
+            .ok();
+        }
+
+        drop(settings);
+
+        if !methods.is_empty() {
             let token = state.jwt.create(&TwoFactorRequiredJwt {
                 base: BasePayload {
                     scope: "two-factor-checkpoint".into(),
@@ -149,6 +172,7 @@ mod post {
                         .await?,
                 ),
                 token,
+                methods,
             })
             .ok()
         } else {

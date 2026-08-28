@@ -7,6 +7,7 @@ import Button from '@/elements/Button.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Stack from '@/elements/Stack.tsx';
 import Text from '@/elements/Text.tsx';
+import { downloadBlob } from '@/lib/download.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,
@@ -32,14 +33,7 @@ export default function DatabaseInstanceDatabaseExportModal({ instance, database
 
     exportDatabaseInstanceDatabase(server.uuid, instance.uuid, database.uuid)
       .then(({ blob, filename }) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename ?? `${database.name}.dump`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
+        downloadBlob(blob, filename ?? `${database.name}.dump`);
 
         props.onClose();
       })

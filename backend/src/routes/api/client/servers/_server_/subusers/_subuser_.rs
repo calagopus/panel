@@ -171,7 +171,7 @@ mod patch {
         models::{
             UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
-            user::{GetAuthMethod, GetPermissionManager, GetUser},
+            user::{CredentialScope, GetAuthMethod, GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -181,7 +181,12 @@ mod patch {
     pub struct Payload {
         #[garde(inner(custom(shared::permissions::validate_server_permissions)))]
         permissions: Option<Vec<compact_str::CompactString>>,
-        #[garde(skip)]
+        #[garde(inner(
+            length(max = 1024),
+            inner(length(chars, min = 1, max = 255)),
+            custom(shared::utils::validate_ignored_files)
+        ))]
+        #[schema(max_items = 1024, min_length = 1, max_length = 255)]
         ignored_files: Option<Vec<compact_str::CompactString>>,
     }
 
@@ -242,6 +247,18 @@ mod patch {
                 .ok();
         }
 
+        if let Some(subuser_ignored_files) = &server.subuser_ignored_files
+            && !data
+                .ignored_files
+                .as_ref()
+                .unwrap_or(&subuser.ignored_files)
+                .ends_with(subuser_ignored_files)
+        {
+            return ApiResponse::error("ignored_files: less restrictive than self")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         permissions.has_server_permission("subusers.update")?;
 
         if subuser.user.uuid == user.uuid {
@@ -275,6 +292,8 @@ mod patch {
         tokio::spawn(async move {
             tracing::debug!(server = %server.uuid, "updating subuser permissions in wings");
 
+            let credential_scope = CredentialScope::from(&**auth);
+
             let node = match server.node.fetch_cached(&state.database).await {
                 Ok(node) => node,
                 Err(err) => {
@@ -305,7 +324,7 @@ mod patch {
                                     Err(_) => return,
                                 },
                                 &subuser,
-                                Some(&auth)
+                                &credential_scope,
                             )
                                 .into_iter()
                                 .map(compact_str::CompactString::from)

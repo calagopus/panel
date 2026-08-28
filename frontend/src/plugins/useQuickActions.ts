@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
-import type { QuickActionDefinition, QuickActionMode, QuickActionScope } from '@/lib/quickActions.ts';
+import type { QuickActionDefinition, QuickActionMode, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { getQuickActionsStore, useQuickActionsStore } from '@/stores/quickActions.ts';
 
@@ -25,7 +25,10 @@ function useProviderRepaint() {
 
 export function useQuickActions(definitions: QuickActionDefinition[], enabled = true) {
   const definitionsRef = useRef(definitions);
-  definitionsRef.current = definitions;
+
+  useEffect(() => {
+    definitionsRef.current = definitions;
+  });
 
   const active = useRegistrationEnabled(enabled);
 
@@ -40,7 +43,10 @@ export function useQuickActions(definitions: QuickActionDefinition[], enabled = 
 
 export function useQuickActionModes(modes: QuickActionMode[], enabled = true) {
   const modesRef = useRef(modes);
-  modesRef.current = modes;
+
+  useEffect(() => {
+    modesRef.current = modes;
+  });
 
   const active = useRegistrationEnabled(enabled);
 

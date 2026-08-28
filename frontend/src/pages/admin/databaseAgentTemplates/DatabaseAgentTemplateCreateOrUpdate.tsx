@@ -1,7 +1,7 @@
 import { faChevronDown, faExternalLink, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dump } from 'js-yaml';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import createDatabaseAgentTemplate from '@/api/admin/database-agent-templates/createDatabaseAgentTemplate.ts';
 import deleteDatabaseAgentTemplate from '@/api/admin/database-agent-templates/deleteDatabaseAgentTemplate.ts';
@@ -17,6 +17,7 @@ import Group from '@/elements/Group.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { serializeForApi } from '@/lib/api-transform.ts';
+import { downloadTextFile } from '@/lib/download.ts';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -121,140 +122,138 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
 
     const contents =
       format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
-    const fileURL = URL.createObjectURL(new Blob([contents], { type: 'text/plain' }));
-    const downloadLink = document.createElement('a');
-    downloadLink.href = fileURL;
-    downloadLink.download = `database-agent-template-${contextDatabaseAgentTemplate.uuid}.${format === 'json' ? 'json' : 'yml'}`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    URL.revokeObjectURL(fileURL);
-    downloadLink.remove();
+    downloadTextFile(
+      contents,
+      `database-agent-template-${contextDatabaseAgentTemplate.uuid}.${format === 'json' ? 'json' : 'yml'}`,
+    );
   };
 
-  const fields: FieldDef<DatabaseAgentTemplateFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'type',
-      label: t('common.form.type', {}),
-      required: true,
-      options: Object.entries(databaseAgentTypeLabelMapping).map(([value, label]) => ({ value, label })),
-      props: { disabled: !!contextDatabaseAgentTemplate },
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), colSpan: 'full' },
-    {
-      type: 'custom',
-      name: 'dockerImages',
-      colSpan: 'full',
-      render: (f) => (
-        <MultiKeyValueInput
-          label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.dockerImages', {})}
-          withAsterisk
-          options={f.getValues().dockerImages ?? {}}
-          onChange={(e) => f.setFieldValue('dockerImages', e)}
-        />
-      ),
-    },
-    {
-      type: 'custom',
-      name: 'env',
-      colSpan: 'full',
-      render: (f) => (
-        <MultiKeyValueInput
-          label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.env', {})}
-          options={f.getValues().env ?? {}}
-          onChange={(e) => f.setFieldValue('env', e)}
-        />
-      ),
-    },
-    {
-      type: 'custom',
-      name: 'volumes',
-      colSpan: 'full',
-      render: (f) => (
-        <MultiKeyValueInput
-          label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.volumes', {})}
-          options={f.getValues().volumes ?? {}}
-          onChange={(e) => f.setFieldValue('volumes', e)}
-        />
-      ),
-    },
-    {
-      type: 'text',
-      name: 'socketPath',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPath', {}),
-      required: true,
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPathDescription', {}),
-      colSpan: 'full',
-    },
-    {
-      type: 'number',
-      name: 'imageUid',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageUid', {}),
-      required: true,
-    },
-    {
-      type: 'number',
-      name: 'imageGid',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageGid', {}),
-      required: true,
-    },
-    {
-      type: 'tags',
-      name: 'cmd',
-      label: t('common.form.command', {}),
-      colSpan: 'full',
-      advanced: true,
-    },
-    {
-      type: 'size',
-      name: 'memory',
-      label: t('common.form.memory', {}),
-      required: true,
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryDescription', {}),
-      tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryTooltip', {}),
-      mode: 'mb',
-      min: 0,
-    },
-    {
-      type: 'size',
-      name: 'swap',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swap', {}),
-      required: true,
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapDescription', {}),
-      tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapTooltip', {}),
-      mode: 'mb',
-      min: -1,
-    },
-    {
-      type: 'size',
-      name: 'disk',
-      label: t('common.form.disk', {}),
-      required: true,
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskDescription', {}),
-      tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskTooltip', {}),
-      mode: 'mb',
-      min: 0,
-    },
-    {
-      type: 'number',
-      name: 'cpu',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpu', {}),
-      required: true,
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuDescription', {}),
-      tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuTooltip', {}),
-    },
-    {
-      type: 'number',
-      name: 'ioWeight',
-      label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeight', {}),
-      description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightDescription', {}),
-      tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightTooltip', {}),
-      advanced: true,
-    },
-    { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
-  ];
+  const fields: FieldDef<DatabaseAgentTemplateFormValues>[] = useMemo(
+    () => [
+      { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+      {
+        type: 'select',
+        name: 'type',
+        label: t('common.form.type', {}),
+        required: true,
+        options: Object.entries(databaseAgentTypeLabelMapping).map(([value, label]) => ({ value, label })),
+        props: { disabled: !!contextDatabaseAgentTemplate },
+      },
+      { type: 'textarea', name: 'description', label: t('common.form.description', {}), colSpan: 'full' },
+      {
+        type: 'custom',
+        name: 'dockerImages',
+        colSpan: 'full',
+        render: (f) => (
+          <MultiKeyValueInput
+            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.dockerImages', {})}
+            withAsterisk
+            options={f.getValues().dockerImages ?? {}}
+            onChange={(e) => f.setFieldValue('dockerImages', e)}
+          />
+        ),
+      },
+      {
+        type: 'custom',
+        name: 'env',
+        colSpan: 'full',
+        render: (f) => (
+          <MultiKeyValueInput
+            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.env', {})}
+            options={f.getValues().env ?? {}}
+            onChange={(e) => f.setFieldValue('env', e)}
+          />
+        ),
+      },
+      {
+        type: 'custom',
+        name: 'volumes',
+        colSpan: 'full',
+        render: (f) => (
+          <MultiKeyValueInput
+            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.volumes', {})}
+            options={f.getValues().volumes ?? {}}
+            onChange={(e) => f.setFieldValue('volumes', e)}
+          />
+        ),
+      },
+      {
+        type: 'text',
+        name: 'socketPath',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPath', {}),
+        required: true,
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPathDescription', {}),
+        colSpan: 'full',
+      },
+      {
+        type: 'number',
+        name: 'imageUid',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageUid', {}),
+        required: true,
+      },
+      {
+        type: 'number',
+        name: 'imageGid',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageGid', {}),
+        required: true,
+      },
+      {
+        type: 'tags',
+        name: 'cmd',
+        label: t('common.form.command', {}),
+        colSpan: 'full',
+        advanced: true,
+      },
+      {
+        type: 'size',
+        name: 'memory',
+        label: t('common.form.memory', {}),
+        required: true,
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryDescription', {}),
+        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryTooltip', {}),
+        mode: 'mb',
+        min: 0,
+      },
+      {
+        type: 'size',
+        name: 'swap',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swap', {}),
+        required: true,
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapDescription', {}),
+        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapTooltip', {}),
+        mode: 'mb',
+        min: -1,
+      },
+      {
+        type: 'size',
+        name: 'disk',
+        label: t('common.form.disk', {}),
+        required: true,
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskDescription', {}),
+        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskTooltip', {}),
+        mode: 'mb',
+        min: 0,
+      },
+      {
+        type: 'number',
+        name: 'cpu',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpu', {}),
+        required: true,
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuDescription', {}),
+        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuTooltip', {}),
+      },
+      {
+        type: 'number',
+        name: 'ioWeight',
+        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeight', {}),
+        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightDescription', {}),
+        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightTooltip', {}),
+        advanced: true,
+      },
+      { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
+    ],
+    [t, contextDatabaseAgentTemplate],
+  );
 
   return (
     <AdminContentContainer

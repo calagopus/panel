@@ -8,8 +8,7 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useRef, useState } from 'react';
-import { zones } from 'tzdata';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import getEggs from '@/api/admin/nests/eggs/getEggs.ts';
@@ -28,7 +27,6 @@ import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/
 import Group from '@/elements/Group.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
-import TextArea from '@/elements/input/TextArea.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
 import Stack from '@/elements/Stack.tsx';
@@ -42,18 +40,21 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { adminServerCreateSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { formatAllocation } from '@/lib/server.ts';
+import { getTimezoneOptions } from '@/lib/timezones.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import {
+  buildBasicInfoFields,
+  buildFeatureLimitsFields,
+  buildNestSelectField,
+  buildResourceLimitsFields,
+  buildStartupField,
+} from './serverFormFields.tsx';
 
-const timezones = Object.keys(zones)
-  .sort()
-  .map((zone) => ({
-    value: zone,
-    label: zone,
-  }));
+const timezones = getTimezoneOptions();
 
 type ServerCreateFormValues = z.infer<typeof adminServerCreateSchema>;
 
@@ -69,7 +70,7 @@ export default function ServerCreate() {
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'confirm-no-allocation' | null>(null);
-  const confirmStayRef = useRef(false);
+  const [confirmStay, setConfirmStay] = useState(false);
 
   const form = useFormEngine<ServerCreateFormValues>('admin.servers.create', {
     schema: adminServerCreateSchema.unwrap(),
@@ -123,7 +124,7 @@ export default function ServerCreate() {
 
   const doSave = (stay: boolean) => {
     if (!form.getValues().allocationUuid) {
-      confirmStayRef.current = stay;
+      setConfirmStay(stay);
       setOpenModal('confirm-no-allocation');
     } else {
       doCreateOrUpdate(stay);
@@ -215,311 +216,158 @@ export default function ServerCreate() {
       .finally(() => setEggVariablesLoading(false));
   }, [selectedNestUuid, selectedEggUuid]);
 
-  const basicInfoFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'text',
-      name: 'name',
-      label: t('common.form.serverName', {}),
-      required: true,
-      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.serverNamePlaceholder', {}) },
-    },
-    {
-      type: 'text',
-      name: 'externalId',
-      label: t('common.form.externalId', {}),
-      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.externalIdPlaceholder', {}) },
-    },
-    {
-      type: 'textarea',
-      name: 'description',
-      label: t('common.form.description', {}),
-      colSpan: 'full',
-      rows: 3,
-      props: { placeholder: t('pages.admin.servers.tabs.general.page.form.descriptionPlaceholder', {}) },
-    },
-  ];
+  const basicInfoFields = useMemo(() => buildBasicInfoFields<ServerCreateFormValues>(t), [t]);
 
-  const serverAssignmentFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'select',
-      name: 'nodeUuid',
-      label: t('common.form.node', {}),
-      required: true,
-      options: nodes.items.map((node) => ({ label: node.name, value: node.uuid })),
-      props: {
-        searchable: true,
-        searchValue: nodes.search,
-        onSearchChange: nodes.setSearch,
-        disabled: !canReadNodes,
-        loading: nodes.loading,
+  const serverAssignmentFields: FieldDef<ServerCreateFormValues>[] = useMemo(
+    (): FieldDef<ServerCreateFormValues>[] => [
+      {
+        type: 'select',
+        name: 'nodeUuid',
+        label: t('common.form.node', {}),
+        required: true,
+        options: nodes.items.map((node) => ({ label: node.name, value: node.uuid })),
+        props: {
+          searchable: true,
+          searchValue: nodes.search,
+          onSearchChange: nodes.setSearch,
+          disabled: !canReadNodes,
+          loading: nodes.loading,
+        },
       },
-    },
-    {
-      type: 'select',
-      name: 'ownerUuid',
-      label: t('pages.admin.servers.tabs.general.page.form.owner', {}),
-      required: true,
-      options: users.items.map((user) => ({ label: user.username, value: user.uuid })),
-      props: {
-        searchable: true,
-        searchValue: users.search,
-        onSearchChange: users.setSearch,
-        loading: users.loading,
-        disabled: !canReadUsers,
+      {
+        type: 'select',
+        name: 'ownerUuid',
+        label: t('pages.admin.servers.tabs.general.page.form.owner', {}),
+        required: true,
+        options: users.items.map((user) => ({ label: user.username, value: user.uuid })),
+        props: {
+          searchable: true,
+          searchValue: users.search,
+          onSearchChange: users.setSearch,
+          loading: users.loading,
+          disabled: !canReadUsers,
+        },
       },
-    },
-    {
-      type: 'custom',
-      name: '_nestSelect',
-      render: () => (
-        <Select
-          withAsterisk
-          label={t('common.form.nest', {})}
-          value={selectedNestUuid}
-          onChange={(value) => {
-            setSelectedNestUuid(value);
-            form.setFieldValue('eggUuid', '');
-          }}
-          data={nests.items.map((nest) => ({ label: nest.name, value: nest.uuid }))}
-          searchable
-          searchValue={nests.search}
-          onSearchChange={nests.setSearch}
-          disabled={!canReadNests}
-          loading={nests.loading}
-        />
-      ),
-    },
-    {
-      type: 'select',
-      name: 'eggUuid',
-      label: t('pages.admin.servers.tabs.general.page.form.egg', {}),
-      required: true,
-      options: eggs.items.map((egg) => ({ label: egg.name, value: egg.uuid })),
-      props: {
-        searchable: true,
-        searchValue: eggs.search,
-        onSearchChange: eggs.setSearch,
-        loading: eggs.loading,
-        disabled: !canReadEggs || !selectedNestUuid,
+      buildNestSelectField<ServerCreateFormValues>(t, {
+        form,
+        selectedNestUuid,
+        setSelectedNestUuid,
+        nests,
+        canReadNests,
+      }),
+      {
+        type: 'select',
+        name: 'eggUuid',
+        label: t('pages.admin.servers.tabs.general.page.form.egg', {}),
+        required: true,
+        options: eggs.items.map((egg) => ({ label: egg.name, value: egg.uuid })),
+        props: {
+          searchable: true,
+          searchValue: eggs.search,
+          onSearchChange: eggs.setSearch,
+          loading: eggs.loading,
+          disabled: !canReadEggs || !selectedNestUuid,
+        },
       },
-    },
-    {
-      type: 'select',
-      name: 'backupConfigurationUuid',
-      label: t('common.form.backupConfiguration', {}),
-      options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
-      props: {
-        placeholder: t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {}),
-        searchable: true,
-        searchValue: backupConfigurations.search,
-        onSearchChange: backupConfigurations.setSearch,
-        allowDeselect: true,
-        clearable: true,
-        disabled: !canReadBackupConfigurations,
-        loading: backupConfigurations.loading,
+      {
+        type: 'select',
+        name: 'backupConfigurationUuid',
+        label: t('common.form.backupConfiguration', {}),
+        options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
+        props: {
+          placeholder: t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {}),
+          searchable: true,
+          searchValue: backupConfigurations.search,
+          onSearchChange: backupConfigurations.setSearch,
+          allowDeselect: true,
+          clearable: true,
+          disabled: !canReadBackupConfigurations,
+          loading: backupConfigurations.loading,
+        },
       },
-    },
-  ];
+    ],
+    [
+      t,
+      nodes,
+      canReadNodes,
+      users,
+      canReadUsers,
+      selectedNestUuid,
+      setSelectedNestUuid,
+      nests,
+      canReadNests,
+      eggs,
+      canReadEggs,
+      backupConfigurations,
+      canReadBackupConfigurations,
+    ],
+  );
 
-  const resourceLimitsFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'number',
-      name: 'limits.cpu',
-      label: t('pages.admin.servers.tabs.general.page.form.cpuLimit', {}),
-      required: true,
-      description: t('pages.admin.servers.tabs.general.page.form.cpuLimitDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.cpuLimitTooltip', {}),
-      props: { placeholder: '100', min: 0 },
-    },
-    {
-      type: 'size',
-      name: 'limits.swap',
-      label: t('pages.admin.servers.tabs.general.page.form.swap', {}),
-      required: true,
-      description: t('pages.admin.servers.tabs.general.page.form.swapDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.swapTooltip', {}),
-      mode: 'mb',
-      min: -1,
-      advanced: true,
-    },
-    {
-      type: 'size',
-      name: 'limits.memory',
-      label: t('common.form.memory', {}),
-      required: true,
-      description: t('pages.admin.servers.tabs.general.page.form.memoryDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.memoryTooltip', {}),
-      mode: 'mb',
-      min: 0,
-    },
-    {
-      type: 'size',
-      name: 'limits.memoryOverhead',
-      label: t('pages.admin.servers.tabs.general.page.form.memoryOverhead', {}),
-      required: true,
-      description: t('pages.admin.servers.tabs.general.page.form.memoryOverheadDescription', {}),
-      mode: 'mb',
-      min: 0,
-      advanced: true,
-    },
-    {
-      type: 'size',
-      name: 'limits.disk',
-      label: t('pages.admin.servers.tabs.general.page.form.diskSpace', {}),
-      required: true,
-      description: t('pages.admin.servers.tabs.general.page.form.diskSpaceDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.diskSpaceTooltip', {}),
-      mode: 'mb',
-      min: 0,
-    },
-    {
-      type: 'number',
-      name: 'limits.ioWeight',
-      label: t('pages.admin.servers.tabs.general.page.form.ioWeight', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.ioWeightDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.ioWeightTooltip', {}),
-      advanced: true,
-    },
-    {
-      type: 'numberTags',
-      name: 'pinnedCpus',
-      label: t('pages.admin.servers.tabs.general.page.form.pinnedCpus', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.pinnedCpusDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.pinnedCpusTooltip', {}),
-      placeholder: '0',
-      allowReordering: false,
-      advanced: true,
-    },
-  ];
+  const resourceLimitsFields = useMemo(
+    () => buildResourceLimitsFields<ServerCreateFormValues>(t, { swapAdvanced: true }),
+    [t],
+  );
 
-  const serverConfigFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'select',
-      name: 'image',
-      label: t('common.form.dockerImage', {}),
-      required: true,
-      options: Object.entries(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {}).map(
-        ([label, value]) => ({
-          label,
-          value,
-        }),
-      ),
-      props: {
-        placeholder: 'ghcr.io/...',
-        searchable: true,
+  const serverConfigFields: FieldDef<ServerCreateFormValues>[] = useMemo(
+    (): FieldDef<ServerCreateFormValues>[] => [
+      {
+        type: 'select',
+        name: 'image',
+        label: t('common.form.dockerImage', {}),
+        required: true,
+        options: Object.entries(eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {}).map(
+          ([label, value]) => ({
+            label,
+            value,
+          }),
+        ),
+        props: {
+          placeholder: 'ghcr.io/...',
+          searchable: true,
+        },
       },
-    },
-    {
-      type: 'select',
-      name: 'timezone',
-      label: t('common.form.timezone', {}),
-      options: [{ label: t('common.form.timezoneSystem', {}), value: '' }, ...timezones],
-      props: {
-        placeholder: 'Europe/Amsterdam',
-        searchable: true,
+      {
+        type: 'select',
+        name: 'timezone',
+        label: t('common.form.timezone', {}),
+        options: [{ label: t('common.form.timezoneSystem', {}), value: '' }, ...timezones],
+        props: {
+          placeholder: 'Europe/Amsterdam',
+          searchable: true,
+        },
       },
-    },
-    {
-      type: 'custom',
-      name: 'startup',
-      colSpan: 'full',
-      render: (f) => (
-        <>
-          {Object.keys(eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {}).length >
-            0 && (
-            <Select
-              label={t('pages.admin.servers.tabs.general.page.form.predefinedStartupCommands', {})}
-              className='col-span-full'
-              data={[
-                {
-                  label: t('pages.admin.servers.tabs.general.page.form.startupCommandCustom', {}),
-                  value: '',
-                },
-                ...Object.entries(
-                  eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                ).map(([key, value]) => ({
-                  value,
-                  label: key,
-                })),
-              ]}
-              value={
-                Object.values(
-                  eggs.items.find((egg) => egg.uuid === form.getValues().eggUuid)?.startupCommands || {},
-                ).find((value) => value === form.getValues().startup) || ''
-              }
-              onChange={(value) => form.setFieldValue('startup', value ?? '')}
-            />
-          )}
-          <TextArea
-            label={t('common.form.startupCommand', {})}
-            placeholder='npm start'
-            className='col-span-full'
-            required
-            rows={2}
-            key={form.key('startup')}
-            {...form.getInputProps('startup')}
-          />
-        </>
-      ),
-    },
-    {
-      type: 'switch',
-      name: 'startOnCompletion',
-      label: t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'skipInstaller',
-      label: t('pages.admin.servers.tabs.general.page.form.skipInstaller', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'hugepagesPassthroughEnabled',
-      label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
-      advanced: true,
-    },
-    {
-      type: 'switch',
-      name: 'kvmPassthroughEnabled',
-      label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
-      advanced: true,
-    },
-  ];
+      buildStartupField<ServerCreateFormValues>(t, { form, eggs }),
+      {
+        type: 'switch',
+        name: 'startOnCompletion',
+        label: t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {}),
+        description: t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {}),
+      },
+      {
+        type: 'switch',
+        name: 'skipInstaller',
+        label: t('pages.admin.servers.tabs.general.page.form.skipInstaller', {}),
+        description: t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {}),
+      },
+      {
+        type: 'switch',
+        name: 'hugepagesPassthroughEnabled',
+        label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
+        description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
+        advanced: true,
+      },
+      {
+        type: 'switch',
+        name: 'kvmPassthroughEnabled',
+        label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
+        description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
+        advanced: true,
+      },
+    ],
+    [t, eggs, selectedEggUuid],
+  );
 
-  const featureLimitsFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'number',
-      name: 'featureLimits.allocations',
-      label: t('pages.admin.servers.tabs.general.page.form.allocationsLimit', {}),
-      required: true,
-      props: { placeholder: '0', min: 0 },
-    },
-    {
-      type: 'number',
-      name: 'featureLimits.databases',
-      label: t('pages.admin.servers.tabs.general.page.form.databasesLimit', {}),
-      required: true,
-      props: { placeholder: '0', min: 0 },
-    },
-    {
-      type: 'number',
-      name: 'featureLimits.backups',
-      label: t('pages.admin.servers.tabs.general.page.form.backupsLimit', {}),
-      required: true,
-      props: { placeholder: '0', min: 0 },
-    },
-    {
-      type: 'number',
-      name: 'featureLimits.schedules',
-      label: t('pages.admin.servers.tabs.general.page.form.schedulesLimit', {}),
-      required: true,
-      props: { placeholder: '0', min: 0 },
-    },
-  ];
+  const featureLimitsFields = useMemo(() => buildFeatureLimitsFields<ServerCreateFormValues>(t), [t]);
 
   return (
     <AdminContentContainer
@@ -535,7 +383,7 @@ export default function ServerCreate() {
         confirm={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.button.confirm', {})}
         onConfirmed={() => {
           setOpenModal(null);
-          doCreateOrUpdate(confirmStayRef.current);
+          doCreateOrUpdate(confirmStay);
         }}
       >
         {t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.content', {})}

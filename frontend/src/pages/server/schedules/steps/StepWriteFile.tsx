@@ -5,7 +5,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
+import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
 
 export default function StepWriteFile({
   form,

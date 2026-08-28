@@ -13,13 +13,13 @@ import Spinner from '@/elements/Spinner.tsx';
 import { Pagination } from '@/elements/Table.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
-import { eventKeyMatches } from '@/lib/shortcuts.ts';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useServerListShowOthers } from '@/plugins/useServerListShowOthers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import { useUserStore } from '@/stores/user.ts';
 import BulkActionBar from './BulkActionBar.tsx';
 import DashboardHomeTitle from './DashboardHomeTitle.tsx';
@@ -28,7 +28,7 @@ import ServerItem from './ServerItem.tsx';
 export default function DashboardHomeAll() {
   const { t } = useTranslations();
   const { setServerGroups } = useUserStore();
-  const { serverListShowOthers, setServerListShowOthers } = useGlobalStore();
+  const [serverListShowOthers, setServerListShowOthers] = useServerListShowOthers();
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));

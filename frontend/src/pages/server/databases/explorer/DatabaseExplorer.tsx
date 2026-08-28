@@ -32,13 +32,18 @@ export default function DatabaseExplorer() {
   const [schemaOpen, setSchemaOpen] = useState(true);
   const [openModal, setOpenModal] = useState<'createTable' | null>(null);
 
-  const { data: tables = [], loading } = useResource({
+  const { data: schema, loading } = useResource({
     queryKey: keys.schema,
     queryFn: api.getSchema,
   });
 
+  const tables = schema?.tables ?? [];
+  const truncated = schema?.truncated ?? false;
+
   const requested = searchParams.get('table');
-  const table = tables.find((entry) => tableIdentity(entry) === requested) ?? tables[0] ?? null;
+  const missing = requested !== null && !tables.some((entry) => tableIdentity(entry) === requested);
+  const beyondCap = missing && truncated;
+  const table = beyondCap ? null : (tables.find((entry) => tableIdentity(entry) === requested) ?? tables[0] ?? null);
 
   useEffect(() => {
     if (loading || !table || requested === tableIdentity(table)) return;
@@ -67,6 +72,12 @@ export default function DatabaseExplorer() {
       setSchemaOpen(false);
     }
   };
+
+  const emptyMessage = beyondCap
+    ? t('pages.server.databases.explorer.schema.tableBeyondLimit', { tables: tables.length })
+    : loading
+      ? t('pages.server.databases.explorer.rows.noTable', {})
+      : t('pages.server.databases.explorer.schema.empty', {});
 
   const draftRef = useRef('');
 
@@ -100,6 +111,7 @@ export default function DatabaseExplorer() {
             <div className='w-full xl:w-72 xl:shrink-0 xl:sticky xl:top-4'>
               <DatabaseSchemaPanel
                 tables={tables}
+                truncated={truncated}
                 loading={loading}
                 selected={table}
                 onSelect={selectTable}
@@ -146,12 +158,7 @@ export default function DatabaseExplorer() {
                   <DatabaseTableRows key={tableIdentity(table)} table={table} />
                 ) : (
                   <Text size='sm' c='dimmed'>
-                    {t(
-                      loading
-                        ? 'pages.server.databases.explorer.rows.noTable'
-                        : 'pages.server.databases.explorer.schema.empty',
-                      {},
-                    )}
+                    {emptyMessage}
                   </Text>
                 )}
               </Tabs.Panel>
@@ -161,12 +168,7 @@ export default function DatabaseExplorer() {
                   <DatabaseTableStructure key={tableIdentity(table)} table={table} />
                 ) : (
                   <Text size='sm' c='dimmed'>
-                    {t(
-                      loading
-                        ? 'pages.server.databases.explorer.rows.noTable'
-                        : 'pages.server.databases.explorer.schema.empty',
-                      {},
-                    )}
+                    {emptyMessage}
                   </Text>
                 )}
               </Tabs.Panel>

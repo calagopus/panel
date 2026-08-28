@@ -14,6 +14,7 @@ import { isAdmin } from '@/lib/permissions.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import DashboardHomeAll from '@/pages/dashboard/home/DashboardHomeAll.tsx';
 import DashboardHomeGrouped from '@/pages/dashboard/home/DashboardHomeGrouped.tsx';
+import { useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutes from '@/routers/routes/accountRoutes.ts';
@@ -22,6 +23,7 @@ import { useGlobalStore } from '@/stores/global.ts';
 export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
   const { t, language } = useTranslations();
   const { user } = useAuth();
+  const [startOnGroupedServers] = useStartOnGroupedServers();
   const routeOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
 
   const allAccountRoutes = useMemo(() => {
@@ -157,7 +159,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
 
               <Suspense fallback={<Spinner.Centered />}>
                 <Routes>
-                  {user?.startOnGroupedServers ? (
+                  {startOnGroupedServers ? (
                     <>
                       <Route path='' element={<DashboardHomeGrouped />} />
                       <Route path='/all' element={<DashboardHomeAll />} />

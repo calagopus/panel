@@ -104,6 +104,7 @@ mod post {
                     query: data.query.clone().into(),
                     read_only: data.read_only,
                     rows: data.rows,
+                    ignored: server.0.subuser_ignored_files.unwrap_or_default(),
                 },
             )
             .await

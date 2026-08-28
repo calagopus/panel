@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import ServerClearStateModal from '@/pages/admin/servers/management/modals/ServerClearStateModal.tsx';
 import ServerDeleteModal from '@/pages/admin/servers/management/modals/ServerDeleteModal.tsx';

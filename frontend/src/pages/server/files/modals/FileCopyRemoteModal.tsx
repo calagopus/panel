@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import copyFilesRemote from '@/api/server/files/copyFilesRemote.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
-import DirectoryBrowser from '@/elements/DirectoryBrowser.tsx';
+import DirectoryBrowser from '@/elements/files/DirectoryBrowser.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -15,6 +14,7 @@ import Stack from '@/elements/Stack.tsx';
 import { serverDirectoryEntrySchema, serverFilesCopyRemoteSchema } from '@/lib/schemas/server/files.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { nullableString } from '@/lib/transformers.ts';
+import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useServerCanFor } from '@/plugins/usePermissions.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
@@ -117,21 +117,17 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
         )}
       </Stack>
 
-      <p className='mt-2 text-sm md:text-base break-all'>
-        <span>{t('pages.server.files.modal.copyRemote.createdAs', {})}</span>
-        <Code>
-          /home/container/
-          <span className='text-cyan-200'>
-            {(isSingleFile
-              ? join(form.values.destination, form.values.name || files[0].name)
-              : form.values.destination
-            ).replace(/^(\.\.\/|\/)+/, '')}
-          </span>
-        </Code>
-      </p>
+      <FilePathPreview
+        label={t('pages.server.files.modal.copyRemote.createdAs', {})}
+        path={isSingleFile ? join(form.values.destination, form.values.name || files[0].name) : form.values.destination}
+      />
 
       <ModalFooter>
-        <Button type='submit' loading={loading} disabled={!!form.values.destinationServer && !canCreate}>
+        <Button
+          type='submit'
+          loading={loading}
+          disabled={!form.isValid() || (!!form.values.destinationServer && !canCreate)}
+        >
           {t('pages.server.files.button.copy', {})}
         </Button>
         <Button variant='default' onClick={handleClose}>

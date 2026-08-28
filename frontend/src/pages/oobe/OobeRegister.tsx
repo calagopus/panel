@@ -41,12 +41,14 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
   const onSubmit = async () => {
     setLoading(true);
 
+    const values = oobeRegister.parse(form.values);
+
     register({
-      username: form.values.username,
-      email: form.values.email,
-      nameFirst: form.values.nameFirst,
-      nameLast: form.values.nameLast,
-      password: form.values.password,
+      username: values.username,
+      email: values.email,
+      nameFirst: values.nameFirst,
+      nameLast: values.nameLast,
+      password: values.password,
       captcha: '',
     })
       .then((response) => {
@@ -82,7 +84,6 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
                 label={t('common.form.firstName', {})}
                 placeholder={t('pages.oobe.register.form.firstNamePlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
-                required
                 className='flex-1'
                 {...form.getInputProps('nameFirst')}
               />
@@ -90,7 +91,6 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
                 label={t('common.form.lastName', {})}
                 placeholder={t('pages.oobe.register.form.lastNamePlaceholder', {})}
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
-                required
                 className='flex-1'
                 {...form.getInputProps('nameLast')}
               />

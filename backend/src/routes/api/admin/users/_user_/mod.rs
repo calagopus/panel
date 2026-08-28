@@ -153,6 +153,7 @@ mod delete {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.delete")?;
+        permissions.can_modify_user(&user)?;
 
         let servers = Server::count_by_user_uuid(&state.database, user.uuid).await?;
         if servers > 0 {
@@ -191,6 +192,8 @@ mod patch {
             UpdatableModel,
             admin_activity::GetAdminActivityLogger,
             user::{GetPermissionManager, GetUser, UpdateUserOptions},
+            user_email_verification::UserEmailVerification,
+            user_password_reset::UserPasswordReset,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -236,11 +239,7 @@ mod patch {
                     .ok();
             }
 
-            if user.admin {
-                return ApiResponse::error("you cannot modify an administrator")
-                    .with_status(StatusCode::FORBIDDEN)
-                    .ok();
-            }
+            permissions.can_modify_user(&user)?;
 
             if caller.uuid != user.uuid {
                 if data.password.is_some() {
@@ -260,6 +259,8 @@ mod patch {
             }
         }
 
+        let old_email = user.email.clone();
+
         match user.update(&state, data).await {
             Ok(_) => {}
             Err(err) if err.is_unique_violation() => {
@@ -268,6 +269,11 @@ mod patch {
                     .ok();
             }
             Err(err) => return ApiResponse::from(err).ok(),
+        }
+
+        if user.email != old_email {
+            UserEmailVerification::delete_by_user_uuid(&state.database, user.uuid).await?;
+            UserPasswordReset::delete_by_user_uuid(&state.database, user.uuid).await?;
         }
 
         activity_logger

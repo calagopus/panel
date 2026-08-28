@@ -18,6 +18,7 @@ import Group from '@/elements/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/Title.tsx';
 import { serializeForApi } from '@/lib/api-transform.ts';
+import { downloadTextFile } from '@/lib/download.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import OAuthProviderDuplicateModal from '@/pages/admin/oAuthProviders/modals/OAuthProviderDuplicateModal.tsx';
@@ -59,7 +60,7 @@ export default function OAuthProviderCreateOrUpdate({
       nameLastPath: null,
       enabled: true,
       loginOnly: false,
-      loginBypass2fa: false,
+      loginBypassTwoFactor: false,
       linkViewable: true,
       userManageable: true,
       basicAuth: false,
@@ -101,7 +102,7 @@ export default function OAuthProviderCreateOrUpdate({
         nameLastPath: contextOAuthProvider.nameLastPath,
         enabled: contextOAuthProvider.enabled,
         loginOnly: contextOAuthProvider.loginOnly,
-        loginBypass2fa: contextOAuthProvider.loginBypass2fa,
+        loginBypassTwoFactor: contextOAuthProvider.loginBypassTwoFactor,
         linkViewable: contextOAuthProvider.linkViewable,
         userManageable: contextOAuthProvider.userManageable,
         basicAuth: contextOAuthProvider.basicAuth,
@@ -120,15 +121,7 @@ export default function OAuthProviderCreateOrUpdate({
 
     const contents =
       format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
-    const fileURL = URL.createObjectURL(new Blob([contents], { type: 'text/plain' }));
-    const downloadLink = document.createElement('a');
-    downloadLink.href = fileURL;
-    downloadLink.download = `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    URL.revokeObjectURL(fileURL);
-    downloadLink.remove();
+    downloadTextFile(contents, `oauth-provider-${contextOAuthProvider.uuid}.${format === 'json' ? 'json' : 'yml'}`);
   };
 
   const fieldsTop: FieldDef<OAuthFormValues>[] = [
@@ -218,9 +211,9 @@ export default function OAuthProviderCreateOrUpdate({
     },
     {
       type: 'switch',
-      name: 'loginBypass2fa',
-      label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2fa', {}),
-      description: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypass2faDescription', {}),
+      name: 'loginBypassTwoFactor',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypassTwoFactor', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypassTwoFactorDescription', {}),
     },
     {
       type: 'switch',

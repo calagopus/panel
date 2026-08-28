@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import { parseFromApi } from '@/lib/api-transform.ts';
-import { fullUserSchema, userSchema } from '@/lib/schemas/user.ts';
+import { fullUserSchema, type twoFactorMethod, userSchema } from '@/lib/schemas/user.ts';
 
 interface Data {
   user: string;
@@ -18,6 +18,7 @@ type Response =
       type: 'two_factor_required';
       user: z.infer<typeof userSchema>;
       token: string;
+      methods: z.infer<typeof twoFactorMethod>[];
     };
 
 export default async ({ user, password, captcha }: Data): Promise<Response> => {

@@ -9,7 +9,7 @@ mod delete {
         ApiError, GetState,
         models::{
             admin_activity::GetAdminActivityLogger, user::GetPermissionManager,
-            user_recovery_code::UserRecoveryCode,
+            user_recovery_code::UserRecoveryCode, user_two_factor_code::UserTwoFactorCode,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -35,8 +35,9 @@ mod delete {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.disable-two-factor")?;
+        permissions.can_modify_user(&user)?;
 
-        if !user.totp_enabled {
+        if !user.totp_enabled && !user.email_two_factor_enabled {
             return ApiResponse::error("two-factor authentication is not enabled")
                 .with_status(StatusCode::CONFLICT)
                 .ok();
@@ -44,9 +45,12 @@ mod delete {
 
         UserRecoveryCode::delete_by_user_uuid(&state.database, user.uuid).await?;
 
+        UserTwoFactorCode::delete_by_user_uuid(&state.database, user.uuid).await?;
+
         sqlx::query!(
             "UPDATE users
-            SET totp_enabled = false, totp_last_used = NULL, totp_secret = NULL
+            SET totp_enabled = false, totp_last_used = NULL, totp_secret = NULL,
+                email_two_factor_enabled = false
             WHERE users.uuid = $1",
             user.uuid
         )

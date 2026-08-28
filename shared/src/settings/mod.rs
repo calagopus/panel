@@ -1,5 +1,6 @@
 use crate::{
     cap::CapFilesystem,
+    censor::{CENSORED_PLACEHOLDER, Censor},
     extensions::settings::{
         ExtensionSettings, ExtensionSettingsDeserializer, SettingsDeserializeExt,
         SettingsDeserializer, SettingsSerializeExt, SettingsSerializer,
@@ -104,6 +105,22 @@ impl StorageDriver {
     }
 }
 
+impl Censor for StorageDriver {
+    fn censor(&mut self) {
+        match self {
+            StorageDriver::Filesystem { .. } => {}
+            StorageDriver::S3 {
+                access_key,
+                secret_key,
+                ..
+            } => {
+                *access_key = CENSORED_PLACEHOLDER.into();
+                *secret_key = CENSORED_PLACEHOLDER.into();
+            }
+        }
+    }
+}
+
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum MailMode {
@@ -146,6 +163,24 @@ pub enum MailMode {
         #[garde(length(chars, min = 1, max = 255))]
         from_name: Option<compact_str::CompactString>,
     },
+}
+
+impl Censor for MailMode {
+    fn censor(&mut self) {
+        match self {
+            MailMode::None | MailMode::Sendmail { .. } | MailMode::Filesystem { .. } => {}
+            MailMode::Smtp {
+                username, password, ..
+            } => {
+                if let Some(username) = username {
+                    *username = CENSORED_PLACEHOLDER.into();
+                }
+                if let Some(password) = password {
+                    *password = CENSORED_PLACEHOLDER.into();
+                }
+            }
+        }
+    }
 }
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
@@ -221,6 +256,22 @@ impl CaptchaProvider {
             CaptchaProvider::Recaptcha { .. } => "",
             CaptchaProvider::Hcaptcha { .. } => "https://hcaptcha.com https://*.hcaptcha.com",
             CaptchaProvider::FriendlyCaptcha { .. } => "",
+        }
+    }
+}
+
+impl Censor for CaptchaProvider {
+    fn censor(&mut self) {
+        match self {
+            CaptchaProvider::None => {}
+            CaptchaProvider::Turnstile { secret_key, .. }
+            | CaptchaProvider::Recaptcha { secret_key, .. }
+            | CaptchaProvider::Hcaptcha { secret_key, .. } => {
+                *secret_key = CENSORED_PLACEHOLDER.into();
+            }
+            CaptchaProvider::FriendlyCaptcha { api_key, .. } => {
+                *api_key = CENSORED_PLACEHOLDER.into();
+            }
         }
     }
 }
@@ -915,25 +966,25 @@ impl<'a> SettingsWriteGuard<'a> {
         Ok(())
     }
 
+    /// The settings as they may be logged, with every secret censored.
+    ///
+    /// [`AppSettings`] deliberately has no [`Censor`] impl: this runs on the live buffer that
+    /// [`Self::save`] writes to the database, so censoring it in place would persist the
+    /// placeholder as the real secret. The secret bearing settings are censored on clones instead.
     pub fn censored(&self) -> serde_json::Value {
-        let settings = self.settings.as_ref().expect("settings have been dropped");
-        let mut json = serde_json::to_value(&settings.settings).unwrap();
+        let settings = &self
+            .settings
+            .as_ref()
+            .expect("settings have been dropped")
+            .settings;
 
-        fn censor_values(key: &str, value: &mut serde_json::Value) {
-            match value {
-                serde_json::Value::Object(map) => {
-                    for (k, v) in map.iter_mut() {
-                        censor_values(k, v);
-                    }
-                }
-                serde_json::Value::String(s) if key.contains("password") => {
-                    *s = "*".repeat(s.len());
-                }
-                _ => {}
-            }
-        }
+        let mut json = serde_json::to_value(settings).unwrap();
 
-        censor_values("", &mut json);
+        json["storage_driver"] =
+            serde_json::to_value(settings.storage_driver.clone().censored()).unwrap();
+        json["mail_mode"] = serde_json::to_value(settings.mail_mode.clone().censored()).unwrap();
+        json["captcha_provider"] =
+            serde_json::to_value(settings.captcha_provider.clone().censored()).unwrap();
 
         json
     }
@@ -1173,5 +1224,115 @@ impl Settings {
         };
         let index = self.cached_index.load(Ordering::Acquire);
         self.cached[index % 2].write().await.expires = std::time::Instant::now();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn storage_driver_censors_its_s3_credentials() {
+        let value = serde_json::to_value(
+            StorageDriver::S3 {
+                public_url: "https://cdn.example.com".into(),
+                access_key: "AKIAEXAMPLE".into(),
+                secret_key: "s3cr3t".into(),
+                bucket: "assets".into(),
+                region: "eu-central-1".into(),
+                endpoint: "https://s3.example.com".into(),
+                path_style: false,
+            }
+            .censored(),
+        )
+        .unwrap();
+
+        assert_eq!(value["access_key"], CENSORED_PLACEHOLDER);
+        assert_eq!(value["secret_key"], CENSORED_PLACEHOLDER);
+
+        assert_eq!(value["public_url"], "https://cdn.example.com");
+        assert_eq!(value["bucket"], "assets");
+        assert_eq!(value["region"], "eu-central-1");
+    }
+
+    #[test]
+    fn mail_mode_censors_its_smtp_credentials() {
+        let value = serde_json::to_value(
+            MailMode::Smtp {
+                host: "smtp.example.com".into(),
+                port: 587,
+                username: Some("panel@example.com".into()),
+                password: Some("hunter2".into()),
+                tls_mode: TlsMode::StartTls,
+                skip_cert_validation: false,
+                from_address: "panel@example.com".into(),
+                from_name: Some("Panel".into()),
+            }
+            .censored(),
+        )
+        .unwrap();
+
+        assert_eq!(value["username"], CENSORED_PLACEHOLDER);
+        assert_eq!(value["password"], CENSORED_PLACEHOLDER);
+
+        assert_eq!(value["host"], "smtp.example.com");
+        assert_eq!(value["from_address"], "panel@example.com");
+    }
+
+    #[test]
+    fn captcha_provider_censors_its_secret_but_not_its_site_key() {
+        for provider in [
+            CaptchaProvider::Turnstile {
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::Recaptcha {
+                v3: true,
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::Hcaptcha {
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+        ] {
+            let value = serde_json::to_value(provider.censored()).unwrap();
+
+            assert_eq!(value["secret_key"], CENSORED_PLACEHOLDER);
+            assert_eq!(value["site_key"], "public");
+        }
+
+        let value = serde_json::to_value(
+            CaptchaProvider::FriendlyCaptcha {
+                site_key: "public".into(),
+                api_key: "s3cr3t".into(),
+            }
+            .censored(),
+        )
+        .unwrap();
+
+        assert_eq!(value["api_key"], CENSORED_PLACEHOLDER);
+        assert_eq!(value["site_key"], "public");
+    }
+
+    #[test]
+    fn settings_without_secrets_are_left_untouched() {
+        let value = serde_json::to_value(
+            StorageDriver::Filesystem {
+                path: "/var/lib/panel/storage".into(),
+            }
+            .censored(),
+        )
+        .unwrap();
+
+        assert_eq!(value["path"], "/var/lib/panel/storage");
+
+        let value = serde_json::to_value(MailMode::None.censored()).unwrap();
+
+        assert_eq!(value["type"], "none");
+
+        let value = serde_json::to_value(CaptchaProvider::None.censored()).unwrap();
+
+        assert_eq!(value["type"], "none");
     }
 }

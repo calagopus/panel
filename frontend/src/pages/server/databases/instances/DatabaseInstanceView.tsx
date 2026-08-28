@@ -45,17 +45,17 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
-import DatabaseInstanceDatabases from './DatabaseInstanceDatabases.tsx';
-import DatabaseInstanceDetails from './DatabaseInstanceDetails.tsx';
-import DatabaseInstanceLogs from './DatabaseInstanceLogs.tsx';
-import DatabaseInstanceOperations from './DatabaseInstanceOperations.tsx';
-import DatabaseInstanceStats from './DatabaseInstanceStats.tsx';
-import DatabaseInstanceUsers from './DatabaseInstanceUsers.tsx';
+import DatabaseInstanceDatabases from './management/DatabaseInstanceDatabases.tsx';
+import DatabaseInstanceUsers from './management/DatabaseInstanceUsers.tsx';
 import DatabaseInstanceApplyUpdateModal from './modals/DatabaseInstanceApplyUpdateModal.tsx';
 import DatabaseInstanceDeleteModal from './modals/DatabaseInstanceDeleteModal.tsx';
 import DatabaseInstanceEditModal from './modals/DatabaseInstanceEditModal.tsx';
 import DatabaseInstanceExportModal from './modals/DatabaseInstanceExportModal.tsx';
 import DatabaseInstanceImportModal from './modals/DatabaseInstanceImportModal.tsx';
+import DatabaseInstanceDetails from './overview/DatabaseInstanceDetails.tsx';
+import DatabaseInstanceLogs from './overview/DatabaseInstanceLogs.tsx';
+import DatabaseInstanceOperations from './overview/DatabaseInstanceOperations.tsx';
+import DatabaseInstanceStats from './overview/DatabaseInstanceStats.tsx';
 
 function withPrelude(prelude: string, message: string) {
   return `\x1b[1m\x1b[33m${prelude} \x1b[0m${message}`;

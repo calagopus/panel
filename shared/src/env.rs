@@ -56,7 +56,7 @@ fn log_filter(debug: bool) -> Targets {
 }
 
 fn default_blocked_cidrs() -> Vec<cidr::IpCidr> {
-    const DEFAULTS: [&str; 10] = [
+    const DEFAULTS: [&str; 17] = [
         "0.0.0.0/8",
         "127.0.0.0/8",
         "10.0.0.0/8",
@@ -64,9 +64,16 @@ fn default_blocked_cidrs() -> Vec<cidr::IpCidr> {
         "172.16.0.0/12",
         "192.168.0.0/16",
         "169.254.0.0/16",
+        "192.0.0.0/24",
+        "198.18.0.0/15",
+        "224.0.0.0/4",
+        "240.0.0.0/4",
+        "::/128",
         "::1/128",
         "fe80::/10",
         "fc00::/7",
+        "2002::/16",
+        "ff00::/8",
     ];
 
     DEFAULTS
@@ -320,24 +327,46 @@ impl Env {
         headers: &HeaderMap,
         connect_info: ConnectInfo<std::net::SocketAddr>,
     ) -> std::net::IpAddr {
-        for cidr in &self.app_trusted_proxies {
-            if cidr.contains(&connect_info.ip()) {
-                if let Some(forwarded) = headers.get("X-Forwarded-For")
-                    && let Ok(forwarded) = forwarded.to_str()
-                    && let Some(ip) = forwarded.split(',').next()
-                {
-                    return ip.parse().unwrap_or_else(|_| connect_info.ip());
-                }
+        let peer = connect_info.ip();
 
-                if let Some(forwarded) = headers.get("X-Real-IP")
-                    && let Ok(forwarded) = forwarded.to_str()
-                {
-                    return forwarded.parse().unwrap_or_else(|_| connect_info.ip());
-                }
-            }
+        if !self
+            .app_trusted_proxies
+            .iter()
+            .any(|cidr| cidr.contains(&peer))
+        {
+            return peer;
         }
 
-        connect_info.ip()
+        fn find_forwarded_ip(
+            forwarded: &str,
+            trusted_proxies: &[cidr::IpCidr],
+        ) -> Option<std::net::IpAddr> {
+            for entry in forwarded.rsplit(',') {
+                let ip: std::net::IpAddr = entry.trim().parse().ok()?;
+
+                if !trusted_proxies.iter().any(|cidr| cidr.contains(&ip)) {
+                    return Some(ip);
+                }
+            }
+
+            None
+        }
+
+        if let Some(forwarded) = headers.get("X-Forwarded-For")
+            && let Ok(forwarded) = forwarded.to_str()
+            && let Some(ip) = find_forwarded_ip(forwarded, &self.app_trusted_proxies)
+        {
+            return ip;
+        }
+
+        if let Some(forwarded) = headers.get("X-Real-IP")
+            && let Ok(forwarded) = forwarded.to_str()
+            && let Ok(ip) = forwarded.trim().parse()
+        {
+            return ip;
+        }
+
+        peer
     }
 
     #[inline]

@@ -17,6 +17,7 @@ pub struct ServerBackupGroup {
     pub server_uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
+    pub order: i16,
     pub retention_count: Option<i32>,
     pub retention_days: Option<i32>,
 
@@ -57,6 +58,10 @@ impl BaseModel for ServerBackupGroup {
                 compact_str::format_compact!("{prefix}name"),
             ),
             (
+                "server_backup_groups.order_",
+                compact_str::format_compact!("{prefix}order"),
+            ),
+            (
                 "server_backup_groups.retention_count",
                 compact_str::format_compact!("{prefix}retention_count"),
             ),
@@ -80,6 +85,7 @@ impl BaseModel for ServerBackupGroup {
             server_uuid: row
                 .try_get(compact_str::format_compact!("{prefix}server_uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
+            order: row.try_get(compact_str::format_compact!("{prefix}order").as_str())?,
             retention_count: row
                 .try_get(compact_str::format_compact!("{prefix}retention_count").as_str())?,
             retention_days: row
@@ -126,7 +132,7 @@ impl ServerBackupGroup {
             SELECT {}, COUNT(*) OVER() AS total_count
             FROM server_backup_groups
             WHERE server_backup_groups.server_uuid = $1 AND ($2 IS NULL OR server_backup_groups.name ILIKE '%' || $2 || '%')
-            ORDER BY server_backup_groups.created
+            ORDER BY server_backup_groups.order_, server_backup_groups.created
             LIMIT $3 OFFSET $4
             "#,
             Self::columns_sql(None)
@@ -160,7 +166,7 @@ impl ServerBackupGroup {
             SELECT {}
             FROM server_backup_groups
             WHERE server_backup_groups.server_uuid = $1
-            ORDER BY server_backup_groups.created
+            ORDER BY server_backup_groups.order_, server_backup_groups.created
             "#,
             Self::columns_sql(None)
         )))
@@ -237,6 +243,7 @@ impl IntoApiObject for ServerBackupGroup {
             ApiServerBackupGroup {
                 uuid: self.uuid,
                 name: self.name,
+                order: self.order,
                 retention_count: self.retention_count,
                 retention_days: self.retention_days,
                 total_backups,
@@ -472,6 +479,7 @@ pub struct ApiServerBackupGroup {
     pub uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
+    pub order: i16,
     pub retention_count: Option<i32>,
     pub retention_days: Option<i32>,
 

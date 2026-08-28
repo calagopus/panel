@@ -8,6 +8,7 @@ import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
 import getServers from '@/api/server/getServers.ts';
 import Divider from '@/elements/Divider.tsx';
+import { DndBoard, DndSortableList, SortableItem } from '@/elements/DragAndDrop.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
 import Spinner from '@/elements/Spinner.tsx';
@@ -18,7 +19,8 @@ import { serverSchema } from '@/lib/schemas/server/server.ts';
 import ServerGroupItem from '@/pages/dashboard/home/ServerGroupItem.tsx';
 import ServerItem from '@/pages/dashboard/home/ServerItem.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
-import { useAuth } from '@/providers/AuthProvider.tsx';
+import { SERVER_GROUPS_CONTAINER_ID, useServerGroupsDnd } from '@/plugins/useServerGroupsDnd.ts';
+import { useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import serverRoutes from '@/routers/routes/serverRoutes.ts';
@@ -89,6 +91,19 @@ function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typ
   }, [addToast, setServerGroups]);
 
   const sortedServerGroups = useMemo(() => [...serverGroups].sort((a, b) => a.order - b.order), [serverGroups]);
+  const serverGroupUuids = useMemo(() => sortedServerGroups.map((g) => g.uuid), [sortedServerGroups]);
+
+  const {
+    collisionDetection,
+    describeItem,
+    activeServer,
+    activeServerDndId,
+    activeServerSourceUuid,
+    blockedTarget,
+    placement,
+    pendingMove,
+    ...dndHandlers
+  } = useServerGroupsDnd();
 
   if (loading) return <Spinner.Centered />;
 
@@ -101,26 +116,62 @@ function GroupedServersView({ getServerTo }: { getServerTo: (server: z.infer<typ
   }
 
   return (
-    <div className='flex flex-col gap-3'>
-      {sortedServerGroups.map((serverGroup) => (
-        <ServerGroupItem
-          key={serverGroup.uuid}
-          serverGroup={serverGroup}
-          sKeyPressedRef={DUMMY_S_KEY_REF}
-          getServerTo={getServerTo}
-        />
-      ))}
-    </div>
+    <DndBoard
+      collisionDetection={collisionDetection}
+      describeItem={describeItem}
+      {...dndHandlers}
+      renderOverlay={() =>
+        activeServer ? (
+          <div style={{ cursor: 'grabbing' }} className='shadow-xl rounded-xl'>
+            <ServerItem
+              server={activeServer}
+              to={getServerTo(activeServer)}
+              showContextMenu
+              showForeignServerBadge
+              onGroupRemove={() => null}
+            />
+          </div>
+        ) : null
+      }
+    >
+      <DndSortableList id={SERVER_GROUPS_CONTAINER_ID} items={serverGroupUuids}>
+        <div className='flex flex-col gap-3'>
+          {sortedServerGroups.map((serverGroup) => (
+            <SortableItem
+              key={serverGroup.uuid}
+              id={serverGroup.uuid}
+              renderItem={() => (
+                <ServerGroupItem
+                  serverGroup={serverGroup}
+                  sKeyPressedRef={DUMMY_S_KEY_REF}
+                  getServerTo={getServerTo}
+                  isDropTarget={
+                    blockedTarget?.groupUuid === serverGroup.uuid || placement?.groupUuid === serverGroup.uuid
+                  }
+                  dropBlockedReason={blockedTarget?.groupUuid === serverGroup.uuid ? blockedTarget.reason : null}
+                  adoptedServer={placement?.groupUuid === serverGroup.uuid ? activeServer : null}
+                  adoptedDndId={placement?.groupUuid === serverGroup.uuid ? activeServerDndId : null}
+                  adoptedIndex={placement?.groupUuid === serverGroup.uuid ? placement.index : null}
+                  hiddenDndId={placement && activeServerSourceUuid === serverGroup.uuid ? activeServerDndId : null}
+                  pendingServer={pendingMove?.groupUuid === serverGroup.uuid ? pendingMove.server : null}
+                />
+              )}
+            />
+          ))}
+        </div>
+      </DndSortableList>
+    </DndBoard>
   );
 }
 
 export default function ServerSelectorModal() {
   const { t } = useTranslations();
-  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<'all' | 'grouped'>(user?.startOnGroupedServers ? 'grouped' : 'all');
+  const [startOnGroupedServers] = useStartOnGroupedServers();
+
+  const [activeTab, setActiveTab] = useState<'all' | 'grouped'>(startOnGroupedServers ? 'grouped' : 'all');
 
   const subPath = location.pathname.replace(/^\/server\/[^/]+/, '');
 

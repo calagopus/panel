@@ -95,6 +95,10 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                         ("email", "Allows changing the account's email address."),
                         ("password", "Allows changing the account's password."),
                         (
+                            "password-login",
+                            "Allows enabling and disabling password login for the account.",
+                        ),
+                        (
                             "two-factor",
                             "Allows adding and removing two-factor authentication.",
                         ),
@@ -184,6 +188,19 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                     permissions: IndexMap::from([
                         ("read", "Allows viewing sessions and their IP addresses."),
                         ("delete", "Allows deleting sessions."),
+                    ]),
+                },
+            ),
+            (
+                "settings",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage synced user settings on an account.",
+                    permissions: IndexMap::from([
+                        ("read", "Allows viewing the account's synced user settings."),
+                        (
+                            "update",
+                            "Allows modifying the account's synced user settings.",
+                        ),
                     ]),
                 },
             ),
@@ -297,7 +314,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("delete", "Allows deleting users."),
                         (
                             "email",
-                            "Allows sending email actions to users, such as password resets.",
+                            "Allows sending email actions to users, such as password resets, and marking a user's email as verified.",
                         ),
                         ("activity", "Allows viewing a user's activity log."),
                         (
@@ -715,6 +732,19 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                             "Allows changing the primary server allocation and attaching notes to allocations.",
                         ),
                         ("delete", "Allows deleting allocations from the server."),
+                    ]),
+                },
+            ),
+            (
+                "firewall",
+                PermissionGroup {
+                    description: "Permissions that control the ability to restrict which sources may reach this server's allocations.",
+                    permissions: IndexMap::from([
+                        ("read", "Allows viewing the firewall rules of the server."),
+                        (
+                            "update",
+                            "Allows adding, reordering, modifying and removing firewall rules.",
+                        ),
                     ]),
                 },
             ),

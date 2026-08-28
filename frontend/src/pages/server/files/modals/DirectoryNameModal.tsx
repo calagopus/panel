@@ -5,11 +5,11 @@ import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 import createDirectory from '@/api/server/files/createDirectory.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverFilesDirectoryCreateSchema } from '@/lib/schemas/server/files.ts';
+import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -53,15 +53,10 @@ export default function DirectoryNameModal({ ...props }: ModalProps) {
         {...form.getInputProps('name')}
       />
 
-      <p className='mt-2 text-sm md:text-base break-all'>
-        <span>{t('pages.server.files.modal.createDirectory.createdAs', {})}</span>
-        <Code>
-          /home/container/
-          <span className='text-cyan-200'>
-            {join(browsingDirectory, form.values.name).replace(/^(\.\.\/|\/)+/, '')}
-          </span>
-        </Code>
-      </p>
+      <FilePathPreview
+        label={t('pages.server.files.modal.createDirectory.createdAs', {})}
+        path={join(browsingDirectory, form.values.name)}
+      />
 
       <ModalFooter>
         <Button type='submit' loading={loading} disabled={!form.isValid()}>

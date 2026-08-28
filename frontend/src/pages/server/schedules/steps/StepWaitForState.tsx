@@ -4,7 +4,7 @@ import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/Stack.tsx';
-import { serverPowerStateLabelMapping } from '@/lib/enums.ts';
+import { mappingToSelectData, serverPowerStateLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -20,10 +20,7 @@ export default function StepWaitForState({
       <Select
         withAsterisk
         label={t('pages.server.schedules.form.serverState', {})}
-        data={Object.entries(serverPowerStateLabelMapping).map(([value, label]) => ({
-          value,
-          label: label(),
-        }))}
+        data={mappingToSelectData(serverPowerStateLabelMapping)}
         {...form.getInputProps('action.state')}
       />
       <NumberInput

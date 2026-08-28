@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _backup_group_;
+mod order;
 
 mod get {
     use serde::Serialize;
@@ -171,6 +172,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
         .routes(routes!(post::route))
+        .nest("/order", order::router(state))
         .nest("/{backup_group}", _backup_group_::router(state))
         .with_state(state.clone())
 }

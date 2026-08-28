@@ -99,7 +99,7 @@ export default function DashboardSecurityKeys() {
         error={error}
       >
         {securityKeys?.data.map((key) => (
-          <SecurityKeyRow key={key.uuid} securityKey={key} />
+          <SecurityKeyRow key={key.uuid} securityKey={key} total={securityKeys.total} />
         ))}
       </Table>
     </AccountContentContainer>

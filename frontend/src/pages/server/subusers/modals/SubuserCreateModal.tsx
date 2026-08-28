@@ -13,6 +13,7 @@ import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserCreateSchema } from '@/lib/schemas/server/subusers.ts';
+import { appendInheritedIgnoredFiles } from '@/lib/subusers.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -30,6 +31,12 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
 
   const captcha = useCaptcha();
 
+  const ignoredFilesDescription =
+    t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {}) +
+    (server.ignoredFiles.length > 0
+      ? ` ${t('pages.server.subusers.modal.createSubuser.form.ignoredFilesInherited', {})}`
+      : '');
+
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverSubuserCreateSchema>>(
     {
       initialValues: {
@@ -44,7 +51,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
         await createSubuser(server.uuid, {
           email: values.email,
           permissions: Array.from(values.permissions),
-          ignoredFiles: values.ignoredFiles,
+          ignoredFiles: appendInheritedIgnoredFiles(values.ignoredFiles, server.ignoredFiles),
           captcha: captchaToken,
         });
         queryClient.invalidateQueries({
@@ -85,7 +92,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
         <IgnoredFilesInput
           serverUuid={server.uuid}
           label={t('common.form.ignoredFiles', {})}
-          description={t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {})}
+          description={ignoredFilesDescription}
           value={form.values.ignoredFiles}
           onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />

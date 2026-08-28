@@ -133,6 +133,7 @@ mod post {
         }
 
         permissions.has_admin_permission("users.oauth-links")?;
+        permissions.can_modify_user(&user)?;
 
         let oauth_provider =
             match OAuthProvider::by_uuid_optional(&state.database, data.oauth_provider_uuid).await?

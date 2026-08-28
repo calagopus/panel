@@ -176,6 +176,7 @@
         "enable": "Aktivieren",
         "disable": "Deaktivieren",
         "disableTwoFactor": "Zwei-Faktor deaktivieren",
+        "verify": "Verifizieren",
         "update": "Aktualisieren",
         "close": "Schließen",
         "cancel": "Abbrechen",
@@ -262,6 +263,22 @@
       },
       "toast": {
         "duplicated": "{resource} dupliziert."
+      },
+      "settingScope": {
+        "account": "Mit Konto synchronisieren",
+        "device": "Nur dieses Gerät",
+        "useAccountValue": "Kontowert verwenden",
+        "saveToAccount": "Diesen Wert in meinem Konto speichern",
+        "stateAccount": "Konto",
+        "stateDevice": "Dieses Gerät",
+        "tooltip": {
+          "account": "Diese Einstellung wird mit deinem Konto synchronisiert.",
+          "device": "Diese Einstellung wird nur auf diesem Gerät überschrieben."
+        },
+        "toast": {
+          "saved": "Einstellung in deinem Konto gespeichert.",
+          "saveFailed": "Einstellung konnte nicht in deinem Konto gespeichert werden."
+        }
       },
       "tooltip": {
         "resetToDefault": "Auf Standard zurücksetzen",
@@ -479,6 +496,10 @@
           "finished": "Abgeschlossen",
           "failed": "Fehlgeschlagen"
         },
+        "serverFirewallRuleAction": {
+          "allow": "Erlauben",
+          "deny": "Verweigern"
+        },
         "connectionStatus": {
           "connected": "Verbunden",
           "offline": "Offline"
@@ -610,7 +631,8 @@
           "theme": "Design",
           "themeAuto": "Automatisch",
           "themeDark": "Dunkel",
-          "themeLight": "Hell"
+          "themeLight": "Hell",
+          "resetDeviceOverrides": "Geräte-Überschreibungen zurücksetzen ({count})"
         },
         "modal": {
           "logout": {
@@ -1016,7 +1038,8 @@
           "error": {
             "usernameRequired": "Bitte gib einen Benutzernamen ein",
             "registrationDisabled": "Es konnte kein passender Account gefunden werden und die Registrierung ist derzeit deaktiviert.",
-            "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits."
+            "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits.",
+            "securityKeyRequired": "Dieser Account erfordert eine Zwei-Faktor-Authentifizierung, melde dich stattdessen mit einem Sicherheitsschlüssel an."
           },
           "passkey": {
             "error": {
@@ -1078,6 +1101,16 @@
                 "useTotp": "TOTP verwenden"
               }
             },
+            "email": {
+              "subtitle": "Wir können dir einen Einmalcode per E-Mail senden, um die Anmeldung abzuschließen.",
+              "enterCode": "Gib den 6-stelligen Code ein, den wir an deine E-Mail-Adresse gesendet haben",
+              "button": {
+                "useEmail": "Code per E-Mail senden",
+                "sendCode": "Code senden",
+                "resend": "Code erneut senden",
+                "resendIn": "Code erneut senden ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "Gib einen Wiederherstellungscode ein",
               "form": {
@@ -1101,6 +1134,14 @@
             "request": "Passwort-Zurücksetzung anfordern"
           },
           "success": "Eine E-Mail mit Anweisungen zum Zurücksetzen deines Passworts wurde an dich gesendet."
+        },
+        "verifyEmail": {
+          "title": "E-Mail bestätigen",
+          "success": "Deine E-Mail-Adresse **{email}** wurde bestätigt.",
+          "failed": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Fordere einen neuen an und versuche es erneut.",
+          "button": {
+            "continue": "Weiter"
+          }
         },
         "resetPassword": {
           "title": "Passwort zurücksetzen",
@@ -1171,6 +1212,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Bereits in dieser Gruppe",
+                      "description": "Dieser Server ist bereits Teil von {group}."
+                    },
+                    "groupFull": {
+                      "title": "Gruppe ist voll",
+                      "description": "Eine Gruppe kann nicht mehr als {max} Server enthalten."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server nach {group} verschoben."
+                  }
+                },
                 "noGroups": "Es konnten keine Gruppen gefunden werden, Zeit eine zu erstellen?"
               }
             },
@@ -1211,6 +1267,14 @@
               "title": "Zwei-Faktor-Authentifizierung erforderlich",
               "description": "Zwei-Faktor-Authentifizierung ist für deinen Account erforderlich. Bitte richte sie unten ein, um das Panel weiter nutzen zu können."
             },
+            "verifyEmail": {
+              "title": "E-Mail-Bestätigung erforderlich",
+              "description": "Bitte bestätige **{email}**, um das Panel weiter zu nutzen. Der Bestätigungslink liegt in deinem Postfach.",
+              "sent": "Bestätigungs-E-Mail an {email} gesendet.",
+              "button": {
+                "resend": "Bestätigungs-E-Mail erneut senden"
+              }
+            },
             "frozen": {
               "title": "Account eingefroren",
               "description": "Dein Account wurde eingefroren. Du kannst keine Änderungen an deinem Account vornehmen, bis er wieder freigegeben wird. Bitte kontaktiere einen Administrator für weitere Informationen."
@@ -1219,18 +1283,31 @@
           "containers": {
             "password": {
               "title": "Passwort",
+              "button": {
+                "logOutOthers": "Andere abmelden"
+              },
               "toast": {
                 "updated": "Passwort erfolgreich aktualisiert."
               },
               "form": {
                 "newPassword": "Neues Passwort",
                 "confirmNewPassword": "Neues Passwort bestätigen"
+              },
+              "modal": {
+                "logOutOtherSessions": {
+                  "title": "Andere Sitzungen abmelden",
+                  "content": "Dein Passwort wurde aktualisiert. Möchtest du alle Sitzungen außer der aktuell genutzten abmelden? Jedes andere Gerät, das in deinem Account angemeldet ist, muss sich erneut anmelden.",
+                  "toast": {
+                    "deleted": "{sessions} gelöscht."
+                  }
+                }
               }
             },
             "email": {
               "title": "E-Mail",
               "toast": {
-                "updated": "E-Mail erfolgreich aktualisiert."
+                "updated": "E-Mail erfolgreich aktualisiert.",
+                "pending": "Bestätigungslink an {email} gesendet. Deine Adresse ändert sich, sobald du ihn öffnest."
               },
               "form": {
                 "newEmail": "Neue E-Mail"
@@ -1258,17 +1335,65 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "2FA einrichten"
+                "setupTwoFactor": "2FA einrichten",
+                "enableEmail": "E-Mail aktivieren",
+                "disableEmail": "E-Mail deaktivieren",
+                "securityKeys": "Sicherheitsschlüssel"
               },
-              "twoFactorEnabled": "Zwei-Faktor-Verifizierung ist derzeit aktiviert.",
-              "twoFactorDisabled": "Du hast derzeit keine Zwei-Faktor-Verifizierung für deinen Account aktiviert. Klicke auf den Button unten, um mit der Konfiguration zu beginnen.",
-              "twoFactorLastUsed": "Zuletzt verwendet: {timestamp}"
+              "twoFactorLastUsed": "Zuletzt verwendet: {timestamp}",
+              "none": "Für dein Konto ist noch kein zweiter Faktor eingerichtet.",
+              "requirementMet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung.",
+              "requirementUnmet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung noch nicht.",
+              "method": {
+                "totp": "Authenticator-App",
+                "securityKey": "Sicherheitsschlüssel",
+                "email": "E-Mail"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "E-Mail-Zwei-Faktor erfolgreich deaktiviert."
+              },
+              "modal": {
+                "enable": {
+                  "title": "E-Mail-Zwei-Faktor aktivieren",
+                  "description": "Bei jeder Anmeldung wird ein Einmalcode an **{email}** gesendet. Wer Zugriff auf dieses Postfach hat, kann sich als du anmelden."
+                },
+                "disable": {
+                  "title": "E-Mail-Zwei-Faktor deaktivieren",
+                  "description": "Das Deaktivieren von E-Mail-Zwei-Faktor macht dein Konto unsicherer."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Passwort-Anmeldung",
+              "enabled": "Du kannst dich mit deinem Passwort anmelden.",
+              "disabled": "Die Passwort-Anmeldung ist deaktiviert. Nur deine Sicherheitsschlüssel können dich anmelden.",
+              "toast": {
+                "updated": "Passwort-Anmeldung erfolgreich aktualisiert."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Füge einen Sicherheitsschlüssel hinzu, bevor du die Passwort-Anmeldung deaktivierst."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Passwort-Anmeldung deaktivieren",
+                  "description": "Dein Passwort meldet dich nirgends mehr an, auch nicht per SFTP. Nur deine Sicherheitsschlüssel funktionieren noch – stelle sicher, dass du einen davon nutzen kannst."
+                },
+                "enable": {
+                  "title": "Passwort-Anmeldung aktivieren",
+                  "description": "Dein Passwort kann dich wieder anmelden."
+                }
+              }
             },
             "account": {
               "title": "Account-Details",
               "toast": {
                 "updated": "Account-Details erfolgreich aktualisiert."
-              },
+              }
+            },
+            "preferences": {
+              "title": "Einstellungen",
               "form": {
                 "toastPosition": "Toast-Position",
                 "startOnGroupedServers": "Auf der Seite 'Gruppierte Server' starten"
@@ -1531,6 +1656,10 @@
               "expires": "Läuft ab"
             }
           },
+          "toast": {
+            "enabled": "API-Schlüssel aktiviert.",
+            "disabled": "API-Schlüssel deaktiviert."
+          },
           "modal": {
             "createApiKey": {
               "title": "API-Schlüssel erstellen",
@@ -1751,11 +1880,22 @@
                   "sessionCookie": "Session-Cookie",
                   "sessionDurationSeconds": "Sitzungsdauer (Sekunden)",
                   "twoFactorRequirement": "Zwei-Faktor-Authentifizierung-Anforderung",
+                  "emailTwoFactorEnabled": "E-Mail-Zwei-Faktor",
+                  "emailTwoFactorEnabledDescription": "Erlaubt Benutzern, einen einmaligen Anmeldecode per E-Mail zu erhalten. Erfordert einen konfigurierten Mail-Transport.",
+                  "twoFactorAcceptedMethods": "Akzeptierte Zwei-Faktor-Methoden",
+                  "twoFactorAcceptedMethodsDescription": "Welche eingerichteten Faktoren zur Zwei-Faktor-Anforderung zählen. E-Mail ist standardmäßig aus: Passwort-Zurücksetzungen laufen ebenfalls über E-Mail, sie ist also nicht unabhängig vom Passwort.",
+                  "emailVerificationRequired": "E-Mail-Bestätigung erforderlich",
+                  "emailVerificationRequiredDescription": "Neue Benutzer müssen ihre E-Mail-Adresse bestätigen, bevor sie das Panel nutzen können. Erfordert einen konfigurierten Mail-Transport.",
                   "telemetryEnabled": "Telemetrie aktivieren",
                   "telemetryEnabledDescription": "Erlaube Calagopus, begrenzte und anonyme Nutzungsdaten zu sammeln, um die Anwendung zu verbessern.",
                   "registrationEnabled": "Registrierung aktivieren"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator-App (TOTP)",
+                    "securityKey": "Sicherheitsschlüssel",
+                    "email": "E-Mail"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Admins",
                     "allUsers": "Alle Benutzer",
@@ -1939,6 +2079,8 @@
                 "form": {
                   "maxFileManagerViewSize": "Max. Anzeigegröße im Dateimanager",
                   "maxScheduleStepCount": "Max. Zeitplan-Schritte",
+                  "maxFirewallRuleCount": "Max. Firewall-Regeln",
+                  "maxFirewallRuleSourceCount": "Max. Quellen pro Firewall-Regel",
                   "maxFileManagerContentSearchSize": "Max. Inhaltssuchgröße im Dateimanager",
                   "maxFileManagerSearchResults": "Max. Suchergebnisse im Dateimanager",
                   "maxSubuserCount": "Max. Anzahl Subbenutzer",
@@ -1971,6 +2113,8 @@
                   "maxCommandSnippetCount": "Max. Befehls-Snippets",
                   "maxSecurityKeyCount": "Max. Sicherheitsschlüssel",
                   "maxSshKeyCount": "Max. SSH-Schlüssel",
+                  "maxSettingsCount": "Max. synchronisierte Einstellungen",
+                  "maxSettingsValueBytes": "Max. Größe synchronisierter Einstellungen (Bytes)",
                   "allowChangingLanguage": "Sprache ändern erlauben",
                   "allowChangingLanguageDescription": "Wenn aktiviert, können Benutzer ihre Spracheinstellungen ändern."
                 },
@@ -2247,6 +2391,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Passwort-Zurücksetzungs-E-Mail senden",
+                  "verifyEmail": "E-Mail als bestätigt markieren",
                   "impersonate": "Impersonieren"
                 },
                 "form": {
@@ -2262,6 +2407,13 @@
                   "delete": {
                     "title": "Benutzerlöschung bestätigen",
                     "content": "Bist du sicher, dass du **{username}** löschen möchtest?"
+                  },
+                  "verifyEmail": {
+                    "title": "E-Mail als bestätigt markieren",
+                    "content": "Möchtest du **{email}** wirklich ohne Bestätigung als verifiziert markieren?",
+                    "toast": {
+                      "verified": "E-Mail als bestätigt markiert."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Zwei-Faktor des Benutzers deaktivieren",
@@ -3850,8 +4002,8 @@
                   "nameLastPath": "Nachname-Pfad",
                   "nameLastPathDescription": "Der Pfad, mit dem der Nachname aus der Antwort der Info-URL extrahiert wird (https://serdejsonpath.live).",
                   "loginOnly": "Nur Login erlauben",
-                  "loginBypass2fa": "2FA beim Login umgehen",
-                  "loginBypass2faDescription": "Erlaubt Benutzern, die sich mit diesem Anbieter anmelden, ihre Panel-2FA zu umgehen.",
+                  "loginBypassTwoFactor": "2FA beim Login umgehen",
+                  "loginBypassTwoFactorDescription": "Erlaubt Benutzern, die sich mit diesem Anbieter anmelden, ihre Panel-2FA zu umgehen.",
                   "linkViewable": "Verknüpfung für Benutzer sichtbar",
                   "linkViewableDescription": "Erlaubt dem Benutzer, die Verbindung und deren Identifier in der Client-Oberfläche zu sehen.",
                   "userManageable": "Verknüpfung vom Benutzer verwaltbar",
@@ -4928,6 +5080,9 @@
               "title": "Tabellen",
               "empty": "Diese Datenbank hat noch keine Tabellen.",
               "noMatches": "Keine Tabellen passen zu deiner Suche.",
+              "noMatchesTruncated": "Keine Tabellen passen zu deiner Suche. Es wurden nur die ersten {tables} Tabellen geladen, der Rest kann nicht durchsucht werden.",
+              "truncated": "Diese Datenbank hat zu viele Tabellen zum Laden. Es werden nur die ersten {tables} angezeigt.",
+              "tableBeyondLimit": "Diese Tabelle liegt außerhalb der ersten {tables} Tabellen, mehr kann diese Datenbank nicht laden.",
               "rowEstimate": "~{rows}",
               "badge": {
                 "view": "View"
@@ -4993,6 +5148,7 @@
               "setNull": "Auf NULL setzen",
               "null": "NULL",
               "empty": "leer",
+              "truncated": "Dieser Wert ist zu groß, um vollständig geladen zu werden, und kann nicht bearbeitet werden.",
               "editorHint": "{enter} übernimmt den Wert, {shiftEnter} fügt eine neue Zeile ein."
             }
           },
@@ -5915,7 +6071,8 @@
               "form": {
                 "emailPlaceholder": "Gib die E-Mail ein, unter der dieser Subuser gespeichert werden soll.",
                 "permissions": "Berechtigungen",
-                "ignoredFilesDescription": "Dateien und Verzeichnisse, die diesen Mustern entsprechen, werden vor diesem Subuser verborgen. Verwendet Glob-Muster im gitignore-Stil (z. B. `*.env`, `secrets/`). Stelle einem Muster ein `!` voran, um einen Pfad wieder anzuzeigen, den ein allgemeineres Muster andernfalls ausschließen würde."
+                "ignoredFilesDescription": "Dateien und Verzeichnisse, die diesen Mustern entsprechen, werden vor diesem Subuser verborgen. Verwendet Glob-Muster im gitignore-Stil (z. B. `*.env`, `secrets/`). Stelle einem Muster ein `!` voran, um einen Pfad wieder anzuzeigen, den ein allgemeineres Muster andernfalls ausschließen würde.",
+                "ignoredFilesInherited": "Die vor dir verborgenen Pfade werden immer zusätzlich angewendet und können nicht weitergegeben werden."
               }
             },
             "updateSubuser": {
@@ -6039,6 +6196,9 @@
         "network": {
           "title": "Netzwerk",
           "subtitle": "{current} von maximal {max} Allocations zugewiesen.",
+          "allocations": {
+            "title": "Allocations"
+          },
           "tooltip": {
             "limitReached": "Dieser Server ist auf {max} Allocations limitiert."
           },
@@ -6059,6 +6219,70 @@
             "removeAllocation": {
               "title": "Entfernen der Allocation bestätigen",
               "content": "Bist du sicher, dass du **{allocation}** von diesem Server entfernen möchtest?"
+            }
+          }
+        },
+        "firewall": {
+          "title": "Firewall",
+          "subtitle": "Regeln werden von oben nach unten geprüft, die erste zutreffende Regel entscheidet.",
+          "empty": {
+            "title": "Keine Firewall-Regeln",
+            "description": "Jede Verbindung zu den Allocations dieses Servers ist erlaubt. Füge eine Regel hinzu, um den Zugriff einzuschränken.",
+            "descriptionReadOnly": "Jede Verbindung zu den Allocations dieses Servers ist erlaubt."
+          },
+          "button": {
+            "createFirstRule": "Regel erstellen",
+            "addRule": "Regel hinzufügen",
+            "addDenyAll": "Alles andere verweigern"
+          },
+          "tooltip": {
+            "limitReached": "Dieser Server ist auf {max} Firewall-Regeln limitiert."
+          },
+          "rule": {
+            "anySource": "beliebiger Quelle",
+            "anyProtocol": "TCP & UDP",
+            "allAllocations": "allen Allocations",
+            "summary": "{protocols} von {sources} an {ports}",
+            "aria": {
+              "reorder": "Firewall-Regel {position} verschieben"
+            }
+          },
+          "alert": {
+            "fallthrough": "Datenverkehr, der auf keine dieser Regeln zutrifft, wird **erlaubt**. Füge unten eine Verweigern-Regel hinzu, die auf alles zutrifft, um standardmäßig alles zu blockieren.",
+            "notEnforced": "Diese Node wird keine Firewall-Regeln durchsetzen. Regeln werden gespeichert, haben aber keine Wirkung, und **dieser Server startet möglicherweise nicht, solange Regeln konfiguriert sind.**",
+            "unallocatedPorts": "Diese Regeln verweisen auf Ports, die diesem Server nicht zugewiesen sind: **{ports}**. Die Node ignoriert sie, bis passende Zuweisungen existieren.",
+            "limitations": "Regeln gelten für Datenverkehr, der diesen Server von außerhalb erreicht, sowohl über seine veröffentlichten Ports als auch direkt über seine Container-Adresse. Verbindungen, die von der Node selbst aufgebaut werden, werden nicht gefiltert.",
+            "shadowed": "Regel {position} kann nie zutreffen, eine frühere Regel deckt bereits alles ab.",
+            "unsaved": "Du hast ungespeicherte Änderungen. Nichts wird angewendet, bevor du speicherst."
+          },
+          "form": {
+            "action": "Aktion",
+            "protocols": "Protokolle",
+            "protocolsDescription": "Leer lassen, um sowohl TCP als auch UDP zu erfassen.",
+            "anyProtocol": "TCP & UDP",
+            "sources": "Quellen",
+            "sourcesDescription": "IP-Adressen oder Netzwerke wie 10.0.0.0/8. Bei einem Netzwerk müssen die Host-Bits null sein. Leer lassen, um jede Quelle zu treffen.",
+            "ports": "Ports",
+            "portsDescription": "Allocation-Ports, für die diese Regel gilt, Bereiche wie 25565-25570 werden aufgelöst. Leer lassen, um alle Allocations des Servers zu treffen.",
+            "invalidSource": "{source} ist keine gültige IP-Adresse und kein gültiges Netzwerk."
+          },
+          "toast": {
+            "saved": "Firewall-Regeln gespeichert."
+          },
+          "modal": {
+            "unsavedChanges": {
+              "title": "Ungespeicherte Änderungen",
+              "content": "Du hast ungespeicherte Firewall-Regeln. Wenn du die Seite jetzt verlässt, gehen sie verloren."
+            },
+            "createRule": {
+              "title": "Firewall-Regel erstellen"
+            },
+            "editRule": {
+              "title": "Firewall-Regel bearbeiten"
+            },
+            "removeRule": {
+              "title": "Regelentfernung bestätigen",
+              "content": "Bist du sicher, dass du diese Firewall-Regel entfernen möchtest?"
             }
           }
         },

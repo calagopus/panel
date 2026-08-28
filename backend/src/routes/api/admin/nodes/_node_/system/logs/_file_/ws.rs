@@ -32,6 +32,12 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                  ws: WebSocketUpgrade| async move {
                     permissions.has_admin_permission("nodes.read")?;
 
+                    if !shared::utils::is_single_component_file_name(&file) {
+                        return ApiResponse::error("log file not found")
+                            .with_status(StatusCode::NOT_FOUND)
+                            .ok();
+                    }
+
                     let endpoint = match params.lines {
                         Some(lines) => format!("/api/system/logs/{file}/ws?lines={lines}"),
                         None => format!("/api/system/logs/{file}/ws"),

@@ -11,11 +11,12 @@ const VisibilityToggleIcon = ({ reveal }: { reveal: boolean }) =>
     <FontAwesomeIcon icon={faEye} className='text-(--mantine-color-text)' />
   );
 
-const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ className, ...rest }, ref) => {
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ className, value, ...rest }, ref) => {
   return (
     <MantinePasswordInput
       ref={ref}
       className={className}
+      value={value ?? undefined}
       placeholder={typeof rest.label === 'string' ? rest.label : undefined}
       visibilityToggleIcon={VisibilityToggleIcon}
       {...rest}

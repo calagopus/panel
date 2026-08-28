@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "password_login_disabled" boolean DEFAULT false NOT NULL;

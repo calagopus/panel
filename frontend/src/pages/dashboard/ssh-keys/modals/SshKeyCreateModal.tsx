@@ -19,7 +19,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const schema = z.object({
   name: z.string().min(3).max(31),
-  publicKey: z.string(),
+  publicKey: z.string().trim().min(1),
 });
 
 export default function SshKeyCreateModal({ ...props }: ModalProps) {

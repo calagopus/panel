@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -70,10 +70,7 @@ export function useSearchablePaginatedTable<T>({
     );
   }, [modifyParams, page, search]);
 
-  const updateDebouncedSearch = useCallback(
-    debounce((s: string) => setDebouncedSearch(s), debounceMs),
-    [],
-  );
+  const updateDebouncedSearch = useMemo(() => debounce((s: string) => setDebouncedSearch(s), debounceMs), [debounceMs]);
 
   useEffect(() => {
     if (!search) {

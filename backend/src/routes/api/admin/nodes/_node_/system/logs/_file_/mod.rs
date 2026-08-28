@@ -62,6 +62,12 @@ mod get {
 
         permissions.has_admin_permission("nodes.read")?;
 
+        if !shared::utils::is_single_component_file_name(&file) {
+            return ApiResponse::error("log file not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
+        }
+
         let logs = node
             .api_client(&state.database)
             .await?

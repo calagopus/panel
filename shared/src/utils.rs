@@ -1,4 +1,3 @@
-use crate::models::user::{AuthMethod, GetAuthMethod};
 use colored::Colorize;
 use compact_str::ToCompactString;
 use garde::Validate;
@@ -35,6 +34,71 @@ pub fn truncate_up_to(mut s: String, max_len: usize) -> String {
 
     s.truncate(idx);
     s
+}
+
+const SENSITIVE_QUERY_KEY_PARTS: [&str; 6] = [
+    "token",
+    "secret",
+    "password",
+    "key",
+    "signature",
+    "credential",
+];
+const SENSITIVE_QUERY_KEYS: [&str; 2] = ["code", "data"];
+
+fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
+    haystack
+        .as_bytes()
+        .windows(needle.len())
+        .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+}
+
+fn is_sensitive_query_key(key: &str) -> bool {
+    SENSITIVE_QUERY_KEYS
+        .iter()
+        .any(|sensitive| key.eq_ignore_ascii_case(sensitive))
+        || SENSITIVE_QUERY_KEY_PARTS
+            .iter()
+            .any(|part| contains_ignore_ascii_case(key, part))
+}
+
+pub fn redact_query(query: &str) -> std::borrow::Cow<'_, str> {
+    fn is_sensitive_pair(pair: &str) -> bool {
+        pair.split_once('=')
+            .is_some_and(|(key, _)| is_sensitive_query_key(key))
+    }
+
+    if !query.split('&').any(is_sensitive_pair) {
+        return std::borrow::Cow::Borrowed(query);
+    }
+
+    let mut redacted = String::with_capacity(query.len());
+    for (index, pair) in query.split('&').enumerate() {
+        if index > 0 {
+            redacted.push('&');
+        }
+
+        match pair.split_once('=') {
+            Some((key, _)) if is_sensitive_query_key(key) => {
+                redacted.push_str(key);
+                redacted.push_str("=<redacted>");
+            }
+            _ => redacted.push_str(pair),
+        }
+    }
+
+    std::borrow::Cow::Owned(redacted)
+}
+
+pub fn redact_url(url: &str) -> std::borrow::Cow<'_, str> {
+    let Some((base, query)) = url.split_once('?') else {
+        return std::borrow::Cow::Borrowed(url);
+    };
+
+    match redact_query(query) {
+        std::borrow::Cow::Borrowed(_) => std::borrow::Cow::Borrowed(url),
+        std::borrow::Cow::Owned(redacted) => std::borrow::Cow::Owned(format!("{base}?{redacted}")),
+    }
 }
 
 pub fn validate_language(
@@ -83,6 +147,29 @@ pub fn validate_json_path(path: &str, _context: &()) -> Result<(), garde::Error>
     if let Err(err) = serde_json_path::JsonPath::parse(path) {
         return Err(garde::Error::new(compact_str::format_compact!(
             "must be a valid json path: {err}"
+        )));
+    }
+
+    Ok(())
+}
+
+pub fn validate_ignored_files(
+    patterns: &[compact_str::CompactString],
+    _context: &(),
+) -> Result<(), garde::Error> {
+    let mut builder = ignore::overrides::OverrideBuilder::new("/");
+
+    for pattern in patterns {
+        if let Err(err) = builder.add(pattern) {
+            return Err(garde::Error::new(compact_str::format_compact!(
+                "{pattern} is not a valid pattern: {err}"
+            )));
+        }
+    }
+
+    if let Err(err) = builder.build() {
+        return Err(garde::Error::new(compact_str::format_compact!(
+            "patterns cannot be compiled: {err}"
         )));
     }
 
@@ -164,13 +251,6 @@ pub fn tungstenite_to_axum(
     })
 }
 
-pub fn api_key_scope(auth: Option<&GetAuthMethod>) -> Option<&[compact_str::CompactString]> {
-    match &***auth? {
-        AuthMethod::ApiKey(api_key) => Some(&api_key.server_permissions),
-        _ => None,
-    }
-}
-
 pub fn push_scope_or_star<'a>(
     permissions: &mut Vec<&'a str>,
     scope: Option<&'a [compact_str::CompactString]>,
@@ -178,5 +258,106 @@ pub fn push_scope_or_star<'a>(
     match scope {
         Some(scope) => permissions.extend(scope.iter().map(compact_str::CompactString::as_str)),
         None => permissions.push("*"),
+    }
+}
+
+pub fn is_single_component_file_name(name: &str) -> bool {
+    let mut components = std::path::Path::new(name).components();
+
+    match (components.next(), components.next()) {
+        (Some(std::path::Component::Normal(component)), None) => component.to_str() == Some(name),
+        _ => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // is_single_component_file_name
+
+    #[test]
+    fn single_component_accepts_plain_file_names() {
+        assert!(is_single_component_file_name("wings.log"));
+        assert!(is_single_component_file_name("wings.log.gz"));
+        assert!(is_single_component_file_name(".env"));
+        assert!(is_single_component_file_name("..hidden"));
+    }
+
+    #[test]
+    fn single_component_rejects_the_wings_endpoint_traversals() {
+        assert!(!is_single_component_file_name("../config"));
+        assert!(!is_single_component_file_name(
+            "../../servers/uuid/files/contents"
+        ));
+        assert!(!is_single_component_file_name("/api/system/config"));
+        assert!(!is_single_component_file_name("wings.log/../../config"));
+        assert!(!is_single_component_file_name("a/b"));
+        assert!(!is_single_component_file_name("wings.log/"));
+    }
+
+    #[test]
+    fn single_component_rejects_empty_and_dot_names() {
+        assert!(!is_single_component_file_name(""));
+        assert!(!is_single_component_file_name("."));
+        assert!(!is_single_component_file_name(".."));
+        assert!(!is_single_component_file_name("./x"));
+    }
+
+    // redact_query
+
+    #[test]
+    fn redact_query_leaves_harmless_queries_borrowed() {
+        let query = "directory=%2F&ignored=&per_page=100&page=1";
+
+        assert!(matches!(redact_query(query), std::borrow::Cow::Borrowed(_)));
+        assert_eq!(redact_query(query), query);
+        assert_eq!(redact_query(""), "");
+    }
+
+    #[test]
+    fn redact_query_redacts_the_download_and_upload_tokens() {
+        assert_eq!(
+            redact_query(
+                "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZSI6ImJhY2t1cC1kb3dubG9hZCJ9.sig"
+            ),
+            "token=<redacted>"
+        );
+        assert_eq!(
+            redact_query("token=eyJ0eXAi.eyJzY29wZSJ9.sig&archive_format=tar_gz"),
+            "token=<redacted>&archive_format=tar_gz"
+        );
+    }
+
+    #[test]
+    fn redact_query_redacts_the_password_reset_and_oauth_parameters() {
+        assert_eq!(
+            redact_query("token=6RnJvbTNoZVNoYWRvd3NPZlRoZURlZXBXZUNhbGxUb1RoZWU"),
+            "token=<redacted>"
+        );
+        assert_eq!(
+            redact_query("code=abc123&state=xyz"),
+            "code=<redacted>&state=xyz"
+        );
+        assert_eq!(redact_query("data=eyJ1c2VyIjp7fX0="), "data=<redacted>");
+    }
+
+    #[test]
+    fn redact_query_matches_keys_case_insensitively_and_by_substring() {
+        assert_eq!(redact_query("Token=abc"), "Token=<redacted>");
+        assert_eq!(redact_query("access_token=abc"), "access_token=<redacted>");
+        assert_eq!(redact_query("api_key=abc"), "api_key=<redacted>");
+        assert_eq!(
+            redact_query("X-Amz-Signature=abc&X-Amz-Credential=def&X-Amz-Date=20260825T000000Z"),
+            "X-Amz-Signature=<redacted>&X-Amz-Credential=<redacted>&X-Amz-Date=20260825T000000Z"
+        );
+    }
+
+    #[test]
+    fn redact_query_keeps_valueless_and_malformed_pairs_intact() {
+        assert_eq!(redact_query("token"), "token");
+        assert_eq!(redact_query("token="), "token=<redacted>");
+        assert_eq!(redact_query("&&"), "&&");
+        assert_eq!(redact_query("token=a=b&x=1"), "token=<redacted>&x=1");
     }
 }

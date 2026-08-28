@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import { canMoveFilesToDirectory, FileMoveEntry, moveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
+import { canMoveFilesToDirectory, FileMoveEntry, moveFilesToDirectory } from '@/pages/server/files/browser/fileMove.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -77,22 +77,20 @@ export function useDraggedFileMove({ disabled = false, targetDirectory }: UseDra
     try {
       const { renamed } = await moveFilesToDirectory(server.uuid, movedFiles, source, target);
 
-      if (renamed < 1) {
+      if (renamed > 0) {
+        addUndoableToast(t('pages.server.files.toast.filesMoved', { files: tItem('file', renamed) }), () =>
+          undoMove(movedFiles, source, target),
+        );
+        state.doSelectFiles([]);
+        state.invalidateFilemanager();
+      } else {
         addToast(t('pages.server.files.toast.filesCouldNotBeMoved', {}), 'error');
-        return;
       }
-
-      addUndoableToast(t('pages.server.files.toast.filesMoved', { files: tItem('file', renamed) }), () =>
-        undoMove(movedFiles, source, target),
-      );
-      state.doSelectFiles([]);
-      state.invalidateFilemanager();
     } catch (msg) {
       addToast(httpErrorToHuman(msg), 'error');
-    } finally {
-      setMoving(false);
-      store.getState().clearDraggingFiles();
     }
+    setMoving(false);
+    store.getState().clearDraggingFiles();
   };
 
   const getDropHandlers = <T extends HTMLElement = HTMLElement>(target: string) => ({

@@ -77,6 +77,9 @@ export default function Login() {
         case 'user_already_exists':
           setError(t('pages.auth.login.error.userAlreadyExists', {}));
           break;
+        case 'security_key_required':
+          setError(t('pages.auth.login.error.securityKeyRequired', {}));
+          break;
       }
 
       searchParams.delete('error');
@@ -206,21 +209,20 @@ export default function Login() {
           JSON.stringify({
             user: response.user,
             token: response.token,
+            methods: response.methods,
           }),
         )
           .replaceAll('+', '-')
           .replaceAll('/', '_');
 
         navigate(`/auth/login/checkpoint?data=${authInfo}`);
-        return;
+      } else {
+        doLogin(response.user);
       }
-
-      doLogin(response.user);
     } catch (err) {
       setError(httpErrorToHuman(err));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

@@ -5,6 +5,7 @@ export const userApiKeySchema = z.looseObject({
   name: z.string().min(3).max(31),
   keyStart: z.string(),
   allowedIps: z.array(z.ipv4().or(z.ipv6()).or(z.cidrv4()).or(z.cidrv6())),
+  enabled: z.boolean(),
   userPermissions: z.array(z.string()),
   serverPermissions: z.array(z.string()),
   adminPermissions: z.array(z.string()),

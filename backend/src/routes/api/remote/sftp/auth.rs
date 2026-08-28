@@ -66,6 +66,11 @@ mod post {
         let user = match data.r#type {
             AuthenticationType::Password => {
                 match User::by_username_password(&state.database, user, &data.password).await? {
+                    Some(user) if user.password_login_disabled => {
+                        return ApiResponse::error("password login is disabled for this account")
+                            .with_status(StatusCode::EXPECTATION_FAILED)
+                            .ok();
+                    }
                     Some(user) => user,
                     None => {
                         return ApiResponse::error("user not found")
@@ -94,6 +99,31 @@ mod post {
                 }
             }
         };
+
+        if user.suspended {
+            return ApiResponse::error("account is suspended")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
+        let settings = state.settings.get().await?;
+        let two_factor_missing =
+            user.require_two_factor(&settings) && !user.satisfies_two_factor(&settings);
+        let email_unverified = user.require_email_verification(&settings) && !user.email_verified;
+        drop(settings);
+
+        if two_factor_missing {
+            return ApiResponse::error("two-factor authentication required")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
+        if email_unverified {
+            return ApiResponse::error("email verification required")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let server = match Server::by_user_identifier(&state.database, &user, server).await? {
             Some(server) => server,
             None => {
@@ -112,7 +142,11 @@ mod post {
         ApiResponse::new_serialized(Response {
             user: user.uuid,
             server: server.uuid,
-            permissions: server.wings_permissions(&*state.settings.get().await?, &user, None),
+            permissions: server.wings_permissions(
+                &*state.settings.get().await?,
+                &user,
+                &shared::models::user::CredentialScope::Session,
+            ),
             ignored_files: server.subuser_ignored_files.as_deref().unwrap_or(&[]),
         })
         .ok()

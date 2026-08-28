@@ -13,6 +13,7 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { downloadTextFile } from '@/lib/download.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 import ScheduleDuplicateModal from '@/pages/server/schedules/modals/ScheduleDuplicateModal.tsx';
@@ -49,27 +50,9 @@ export default function ScheduleRow({ schedule }: { schedule: z.infer<typeof ser
         addToast(t('pages.server.schedules.toast.exported', {}), 'success');
 
         if (format === 'json') {
-          const jsonData = JSON.stringify(data, undefined, 2);
-          const fileURL = URL.createObjectURL(new Blob([jsonData], { type: 'text/plain' }));
-          const downloadLink = document.createElement('a');
-          downloadLink.href = fileURL;
-          downloadLink.download = `schedule-${schedule.uuid}.json`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-
-          URL.revokeObjectURL(fileURL);
-          downloadLink.remove();
+          downloadTextFile(JSON.stringify(data, undefined, 2), `schedule-${schedule.uuid}.json`);
         } else {
-          const yamlData = dump(data, { flowLevel: -1, forceQuotes: true });
-          const fileURL = URL.createObjectURL(new Blob([yamlData], { type: 'text/plain' }));
-          const downloadLink = document.createElement('a');
-          downloadLink.href = fileURL;
-          downloadLink.download = `schedule-${schedule.uuid}.yml`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-
-          URL.revokeObjectURL(fileURL);
-          downloadLink.remove();
+          downloadTextFile(dump(data, { flowLevel: -1, forceQuotes: true }), `schedule-${schedule.uuid}.yml`);
         }
       })
       .catch((msg) => {

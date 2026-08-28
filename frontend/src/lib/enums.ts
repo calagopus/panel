@@ -45,6 +45,7 @@ import {
   faRightLeft,
   faScroll,
   faServer,
+  faShieldHalved,
   faSkull,
   faStopwatch,
   faTerminal,
@@ -71,6 +72,7 @@ import {
 import { serverDatabaseInstanceUserPermission } from '@/lib/schemas/server/databaseInstances.ts';
 import { serverDatabaseFilterOperator } from '@/lib/schemas/server/databases.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
+import { serverFirewallRuleAction, serverFirewallRuleProtocol } from '@/lib/schemas/server/firewall.ts';
 import {
   serverScheduleComparator,
   serverScheduleConditionSchema,
@@ -85,6 +87,13 @@ import { getTranslations } from '@/providers/TranslationProvider.tsx';
 import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts';
 import { adminEggRepositoryCredentialsSchema } from './schemas/admin/eggRepositories.ts';
 import { announcementType } from './schemas/announcements.ts';
+
+export function mappingToSelectData<T extends string>(mapping: Record<T, () => string>): { value: T; label: string }[] {
+  return Object.entries(mapping).map(([value, label]) => ({
+    value: value as T,
+    label: (label as () => string)(),
+  }));
+}
 
 export const captchaProviderTypeLabelMapping: Record<
   z.infer<typeof publicSettingsCaptchaProviderSchema>['type'],
@@ -429,6 +438,21 @@ export const serverBackupStatusLabelMapping: Record<z.infer<typeof serverBackupS
   starting: () => getTranslations().t('common.enum.serverBackupStatus.starting', {}),
   finished: () => getTranslations().t('common.enum.serverBackupStatus.finished', {}),
   failed: () => getTranslations().t('common.enum.serverBackupStatus.failed', {}),
+};
+
+export const serverFirewallRuleActionLabelMapping: Record<z.infer<typeof serverFirewallRuleAction>, () => string> = {
+  allow: () => getTranslations().t('common.enum.serverFirewallRuleAction.allow', {}),
+  deny: () => getTranslations().t('common.enum.serverFirewallRuleAction.deny', {}),
+};
+
+export const serverFirewallRuleActionColorMapping: Record<z.infer<typeof serverFirewallRuleAction>, string> = {
+  allow: 'green',
+  deny: 'red',
+};
+
+export const serverFirewallRuleProtocolLabelMapping: Record<z.infer<typeof serverFirewallRuleProtocol>, string> = {
+  tcp: 'TCP',
+  udp: 'UDP',
 };
 
 export const scheduleHttpMethodLabelMapping: Record<string, string> = {
@@ -782,6 +806,7 @@ export const permissionCategoryIconMapping: Record<string, IconDefinition> = {
   assets: faFolderOpen,
   extensions: faPuzzlePiece,
   files: faFolderOpen,
+  firewall: faShieldHalved,
   locations: faEarthAmerica,
   mounts: faFolder,
   nests: faKiwiBird,

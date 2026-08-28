@@ -19,11 +19,14 @@ pub struct AppSettingsRatelimits {
     pub auth_register: RatelimitConfiguration,
     pub auth_login: RatelimitConfiguration,
     pub auth_login_checkpoint: RatelimitConfiguration,
+    pub auth_login_checkpoint_email: RatelimitConfiguration,
     pub auth_login_security_key: RatelimitConfiguration,
     pub auth_password_forgot: RatelimitConfiguration,
     pub auth_password_reset: RatelimitConfiguration,
+    pub auth_email_verification: RatelimitConfiguration,
 
     pub client: RatelimitConfiguration,
+    pub client_account_email_resend_verification: RatelimitConfiguration,
     pub client_servers_backups_create: RatelimitConfiguration,
     pub client_servers_files_pull: RatelimitConfiguration,
     pub client_servers_files_pull_query: RatelimitConfiguration,
@@ -42,10 +45,19 @@ impl SettingsSerializeExt for AppSettingsRatelimits {
             .write_serde_setting("auth_register", &self.auth_register)?
             .write_serde_setting("auth_login", &self.auth_login)?
             .write_serde_setting("auth_login_checkpoint", &self.auth_login_checkpoint)?
+            .write_serde_setting(
+                "auth_login_checkpoint_email",
+                &self.auth_login_checkpoint_email,
+            )?
             .write_serde_setting("auth_login_security_key", &self.auth_login_security_key)?
             .write_serde_setting("auth_password_forgot", &self.auth_password_forgot)?
             .write_serde_setting("auth_password_reset", &self.auth_password_reset)?
+            .write_serde_setting("auth_email_verification", &self.auth_email_verification)?
             .write_serde_setting("client", &self.client)?
+            .write_serde_setting(
+                "client_account_email_resend_verification",
+                &self.client_account_email_resend_verification,
+            )?
             .write_serde_setting(
                 "client_servers_backups_create",
                 &self.client_servers_backups_create,
@@ -87,6 +99,12 @@ impl SettingsDeserializeExt for AppSettingsRatelimitsDeserializer {
                     hits: 10,
                     window_seconds: 300,
                 }),
+            auth_login_checkpoint_email: deserializer
+                .read_serde_setting("auth_login_checkpoint_email")
+                .unwrap_or(RatelimitConfiguration {
+                    hits: 5,
+                    window_seconds: 900,
+                }),
             auth_login_security_key: deserializer
                 .read_serde_setting("auth_login_security_key")
                 .unwrap_or(RatelimitConfiguration {
@@ -105,11 +123,23 @@ impl SettingsDeserializeExt for AppSettingsRatelimitsDeserializer {
                     hits: 10,
                     window_seconds: 300,
                 }),
+            auth_email_verification: deserializer
+                .read_serde_setting("auth_email_verification")
+                .unwrap_or(RatelimitConfiguration {
+                    hits: 10,
+                    window_seconds: 3600,
+                }),
             client: deserializer
                 .read_serde_setting("client")
                 .unwrap_or(RatelimitConfiguration {
                     hits: 360,
                     window_seconds: 30,
+                }),
+            client_account_email_resend_verification: deserializer
+                .read_serde_setting("client_account_email_resend_verification")
+                .unwrap_or(RatelimitConfiguration {
+                    hits: 10,
+                    window_seconds: 3600,
                 }),
             client_servers_backups_create: deserializer
                 .read_serde_setting("client_servers_backups_create")

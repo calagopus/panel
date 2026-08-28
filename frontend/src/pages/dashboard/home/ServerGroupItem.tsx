@@ -1,6 +1,7 @@
 import { rectSortingStrategy } from '@dnd-kit/sortable';
 import {
   faChevronRight,
+  faCircleExclamation,
   faEllipsisVertical,
   faGripVertical,
   faPen,
@@ -12,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ComponentProps, memo, startTransition, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, memo, useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import deleteServerGroup from '@/api/me/servers/groups/deleteServerGroup.ts';
@@ -20,10 +21,11 @@ import getServerGroupServers from '@/api/me/servers/groups/getServerGroupServers
 import updateServerGroup from '@/api/me/servers/groups/updateServerGroup.ts';
 import ActionIcon from '@/elements/ActionIcon.tsx';
 import Badge from '@/elements/Badge.tsx';
+import BlockedOverlay from '@/elements/BlockedOverlay.tsx';
 import Card from '@/elements/Card.tsx';
 import Collapse from '@/elements/Collapse.tsx';
 import Divider from '@/elements/Divider.tsx';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
+import { DndSortableList, SortableItem } from '@/elements/DragAndDrop.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Menu from '@/elements/Menu.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -35,20 +37,59 @@ import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { useUserSettingMapEntry } from '@/lib/userSettings.ts';
 import ServerItem from '@/pages/dashboard/home/ServerItem.tsx';
 import { useBulkPowerActions } from '@/plugins/useBulkPowerActions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { MAX_SERVERS_PER_GROUP, ServerGroupDropBlockReason, serverDndId } from '@/plugins/useServerGroupsDnd.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useUserStore } from '@/stores/user.ts';
 import GroupAddServerModal from './modals/GroupAddServerModal.tsx';
 import ServerGroupEditModal from './modals/ServerGroupEditModal.tsx';
 
-interface DndServer extends z.infer<typeof serverSchema>, DndItem {
-  id: string;
-}
+const expandedSchema = z.boolean();
 
 const MemoizedServerItem = memo(ServerItem);
+
+function ServerGroupServerRow({
+  server,
+  to,
+  isSelected,
+  onServerSelectionChange,
+  onServerClick,
+  sKeyPressedRef,
+  onRemoveRequested,
+}: {
+  server: z.infer<typeof serverSchema>;
+  to?: string;
+  isSelected?: boolean;
+  onServerSelectionChange?: (server: z.infer<typeof serverSchema>, selected: boolean) => void;
+  onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
+  sKeyPressedRef: React.RefObject<boolean>;
+  onRemoveRequested: (server: z.infer<typeof serverSchema>) => void;
+}) {
+  const handleSelectionChange = useCallback(
+    (selected: boolean) => onServerSelectionChange?.(server, selected),
+    [onServerSelectionChange, server],
+  );
+  const handleClick = useCallback((event: React.MouseEvent) => onServerClick?.(server, event), [onServerClick, server]);
+  const handleGroupRemove = useCallback(() => onRemoveRequested(server), [onRemoveRequested, server]);
+
+  return (
+    <MemoizedServerItem
+      server={server}
+      to={to}
+      showContextMenu
+      isSelected={isSelected}
+      onSelectionChange={onServerSelectionChange ? handleSelectionChange : undefined}
+      showForeignServerBadge
+      onClick={onServerClick ? handleClick : undefined}
+      onGroupRemove={handleGroupRemove}
+      sKeyPressedRef={sKeyPressedRef}
+    />
+  );
+}
 
 export default function ServerGroupItem({
   serverGroup,
@@ -58,6 +99,13 @@ export default function ServerGroupItem({
   onServerClick,
   sKeyPressedRef,
   getServerTo,
+  isDropTarget = false,
+  dropBlockedReason = null,
+  adoptedServer = null,
+  adoptedDndId = null,
+  adoptedIndex = null,
+  hiddenDndId = null,
+  pendingServer = null,
 }: {
   serverGroup: z.infer<typeof userServerGroupSchema>;
   dragHandleProps?: ComponentProps<'button'>;
@@ -66,6 +114,13 @@ export default function ServerGroupItem({
   onServerClick?: (server: z.infer<typeof serverSchema>, event: React.MouseEvent) => void;
   sKeyPressedRef: React.RefObject<boolean>;
   getServerTo?: (server: z.infer<typeof serverSchema>) => string;
+  isDropTarget?: boolean;
+  dropBlockedReason?: ServerGroupDropBlockReason | null;
+  adoptedServer?: z.infer<typeof serverSchema> | null;
+  adoptedDndId?: string | null;
+  adoptedIndex?: number | null;
+  hiddenDndId?: string | null;
+  pendingServer?: z.infer<typeof serverSchema> | null;
 }) {
   const { t, tItem } = useTranslations();
   const updateStateServerGroup = useUserStore((state) => state.updateServerGroup);
@@ -73,8 +128,11 @@ export default function ServerGroupItem({
   const { addToast } = useToast();
   const isDark = useComputedColorScheme('dark') === 'dark';
 
-  const [isExpanded, setIsExpanded] = useState(
-    localStorage.getItem(`server-group-expanded-${serverGroup.uuid}`) !== 'false',
+  const [isExpanded, setIsExpanded] = useUserSettingMapEntry(
+    'dashboard::server_groups_expanded',
+    serverGroup.uuid,
+    expandedSchema,
+    true,
   );
   const [servers, setServers] = useState(getEmptyPaginationSet<z.infer<typeof serverSchema>>());
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | 'add-server' | 'remove-server' | null>(null);
@@ -90,10 +148,6 @@ export default function ServerGroupItem({
     setStoreData: setServers,
     modifyParams: false,
   });
-
-  useEffect(() => {
-    localStorage.setItem(`server-group-expanded-${serverGroup.uuid}`, String(isExpanded));
-  }, [isExpanded, serverGroup.uuid]);
 
   const doDelete = async () => {
     await deleteServerGroup(serverGroup.uuid)
@@ -143,16 +197,38 @@ export default function ServerGroupItem({
       });
   };
 
-  const dndServers: DndServer[] = useMemo(
-    () =>
-      servers.data.map((s) => ({
-        ...s,
-        id: `${serverGroup.uuid}-${s.uuid}`,
-      })),
-    [servers.data, serverGroup.uuid],
-  );
+  const orderedServers = useMemo(() => {
+    const positions = new Map(serverGroup.serverOrder.map((uuid, i) => [uuid, i]));
+    const data =
+      pendingServer && !servers.data.some((s) => s.uuid === pendingServer.uuid)
+        ? [...servers.data, pendingServer]
+        : servers.data;
+
+    return data
+      .filter((s) => positions.has(s.uuid))
+      .sort((a, b) => (positions.get(a.uuid) ?? 0) - (positions.get(b.uuid) ?? 0));
+  }, [servers.data, serverGroup.serverOrder, pendingServer]);
+
+  const dndServers = useMemo(() => {
+    const items = orderedServers
+      .map((server) => ({ server, dndId: serverDndId(serverGroup.uuid, server.uuid) }))
+      .filter((item) => item.dndId !== hiddenDndId);
+
+    if (!adoptedServer || !adoptedDndId) return items;
+
+    const at = Math.min(Math.max(adoptedIndex ?? items.length, 0), items.length);
+
+    return [...items.slice(0, at), { server: adoptedServer, dndId: adoptedDndId }, ...items.slice(at)];
+  }, [orderedServers, serverGroup.uuid, hiddenDndId, adoptedServer, adoptedDndId, adoptedIndex]);
+
+  const serverDndIds = useMemo(() => dndServers.map((item) => item.dndId), [dndServers]);
 
   const serverCount = servers.total;
+
+  const handleRemoveRequested = useCallback((server: z.infer<typeof serverSchema>) => {
+    setServerToRemove({ server });
+    setOpenModal('remove-server');
+  }, []);
 
   return (
     <>
@@ -191,7 +267,31 @@ export default function ServerGroupItem({
         }).md()}
       </ConfirmationModal>
 
-      <Card key={serverGroup.uuid} p={0} className='overflow-hidden rounded-xl!'>
+      <Card
+        key={serverGroup.uuid}
+        p={0}
+        className={classNames(
+          'overflow-hidden rounded-xl! transition-shadow duration-150',
+          isDropTarget && !dropBlockedReason && 'ring-2 ring-(--mantine-color-blue-filled)',
+        )}
+      >
+        <BlockedOverlay
+          visible={isDropTarget && dropBlockedReason === 'alreadyInGroup'}
+          icon={faCircleExclamation}
+          title={t('pages.account.home.tabs.groupedServers.page.drag.blocked.alreadyInGroup.title', {})}
+          description={t('pages.account.home.tabs.groupedServers.page.drag.blocked.alreadyInGroup.description', {
+            group: serverGroup.name,
+          })}
+        />
+        <BlockedOverlay
+          visible={isDropTarget && dropBlockedReason === 'groupFull'}
+          icon={faCircleExclamation}
+          title={t('pages.account.home.tabs.groupedServers.page.drag.blocked.groupFull.title', {})}
+          description={t('pages.account.home.tabs.groupedServers.page.drag.blocked.groupFull.description', {
+            max: MAX_SERVERS_PER_GROUP,
+          })}
+        />
+
         <div
           id='server-group-item-header'
           className={classNames(
@@ -316,83 +416,30 @@ export default function ServerGroupItem({
 
         <Collapse expanded={isExpanded}>
           <div className='p-3'>
-            {loading ? (
+            {loading && servers.data.length === 0 ? (
               <Spinner.Centered />
-            ) : servers.total === 0 ? (
+            ) : dndServers.length === 0 ? (
               <p className='text-gray-500 text-sm text-center py-4 light:text-gray-600!'>
                 {t('pages.account.home.noServers', {})}
               </p>
             ) : (
-              <DndContainer
-                items={dndServers}
-                strategy={rectSortingStrategy}
-                callbacks={{
-                  onDragEnd: async (items) => {
-                    const serverOrder = [...serverGroup.serverOrder];
-                    const knownUuids = new Set(serverOrder);
-                    const draggedUuids = items.map((s) => s.uuid).filter((uuid) => knownUuids.has(uuid));
-                    const positions = draggedUuids.map((uuid) => serverOrder.indexOf(uuid)).sort((a, b) => a - b);
-                    positions.forEach((position, i) => {
-                      serverOrder[position] = draggedUuids[i];
-                    });
-
-                    updateStateServerGroup(serverGroup.uuid, { serverOrder });
-                    startTransition(() => {
-                      setServers({ ...servers, data: items });
-                    });
-
-                    await updateServerGroup(serverGroup.uuid, { serverOrder }).catch((err) => {
-                      addToast(httpErrorToHuman(err), 'error');
-                      updateStateServerGroup(serverGroup.uuid, {
-                        serverOrder: serverGroup.serverOrder,
-                      });
-                      setServers({ ...servers, data: servers.data });
-                    });
-                  },
-                  onError: (error) => {
-                    console.error('Drag error:', error);
-                  },
-                }}
-                renderOverlay={(activeServer) =>
-                  activeServer ? (
-                    <div style={{ cursor: 'grabbing' }}>
-                      <MemoizedServerItem
-                        server={activeServer}
-                        to={getServerTo?.(activeServer)}
-                        showForeignServerBadge
-                        onGroupRemove={() => null}
+              <DndSortableList id={serverGroup.uuid} items={serverDndIds} strategy={rectSortingStrategy}>
+                <div className='gap-3 grid md:grid-cols-2 auto-rows-[minmax(8.5rem,auto)]'>
+                  {dndServers.map(({ server, dndId }) => (
+                    <SortableItem key={dndId} id={dndId} data={{ server }}>
+                      <ServerGroupServerRow
+                        server={server}
+                        to={getServerTo?.(server)}
+                        isSelected={selectedServers?.has(server)}
+                        onServerSelectionChange={onServerSelectionChange}
+                        onServerClick={onServerClick}
+                        sKeyPressedRef={sKeyPressedRef}
+                        onRemoveRequested={handleRemoveRequested}
                       />
-                    </div>
-                  ) : null
-                }
-              >
-                {(items) => (
-                  <div className='gap-3 grid md:grid-cols-2'>
-                    {items.map((server) => (
-                      <SortableItem key={server.id} id={server.id}>
-                        <MemoizedServerItem
-                          server={server}
-                          to={getServerTo?.(server)}
-                          showContextMenu
-                          isSelected={selectedServers?.has(server)}
-                          onSelectionChange={
-                            onServerSelectionChange
-                              ? (selected) => onServerSelectionChange(server, selected)
-                              : undefined
-                          }
-                          showForeignServerBadge
-                          onClick={onServerClick ? (event) => onServerClick(server, event) : undefined}
-                          onGroupRemove={() => {
-                            setServerToRemove({ server });
-                            setOpenModal('remove-server');
-                          }}
-                          sKeyPressedRef={sKeyPressedRef}
-                        />
-                      </SortableItem>
-                    ))}
-                  </div>
-                )}
-              </DndContainer>
+                    </SortableItem>
+                  ))}
+                </div>
+              </DndSortableList>
             )}
 
             {servers.total > servers.perPage && (

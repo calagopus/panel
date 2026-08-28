@@ -80,6 +80,7 @@ export default function DashboardApiKeys() {
           t('common.table.columns.name', {}),
           t('pages.account.apiKeys.table.columns.key', {}),
           t('pages.account.apiKeys.table.columns.permissions', {}),
+          t('common.table.columns.status', {}),
           t('common.table.columns.lastUsed', {}),
           t('pages.account.apiKeys.table.columns.expires', {}),
           t('common.table.columns.created', {}),

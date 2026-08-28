@@ -10,6 +10,7 @@ use shared::{
         ByUuid,
         user::{AuthMethod, PermissionManager, User, UserImpersonator},
         user_activity::UserActivityLogger,
+        user_api_key::UserApiKey,
         user_session::UserSession,
     },
     response::ApiResponse,
@@ -55,6 +56,141 @@ fn can_impersonate(impersonator: &User, target: &User) -> bool {
         && tgt_server.iter().all(|p| imp_server.contains(p))
 }
 
+fn check_account_gates(
+    user: &User,
+    api_key: Option<&UserApiKey>,
+    settings: &shared::settings::AppSettings,
+    matched_path: &str,
+) -> Option<Response> {
+    const IGNORED_SUSPENDED_PATHS: &[&str] = &[
+        "/api/client/account",
+        "/api/client/account/logout",
+        "/api/client/account/settings",
+    ];
+
+    const IGNORED_REMEDIABLE_PATHS: &[&str] = &[
+        "/api/client/account",
+        "/api/client/account/logout",
+        "/api/client/account/email",
+        "/api/client/account/email/resend-verification",
+        "/api/client/account/two-factor",
+        "/api/client/account/two-factor/email",
+        "/api/client/account/security-keys",
+        "/api/client/account/security-keys/{security_key}",
+        "/api/client/account/security-keys/{security_key}/challenge",
+        "/api/client/account/settings",
+    ];
+
+    if api_key.is_some_and(|api_key| !api_key.enabled) {
+        return Some(
+            ApiResponse::error("api key is disabled")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_SUSPENDED_PATHS.contains(&matched_path) && user.suspended {
+        return Some(
+            ApiResponse::error("account is suspended")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_REMEDIABLE_PATHS.contains(&matched_path)
+        && user.require_two_factor(settings)
+        && !user.satisfies_two_factor(settings)
+    {
+        return Some(
+            ApiResponse::error("two-factor authentication required")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    if !IGNORED_REMEDIABLE_PATHS.contains(&matched_path)
+        && user.require_email_verification(settings)
+        && !user.email_verified
+    {
+        return Some(
+            ApiResponse::error("email verification required")
+                .with_status(StatusCode::FORBIDDEN)
+                .into_response(),
+        );
+    }
+
+    None
+}
+
+async fn finalize(
+    state: &GetState,
+    ip: shared::GetIp,
+    req: &mut Request,
+    auth_user: User,
+    auth_method: AuthMethod,
+) -> Option<Response> {
+    let auth_permission_manager = PermissionManager::new(&auth_user, &auth_method);
+    let api_key_uuid = auth_method.api_key_uuid();
+
+    if auth_permission_manager
+        .has_admin_permission("users.impersonate")
+        .is_ok()
+        && let Some(user_uuid) = req
+            .headers()
+            .get("Calagopus-User")
+            .and_then(|h| h.to_str().ok())
+            .and_then(|h| h.parse().ok())
+    {
+        let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
+            Ok(Some(user)) => user,
+            Ok(None) => {
+                return Some(
+                    ApiResponse::error("unable to find user from calagopus-user header")
+                        .with_status(StatusCode::UNAUTHORIZED)
+                        .into_response(),
+                );
+            }
+            Err(err) => return Some(ApiResponse::from(err).into_response()),
+        };
+
+        if !can_impersonate(&auth_user, &user) {
+            return Some(
+                ApiResponse::error("cannot impersonate a user with more permissions")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .into_response(),
+            );
+        }
+
+        req.extensions_mut()
+            .insert(PermissionManager::new(&user, &auth_method));
+        req.extensions_mut().insert(UserActivityLogger {
+            state: Arc::clone(state),
+            user_uuid: user.uuid,
+            impersonator_uuid: Some(auth_user.uuid),
+            api_key_uuid,
+            ip: ip.0,
+        });
+        req.extensions_mut().insert(user);
+        req.extensions_mut()
+            .insert(Some(UserImpersonator(auth_user)));
+    } else {
+        req.extensions_mut().insert(auth_permission_manager);
+        req.extensions_mut().insert(UserActivityLogger {
+            state: Arc::clone(state),
+            user_uuid: auth_user.uuid,
+            impersonator_uuid: None,
+            api_key_uuid,
+            ip: ip.0,
+        });
+        req.extensions_mut().insert(auth_user);
+        req.extensions_mut().insert(None::<UserImpersonator>);
+    }
+
+    req.extensions_mut().insert(Arc::new(auth_method));
+
+    None
+}
+
 pub async fn auth(
     state: GetState,
     ip: shared::GetIp,
@@ -85,31 +221,20 @@ pub async fn auth(
         Err(err) => return Ok(ApiResponse::from(err).into_response()),
     };
 
-    const IGNORED_SUSPENDED_PATHS: &[&str] = &["/api/client/account", "/api/client/account/logout"];
-
-    const IGNORED_TWO_FACTOR_PATHS: &[&str] = &[
-        "/api/client/account",
-        "/api/client/account/two-factor",
-        "/api/client/account/logout",
-    ];
-
     if let Some((auth_user, auth_method)) = req.extensions_mut().remove::<(User, AuthMethod)>() {
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate = check_account_gates(
+            &auth_user,
+            match &auth_method {
+                AuthMethod::ApiKey(api_key) => Some(api_key),
+                AuthMethod::Session(_) => None,
+            },
+            &settings,
+            matched_path.as_str(),
+        );
         drop(settings);
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
-        }
-
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
-        {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
         match &auth_method {
@@ -130,62 +255,9 @@ pub async fn auth(
             }
         }
 
-        let auth_permission_manager = PermissionManager::new(&auth_user);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
-        {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
+        if let Some(response) = finalize(&state, ip, &mut req, auth_user, auth_method).await {
+            return Ok(response);
         }
-
-        req.extensions_mut().insert(Arc::new(auth_method));
     } else if let Some(session_id) = cookies.get(&settings.app.session_cookie) {
         drop(settings);
 
@@ -206,22 +278,25 @@ pub async fn auth(
                 Err(err) => return Ok(ApiResponse::from(err).into_response()),
             };
 
-        session
-            .update_last_used(
-                &state.database,
-                ip.0,
-                req.headers()
-                    .get("User-Agent")
-                    .and_then(|ua| ua.to_str().ok())
-                    .unwrap_or("unknown"),
-            )
-            .await;
+        let auth_method = AuthMethod::Session(session);
+        if let AuthMethod::Session(session) = &auth_method {
+            session
+                .update_last_used(
+                    &state.database,
+                    ip.0,
+                    req.headers()
+                        .get("User-Agent")
+                        .and_then(|ua| ua.to_str().ok())
+                        .unwrap_or("unknown"),
+                )
+                .await;
+        }
 
         let settings = match state.settings.get().await {
             Ok(settings) => settings,
             Err(err) => return Ok(ApiResponse::from(err).into_response()),
         };
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate = check_account_gates(&auth_user, None, &settings, matched_path.as_str());
         drop(settings);
 
         cookies.add(
@@ -231,78 +306,13 @@ pub async fn auth(
             },
         );
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
-        {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = finalize(&state, ip, &mut req, auth_user, auth_method).await {
+            return Ok(response);
         }
-
-        let auth_permission_manager = PermissionManager::new(&auth_user);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
-        {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
-        }
-
-        req.extensions_mut()
-            .insert(Arc::new(AuthMethod::Session(session)));
     } else if let Some(api_token) = req.headers().get("Authorization") {
         drop(settings);
 
@@ -340,87 +350,25 @@ pub async fn auth(
             );
         }
 
-        api_key.update_last_used(&state.database).await;
-
         let settings = match state.settings.get().await {
             Ok(settings) => settings,
             Err(err) => return Ok(ApiResponse::from(err).into_response()),
         };
-        let require_two_factor = auth_user.require_two_factor(&settings);
+        let gate =
+            check_account_gates(&auth_user, Some(&api_key), &settings, matched_path.as_str());
         drop(settings);
 
-        if !IGNORED_SUSPENDED_PATHS.contains(&matched_path.as_str()) && auth_user.suspended {
-            return Ok(ApiResponse::error("account is suspended")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+        if let Some(response) = gate {
+            return Ok(response);
         }
 
-        if !IGNORED_TWO_FACTOR_PATHS.contains(&matched_path.as_str())
-            && !auth_user.totp_enabled
-            && require_two_factor
+        api_key.update_last_used(&state.database).await;
+
+        if let Some(response) =
+            finalize(&state, ip, &mut req, auth_user, AuthMethod::ApiKey(api_key)).await
         {
-            return Ok(ApiResponse::error("two-factor authentication required")
-                .with_status(StatusCode::FORBIDDEN)
-                .into_response());
+            return Ok(response);
         }
-
-        let auth_permission_manager = PermissionManager::new(&auth_user).add_api_key(&api_key);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
-        {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: Some(api_key.uuid),
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: Some(api_key.uuid),
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
-        }
-
-        req.extensions_mut()
-            .insert(Arc::new(AuthMethod::ApiKey(api_key)));
     } else {
         return Ok(ApiResponse::error("missing authorization")
             .with_status(StatusCode::UNAUTHORIZED)

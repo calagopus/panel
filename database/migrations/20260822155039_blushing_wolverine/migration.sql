@@ -1,0 +1,1 @@
+ALTER TABLE "oauth_providers" RENAME COLUMN "login_bypass_2fa" TO "login_bypass_two_factor";

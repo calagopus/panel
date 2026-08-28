@@ -1,5 +1,5 @@
 import { Registry } from 'shared';
-import type { QuickActionCategory, QuickActionDefinition, QuickActionMode } from '@/lib/quickActions.ts';
+import type { QuickActionCategory, QuickActionDefinition, QuickActionMode } from '@/lib/quickActions/quickActions.ts';
 
 export class QuickActionRegistry implements Registry {
   public mergeFrom(other: this): this {

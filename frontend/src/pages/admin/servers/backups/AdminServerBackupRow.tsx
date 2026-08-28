@@ -34,6 +34,8 @@ import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDelete
 import NodeBackupsExportModal from '../../nodes/backups/modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
 
+const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);
+
 export default function AdminServerBackupRow({
   server,
   backup,
@@ -45,7 +47,6 @@ export default function AdminServerBackupRow({
   const { addToast } = useToast();
 
   const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | 'metadata' | null>(null);
-  const jsonLanguage = useMemo(() => () => import('highlight.js/lib/languages/json').then((m) => m.default), []);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
@@ -89,7 +90,7 @@ export default function AdminServerBackupRow({
         onClose={() => setOpenModal(null)}
         opened={openModal === 'metadata'}
       >
-        <HljsCode languageName='json' language={jsonLanguage}>
+        <HljsCode languageName='json' language={loadJsonLanguage}>
           {metadataJson}
         </HljsCode>
 

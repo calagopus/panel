@@ -66,6 +66,12 @@ mod put {
         language: Option<compact_str::CompactString>,
         #[garde(skip)]
         two_factor_requirement: Option<shared::settings::app::TwoFactorRequirement>,
+        #[garde(skip)]
+        email_two_factor_enabled: Option<bool>,
+        #[garde(skip)]
+        two_factor_accepted_methods: Option<Vec<shared::settings::app::TwoFactorMethod>>,
+        #[garde(skip)]
+        email_verification_required: Option<bool>,
         #[garde(length(chars, min = 1, max = 255))]
         session_cookie: Option<compact_str::CompactString>,
         #[garde(range(min = 60, max = 31536000))]
@@ -111,6 +117,10 @@ mod put {
         #[garde(skip)]
         max_backup_group_count: Option<u64>,
         #[garde(skip)]
+        max_firewall_rule_count: Option<u64>,
+        #[garde(skip)]
+        max_firewall_rule_source_count: Option<u64>,
+        #[garde(skip)]
         max_database_instance_database_count: Option<u64>,
         #[garde(skip)]
         max_database_instance_user_count: Option<u64>,
@@ -140,6 +150,10 @@ mod put {
         max_security_key_count: Option<u64>,
         #[garde(skip)]
         max_ssh_key_count: Option<u64>,
+        #[garde(skip)]
+        max_settings_count: Option<u64>,
+        #[garde(skip)]
+        max_settings_value_bytes: Option<u64>,
 
         #[garde(skip)]
         allow_changing_language: Option<bool>,
@@ -189,13 +203,20 @@ mod put {
         #[garde(dive)]
         auth_login_checkpoint: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
+        auth_login_checkpoint_email: Option<shared::settings::ratelimits::RatelimitConfiguration>,
+        #[garde(dive)]
         auth_login_security_key: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
         auth_password_forgot: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
         auth_password_reset: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
+        auth_email_verification: Option<shared::settings::ratelimits::RatelimitConfiguration>,
+        #[garde(dive)]
         client: Option<shared::settings::ratelimits::RatelimitConfiguration>,
+        #[garde(dive)]
+        client_account_email_resend_verification:
+            Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
         client_servers_backups_create: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
@@ -247,6 +268,7 @@ mod put {
 
     #[utoipa::path(put, path = "/", responses(
         (status = OK, body = inline(Response)),
+        (status = BAD_REQUEST, body = ApiError),
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
@@ -302,6 +324,22 @@ mod put {
             if let Some(two_factor_requirement) = app.two_factor_requirement {
                 settings.app.two_factor_requirement = two_factor_requirement;
             }
+            if let Some(email_two_factor_enabled) = app.email_two_factor_enabled {
+                settings.app.email_two_factor_enabled = email_two_factor_enabled;
+            }
+            if let Some(two_factor_accepted_methods) = app.two_factor_accepted_methods {
+                let mut deduped: Vec<shared::settings::app::TwoFactorMethod> = Vec::new();
+                for method in two_factor_accepted_methods {
+                    if !deduped.contains(&method) {
+                        deduped.push(method);
+                    }
+                }
+
+                settings.app.two_factor_accepted_methods = deduped;
+            }
+            if let Some(email_verification_required) = app.email_verification_required {
+                settings.app.email_verification_required = email_verification_required;
+            }
             if let Some(session_cookie) = app.session_cookie {
                 settings.app.session_cookie = session_cookie;
             }
@@ -330,6 +368,12 @@ mod put {
             }
             if let Some(max_ssh_key_count) = user.max_ssh_key_count {
                 settings.user.max_ssh_key_count = max_ssh_key_count;
+            }
+            if let Some(max_settings_count) = user.max_settings_count {
+                settings.user.max_settings_count = max_settings_count;
+            }
+            if let Some(max_settings_value_bytes) = user.max_settings_value_bytes {
+                settings.user.max_settings_value_bytes = max_settings_value_bytes;
             }
             if let Some(allow_changing_language) = user.allow_changing_language {
                 settings.user.allow_changing_language = allow_changing_language;
@@ -379,6 +423,12 @@ mod put {
             }
             if let Some(max_backup_group_count) = server.max_backup_group_count {
                 settings.server.max_backup_group_count = max_backup_group_count;
+            }
+            if let Some(max_firewall_rule_count) = server.max_firewall_rule_count {
+                settings.server.max_firewall_rule_count = max_firewall_rule_count;
+            }
+            if let Some(max_firewall_rule_source_count) = server.max_firewall_rule_source_count {
+                settings.server.max_firewall_rule_source_count = max_firewall_rule_source_count;
             }
             if let Some(max_database_instance_database_count) =
                 server.max_database_instance_database_count
@@ -448,6 +498,9 @@ mod put {
             if let Some(auth_login_checkpoint) = ratelimits.auth_login_checkpoint {
                 settings.ratelimits.auth_login_checkpoint = auth_login_checkpoint;
             }
+            if let Some(auth_login_checkpoint_email) = ratelimits.auth_login_checkpoint_email {
+                settings.ratelimits.auth_login_checkpoint_email = auth_login_checkpoint_email;
+            }
             if let Some(auth_login_security_key) = ratelimits.auth_login_security_key {
                 settings.ratelimits.auth_login_security_key = auth_login_security_key;
             }
@@ -457,8 +510,17 @@ mod put {
             if let Some(auth_password_reset) = ratelimits.auth_password_reset {
                 settings.ratelimits.auth_password_reset = auth_password_reset;
             }
+            if let Some(auth_email_verification) = ratelimits.auth_email_verification {
+                settings.ratelimits.auth_email_verification = auth_email_verification;
+            }
             if let Some(client) = ratelimits.client {
                 settings.ratelimits.client = client;
+            }
+            if let Some(client_account_email_resend_verification) =
+                ratelimits.client_account_email_resend_verification
+            {
+                settings.ratelimits.client_account_email_resend_verification =
+                    client_account_email_resend_verification;
             }
             if let Some(client_servers_backups_create) = ratelimits.client_servers_backups_create {
                 settings.ratelimits.client_servers_backups_create = client_servers_backups_create;
@@ -478,6 +540,28 @@ mod put {
             if let Some(remote_sftp_auth) = ratelimits.remote_sftp_auth {
                 settings.ratelimits.remote_sftp_auth = remote_sftp_auth;
             }
+        }
+
+        if settings.app.two_factor_accepted_methods.is_empty()
+            && !matches!(
+                settings.app.two_factor_requirement,
+                shared::settings::app::TwoFactorRequirement::None
+            )
+        {
+            return ApiResponse::error(
+                "at least one two-factor method must be accepted while two-factor is required",
+            )
+            .with_status(StatusCode::BAD_REQUEST)
+            .ok();
+        }
+        if matches!(settings.mail_mode, shared::settings::MailMode::None)
+            && (settings.app.email_two_factor_enabled || settings.app.email_verification_required)
+        {
+            return ApiResponse::error(
+                "email two-factor and email verification require a mail transport to be configured",
+            )
+            .with_status(StatusCode::BAD_REQUEST)
+            .ok();
         }
 
         let settings_json = settings.censored();

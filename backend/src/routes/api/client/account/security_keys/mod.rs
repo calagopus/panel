@@ -98,6 +98,10 @@ mod post {
         #[garde(skip)]
         #[serde(default)]
         allow_usernameless_login: bool,
+
+        #[garde(length(max = 512))]
+        #[schema(max_length = 512)]
+        password: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -111,6 +115,7 @@ mod post {
         (status = OK, body = inline(Response)),
         (status = BAD_REQUEST, body = ApiError),
         (status = CONFLICT, body = ApiError),
+        (status = FORBIDDEN, body = ApiError),
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
@@ -135,6 +140,15 @@ mod post {
         let allow_discoverable = settings.webauthn.allow_discoverable;
         let registration_timeout_seconds = settings.webauthn.registration_timeout_seconds;
         drop(settings);
+
+        if !user
+            .validate_password(&state.database, &data.password)
+            .await?
+        {
+            return ApiResponse::error("invalid password")
+                .with_status(StatusCode::FORBIDDEN)
+                .ok();
+        }
 
         let webauthn = state.settings.get_webauthn().await?;
 

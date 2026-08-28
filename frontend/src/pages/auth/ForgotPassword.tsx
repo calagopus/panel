@@ -49,9 +49,8 @@ export default function ForgotPassword() {
       setRequested(true);
     } catch (err) {
       setError(httpErrorToHuman(err));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

@@ -730,6 +730,30 @@ impl Node {
         ))
     }
 
+    /// Whether this node will enforce firewall rules, `None` when its configuration could not
+    /// be retrieved in time. False covers both a node that cannot firewall at all and one with
+    /// firewalling turned off, so the reason stays out of the client API.
+    pub async fn fetch_firewall_support(
+        &self,
+        database: &crate::database::Database,
+    ) -> Option<bool> {
+        const FIREWALL_SUPPORT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(3);
+
+        let config =
+            tokio::time::timeout(FIREWALL_SUPPORT_TIMEOUT, self.fetch_configuration(database))
+                .await
+                .ok()?
+                .ok()?;
+
+        Some(
+            !config.system.user.rootless.enabled
+                && !matches!(
+                    config.docker.firewall.backend,
+                    wings_api::FirewallBackendKind::Disabled
+                ),
+        )
+    }
+
     pub async fn used_ports(
         &self,
         state: &crate::State,

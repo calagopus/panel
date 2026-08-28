@@ -9,8 +9,10 @@ mod email;
 mod logout;
 mod oauth_links;
 mod password;
+mod password_login;
 mod security_keys;
 mod sessions;
+mod settings;
 mod ssh_keys;
 mod two_factor;
 
@@ -50,7 +52,7 @@ mod patch {
         ApiError, GetState,
         models::{
             UpdatableModel,
-            user::{GetPermissionManager, GetUser, UpdateUserOptions, UserToastPosition},
+            user::{GetPermissionManager, GetUser, UpdateUserOptions},
             user_activity::GetUserActivityLogger,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -65,10 +67,20 @@ mod patch {
         username: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_first: Option<compact_str::CompactString>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "::serde_with::rust::double_option"
+        )]
+        name_first: Option<Option<compact_str::CompactString>>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]
-        name_last: Option<compact_str::CompactString>,
+        #[serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "::serde_with::rust::double_option"
+        )]
+        name_last: Option<Option<compact_str::CompactString>>,
 
         #[garde(
             length(chars, min = 2, max = 15),
@@ -76,10 +88,6 @@ mod patch {
         )]
         #[schema(min_length = 2, max_length = 15)]
         language: Option<compact_str::CompactString>,
-        #[garde(skip)]
-        toast_position: Option<UserToastPosition>,
-        #[garde(skip)]
-        start_on_grouped_servers: Option<bool>,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -125,8 +133,6 @@ mod patch {
                 name_first: data.name_first,
                 name_last: data.name_last,
                 language: data.language,
-                toast_position: data.toast_position,
-                start_on_grouped_servers: data.start_on_grouped_servers,
                 ..Default::default()
             },
         )
@@ -140,8 +146,6 @@ mod patch {
                     "name_first": user.name_first,
                     "name_last": user.name_last,
                     "language": user.language,
-                    "toast_position": user.toast_position,
-                    "start_on_grouped_servers": user.start_on_grouped_servers,
                 }),
             )
             .await;
@@ -158,6 +162,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/avatar", avatar::router(state))
         .nest("/email", email::router(state))
         .nest("/password", password::router(state))
+        .nest("/password-login", password_login::router(state))
         .nest("/two-factor", two_factor::router(state))
         .nest("/security-keys", security_keys::router(state))
         .nest("/oauth-links", oauth_links::router(state))
@@ -165,6 +170,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/api-keys", api_keys::router(state))
         .nest("/ssh-keys", ssh_keys::router(state))
         .nest("/sessions", sessions::router(state))
+        .nest("/settings", settings::router(state))
         .nest("/activity", activity::router(state))
         .with_state(state.clone())
 }

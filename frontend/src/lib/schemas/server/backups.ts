@@ -33,6 +33,7 @@ export const serverBackupEditSchema = z.object({
 export const serverBackupGroupSchema = z.object({
   uuid: z.uuid(),
   name: z.string(),
+  order: z.number(),
   retentionCount: z.number().nullable(),
   retentionDays: z.number().nullable(),
   totalBackups: z.number(),

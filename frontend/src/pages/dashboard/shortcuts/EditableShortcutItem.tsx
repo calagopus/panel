@@ -20,15 +20,15 @@ import KbdKey from '@/elements/KbdKey.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 import Text from '@/elements/Text.tsx';
 import Tooltip from '@/elements/Tooltip.tsx';
+import { disableShortcut, resetShortcut, setShortcutBinding } from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   bindingFromEvent,
   ModifierKey,
   ShortcutBinding,
   ShortcutDefinition,
   shortcutDescription,
-} from '@/lib/shortcuts.ts';
+} from '@/lib/quickActions/shortcuts.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 
 const ARROW_ICONS: Record<string, IconDefinition> = {
   ArrowUp: faArrowUp,
@@ -94,9 +94,6 @@ export default function EditableShortcutItem({
   hideBorder,
 }: EditableShortcutItemProps) {
   const { t } = useTranslations();
-  const setShortcutBinding = useGlobalStore((state) => state.setShortcutBinding);
-  const disableShortcut = useGlobalStore((state) => state.disableShortcut);
-  const resetShortcut = useGlobalStore((state) => state.resetShortcut);
 
   useEffect(() => {
     if (!recording) return;
@@ -119,7 +116,7 @@ export default function EditableShortcutItem({
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [recording, definition.id, setShortcutBinding, setRecordingId]);
+  }, [recording, definition.id, setRecordingId]);
 
   return (
     <Flex

@@ -6,9 +6,10 @@
 
 [![Rust](https://img.shields.io/badge/rust-stable-orange.svg?logo=rust)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/github/license/calagopus/panel?color=blue)](https://github.com/calagopus/panel/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/calagopus/panel)](https://github.com/calagopus/panel/issues)
+[![GitHub issues](https://img.shields.io/github/issues/calagopus/panel?color=green)](https://github.com/calagopus/panel/issues)
 [![GitHub stars](https://img.shields.io/github/stars/calagopus/panel)](https://github.com/calagopus/panel/stargazers)
 [![Discord](https://img.shields.io/discord/1429911351777824892?label=discord&logo=discord&color=5865F2)](https://discord.gg/uSM8tvTxBV)
+[![Crowdin](https://img.shields.io/badge/translate-Crowdin-red?logo=crowdin)](https://crowdin.com/project/calagopus)
 
 **A modern game server management panel, rebuilt from the ground up in Rust.**
 
@@ -64,7 +65,7 @@ Tracked publicly here:
 
 ## Contributing
 
-Contributions are welcome. Open an issue to discuss larger changes first, and check the [Discord](https://discord.gg/uSM8tvTxBV) if you want to chat through an idea before writing code.
+Contributions are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for PR guidelines, open an issue to discuss larger changes first, and check the [Discord](https://discord.gg/uSM8tvTxBV) if you want to chat through an idea before writing code.
 
 ## Acknowledgments
 

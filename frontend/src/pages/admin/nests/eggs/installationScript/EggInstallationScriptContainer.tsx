@@ -103,8 +103,7 @@ export default function EggInstallationScriptContainer({
                   codeLens: false,
                   scrollBeyondLastLine: false,
                   smoothScrolling: false,
-                  // @ts-expect-error this is valid
-                  touchScrollEnabled: true,
+                  inertialScroll: true,
                 }}
                 onChange={(value) => form.setFieldValue('content', value || '')}
                 defaultLanguage='shell'

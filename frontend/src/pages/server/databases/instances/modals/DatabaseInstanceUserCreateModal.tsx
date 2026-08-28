@@ -19,7 +19,7 @@ import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import DatabaseInstanceUserDatabasesInput from '../DatabaseInstanceUserDatabasesInput.tsx';
+import DatabaseInstanceUserDatabasesInput from '../management/DatabaseInstanceUserDatabasesInput.tsx';
 
 type Props = ModalProps & {
   instance: z.infer<typeof serverDatabaseInstanceSchema>;

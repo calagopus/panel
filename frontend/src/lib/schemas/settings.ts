@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { eggConfigurationRouteItemSchema } from '@/lib/schemas/generic.ts';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
+import { twoFactorMethod } from '@/lib/schemas/user.ts';
 
 export const publicSettingsCaptchaProviderNoneSchema = z.object({
   type: z.literal('none'),
@@ -49,6 +50,9 @@ export const publicSettingsSchema = z.object({
     name: z.string(),
     language: z.string(),
     registrationEnabled: z.boolean(),
+    emailTwoFactorEnabled: z.boolean(),
+    emailVerificationRequired: z.boolean(),
+    twoFactorAcceptedMethods: z.array(twoFactorMethod),
     debug: z.boolean(),
   }),
   webauthn: z.object({
@@ -62,6 +66,8 @@ export const publicSettingsSchema = z.object({
     maxSubuserCount: z.number(),
     maxScheduleStepCount: z.number(),
     maxBackupGroupCount: z.number(),
+    maxFirewallRuleCount: z.number(),
+    maxFirewallRuleSourceCount: z.number(),
     maxDatabaseInstanceDatabaseCount: z.number(),
     maxDatabaseInstanceUserCount: z.number(),
     allowOverwritingCustomDockerImage: z.boolean(),

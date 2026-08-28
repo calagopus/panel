@@ -158,6 +158,20 @@ impl Default for ExtensionEmailTemplateBuilder {
                     default_enabled: true,
                 },
                 EmailTemplate {
+                    identifier: "email_verification",
+                    available_variables: vec!["user", "email", "verification_link"],
+                    default_subject: "{{ settings.app.name }} - Verify Your Email",
+                    default_content: include_str!("../../mails/email_verification.html"),
+                    default_enabled: true,
+                },
+                EmailTemplate {
+                    identifier: "two_factor_code",
+                    available_variables: vec!["user", "code"],
+                    default_subject: "{{ settings.app.name }} - Your Login Code",
+                    default_content: include_str!("../../mails/two_factor_code.html"),
+                    default_enabled: true,
+                },
+                EmailTemplate {
                     identifier: "connection_test",
                     available_variables: vec![],
                     default_subject: "{{ settings.app.name }} - Connection Test",

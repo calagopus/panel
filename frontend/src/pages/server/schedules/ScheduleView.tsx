@@ -34,10 +34,10 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import ScheduleConditionBuilder from './forms/ScheduleConditionBuilder.tsx';
 import ScheduleCreateOrUpdateModal from './modals/ScheduleCreateOrUpdateModal.tsx';
 import DetailCard from './renderers/DetailCard.tsx';
 import TriggerCard from './renderers/TriggerCard.tsx';
-import ScheduleConditionBuilder from './ScheduleConditionBuilder.tsx';
 import StepCard from './StepCard.tsx';
 import StepsEditor, { stepIndentStyle, stepIndents } from './StepsEditor.tsx';
 

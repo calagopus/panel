@@ -1,18 +1,18 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
 import SubNavigation from '@/elements/SubNavigation.tsx';
-import { useAuth } from '@/providers/AuthProvider.tsx';
+import { useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function DashboardHomeTitle() {
   const { t } = useTranslations();
-  const { user } = useAuth();
+  const [startOnGroupedServers] = useStartOnGroupedServers();
 
   return (
     <>
       <SubNavigation
         baseUrl='/'
         items={
-          user?.startOnGroupedServers
+          startOnGroupedServers
             ? [
                 {
                   name: t('pages.account.home.tabs.groupedServers.title', {}),

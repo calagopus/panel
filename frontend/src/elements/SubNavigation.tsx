@@ -5,8 +5,8 @@ import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { HookableComponentBase, makeComponentHookable } from 'shared';
 import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
-import { pageNavigationCategoryId } from '@/lib/coreQuickActions.tsx';
 import { type LazyString, resolveString } from '@/lib/lazy.ts';
+import { pageNavigationCategoryId } from '@/lib/quickActions/coreQuickActions.tsx';
 import { to } from '@/lib/routes.ts';
 import { useAdminPermissions } from '@/plugins/usePermissions.ts';
 import { useQuickActions } from '@/plugins/useQuickActions.ts';
@@ -44,12 +44,14 @@ function useVisibleItems(items: ItemProp[]): ItemProp[] {
   const permissionMatrix = useAdminPermissions(items.flatMap((item) => item.permission ?? []));
 
   let permissionIndex = 0;
+  const result: ItemProp[] = [];
 
-  return items.filter((item) => {
+  for (const item of items) {
     const canAccess = item.permission === undefined || permissionMatrix[permissionIndex++];
+    if (canAccess && !item.hidden) result.push(item);
+  }
 
-    return canAccess && !item.hidden;
-  });
+  return result;
 }
 
 const itemPath = (baseUrl: string, item: ItemProp) => item.link ?? to(item.path, baseUrl);
@@ -115,6 +117,7 @@ function SubNavigation<P>({
 
   const visibleItems = useVisibleItems(items);
   const tabsShown = !hideWhenSingle || visibleItems.length > 1;
+  const pathItems = items.filter((item) => item.path);
 
   useSubNavigationQuickActions(baseUrl, visibleItems, tabsShown, depth);
 
@@ -150,15 +153,15 @@ function SubNavigation<P>({
           </Tabs.List>
         </Tabs>
       )}
-      <Routes>
-        {items
-          .filter((item) => item.path)
-          .map((item) => (
+      {pathItems.length > 0 && (
+        <Routes>
+          {pathItems.map((item) => (
             <Route key={item.path} element={<AdminPermissionGuard permission={item.permission ?? []} />}>
               <Route path={item.path} element={item.element} />
             </Route>
           ))}
-      </Routes>
+        </Routes>
+      )}
     </SubNavigationDepthContext.Provider>
   );
 }

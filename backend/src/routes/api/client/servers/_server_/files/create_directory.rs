@@ -12,6 +12,7 @@ mod post {
         },
         response::{ApiResponse, ApiResponseResult},
     };
+    use std::path::Path;
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize)]
@@ -53,8 +54,9 @@ mod post {
                 .ok();
         }
 
-        if server.is_ignored(&data.name, true) {
-            return ApiResponse::error("root directory not found")
+        let destination = Path::new(data.root.as_str()).join(data.name.as_str());
+        if server.is_ignored(&destination, true) {
+            return ApiResponse::error("destination not found")
                 .with_status(StatusCode::NOT_FOUND)
                 .ok();
         }
@@ -62,15 +64,17 @@ mod post {
         let request_body = wings_api::servers_server_files_create_directory::post::RequestBody {
             root: data.root,
             name: data.name,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         match server
+            .0
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_create_directory(server.uuid, &request_body)
+            .post_servers_server_files_create_directory(server.0.uuid, &request_body)
             .await
         {
             Ok(_) => {}

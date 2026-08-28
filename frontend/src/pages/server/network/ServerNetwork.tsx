@@ -9,16 +9,20 @@ import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import AllocationRow from './AllocationRow.tsx';
+import ServerFirewall from './firewall/ServerFirewall.tsx';
+import NetworkSubNavigation from './NetworkSubNavigation.tsx';
 
 export default function ServerNetwork() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { server } = useServerStore();
+  const canReadAllocations = useServerCan('allocations.read');
 
   const {
     data: allocations,
@@ -31,6 +35,7 @@ export default function ServerNetwork() {
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).network.all(),
     fetcher: (page, search) => getAllocations(server.uuid, page, search),
+    canRequest: canReadAllocations,
   });
 
   const doAdd = () => {
@@ -43,6 +48,10 @@ export default function ServerNetwork() {
         addToast(httpErrorToHuman(msg), 'error');
       });
   };
+
+  if (!canReadAllocations) {
+    return <ServerFirewall />;
+  }
 
   return (
     <ServerContentContainer
@@ -72,6 +81,8 @@ export default function ServerNetwork() {
       }
       registry={window.extensionContext.extensionRegistry.pages.server.network.container}
     >
+      <NetworkSubNavigation />
+
       <Table
         columns={[
           '',

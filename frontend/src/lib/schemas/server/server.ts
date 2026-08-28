@@ -49,6 +49,7 @@ export const serverSchema = z.looseObject({
   isOwner: z.boolean(),
   isTransferring: z.boolean(),
   permissions: z.array(z.string()),
+  ignoredFiles: z.array(z.string()),
   locationUuid: z.string(),
   locationName: z.string(),
   locationFlag: z.string().nullable(),
@@ -76,6 +77,12 @@ export const serverImagePullProgressSchema = z.object({
   status: z.enum(['pulling', 'extracting']),
   bytes_processed: z.number(),
   bytes_total: z.number(),
+});
+
+export const serverInstallProgressSchema = z.object({
+  progress: z.number(),
+  total: z.number(),
+  label: z.string().nullish(),
 });
 
 export const serverResourceUsageSchema = z.object({

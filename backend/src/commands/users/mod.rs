@@ -3,6 +3,7 @@ use shared::extensions::commands::CliCommandGroupBuilder;
 mod create;
 mod disable_2fa;
 mod reset_password;
+mod verify_email;
 
 pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
     cli.add_command(
@@ -19,5 +20,10 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
         "reset-password",
         "Resets a user's password.",
         reset_password::ResetPasswordCommand,
+    )
+    .add_command(
+        "verify-email",
+        "Marks a user's email address as verified.",
+        verify_email::VerifyEmailCommand,
     )
 }

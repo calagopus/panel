@@ -176,6 +176,7 @@
         "enable": "Povoliť",
         "disable": "Zakázať",
         "disableTwoFactor": "Disable Two-Factor",
+        "verify": "Verify",
         "update": "Aktualizovať",
         "close": "Zavrieť",
         "cancel": "Zrušiť",
@@ -250,6 +251,17 @@
           "noMatches": "No matches",
           "exception": "Exception",
           "tooManyPatterns": "Matching is not counted automatically for more than {max} patterns."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day",
+            "month": "Month",
+            "weekday": "Weekday"
+          },
+          "nextRun": "Next run is {timestamp}."
         }
       },
       "modal": {
@@ -262,6 +274,22 @@
       },
       "toast": {
         "duplicated": "{resource} duplicated."
+      },
+      "settingScope": {
+        "account": "Sync With Account",
+        "device": "Only This Device",
+        "useAccountValue": "Use the Account Value",
+        "saveToAccount": "Save This Value to My Account",
+        "stateAccount": "Account",
+        "stateDevice": "This Device",
+        "tooltip": {
+          "account": "This setting is synced with your account.",
+          "device": "This setting is overridden on this device only."
+        },
+        "toast": {
+          "saved": "Setting saved to your account.",
+          "saveFailed": "Failed to save this setting to your account."
+        }
       },
       "tooltip": {
         "resetToDefault": "Obnoviť predvolené nastavenie",
@@ -611,7 +639,8 @@
           "theme": "Theme",
           "themeAuto": "Auto",
           "themeDark": "Dark",
-          "themeLight": "Light"
+          "themeLight": "Light",
+          "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },
         "modal": {
           "logout": {
@@ -1079,6 +1108,16 @@
                 "useTotp": "Použiť TOTP"
               }
             },
+            "email": {
+              "subtitle": "We can email you a one-time code to finish signing in.",
+              "enterCode": "Enter the 6-digit code we sent to your email address",
+              "button": {
+                "useEmail": "Email me a code",
+                "sendCode": "Send Code",
+                "resend": "Resend Code",
+                "resendIn": "Resend Code ({seconds}s)"
+              }
+            },
             "totpRecovery": {
               "subtitle": "Zadajte kód na obnovenie",
               "form": {
@@ -1112,6 +1151,14 @@
             "request": "Požiadať o obnovenie hesla"
           },
           "success": "Bol vám odoslaný e-mail s pokynmi, ako obnoviť heslo."
+        },
+        "verifyEmail": {
+          "title": "Verify Email",
+          "success": "Your email address **{email}** has been verified.",
+          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
+          "button": {
+            "continue": "Continue"
+          }
         },
         "resetPassword": {
           "title": "Obnoviť heslo",
@@ -1186,6 +1233,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Already in this group",
+                      "description": "This server is already part of {group}."
+                    },
+                    "groupFull": {
+                      "title": "Group is full",
+                      "description": "A group cannot hold more than {max} servers."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Server moved to {group}."
+                  }
+                },
                 "noGroups": "Nenašli sa žiadne skupiny, je čas na vytvorenie?"
               }
             },
@@ -1226,6 +1288,14 @@
               "title": "Vyžaduje sa dvojfaktorové overenie",
               "description": "Na vašom účte sa vyžaduje dvojfaktorové overenie. Ak chcete panel naďalej používať, nastavte ho nižšie."
             },
+            "verifyEmail": {
+              "title": "Email Verification Required",
+              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
+              "sent": "Verification email sent to {email}.",
+              "button": {
+                "resend": "Resend Verification Email"
+              }
+            },
             "frozen": {
               "title": "Účet zmrazený",
               "description": "Váš účet bol zmrazený. Vo svojom účte nemôžete vykonávať zmeny, kým nebude odmrazený. Pre viac informácií kontaktujte správcu."
@@ -1245,7 +1315,8 @@
             "email": {
               "title": "E-mail",
               "toast": {
-                "updated": "E-mail bol úspešne aktualizovaný."
+                "updated": "E-mail bol úspešne aktualizovaný.",
+                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
               },
               "form": {
                 "newEmail": "Nový e-mail"
@@ -1273,20 +1344,68 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "Nastaviť dvojfaktorové overenie"
+                "setupTwoFactor": "Nastaviť dvojfaktorové overenie",
+                "enableEmail": "Enable Email",
+                "disableEmail": "Disable Email",
+                "securityKeys": "Security Keys"
               },
-              "twoFactorEnabled": "Momentálne je povolené dvojfaktorové overenie.",
-              "twoFactorDisabled": "Vo svojom účte momentálne nemáte povolené dvojfaktorové overenie. Kliknutím na tlačidlo nižšie ho začnete konfigurovať.",
-              "twoFactorLastUsed": "Naposledy použité: {timestamp}"
+              "twoFactorLastUsed": "Naposledy použité: {timestamp}",
+              "none": "No second factor is set up on your account yet.",
+              "requirementMet": "Your account meets the two-factor requirement.",
+              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
+              "method": {
+                "totp": "Authenticator App",
+                "securityKey": "Security Key",
+                "email": "Email"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Email two-factor disabled successfully."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Enable Email Two-Factor",
+                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
+                },
+                "disable": {
+                  "title": "Disable Email Two-Factor",
+                  "description": "Disabling email two-factor will make your account less secure."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Password Login",
+              "enabled": "You can sign in with your password.",
+              "disabled": "Password login is turned off. Only your security keys can sign you in.",
+              "toast": {
+                "updated": "Password login updated successfully."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Add a security key before turning off password login."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Disable Password Login",
+                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
+                },
+                "enable": {
+                  "title": "Enable Password Login",
+                  "description": "Your password will be able to sign you in again."
+                }
+              }
             },
             "account": {
               "title": "Podrobnosti o účte",
               "toast": {
                 "updated": "Podrobnosti účtu boli úspešne aktualizované."
-              },
+              }
+            },
+            "preferences": {
+              "title": "Preferences",
               "form": {
-                "toastPosition": "Pozícia toastu",
-                "startOnGroupedServers": "Začať na stránke Zoskupené servery"
+                "toastPosition": "Toast Position",
+                "startOnGroupedServers": "Start on the Grouped Servers page"
               }
             },
             "avatar": {
@@ -1546,6 +1665,10 @@
               "expires": "Platnosť vyprší"
             }
           },
+          "toast": {
+            "enabled": "API key enabled.",
+            "disabled": "API key disabled."
+          },
           "modal": {
             "createApiKey": {
               "title": "Vytvoriť kľúč API",
@@ -1766,11 +1889,22 @@
                   "sessionCookie": "Súbor cookie relácie",
                   "sessionDurationSeconds": "Trvanie relácie (sekundy)",
                   "twoFactorRequirement": "Požiadavka dvojfaktorového overenia",
+                  "emailTwoFactorEnabled": "Email Two-Factor",
+                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
+                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
+                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
+                  "emailVerificationRequired": "Require Email Verification",
+                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "Povoliť telemetriu",
                   "telemetryEnabledDescription": "Umožní Calagopusu zhromažďovať obmedzené a anonymné údaje o používaní, ktoré pomôžu zlepšiť aplikáciu.",
                   "registrationEnabled": "Povoliť registráciu"
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Authenticator App (TOTP)",
+                    "securityKey": "Security Key",
+                    "email": "Email"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Správcovia",
                     "allUsers": "Všetci používatelia",
@@ -1986,6 +2120,8 @@
                   "maxCommandSnippetCount": "Maximálny počet úryvkov príkazov",
                   "maxSecurityKeyCount": "Maximálny počet bezpečnostných kľúčov",
                   "maxSshKeyCount": "Maximálny počet kľúčov SSH",
+                  "maxSettingsCount": "Max Synced Settings",
+                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "Povoliť zmenu jazyka",
                   "allowChangingLanguageDescription": "Ak je táto možnosť povolená, používatelia budú môcť zmeniť svoje jazykové predvoľby."
                 },
@@ -2125,6 +2261,10 @@
             "buildFailed": {
               "title": "The last extension build failed",
               "content": "These extensions are not built again until they change, or until you retry the build explicitly."
+            },
+            "pendingRestart": {
+              "title": "Some extensions were enabled or disabled",
+              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2134,6 +2274,7 @@
             "retryBuild": "Retry build",
             "cancelBuild": "Cancel build",
             "configure": "Konfigurovať",
+            "restart": "Restart the panel",
             "back": "Späť na rozšírenia",
             "accept": "Prijať",
             "decline": "Odmietnuť"
@@ -2144,7 +2285,10 @@
             "cancelling": "The build stops once its current step ends.",
             "noBackend": "Na konfiguráciu tohto rozšírenia je potrebné backendové rozšírenie.",
             "noConfigurationPage": "Toto rozšírenie nemá definovanú konfiguračnú stránku.",
-            "removeExtension": "Odstrániť rozšírenie"
+            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
+            "removeExtension": "Odstrániť rozšírenie",
+            "enableExtension": "Enable extension",
+            "disableExtension": "Disable extension"
           },
           "phase": {
             "queued": "Queued…",
@@ -2162,7 +2306,9 @@
             "frontendMissing": "Chýba frontend",
             "backendMissing": "Chýba backend",
             "pendingBuild": "Čaká sa na zostavenie",
-            "pendingRemoval": "Čaká sa na odstránenie"
+            "pendingRemoval": "Čaká sa na odstránenie",
+            "pendingRestart": "Pending restart",
+            "disabled": "Disabled"
           },
           "card": {
             "version": "Verzia",
@@ -2182,7 +2328,10 @@
             "buildFailed": "Extension build failed: {reason}",
             "cancelRequested": "Cancel requested. The build stops once its current step ends.",
             "added": "Rozšírenie `{packageName}` bolo úspešne pridané.",
-            "removed": "Rozšírenie `{packageName}` bolo úspešne odstránené."
+            "removed": "Rozšírenie `{packageName}` bolo úspešne odstránené.",
+            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
+            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
+            "restarting": "The panel is restarting."
           },
           "notFound": {
             "title": "Rozšírenie sa nenašlo",
@@ -2249,6 +2398,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Odoslať e-mail na obnovenie hesla",
+                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "Zastupovať"
                 },
                 "form": {
@@ -2264,6 +2414,13 @@
                   "delete": {
                     "title": "Potvrdiť odstránenie používateľa",
                     "content": "Naozaj chcete odstrániť **{username}**?"
+                  },
+                  "verifyEmail": {
+                    "title": "Mark Email Verified",
+                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
+                    "toast": {
+                      "verified": "Email marked as verified."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Zakázať dvojfaktorové overenie používateľa",
@@ -3855,8 +4012,8 @@
                   "nameLastPath": "Cesta k priezvisku",
                   "nameLastPathDescription": "Cesta použitá na extrahovanie priezviska z odpovede z URL s informáciami (https://serdejsonpath.live).",
                   "loginOnly": "Povoliť iba prihlásenie",
-                  "loginBypass2fa": "Obísť 2FA pri prihlásení",
-                  "loginBypass2faDescription": "Umožňuje používateľom prihláseným cez tohto poskytovateľa obísť 2FA v paneli.",
+                  "loginBypassTwoFactor": "Bypass 2FA on Login",
+                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "Prepojenie je viditeľné pre používateľa",
                   "linkViewableDescription": "Umožňuje používateľovi vidieť pripojenie a jeho identifikátor v používateľskom rozhraní klienta.",
                   "userManageable": "Prepojenie môže spravovať používateľ",

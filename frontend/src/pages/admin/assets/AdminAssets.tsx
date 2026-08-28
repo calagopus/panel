@@ -2,7 +2,7 @@ import { faArrowUp, faFolderPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
-import { Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, Ref, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
@@ -13,9 +13,9 @@ import Card from '@/elements/Card.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SelectionArea from '@/elements/SelectionArea.tsx';
 import Table from '@/elements/Table.tsx';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { assetTableColumns } from '@/lib/tableColumns.ts';
 import AssetUpload from '@/pages/admin/assets/AssetUpload.tsx';
@@ -51,10 +51,7 @@ export default function AdminAssets() {
   const [search, setSearchValue] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const updateDebouncedSearch = useCallback(
-    debounce((value: string) => setDebouncedSearch(value), 150),
-    [],
-  );
+  const updateDebouncedSearch = useMemo(() => debounce((value: string) => setDebouncedSearch(value), 150), []);
 
   useEffect(() => {
     if (!search) {
@@ -81,7 +78,10 @@ export default function AdminAssets() {
   }, [queryClient]);
 
   const currentDirectoryRef = useRef(currentDirectory);
-  currentDirectoryRef.current = currentDirectory;
+
+  useEffect(() => {
+    currentDirectoryRef.current = currentDirectory;
+  }, [currentDirectory]);
 
   const getDestination = useCallback(
     (): UploadDestination => ({ type: 'adminAsset', directory: currentDirectoryRef.current }),

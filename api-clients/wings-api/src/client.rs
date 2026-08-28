@@ -494,6 +494,11 @@ impl WingsClient {
         if let Some(value) = query.max_size {
             query_parts.push(format!("max_size={}", value).into());
         }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
         let query = if query_parts.is_empty() {
             String::new()
         } else {
@@ -626,6 +631,11 @@ impl WingsClient {
         if let Some(value) = &query.files {
             for value in value {
                 query_parts.push(format!("files={}", urlencoding::encode(value)).into());
+            }
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
             }
         }
         let query = if query_parts.is_empty() {
@@ -847,6 +857,11 @@ impl WingsClient {
         if let Some(value) = &query.file {
             query_parts.push(format!("file={}", urlencoding::encode(value)).into());
         }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
         let query = if query_parts.is_empty() {
             String::new()
         } else {
@@ -871,6 +886,11 @@ impl WingsClient {
         let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
         if let Some(value) = &query.file {
             query_parts.push(format!("file={}", urlencoding::encode(value)).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
         }
         let query = if query_parts.is_empty() {
             String::new()
@@ -929,6 +949,11 @@ impl WingsClient {
         }
         if let Some(value) = query.user {
             query_parts.push(format!("user={}", value).into());
+        }
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
         }
         let query = if query_parts.is_empty() {
             String::new()

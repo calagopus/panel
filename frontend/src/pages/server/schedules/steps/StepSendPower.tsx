@@ -3,7 +3,7 @@ import { z } from 'zod';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/Stack.tsx';
-import { serverPowerActionLabelMapping } from '@/lib/enums.ts';
+import { mappingToSelectData, serverPowerActionLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -30,10 +30,9 @@ export default function StepSendPower({
       <Select
         withAsterisk
         label={t('common.form.powerAction', {})}
-        data={Object.entries(serverPowerActionLabelMapping).map(([value, label]) => ({
-          value,
-          label: label(),
-          disabled: !allowedPowerActions[value as keyof typeof serverPowerActionLabelMapping],
+        data={mappingToSelectData(serverPowerActionLabelMapping).map((item) => ({
+          ...item,
+          disabled: !allowedPowerActions[item.value as keyof typeof serverPowerActionLabelMapping],
         }))}
         {...form.getInputProps('action.action')}
       />

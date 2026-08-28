@@ -4,7 +4,7 @@ import TextArea from '@/elements/input/TextArea.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import ScheduleDynamicParameterInput from '../ScheduleDynamicParameterInput.tsx';
+import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
 
 export default function StepFormat({
   form,

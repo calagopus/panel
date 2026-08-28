@@ -7,12 +7,12 @@ import { z } from 'zod';
 import pullFile from '@/api/server/files/pullFile.ts';
 import queryFilePull from '@/api/server/files/queryFilePull.ts';
 import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverFilesPullQueryResultSchema, serverFilesPullSchema } from '@/lib/schemas/server/files.ts';
 import { bytesToString } from '@/lib/size.ts';
+import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -98,15 +98,10 @@ export default function PullFileModal({ ...props }: ModalProps) {
         {...form.getInputProps('name')}
       />
 
-      <p className='mt-2 text-sm md:text-base break-all'>
-        <span>{t('pages.server.files.modal.pullFile.createdAs', {})}</span>
-        <Code>
-          /home/container/
-          <span className='text-cyan-200'>
-            {join(browsingDirectory, form.values.name ?? '').replace(/^(\.\.\/|\/)+/, '')}
-          </span>
-        </Code>
-      </p>
+      <FilePathPreview
+        label={t('pages.server.files.modal.pullFile.createdAs', {})}
+        path={join(browsingDirectory, form.values.name ?? '')}
+      />
 
       <ModalFooter>
         <Button type='submit' loading={loading} disabled={!form.isValid()}>

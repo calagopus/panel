@@ -1,8 +1,9 @@
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import ActionIcon from '@/elements/ActionIcon.tsx';
+import Alert from '@/elements/Alert.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Group from '@/elements/Group.tsx';
@@ -22,12 +23,14 @@ export function tableIdentity(table: z.infer<typeof serverDatabaseSchemaTableSch
 
 export default function DatabaseSchemaPanel({
   tables,
+  truncated = false,
   loading,
   selected,
   onSelect,
   onCreateTable,
 }: {
   tables: z.infer<typeof serverDatabaseSchemaTableSchema>[];
+  truncated?: boolean;
   loading: boolean;
   selected: z.infer<typeof serverDatabaseSchemaTableSchema> | null;
   onSelect: (table: z.infer<typeof serverDatabaseSchemaTableSchema>) => void;
@@ -61,6 +64,13 @@ export default function DatabaseSchemaPanel({
           leftSection={<FontAwesomeIcon icon={faSearch} />}
         />
       </div>
+      {truncated && (
+        <div className='px-2 pb-2'>
+          <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            {t('pages.server.databases.explorer.schema.truncated', { tables: tables.length })}
+          </Alert>
+        </div>
+      )}
       <Divider />
       <ScrollArea className='flex-1' mah='max(20rem, calc(100dvh - 26rem))' type='auto'>
         <Stack gap={0} p='xs'>
@@ -71,7 +81,9 @@ export default function DatabaseSchemaPanel({
           )}
           {!loading && tables.length > 0 && filtered.length === 0 && (
             <Text size='sm' c='dimmed' p='xs'>
-              {t('pages.server.databases.explorer.schema.noMatches', {})}
+              {truncated
+                ? t('pages.server.databases.explorer.schema.noMatchesTruncated', { tables: tables.length })
+                : t('pages.server.databases.explorer.schema.noMatches', {})}
             </Text>
           )}
           {filtered.map((table) => (

@@ -179,6 +179,49 @@ nestify::nest! {
     }
 }
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum FirewallBackendKind {
+    #[serde(rename = "auto")]
+    Auto,
+    #[serde(rename = "nftables")]
+    Nftables,
+    #[serde(rename = "iptables")]
+    Iptables,
+    #[serde(rename = "container")]
+    Container,
+    #[serde(rename = "disabled")]
+    Disabled,
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct FirewallRule {
+        #[schema(inline)]
+        pub action: FirewallRuleAction,
+        #[schema(inline)]
+        pub protocols: Vec<FirewallRuleProtocol>,
+        #[schema(inline)]
+        pub sources: Vec<compact_str::CompactString>,
+        #[schema(inline)]
+        pub ports: Option<Vec<u32>>,
+    }
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum FirewallRuleAction {
+    #[serde(rename = "allow")]
+    Allow,
+    #[serde(rename = "deny")]
+    Deny,
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum FirewallRuleProtocol {
+    #[serde(rename = "tcp")]
+    Tcp,
+    #[serde(rename = "udp")]
+    Udp,
+}
+
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct InstallationScript {
         #[schema(inline)]
@@ -225,6 +268,7 @@ nestify::nest! {
         #[schema(inline)]
         pub rows_affected: u64,
         #[schema(inline)]
+        #[serde(default)]
         pub truncated: bool,
     }
 }
@@ -422,6 +466,8 @@ nestify::nest! {
         #[schema(inline)]
         pub mounts: Vec<Mount>,
         #[schema(inline)]
+        pub firewall: Vec<FirewallRule>,
+        #[schema(inline)]
         pub egg: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationEgg {
             #[schema(inline)]
             pub id: uuid::Uuid,
@@ -457,6 +503,32 @@ nestify::nest! {
 
         #[schema(inline)]
         pub auto_start_behavior: ServerAutoStartBehavior,
+        #[schema(inline)]
+        pub features: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationFeatures {
+            #[schema(inline)]
+            pub startup_cpu_boost: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationFeaturesStartupCpuBoost {
+                #[schema(inline)]
+                pub enabled: bool,
+                #[schema(inline)]
+                pub timeout: u64,
+            }>,
+            #[schema(inline)]
+            pub runtime_cpu_boost: Option<#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationFeaturesRuntimeCpuBoost {
+                #[schema(inline)]
+                pub enabled: bool,
+                #[schema(inline)]
+                pub threshold: u64,
+                #[schema(inline)]
+                pub sustained: u64,
+                #[schema(inline)]
+                pub multiple: f64,
+                #[schema(inline)]
+                pub duration: u64,
+                #[schema(inline)]
+                pub cooldown: u64,
+            }>,
+        },
+
     }
 }
 
@@ -706,6 +778,8 @@ pub enum WebsocketEvent {
     ImagePullCompleted,
     #[serde(rename = "install started")]
     InstallStarted,
+    #[serde(rename = "install progress")]
+    InstallProgress,
     #[serde(rename = "install completed")]
     InstallCompleted,
     #[serde(rename = "daemon message")]
@@ -834,6 +908,8 @@ pub mod backups_backup_export {
                 pub archive_format: StreamableArchiveFormat,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1155,6 +1231,8 @@ pub mod servers_server_files_chmod {
                     #[schema(inline)]
                     pub recursive: bool,
                 }>,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1190,6 +1268,8 @@ pub mod servers_server_files_compress {
                 pub files: Vec<compact_str::CompactString>,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1236,6 +1316,7 @@ pub mod servers_server_files_contents {
             pub file: Option<compact_str::CompactString>,
             pub download: Option<bool>,
             pub max_size: Option<u64>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1257,6 +1338,8 @@ pub mod servers_server_files_copy {
                 pub overwrite: bool,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1304,6 +1387,8 @@ pub mod servers_server_files_copy_many {
                 pub overwrite: bool,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1362,6 +1447,10 @@ pub mod servers_server_files_copy_remote {
                 #[schema(inline)]
                 pub destination_path: compact_str::CompactString,
                 #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
+                #[schema(inline)]
+                pub destination_ignored: Vec<compact_str::CompactString>,
+                #[schema(inline)]
                 pub foreground: bool,
             }
         }
@@ -1402,6 +1491,8 @@ pub mod servers_server_files_create_directory {
                 pub root: compact_str::CompactString,
                 #[schema(inline)]
                 pub name: compact_str::CompactString,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1431,6 +1522,8 @@ pub mod servers_server_files_create_symlink {
                 pub link: compact_str::CompactString,
                 #[schema(inline)]
                 pub target: compact_str::CompactString,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1460,6 +1553,8 @@ pub mod servers_server_files_decompress {
                 pub file: compact_str::CompactString,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1499,6 +1594,8 @@ pub mod servers_server_files_delete {
                 pub root: compact_str::CompactString,
                 #[schema(inline)]
                 pub files: Vec<compact_str::CompactString>,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1536,6 +1633,7 @@ pub mod servers_server_files_fingerprints {
         pub struct Query {
             pub algorithm: Option<Algorithm>,
             pub files: Option<Vec<compact_str::CompactString>>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1691,6 +1789,8 @@ pub mod servers_server_files_pull {
                 pub use_header: bool,
                 #[schema(inline)]
                 pub foreground: bool,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1780,6 +1880,8 @@ pub mod servers_server_files_rename {
                     #[schema(inline)]
                     pub to: compact_str::CompactString,
                 }>,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1814,6 +1916,7 @@ pub mod servers_server_files_revisions {
         #[allow(clippy::manual_non_exhaustive)]
         pub struct Query {
             pub file: Option<compact_str::CompactString>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1835,6 +1938,7 @@ pub mod servers_server_files_revisions_revision {
         #[allow(clippy::manual_non_exhaustive)]
         pub struct Query {
             pub file: Option<compact_str::CompactString>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1910,6 +2014,8 @@ pub mod servers_server_files_sqlite_query {
                 pub read_only: bool,
                 #[schema(inline)]
                 pub rows: u32,
+                #[schema(inline)]
+                pub ignored: Vec<compact_str::CompactString>,
             }
         }
 
@@ -1957,6 +2063,7 @@ pub mod servers_server_files_write {
         pub struct Query {
             pub file: Option<compact_str::CompactString>,
             pub user: Option<uuid::Uuid>,
+            pub ignored: Option<Vec<compact_str::CompactString>>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -2766,6 +2873,12 @@ pub mod system_config {
                     },
 
                     #[schema(inline)]
+                    pub firewall: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerFirewall {
+                        #[schema(inline)]
+                        pub backend: FirewallBackendKind,
+                    },
+
+                    #[schema(inline)]
                     pub domainname: compact_str::CompactString,
                     #[schema(inline)]
                     pub registries: IndexMap<compact_str::CompactString, serde_json::Value>,
@@ -2818,6 +2931,24 @@ pub mod system_config {
                         pub enabled: bool,
                         #[schema(inline)]
                         pub timeout: u64,
+                        #[schema(inline)]
+                        pub max_concurrent: u64,
+                    },
+
+                    #[schema(inline)]
+                    pub runtime_boost: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerRuntimeBoost {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub threshold: u64,
+                        #[schema(inline)]
+                        pub sustained: u64,
+                        #[schema(inline)]
+                        pub multiple: f64,
+                        #[schema(inline)]
+                        pub duration: u64,
+                        #[schema(inline)]
+                        pub cooldown: u64,
                         #[schema(inline)]
                         pub max_concurrent: u64,
                     },

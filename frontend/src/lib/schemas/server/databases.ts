@@ -34,8 +34,8 @@ export const serverDatabaseQueryColumnSchema = z.object({
 
 export const serverDatabaseQueryValueSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('null') }),
-  z.object({ type: z.literal('text'), value: z.string() }),
-  z.object({ type: z.literal('binary'), value: z.string() }),
+  z.object({ type: z.literal('text'), value: z.string(), truncated: z.boolean() }),
+  z.object({ type: z.literal('binary'), value: z.string(), truncated: z.boolean() }),
 ]);
 
 export const serverDatabaseQueryResultSchema = z.object({
@@ -62,6 +62,11 @@ export const serverDatabaseSchemaTableSchema = z.object({
   view: z.boolean(),
   rowEstimate: z.number().nullable(),
   columns: z.array(serverDatabaseSchemaColumnSchema),
+});
+
+export const serverDatabaseSchemaSchema = z.object({
+  tables: z.array(serverDatabaseSchemaTableSchema),
+  truncated: z.boolean(),
 });
 
 export const serverDatabaseFilterOperator = z.enum([

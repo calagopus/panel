@@ -12,6 +12,7 @@ import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserSchema, serverSubuserUpdateSchema } from '@/lib/schemas/server/subusers.ts';
+import { appendInheritedIgnoredFiles, stripInheritedIgnoredFiles } from '@/lib/subusers.ts';
 import { useModalForm } from '@/plugins/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -31,18 +32,24 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
 
   const grantablePermissions = server.permissions.includes('*') ? undefined : server.permissions;
 
+  const ignoredFilesDescription =
+    t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {}) +
+    (server.ignoredFiles.length > 0
+      ? ` ${t('pages.server.subusers.modal.createSubuser.form.ignoredFilesInherited', {})}`
+      : '');
+
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<z.infer<typeof serverSubuserUpdateSchema>>(
     {
       initialValues: {
         permissions: subuser.permissions,
-        ignoredFiles: subuser.ignoredFiles,
+        ignoredFiles: stripInheritedIgnoredFiles(subuser.ignoredFiles, server.ignoredFiles),
       },
       validate: zod4Resolver(serverSubuserUpdateSchema),
       onClose: props.onClose,
       onSubmit: async (values) => {
         await updateSubuser(server.uuid, subuser.user.uuid, {
           permissions: Array.from(values.permissions),
-          ignoredFiles: values.ignoredFiles,
+          ignoredFiles: appendInheritedIgnoredFiles(values.ignoredFiles, server.ignoredFiles),
         });
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });
         addToast(t('pages.server.subusers.modal.updateSubuser.toast.updated', {}), 'success');
@@ -54,7 +61,7 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
     if (props.opened) {
       const values = {
         permissions: subuser.permissions,
-        ignoredFiles: subuser.ignoredFiles,
+        ignoredFiles: stripInheritedIgnoredFiles(subuser.ignoredFiles, server.ignoredFiles),
       };
 
       form.setValues(values);
@@ -85,7 +92,7 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
         <IgnoredFilesInput
           serverUuid={server.uuid}
           label={t('common.form.ignoredFiles', {})}
-          description={t('pages.server.subusers.modal.createSubuser.form.ignoredFilesDescription', {})}
+          description={ignoredFilesDescription}
           value={form.values.ignoredFiles}
           onChange={(value) => form.setFieldValue('ignoredFiles', value)}
         />

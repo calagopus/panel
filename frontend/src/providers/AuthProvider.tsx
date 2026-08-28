@@ -7,6 +7,7 @@ import getMe from '@/api/me/getMe.ts';
 import logout from '@/api/me/logout.ts';
 import Spinner from '@/elements/Spinner.tsx';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { flushUserSettings, loadUserSettings, unloadUserSettings } from '@/lib/userSettings.ts';
 import { AuthContext } from '@/providers/contexts/authContext.ts';
 import { useUserStore } from '@/stores/user.ts';
 import { useToast } from './ToastProvider.tsx';
@@ -14,7 +15,7 @@ import { useTranslations } from './TranslationProvider.tsx';
 import { useWindows } from './WindowProvider.tsx';
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { setToastPosition, addToast } = useToast();
+  const { addToast } = useToast();
   const { setLanguage } = useTranslations();
   const { closeAllWindows } = useWindows();
   const navigate = useNavigate();
@@ -32,11 +33,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user) {
       startTransition(() => {
-        setToastPosition(user.toastPosition);
         setLanguage(user.language);
       });
+      loadUserSettings(user.uuid);
     }
-  }, [user, setToastPosition, setLanguage]);
+  }, [user, setLanguage]);
 
   useEffect(() => {
     getMe()
@@ -63,6 +64,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       queryClient.clear();
       useUserStore.getState().reset();
+      unloadUserSettings();
       setUser(null);
     };
     window.addEventListener('session-expired', handleSessionExpired);
@@ -70,6 +72,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [queryClient]);
 
   const doImpersonate = async (user: z.infer<typeof fullUserSchema>) => {
+    await flushUserSettings();
+
     const previousImpersonatedUser = getImpersonatedUser();
     setImpersonatedUser(user.uuid);
 
@@ -116,9 +120,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    logout()
+    flushUserSettings()
+      .then(() => logout())
       .then(() => {
         clearIdentityData();
+        unloadUserSettings();
         setUser(null);
       })
       .catch((msg) => {

@@ -13,9 +13,9 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/coreQuickActions.tsx';
-import { isArchiveType } from '@/lib/files.ts';
-import { canMoveFilesToDirectory } from '@/pages/server/files/fileMove.ts';
+import { isArchiveType } from '@/lib/files/files.ts';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
+import { canMoveFilesToDirectory } from '@/pages/server/files/browser/fileMove.ts';
 import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi } from '@/stores/fileManager.ts';

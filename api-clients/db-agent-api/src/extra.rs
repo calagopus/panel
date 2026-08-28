@@ -8,8 +8,8 @@ pub type Config = super::system_config::get::Response200;
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum QueryValue {
     Null,
-    Text { value: String },
-    Binary { value: String },
+    Text { value: String, truncated: bool },
+    Binary { value: String, truncated: bool },
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
