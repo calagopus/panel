@@ -49,10 +49,10 @@ export default function FileDeleteModal({ files, ...props }: Props) {
   return (
     <Modal title={t('pages.server.files.modal.deleteFile.title', {})} {...props}>
       {files.length === 1 ? (
-        <div>{t('pages.server.files.modal.deleteFile.singleFileWarning', { file: files[0].name }).md()}</div>
+        t('pages.server.files.modal.deleteFile.singleFileWarning', { file: files[0].name }).md()
       ) : (
         <>
-          <div>{t('pages.server.files.modal.deleteFile.multipleFilesWarning', {}).md()}</div>
+          {t('pages.server.files.modal.deleteFile.multipleFilesWarning', {}).md()}
           <Code block className='mt-1'>
             <ul>
               {files.map((file) => (
