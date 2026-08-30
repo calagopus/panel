@@ -94,6 +94,10 @@ mod post {
         #[garde(length(chars, min = 3, max = 31))]
         #[schema(min_length = 3, max_length = 31)]
         name: compact_str::CompactString,
+
+        #[garde(length(max = 512))]
+        #[schema(max_length = 512)]
+        password: compact_str::CompactString,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -107,6 +111,7 @@ mod post {
         (status = OK, body = inline(Response)),
         (status = BAD_REQUEST, body = ApiError),
         (status = CONFLICT, body = ApiError),
+        (status = FORBIDDEN, body = ApiError),
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
@@ -121,6 +126,15 @@ mod post {
         }
 
         permissions.has_user_permission("security-keys.create")?;
+
+        if !user
+            .validate_password(&state.database, &data.password)
+            .await?
+        {
+            return ApiResponse::error("invalid password")
+                .with_status(StatusCode::FORBIDDEN)
+                .ok();
+        }
 
         let webauthn = state.settings.get_webauthn().await?;
 

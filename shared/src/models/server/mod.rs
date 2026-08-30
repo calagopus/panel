@@ -1,6 +1,6 @@
 use crate::{
     State,
-    models::{InsertQueryBuilder, UpdateQueryBuilder, user::GetAuthMethod},
+    models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
     response::DisplayError,
 };
@@ -1296,85 +1296,20 @@ impl Server {
         Ok(())
     }
 
-    pub fn wings_permissions<'a>(
-        &'a self,
-        settings: &crate::settings::AppSettings,
-        user: &super::user::User,
-        auth: Option<&'a GetAuthMethod>,
-    ) -> Vec<&'a str> {
-        let scope = crate::utils::api_key_scope(auth);
-        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
-
-        if user.admin {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-            permissions.push("admin.websocket.errors");
-            permissions.push("admin.websocket.install");
-            permissions.push("admin.websocket.transfer");
-
-            return permissions;
-        }
-
-        if let Some(subuser_permissions) = &self.subuser_permissions {
-            permissions.reserve(subuser_permissions.len());
-
-            for permission in subuser_permissions.iter() {
-                if scope.is_some_and(|s| !s.contains(permission)) {
-                    continue;
-                }
-
-                if permission == "control.read-console" {
-                    if settings.server.allow_viewing_installation_logs {
-                        permissions.push("admin.websocket.install");
-                    }
-                    if settings.server.allow_viewing_transfer_progress {
-                        permissions.push("admin.websocket.transfer");
-                    }
-                }
-
-                permissions.push(permission.as_str());
-            }
-        } else {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 2);
-
-            if settings.server.allow_viewing_installation_logs {
-                permissions.push("admin.websocket.install");
-            }
-            if settings.server.allow_viewing_transfer_progress {
-                permissions.push("admin.websocket.transfer");
-            }
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-        }
-
-        permissions
+    fn scope_allows_console_streams(scope: Option<&[compact_str::CompactString]>) -> bool {
+        scope.is_none_or(|scope| scope.iter().any(|p| p == "control.read-console"))
     }
 
-    pub fn wings_subuser_permissions<'a>(
-        &self,
+    fn push_granted_permissions<'a>(
+        permissions: &mut Vec<&'a str>,
+        granted: impl Iterator<Item = &'a compact_str::CompactString>,
+        scope: Option<&[compact_str::CompactString]>,
         settings: &crate::settings::AppSettings,
-        subuser: &'a super::server_subuser::ServerSubuser,
-        auth: Option<&'a GetAuthMethod>,
-    ) -> Vec<&'a str> {
-        let scope = crate::utils::api_key_scope(auth);
-        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
-
-        if subuser.user.admin {
-            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
-
-            crate::utils::push_scope_or_star(&mut permissions, scope);
-            permissions.push("admin.websocket.errors");
-            permissions.push("admin.websocket.install");
-            permissions.push("admin.websocket.transfer");
-
-            return permissions;
-        }
-
-        permissions.reserve(subuser.permissions.len() + 1);
-
-        for permission in subuser.permissions.iter() {
-            if scope.is_some_and(|s| !s.contains(permission)) {
+    ) {
+        for permission in granted {
+            if scope.is_some_and(|scope| !scope.contains(permission))
+                || permissions.contains(&permission.as_str())
+            {
                 continue;
             }
 
@@ -1389,6 +1324,110 @@ impl Server {
 
             permissions.push(permission.as_str());
         }
+    }
+
+    pub fn wings_permissions<'a>(
+        &'a self,
+        settings: &crate::settings::AppSettings,
+        user: &'a super::user::User,
+        scope: &'a crate::models::user::CredentialScope,
+    ) -> Vec<&'a str> {
+        let scope = scope.server_permissions();
+        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
+
+        if user.admin {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            if Self::scope_allows_console_streams(scope) {
+                permissions.push("admin.websocket.errors");
+                permissions.push("admin.websocket.install");
+                permissions.push("admin.websocket.transfer");
+            }
+
+            return permissions;
+        }
+
+        if self.owner.uuid == user.uuid {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 2);
+
+            if Self::scope_allows_console_streams(scope) {
+                if settings.server.allow_viewing_installation_logs {
+                    permissions.push("admin.websocket.install");
+                }
+                if settings.server.allow_viewing_transfer_progress {
+                    permissions.push("admin.websocket.transfer");
+                }
+            }
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            return permissions;
+        }
+
+        // anyone else reaches this server through their role, their subuser entry, or both, and
+        // holds exactly what those grant. this has to mirror
+        // `PermissionManager::has_server_permission`, otherwise the token authorizes more than
+        // the rest api would.
+        let role_permissions = user
+            .role
+            .as_ref()
+            .map_or(&[][..], |role| role.server_permissions.as_slice());
+        let subuser_permissions = self
+            .subuser_permissions
+            .iter()
+            .flat_map(|permissions| permissions.iter());
+
+        permissions.reserve(
+            role_permissions.len() + self.subuser_permissions.as_ref().map_or(0, |p| p.len()),
+        );
+        Self::push_granted_permissions(
+            &mut permissions,
+            role_permissions.iter().chain(subuser_permissions),
+            scope,
+            settings,
+        );
+
+        permissions
+    }
+
+    pub fn wings_subuser_permissions<'a>(
+        &self,
+        settings: &crate::settings::AppSettings,
+        subuser: &'a super::server_subuser::ServerSubuser,
+        scope: &'a crate::models::user::CredentialScope,
+    ) -> Vec<&'a str> {
+        let scope = scope.server_permissions();
+        let mut permissions = vec!["websocket.connect", "meta.calagopus"];
+
+        if subuser.user.admin {
+            permissions.reserve(scope.map_or(1, |s| s.len()) + 3);
+
+            crate::utils::push_scope_or_star(&mut permissions, scope);
+
+            if Self::scope_allows_console_streams(scope) {
+                permissions.push("admin.websocket.errors");
+                permissions.push("admin.websocket.install");
+                permissions.push("admin.websocket.transfer");
+            }
+
+            return permissions;
+        }
+
+        let role_permissions = subuser
+            .user
+            .role
+            .as_ref()
+            .map_or(&[][..], |role| role.server_permissions.as_slice());
+
+        permissions.reserve(subuser.permissions.len() + role_permissions.len() + 1);
+        Self::push_granted_permissions(
+            &mut permissions,
+            role_permissions.iter().chain(subuser.permissions.iter()),
+            scope,
+            settings,
+        );
 
         permissions
     }

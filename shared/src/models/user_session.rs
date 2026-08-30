@@ -150,6 +150,24 @@ impl UserSession {
         })
     }
 
+    pub async fn delete_by_user_uuid_except(
+        database: &crate::database::Database,
+        user_uuid: uuid::Uuid,
+        except: Option<uuid::Uuid>,
+    ) -> Result<u64, sqlx::Error> {
+        Ok(sqlx::query(
+            r#"
+            DELETE FROM user_sessions
+            WHERE user_sessions.user_uuid = $1 AND ($2 IS NULL OR user_sessions.uuid != $2)
+            "#,
+        )
+        .bind(user_uuid)
+        .bind(except)
+        .execute(database.write())
+        .await?
+        .rows_affected())
+    }
+
     pub async fn delete_unused(
         database: &crate::database::Database,
         duration_seconds: i64,

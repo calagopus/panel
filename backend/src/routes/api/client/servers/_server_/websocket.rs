@@ -9,7 +9,7 @@ mod get {
         jwt::BasePayload,
         models::{
             server::GetServer,
-            user::{GetAuthMethod, GetUser},
+            user::{CredentialScope, GetAuthMethod, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -48,6 +48,8 @@ mod get {
             ignored_files: &'a [compact_str::CompactString],
         }
 
+        let credential_scope = CredentialScope::from(&**auth);
+
         let node = server.node.fetch_cached(&state.database).await?;
 
         let token = node.create_jwt(
@@ -69,7 +71,7 @@ mod get {
                 permissions: server.wings_permissions(
                     &*state.settings.get().await?,
                     &user,
-                    Some(&auth),
+                    &credential_scope,
                 ),
                 ignored_files: server.subuser_ignored_files.as_deref().unwrap_or(&[]),
             },

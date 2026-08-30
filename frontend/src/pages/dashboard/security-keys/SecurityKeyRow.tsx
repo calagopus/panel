@@ -1,36 +1,19 @@
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { z } from 'zod';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import deleteSecurityKey from '@/api/me/security-keys/deleteSecurityKey.ts';
 import Code from '@/elements/Code.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
-import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useUserStore } from '@/stores/user.ts';
+import SecurityKeyDeleteModal from './modals/SecurityKeyDeleteModal.tsx';
 import SecurityKeyEditModal from './modals/SecurityKeyEditModal.tsx';
 
 export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<typeof userSecurityKeySchema> }) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
-  const { removeSecurityKey } = useUserStore();
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
-
-  const doDelete = async () => {
-    await deleteSecurityKey(securityKey.uuid)
-      .then(() => {
-        removeSecurityKey(securityKey);
-        addToast(t('pages.account.securityKeys.modal.deleteSecurityKey.toast.deleted', {}), 'success');
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  };
 
   return (
     <>
@@ -40,17 +23,11 @@ export default function SecurityKeyRow({ securityKey }: { securityKey: z.infer<t
         onClose={() => setOpenModal(null)}
       />
 
-      <ConfirmationModal
+      <SecurityKeyDeleteModal
+        securityKey={securityKey}
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title={t('pages.account.securityKeys.modal.deleteSecurityKey.title', {})}
-        confirm={t('common.button.delete', {})}
-        onConfirmed={doDelete}
-      >
-        {t('pages.account.securityKeys.modal.deleteSecurityKey.content', {
-          key: securityKey.name,
-        }).md()}
-      </ConfirmationModal>
+      />
 
       <ContextMenu
         items={[

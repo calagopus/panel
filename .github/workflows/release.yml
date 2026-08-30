@@ -87,18 +87,22 @@ jobs:
         include:
           - build: x86_64-linux
             os: ubuntu-24.04
+            wings_arch: x86_64
             target: x86_64-unknown-linux-musl
             binary_suffix: ""
           - build: aarch64-linux
             os: ubuntu-24.04
+            wings_arch: aarch64
             target: aarch64-unknown-linux-musl
             binary_suffix: ""
           - build: riscv64-linux
             os: ubuntu-24.04
+            wings_arch: riscv64
             target: riscv64gc-unknown-linux-gnu
             binary_suffix: ""
           - build: ppc64le-linux
             os: ubuntu-24.04
+            wings_arch: ppc64le
             target: powerpc64le-unknown-linux-gnu
             binary_suffix: ""
           - build: x86_64-windows
@@ -133,8 +137,19 @@ jobs:
         if: contains(matrix.target, 'linux')
         run: cargo install cross --git https://github.com/cross-rs/cross
 
+      - name: Fetch wings binary
+        if: contains(matrix.target, 'linux')
+        run: |
+          mkdir -p bins/all-in-one/bins
+          curl -fL -o bins/all-in-one/bins/wings-release-bin \
+            "https://github.com/calagopus/wings/releases/download/release-1.0.11/wings-rs-${{ matrix.wings_arch }}-linux"
+          chmod +x bins/all-in-one/bins/wings-release-bin
+
       - name: Build release binaries (Linux)
         if: contains(matrix.target, 'linux')
+        env:
+          WINGS_RELEASE: ${{ github.ref_name }}
+          WINGS_BINARY_PATH: bins/wings-release-bin
         run: |
           RUSTFLAGS="-C target-feature=+crt-static" \
           cross build --release --target ${{ matrix.target }} -p $BIN_NAME

@@ -171,7 +171,7 @@ mod patch {
         models::{
             UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
-            user::{GetAuthMethod, GetPermissionManager, GetUser},
+            user::{CredentialScope, GetAuthMethod, GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -265,6 +265,8 @@ mod patch {
         tokio::spawn(async move {
             tracing::debug!(server = %server.uuid, "updating subuser permissions in wings");
 
+            let credential_scope = CredentialScope::from(&**auth);
+
             let node = match server.node.fetch_cached(&state.database).await {
                 Ok(node) => node,
                 Err(err) => {
@@ -295,7 +297,7 @@ mod patch {
                                     Err(_) => return,
                                 },
                                 &subuser,
-                                Some(&auth)
+                                &credential_scope,
                             )
                                 .into_iter()
                                 .map(compact_str::CompactString::from)

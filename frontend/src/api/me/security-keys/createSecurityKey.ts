@@ -42,6 +42,7 @@ function prepareCredentialOptions(options: CredentialCreationOptions): Credentia
 
 interface Data {
   name: string;
+  password: string;
 }
 
 export default async (data: Data): Promise<[z.infer<typeof userSecurityKeySchema>, CredentialCreationOptions]> => {

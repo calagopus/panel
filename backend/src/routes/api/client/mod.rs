@@ -55,6 +55,75 @@ fn can_impersonate(impersonator: &User, target: &User) -> bool {
         && tgt_server.iter().all(|p| imp_server.contains(p))
 }
 
+async fn finalize(
+    state: &GetState,
+    ip: shared::GetIp,
+    req: &mut Request,
+    auth_user: User,
+    auth_method: AuthMethod,
+) -> Option<Response> {
+    let auth_permission_manager = PermissionManager::new(&auth_user, &auth_method);
+    let api_key_uuid = auth_method.api_key_uuid();
+
+    if auth_permission_manager
+        .has_admin_permission("users.impersonate")
+        .is_ok()
+        && let Some(user_uuid) = req
+            .headers()
+            .get("Calagopus-User")
+            .and_then(|h| h.to_str().ok())
+            .and_then(|h| h.parse().ok())
+    {
+        let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
+            Ok(Some(user)) => user,
+            Ok(None) => {
+                return Some(
+                    ApiResponse::error("unable to find user from calagopus-user header")
+                        .with_status(StatusCode::UNAUTHORIZED)
+                        .into_response(),
+                );
+            }
+            Err(err) => return Some(ApiResponse::from(err).into_response()),
+        };
+
+        if !can_impersonate(&auth_user, &user) {
+            return Some(
+                ApiResponse::error("cannot impersonate a user with more permissions")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .into_response(),
+            );
+        }
+
+        req.extensions_mut()
+            .insert(PermissionManager::new(&user, &auth_method));
+        req.extensions_mut().insert(UserActivityLogger {
+            state: Arc::clone(state),
+            user_uuid: user.uuid,
+            impersonator_uuid: Some(auth_user.uuid),
+            api_key_uuid,
+            ip: ip.0,
+        });
+        req.extensions_mut().insert(user);
+        req.extensions_mut()
+            .insert(Some(UserImpersonator(auth_user)));
+    } else {
+        req.extensions_mut().insert(auth_permission_manager);
+        req.extensions_mut().insert(UserActivityLogger {
+            state: Arc::clone(state),
+            user_uuid: auth_user.uuid,
+            impersonator_uuid: None,
+            api_key_uuid,
+            ip: ip.0,
+        });
+        req.extensions_mut().insert(auth_user);
+        req.extensions_mut().insert(None::<UserImpersonator>);
+    }
+
+    req.extensions_mut().insert(Arc::new(auth_method));
+
+    None
+}
+
 pub async fn auth(
     state: GetState,
     ip: shared::GetIp,
@@ -130,62 +199,9 @@ pub async fn auth(
             }
         }
 
-        let auth_permission_manager = PermissionManager::new(&auth_user);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
-        {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
+        if let Some(response) = finalize(&state, ip, &mut req, auth_user, auth_method).await {
+            return Ok(response);
         }
-
-        req.extensions_mut().insert(Arc::new(auth_method));
     } else if let Some(session_id) = cookies.get(&settings.app.session_cookie) {
         drop(settings);
 
@@ -206,16 +222,19 @@ pub async fn auth(
                 Err(err) => return Ok(ApiResponse::from(err).into_response()),
             };
 
-        session
-            .update_last_used(
-                &state.database,
-                ip.0,
-                req.headers()
-                    .get("User-Agent")
-                    .and_then(|ua| ua.to_str().ok())
-                    .unwrap_or("unknown"),
-            )
-            .await;
+        let auth_method = AuthMethod::Session(session);
+        if let AuthMethod::Session(session) = &auth_method {
+            session
+                .update_last_used(
+                    &state.database,
+                    ip.0,
+                    req.headers()
+                        .get("User-Agent")
+                        .and_then(|ua| ua.to_str().ok())
+                        .unwrap_or("unknown"),
+                )
+                .await;
+        }
 
         let settings = match state.settings.get().await {
             Ok(settings) => settings,
@@ -246,63 +265,9 @@ pub async fn auth(
                 .into_response());
         }
 
-        let auth_permission_manager = PermissionManager::new(&auth_user);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
-        {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: None,
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
+        if let Some(response) = finalize(&state, ip, &mut req, auth_user, auth_method).await {
+            return Ok(response);
         }
-
-        req.extensions_mut()
-            .insert(Arc::new(AuthMethod::Session(session)));
     } else if let Some(api_token) = req.headers().get("Authorization") {
         drop(settings);
 
@@ -364,63 +329,11 @@ pub async fn auth(
                 .into_response());
         }
 
-        let auth_permission_manager = PermissionManager::new(&auth_user).add_api_key(&api_key);
-
-        if auth_permission_manager
-            .has_admin_permission("users.impersonate")
-            .is_ok()
-            && let Some(user_uuid) = req
-                .headers()
-                .get("Calagopus-User")
-                .and_then(|h| h.to_str().ok())
-                .and_then(|h| h.parse().ok())
+        if let Some(response) =
+            finalize(&state, ip, &mut req, auth_user, AuthMethod::ApiKey(api_key)).await
         {
-            let user = match User::by_uuid_optional_cached(&state.database, user_uuid).await {
-                Ok(Some(user)) => user,
-                Ok(None) => {
-                    return Ok(ApiResponse::error(
-                        "unable to find user from calagopus-user header",
-                    )
-                    .with_status(StatusCode::UNAUTHORIZED)
-                    .into_response());
-                }
-                Err(err) => return Ok(ApiResponse::from(err).into_response()),
-            };
-
-            if !can_impersonate(&auth_user, &user) {
-                return Ok(
-                    ApiResponse::error("cannot impersonate a user with more permissions")
-                        .with_status(StatusCode::FORBIDDEN)
-                        .into_response(),
-                );
-            }
-
-            req.extensions_mut().insert(PermissionManager::new(&user));
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: user.uuid,
-                impersonator_uuid: Some(auth_user.uuid),
-                api_key_uuid: Some(api_key.uuid),
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(user);
-            req.extensions_mut()
-                .insert(Some(UserImpersonator(auth_user)));
-        } else {
-            req.extensions_mut().insert(auth_permission_manager);
-            req.extensions_mut().insert(UserActivityLogger {
-                state: Arc::clone(&state),
-                user_uuid: auth_user.uuid,
-                impersonator_uuid: None,
-                api_key_uuid: Some(api_key.uuid),
-                ip: ip.0,
-            });
-            req.extensions_mut().insert(auth_user);
-            req.extensions_mut().insert(None::<UserImpersonator>);
+            return Ok(response);
         }
-
-        req.extensions_mut()
-            .insert(Arc::new(AuthMethod::ApiKey(api_key)));
     } else {
         return Ok(ApiResponse::error("missing authorization")
             .with_status(StatusCode::UNAUTHORIZED)
