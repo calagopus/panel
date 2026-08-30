@@ -75,6 +75,7 @@ mod post {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
+        censor::Censor,
         models::{
             CreatableModel, IntoAdminApiObject,
             admin_activity::GetAdminActivityLogger,

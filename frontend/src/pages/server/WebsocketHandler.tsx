@@ -141,11 +141,12 @@ export default function WebsocketHandler() {
 
         socket.on('token expiring', () => updateToken(socket));
         socket.on('token expired', () => {
+          socket.setAuthGapped(true);
           tokenRefreshFailuresRef.current += 1;
           updateToken(socket);
         });
         socket.on('jwt error', (error: string) => {
-          setSocketConnectionState(false);
+          socket.setAuthGapped(true);
           console.warn('JWT validation error from wings:', error);
 
           setSocketError({

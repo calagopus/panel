@@ -153,6 +153,29 @@ pub fn validate_json_path(path: &str, _context: &()) -> Result<(), garde::Error>
     Ok(())
 }
 
+pub fn validate_ignored_files(
+    patterns: &[compact_str::CompactString],
+    _context: &(),
+) -> Result<(), garde::Error> {
+    let mut builder = ignore::overrides::OverrideBuilder::new("/");
+
+    for pattern in patterns {
+        if let Err(err) = builder.add(pattern) {
+            return Err(garde::Error::new(compact_str::format_compact!(
+                "{pattern} is not a valid pattern: {err}"
+            )));
+        }
+    }
+
+    if let Err(err) = builder.build() {
+        return Err(garde::Error::new(compact_str::format_compact!(
+            "patterns cannot be compiled: {err}"
+        )));
+    }
+
+    Ok(())
+}
+
 pub fn validate_time_in_future(
     time: &chrono::DateTime<chrono::Utc>,
     _context: &(),
@@ -238,9 +261,48 @@ pub fn push_scope_or_star<'a>(
     }
 }
 
+pub fn is_single_component_file_name(name: &str) -> bool {
+    let mut components = std::path::Path::new(name).components();
+
+    match (components.next(), components.next()) {
+        (Some(std::path::Component::Normal(component)), None) => component.to_str() == Some(name),
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // is_single_component_file_name
+
+    #[test]
+    fn single_component_accepts_plain_file_names() {
+        assert!(is_single_component_file_name("wings.log"));
+        assert!(is_single_component_file_name("wings.log.gz"));
+        assert!(is_single_component_file_name(".env"));
+        assert!(is_single_component_file_name("..hidden"));
+    }
+
+    #[test]
+    fn single_component_rejects_the_wings_endpoint_traversals() {
+        assert!(!is_single_component_file_name("../config"));
+        assert!(!is_single_component_file_name(
+            "../../servers/uuid/files/contents"
+        ));
+        assert!(!is_single_component_file_name("/api/system/config"));
+        assert!(!is_single_component_file_name("wings.log/../../config"));
+        assert!(!is_single_component_file_name("a/b"));
+        assert!(!is_single_component_file_name("wings.log/"));
+    }
+
+    #[test]
+    fn single_component_rejects_empty_and_dot_names() {
+        assert!(!is_single_component_file_name(""));
+        assert!(!is_single_component_file_name("."));
+        assert!(!is_single_component_file_name(".."));
+        assert!(!is_single_component_file_name("./x"));
+    }
 
     // redact_query
 

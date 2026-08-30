@@ -88,11 +88,12 @@ mod get {
 
         let url = if params.files.len() == 1 {
             #[derive(Serialize)]
-            struct FileDownloadJwt {
+            struct FileDownloadJwt<'a> {
                 #[serde(flatten)]
                 base: BasePayload,
 
                 file_path: PathBuf,
+                ignored_files: &'a [compact_str::CompactString],
                 server_uuid: uuid::Uuid,
                 unique_id: uuid::Uuid,
             }
@@ -112,6 +113,7 @@ mod get {
                         jwt_id: user.uuid.to_compact_string(),
                     },
                     file_path: Path::new(&params.root).join(&params.files[0]),
+                    ignored_files: server.subuser_ignored_files.as_deref().unwrap_or(&[]),
                     server_uuid: server.uuid,
                     unique_id: uuid::Uuid::new_v4(),
                 },
@@ -142,6 +144,7 @@ mod get {
 
                 file_path: &'a str,
                 file_paths: &'a [String],
+                ignored_files: &'a [compact_str::CompactString],
                 server_uuid: uuid::Uuid,
                 unique_id: uuid::Uuid,
             }
@@ -162,6 +165,7 @@ mod get {
                     },
                     file_path: &params.root,
                     file_paths: &params.files,
+                    ignored_files: server.subuser_ignored_files.as_deref().unwrap_or(&[]),
                     server_uuid: server.uuid,
                     unique_id: uuid::Uuid::new_v4(),
                 },

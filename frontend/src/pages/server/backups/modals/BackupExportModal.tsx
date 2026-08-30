@@ -1,4 +1,5 @@
 import { ModalProps } from '@mantine/core';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { useEffect, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
@@ -47,6 +48,13 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       name: backup.name,
       format: 'tar_gz',
     },
+    validate: zod4Resolver(
+      z.object({
+        directory: z.string().min(1).max(255),
+        name: z.string().min(1).max(255),
+        format: streamingArchiveFormat,
+      }),
+    ),
     onClose: props.onClose,
     onSubmit: async (values) => {
       await exportBackup(server.uuid, backup.uuid, {
@@ -144,7 +152,7 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       </p>
 
       <ModalFooter>
-        <Button type='submit' loading={loading}>
+        <Button type='submit' loading={loading} disabled={!form.isValid()}>
           {t('common.button.export', {})}
         </Button>
         <Button variant='default' onClick={handleClose}>

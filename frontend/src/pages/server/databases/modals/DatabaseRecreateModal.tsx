@@ -44,7 +44,9 @@ export default function DatabaseRecreateModal({ database, onRecreated, ...props 
       onSubmit={handleSubmit}
     >
       <Stack>
-        <Text>{t('pages.server.databases.modal.recreateDatabase.content', { name: database.name }).md()}</Text>
+        <Text component='div'>
+          {t('pages.server.databases.modal.recreateDatabase.content', { name: database.name }).md()}
+        </Text>
 
         <TextInput
           withAsterisk

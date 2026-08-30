@@ -49,6 +49,7 @@ export default function ServerStatusIndicator() {
   const isOffline = state === 'offline';
   const hasPower = canStart || canStop;
   const startPrimary = canStart && (isOffline || !canStop);
+  const showRestart = canRestart && !isOffline;
 
   const powerBlocked =
     !socketConnected || !!server.status || server.isSuspended || server.isTransferring || server.nodeMaintenanceEnabled;
@@ -143,7 +144,7 @@ export default function ServerStatusIndicator() {
           {uptime && <span className='text-xs leading-4 ml-auto shrink-0 text-(--mantine-color-dimmed)'>{uptime}</span>}
         </div>
 
-        {(hasPower || canRestart) && (
+        {(hasPower || showRestart) && (
           <div className='flex gap-2 mt-2'>
             {hasPower && (
               <Button
@@ -157,7 +158,7 @@ export default function ServerStatusIndicator() {
                 {t(`common.enum.serverPowerAction.${buttonAction}`, {})}
               </Button>
             )}
-            {canRestart &&
+            {showRestart &&
               (hasPower ? (
                 <Tooltip label={t('common.enum.serverPowerAction.restart', {})}>
                   <Button

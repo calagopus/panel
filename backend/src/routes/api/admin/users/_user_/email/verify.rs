@@ -35,6 +35,7 @@ mod post {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.email")?;
+        permissions.can_modify_user(&user)?;
 
         if user.email_verified {
             return ApiResponse::error("email is already verified")

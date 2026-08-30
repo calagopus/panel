@@ -13,6 +13,8 @@ pub struct TwoFactorRequiredJwt {
     pub user_uuid: uuid::Uuid,
 }
 
+/// Every factor the user can prove here, which excludes security keys: they have no checkpoint
+/// step, only a login of their own.
 pub fn available_methods(
     user: &User,
     settings: &shared::settings::AppSettings,
@@ -21,6 +23,17 @@ pub fn available_methods(
         .into_iter()
         .filter(|method| matches!(method, TwoFactorMethod::Totp | TwoFactorMethod::Email))
         .collect()
+}
+
+/// Whether the user meets an enforced two-factor requirement solely through factors that cannot be
+/// proven at this checkpoint, in which case handing them a session would let them past
+/// `check_account_gates` without ever presenting a second factor.
+pub fn two_factor_unprovable(user: &User, settings: &shared::settings::AppSettings) -> bool {
+    user.require_two_factor(settings)
+        && user.satisfies_two_factor(settings)
+        && !available_methods(user, settings)
+            .iter()
+            .any(|method| settings.app.two_factor_accepted_methods.contains(method))
 }
 
 mod post {

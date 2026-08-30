@@ -4,7 +4,8 @@ use compact_str::ToCompactString;
 use rustis::{
     client::Client,
     commands::{
-        GenericCommands, InfoSection, ServerCommands, SetCondition, SetExpiration, StringCommands,
+        GenericCommands, InfoSection, ScriptingCommands, ServerCommands, SetCondition,
+        SetExpiration, StringCommands,
     },
     resp::BulkString,
 };
@@ -17,6 +18,16 @@ use std::{
     },
     time::{Duration, Instant},
 };
+
+const RATELIMIT_SCRIPT: &str = r#"
+local hits = redis.call('INCR', KEYS[1])
+local ttl = redis.call('TTL', KEYS[1])
+if ttl < 0 then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+  ttl = tonumber(ARGV[1])
+end
+return {hits, ttl}
+"#;
 
 #[derive(Clone, Serialize)]
 pub struct BulkStringRef<'a>(
@@ -189,69 +200,58 @@ impl Cache {
             client.as_ref()
         );
 
-        let now = chrono::Utc::now().timestamp();
+        let now = chrono::Utc::now().timestamp() as u64;
 
-        if let Some(redis_client) = &self.client {
-            let expiry = redis_client.expiretime(&key).await.unwrap_or_default();
-            let expire_unix: u64 = if expiry > now + 2 {
-                expiry as u64
-            } else {
-                now as u64 + limit_window
-            };
-
-            let limit_used = redis_client.get::<u64>(&key).await.unwrap_or_default() + 1;
-            redis_client
-                .set_with_options(key, limit_used, None, SetExpiration::Exat(expire_unix))
-                .await?;
-
-            if limit_used >= limit {
-                let retry_after = expire_unix.saturating_sub(now as u64);
-
-                return Err(ApiResponse::error(format!(
-                    "you are ratelimited, retry in {retry_after}s"
-                ))
-                .with_status(StatusCode::TOO_MANY_REQUESTS)
-                .with_header("X-RateLimit-Limit", limit.to_compact_string())
-                .with_header(
-                    "X-RateLimit-Remaining",
-                    limit.saturating_sub(limit_used).to_compact_string(),
-                )
-                .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
-                .with_header("Retry-After", retry_after.to_compact_string()));
-            }
-        } else {
-            let mut current_count = 0;
-            let mut expire_unix = now as u64 + limit_window;
-
-            if let Some((count, exp)) = self.local_ratelimits.get(&key).await
-                && exp > now as u64 + 2
+        let remote = match &self.client {
+            Some(redis_client) => match redis_client
+                .eval::<(u64, i64)>(RATELIMIT_SCRIPT, [key.as_str()], [limit_window])
+                .await
             {
-                current_count = count;
-                expire_unix = exp;
-            }
+                Ok((limit_used, ttl)) => Some((limit_used, now + ttl.max(0) as u64)),
+                Err(err) => {
+                    tracing::warn!(
+                        "failed to apply redis ratelimit for {key}, falling back to local ratelimit: {err:#?}"
+                    );
 
-            let limit_used = current_count + 1;
-            self.local_ratelimits
-                .insert(key, (limit_used, expire_unix))
-                .await;
+                    None
+                }
+            },
+            None => None,
+        };
 
-            if limit_used >= limit {
-                return Err(ApiResponse::error(format!(
-                    "you are ratelimited, retry in {}s",
-                    expire_unix.saturating_sub(now as u64)
-                ))
-                .with_status(StatusCode::TOO_MANY_REQUESTS)
-                .with_header("X-RateLimit-Limit", limit.to_compact_string())
-                .with_header(
-                    "X-RateLimit-Remaining",
-                    limit.saturating_sub(limit_used).to_compact_string(),
-                )
-                .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
-                .with_header(
-                    "Retry-After",
-                    (expire_unix.saturating_sub(now as u64)).to_compact_string(),
-                ));
-            }
+        let (limit_used, expire_unix) = match remote {
+            Some(remote) => remote,
+            None => self
+                .local_ratelimits
+                .entry(key)
+                .and_upsert_with(|entry| {
+                    let current = entry
+                        .map(|entry| entry.into_value())
+                        .filter(|(_, expire_unix)| *expire_unix > now + 2);
+
+                    std::future::ready(match current {
+                        Some((limit_used, expire_unix)) => (limit_used + 1, expire_unix),
+                        None => (1, now + limit_window),
+                    })
+                })
+                .await
+                .into_value(),
+        };
+
+        if limit_used >= limit {
+            let retry_after = expire_unix.saturating_sub(now);
+
+            return Err(ApiResponse::error(format!(
+                "you are ratelimited, retry in {retry_after}s"
+            ))
+            .with_status(StatusCode::TOO_MANY_REQUESTS)
+            .with_header("X-RateLimit-Limit", limit.to_compact_string())
+            .with_header(
+                "X-RateLimit-Remaining",
+                limit.saturating_sub(limit_used).to_compact_string(),
+            )
+            .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
+            .with_header("Retry-After", retry_after.to_compact_string()));
         }
 
         Ok(())

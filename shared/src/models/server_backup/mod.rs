@@ -1453,6 +1453,7 @@ impl ServerBackup {
                     path,
                     archive_format,
                     foreground,
+                    ignored: server.subuser_ignored_files.clone().unwrap_or_default(),
                 },
             )
             .await

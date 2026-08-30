@@ -241,6 +241,7 @@ nestify::nest! {
         #[schema(inline)]
         pub rows_affected: u64,
         #[schema(inline)]
+        #[serde(default)]
         pub truncated: bool,
     }
 }
@@ -926,6 +927,9 @@ pub mod instances_instance_databases_database_explorer_schema {
             #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
                 #[schema(inline)]
                 pub tables: Vec<SchemaTable>,
+                #[schema(inline)]
+                #[serde(default)]
+                pub truncated: bool,
             }
         }
 

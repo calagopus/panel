@@ -97,10 +97,11 @@ export function createSqliteExplorerApi(run: SqliteRunner): Omit<DatabaseExplore
 
         return name === null ? [] : [{ name, view: cell(row[1]) === 'view' }];
       });
+      const truncated = master?.truncated ?? false;
       if (entries.length === 0) {
         tableColumns.clear();
 
-        return [];
+        return { tables: [], truncated };
       }
 
       const pragmas = await run(
@@ -110,7 +111,7 @@ export function createSqliteExplorerApi(run: SqliteRunner): Omit<DatabaseExplore
 
       tableColumns.clear();
 
-      return entries.map((entry, index): z.infer<typeof serverDatabaseSchemaTableSchema> => {
+      const tables = entries.map((entry, index): z.infer<typeof serverDatabaseSchemaTableSchema> => {
         const result = pragmas[index];
         const fields = Object.fromEntries((result?.columns ?? []).map((column, at) => [column.name, at]));
 
@@ -150,6 +151,8 @@ export function createSqliteExplorerApi(run: SqliteRunner): Omit<DatabaseExplore
 
         return { schema: null, name: entry.name, view: entry.view, rowEstimate: null, columns };
       });
+
+      return { tables, truncated };
     },
 
     browseRows: async (data) => {

@@ -23,6 +23,26 @@ pub mod firewall;
 pub type GetServer = crate::extract::ConsumingExtension<Server>;
 pub type GetServerActivityLogger = crate::extract::ConsumingExtension<ServerActivityLogger>;
 
+/// The path is resolved before matching so that alternative spellings of the same file
+/// (`/./x`, `//x`, `/a/../x`) cannot slip past an anchored pattern, since wings collapses
+/// those components before touching the filesystem.
+fn is_path_ignored(
+    overrides: &ignore::overrides::Override,
+    path: impl AsRef<std::path::Path>,
+    is_dir: bool,
+) -> bool {
+    let path = crate::cap::CapFilesystem::resolve_path(path.as_ref());
+
+    if path == std::path::Path::new("/")
+        || path == std::path::Path::new("")
+        || path == std::path::Path::new(".")
+    {
+        return false;
+    }
+
+    overrides.matched(path, is_dir).is_whitelist()
+}
+
 #[derive(Clone)]
 pub struct ServerActivityLogger {
     pub state: State,
@@ -1598,14 +1618,8 @@ impl Server {
 
     pub fn is_ignored(&mut self, path: impl AsRef<std::path::Path>, is_dir: bool) -> bool {
         if let Some(ignored_files) = &self.subuser_ignored_files {
-            if path.as_ref() == std::path::Path::new("/")
-                || path.as_ref() == std::path::Path::new("")
-                || path.as_ref() == std::path::Path::new(".")
-            {
-                return false;
-            }
             if let Some(overrides) = &self.subuser_ignored_files_overrides {
-                return overrides.matched(path, is_dir).is_whitelist();
+                return is_path_ignored(overrides, path, is_dir);
             }
 
             let mut override_builder = ignore::overrides::OverrideBuilder::new("/");
@@ -1614,15 +1628,32 @@ impl Server {
                 override_builder.add(file).ok();
             }
 
-            if let Ok(override_builder) = override_builder.build() {
-                let ignored = override_builder.matched(path, is_dir).is_whitelist();
-                self.subuser_ignored_files_overrides = Some(Box::new(override_builder));
+            match override_builder.build() {
+                Ok(overrides) => {
+                    let ignored = is_path_ignored(&overrides, path, is_dir);
+                    self.subuser_ignored_files_overrides = Some(Box::new(overrides));
 
-                return ignored;
+                    return ignored;
+                }
+                Err(err) => {
+                    tracing::error!(
+                        server = %self.uuid,
+                        "failed to compile subuser ignored files, denying access: {:#?}",
+                        err
+                    );
+
+                    return true;
+                }
             }
         }
 
         false
+    }
+
+    pub fn is_ignored_either(&mut self, path: impl AsRef<std::path::Path>) -> bool {
+        let path = path.as_ref();
+
+        self.is_ignored(path, false) || self.is_ignored(path, true)
     }
 
     #[inline]
@@ -1976,6 +2007,7 @@ impl super::IntoApiObject for Server {
                     self.subuser_permissions
                         .map_or_else(|| vec!["*".into()], |p| p.to_vec())
                 },
+                ignored_files: self.subuser_ignored_files.unwrap_or_default(),
                 location_uuid: node.location.uuid,
                 location_name: node.location.name,
                 location_flag: node.location.flag,
@@ -2854,6 +2886,7 @@ pub struct ApiServer {
     pub is_suspended: bool,
     pub is_transferring: bool,
     pub permissions: Vec<compact_str::CompactString>,
+    pub ignored_files: Vec<compact_str::CompactString>,
 
     pub location_uuid: uuid::Uuid,
     pub location_name: compact_str::CompactString,
@@ -2881,4 +2914,73 @@ pub struct ApiServer {
     pub timezone: Option<compact_str::CompactString>,
 
     pub created: chrono::DateTime<chrono::Utc>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_path_ignored;
+
+    fn overrides(patterns: &[&str]) -> ignore::overrides::Override {
+        let mut builder = ignore::overrides::OverrideBuilder::new("/");
+
+        for pattern in patterns {
+            builder.add(pattern).unwrap();
+        }
+
+        builder.build().unwrap()
+    }
+
+    #[test]
+    fn an_anchored_pattern_matches_every_spelling_of_the_path() {
+        let overrides = overrides(&["/config/secrets.yml"]);
+
+        for path in [
+            "/config/secrets.yml",
+            "/./config/secrets.yml",
+            "/config//secrets.yml",
+            "/config/./secrets.yml",
+            "/config/../config/secrets.yml",
+            "/../config/secrets.yml",
+            "config/secrets.yml",
+        ] {
+            assert!(is_path_ignored(&overrides, path, false), "{path}");
+        }
+
+        assert!(!is_path_ignored(&overrides, "/config/public.yml", false));
+    }
+
+    #[test]
+    fn appending_a_list_keeps_everything_it_hid_hidden() {
+        // Last-match-wins, so reordering the same set flips the verdict - which is why
+        // the grant routes require a suffix rather than a subset.
+        let caller = ["!/a/b", "/a/**"];
+
+        assert!(is_path_ignored(&overrides(&caller), "/a/b", false));
+        assert!(!is_path_ignored(
+            &overrides(&["/a/**", "!/a/b"]),
+            "/a/b",
+            false
+        ));
+
+        for granted in [
+            vec!["!/a/b", "/a/**"],
+            vec!["/a/**", "!/a/b", "!/a/b", "/a/**"],
+            vec!["!/a/**", "!/a/b", "/a/**"],
+        ] {
+            assert!(granted.ends_with(&caller));
+            assert!(
+                is_path_ignored(&overrides(&granted), "/a/b", false),
+                "{granted:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_server_root_is_never_ignored() {
+        let overrides = overrides(&["*"]);
+
+        for path in ["/", "", ".", "/.", "/config/.."] {
+            assert!(!is_path_ignored(&overrides, path, true), "{path}");
+        }
+    }
 }

@@ -66,6 +66,7 @@ mod get {
                 &wings_api::servers_server_files_contents::get::Query {
                     file: Some(params.file.clone()),
                     max_size: Some(max_file_manager_view_size),
+                    ignored: server.0.subuser_ignored_files,
                     ..Default::default()
                 },
             )
@@ -94,7 +95,13 @@ mod get {
             )
             .await;
 
-        ApiResponse::new_stream(contents).ok()
+        ApiResponse::new_stream(contents)
+            .with_header("Content-Type", "application/octet-stream")
+            .with_header("Content-Disposition", "attachment")
+            .with_header("Content-Security-Policy", "sandbox")
+            .with_header("X-Content-Type-Options", "nosniff")
+            .with_header("X-Frame-Options", "SAMEORIGIN")
+            .ok()
     }
 }
 

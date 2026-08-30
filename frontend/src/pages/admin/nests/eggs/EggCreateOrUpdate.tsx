@@ -152,9 +152,11 @@ export default function EggCreateOrUpdate({
   });
 
   const doExport = (format: 'calagopus' | 'pterodactyl', fileType: 'json' | 'yaml') => {
+    if (!contextEgg) return;
+
     setLoading(true);
 
-    exportEgg(contextNest?.uuid, contextEgg!.uuid)
+    exportEgg(contextNest.uuid, contextEgg.uuid)
       .then((exported) => {
         const data = format === 'pterodactyl' ? toPterodactylEgg(exported) : exported;
 
@@ -172,8 +174,10 @@ export default function EggCreateOrUpdate({
       .finally(() => setLoading(false));
   };
 
-  const applyEggUpdate = () =>
-    getEgg(contextNest.uuid, contextEgg!.uuid)
+  const applyEggUpdate = () => {
+    if (!contextEgg) return;
+
+    getEgg(contextNest.uuid, contextEgg.uuid)
       .then((egg) => {
         form.setValues({
           ...egg,
@@ -184,8 +188,11 @@ export default function EggCreateOrUpdate({
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
+  };
 
   const doRepositoryUpdate = () => {
+    if (!contextEgg) return;
+
     setLoading(true);
 
     updateEggUsingRepository(contextNest.uuid, contextEgg!.uuid)

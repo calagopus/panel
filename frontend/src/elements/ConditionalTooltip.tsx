@@ -15,7 +15,7 @@ const ConditionalTooltip = forwardRef<HTMLDivElement, TooltipProps>(
         {children}
       </Tooltip>
     ) : (
-      <div className={classNames(className, innerClassName)}>{children}</div>
+      <span className={classNames(className, innerClassName, 'inline-block')}>{children}</span>
     );
   },
 );

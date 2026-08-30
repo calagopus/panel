@@ -97,6 +97,7 @@ mod delete {
         Path((_user, oauth_link)): Path<(String, uuid::Uuid)>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.oauth-links")?;
+        permissions.can_modify_user(&user)?;
 
         let oauth_link =
             match UserOAuthLink::by_user_uuid_uuid(&state.database, user.uuid, oauth_link).await? {

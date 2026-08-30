@@ -96,32 +96,32 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
             })}
           </Text>
         ) : trigger.type === 'power_action' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.powerAction.card.content', {
               action: trigger.action,
             }).md()}
           </Text>
         ) : trigger.type === 'server_state' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.serverState.card.content', {
               state: t(`common.enum.serverState.${trigger.state}`, {}),
             }).md()}
           </Text>
         ) : trigger.type === 'backup_status' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.backupStatus.card.content', {
               status: trigger.status,
             }).md()}
           </Text>
         ) : trigger.type === 'schedule_completion' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.scheduleCompletion.card.content', {
               schedule: completionSchedule?.name ?? trigger.schedule,
               status: t(trigger.successful ? 'common.badge.successful' : 'common.badge.failed', {}),
             }).md()}
           </Text>
         ) : trigger.type === 'resource_usage' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.resourceUsage.card.content', {
               metric: scheduleResourceMetricLabelMapping[trigger.metric](),
               comparator: scheduleComparatorLabelMapping[trigger.comparator](),
@@ -129,13 +129,13 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
             }).md()}
           </Text>
         ) : trigger.type === 'console_line' ? (
-          <Text>
+          <Text component='div'>
             {t('pages.server.schedules.triggers.consoleLine.card.content', {
               contains: trigger.contains,
             }).md()}
           </Text>
         ) : trigger.type === 'crash' ? (
-          <Text>{t('pages.server.schedules.triggers.crash.card.content', {}).md()}</Text>
+          <Text component='div'>{t('pages.server.schedules.triggers.crash.card.content', {}).md()}</Text>
         ) : null}
       </Group>
     </Card>

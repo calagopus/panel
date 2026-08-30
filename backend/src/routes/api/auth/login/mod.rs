@@ -5,7 +5,9 @@ pub mod checkpoint;
 mod security_key;
 
 mod post {
-    use crate::routes::api::auth::login::checkpoint::{TwoFactorRequiredJwt, available_methods};
+    use crate::routes::api::auth::login::checkpoint::{
+        TwoFactorRequiredJwt, available_methods, two_factor_unprovable,
+    };
     use axum::http::StatusCode;
     use compact_str::ToCompactString;
     use garde::Validate;
@@ -110,6 +112,15 @@ mod post {
 
         let settings = state.settings.get().await?;
         let methods = available_methods(&user, &settings);
+
+        if two_factor_unprovable(&user, &settings) {
+            return ApiResponse::error(
+                "two-factor authentication is required for this account, sign in with a security key",
+            )
+            .with_status(StatusCode::BAD_REQUEST)
+            .ok();
+        }
+
         drop(settings);
 
         if !methods.is_empty() {

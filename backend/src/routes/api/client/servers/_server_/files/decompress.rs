@@ -71,16 +71,18 @@ mod post {
             root: data.root,
             file: data.file,
             foreground: data.foreground,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         tokio::spawn(async move {
             let identifier = match server
+                .0
                 .node
                 .fetch_cached(&state.database)
                 .await?
                 .api_client(&state.database)
                 .await?
-                .post_servers_server_files_decompress(server.uuid, &request_body)
+                .post_servers_server_files_decompress(server.0.uuid, &request_body)
                 .await
             {
                 Ok(wings_api::servers_server_files_decompress::post::Response::Ok(_)) => None,

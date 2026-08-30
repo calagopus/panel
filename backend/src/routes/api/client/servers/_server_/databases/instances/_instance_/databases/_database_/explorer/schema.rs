@@ -15,6 +15,7 @@ mod get {
     #[derive(ToSchema, Serialize)]
     struct Response {
         tables: Vec<SchemaTable>,
+        truncated: bool,
     }
 
     #[utoipa::path(get, path = "/", responses(
@@ -53,14 +54,14 @@ mod get {
             .api_client(&state.database)
             .await?;
 
-        let tables = match client
+        let schema = match client
             .get_instances_instance_databases_database_explorer_schema(
                 database_instance.uuid,
                 database,
             )
             .await
         {
-            Ok(response) => response.tables,
+            Ok(response) => response,
             Err(db_agent_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
                 return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
                     .with_status(StatusCode::NOT_FOUND)
@@ -80,7 +81,8 @@ mod get {
         };
 
         ApiResponse::new_serialized(Response {
-            tables: tables.into_iter().map(Into::into).collect(),
+            tables: schema.tables.into_iter().map(Into::into).collect(),
+            truncated: schema.truncated,
         })
         .ok()
     }

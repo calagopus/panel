@@ -191,6 +191,7 @@ mod patch {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
+        censor::Censor,
         models::{
             UpdatableModel, admin_activity::GetAdminActivityLogger,
             database_host::UpdateDatabaseHostOptions, user::GetPermissionManager,

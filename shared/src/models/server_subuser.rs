@@ -207,7 +207,11 @@ pub struct CreateServerSubuserOptions<'a> {
     pub email: compact_str::CompactString,
     #[garde(custom(crate::permissions::validate_server_permissions))]
     pub permissions: Vec<compact_str::CompactString>,
-    #[garde(skip)]
+    #[garde(
+        length(max = 1024),
+        inner(length(chars, min = 1, max = 255)),
+        custom(crate::utils::validate_ignored_files)
+    )]
     pub ignored_files: Vec<compact_str::CompactString>,
 }
 
@@ -343,7 +347,11 @@ impl CreatableModel for ServerSubuser {
 pub struct UpdateServerSubuserOptions {
     #[garde(inner(custom(crate::permissions::validate_server_permissions)))]
     pub permissions: Option<Vec<compact_str::CompactString>>,
-    #[garde(skip)]
+    #[garde(inner(
+        length(max = 1024),
+        inner(length(chars, min = 1, max = 255)),
+        custom(crate::utils::validate_ignored_files)
+    ))]
     pub ignored_files: Option<Vec<compact_str::CompactString>>,
 }
 

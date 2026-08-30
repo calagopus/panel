@@ -23,6 +23,7 @@ export interface DatabaseResultSort {
 
 export interface DatabaseResultEditing {
   editableColumns: Set<string>;
+  isLocked: (rowIndex: number) => boolean;
   isDirty: (rowIndex: number, column: string) => boolean;
   onChange: (rowIndex: number, column: string, value: z.infer<typeof serverDatabaseQueryValueSchema>) => void;
   selected: Set<number>;
@@ -78,11 +79,21 @@ export default function DatabaseResultSet({
   const { t, tItem } = useTranslations();
   const [active, setActive] = useState<CellPosition | null>(null);
 
+  const truncatedAlert = result.truncated && (
+    <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+      {t('pages.server.databases.explorer.result.truncated', {})}
+    </Alert>
+  );
+
   if (result.columns.length === 0) {
     return (
-      <Text size='sm' c='dimmed'>
-        {t('pages.server.databases.explorer.result.rowsAffected', { rows: tItem('row', result.rowsAffected) })}
-      </Text>
+      <Stack gap='xs'>
+        {truncatedAlert}
+
+        <Text size='sm' c='dimmed'>
+          {t('pages.server.databases.explorer.result.rowsAffected', { rows: tItem('row', result.rowsAffected) })}
+        </Text>
+      </Stack>
     );
   }
 
@@ -136,12 +147,14 @@ export default function DatabaseResultSet({
     onClick: sort ? () => sort.onSort(column.name) : undefined,
   }));
 
+  const selectableRows = editing ? result.rows.filter((_, rowIndex) => !editing.isLocked(rowIndex)).length : 0;
+
   if (editing) {
     columns.unshift({
       rightSection: (
         <Checkbox
-          checked={editing.selected.size > 0 && editing.selected.size === result.rows.length}
-          indeterminate={editing.selected.size > 0 && editing.selected.size < result.rows.length}
+          checked={editing.selected.size > 0 && editing.selected.size === selectableRows}
+          indeterminate={editing.selected.size > 0 && editing.selected.size < selectableRows}
           onChange={editing.onToggleAll}
         />
       ),
@@ -150,11 +163,7 @@ export default function DatabaseResultSet({
 
   const table = (
     <Stack gap='xs'>
-      {result.truncated && (
-        <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
-          {t('pages.server.databases.explorer.result.truncated', {})}
-        </Alert>
-      )}
+      {truncatedAlert}
 
       <Table
         columns={columns}
@@ -200,6 +209,7 @@ export default function DatabaseResultSet({
               <TableData>
                 <Checkbox
                   checked={editing.selected.has(rowIndex)}
+                  disabled={editing.isLocked(rowIndex)}
                   onChange={(event) => editing.onSelectRow(rowIndex, event.currentTarget.checked)}
                 />
               </TableData>
@@ -211,7 +221,7 @@ export default function DatabaseResultSet({
                 <DatabaseResultCell
                   key={`value-${valueIndex}`}
                   value={value}
-                  editable={editing?.editableColumns.has(column)}
+                  editable={editing?.editableColumns.has(column) && !editing.isLocked(rowIndex)}
                   dirty={editing?.isDirty(rowIndex, column)}
                   onChange={(next) => editing?.onChange(rowIndex, column, next)}
                   {...cellProps({ ghost: false, rowIndex, column })}

@@ -20,6 +20,7 @@ use utoipa::ToSchema;
 pub mod cache;
 pub mod cap;
 pub mod captcha;
+pub mod censor;
 pub mod database;
 pub mod deserialize;
 pub mod env;

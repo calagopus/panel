@@ -68,6 +68,7 @@ mod get {
                 &wings_api::servers_server_files_fingerprints::get::Query {
                     algorithm: Some(params.algorithm),
                     files: Some(vec![params.file]),
+                    ignored: server.0.subuser_ignored_files,
                     ..Default::default()
                 },
             )

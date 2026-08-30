@@ -128,7 +128,7 @@ export default function NodeInitialSetupSection({
                 </HljsCode>
 
                 <div className='mt-2'>
-                  <p>{t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}</p>
+                  {t('pages.admin.nodes.tabs.configuration.page.description.placeFile', {}).md()}
                   <Group gap='xs' align='flex-start' wrap='nowrap' className='mt-2'>
                     <Code block className='flex-1 min-w-0 overflow-x-auto'>
                       {command}

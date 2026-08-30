@@ -31,46 +31,52 @@ export default function FileDetailsModal({ file, ...props }: Props) {
 
         <Divider className='my-2' />
 
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.path', {})}</p>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.path', {})}</span>
           <Code className='break-all'>{join(browsingDirectory, file?.name || '')}</Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.mode', {})}</p>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.mode', {})}</span>
           <Code>{file?.mode}</Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.logicalSize', {})}</p>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>
+            {t('pages.server.files.modal.details.logicalSize', {})}
+          </span>
           <Code>
             {bytesToString(file?.size || 0)} ({file?.size} Bytes)
           </Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>
             {t('pages.server.files.modal.details.physicalSize', {})}
-          </p>
+          </span>
           <Code>
             {bytesToString(file?.sizePhysical || 0)} ({file?.sizePhysical} Bytes)
           </Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.mimeType', {})}</p>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>
+            {t('pages.server.files.modal.details.mimeType', {})}
+          </span>
           <Code>{file?.mime}</Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>
             {t('pages.server.files.modal.details.lastModifiedAt', {})}
-          </p>
+          </span>
           <Code>
             <FormattedTimestamp timestamp={file?.modified ?? 0} />
           </Code>
-        </span>
-        <span className='flex flex-row items-center justify-between'>
-          <p className='text-(--mantine-color-dimmed)! mr-4'>{t('pages.server.files.modal.details.createdAt', {})}</p>
+        </div>
+        <div className='flex flex-row items-center justify-between'>
+          <span className='text-(--mantine-color-dimmed)! mr-4'>
+            {t('pages.server.files.modal.details.createdAt', {})}
+          </span>
           <Code>
             <FormattedTimestamp timestamp={file?.created ?? 0} />
           </Code>
-        </span>
+        </div>
       </div>
 
       <ModalFooter>

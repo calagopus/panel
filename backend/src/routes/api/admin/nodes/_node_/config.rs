@@ -5,6 +5,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
+        censor::Censor,
         models::{node::GetNode, user::GetPermissionManager},
         response::{ApiResponse, ApiResponseResult},
     };
@@ -32,8 +33,7 @@ mod get {
             .has_admin_permission("nodes.read-token")
             .is_err()
         {
-            config.token_id = "redacted".into();
-            config.token = "redacted".into();
+            config.censor();
         }
 
         ApiResponse::new_serialized(Response { config }).ok()

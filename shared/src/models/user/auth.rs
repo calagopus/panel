@@ -179,6 +179,17 @@ impl PermissionManager {
         Self::check(granted && self.scope.allows_admin(permission), permission)
     }
 
+    /// Administrators may only be written to by other administrators, no matter which admin
+    /// permissions a role grants.
+    pub fn can_modify_user(&self, user: &super::User) -> Result<(), ApiResponse> {
+        if self.user_admin || !user.admin {
+            return Ok(());
+        }
+
+        Err(ApiResponse::error("you cannot modify an administrator")
+            .with_status(StatusCode::FORBIDDEN))
+    }
+
     pub fn has_server_permission(&self, permission: &str) -> Result<(), ApiResponse> {
         let granted = self.user_admin
             || self.server_owner

@@ -896,11 +896,22 @@ pub async fn handle_startup() -> Result<
                             None
                         };
 
+                        let content_type = shared::storage::content_type(path);
+
                         return ApiResponse::new(Body::from_stream(
                             tokio_util::io::ReaderStream::new(tokio_file),
                         ))
                         .with_header("Content-Length", metadata.len().to_compact_string())
                         .with_optional_header("Last-Modified", modified.as_deref())
+                        .with_header("Content-Type", content_type)
+                        .with_optional_header(
+                            "Content-Disposition",
+                            shared::storage::content_type_requires_attachment(content_type)
+                                .then_some("attachment"),
+                        )
+                        .with_header("Content-Security-Policy", "sandbox")
+                        .with_header("X-Content-Type-Options", "nosniff")
+                        .with_header("X-Frame-Options", "SAMEORIGIN")
                         .ok();
                     }
 

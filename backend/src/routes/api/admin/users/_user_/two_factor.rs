@@ -35,6 +35,7 @@ mod delete {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.disable-two-factor")?;
+        permissions.can_modify_user(&user)?;
 
         if !user.totp_enabled && !user.email_two_factor_enabled {
             return ApiResponse::error("two-factor authentication is not enabled")

@@ -77,6 +77,9 @@ export default function Login() {
         case 'user_already_exists':
           setError(t('pages.auth.login.error.userAlreadyExists', {}));
           break;
+        case 'security_key_required':
+          setError(t('pages.auth.login.error.securityKeyRequired', {}));
+          break;
       }
 
       searchParams.delete('error');

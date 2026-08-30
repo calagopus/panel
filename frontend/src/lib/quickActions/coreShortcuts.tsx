@@ -71,6 +71,14 @@ function buildCoreShortcutDefinitions(): ShortcutDefinition[] {
       allowWhenInputFocused: true,
     },
     {
+      id: 'general.save',
+      category: general,
+      description: () => getTranslations().t('pages.account.shortcuts.general.save', {}),
+      defaultBinding: binding('s', ['ctrlOrMeta']),
+      allowWhenInputFocused: true,
+      preventDefault: true,
+    },
+    {
       id: 'files.selectAll',
       category: fileManager,
       description: () => getTranslations().t('pages.account.shortcuts.fileManager.selectAll', {}),

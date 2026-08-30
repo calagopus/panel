@@ -347,7 +347,7 @@ function Footer() {
               <div className='flex items-center flex-1 min-w-0'>
                 <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
                 <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
-                  {user.username}
+                  {user.nameFirst && user.nameLast ? `${user.nameFirst} ${user.nameLast}` : user.username}
                 </span>
               </div>
             ) : (
@@ -361,7 +361,7 @@ function Footer() {
               >
                 <Avatar size={40} className='select-none shrink-0' src={user.avatar} name={user.username} />
                 <span className='font-sans font-normal text-sm whitespace-nowrap leading-tight ml-3 overflow-hidden text-ellipsis'>
-                  {user.username}
+                  {user.nameFirst && user.nameLast ? `${user.nameFirst} ${user.nameLast}` : user.username}
                 </span>
               </NavLink>
             )}

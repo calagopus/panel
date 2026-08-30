@@ -123,7 +123,11 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
       />
 
       <ModalFooter>
-        <Button type='submit' loading={loading} disabled={!!form.values.destinationServer && !canCreate}>
+        <Button
+          type='submit'
+          loading={loading}
+          disabled={!form.isValid() || (!!form.values.destinationServer && !canCreate)}
+        >
           {t('pages.server.files.button.copy', {})}
         </Button>
         <Button variant='default' onClick={handleClose}>

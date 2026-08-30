@@ -158,10 +158,7 @@ mod put {
                     .with_status(StatusCode::BAD_REQUEST)
                     .ok();
             }
-            let content_type = field
-                .content_type()
-                .unwrap_or("application/octet-stream")
-                .to_compact_string();
+            let content_type = shared::storage::content_type(&filename);
 
             let reader = tokio_util::io::StreamReader::new(field.into_stream().map_err(|err| {
                 std::io::Error::other(format!("failed to read multipart field: {err}"))
@@ -177,7 +174,7 @@ mod put {
 
             let size = state
                 .storage
-                .store(&asset_path, reader, &content_type)
+                .store(&asset_path, reader, content_type)
                 .await?;
 
             activity_logger

@@ -181,7 +181,12 @@ mod patch {
     pub struct Payload {
         #[garde(inner(custom(shared::permissions::validate_server_permissions)))]
         permissions: Option<Vec<compact_str::CompactString>>,
-        #[garde(skip)]
+        #[garde(inner(
+            length(max = 1024),
+            inner(length(chars, min = 1, max = 255)),
+            custom(shared::utils::validate_ignored_files)
+        ))]
+        #[schema(max_items = 1024, min_length = 1, max_length = 255)]
         ignored_files: Option<Vec<compact_str::CompactString>>,
     }
 
@@ -238,6 +243,18 @@ mod patch {
                 .any(|p| permissions.has_server_permission(p).is_err())
         {
             return ApiResponse::error("permissions: more permissions than self")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
+        if let Some(subuser_ignored_files) = &server.subuser_ignored_files
+            && !data
+                .ignored_files
+                .as_ref()
+                .unwrap_or(&subuser.ignored_files)
+                .ends_with(subuser_ignored_files)
+        {
+            return ApiResponse::error("ignored_files: less restrictive than self")
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }

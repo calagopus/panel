@@ -66,7 +66,8 @@ mod get {
                 server.uuid,
                 revision,
                 &wings_api::servers_server_files_revisions_revision::get::Query {
-                    file: Some(params.file.clone()),
+                    file: Some(params.file),
+                    ignored: server.0.subuser_ignored_files,
                     ..Default::default()
                 },
             )
@@ -81,7 +82,13 @@ mod get {
             Err(err) => return Err(err.into()),
         };
 
-        ApiResponse::new_stream(contents).ok()
+        ApiResponse::new_stream(contents)
+            .with_header("Content-Type", "application/octet-stream")
+            .with_header("Content-Disposition", "attachment")
+            .with_header("Content-Security-Policy", "sandbox")
+            .with_header("X-Content-Type-Options", "nosniff")
+            .with_header("X-Frame-Options", "SAMEORIGIN")
+            .ok()
     }
 }
 

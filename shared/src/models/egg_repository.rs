@@ -1,4 +1,5 @@
 use crate::{
+    censor::{CENSORED_PLACEHOLDER, Censor},
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
@@ -166,22 +167,24 @@ impl EggRepositoryCredentials {
 
         Ok(())
     }
+}
 
-    pub fn censor(&mut self) {
+impl Censor for EggRepositoryCredentials {
+    fn censor(&mut self) {
         match self {
             EggRepositoryCredentials::None => {}
             EggRepositoryCredentials::Password { password, .. } => {
-                *password = "".into();
+                *password = CENSORED_PLACEHOLDER.into();
             }
             EggRepositoryCredentials::PrivateKey {
                 private_key,
                 passphrase,
                 ..
             } => {
-                *private_key = "".into();
+                *private_key = CENSORED_PLACEHOLDER.into();
 
                 if let Some(passphrase) = passphrase {
-                    *passphrase = "".into();
+                    *passphrase = CENSORED_PLACEHOLDER.into();
                 }
             }
         }

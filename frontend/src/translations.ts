@@ -940,6 +940,8 @@ const baseTranslations = defineTranslations({
             usernameRequired: 'Please enter a username',
             registrationDisabled: 'No matching Account could be found and registration is currently disabled.',
             userAlreadyExists: 'An account with this username or email already exists.',
+            securityKeyRequired:
+              'This account requires two-factor authentication, sign in with a security key instead.',
           },
           passkey: {
             error: {
@@ -1385,6 +1387,9 @@ const baseTranslations = defineTranslations({
           button: {
             deleteOthers: 'Log Out Others',
           },
+          tooltip: {
+            noOtherSessions: 'There are no other sessions to log out.',
+          },
           table: {
             columns: {
               thisDevice: 'This Device?',
@@ -1435,6 +1440,7 @@ const baseTranslations = defineTranslations({
             title: 'General',
             undo: 'Undo the last action',
             quickActions: 'Open quick actions',
+            save: 'Save the current form',
           },
           fileManager: {
             title: 'File Manager',
@@ -5165,6 +5171,10 @@ const baseTranslations = defineTranslations({
               title: 'Tables',
               empty: 'This database has no tables yet.',
               noMatches: 'No tables match your search.',
+              noMatchesTruncated:
+                'No tables match your search. Only the first {tables} tables were loaded, so the rest cannot be searched.',
+              truncated: 'This database has too many tables to load. Only the first {tables} are shown.',
+              tableBeyondLimit: 'This table is outside the first {tables} tables, which is all this database can load.',
               rowEstimate: '~{rows}',
               badge: {
                 view: 'View',
@@ -5231,6 +5241,7 @@ const baseTranslations = defineTranslations({
               setNull: 'Set to NULL',
               null: 'NULL',
               empty: 'empty',
+              truncated: 'This value was too large to load in full and cannot be edited.',
               editorHint: '{enter} applies the value, {shiftEnter} inserts a new line.',
             },
           },
@@ -6172,6 +6183,8 @@ const baseTranslations = defineTranslations({
                 permissions: 'Permissions',
                 ignoredFilesDescription:
                   'Files and directories matching these patterns will be hidden from this subuser. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`). Prefix a pattern with `!` to un-hide a path that a broader pattern would otherwise exclude.',
+                ignoredFilesInherited:
+                  'The paths hidden from you are always applied on top of these, and cannot be granted away.',
               },
             },
             updateSubuser: {

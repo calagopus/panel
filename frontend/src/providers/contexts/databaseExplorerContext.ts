@@ -11,7 +11,7 @@ import {
   serverDatabaseRowsDeleteSchema,
   serverDatabaseRowsInsertSchema,
   serverDatabaseRowsUpdateSchema,
-  serverDatabaseSchemaTableSchema,
+  serverDatabaseSchemaSchema,
   serverDatabaseTableCreateSchema,
   serverDatabaseTableDeleteSchema,
   serverDatabaseTableRenameSchema,
@@ -21,7 +21,7 @@ export type DatabaseExplorerAction = 'query-raw' | 'edit-rows' | 'edit-structure
 
 export interface DatabaseExplorerContextType {
   api: {
-    getSchema: () => Promise<z.infer<typeof serverDatabaseSchemaTableSchema>[]>;
+    getSchema: () => Promise<z.infer<typeof serverDatabaseSchemaSchema>>;
     query: (
       data: z.infer<typeof serverDatabaseQuerySchema>,
     ) => Promise<z.infer<typeof serverDatabaseQueryResultSchema>[]>;

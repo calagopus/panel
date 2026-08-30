@@ -6,7 +6,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(({ className, descripti
   return (
     <div className='flex flex-col gap-1'>
       <MantineSwitch ref={ref} className={className} {...rest} />
-      {description && <p className='text-(--mantine-color-dimmed)! text-xs'>{description}</p>}
+      {description && <div className='text-(--mantine-color-dimmed)! text-xs'>{description}</div>}
     </div>
   );
 });

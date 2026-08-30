@@ -6,6 +6,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteSessions from '@/api/me/sessions/deleteSessions.ts';
 import getSessions from '@/api/me/sessions/getSessions.ts';
 import Button from '@/elements/Button.tsx';
+import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Table from '@/elements/Table.tsx';
@@ -34,6 +35,8 @@ export default function DashboardSessions() {
     fetcher: getSessions,
   });
 
+  const hasOtherSessions = sessions?.data.some((session) => !session.isUsing) ?? false;
+
   const doDeleteOthers = async () => {
     await deleteSessions()
       .then(({ deleted }) => {
@@ -57,13 +60,16 @@ export default function DashboardSessions() {
       search={search}
       setSearch={setSearch}
       contentRight={
-        <Button
-          onClick={() => setOpenModal('deleteOthers')}
-          color='red'
-          leftSection={<FontAwesomeIcon icon={faRightFromBracket} />}
-        >
-          {t('pages.account.sessions.button.deleteOthers', {})}
-        </Button>
+        <ConditionalTooltip enabled={!hasOtherSessions} label={t('pages.account.sessions.tooltip.noOtherSessions', {})}>
+          <Button
+            onClick={() => setOpenModal('deleteOthers')}
+            color='red'
+            disabled={!hasOtherSessions}
+            leftSection={<FontAwesomeIcon icon={faRightFromBracket} />}
+          >
+            {t('pages.account.sessions.button.deleteOthers', {})}
+          </Button>
+        </ConditionalTooltip>
       }
       registry={window.extensionContext.extensionRegistry.pages.dashboard.sessions.container}
     >

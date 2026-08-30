@@ -1,7 +1,8 @@
 use super::{
-    ExplorerConnection, QUERY_STATEMENT_TIMEOUT_MS, QueryColumn, QueryResultSet, QueryValue,
-    ResultCollector, SchemaColumn, SchemaTable, Statement, TENANT_POOL_ACQUIRE_TIMEOUT,
-    TENANT_POOL_IDLE_TIMEOUT, TENANT_POOL_MAX_CONNECTIONS, display, query_error, render_type,
+    DatabaseSchema, ExplorerConnection, QUERY_STATEMENT_TIMEOUT_MS, QueryColumn, QueryResultSet,
+    QueryValue, ResultCollector, SCHEMA_MAX_TABLES, SchemaColumn, SchemaTable, Statement,
+    TENANT_POOL_ACQUIRE_TIMEOUT, TENANT_POOL_IDLE_TIMEOUT, TENANT_POOL_MAX_CONNECTIONS, display,
+    query_error, render_type,
 };
 use compact_str::CompactString;
 use futures_util::StreamExt;
@@ -82,16 +83,10 @@ fn postgres_row(row: &PgRow) -> Vec<QueryValue> {
                 return QueryValue::Null;
             }
 
-            let bytes = value
-                .as_bytes()
-                .map(<[u8]>::to_vec)
-                .unwrap_or_else(|_| Vec::new());
+            let bytes = value.as_bytes().unwrap_or_default();
 
             if column.type_info().oid().map(|oid| oid.0) == Some(POSTGRES_BYTEA_OID) {
-                let text = String::from_utf8_lossy(&bytes);
-                return QueryValue::Binary {
-                    value: text.strip_prefix("\\x").unwrap_or(&text).to_owned(),
-                };
+                return QueryValue::hex(bytes.strip_prefix(b"\\x").unwrap_or(bytes));
             }
 
             QueryValue::from_bytes(Some(bytes))
@@ -188,7 +183,7 @@ const POSTGRES_TABLES: &str = "SELECT n.nspname AS schema, c.relname AS name,
       AND n.nspname <> 'information_schema' AND n.nspname !~ '^pg_'
       AND pg_catalog.has_schema_privilege(n.oid, 'USAGE')
       AND pg_catalog.has_table_privilege(c.oid, 'SELECT')
-    ORDER BY n.nspname, c.relname";
+    ORDER BY n.nspname, c.relname LIMIT $1";
 
 const POSTGRES_COLUMNS: &str = "SELECT n.nspname AS schema, c.relname AS table_name,
     a.attname AS name, pg_catalog.format_type(a.atttypid, a.atttypmod) AS type_name,
@@ -209,6 +204,7 @@ const POSTGRES_COLUMNS: &str = "SELECT n.nspname AS schema, c.relname AS table_n
       AND n.nspname <> 'information_schema' AND n.nspname !~ '^pg_'
       AND pg_catalog.has_schema_privilege(n.oid, 'USAGE')
       AND pg_catalog.has_table_privilege(c.oid, 'SELECT')
+      AND (n.nspname, c.relname) <= ($1, $2)
     ORDER BY n.nspname, c.relname, a.attnum";
 
 fn postgres_column(row: &PgRow) -> Result<SchemaColumn, sqlx::Error> {
@@ -341,16 +337,16 @@ impl ExplorerConnection for PostgresExplorer {
         POSTGRES_INTEGER_TYPES.contains(&base)
     }
 
-    async fn schema_tables(&mut self) -> Result<Vec<SchemaTable>, anyhow::Error> {
-        let tables = sqlx::query(POSTGRES_TABLES)
-            .fetch_all(&mut *self.connection)
-            .await?;
-        let columns = sqlx::query(POSTGRES_COLUMNS)
+    async fn schema_tables(&mut self) -> Result<DatabaseSchema, anyhow::Error> {
+        let rows = sqlx::query(POSTGRES_TABLES)
+            .bind(SCHEMA_MAX_TABLES as i64 + 1)
             .fetch_all(&mut *self.connection)
             .await?;
 
-        let mut tables: Vec<SchemaTable> = tables
+        let truncated = rows.len() > SCHEMA_MAX_TABLES;
+        let mut tables: Vec<SchemaTable> = rows
             .into_iter()
+            .take(SCHEMA_MAX_TABLES)
             .map(|row| {
                 Ok(SchemaTable {
                     schema: Some(row.try_get("schema")?),
@@ -362,19 +358,39 @@ impl ExplorerConnection for PostgresExplorer {
             })
             .collect::<Result<_, sqlx::Error>>()?;
 
+        let Some(last) = tables
+            .last()
+            .map(|table| (table.schema.clone().unwrap_or_default(), table.name.clone()))
+        else {
+            return Ok(DatabaseSchema { tables, truncated });
+        };
+
+        let columns = sqlx::query(POSTGRES_COLUMNS)
+            .bind(last.0.as_str())
+            .bind(last.1.as_str())
+            .fetch_all(&mut *self.connection)
+            .await?;
+
+        let mut index: HashMap<(CompactString, CompactString), usize> =
+            HashMap::with_capacity(tables.len());
+        for (at, table) in tables.iter().enumerate() {
+            index.insert(
+                (table.schema.clone().unwrap_or_default(), table.name.clone()),
+                at,
+            );
+        }
+
         for row in columns {
             let schema: CompactString = row.try_get("schema")?;
             let table_name: CompactString = row.try_get("table_name")?;
-            let Some(table) = tables.iter_mut().find(|table| {
-                table.name == table_name && table.schema.as_deref() == Some(schema.as_str())
-            }) else {
+            let Some(table) = index.get(&(schema, table_name)).map(|at| &mut tables[*at]) else {
                 continue;
             };
 
             table.columns.push(postgres_column(&row)?);
         }
 
-        Ok(tables)
+        Ok(DatabaseSchema { tables, truncated })
     }
 
     async fn table_columns(
@@ -442,18 +458,32 @@ impl ExplorerConnection for PostgresExplorer {
             .collect()
     }
 
-    async fn fetch_unprepared(&mut self, sql: String) -> Result<QueryResultSet, anyhow::Error> {
-        let rows = sqlx::raw_sql(sqlx::AssertSqlSafe(sql))
-            .fetch_all(&mut *self.connection)
-            .await
-            .map_err(query_error)?;
+    async fn fetch_unprepared(
+        &mut self,
+        sql: String,
+        max_rows: usize,
+    ) -> Result<QueryResultSet, anyhow::Error> {
+        let mut collector = ResultCollector::new(max_rows);
+        let mut stream = sqlx::raw_sql(sqlx::AssertSqlSafe(sql)).fetch_many(&mut *self.connection);
 
-        let mut result = QueryResultSet {
-            columns: rows.first().map(postgres_columns).unwrap_or_default(),
-            rows: rows.iter().map(postgres_row).collect(),
-            rows_affected: 0,
-            truncated: false,
-        };
+        while let Some(item) = stream.next().await {
+            if let Either::Right(row) = item.map_err(query_error)? {
+                collector.push(|| postgres_columns(&row), || postgres_row(&row));
+            }
+        }
+
+        drop(stream);
+
+        let mut result = collector
+            .into_results()
+            .into_iter()
+            .next()
+            .unwrap_or_else(|| QueryResultSet {
+                columns: Vec::new(),
+                rows: Vec::new(),
+                rows_affected: 0,
+                truncated: false,
+            });
 
         resolve_postgres_type_names(&mut self.connection, std::slice::from_mut(&mut result)).await;
 
@@ -472,7 +502,9 @@ impl ExplorerConnection for PostgresExplorer {
         while let Some(item) = stream.next().await {
             match item.map_err(query_error)? {
                 Either::Left(result) => collector.finish_set(result.rows_affected()),
-                Either::Right(row) => collector.push(|| postgres_columns(&row), postgres_row(&row)),
+                Either::Right(row) => {
+                    collector.push(|| postgres_columns(&row), || postgres_row(&row))
+                }
             }
         }
 
@@ -498,7 +530,7 @@ impl ExplorerConnection for PostgresExplorer {
             }
 
             let result = transaction.execute(query).await.map_err(query_error)?;
-            if expects_single_row && result.rows_affected() != 1 {
+            if result.rows_affected() > 1 || (expects_single_row && result.rows_affected() != 1) {
                 transaction.rollback().await?;
 
                 return Err(display(

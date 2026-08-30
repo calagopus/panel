@@ -99,8 +99,8 @@ mod post {
         }
 
         for file in &data.files {
-            if server.is_ignored(Path::new(&data.root).join(&file.from), false)
-                || destination_server.is_ignored(Path::new(&data.destination).join(&file.to), false)
+            if server.is_ignored_either(Path::new(&data.root).join(&file.from))
+                || destination_server.is_ignored_either(Path::new(&data.destination).join(&file.to))
             {
                 return ApiResponse::error("file not found")
                     .with_status(StatusCode::NOT_FOUND)
@@ -163,17 +163,20 @@ mod post {
             files: data.files,
             destination_server: destination_server.uuid,
             destination_path: data.destination,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
+            destination_ignored: destination_server.subuser_ignored_files.unwrap_or_default(),
             foreground: data.foreground,
         };
 
         tokio::spawn(async move {
             let response = match server
+                .0
                 .node
                 .fetch_cached(&state.database)
                 .await?
                 .api_client(&state.database)
                 .await?
-                .post_servers_server_files_copy_remote(server.uuid, &request_body)
+                .post_servers_server_files_copy_remote(server.0.uuid, &request_body)
                 .await
             {
                 Ok(wings_api::servers_server_files_copy_remote::post::Response::Ok(_)) => {
@@ -220,7 +223,7 @@ mod post {
                         "directory": request_body.root,
                         "files": request_body.files.iter().collect::<Vec<_>>(),
 
-                        "source_server": server.uuid,
+                        "source_server": server.0.uuid,
                         "destination_path": request_body.destination_path,
                     }),
                 )

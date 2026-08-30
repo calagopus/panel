@@ -1,12 +1,12 @@
 import { type OnMount } from '@monaco-editor/react';
 import { type EditorChangeEvent } from '@pierre/diffs/edit';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MonacoBinding } from 'y-monaco';
 import { Awareness, applyAwarenessUpdate, encodeAwarenessUpdate } from 'y-protocols/awareness';
 import * as Y from 'yjs';
 import { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
 import {
   bindPierreEditor,
+  createMonacoBinding,
   cursorColor,
   fromBase64,
   normalizePath,
@@ -73,6 +73,8 @@ export default function useFileCollab({
   const bindingRef = useRef<{ destroy: () => void } | null>(null);
   const styleRef = useRef<HTMLStyleElement | null>(null);
   const subscribedRef = useRef(false);
+  const authGappedRef = useRef(false);
+  const pendingSaveRef = useRef<string[] | null>(null);
   const pierreChangeHandlerRef = useRef<((event: EditorChangeEvent<undefined>) => void) | null>(null);
 
   const callbacksRef = useRef({ onActivated, onSaved, onConflict, onError });
@@ -107,6 +109,7 @@ export default function useFileCollab({
     const editorId = String(editorSequence);
 
     let sessionKey: string | null = null;
+    let syncedEpoch: string | null = null;
     const matchesSession = (eventPath: string) => {
       const normalized = normalizePath(eventPath);
       return normalized === normalizePath(path) || normalized === sessionKey;
@@ -127,8 +130,46 @@ export default function useFileCollab({
       }
     };
 
-    const onSync = (syncPath: string, state: string, meta?: string, rawPath?: string) => {
+    const onSync = (syncPath: string, state: string, meta?: string, rawPath?: string, stateVector?: string) => {
       if (!(rawPath !== undefined && normalizePath(rawPath) === normalizePath(path)) && !matchesSession(syncPath)) {
+        return;
+      }
+
+      let dirty = false;
+      let syncConflict: CollabConflict | null = null;
+      let epoch: string | null = null;
+      try {
+        const parsed = JSON.parse(meta ?? '{}');
+        dirty = Boolean(parsed.dirty);
+        syncConflict = parsed.conflict ?? null;
+        epoch = typeof parsed.epoch === 'string' ? parsed.epoch : null;
+      } catch {
+        // ignore
+      }
+
+      // a document from the same daemon-side lineage can absorb the sync instead of being
+      // replaced by it, which keeps local edits the daemon never received. a rebuilt document
+      // carries a new epoch and shares no history, so merging into it would duplicate content
+      const existing = docRef.current;
+      if (existing && stateVector && epoch !== null && epoch === syncedEpoch) {
+        sessionKey = normalizePath(syncPath);
+        Y.applyUpdate(existing, fromBase64(state), 'remote');
+
+        // pushed unconditionally: deletions carry no new operations, so no comparison of
+        // state vectors can tell whether this document holds edits wings is missing. an
+        // update that turns out to be redundant only marks the session dirty, which the
+        // daemon's reconciler clears within a second
+        sendUpdate(Y.encodeStateAsUpdate(existing, fromBase64(stateVector)));
+
+        // onActivated is deliberately not called here: the session was already active, and
+        // it resets the editor's saved-content baseline, which would report unsaved edits
+        // as saved
+        setConflict(syncConflict);
+
+        if (pendingSaveRef.current) {
+          socket.send(SocketRequest.FILE_COLLAB_SAVE, pendingSaveRef.current);
+        }
+
         return;
       }
 
@@ -138,6 +179,7 @@ export default function useFileCollab({
 
       destroySession();
       sessionKey = normalizePath(syncPath);
+      syncedEpoch = epoch;
 
       const doc = new Y.Doc();
       Y.applyUpdate(doc, fromBase64(state), 'remote');
@@ -171,7 +213,7 @@ export default function useFileCollab({
           },
         );
 
-        bindingRef.current = new MonacoBinding(text, model, new Set([monacoEditor]), awareness);
+        bindingRef.current = createMonacoBinding(text, model, new Set([monacoEditor]), awareness);
         awarenessRef.current = awareness;
         styleRef.current = styleEl;
 
@@ -193,15 +235,6 @@ export default function useFileCollab({
       pendingUpdates = [];
       setActive(true);
 
-      let dirty = false;
-      let syncConflict: CollabConflict | null = null;
-      try {
-        const parsed = JSON.parse(meta ?? '{}');
-        dirty = Boolean(parsed.dirty);
-        syncConflict = parsed.conflict ?? null;
-      } catch {
-        // ignore
-      }
       setConflict(syncConflict);
       callbacksRef.current.onActivated(dirty);
     };
@@ -238,6 +271,7 @@ export default function useFileCollab({
     const onSavedEvent = (savedPath: string, data: string) => {
       if (!matchesSession(savedPath)) return;
 
+      pendingSaveRef.current = null;
       setConflict(null);
       try {
         const payload = JSON.parse(data);
@@ -256,8 +290,22 @@ export default function useFileCollab({
       } catch {
         // ignore malformed payloads
       }
+      pendingSaveRef.current = null;
       setConflict(parsed);
       callbacksRef.current.onConflict(parsed);
+    };
+
+    // updates sent while the jwt was stale were held back or discarded, so the subscription
+    // is rebuilt to merge whatever wings is missing back into it
+    const onAuthSuccess = () => {
+      if (!authGappedRef.current) return;
+      authGappedRef.current = false;
+
+      socket.send(SocketRequest.FILE_COLLAB_SUBSCRIBE, [path, editorId]);
+    };
+
+    const onAuthGap = () => {
+      authGappedRef.current = true;
     };
 
     const onErrorEvent = (errorPath: string, message: string) => {
@@ -265,19 +313,29 @@ export default function useFileCollab({
 
       const wasActive = docRef.current !== null;
       pendingUpdates = [];
+
+      // a resync keeps the document so the sync it triggers can merge into it, preserving
+      // edits the daemon never received. onSync still replaces it when the epoch changed,
+      // and re-issues the save that the daemon refused while it was missing updates
+      if (message === 'resync') {
+        socket.send(SocketRequest.FILE_COLLAB_SUBSCRIBE, [path, editorId]);
+        return;
+      }
+
+      pendingSaveRef.current = null;
       destroySession();
 
-      if (message === 'resync' || wasActive) {
+      if (wasActive) {
         socket.send(SocketRequest.FILE_COLLAB_SUBSCRIBE, [path, editorId]);
-        if (message !== 'resync') {
-          callbacksRef.current.onError(message);
-        }
       } else {
         subscribedRef.current = false;
-        callbacksRef.current.onError(message);
       }
+      callbacksRef.current.onError(message);
     };
 
+    socket.addListener('auth success', onAuthSuccess);
+    socket.addListener('jwt error', onAuthGap);
+    socket.addListener('token expired', onAuthGap);
     socket.addListener(SocketEvent.FILE_COLLAB_SYNC, onSync);
     socket.addListener(SocketEvent.FILE_COLLAB_UPDATE, onUpdate);
     socket.addListener(SocketEvent.FILE_COLLAB_AWARENESS, onAwareness);
@@ -290,6 +348,9 @@ export default function useFileCollab({
     socket.send(SocketRequest.FILE_COLLAB_SUBSCRIBE, [path, editorId]);
 
     return () => {
+      socket.removeListener('auth success', onAuthSuccess);
+      socket.removeListener('jwt error', onAuthGap);
+      socket.removeListener('token expired', onAuthGap);
       socket.removeListener(SocketEvent.FILE_COLLAB_SYNC, onSync);
       socket.removeListener(SocketEvent.FILE_COLLAB_UPDATE, onUpdate);
       socket.removeListener(SocketEvent.FILE_COLLAB_AWARENESS, onAwareness);
@@ -311,14 +372,12 @@ export default function useFileCollab({
     (force?: boolean, expectedHash?: string | null) => {
       if (!socketInstance || !subscribedRef.current) return false;
 
-      if (force) {
-        socketInstance.send(
-          SocketRequest.FILE_COLLAB_SAVE,
-          expectedHash ? [filePath, '1', expectedHash] : [filePath, '1'],
-        );
-      } else {
-        socketInstance.send(SocketRequest.FILE_COLLAB_SAVE, filePath);
-      }
+      // kept so a save wings refuses because it is missing updates can be re-issued once a
+      // resync has pushed them back
+      const args = force ? (expectedHash ? [filePath, '1', expectedHash] : [filePath, '1']) : [filePath];
+      pendingSaveRef.current = args;
+      socketInstance.send(SocketRequest.FILE_COLLAB_SAVE, args);
+
       return true;
     },
     [socketInstance, filePath],

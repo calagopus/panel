@@ -1,4 +1,6 @@
-use crate::routes::api::auth::login::checkpoint::{TwoFactorRequiredJwt, available_methods};
+use crate::routes::api::auth::login::checkpoint::{
+    TwoFactorRequiredJwt, available_methods, two_factor_unprovable,
+};
 
 use super::State;
 use axum::{
@@ -281,6 +283,17 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
 
                         let settings = state.settings.get().await?;
                         let methods = available_methods(&user, &settings);
+
+                        if two_factor_unprovable(&user, &settings) && !oauth_provider.login_bypass_two_factor {
+                            let app_url = settings.app.url.clone();
+                            drop(settings);
+
+                            return ApiResponse::new(Body::empty())
+                                .with_header("Location", format!("{}/auth/login?error=security_key_required", app_url.trim_end_matches('/')))
+                                .with_status(StatusCode::TEMPORARY_REDIRECT)
+                                .ok();
+                        }
+
                         drop(settings);
 
                         if !methods.is_empty() && !oauth_provider.login_bypass_two_factor {

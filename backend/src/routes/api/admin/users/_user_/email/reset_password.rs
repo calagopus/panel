@@ -34,6 +34,7 @@ mod post {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.email")?;
+        permissions.can_modify_user(&user)?;
 
         let user_uuid = user.uuid;
 

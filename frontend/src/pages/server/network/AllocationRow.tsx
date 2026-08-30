@@ -30,6 +30,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');
   const canUpdate = useServerCan('allocations.update');
+  const canUnsetPrimary = !server.eggConfiguration?.allocationSelfAssignRequirePrimary;
 
   const setDebouncedNotes = useMemo(
     () =>
@@ -65,6 +66,10 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
   };
 
   const doUnsetPrimary = () => {
+    if (!canUnsetPrimary) {
+      return;
+    }
+
     updateAllocation(server.uuid, allocation.uuid, { primary: false })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
@@ -118,6 +123,7 @@ export default function AllocationRow({ allocation }: { allocation: z.infer<type
             icon: faStar,
             label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
+            disabled: !canUnsetPrimary,
             onClick: doUnsetPrimary,
             color: 'red',
             canAccess: canUpdate,

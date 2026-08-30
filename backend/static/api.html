@@ -12,16 +12,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.44.20"></script>
 
-    {% autoescape false %}
     <script>
+      const appName = {{ settings.app.name | tojson }};
+      const appUrl = {{ settings.app.url | tojson }};
+
       Scalar.createApiReference('#app', {
         url: '/openapi.json',
         telemetry: false,
         hideClientButton: true,
         servers: [
           {
-            url: '{{ settings.app.url }}'.replace(/\/$/, ''),
-            description: '{{ settings.app.name }} API',
+            url: appUrl.replace(/\/$/, ''),
+            description: `${appName} API`,
           },
         ],
         tagsSorter: (a, b) => {
@@ -32,6 +34,5 @@
         },
       });
     </script>
-    {% endautoescape %}
   </body>
 </html>

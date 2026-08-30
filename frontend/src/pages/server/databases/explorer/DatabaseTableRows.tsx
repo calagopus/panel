@@ -32,7 +32,7 @@ const ROWS_PER_PAGE = 50;
 export function clearRowParams(params: URLSearchParams) {
   params.delete('sort');
   params.delete('desc');
-  params.delete('page');
+  params.delete('offset');
 }
 
 export default function DatabaseTableRows({ table }: { table: z.infer<typeof serverDatabaseSchemaTableSchema> }) {
@@ -49,10 +49,11 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
   const [ghosts, setGhosts] = useState<Record<string, z.infer<typeof serverDatabaseQueryValueSchema>>[]>([]);
   const [saving, setSaving] = useState(false);
   const [openModal, setOpenModal] = useState<'deleteRows' | null>(null);
+  const [previous, setPrevious] = useState<number[]>([]);
 
   const orderBy = searchParams.get('sort');
   const descending = searchParams.get('desc') === '1';
-  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+  const offset = Math.max(0, Number(searchParams.get('offset')) || 0);
   const filtersParam = searchParams.get('filters');
   const filters = parseFilters(filtersParam);
 
@@ -68,8 +69,8 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
     );
   };
 
-  const setPage = (next: number) =>
-    setParams((params) => (next > 1 ? params.set('page', next.toString()) : params.delete('page')));
+  const setOffset = (next: number) =>
+    setParams((params) => (next > 0 ? params.set('offset', next.toString()) : params.delete('offset')));
 
   const setFilters = (next: z.infer<typeof serverDatabaseBrowseFilterSchema>[]) =>
     setParams((params) => {
@@ -79,7 +80,7 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
         params.delete('filters');
       }
 
-      params.delete('page');
+      params.delete('offset');
     });
 
   const options = {
@@ -87,7 +88,7 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
     table: table.name,
     orderBy,
     descending,
-    offset: (page - 1) * ROWS_PER_PAGE,
+    offset,
     filters,
   };
 
@@ -145,7 +146,19 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
 
   useEffect(() => {
     reset();
-  }, [page, orderBy, descending, filtersParam]);
+  }, [offset, orderBy, descending, filtersParam]);
+
+  useEffect(() => {
+    setPrevious([]);
+  }, [orderBy, descending, filtersParam, tableIdentity(table)]);
+
+  const truncatedKey = (rowIndex: number) =>
+    primaryKey.some((column) => {
+      const index = base.columns.findIndex((entry) => entry.name === column.name);
+      const value = base.rows[rowIndex]?.[index];
+
+      return value && value.type !== 'null' && value.truncated === true;
+    });
 
   const keysFor = (rowIndex: number) =>
     primaryKey.map((column) => {
@@ -213,14 +226,32 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
     setOpenModal(null);
   };
 
-  const hasPrevious = page > 1 && !loading;
-  const hasNext = !loading && loaded.rows.length >= ROWS_PER_PAGE;
+  const hasPrevious = offset > 0 && !loading;
+  const hasNext = !loading && (loaded.rows.length >= ROWS_PER_PAGE || loaded.truncated);
+
+  const goFirst = () => {
+    setPrevious([]);
+    setOffset(0);
+  };
+
+  const goPrevious = () => {
+    const stack = [...previous];
+    const target = stack.pop();
+
+    setPrevious(stack);
+    setOffset(target ?? Math.max(0, offset - ROWS_PER_PAGE));
+  };
+
+  const goNext = () => {
+    setPrevious([...previous, offset]);
+    setOffset(offset + loaded.rows.length);
+  };
 
   useKeyboardShortcuts({
     shortcuts: [
-      { id: 'table.firstPage', callback: () => page > 1 && setPage(1) },
-      { id: 'table.previousPage', callback: () => hasPrevious && setPage(page - 1) },
-      { id: 'table.nextPage', callback: () => hasNext && setPage(page + 1) },
+      { id: 'table.firstPage', callback: () => offset > 0 && goFirst() },
+      { id: 'table.previousPage', callback: () => hasPrevious && goPrevious() },
+      { id: 'table.nextPage', callback: () => hasNext && goNext() },
     ],
   });
 
@@ -234,7 +265,7 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
         params.delete('desc');
       }
 
-      params.delete('page');
+      params.delete('offset');
     });
   };
 
@@ -281,12 +312,12 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
           )}
           <Group gap='xs'>
             <Tooltip label={t('pages.server.databases.explorer.button.previous', {})}>
-              <ActionIcon variant='default' size='input-sm' disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
+              <ActionIcon variant='default' size='input-sm' disabled={!hasPrevious} onClick={goPrevious}>
                 <FontAwesomeIcon icon={faChevronLeft} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label={t('pages.server.databases.explorer.button.next', {})}>
-              <ActionIcon variant='default' size='input-sm' disabled={!hasNext} onClick={() => setPage(page + 1)}>
+              <ActionIcon variant='default' size='input-sm' disabled={!hasNext} onClick={goNext}>
                 <FontAwesomeIcon icon={faChevronRight} />
               </ActionIcon>
             </Tooltip>
@@ -302,6 +333,7 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
           rowsEditable
             ? {
                 editableColumns,
+                isLocked: truncatedKey,
                 isDirty: (rowIndex, column) => edits[rowIndex]?.[column] !== undefined,
                 onChange: (rowIndex, column, value) =>
                   setEdits((prev) => ({
@@ -323,9 +355,11 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
                     return next;
                   }),
                 onToggleAll: () =>
-                  setSelected((prev) =>
-                    prev.size === loaded.rows.length ? new Set() : new Set(loaded.rows.map((_, index) => index)),
-                  ),
+                  setSelected((prev) => {
+                    const selectable = loaded.rows.map((_, index) => index).filter((index) => !truncatedKey(index));
+
+                    return prev.size === selectable.length ? new Set() : new Set(selectable);
+                  }),
                 onSelectedStart,
                 onSelected,
                 ghosts,
@@ -350,10 +384,10 @@ export default function DatabaseTableRows({ table }: { table: z.infer<typeof ser
             : ''}
         </Text>
         <Group>
-          <Button color='gray' disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
+          <Button color='gray' disabled={!hasPrevious} onClick={goPrevious}>
             {t('pages.server.databases.explorer.button.previous', {})}
           </Button>
-          <Button color='gray' disabled={!hasNext} onClick={() => setPage(page + 1)}>
+          <Button color='gray' disabled={!hasNext} onClick={goNext}>
             {t('pages.server.databases.explorer.button.next', {})}
           </Button>
         </Group>

@@ -38,6 +38,7 @@ export class Websocket extends EventEmitter {
   private socket: WebSocket | null = null;
   private url: string | null = null;
   private token = '';
+  private authGapped = false;
   private useBinary = false;
 
   private state: SocketState = SocketState.CLOSED;
@@ -112,10 +113,34 @@ export class Websocket extends EventEmitter {
   }
 
   /**
+   * Clears the auth gap before listeners run, so a listener reacting to 'auth success' can
+   * send without depending on the order handlers were registered in.
+   */
+  private dispatch(event: string, args: string[]): void {
+    if (event === 'auth success') {
+      this.authGapped = false;
+    }
+
+    this.emit(event, ...args);
+  }
+
+  /**
+   * Marks the socket as having a stale token. Wings rejects and discards every non-auth
+   * frame in this state, and closes the connection outright once it drops the jwt, so
+   * frames are held back until the refreshed token is accepted.
+   */
+  setAuthGapped(gapped: boolean): void {
+    this.authGapped = gapped;
+  }
+
+  /**
    * Sends a message over the socket. Silently drops messages if not connected.
    */
   send(event: string, payload?: string | string[]): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+    if (this.authGapped && event !== 'auth') {
       return;
     }
 
@@ -165,10 +190,10 @@ export class Websocket extends EventEmitter {
 
         if (typeof e.data === 'string') {
           const { event, args } = JSON.parse(e.data) as { event: string; args: string[] };
-          this.emit(event, ...args);
+          this.dispatch(event, args);
         } else if (e.data instanceof ArrayBuffer) {
           const [event, args] = decode(e.data) as [string, string[]];
-          this.emit(event, ...args);
+          this.dispatch(event, args);
         }
       } catch (ex) {
         console.warn('Failed to parse incoming websocket message.', ex);

@@ -52,21 +52,23 @@ mod post {
         let files = data
             .files
             .into_iter()
-            .filter(|f| !server.is_ignored(std::path::Path::new(&data.root).join(f), false))
+            .filter(|f| !server.is_ignored_either(std::path::Path::new(&data.root).join(f)))
             .collect();
 
         let request_body = wings_api::servers_server_files_delete::post::RequestBody {
             root: data.root,
             files,
+            ignored: server.0.subuser_ignored_files.unwrap_or_default(),
         };
 
         let data = match server
+            .0
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
             .await?
-            .post_servers_server_files_delete(server.uuid, &request_body)
+            .post_servers_server_files_delete(server.0.uuid, &request_body)
             .await
         {
             Ok(data) => data,

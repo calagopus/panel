@@ -73,6 +73,11 @@ export default function ServerItem({
   const [openModal, setOpenModal] = useState<'add-group' | 'kill' | null>(null);
   const stats = useServerStats(server);
 
+  const availableServerGroups = useMemo(
+    () => serverGroups.filter((g) => !g.serverOrder.includes(server.uuid)),
+    [serverGroups, server.uuid],
+  );
+
   const { handleBulkPowerAction, bulkActionLoading } = useBulkPowerActions();
 
   const state = stats?.state;
@@ -261,7 +266,7 @@ export default function ServerItem({
                       {showGroupAddButton && (
                         <Tooltip
                           label={
-                            serverGroups.length === 0
+                            availableServerGroups.length === 0
                               ? t('pages.account.home.tooltip.noGroups', {})
                               : t('pages.account.home.tooltip.addToGroup', {})
                           }
@@ -270,7 +275,7 @@ export default function ServerItem({
                           <ActionIcon
                             size='input-sm'
                             variant='light'
-                            disabled={serverGroups.length === 0}
+                            disabled={availableServerGroups.length === 0}
                             onClick={(e) => {
                               e.preventDefault();
                               setOpenModal('add-group');

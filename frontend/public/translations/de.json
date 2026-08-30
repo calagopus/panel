@@ -1038,7 +1038,8 @@
           "error": {
             "usernameRequired": "Bitte gib einen Benutzernamen ein",
             "registrationDisabled": "Es konnte kein passender Account gefunden werden und die Registrierung ist derzeit deaktiviert.",
-            "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits."
+            "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits.",
+            "securityKeyRequired": "Dieser Account erfordert eine Zwei-Faktor-Authentifizierung, melde dich stattdessen mit einem Sicherheitsschlüssel an."
           },
           "passkey": {
             "error": {
@@ -5079,6 +5080,9 @@
               "title": "Tabellen",
               "empty": "Diese Datenbank hat noch keine Tabellen.",
               "noMatches": "Keine Tabellen passen zu deiner Suche.",
+              "noMatchesTruncated": "Keine Tabellen passen zu deiner Suche. Es wurden nur die ersten {tables} Tabellen geladen, der Rest kann nicht durchsucht werden.",
+              "truncated": "Diese Datenbank hat zu viele Tabellen zum Laden. Es werden nur die ersten {tables} angezeigt.",
+              "tableBeyondLimit": "Diese Tabelle liegt außerhalb der ersten {tables} Tabellen, mehr kann diese Datenbank nicht laden.",
               "rowEstimate": "~{rows}",
               "badge": {
                 "view": "View"
@@ -5144,6 +5148,7 @@
               "setNull": "Auf NULL setzen",
               "null": "NULL",
               "empty": "leer",
+              "truncated": "Dieser Wert ist zu groß, um vollständig geladen zu werden, und kann nicht bearbeitet werden.",
               "editorHint": "{enter} übernimmt den Wert, {shiftEnter} fügt eine neue Zeile ein."
             }
           },
@@ -6066,7 +6071,8 @@
               "form": {
                 "emailPlaceholder": "Gib die E-Mail ein, unter der dieser Subuser gespeichert werden soll.",
                 "permissions": "Berechtigungen",
-                "ignoredFilesDescription": "Dateien und Verzeichnisse, die diesen Mustern entsprechen, werden vor diesem Subuser verborgen. Verwendet Glob-Muster im gitignore-Stil (z. B. `*.env`, `secrets/`). Stelle einem Muster ein `!` voran, um einen Pfad wieder anzuzeigen, den ein allgemeineres Muster andernfalls ausschließen würde."
+                "ignoredFilesDescription": "Dateien und Verzeichnisse, die diesen Mustern entsprechen, werden vor diesem Subuser verborgen. Verwendet Glob-Muster im gitignore-Stil (z. B. `*.env`, `secrets/`). Stelle einem Muster ein `!` voran, um einen Pfad wieder anzuzeigen, den ein allgemeineres Muster andernfalls ausschließen würde.",
+                "ignoredFilesInherited": "Die vor dir verborgenen Pfade werden immer zusätzlich angewendet und können nicht weitergegeben werden."
               }
             },
             "updateSubuser": {

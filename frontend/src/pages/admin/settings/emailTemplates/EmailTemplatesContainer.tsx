@@ -12,6 +12,7 @@ import Anchor from '@/elements/Anchor.tsx';
 import Badge from '@/elements/Badge.tsx';
 import Button from '@/elements/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Code from '@/elements/Code.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Divider from '@/elements/Divider.tsx';
 import Group from '@/elements/Group.tsx';
@@ -208,18 +209,9 @@ export default function EmailTemplatesContainer() {
             {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxLink', {})}
           </Anchor>
           &nbsp;
-          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxMiddle', {})}{' '}
-          <Text span ff='monospace' size='sm'>
-            {'{{ variable }}'}
-          </Text>{' '}
-          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAnd', {})}{' '}
-          <Text span ff='monospace' size='sm'>
-            {'{% if %}'}
-          </Text>{' '}
-          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxOr', {})}{' '}
-          <Text span ff='monospace' size='sm'>
-            {'{% for %}'}
-          </Text>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxMiddle', {})} <Code>{'{{ variable }}'}</Code>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAnd', {})} <Code>{'{% if %}'}</Code>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxOr', {})} <Code>{'{% for %}'}</Code>{' '}
           {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAfter', {})}
         </Text>
       </Alert>

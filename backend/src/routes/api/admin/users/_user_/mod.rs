@@ -153,6 +153,7 @@ mod delete {
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("users.delete")?;
+        permissions.can_modify_user(&user)?;
 
         let servers = Server::count_by_user_uuid(&state.database, user.uuid).await?;
         if servers > 0 {
@@ -238,11 +239,7 @@ mod patch {
                     .ok();
             }
 
-            if user.admin {
-                return ApiResponse::error("you cannot modify an administrator")
-                    .with_status(StatusCode::FORBIDDEN)
-                    .ok();
-            }
+            permissions.can_modify_user(&user)?;
 
             if caller.uuid != user.uuid {
                 if data.password.is_some() {
