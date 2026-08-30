@@ -141,10 +141,6 @@ export const PierreEditor = memo(
     const instanceRef = useRef<Editor<undefined> | null>(null);
     const defaultValueRef = useRef(defaultValue);
 
-    useEffect(() => {
-      defaultValueRef.current = defaultValue;
-    });
-
     const file = useMemo(() => toFile(path, defaultValue), [path, defaultValue]);
 
     const handle = useMemo<PierreEditorHandle>(
@@ -163,6 +159,12 @@ export const PierreEditor = memo(
 
     useImperativeHandle(ref, () => handle, [handle]);
 
+    useEffect(() => {
+      defaultValueRef.current = defaultValue;
+      const editor = instanceRef.current;
+      if (editor) replaceBuffer(editor, defaultValue);
+    }, [defaultValue, path]);
+
     const editorOptions = useMemo<EditorOptions<undefined>>(
       () => ({
         persistState: true,
@@ -172,6 +174,7 @@ export const PierreEditor = memo(
         historyMaxEntries: 1000,
         onAttach: (editor) => {
           instanceRef.current = editor;
+          replaceBuffer(editor, defaultValueRef.current);
           callbacks.current.onMount?.(handle);
         },
         onChange: (f, _lineAnnotations, event) => {
