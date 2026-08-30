@@ -14,7 +14,7 @@ exclude = ["backend-extensions/node_modules"]
 default-members = ["bins/base", "bins/all-in-one", "bins/heavy-supervisor"]
 package.rust-version = "1.97.0"
 package.license = "MIT"
-package.version = "1.1.4"
+package.version = "1.1.5"
 package.edition = "2024"
 
 [workspace.dependencies]
