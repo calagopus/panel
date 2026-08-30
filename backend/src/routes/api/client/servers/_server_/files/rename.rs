@@ -61,6 +61,7 @@ mod put {
                 })
                 .collect(),
             root: data.root,
+            create_directories: permissions.has_server_permission("files.create").is_ok(),
         };
 
         let data = match server

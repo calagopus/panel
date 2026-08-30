@@ -259,6 +259,7 @@
         "author": "Autor",
         "type": "Typ",
         "password": "Passwort",
+        "passwordRequired": "Passwort ist erforderlich",
         "host": "Host",
         "username": "Benutzername",
         "usernameOrEmail": "Benutzername/E-Mail",

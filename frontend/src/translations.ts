@@ -145,6 +145,7 @@ const baseTranslations = defineTranslations({
         author: 'Author',
         type: 'Type',
         password: 'Password',
+        passwordRequired: 'Password is required',
         host: 'Host',
         username: 'Username',
         usernameOrEmail: 'Username/Email',

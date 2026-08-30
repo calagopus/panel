@@ -48,7 +48,7 @@ pub async fn handle_request(
 
     tracing::info!(
         path = req.uri().path(),
-        query = req.uri().query().unwrap_or_default(),
+        query = %shared::utils::redact_query(req.uri().query().unwrap_or_default()),
         "http {}",
         req.method().to_string().to_lowercase(),
     );
@@ -63,6 +63,41 @@ pub async fn handle_request(
                 .await
         })
         .await)
+}
+
+const STRIPPED_PROXY_REQUEST_HEADERS: &[&str] = &[
+    "authorization",
+    "calagopus-user",
+    "cf-connecting-ip",
+    "connection",
+    "content-length",
+    "cookie",
+    "forwarded",
+    "host",
+    "keep-alive",
+    "proxy-authorization",
+    "proxy-connection",
+    "sec-websocket-accept",
+    "sec-websocket-extensions",
+    "sec-websocket-key",
+    "sec-websocket-version",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "true-client-ip",
+    "upgrade",
+    "x-client-ip",
+    "x-forwarded-for",
+    "x-forwarded-host",
+    "x-forwarded-port",
+    "x-forwarded-proto",
+    "x-real-ip",
+    "x-real-ip-token",
+];
+
+#[inline]
+fn is_stripped_proxy_request_header(name: &axum::http::HeaderName) -> bool {
+    STRIPPED_PROXY_REQUEST_HEADERS.contains(&name.as_str())
 }
 
 fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> Response<Body> {
@@ -293,7 +328,25 @@ pub async fn handle_startup() -> Result<
                     .map_or(Cow::Borrowed("calagopus"), |s| s.into()),
             )
             .traces_sample_rate(env.sentry_tracing_sample_rate)
-            .release(shared::full_version()),
+            .release(shared::full_version())
+            .before_send(|mut event| {
+                if let Some(request) = event.request.as_mut() {
+                    if let Some(url) = request.url.as_mut() {
+                        let redacted = url
+                            .query()
+                            .map(|query| shared::utils::redact_query(query).into_owned());
+                        if let Some(redacted) = redacted {
+                            url.set_query(Some(&redacted));
+                        }
+                    }
+
+                    if let Some(query_string) = request.query_string.as_mut() {
+                        *query_string = shared::utils::redact_query(query_string).into_owned();
+                    }
+                }
+
+                Some(event)
+            }),
     ));
 
     let jwt = Arc::new(shared::jwt::Jwt::new(&env));
@@ -609,19 +662,7 @@ pub async fn handle_startup() -> Result<
                             };
 
                             for (name, value) in parts.headers.iter() {
-                                if matches!(
-                                    name.as_str(),
-                                    "host"
-                                        | "connection"
-                                        | "upgrade"
-                                        | "content-length"
-                                        | "transfer-encoding"
-                                        | "x-forwarded-for"
-                                        | "sec-websocket-key"
-                                        | "sec-websocket-version"
-                                        | "sec-websocket-extensions"
-                                        | "sec-websocket-accept"
-                                ) {
+                                if is_stripped_proxy_request_header(name) {
                                     continue;
                                 }
 
@@ -639,7 +680,7 @@ pub async fn handle_startup() -> Result<
 
                             tracing::debug!(
                                 "proxying websocket to wings-proxy upstream: {}",
-                                upstream_request.uri()
+                                shared::utils::redact_url(&upstream_request.uri().to_string())
                             );
 
                             let upstream =
@@ -694,22 +735,20 @@ pub async fn handle_startup() -> Result<
                             .ok();
                         }
 
+                        let mut headers =
+                            axum::http::HeaderMap::with_capacity(parts.headers.len());
+                        for (name, value) in parts.headers.iter() {
+                            if is_stripped_proxy_request_header(name) {
+                                continue;
+                            }
+
+                            headers.append(name.clone(), value.clone());
+                        }
+
                         let mut request = reqwest::Request::new(parts.method, url);
-                        *request.headers_mut() = parts.headers;
+                        *request.headers_mut() = headers;
                         *request.body_mut() =
                             Some(reqwest::Body::wrap_stream(body.into_data_stream()));
-
-                        request.headers_mut().remove(axum::http::header::HOST);
-                        request.headers_mut().remove("X-Forwarded-For");
-
-                        request
-                            .headers_mut()
-                            .remove(axum::http::header::TRANSFER_ENCODING);
-                        request
-                            .headers_mut()
-                            .remove(axum::http::header::CONTENT_LENGTH);
-
-                        request.headers_mut().remove(axum::http::header::CONNECTION);
 
                         request
                             .headers_mut()
@@ -720,22 +759,22 @@ pub async fn handle_startup() -> Result<
 
                         tracing::debug!(
                             "proxying request to wings-proxy upstream: {}",
-                            request.url()
+                            shared::utils::redact_url(request.url().as_str())
                         );
 
                         let response = match state.client.execute(request).await {
                             Ok(response) => response,
                             Err(err) => {
-                                tracing::warn!(
-                                    "failed to connect to wings-proxy upstream: {:#?}",
-                                    err
-                                );
-
                                 let status = if err.is_connect() || err.is_timeout() {
                                     StatusCode::GATEWAY_TIMEOUT
                                 } else {
                                     StatusCode::BAD_GATEWAY
                                 };
+
+                                tracing::warn!(
+                                    "failed to connect to wings-proxy upstream: {:#?}",
+                                    err.without_url()
+                                );
 
                                 return ApiResponse::error("failed to connect to upstream")
                                     .with_status(status)
