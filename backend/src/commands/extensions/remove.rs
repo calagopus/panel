@@ -91,7 +91,7 @@ impl shared::extensions::commands::CliCommand<RemoveArgs> for RemoveCommand {
                 }
 
                 let frontend_translations_path = Path::new("frontend/public/translations/en")
-                    .join(format!("{}.json", &args.package_name));
+                    .join(format!("{}.json", args.package_name));
                 let migrations_path =
                     Path::new("database/extension-migrations").join(&package_identifier);
 
