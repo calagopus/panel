@@ -74,6 +74,7 @@ export interface TreeDirectoryCapabilities {
 export interface FileTreeProps {
   onOpenFile: (item: TreeSelectionItem, capabilities: TreeDirectoryCapabilities) => void;
   activePath: string | null;
+  initialDirectory: string;
   collapsed: boolean;
   onToggleCollapsed: () => void;
 }

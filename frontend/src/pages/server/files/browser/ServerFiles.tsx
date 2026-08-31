@@ -401,13 +401,15 @@ function FileBrowser() {
   );
 }
 
-type FileManagerView = 'files' | 'editor';
+type FileManagerView = 'list' | 'tree';
 const FileTreeWorkspace = lazy(() => import('@/pages/server/files/workspace/FileTreeWorkspace.tsx'));
 const FILE_MANAGER_VIEW_STORAGE_KEY = 'file_manager_view';
 const fileTreeVisibilityStorageKey = (serverUuid: string) => `file_manager_tree_visible:${serverUuid}`;
 
-const getStoredFileManagerView = (): FileManagerView =>
-  localStorage.getItem(FILE_MANAGER_VIEW_STORAGE_KEY) === 'editor' ? 'editor' : 'files';
+const getStoredFileManagerView = (): FileManagerView => {
+  const stored = localStorage.getItem(FILE_MANAGER_VIEW_STORAGE_KEY);
+  return stored === 'tree' || stored === 'editor' ? 'tree' : 'list';
+};
 
 const getStoredFileTreeVisibility = (serverUuid: string) =>
   localStorage.getItem(fileTreeVisibilityStorageKey(serverUuid)) !== 'false';
@@ -416,14 +418,17 @@ function ServerFilesComponent() {
   const { t } = useTranslations();
   const serverUuid = useServerStore((state) => state.server.uuid);
   const doOpenModal = useFileManagerStore((state) => state.doOpenModal);
+  const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
   const [view, setView] = useState<FileManagerView>(getStoredFileManagerView);
   const [fileTreeVisible, setFileTreeVisible] = useState(() => getStoredFileTreeVisibility(serverUuid));
+  const [treeInitialDirectory, setTreeInitialDirectory] = useState(browsingDirectory);
 
   useEffect(() => setFileTreeVisible(getStoredFileTreeVisibility(serverUuid)), [serverUuid]);
 
   const changeView = (value: string) => {
-    if (value !== 'files' && value !== 'editor') return;
+    if (value !== 'list' && value !== 'tree') return;
 
+    if (value === 'tree') setTreeInitialDirectory(browsingDirectory);
     localStorage.setItem(FILE_MANAGER_VIEW_STORAGE_KEY, value);
     setView(value);
   };
@@ -438,19 +443,19 @@ function ServerFilesComponent() {
   return (
     <div data-file-manager-page className='flex w-full min-w-0 flex-col'>
       <FileModals />
-      <FileUpload showOverlay={view === 'files'} />
+      <FileUpload showOverlay={view === 'list'} />
       <FileActionBar />
 
       <Group justify='space-between' align='center' mb='md'>
         <Group>
           <Title order={1}>
-            {t(view === 'editor' ? 'pages.server.files.view.editor' : 'pages.server.files.view.files', {})}
+            {t(view === 'tree' ? 'pages.server.files.view.editor' : 'pages.server.files.view.files', {})}
           </Title>
           <FileSettings />
         </Group>
 
         <Group>
-          {view === 'editor' && (
+          {view === 'tree' && (
             <Tooltip label={t('pages.server.files.tooltip.advancedSearch', {})}>
               <ActionIcon
                 type='button'
@@ -469,25 +474,23 @@ function ServerFilesComponent() {
             onChange={changeView}
             data={[
               {
-                value: 'files',
+                value: 'list',
                 label: (
-                  <FontAwesomeIcon
-                    icon={faFolderOpen}
-                    title={t('pages.server.files.view.files', {})}
-                    aria-label={t('pages.server.files.view.files', {})}
-                    fixedWidth
-                  />
+                  <Tooltip label={t('pages.server.files.view.files', {})}>
+                    <FontAwesomeIcon
+                      icon={faFolderOpen}
+                      aria-label={t('pages.server.files.view.files', {})}
+                      fixedWidth
+                    />
+                  </Tooltip>
                 ),
               },
               {
-                value: 'editor',
+                value: 'tree',
                 label: (
-                  <FontAwesomeIcon
-                    icon={faCode}
-                    title={t('pages.server.files.view.editor', {})}
-                    aria-label={t('pages.server.files.view.editor', {})}
-                    fixedWidth
-                  />
+                  <Tooltip label={t('pages.server.files.view.editor', {})}>
+                    <FontAwesomeIcon icon={faCode} aria-label={t('pages.server.files.view.editor', {})} fixedWidth />
+                  </Tooltip>
                 ),
               },
             ]}
@@ -498,7 +501,7 @@ function ServerFilesComponent() {
         </Group>
       </Group>
 
-      {view === 'files' ? (
+      {view === 'list' ? (
         <FileBrowser />
       ) : (
         <Suspense
@@ -508,7 +511,12 @@ function ServerFilesComponent() {
             </div>
           }
         >
-          <FileTreeWorkspace key={serverUuid} fileTreeVisible={fileTreeVisible} onToggleFileTree={toggleFileTree} />
+          <FileTreeWorkspace
+            key={serverUuid}
+            initialDirectory={treeInitialDirectory}
+            fileTreeVisible={fileTreeVisible}
+            onToggleFileTree={toggleFileTree}
+          />
         </Suspense>
       )}
     </div>

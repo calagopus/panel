@@ -1,5 +1,5 @@
 import { faFileCirclePlus, faFolderPlus } from '@fortawesome/free-solid-svg-icons';
-import { dirname, join } from 'pathe';
+import { dirname, join, resolve } from 'pathe';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -38,7 +38,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
-function FileTree({ onOpenFile, activePath, collapsed, onToggleCollapsed }: FileTreeProps) {
+function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggleCollapsed }: FileTreeProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -196,6 +196,30 @@ function FileTree({ onOpenFile, activePath, collapsed, onToggleCollapsed }: File
     setSearchError(null);
     void loadPage(ROOT_DIRECTORY, 1);
   }, [server.uuid, loadPage, clearDropTarget, store]);
+
+  useEffect(() => {
+    const paths: string[] = [];
+    let current = resolve(ROOT_DIRECTORY, initialDirectory);
+
+    while (current !== ROOT_DIRECTORY) {
+      paths.unshift(current);
+      const parent = dirname(current);
+      if (parent === current) break;
+      current = parent;
+    }
+
+    if (paths.length === 0) return;
+
+    setExpandedDirectories((expanded) => {
+      const next = new Set(expanded);
+      for (const path of paths) next.add(path);
+      return next.size === expanded.size ? expanded : next;
+    });
+
+    for (const path of paths) {
+      if (!directoriesRef.current[path]) void loadPage(path, 1);
+    }
+  }, [initialDirectory, loadPage]);
 
   useEffect(
     () =>

@@ -34,11 +34,16 @@ interface PendingTabClose {
 }
 
 interface FileTreeWorkspaceProps {
+  initialDirectory: string;
   fileTreeVisible: boolean;
   onToggleFileTree: () => void;
 }
 
-export default function FileTreeWorkspace({ fileTreeVisible, onToggleFileTree }: FileTreeWorkspaceProps) {
+export default function FileTreeWorkspace({
+  initialDirectory,
+  fileTreeVisible,
+  onToggleFileTree,
+}: FileTreeWorkspaceProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -388,6 +393,7 @@ export default function FileTreeWorkspace({ fileTreeVisible, onToggleFileTree }:
           >
             <FileTree
               activePath={activeSelection ? join(activeSelection.directory, activeSelection.file.name) : null}
+              initialDirectory={initialDirectory}
               collapsed={!fileTreeVisible}
               onToggleCollapsed={onToggleFileTree}
               onOpenFile={openFile}

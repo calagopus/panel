@@ -13,7 +13,7 @@ function FileUploadOverlay({ visible }: FileUploadOverlayProps) {
   if (!visible) return null;
 
   return (
-    <div className='pointer-events-none fixed inset-0 z-100 flex h-screen w-screen items-center justify-center bg-black/20 backdrop-blur-md'>
+    <div className='pointer-events-none fixed inset-0 z-100 flex h-screen w-screen items-center justify-center bg-black/50'>
       <div className='pointer-events-none'>
         <div className='bg-(--mantine-color-body) rounded-lg p-8 shadow-2xl border-2 border-dashed border-(--mantine-color-blue-5)'>
           <div className='flex flex-col items-center gap-4 z-100'>
