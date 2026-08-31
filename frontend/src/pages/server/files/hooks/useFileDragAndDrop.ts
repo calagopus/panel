@@ -5,6 +5,11 @@ interface UseFileDragAndDropOptions {
   enabled?: boolean;
 }
 
+const dataTransferHasFiles = (dataTransfer: DataTransfer | null) =>
+  !!dataTransfer &&
+  (Array.from(dataTransfer.types).includes('Files') ||
+    Array.from(dataTransfer.items).some((item) => item.kind === 'file'));
+
 const withRelativePath = (file: File, relativePath: string) => {
   Object.defineProperty(file, 'webkitRelativePath', { configurable: true, value: relativePath });
   return file;
@@ -71,14 +76,24 @@ export async function getFilesFromDataTransfer(dataTransfer: DataTransfer): Prom
 export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDropOptions) {
   const [isDragging, setIsDragging] = useState(false);
   const dragCounterRef = useRef(0);
+  const dragResetTimerRef = useRef<number | null>(null);
+
+  const resetDragState = useCallback(() => {
+    if (dragResetTimerRef.current !== null) {
+      window.clearTimeout(dragResetTimerRef.current);
+      dragResetTimerRef.current = null;
+    }
+
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+  }, []);
 
   const handleDrop = useCallback(
     async (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      setIsDragging(false);
-      dragCounterRef.current = 0;
+      resetDragState();
 
       if (!enabled) return;
 
@@ -88,19 +103,28 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
         await onDrop(files);
       }
     },
-    [enabled, onDrop],
+    [enabled, onDrop, resetDragState],
   );
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      resetDragState();
+      return;
+    }
+
+    const scheduleDragReset = () => {
+      if (dragResetTimerRef.current !== null) window.clearTimeout(dragResetTimerRef.current);
+      dragResetTimerRef.current = window.setTimeout(resetDragState, 750);
+    };
 
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
       dragCounterRef.current++;
-      if (e.dataTransfer?.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].kind === 'file') {
+      if (dataTransferHasFiles(e.dataTransfer)) {
         setIsDragging(true);
+        scheduleDragReset();
       }
     };
 
@@ -108,29 +132,46 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
       e.preventDefault();
       e.stopPropagation();
 
-      dragCounterRef.current--;
+      dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
       if (dragCounterRef.current === 0) {
-        setIsDragging(false);
+        resetDragState();
       }
     };
 
     const handleDragOver = (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
+
+      if (dataTransferHasFiles(e.dataTransfer)) scheduleDragReset();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) resetDragState();
     };
 
     document.addEventListener('dragenter', handleDragEnter);
     document.addEventListener('dragleave', handleDragLeave);
     document.addEventListener('dragover', handleDragOver);
     document.addEventListener('drop', handleDrop);
+    document.addEventListener('drop', resetDragState, true);
+    document.addEventListener('dragend', resetDragState, true);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', resetDragState);
 
     return () => {
       document.removeEventListener('dragenter', handleDragEnter);
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('dragover', handleDragOver);
       document.removeEventListener('drop', handleDrop);
+      document.removeEventListener('drop', resetDragState, true);
+      document.removeEventListener('dragend', resetDragState, true);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', resetDragState);
+      if (dragResetTimerRef.current !== null) window.clearTimeout(dragResetTimerRef.current);
+      dragResetTimerRef.current = null;
+      dragCounterRef.current = 0;
     };
-  }, [enabled, handleDrop]);
+  }, [enabled, handleDrop, resetDragState]);
 
-  return { isDragging };
+  return { isDragging: enabled && isDragging };
 }

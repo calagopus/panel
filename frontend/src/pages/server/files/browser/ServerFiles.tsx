@@ -472,16 +472,19 @@ function ServerFilesComponent() {
           <SegmentedControl
             value={view}
             onChange={changeView}
+            styles={{ label: { padding: 0 } }}
             data={[
               {
                 value: 'list',
                 label: (
                   <Tooltip label={t('pages.server.files.view.files', {})}>
-                    <FontAwesomeIcon
-                      icon={faFolderOpen}
-                      aria-label={t('pages.server.files.view.files', {})}
-                      fixedWidth
-                    />
+                    <span className='block' style={{ padding: 'var(--sc-padding)' }}>
+                      <FontAwesomeIcon
+                        icon={faFolderOpen}
+                        aria-label={t('pages.server.files.view.files', {})}
+                        fixedWidth
+                      />
+                    </span>
                   </Tooltip>
                 ),
               },
@@ -489,7 +492,9 @@ function ServerFilesComponent() {
                 value: 'tree',
                 label: (
                   <Tooltip label={t('pages.server.files.view.editor', {})}>
-                    <FontAwesomeIcon icon={faCode} aria-label={t('pages.server.files.view.editor', {})} fixedWidth />
+                    <span className='block' style={{ padding: 'var(--sc-padding)' }}>
+                      <FontAwesomeIcon icon={faCode} aria-label={t('pages.server.files.view.editor', {})} fixedWidth />
+                    </span>
                   </Tooltip>
                 ),
               },

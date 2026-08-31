@@ -75,6 +75,11 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
   const { moving, canMoveToDirectory, getDropHandlers } = useDraggedFileMove({ trackDropTarget: false });
   const movingRef = useRef(moving);
 
+  const setHorizontalDragScrollLocked = useCallback((locked: boolean) => {
+    if (locked) viewportRef.current?.style.setProperty('overflow-x', 'hidden');
+    else viewportRef.current?.style.removeProperty('overflow-x');
+  }, []);
+
   useEffect(() => {
     directoriesRef.current = directories;
     expandedDirectoriesRef.current = expandedDirectories;
@@ -92,7 +97,8 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
     highlightedDropTargetRef.current?.element.classList.remove('file-tree-drop-target', 'file-tree-root-drop-target');
     highlightedDropTargetRef.current = null;
     store.getState().setDraggingTarget(null);
-  }, [store]);
+    setHorizontalDragScrollLocked(false);
+  }, [setHorizontalDragScrollLocked, store]);
 
   const highlightDropTarget = useCallback((target: string, element: HTMLElement) => {
     if (clearDropTargetTimerRef.current !== null) {
@@ -108,12 +114,38 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
     highlightedDropTargetRef.current = { element, target };
   }, []);
 
-  const scheduleDropTargetClear = useCallback(() => {
-    if (clearDropTargetTimerRef.current !== null) return;
-    clearDropTargetTimerRef.current = window.setTimeout(clearDropTarget, 60);
-  }, [clearDropTarget]);
+  const scheduleDropTargetClear = useCallback(
+    (delay = 60) => {
+      if (clearDropTargetTimerRef.current !== null) window.clearTimeout(clearDropTargetTimerRef.current);
+      clearDropTargetTimerRef.current = window.setTimeout(clearDropTarget, delay);
+    },
+    [clearDropTarget],
+  );
 
-  useEffect(() => clearDropTarget, [clearDropTarget]);
+  useEffect(() => {
+    const clearWhenOutsideTree = (event: DragEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node) || !treeRef.current?.contains(target)) clearDropTarget();
+    };
+    const clearWhenHidden = () => {
+      if (document.hidden) clearDropTarget();
+    };
+
+    document.addEventListener('dragover', clearWhenOutsideTree, true);
+    document.addEventListener('drop', clearDropTarget, true);
+    document.addEventListener('dragend', clearDropTarget, true);
+    document.addEventListener('visibilitychange', clearWhenHidden);
+    window.addEventListener('blur', clearDropTarget);
+
+    return () => {
+      document.removeEventListener('dragover', clearWhenOutsideTree, true);
+      document.removeEventListener('drop', clearDropTarget, true);
+      document.removeEventListener('dragend', clearDropTarget, true);
+      document.removeEventListener('visibilitychange', clearWhenHidden);
+      window.removeEventListener('blur', clearDropTarget);
+      clearDropTarget();
+    };
+  }, [clearDropTarget]);
 
   const loadPage = useCallback(
     async (directory: string, page: number) => {
@@ -543,13 +575,14 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
       setFileTreeEditorDragData(event.dataTransfer, editorItems);
       event.dataTransfer.setData('text/plain', items.map((entry) => entry.path).join('\n'));
       event.dataTransfer.effectAllowed = canMove ? 'copyMove' : 'copy';
+      setHorizontalDragScrollLocked(true);
       if (!canMove) return;
 
       setDraggedPaths(new Set(items.map((entry) => entry.path)));
       store.getState().doDragFileGroups(groupTreeItems(items));
       event.dataTransfer.setData('application/x-calagopus-file-manager', 'move');
     },
-    [canUpdateFiles, getDirectoryCapabilities, getSelectedItems, store],
+    [canUpdateFiles, getDirectoryCapabilities, getSelectedItems, setHorizontalDragScrollLocked, store],
   );
 
   const refreshDirectories = (paths: string[]) => {
@@ -596,6 +629,7 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
 
     event.preventDefault();
     event.stopPropagation();
+    setHorizontalDragScrollLocked(true);
     const destination = getDropDestination(event);
     const allowed = destination
       ? externalUpload
@@ -614,22 +648,14 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
     } else {
       event.dataTransfer.dropEffect = 'move';
     }
-    if (destination.highlightElement) highlightDropTarget(destination.target, destination.highlightElement);
+    if (destination.highlightElement) {
+      highlightDropTarget(destination.target, destination.highlightElement);
+      scheduleDropTargetClear(750);
+    }
   };
 
   const onTreeDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
     if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    if (
-      event.clientX >= bounds.left &&
-      event.clientX <= bounds.right &&
-      event.clientY >= bounds.top &&
-      event.clientY <= bounds.bottom
-    ) {
-      return;
-    }
-
     scheduleDropTargetClear();
   };
 
