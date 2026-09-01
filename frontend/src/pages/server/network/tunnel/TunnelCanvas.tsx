@@ -332,7 +332,7 @@ export default function TunnelCanvas({
     <ContextMenu items={backgroundItems}>
       {({ openMenu }) => (
         <div
-          className='relative w-full overflow-hidden rounded-md border border-(--chart-grid-color) bg-(--mantine-color-body)'
+          className='relative w-full overflow-hidden rounded-md border border-(--chart-grid-color) bg-(--mantine-color-body) lg:h-[70vh]!'
           style={{ height: `min(70vh, max(${MIN_CANVAS_HEIGHT}px, ${height + FIT_PADDING * 2}px))` }}
           onContextMenu={(event) => {
             event.preventDefault();
