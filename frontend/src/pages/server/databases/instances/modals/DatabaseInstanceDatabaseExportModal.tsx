@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import exportDatabaseInstanceDatabase from '@/api/server/databases/instances/exportDatabaseInstanceDatabase.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import { downloadBlob } from '@/lib/download.ts';
+import Text from '@/elements/typography/Text.tsx';
+import { downloadBlob } from '@/lib/download/download.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,

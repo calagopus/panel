@@ -5,7 +5,7 @@ import getNests from '@/api/admin/nests/getNests.ts';
 import Select from '@/elements/input/Select.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 
 type Nest = z.infer<typeof adminNestSchema>;
 

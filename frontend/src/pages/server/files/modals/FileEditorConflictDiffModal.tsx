@@ -1,10 +1,10 @@
 import { RefObject } from 'react';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import { MonacoDiffEditor } from '@/elements/MonacoEditor.tsx';
+import { MonacoDiffEditor } from '@/elements/editors/MonacoEditor.tsx';
+import { PierreDiffEditor } from '@/elements/editors/PierreEditor.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import { PierreDiffEditor } from '@/elements/PierreEditor.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

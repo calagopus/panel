@@ -32,8 +32,8 @@ mod post {
     use shared::{
         GetState,
         models::{
-            EventEmittingModel,
-            server::{GetServer, ServerStatus},
+            ByUuid, EventEmittingModel,
+            server::{GetServer, Server, ServerEvent, ServerStatus},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -72,6 +72,8 @@ mod post {
             )
             .await?;
 
+        Server::invalidate_cached(&state.database, server.uuid).await;
+
         let settings = state.settings.get().await?;
         state
             .mail
@@ -92,9 +94,9 @@ mod post {
             .await;
         drop(settings);
 
-        shared::models::server::Server::get_event_emitter().emit(
+        Server::get_event_emitter().emit(
             state.0,
-            shared::models::server::ServerEvent::InstallCompleted {
+            ServerEvent::InstallCompleted {
                 server: Box::new(server.0),
                 successful: data.successful,
             },

@@ -6,13 +6,13 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteApiKey from '@/api/me/api-keys/deleteApiKey.ts';
 import recreateApiKey from '@/api/me/api-keys/recreateApiKey.ts';
 import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userApiKeySchema } from '@/lib/schemas/user/apiKeys.ts';
 import ApiKeyCreateOrUpdateModal from '@/pages/dashboard/api-keys/modals/ApiKeyCreateOrUpdateModal.tsx';
@@ -158,11 +158,11 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
             </TableData>
 
             <TableData>
-              {!apiKey.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={apiKey.lastUsed} />}
+              <FormattedTimestamp timestamp={apiKey.lastUsed} showNA />
             </TableData>
 
             <TableData>
-              {!apiKey.expires ? t('common.na', {}) : <FormattedTimestamp timestamp={apiKey.expires} />}
+              <FormattedTimestamp timestamp={apiKey.expires} showNA />
             </TableData>
 
             <TableData>

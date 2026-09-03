@@ -2,15 +2,15 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import ActionBar from '@/elements/ActionBar.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { AssetSet } from '@/pages/admin/assets/hooks/useAssetSelection.ts';
 import { useDeleteAssets } from '@/pages/admin/assets/hooks/useDeleteAssets.ts';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AssetActionBar({

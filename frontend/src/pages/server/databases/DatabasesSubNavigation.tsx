@@ -1,6 +1,6 @@
 import { faDatabase, faServer } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from 'react-router';
-import SubNavigation from '@/elements/SubNavigation.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import { useDatabaseRelevance } from './useDatabaseRelevance.ts';

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userSecurityKeyCreateSchema, userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
-import { base64ToArrayBuffer } from '@/lib/transformers.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
+import { base64ToArrayBuffer } from '@/lib/serialization/transformers.ts';
 
 function prepareCredentialOptions(options: CredentialCreationOptions): CredentialCreationOptions {
   if (!options.publicKey) {

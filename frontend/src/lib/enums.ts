@@ -90,10 +90,12 @@ import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts
 import { adminEggRepositoryCredentialsSchema } from './schemas/admin/eggRepositories.ts';
 import { announcementType } from './schemas/announcements.ts';
 
-export function mappingToSelectData<T extends string>(mapping: Record<T, () => string>): { value: T; label: string }[] {
+export function mappingToSelectData<T extends string>(
+  mapping: Record<T, string | (() => string)>,
+): { value: T; label: string }[] {
   return Object.entries(mapping).map(([value, label]) => ({
     value: value as T,
-    label: (label as () => string)(),
+    label: typeof label === 'function' ? (label as () => string)() : (label as string),
   }));
 }
 
@@ -345,6 +347,12 @@ export const oauthProviderMappingMatcherLabelMapping: Record<AdminOAuthProviderM
     getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldEndsWith', {}),
 };
 
+export function oauthProviderMappingMatcherSummary(matcher: AdminOAuthProviderMappingMatcher): string {
+  const label = oauthProviderMappingMatcherLabelMapping[matcher.type]();
+
+  return matcher.type === 'and' || matcher.type === 'or' ? `${label} (${matcher.matchers.length})` : label;
+}
+
 export const scheduleConditionLabelMapping: Record<
   z.infer<typeof serverScheduleConditionSchema>['type'],
   () => string
@@ -491,6 +499,7 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
   rename_files: () => getTranslations().t('pages.server.schedules.steps.renameFiles.title', {}),
   compress_files: () => getTranslations().t('pages.server.schedules.steps.compressFiles.title', {}),
   decompress_file: () => getTranslations().t('pages.server.schedules.steps.decompressFile.title', {}),
+  pull_file: () => getTranslations().t('pages.server.schedules.steps.pullFile.title', {}),
   update_startup_variable: () => getTranslations().t('pages.server.schedules.steps.updateStartupVariable.title', {}),
   update_startup_command: () => getTranslations().t('pages.server.schedules.steps.updateStartupCommand.title', {}),
   update_startup_docker_image: () =>
@@ -536,6 +545,7 @@ export const scheduleStepGroupMapping: Record<
   rename_files: 'files',
   compress_files: 'files',
   decompress_file: 'files',
+  pull_file: 'files',
   update_startup_variable: 'startup',
   update_startup_command: 'startup',
   update_startup_docker_image: 'startup',
@@ -570,6 +580,7 @@ export const scheduleStepDescriptionMapping: Record<
   rename_files: () => getTranslations().t('pages.server.schedules.steps.renameFiles.description', {}),
   compress_files: () => getTranslations().t('pages.server.schedules.steps.compressFiles.description', {}),
   decompress_file: () => getTranslations().t('pages.server.schedules.steps.decompressFile.description', {}),
+  pull_file: () => getTranslations().t('pages.server.schedules.steps.pullFile.description', {}),
   update_startup_variable: () =>
     getTranslations().t('pages.server.schedules.steps.updateStartupVariable.description', {}),
   update_startup_command: () =>
@@ -718,6 +729,15 @@ export const scheduleStepDefaultMapping: Record<
     root: '/',
     file: '',
   },
+  pull_file: {
+    type: 'pull_file',
+    ignoreFailure: false,
+    foreground: false,
+    root: '/',
+    url: '',
+    fileName: null,
+    useHeader: true,
+  },
   update_startup_variable: {
     type: 'update_startup_variable',
     ignoreFailure: false,
@@ -773,6 +793,7 @@ export const scheduleStepIconMapping: Record<z.infer<typeof serverScheduleStepAc
   rename_files: faEdit,
   compress_files: faCompress,
   decompress_file: faExpand,
+  pull_file: faDownload,
   update_startup_variable: faGear,
   update_startup_command: faCode,
   update_startup_docker_image: faDocker,

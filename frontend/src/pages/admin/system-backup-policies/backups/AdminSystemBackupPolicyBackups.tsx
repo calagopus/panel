@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import getSystemBackupPolicyBackups from '@/api/admin/system-backup-policies/backups/getSystemBackupPolicyBackups.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeServerBackupRow from '../../nodes/backups/NodeServerBackupRow.tsx';
 

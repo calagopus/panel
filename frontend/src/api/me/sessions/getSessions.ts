@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { userSessionSchema } from '@/lib/schemas/user/sessions.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (page: number, search?: string): Promise<Pagination<z.infer<typeof userSessionSchema>>> => {
   const { data } = await axiosInstance.get('/api/client/account/sessions', {

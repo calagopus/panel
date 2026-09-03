@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import ActionBar from '@/elements/ActionBar.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import ServerPowerButtons from './ServerPowerButtons.tsx';
 
 interface BulkActionBarProps {
   selectedCount: number;
@@ -24,32 +25,7 @@ export default function BulkActionBar({
 
   return (
     <ActionBar opened={selectedCount > 0}>
-      <AdminCan action='nodes.power'>
-        <Button
-          color='green'
-          onClick={() => onPowerAction('start')}
-          loading={loading === 'start'}
-          disabled={loading !== null && loading !== 'start'}
-        >
-          {t('common.enum.serverPowerAction.start', {})} ({selectedCount})
-        </Button>
-        <Button
-          color='gray'
-          onClick={() => onPowerAction('restart')}
-          loading={loading === 'restart'}
-          disabled={loading !== null && loading !== 'restart'}
-        >
-          {t('common.enum.serverPowerAction.restart', {})} ({selectedCount})
-        </Button>
-        <Button
-          color='red'
-          onClick={() => onPowerAction('stop')}
-          loading={loading === 'stop'}
-          disabled={loading !== null && loading !== 'stop'}
-        >
-          {t('common.enum.serverPowerAction.stop', {})} ({selectedCount})
-        </Button>
-      </AdminCan>
+      <ServerPowerButtons count={selectedCount} loading={loading} onAction={onPowerAction} />
       <AdminCan action='nodes.transfers'>
         <Button color='gray' onClick={onTransfer} disabled={loading !== null}>
           {t('common.button.transfer', {})} ({selectedCount})

@@ -8,8 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            DeletableModel,
-            user::{GetPermissionManager, GetUser},
+            ByUuid, DeletableModel,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_security_key::UserSecurityKey,
         },
@@ -125,6 +125,8 @@ mod post {
                 .with_status(StatusCode::BAD_REQUEST)
                 .ok();
         }
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         activity_logger
             .log(

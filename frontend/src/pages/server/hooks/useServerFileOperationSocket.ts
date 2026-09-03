@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
-import { transformKeysToCamelCase } from '@/lib/transformers.ts';
-import useWebsocketEvent, { SocketEvent } from '@/plugins/useWebsocketEvent.ts';
+import { transformKeysToCamelCase } from '@/lib/serialization/transformers.ts';
+import useWebsocketEvent, { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';

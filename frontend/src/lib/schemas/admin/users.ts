@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 import { roleSchema, twoFactorMethod } from '@/lib/schemas/user.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const adminUserSchema = z.looseObject({
   uuid: z.string(),

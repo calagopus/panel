@@ -2,7 +2,7 @@ import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Alert } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import createSystemBackupPolicy from '@/api/admin/system-backup-policies/createSystemBackupPolicy.ts';
@@ -10,29 +10,32 @@ import deleteSystemBackupPolicy from '@/api/admin/system-backup-policies/deleteS
 import triggerSystemBackupPolicy from '@/api/admin/system-backup-policies/triggerSystemBackupPolicy.ts';
 import updateSystemBackupPolicy from '@/api/admin/system-backup-policies/updateSystemBackupPolicy.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
-import CronInput from '@/elements/input/CronInput.tsx';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import {
   adminSystemBackupPolicySchema,
   adminSystemBackupPolicyUpdateSchema,
 } from '@/lib/schemas/admin/systemBackupPolicies.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { systemBackupPolicyEmptyFormValues, systemBackupPolicyToFormValues } from './systemBackupPolicyFormValues.ts';
-
-type SystemBackupPolicyFormValues = z.infer<typeof adminSystemBackupPolicyUpdateSchema>;
+import {
+  type SystemBackupPolicyFormValues,
+  systemBackupPolicyEmptyFormValues,
+  systemBackupPolicyToFormValues,
+  useSystemBackupPolicyFormFields,
+} from './systemBackupPolicyFormValues.tsx';
 
 export default function SystemBackupPolicyCreateOrUpdate({
   contextSystemBackupPolicy,
@@ -94,11 +97,7 @@ export default function SystemBackupPolicyCreateOrUpdate({
     resourceName: t('pages.admin.systemBackupPolicies.resourceName', {}),
   });
 
-  useEffect(() => {
-    if (contextSystemBackupPolicy) {
-      form.setValues(systemBackupPolicyToFormValues(contextSystemBackupPolicy));
-    }
-  }, [contextSystemBackupPolicy]);
+  useHydrateForm(form, contextSystemBackupPolicy, systemBackupPolicyToFormValues);
 
   const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
@@ -107,74 +106,7 @@ export default function SystemBackupPolicyCreateOrUpdate({
     canRequest: canReadBackupConfigurations,
   });
 
-  const fields: FieldDef<SystemBackupPolicyFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'backupConfigurationUuid',
-      label: t('common.form.backupConfiguration', {}),
-      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
-      props: {
-        placeholder: t('pages.admin.systemBackupPolicies.form.backupConfigurationPlaceholder', {}),
-        searchable: true,
-        searchValue: backupConfigurations.search,
-        onSearchChange: backupConfigurations.setSearch,
-        allowDeselect: true,
-        clearable: true,
-        disabled: !canReadBackupConfigurations,
-        loading: backupConfigurations.loading,
-      },
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
-    {
-      type: 'custom',
-      name: 'cron',
-      render: (form) => {
-        const inputProps = form.getInputProps('cron');
-
-        return (
-          <CronInput
-            label={t('pages.admin.systemBackupPolicies.form.cron', {})}
-            description={t('pages.admin.systemBackupPolicies.form.cronDescription', {})}
-            required
-            placeholder='0 0 0 * * *'
-            value={form.values.cron}
-            onChange={inputProps.onChange}
-            onBlur={inputProps.onBlur}
-            error={inputProps.error}
-          />
-        );
-      },
-    },
-    {
-      type: 'number',
-      name: 'parallelism',
-      label: t('pages.admin.systemBackupPolicies.form.parallelism', {}),
-      description: t('pages.admin.systemBackupPolicies.form.parallelismDescription', {}),
-      required: true,
-      props: { min: 1, max: 100, allowDecimal: false },
-    },
-    {
-      type: 'number',
-      name: 'retentionCount',
-      label: t('pages.admin.systemBackupPolicies.form.retentionCount', {}),
-      description: t('pages.admin.systemBackupPolicies.form.retentionCountDescription', {}),
-      props: { min: 1, allowDecimal: false },
-    },
-    {
-      type: 'number',
-      name: 'retentionDays',
-      label: t('pages.admin.systemBackupPolicies.form.retentionDays', {}),
-      description: t('pages.admin.systemBackupPolicies.form.retentionDaysDescription', {}),
-      props: { min: 1, allowDecimal: false },
-    },
-    {
-      type: 'switch',
-      name: 'enabled',
-      label: t('common.form.enabled', {}),
-      description: t('pages.admin.systemBackupPolicies.form.enabledDescription', {}),
-    },
-  ];
+  const fields = useSystemBackupPolicyFormFields({ backupConfigurations, canReadBackupConfigurations });
 
   return (
     <AdminContentContainer

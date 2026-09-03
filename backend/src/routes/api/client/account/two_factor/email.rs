@@ -8,7 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetPermissionManager, GetUser},
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_recovery_code::UserRecoveryCode,
         },
@@ -102,6 +103,8 @@ mod post {
         .execute(state.database.write())
         .await?;
 
+        User::invalidate_cached(&state.database, user.uuid).await;
+
         activity_logger
             .log("account:two-factor.email.enable", serde_json::json!({}))
             .await;
@@ -117,7 +120,8 @@ mod delete {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetPermissionManager, GetUser},
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_recovery_code::UserRecoveryCode,
             user_two_factor_code::UserTwoFactorCode,
@@ -186,6 +190,8 @@ mod delete {
         )
         .execute(state.database.write())
         .await?;
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         activity_logger
             .log("account:two-factor.email.disable", serde_json::json!({}))

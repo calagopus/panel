@@ -1,5 +1,5 @@
 import { Registry } from 'shared';
-import type { ContextMenuItem } from '@/elements/ContextMenu.tsx';
+import type { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 
 type ComponentItemInterceptor<P> = React.FC<{ items: ContextMenuItem[] } & P>;
 type ItemInterceptor<P> = (items: ContextMenuItem[], props: P) => void;

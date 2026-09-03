@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminNodeMountSchema } from '@/lib/schemas/admin/nodes.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   nestUuid: string,

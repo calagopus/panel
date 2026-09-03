@@ -2,11 +2,11 @@ import { faChevronDown, faChevronRight, faEllipsis } from '@fortawesome/free-sol
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import ActionIcon from '@/elements/ActionIcon.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 import FileRowContextMenu from '@/pages/server/files/list/FileRowContextMenu.tsx';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
 import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';

@@ -15,13 +15,13 @@ import queryDatabaseInstanceDatabase from '@/api/server/databases/instances/quer
 import renameDatabaseInstanceDatabaseColumn from '@/api/server/databases/instances/renameDatabaseInstanceDatabaseColumn.ts';
 import renameDatabaseInstanceDatabaseTable from '@/api/server/databases/instances/renameDatabaseInstanceDatabaseTable.ts';
 import updateDatabaseInstanceDatabaseRows from '@/api/server/databases/instances/updateDatabaseInstanceDatabaseRows.ts';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { DatabaseExplorerContext } from '@/providers/contexts/databaseExplorerContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';

@@ -8,8 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, user_activity::UserActivity, user_password_reset::UserPasswordReset,
-            user_session::UserSession,
+            ByUuid, CreatableModel, user::User, user_activity::UserActivity,
+            user_password_reset::UserPasswordReset, user_session::UserSession,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -109,6 +109,8 @@ mod post {
         )
         .execute(state.database.write())
         .await?;
+
+        User::invalidate_cached(&state.database, token.user.uuid).await;
 
         ApiResponse::new_serialized(Response {}).ok()
     }

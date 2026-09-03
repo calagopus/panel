@@ -15,16 +15,16 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import postDatabaseInstancePower, {
   DatabaseInstancePowerAction,
 } from '@/api/server/databases/instances/postDatabaseInstancePower.ts';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
-import Group from '@/elements/Group.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

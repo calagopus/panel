@@ -5,27 +5,27 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getNodeConfig from '@/api/admin/nodes/getNodeConfig.ts';
 import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
+import getNodeSystemDirect from '@/api/admin/nodes/system/getNodeSystemDirect.ts';
 import getNodeSystemOverview from '@/api/admin/nodes/system/getNodeSystemOverview.ts';
 import updateNodeConfig from '@/api/admin/nodes/updateNodeConfig.ts';
-import { axiosInstance, httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import { httpErrorToHuman } from '@/api/axios.ts';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Divider from '@/elements/Divider.tsx';
-import Group from '@/elements/Group.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import {
   getNodeConfiguration,
   getNodeConfigurationCommand,
   getNodeConnectPort,
   getNodeDefaultApiPort,
-  getNodeUrl,
   isNodeAIO,
-} from '@/lib/node.ts';
+} from '@/lib/domain/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeInitialSetupSection from './NodeInitialSetupSection.tsx';
@@ -66,14 +66,8 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       .then((overview) => setBackendResult({ ok: true, version: overview.version }))
       .catch((err) => setBackendResult({ ok: false, error: httpErrorToHuman(err) }));
 
-    const frontendCheck = axiosInstance
-      .get(getNodeUrl(node, '/api/system'), {
-        headers: {
-          Authorization: `Bearer ${nodeToken.token}`,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-      })
-      .then(({ data }) => setFrontendResult({ ok: true, version: data.version ?? 'unknown' }))
+    const frontendCheck = getNodeSystemDirect(node)
+      .then(({ version }) => setFrontendResult({ ok: true, version: version ?? 'unknown' }))
       .catch((err) => setFrontendResult({ ok: false, error: httpErrorToHuman(err) }));
 
     Promise.allSettled([backendCheck, frontendCheck]).finally(() => setVerifying(false));
@@ -98,18 +92,20 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
 
   const [revealed, setRevealed] = useState(false);
   const [yaml, setYaml] = useState<string | null>(null);
-  const [liveConfigError, setLiveConfigError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const { data: liveConfig, error: liveConfigErrorRaw } = useResource({
+    queryKey: queryKeys.admin.nodes.config(node.uuid),
+    queryFn: useCallback(() => getNodeConfig(node.uuid), [node.uuid]),
+    silent: true,
+  });
+  const liveConfigError = liveConfigErrorRaw ? httpErrorToHuman(liveConfigErrorRaw) : null;
+
   useEffect(() => {
-    getNodeConfig(node.uuid)
-      .then((config) => {
-        setYaml(dump(config, { lineWidth: -1 }));
-      })
-      .catch((err) => {
-        setLiveConfigError(httpErrorToHuman(err));
-      });
-  }, [node.uuid]);
+    if (liveConfig) {
+      setYaml(dump(liveConfig, { lineWidth: -1 }));
+    }
+  }, [liveConfig]);
 
   const doSave = () => {
     if (!canUpdate || yaml === null || liveConfigError !== null) return;

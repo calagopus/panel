@@ -3,7 +3,7 @@ import { type EditorChangeEvent } from '@pierre/diffs/edit';
 import { MonacoBinding } from 'y-monaco';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-import { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
+import { type PierreEditorHandle } from '@/elements/editors/PierreEditor.tsx';
 
 type MonacoEditor = Parameters<OnMount>[0];
 type MonacoModel = NonNullable<ReturnType<MonacoEditor['getModel']>>;

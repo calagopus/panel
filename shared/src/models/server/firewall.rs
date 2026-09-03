@@ -34,6 +34,10 @@ pub struct FirewallRule {
     #[schema(min_items = 1, max_items = 1024)]
     #[serde(default)]
     pub ports: Option<Vec<u16>>,
+    #[garde(inner(length(min = 1, max = 512)))]
+    #[schema(min_length = 1, max_length = 512)]
+    #[serde(default)]
+    pub source_file: Option<String>,
 }
 
 impl From<FirewallRule> for wings_api::FirewallRule {
@@ -59,6 +63,7 @@ impl From<FirewallRule> for wings_api::FirewallRule {
             ports: value
                 .ports
                 .map(|ports| ports.into_iter().map(|port| port as u32).collect()),
+            source_file: value.source_file.map(Into::into),
         }
     }
 }

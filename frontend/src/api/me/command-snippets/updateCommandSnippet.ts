@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   commandSnippetUuid: string,

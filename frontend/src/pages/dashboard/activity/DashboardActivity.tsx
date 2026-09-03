@@ -1,10 +1,10 @@
 import getUserActivity from '@/api/me/getUserActivity.ts';
 import ActivityRow from '@/elements/activity/ActivityRow.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { activityColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

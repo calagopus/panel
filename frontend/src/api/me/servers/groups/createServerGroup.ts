@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const createServerGroupSchema = z.object({
   name: z.string(),

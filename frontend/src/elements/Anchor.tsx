@@ -1,9 +1,6 @@
-import { AnchorProps, ElementProps, Anchor as MantineAnchor } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Anchor = forwardRef<HTMLAnchorElement, AnchorProps & ElementProps<'a'>>(({ className, ...rest }, ref) => {
-  return <MantineAnchor ref={ref} className={className} {...rest} />;
-});
-
-export default makeComponentHookable(Anchor);
+/**
+ * @deprecated `@/elements/Anchor.tsx` has moved to `@/elements/typography/Anchor.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/typography/Anchor.tsx';

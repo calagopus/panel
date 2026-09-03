@@ -241,6 +241,8 @@ pub fn extract_readable_error(err: &anyhow::Error) -> Option<(String, axum::http
         return Some((error.to_string(), axum::http::StatusCode::BAD_REQUEST));
     } else if let Some(DatabaseError::Any(error)) = err.downcast_ref::<DatabaseError>() {
         return extract_readable_error(error);
+    } else if let Some(error) = err.downcast_ref::<crate::cache::SharedComputeError>() {
+        return extract_readable_error(&error.0);
     }
 
     None

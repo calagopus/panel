@@ -2,13 +2,13 @@ import { UseFormReturnType } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
-import Group from '@/elements/Group.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import {
   mappingToSelectData,
   scheduleComparatorLabelMapping,

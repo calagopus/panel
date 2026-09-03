@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminEggRepositorySchema, adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   eggRepositoryData: z.infer<typeof adminEggRepositoryUpdateSchema>,

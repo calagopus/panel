@@ -1,8 +1,8 @@
 import getSystemBackups from '@/api/server/backups/getSystemBackups.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import BackupRow from '../BackupRow.tsx';

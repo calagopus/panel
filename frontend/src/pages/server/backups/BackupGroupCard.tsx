@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { ComponentProps, ReactNode } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Card from '@/elements/Card.tsx';
-import Collapse from '@/elements/Collapse.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import Collapse from '@/elements/layout/Collapse.tsx';
 import { useUserSettingMapEntry } from '@/lib/userSettings.ts';
 
 const expandedSchema = z.boolean();

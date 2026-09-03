@@ -1,15 +1,6 @@
-export function downloadBlob(blob: Blob, filename: string): void {
-  const fileURL = URL.createObjectURL(blob);
-  const downloadLink = document.createElement('a');
-  downloadLink.href = fileURL;
-  downloadLink.download = filename;
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-
-  URL.revokeObjectURL(fileURL);
-  downloadLink.remove();
-}
-
-export function downloadTextFile(content: string, filename: string, mimeType = 'text/plain'): void {
-  downloadBlob(new Blob([content], { type: mimeType }), filename);
-}
+/**
+ * @deprecated `@/lib/download.ts` has moved to `@/lib/download/download.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/lib/download/download.ts';

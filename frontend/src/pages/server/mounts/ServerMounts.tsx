@@ -1,9 +1,9 @@
 import getMounts from '@/api/server/mounts/getMounts.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { MountRow } from '@/pages/server/mounts/MountRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

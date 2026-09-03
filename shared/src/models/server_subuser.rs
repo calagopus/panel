@@ -87,6 +87,33 @@ impl BaseModel for ServerSubuser {
 }
 
 impl ServerSubuser {
+    pub async fn permissions_by_server_uuid_user_uuid(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+        user_uuid: uuid::Uuid,
+    ) -> Result<
+        Option<(
+            Vec<compact_str::CompactString>,
+            Vec<compact_str::CompactString>,
+        )>,
+        sqlx::Error,
+    > {
+        let row = sqlx::query(
+            r#"
+            SELECT server_subusers.permissions, server_subusers.ignored_files
+            FROM server_subusers
+            WHERE server_subusers.server_uuid = $1 AND server_subusers.user_uuid = $2
+            "#,
+        )
+        .bind(server_uuid)
+        .bind(user_uuid)
+        .fetch_optional(database.read())
+        .await?;
+
+        row.map(|row| Ok((row.try_get("permissions")?, row.try_get("ignored_files")?)))
+            .transpose()
+    }
+
     pub async fn by_server_uuid_user_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,

@@ -1,27 +1,21 @@
 import { faGlobe, faHeart, faHeartBroken } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { forwardRef, useCallback, useEffect, useState } from 'react';
-import { z } from 'zod';
-import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
-import { axiosInstance } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
-import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import { forwardRef } from 'react';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { getNodeUrl, isNodeAIO } from '@/lib/node.ts';
-import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { parseVersion } from '@/lib/version.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import Code from '@/elements/typography/Code.tsx';
+import { isNodeAIO } from '@/lib/domain/node.ts';
+import { AdminNode } from '@/lib/schemas/admin/nodes.ts';
+import { useNodeVersion } from '@/plugins/nodes/useNodeVersion.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 interface NodeRowProps {
-  node: z.infer<typeof adminNodeSchema>;
+  node: AdminNode;
   desync?: number;
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
@@ -33,35 +27,7 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
   ref,
 ) {
   const { t } = useTranslations();
-  const updateInformation = useAdminStore((state) => state.updateInformation);
-
-  const [version, setVersion] = useState<string | null>(null);
-  const { data: nodeToken } = useResource({
-    queryKey: queryKeys.admin.nodes.token(node.uuid),
-    queryFn: useCallback(() => getNodeToken(node.uuid), [node.uuid]),
-    silent: true,
-  });
-  const bearerToken = nodeToken?.token;
-
-  useEffect(() => {
-    if (!bearerToken) {
-      return;
-    }
-
-    axiosInstance
-      .get(getNodeUrl(node, '/api/system'), {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-        },
-      })
-      .then(({ data }) => {
-        setVersion(data.version ?? 'Unavailable');
-      })
-      .catch((msg) => {
-        console.error('Error while connecting to node', msg);
-        setVersion('Unavailable');
-      });
-  }, [node, bearerToken]);
+  const { version, unavailable, loading, updateAvailable } = useNodeVersion(node);
 
   return (
     <TableRow
@@ -94,22 +60,20 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
       )}
 
       <TableData>
-        {version ? (
-          version === 'Unavailable' ? (
-            <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.errorWhileFetchingVersion', {})}>
-              <FontAwesomeIcon icon={faHeartBroken} className='text-red-500' />
-            </Tooltip>
-          ) : updateInformation && parseVersion(updateInformation.latestWingsVersion).isNewerThan(version) ? (
-            <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.updateAvailable', { version })}>
-              <FontAwesomeIcon icon={faHeart} className='text-yellow-500 animate-pulse' />
-            </Tooltip>
-          ) : (
-            <Tooltip label={version}>
-              <FontAwesomeIcon icon={faHeart} className='text-green-500 animate-pulse' />
-            </Tooltip>
-          )
-        ) : (
+        {loading ? (
           <Spinner size={16} />
+        ) : unavailable || !version ? (
+          <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.errorWhileFetchingVersion', {})}>
+            <FontAwesomeIcon icon={faHeartBroken} className='text-red-500' />
+          </Tooltip>
+        ) : updateAvailable ? (
+          <Tooltip label={t('pages.admin.nodes.tabs.general.page.tooltip.updateAvailable', { version })}>
+            <FontAwesomeIcon icon={faHeart} className='text-yellow-500 animate-pulse' />
+          </Tooltip>
+        ) : (
+          <Tooltip label={version}>
+            <FontAwesomeIcon icon={faHeart} className='text-green-500 animate-pulse' />
+          </Tooltip>
         )}
       </TableData>
 

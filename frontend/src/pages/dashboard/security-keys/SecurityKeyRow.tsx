@@ -1,10 +1,10 @@
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import SecurityKeyDeleteModal from './modals/SecurityKeyDeleteModal.tsx';
@@ -70,7 +70,7 @@ export default function SecurityKeyRow({
             </TableData>
 
             <TableData>
-              {!securityKey.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={securityKey.lastUsed} />}
+              <FormattedTimestamp timestamp={securityKey.lastUsed} showNA />
             </TableData>
 
             <TableData>

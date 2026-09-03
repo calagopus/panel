@@ -195,6 +195,8 @@ mod post {
                 .execute(state.database.write())
                 .await?;
 
+                User::invalidate_cached(&state.database, user.uuid).await;
+
                 "two-factor"
             }
             Some(TwoFactorMethod::Email) => {

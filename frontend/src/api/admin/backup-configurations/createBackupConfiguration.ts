@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminBackupConfigurationSchema,
   adminBackupConfigurationUpdateSchema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   backupConfigurationData: z.infer<typeof adminBackupConfigurationUpdateSchema>,

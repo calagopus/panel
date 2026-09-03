@@ -34,9 +34,10 @@ mod get {
         permissions.has_admin_permission("database-agent-hosts.read-token")?;
 
         ApiResponse::new_serialized(Response {
-            token: state
-                .database
-                .decrypt(database_agent_host.0.token.clone())
+            token: database_agent_host
+                .0
+                .token
+                .decrypt(&state.database)
                 .await?
                 .to_string(),
         })

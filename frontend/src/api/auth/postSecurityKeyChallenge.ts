@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 import { prepareCredentialForTransport } from '../me/security-keys/postSecurityKeyChallenge.ts';
 
 interface Response {

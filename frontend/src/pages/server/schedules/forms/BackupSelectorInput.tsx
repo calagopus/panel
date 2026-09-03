@@ -4,7 +4,7 @@ import { z } from 'zod';
 import getBackupGroups from '@/api/server/backups/groups/getBackupGroups.ts';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';

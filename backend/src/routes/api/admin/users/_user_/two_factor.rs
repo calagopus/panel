@@ -8,8 +8,11 @@ mod delete {
     use shared::{
         ApiError, GetState,
         models::{
-            admin_activity::GetAdminActivityLogger, user::GetPermissionManager,
-            user_recovery_code::UserRecoveryCode, user_two_factor_code::UserTwoFactorCode,
+            ByUuid,
+            admin_activity::GetAdminActivityLogger,
+            user::{GetPermissionManager, User},
+            user_recovery_code::UserRecoveryCode,
+            user_two_factor_code::UserTwoFactorCode,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -56,6 +59,8 @@ mod delete {
         )
         .execute(state.database.write())
         .await?;
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         activity_logger
             .log(

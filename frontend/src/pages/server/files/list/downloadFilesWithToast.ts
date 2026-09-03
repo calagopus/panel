@@ -1,7 +1,7 @@
 import { faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import { ContextMenuItem } from '@/elements/ContextMenu.tsx';
+import { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { AddToast } from '@/providers/contexts/toastContext.ts';

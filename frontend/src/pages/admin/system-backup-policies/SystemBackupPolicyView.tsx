@@ -2,14 +2,14 @@ import { faArchive, faCog, faDesktop, faEarthAmerica, faServer } from '@fortawes
 import { useParams } from 'react-router';
 import getSystemBackupPolicy from '@/api/admin/system-backup-policies/getSystemBackupPolicy.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminSystemBackupPolicyBackups from '@/pages/admin/system-backup-policies/backups/AdminSystemBackupPolicyBackups.tsx';
 import AdminSystemBackupPolicyLocations from '@/pages/admin/system-backup-policies/locations/AdminSystemBackupPolicyLocations.tsx';
 import AdminSystemBackupPolicyNodes from '@/pages/admin/system-backup-policies/nodes/AdminSystemBackupPolicyNodes.tsx';
 import AdminSystemBackupPolicyServers from '@/pages/admin/system-backup-policies/servers/AdminSystemBackupPolicyServers.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import SystemBackupPolicyCreateOrUpdate from './SystemBackupPolicyCreateOrUpdate.tsx';
 

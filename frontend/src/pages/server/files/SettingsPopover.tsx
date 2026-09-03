@@ -1,9 +1,10 @@
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ComponentType, ReactNode } from 'react';
-import Button from '@/elements/Button.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 
 export default function SettingsPopover({
   tooltip,
@@ -27,15 +28,11 @@ export default function SettingsPopover({
       <Popover.Target>{tooltip ? <Tooltip label={tooltip}>{trigger}</Tooltip> : trigger}</Popover.Target>
       <Popover.Dropdown>
         <div className='flex flex-col space-y-2'>
-          {registry.prependedComponents.map((Component, i) => (
-            <Component key={`${keyPrefix}-prepended-${i}`} />
-          ))}
+          <ExtensionSlot components={registry.prependedComponents} name={`${keyPrefix}-prepended`} />
 
           {children}
 
-          {registry.appendedComponents.map((Component, i) => (
-            <Component key={`${keyPrefix}-appended-${i}`} />
-          ))}
+          <ExtensionSlot components={registry.appendedComponents} name={`${keyPrefix}-appended`} />
         </div>
       </Popover.Dropdown>
     </Popover>

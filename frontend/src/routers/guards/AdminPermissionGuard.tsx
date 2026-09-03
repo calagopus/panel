@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
 import { useAdminPermissions, useCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

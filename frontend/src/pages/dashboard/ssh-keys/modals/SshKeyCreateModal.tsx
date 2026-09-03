@@ -6,14 +6,14 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { ChangeEvent, useRef } from 'react';
 import { z } from 'zod';
 import createSshKey from '@/api/me/ssh-keys/createSshKey.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

@@ -1,11 +1,6 @@
-import { z } from 'zod';
-import { fullUserSchema } from '@/lib/schemas/user.ts';
-
-export const isAdmin = (user: z.infer<typeof fullUserSchema> | null, permission?: string) => {
-  return (
-    user?.admin ||
-    (permission
-      ? (user?.role?.adminPermissions || []).includes(permission)
-      : (user?.role?.adminPermissions || []).length > 0)
-  );
-};
+/**
+ * @deprecated `@/lib/permissions.ts` has moved to `@/lib/auth/permissions.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/lib/auth/permissions.ts';

@@ -13,9 +13,9 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { join } from 'pathe';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
-import { handleRawCopyToClipboard } from '@/lib/copy.ts';
+import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi } from '@/stores/fileManager.ts';

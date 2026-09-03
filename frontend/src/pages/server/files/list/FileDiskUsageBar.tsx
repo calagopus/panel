@@ -1,6 +1,6 @@
-import Card from '@/elements/Card.tsx';
-import Progress from '@/elements/Progress.tsx';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
+import Card from '@/elements/data-display/Card.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

@@ -1,5 +1,5 @@
 use super::ServerDatabase;
-use crate::models::database_host::DatabaseType;
+use crate::{crypt::EncryptedString, models::database_host::DatabaseType};
 use compact_str::CompactString;
 use garde::Validate;
 use serde::{Deserialize, Serialize};
@@ -54,7 +54,7 @@ impl TenantPool {
     }
 }
 
-type TenantPoolValue = (std::time::Instant, Vec<u8>, TenantPool);
+type TenantPoolValue = (std::time::Instant, EncryptedString, TenantPool);
 static TENANT_POOLS: LazyLock<Arc<tokio::sync::Mutex<HashMap<uuid::Uuid, TenantPoolValue>>>> =
     LazyLock::new(|| {
         let pools = Arc::new(tokio::sync::Mutex::new(HashMap::<
@@ -205,7 +205,7 @@ impl ServerDatabase {
                     .credentials
                     .parse_connection_details(database)
                     .await?;
-                let password = database.decrypt(self.password.clone()).await?;
+                let password = self.password.decrypt(database).await?;
 
                 let pool = match self.database_host.r#type {
                     DatabaseType::Mysql => TenantPool::Mysql(mysql::MysqlExplorer::create_pool(

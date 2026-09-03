@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { AdminExtensionList } from '@/api/admin/extensions/getAdminExtensions.ts';
 import { ExtensionStatus } from '@/api/admin/extensions/manage/getExtensionStatus.ts';
-import Spinner from '@/elements/Spinner.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import {
   computeInstalledCount,
   findByPackageName,

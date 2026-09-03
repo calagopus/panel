@@ -1,5 +1,5 @@
 import { ZodType, z } from 'zod';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 import { eggConfigurationRouteItemSchema } from '../generic.ts';
 
 export const adminEggConfigurationDeploymentRandomSchema = z.object({

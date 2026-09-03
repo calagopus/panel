@@ -1,9 +1,6 @@
-import { BreadcrumbsProps, Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Breadcrumbs = forwardRef<HTMLDivElement, BreadcrumbsProps>(({ ...rest }, ref) => {
-  return <MantineBreadcrumbs ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(Breadcrumbs);
+/**
+ * @deprecated `@/elements/Breadcrumbs.tsx` has moved to `@/elements/data-display/Breadcrumbs.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/data-display/Breadcrumbs.tsx';

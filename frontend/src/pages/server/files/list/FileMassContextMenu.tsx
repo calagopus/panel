@@ -10,7 +10,7 @@ import {
 import { useCallback, useMemo } from 'react';
 import { z } from 'zod';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
-import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
+import ContextMenu, { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { buildDownloadAsMenuItems, downloadFilesWithToast } from '@/pages/server/files/list/downloadFilesWithToast.ts';

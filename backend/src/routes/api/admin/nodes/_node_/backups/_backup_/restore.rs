@@ -128,6 +128,8 @@ mod post {
 
         transaction.commit().await?;
 
+        Server::invalidate_cached(&state.database, data.server_uuid).await;
+
         activity_logger
             .log(
                 "node:backup.restore",

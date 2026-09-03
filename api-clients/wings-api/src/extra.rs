@@ -458,6 +458,23 @@ pub enum ScheduleActionInner {
         #[garde(dive)]
         file: ScheduleDynamicParameter,
     },
+    PullFile {
+        #[garde(skip)]
+        ignore_failure: bool,
+        #[garde(skip)]
+        foreground: bool,
+
+        #[garde(dive)]
+        root: ScheduleDynamicParameter,
+        #[garde(dive)]
+        url: ScheduleDynamicParameter,
+        #[garde(dive)]
+        #[serde(default)]
+        file_name: Option<ScheduleDynamicParameter>,
+        #[garde(skip)]
+        #[serde(default)]
+        use_header: bool,
+    },
     UpdateStartupVariable {
         #[garde(skip)]
         ignore_failure: bool,
@@ -544,6 +561,7 @@ impl ScheduleActionInner {
             ScheduleActionInner::RenameFiles { .. } => Some("files.update"),
             ScheduleActionInner::CompressFiles { .. } => Some("files.archive"),
             ScheduleActionInner::DecompressFile { .. } => Some("files.archive"),
+            ScheduleActionInner::PullFile { .. } => Some("files.create"),
             ScheduleActionInner::UpdateStartupVariable { .. } => Some("startup.update"),
             ScheduleActionInner::UpdateStartupCommand { .. } => Some("startup.command"),
             ScheduleActionInner::UpdateStartupDockerImage { .. } => Some("startup.docker-image"),

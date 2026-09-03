@@ -1,9 +1,9 @@
 import { forwardRef, memo } from 'react';
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 
 interface EggRepositoryEggRowProps {

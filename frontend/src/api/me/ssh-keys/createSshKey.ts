@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { userSshKeySchema } from '@/lib/schemas/user/sshKeys.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const createSshKeySchema = z.object({
   name: z.string(),

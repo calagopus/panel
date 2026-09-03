@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { join } from 'pathe';
 import { useSearchParams } from 'react-router';
-import { TableData, TableRow } from '@/elements/Table.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';

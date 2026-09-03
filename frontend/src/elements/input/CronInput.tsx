@@ -2,10 +2,10 @@ import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue/i18n';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { isValidCronExpression } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

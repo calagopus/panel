@@ -647,7 +647,7 @@ pub async fn handle_startup() -> Result<
                         let mut url = node.url(path);
                         url.set_query(parts.uri.query());
 
-                        let node_token = state.database.decrypt(node.token.clone()).await?;
+                        let node_token = node.token.decrypt(&state.database).await?;
 
                         if is_upgrade {
                             let ws = match WebSocketUpgrade::from_request_parts(

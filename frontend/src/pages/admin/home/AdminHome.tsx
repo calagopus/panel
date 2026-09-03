@@ -1,6 +1,6 @@
 import { faCog, faHeartPulse, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminOverviewHealth from './health/AdminOverviewHealth.tsx';
 import AdminOverview from './overview/AdminOverview.tsx';

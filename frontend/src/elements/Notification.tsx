@@ -1,9 +1,6 @@
-import { Notification as MantineNotification, NotificationProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Notification = forwardRef<HTMLDivElement, NotificationProps>(({ className, ...rest }, ref) => {
-  return <MantineNotification ref={ref} className={className} radius='md' withCloseButton={false} {...rest} />;
-});
-
-export default makeComponentHookable(Notification);
+/**
+ * @deprecated `@/elements/Notification.tsx` has moved to `@/elements/feedback/Notification.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/feedback/Notification.tsx';

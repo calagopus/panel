@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import getServer from '@/api/server/getServer.ts';
+import { isTransientStatus } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { isTransientStatus } from '@/lib/server.ts';
-import { usePollingResource } from '@/plugins/usePollingResource.ts';
+import { usePollingResource } from '@/plugins/resource/usePollingResource.ts';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 
 const STALE_CACHE_GRACE = 6000;

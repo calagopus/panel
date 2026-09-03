@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminDatabaseHostUpdateSchema } from '@/lib/schemas/admin/databaseHosts.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (hostUuid: string, data: z.infer<typeof adminDatabaseHostUpdateSchema>): Promise<void> => {
   await axiosInstance.patch(

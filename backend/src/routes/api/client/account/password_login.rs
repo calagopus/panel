@@ -8,7 +8,8 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetPermissionManager, GetUser},
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -84,6 +85,8 @@ mod put {
         )
         .execute(state.database.write())
         .await?;
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         activity_logger
             .log(

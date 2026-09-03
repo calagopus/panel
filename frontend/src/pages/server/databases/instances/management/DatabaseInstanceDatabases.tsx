@@ -5,22 +5,22 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getDatabaseInstanceDatabases from '@/api/server/databases/instances/getDatabaseInstanceDatabases.ts';
 import getDatabaseInstanceUsers from '@/api/server/databases/instances/getDatabaseInstanceUsers.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import Group from '@/elements/Group.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Table from '@/elements/Table.tsx';
-import Text from '@/elements/Text.tsx';
-import Title from '@/elements/Title.tsx';
+import Table from '@/elements/data-display/Table.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,
   serverDatabaseInstanceUserSchema,
 } from '@/lib/schemas/server/databaseInstances.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';

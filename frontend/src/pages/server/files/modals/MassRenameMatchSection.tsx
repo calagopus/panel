@@ -1,9 +1,9 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
-import Group from '@/elements/Group.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { MassRenameOptions } from '@/lib/files/massRename.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

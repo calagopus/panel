@@ -4,12 +4,13 @@ import { NavLink, Route, Routes } from 'react-router';
 import type { AdminRouteDefinition } from 'shared';
 import getUpdates from '@/api/admin/system/updates/getUpdates.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
-import Container from '@/elements/Container.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Container from '@/elements/layout/Container.tsx';
+import Sidebar from '@/elements/navigation/Sidebar.tsx';
 import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
-import Sidebar from '@/elements/Sidebar.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import { resolveString } from '@/lib/lazy.ts';
 import { to } from '@/lib/routes.ts';
 import { checkPermissions, useAdminCan } from '@/plugins/usePermissions.ts';
@@ -155,9 +156,10 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
             />
           ) : (
             <>
-              {window.extensionContext.extensionRegistry.pages.admin.prependedComponents.map((Component, i) => (
-                <Component key={`admin-prepended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.admin.prependedComponents}
+                name='admin-prepended-component'
+              />
 
               <Suspense fallback={<Spinner.Centered />}>
                 <Routes>
@@ -185,9 +187,10 @@ export default function AdminRouter({ isNormal }: { isNormal: boolean }) {
                 </Routes>
               </Suspense>
 
-              {window.extensionContext.extensionRegistry.pages.admin.appendedComponents.map((Component, i) => (
-                <Component key={`admin-appended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.admin.appendedComponents}
+                name='admin-appended-component'
+              />
             </>
           )}
         </Container>

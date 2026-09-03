@@ -165,6 +165,19 @@ impl Database {
         .await?
     }
 
+    pub async fn encrypt_with_input<P: AsRef<[u8]> + Send + 'static>(
+        &self,
+        data: P,
+    ) -> Result<(P, Vec<u8>), anyhow::Error> {
+        let encryption_key = self.encryption_key.clone();
+
+        tokio::task::spawn_blocking(move || {
+            simple_crypt::encrypt(data.as_ref(), encryption_key.as_bytes())
+                .map(|bytes| (data, bytes))
+        })
+        .await?
+    }
+
     pub async fn encrypt_base64(
         &self,
         data: impl AsRef<[u8]> + Send + 'static,

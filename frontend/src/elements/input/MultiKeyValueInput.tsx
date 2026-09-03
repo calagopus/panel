@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ActionIcon, Badge, Button, Group, Input, Stack, Text, TextInput } from '@mantine/core';
 import { ComponentProps, startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import { DndContainer, DndItem, SortableItem } from '@/elements/dnd/DragAndDrop.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import Card from '../Card.tsx';
 
 interface MultiKeyValueInputProps {
   label?: string;

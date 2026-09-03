@@ -1,0 +1,10 @@
+.xterm,
+.xterm .xterm-viewport,
+.xterm .xterm-screen,
+.xterm .xterm-text-layer {
+  background-color: transparent !important;
+}
+.xterm .xterm-cursor-layer {
+  display: none !important;
+  opacity: 0 !important;
+}

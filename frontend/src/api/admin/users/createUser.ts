@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   userData: z.infer<typeof adminUserUpdateSchema>,

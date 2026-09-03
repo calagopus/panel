@@ -6234,6 +6234,23 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            pullFile: {
+              title: 'Pull File',
+              description: 'Download a file from a URL into a folder.',
+              form: {
+                useHeader: 'Use Response File Name',
+                useHeaderDescription: 'Name the file after the Content-Disposition header when no file name is set.',
+              },
+              renderer: {
+                compact: 'Pull {url} into {root}',
+                detail: {
+                  url: 'URL: {url}',
+                  root: 'Root: {root}',
+                  fileName: 'File Name: {fileName}',
+                  useHeader: 'Use Response File Name: {value}',
+                },
+              },
+            },
             updateStartupVariable: {
               title: 'Update Startup Variable',
               description: 'Change the value of a startup variable.',
@@ -6495,6 +6512,7 @@ const baseTranslations = defineTranslations({
             anySource: 'any source',
             anyProtocol: 'TCP & UDP',
             allAllocations: 'all allocations',
+            sourceFile: 'file {file}',
             summary: '{protocols} from {sources} to {ports}',
             aria: {
               reorder: 'Reorder firewall rule {position}',
@@ -6520,6 +6538,9 @@ const baseTranslations = defineTranslations({
             sources: 'Sources',
             sourcesDescription:
               'IP addresses or networks such as 10.0.0.0/8. A network must have its host bits zeroed. Leave empty to match any source.',
+            sourceFile: 'Source File',
+            sourceFileDescription:
+              'Path of a file in the server directory with one IP address or network per line, lines starting with # are ignored. Its entries are added to the sources above, and the node picks up edits to the file on its own.',
             ports: 'Ports',
             portsDescription:
               'Allocation ports this rule applies to, ranges like 25565-25570 are expanded. Leave empty to match every allocation of the server.',

@@ -3,18 +3,18 @@ import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
-import Card from '@/elements/Card.tsx';
-import ChartBlock from '@/elements/ChartBlock.tsx';
-import ChartLegend from '@/elements/ChartLegend.tsx';
-import SemiCircleProgress from '@/elements/SemiCircleProgress.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import StreamChart from '@/elements/StreamChart.tsx';
-import Title from '@/elements/Title.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import ChartBlock from '@/elements/charts/ChartBlock.tsx';
+import ChartLegend from '@/elements/charts/ChartLegend.tsx';
+import StreamChart from '@/elements/charts/StreamChart.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import SemiCircleProgress from '@/elements/feedback/SemiCircleProgress.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { formatBytes, formatBytesRate, formatPercent, useStreamChart } from '@/lib/chart.ts';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { adminSystemStatisticsSchema } from '@/lib/schemas/admin/system.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { useWebsocket } from '@/plugins/useWebsocket.ts';
+import { useWebsocket } from '@/plugins/websocket/useWebsocket.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
 export interface SystemStatisticsLabels {

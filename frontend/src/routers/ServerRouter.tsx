@@ -8,25 +8,26 @@ import getServerAnnouncements from '@/api/server/announcements/getAnnouncements.
 import getServer from '@/api/server/getServer.ts';
 import AppIcon from '@/elements/AppIcon.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import Container from '@/elements/Container.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Container from '@/elements/layout/Container.tsx';
+import ServerSwitcher from '@/elements/navigation/ServerSwitcher.tsx';
+import Sidebar from '@/elements/navigation/Sidebar.tsx';
 import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
 import ServerQuickActions from '@/elements/quickActions/ServerQuickActions.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
 import ServerStatusIndicator from '@/elements/ServerStatusIndicator.tsx';
-import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
-import Sidebar from '@/elements/Sidebar.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import { isAdmin } from '@/lib/auth/permissions.ts';
+import { isConflictingState } from '@/lib/domain/server.ts';
 import { resolveString } from '@/lib/lazy.ts';
-import { isAdmin } from '@/lib/permissions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
-import { isConflictingState } from '@/lib/server.ts';
 import ServerStatusPoller from '@/pages/server/ServerStatusPoller.tsx';
 import WebsocketHandler from '@/pages/server/WebsocketHandler.tsx';
 import WebsocketListener from '@/pages/server/WebsocketListener.tsx';
 import WebsocketStatusBanner from '@/pages/server/WebsocketStatusBanner.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -273,9 +274,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <WebsocketHandler />
               <WebsocketListener />
               <ServerStatusPoller />
-              {window.extensionContext.extensionRegistry.pages.server.prependedComponents.map((Component, i) => (
-                <Component key={`server-prepended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.server.prependedComponents}
+                name='server-prepended-component'
+              />
 
               <WebsocketStatusBanner />
 
@@ -308,9 +310,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
                 </Routes>
               </Suspense>
 
-              {window.extensionContext.extensionRegistry.pages.server.appendedComponents.map((Component, i) => (
-                <Component key={`server-appended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.server.appendedComponents}
+                name='server-appended-component'
+              />
             </>
           ) : (
             <ServerContentContainer title={t('elements.screenBlock.notFound.title', {})} hideTitleComponent>

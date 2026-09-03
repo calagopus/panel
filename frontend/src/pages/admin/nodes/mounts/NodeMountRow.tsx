@@ -1,27 +1,20 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { z } from 'zod';
 import deleteNodeMount from '@/api/admin/nodes/mounts/deleteNodeMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeMountSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { AdminNode, AdminNodeMount } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function NodeMountRow({
-  node,
-  mount,
-}: {
-  node: z.infer<typeof adminNodeSchema>;
-  mount: z.infer<typeof adminNodeMountSchema>;
-}) {
+export default function NodeMountRow({ node, mount }: { node: AdminNode; mount: AdminNodeMount }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();

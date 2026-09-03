@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel } from '@/lib/schemas/server/files.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const transferSchema = z.object({
   nodeUuid: z.string(),

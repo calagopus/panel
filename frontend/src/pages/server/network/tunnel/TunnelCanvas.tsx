@@ -8,12 +8,12 @@ import {
   useControls,
   useTransformEffect,
 } from 'react-zoom-pan-pinch';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
-import Group from '@/elements/Group.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
-import { useContainerAutoHeight } from '@/plugins/useContainerAutoHeight.ts';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import ContextMenu, { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { useContainerAutoHeight } from '@/plugins/viewport/useContainerAutoHeight.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { INBOUND_COLOR, OUTBOUND_COLOR } from './directions.ts';

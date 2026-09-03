@@ -1,6 +1,6 @@
 import { useShallow } from 'zustand/react/shallow';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import useWebsocketEvent, { SocketEvent } from '@/plugins/useWebsocketEvent.ts';
+import useWebsocketEvent, { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';

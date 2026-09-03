@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ResourceViewProps<T> {

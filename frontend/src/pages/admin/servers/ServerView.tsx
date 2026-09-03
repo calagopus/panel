@@ -13,8 +13,8 @@ import {
 import { useParams } from 'react-router';
 import getServer from '@/api/admin/servers/getServer.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminServerActions from '@/pages/admin/servers/AdminServerActions.tsx';
 import AdminServerAllocations from '@/pages/admin/servers/allocations/AdminServerAllocations.tsx';
@@ -26,7 +26,7 @@ import AdminServerMounts from '@/pages/admin/servers/mounts/AdminServerMounts.ts
 import ServerOverview from '@/pages/admin/servers/ServerOverview.tsx';
 import ServerUpdate from '@/pages/admin/servers/ServerUpdate.tsx';
 import AdminServerVariables from '@/pages/admin/servers/variables/AdminServerVariables.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerView() {

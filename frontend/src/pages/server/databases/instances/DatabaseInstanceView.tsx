@@ -16,18 +16,18 @@ import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import getDatabaseInstance from '@/api/server/databases/instances/getDatabaseInstance.ts';
 import { DatabaseInstancePowerAction } from '@/api/server/databases/instances/postDatabaseInstancePower.ts';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Tabs from '@/elements/layout/Tabs.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Tabs from '@/elements/Tabs.tsx';
-import Title from '@/elements/Title.tsx';
-import { safeParseFromApi } from '@/lib/api-transform.ts';
+import Title from '@/elements/typography/Title.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceImagePullProgressSchema,
@@ -36,11 +36,11 @@ import {
   serverDatabaseInstanceResourceUsageSchema,
   serverDatabaseInstanceWebsocketMessageSchema,
 } from '@/lib/schemas/server/databaseInstances.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
+import { safeParseFromApi } from '@/lib/serialization/api-transform.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
-import { useWebsocket } from '@/plugins/useWebsocket.ts';
-import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { useWebsocket } from '@/plugins/websocket/useWebsocket.ts';
+import { SocketEvent, SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';

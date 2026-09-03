@@ -6,14 +6,14 @@ import { useNavigate } from 'react-router';
 import type { AdminRouteDefinition, RouteDefinition, ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
 import getServers from '@/api/server/getServers.ts';
-import Group from '@/elements/Group.tsx';
-import Kbd from '@/elements/Kbd.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Text from '@/elements/Text.tsx';
+import Kbd from '@/elements/typography/Kbd.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { useLogoutConfirmation } from '@/elements/useLogoutConfirmation.tsx';
+import { isAdmin } from '@/lib/auth/permissions.ts';
 import { resolveString } from '@/lib/lazy.ts';
-import { isAdmin } from '@/lib/permissions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   buildCoreQuickActionCategories,
@@ -26,11 +26,11 @@ import {
 import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useQuickActionLocation } from '@/plugins/quick-actions/useQuickActions.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
-import { useQuickActionLocation } from '@/plugins/useQuickActions.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
-import { useServerListShowOthers } from '@/plugins/useServerListShowOthers.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';

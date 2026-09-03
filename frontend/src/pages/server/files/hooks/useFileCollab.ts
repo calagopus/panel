@@ -3,7 +3,7 @@ import { type EditorChangeEvent } from '@pierre/diffs/edit';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Awareness, applyAwarenessUpdate, encodeAwarenessUpdate } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-import { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
+import { type PierreEditorHandle } from '@/elements/editors/PierreEditor.tsx';
 import {
   bindPierreEditor,
   createMonacoBinding,
@@ -13,7 +13,7 @@ import {
   toBase64,
   updateCursorStyles,
 } from '@/lib/files/collab.ts';
-import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { SocketEvent, SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

@@ -2,13 +2,13 @@ import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { z } from 'zod';
-import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { assetDirectoryCreateSchema } from '@/lib/schemas/admin/assets.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface NewDirectoryModalProps extends Omit<ModalProps, 'onSubmit'> {

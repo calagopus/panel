@@ -17,16 +17,16 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Card from '@/elements/Card.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
-import SegmentedControl from '@/elements/SegmentedControl.tsx';
-import SelectionArea from '@/elements/SelectionArea.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Table, { TableData, TableHeaderProps, TableRow } from '@/elements/Table.tsx';
-import Title from '@/elements/Title.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import Table, { TableData, TableHeaderProps, TableRow } from '@/elements/data-display/Table.tsx';
+import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import { useFileBrowserQuickActions } from '@/pages/server/files/hooks/useFileBrowserQuickActions.tsx';
@@ -46,9 +46,13 @@ import ServerFilesColumnRightSection, {
   columnOnClick,
   type ServerFilesColumn,
 } from '@/pages/server/files/list/ServerFilesColumnRightSection.tsx';
-import { isInputFocused, matchesActiveShortcut, useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import {
+  isInputFocused,
+  matchesActiveShortcut,
+  useKeyboardShortcuts,
+} from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
 import { FileManagerProvider } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

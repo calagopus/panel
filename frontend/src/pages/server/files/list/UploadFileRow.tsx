@@ -1,12 +1,12 @@
 import { faPause, faPlay, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
-import Progress from '@/elements/Progress.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { canResumeInSession, pauseUpload, resumeUpload } from '@/lib/files/uploadManager.ts';
-import { bytesProgressString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { UploadItem } from '@/stores/uploads.ts';
 

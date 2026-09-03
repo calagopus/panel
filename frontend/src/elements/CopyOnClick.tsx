@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { handleCopyToClipboard } from '@/lib/copy.ts';
+import { handleCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 
 export default function CopyOnClick({

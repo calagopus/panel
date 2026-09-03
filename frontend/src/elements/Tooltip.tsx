@@ -1,16 +1,6 @@
-import { Tooltip as MantineTooltip, TooltipProps } from '@mantine/core';
-import classNames from 'classnames';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Tooltip = forwardRef<HTMLDivElement, TooltipProps & { innerClassName?: string }>(
-  ({ children, className, innerClassName, ...rest }, ref) => {
-    return (
-      <MantineTooltip ref={ref} className={classNames(className, 'w-fit leading-none')} {...rest}>
-        <span className={classNames(innerClassName, 'inline-block')}>{children}</span>
-      </MantineTooltip>
-    );
-  },
-);
-
-export default makeComponentHookable(Tooltip);
+/**
+ * @deprecated `@/elements/Tooltip.tsx` has moved to `@/elements/overlays/Tooltip.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/overlays/Tooltip.tsx';

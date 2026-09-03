@@ -1,7 +1,7 @@
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface TerminalSelectionMenuProps {

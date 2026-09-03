@@ -9,12 +9,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
+import StatCard from '@/elements/data-display/StatCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
-import StatCard from '@/elements/StatCard.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
-import { formatAllocation } from '@/lib/server.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
+import { formatAllocation } from '@/lib/domain/server.ts';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { useUserSetting } from '@/lib/userSettings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -206,9 +207,10 @@ export default function ServerDetails() {
             : `${bytesToString(Math.round(networkSpeeds.txBytesSpeed), undefined, true)}/s, ${Math.round(networkSpeeds.txPacketsSpeed)} pps`
         }
       />
-      {window.extensionContext.extensionRegistry.pages.server.console.statCards.map((StatCard, i) => (
-        <StatCard key={`console-stat-card-${i}`} />
-      ))}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.server.console.statCards}
+        name='console-stat-card'
+      />
     </div>
   );
 }

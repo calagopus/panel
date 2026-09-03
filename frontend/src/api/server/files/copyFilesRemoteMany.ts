@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { serverFilesCopyRemoteManyResultSchema, serverFilesCopyRemoteManySchema } from '@/lib/schemas/server/files.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const copyFileSchema = z.object({ from: z.string(), to: z.string() });
 

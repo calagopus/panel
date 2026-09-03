@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { z } from 'zod';
 import deleteOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/deleteOAuthProviderMapping.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { oauthProviderMappingMatcherLabelMapping } from '@/lib/enums.ts';
+import Code from '@/elements/typography/Code.tsx';
+import { oauthProviderMappingMatcherSummary } from '@/lib/enums.ts';
 import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -116,12 +116,7 @@ export default function OAuthProviderMappingRow({
               )}
             </TableData>
 
-            <TableData>
-              {oauthProviderMappingMatcherLabelMapping[mapping.matcher.type]()}
-              {mapping.matcher.type === 'and' || mapping.matcher.type === 'or'
-                ? ` (${mapping.matcher.matchers.length})`
-                : ''}
-            </TableData>
+            <TableData>{oauthProviderMappingMatcherSummary(mapping.matcher)}</TableData>
 
             <TableData>
               <FormattedTimestamp timestamp={mapping.created} />

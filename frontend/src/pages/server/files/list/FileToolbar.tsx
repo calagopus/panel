@@ -10,10 +10,11 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { createSearchParams, useNavigate } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
-import Group from '@/elements/Group.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -35,11 +36,10 @@ export default function FileToolbar() {
 
   return (
     <Group>
-      {window.extensionContext.extensionRegistry.pages.server.files.fileToolbar.prependedComponents.map(
-        (Component, i) => (
-          <Component key={`files-fileToolbar-prepended-${i}`} />
-        ),
-      )}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.server.files.fileToolbar.prependedComponents}
+        name='files-fileToolbar-prepended'
+      />
       <FileConnectButton />
       {browsingWritableDirectory && (
         <ServerCan action='files.create'>
@@ -110,11 +110,10 @@ export default function FileToolbar() {
           </ContextMenu>
         </ServerCan>
       )}
-      {window.extensionContext.extensionRegistry.pages.server.files.fileToolbar.appendedComponents.map(
-        (Component, i) => (
-          <Component key={`files-fileToolbar-appended-${i}`} />
-        ),
-      )}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.server.files.fileToolbar.appendedComponents}
+        name='files-fileToolbar-appended'
+      />
     </Group>
   );
 }

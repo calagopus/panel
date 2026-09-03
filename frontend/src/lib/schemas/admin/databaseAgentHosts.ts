@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
 export const adminDatabaseAgentHostTypeSettingsSchema = z.object({

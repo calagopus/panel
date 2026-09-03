@@ -43,3 +43,12 @@ class CalagopusVersionInfo {
 export const parseVersion = (version: string | CalagopusVersionInfo) => {
   return version instanceof CalagopusVersionInfo ? version : new CalagopusVersionInfo(version);
 };
+
+export const isOutdated = (
+  latest: string | CalagopusVersionInfo | null | undefined,
+  current: string | CalagopusVersionInfo | null | undefined,
+): boolean => {
+  if (!latest || !current) return false;
+
+  return parseVersion(latest).isNewerThan(current);
+};

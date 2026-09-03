@@ -1,40 +1,32 @@
-import { faExternalLink, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UseFormReturnType } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createDatabaseHost from '@/api/admin/database-hosts/createDatabaseHost.ts';
 import deleteDatabaseHost from '@/api/admin/database-hosts/deleteDatabaseHost.ts';
 import testDatabaseHost from '@/api/admin/database-hosts/testDatabaseHost.ts';
 import updateDatabaseHost from '@/api/admin/database-hosts/updateDatabaseHost.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
-import Select from '@/elements/input/Select.tsx';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import Group from '@/elements/layout/Group.tsx';
 import ForceDeleteModal from '@/elements/modals/ForceDeleteModal.tsx';
-import { databaseCredentialTypeLabelMapping, databaseTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
-  adminDatabaseCredentialsConnectionStringSchema,
-  adminDatabaseCredentialsDetailsSchema,
   adminDatabaseHostCreateSchema,
   adminDatabaseHostSchema,
   adminDatabaseHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseHosts.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useHostAction } from '@/plugins/useHostAction.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {
-  type AdminDatabaseCredentialType,
   adminDatabaseCredentialsDefaults,
   databaseHostEmptyFormValues,
   databaseHostToFormValues,
-} from './databaseHostFormValues.ts';
-import CredentialConnectionString from './forms/CredentialConnectionString.tsx';
-import CredentialDetails from './forms/CredentialDetails.tsx';
+  useDatabaseHostFormFields,
+} from './databaseHostFormValues.tsx';
 
 type DatabaseHostFormValues = z.infer<typeof adminDatabaseHostUpdateSchema>;
 
@@ -84,75 +76,7 @@ export default function DatabaseHostCreateOrUpdate({
   const doTest = () =>
     runHostAction(testDatabaseHost, t('pages.admin.databaseHosts.tabs.general.page.toast.tested', {}));
 
-  const fields: FieldDef<DatabaseHostFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'type',
-      label: t('common.form.type', {}),
-      required: true,
-      options: Object.entries(databaseTypeLabelMapping).map(([value, label]) => ({ value, label })),
-      props: { disabled: !!contextDatabaseHost },
-    },
-    { type: 'text', name: 'publicHost', label: t('pages.admin.databaseHosts.tabs.general.page.form.publicHost', {}) },
-    {
-      type: 'number',
-      name: 'publicPort',
-      label: t('pages.admin.databaseHosts.tabs.general.page.form.publicPort', {}),
-    },
-    {
-      type: 'custom',
-      name: 'credentials',
-      colSpan: 'full',
-      render: (f) => (
-        <CollapsibleSection
-          icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
-          enabled={!!f.values.credentials}
-          onToggle={(enabled) =>
-            f.setValues({
-              credentials: enabled
-                ? (contextDatabaseHost?.credentials ?? adminDatabaseCredentialsDefaults.connection_string)
-                : undefined,
-            })
-          }
-          title={t('pages.admin.databaseHosts.tabs.general.page.form.connectionCredentials', {})}
-        >
-          <Select
-            withAsterisk
-            label={t('pages.admin.databaseHosts.tabs.general.page.form.credentialType', {})}
-            data={mappingToSelectData(databaseCredentialTypeLabelMapping)}
-            key={f.key('credentials.type')}
-            {...f.getInputProps('credentials.type')}
-            onChange={(value) => {
-              if (value && value !== f.values.credentials?.type) {
-                f.setValues({ credentials: adminDatabaseCredentialsDefaults[value as AdminDatabaseCredentialType] });
-              }
-            }}
-          />
-
-          {f.values.credentials?.type === 'connection_string' ? (
-            <CredentialConnectionString
-              form={
-                f as UseFormReturnType<{
-                  credentials: z.infer<typeof adminDatabaseCredentialsConnectionStringSchema>;
-                }>
-              }
-            />
-          ) : f.values.credentials?.type === 'details' ? (
-            <CredentialDetails
-              form={
-                f as UseFormReturnType<{
-                  credentials: z.infer<typeof adminDatabaseCredentialsDetailsSchema>;
-                }>
-              }
-            />
-          ) : null}
-        </CollapsibleSection>
-      ),
-    },
-    { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
-    { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },
-  ];
+  const fields = useDatabaseHostFormFields(contextDatabaseHost);
 
   return (
     <AdminContentContainer

@@ -1,27 +1,20 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { z } from 'zod';
 import deleteServerMount from '@/api/admin/servers/mounts/deleteServerMount.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, AdminServerMount } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerMountRow({
-  server,
-  mount,
-}: {
-  server: z.infer<typeof adminServerSchema>;
-  mount: z.infer<typeof adminServerMountSchema>;
-}) {
+export default function ServerMountRow({ server, mount }: { server: AdminServer; mount: AdminServerMount }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();

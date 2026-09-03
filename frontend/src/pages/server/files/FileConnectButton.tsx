@@ -1,14 +1,14 @@
 import { faChevronDown, faCode, faServer } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useShallow } from 'zustand/react/shallow';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { vscodeConnectUrl } from '@/lib/files/files.ts';
+import { openUrl } from '@/lib/network/url.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
-import { openUrl } from '@/lib/url.ts';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

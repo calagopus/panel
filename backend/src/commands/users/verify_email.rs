@@ -2,7 +2,7 @@ use clap::{Args, FromArgMatches};
 use colored::Colorize;
 use compact_str::ToCompactString;
 use dialoguer::{Input, theme::ColorfulTheme};
-use shared::models::ByUuid;
+use shared::models::{ByUuid, user::User};
 use std::io::IsTerminal;
 
 #[derive(Args)]
@@ -47,11 +47,11 @@ impl shared::extensions::commands::CliCommand<VerifyEmailArgs> for VerifyEmailCo
                 };
 
                 let user = if let Ok(uuid) = user.parse() {
-                    shared::models::user::User::by_uuid_optional(&state.database, uuid).await
+                    User::by_uuid_optional(&state.database, uuid).await
                 } else if user.contains('@') {
-                    shared::models::user::User::by_email(&state.database, &user).await
+                    User::by_email(&state.database, &user).await
                 } else {
-                    shared::models::user::User::by_username(&state.database, &user).await
+                    User::by_username(&state.database, &user).await
                 }?;
 
                 let Some(user) = user else {
@@ -78,6 +78,8 @@ impl shared::extensions::commands::CliCommand<VerifyEmailArgs> for VerifyEmailCo
                 )
                 .execute(state.database.write())
                 .await?;
+
+                User::invalidate_cached(&state.database, user.uuid).await;
 
                 eprintln!(
                     "email {} has been marked as verified for the user {}",

@@ -8,7 +8,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, user_activity::UserActivity,
+            ByUuid, CreatableModel, user::User, user_activity::UserActivity,
             user_email_verification::UserEmailVerification, user_password_reset::UserPasswordReset,
         },
         prelude::SqlxErrorExt,
@@ -80,7 +80,9 @@ mod post {
         .execute(state.database.write())
         .await
         {
-            Ok(_) => {}
+            Ok(_) => {
+                User::invalidate_cached(&state.database, verification.user.uuid).await;
+            }
             Err(err) if err.is_unique_violation() => {
                 return ApiResponse::error("email already in use")
                     .with_status(StatusCode::CONFLICT)

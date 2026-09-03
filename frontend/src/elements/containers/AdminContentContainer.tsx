@@ -3,6 +3,7 @@ import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import ExtensionSlot from '../ExtensionSlot.tsx';
 import ContentContainer from './ContentContainer.tsx';
 import ContentContainerHeader from './ContentContainerHeader.tsx';
 
@@ -51,9 +52,7 @@ function AdminContentContainer(props: Props) {
   return (
     <ContentContainer title={`${title} | ${settings.app.name}`}>
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
-        {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot components={registry?.prependedComponents ?? []} name='prepended' props={modifiedProps} />
 
         <ContentContainerHeader
           title={title}
@@ -64,15 +63,19 @@ function AdminContentContainer(props: Props) {
           setSearch={setSearch}
           contentRight={contentRight}
         />
-        {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot
+          components={registry?.prependedContentComponents ?? []}
+          name='prepended-content'
+          props={modifiedProps}
+        />
 
         {children}
 
-        {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot
+          components={registry?.appendedContentComponents ?? []}
+          name='appended-content'
+          props={modifiedProps}
+        />
       </div>
     </ContentContainer>
   );

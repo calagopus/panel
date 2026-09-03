@@ -3,24 +3,24 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
-import postTransfers from '@/api/admin/nodes/servers/postTransfers.ts';
+import postTransfers, { transferAllocationMode } from '@/api/admin/nodes/servers/postTransfers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
+import { MAX_TRANSFER_MULTIPLEX_CHANNELS } from '@/lib/domain/node.ts';
 import { compressionLevelLabelMapping, mappingToSelectData, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
-import { MAX_TRANSFER_MULTIPLEX_CHANNELS } from '@/lib/node.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -40,14 +40,7 @@ export default function ServersTransferModal({
 
   const [openModal, setOpenModal] = useState<'confirm' | null>(null);
   const [selectedNodeUuid, setSelectedNodeUuid] = useState<string | null>(null);
-  const [allocationMode, setAllocationMode] = useState<
-    | 'none'
-    | 'random_primary'
-    | 'random_all'
-    | 'preserve_ports'
-    | 'egg_config_deployment'
-    | 'egg_config_self_assign_range'
-  >('preserve_ports');
+  const [allocationMode, setAllocationMode] = useState<z.infer<typeof transferAllocationMode>>('preserve_ports');
   const [transferBackups, setTransferBackups] = useState(false);
   const [deleteSourceBackups, setDeleteSourceBackups] = useState(false);
   const [archiveFormat, setArchiveFormat] = useState<z.infer<typeof transferArchiveFormat>>('tar_zstd');
@@ -134,17 +127,7 @@ export default function ServersTransferModal({
             withAsterisk
             label={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.allocationMode', {})}
             value={allocationMode}
-            onChange={(value) =>
-              setAllocationMode(
-                value as
-                  | 'none'
-                  | 'random_primary'
-                  | 'random_all'
-                  | 'preserve_ports'
-                  | 'egg_config_deployment'
-                  | 'egg_config_self_assign_range',
-              )
-            }
+            onChange={(value) => setAllocationMode(value as z.infer<typeof transferAllocationMode>)}
             data={[
               {
                 value: 'none',

@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
+import Alert from '@/elements/feedback/Alert.tsx';
 import { announcementTypeColorMapping, announcementTypeIconMapping } from '@/lib/enums.ts';
 import { announcementSchema } from '@/lib/schemas/announcements.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import Alert from './Alert.tsx';
 
 type Announcement = z.infer<typeof announcementSchema>;
 

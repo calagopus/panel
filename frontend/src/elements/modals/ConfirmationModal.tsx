@@ -2,9 +2,9 @@ import { DefaultMantineColor, ModalProps } from '@mantine/core';
 import { MouseEvent as ReactMouseEvent, ReactNode, useCallback, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import Button from '@/elements/buttons/Button.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import Button from '../Button.tsx';
 import { Modal, ModalFooter } from './Modal.tsx';
 
 type ConfirmationProps = Omit<ModalProps, 'children'> & {

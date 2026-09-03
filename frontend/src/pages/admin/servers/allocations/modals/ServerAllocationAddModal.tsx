@@ -5,22 +5,19 @@ import { z } from 'zod';
 import getAvailableNodeAllocations from '@/api/admin/nodes/allocations/getAvailableNodeAllocations.ts';
 import createServerAllocation from '@/api/admin/servers/allocations/createServerAllocation.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
+import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { formatAllocation } from '@/lib/server.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerAllocationAddModal({
-  server,
-  ...props
-}: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+export default function ServerAllocationAddModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();

@@ -1,6 +1,6 @@
 import { Tooltip } from '@mantine/core';
 import { ReactNode } from 'react';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { useAdminPermissions, useCan, useServerPermissions } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

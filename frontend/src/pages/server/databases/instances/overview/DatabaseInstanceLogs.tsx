@@ -2,14 +2,14 @@ import { useComputedColorScheme } from '@mantine/core';
 import { FitAddon } from '@xterm/addon-fit';
 import { ITerminalInitOnlyOptions, ITerminalOptions, Terminal as XTerm } from '@xterm/xterm';
 import { useEffect, useRef } from 'react';
-import Card from '@/elements/Card.tsx';
-import Progress from '@/elements/Progress.tsx';
-import { getXtermTheme } from '@/lib/xterm.ts';
+import Card from '@/elements/data-display/Card.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import { getXtermTheme } from '@/lib/editor/xterm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
 import '@xterm/xterm/css/xterm.css';
-import '@/lib/xterm.css';
+import '@/lib/editor/xterm.css';
 
 export default function DatabaseInstanceLogs() {
   const { t } = useTranslations();

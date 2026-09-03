@@ -419,6 +419,56 @@ impl BaseModel for Server {
             extension_data: Self::map_extensions(prefix, row)?,
         })
     }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
+}
+
+#[async_trait::async_trait]
+impl ResolvableModel for Server {
+    type Fingerprint = i32;
+
+    fn uuid(&self) -> uuid::Uuid {
+        self.uuid
+    }
+
+    fn fingerprint(&self) -> Self::Fingerprint {
+        self.uuid_short
+    }
+
+    async fn resolve(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error> {
+        let Ok(uuid_short) = u32::from_str_radix(identifier, 16) else {
+            return Ok(None);
+        };
+
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM servers
+            LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
+            LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
+            JOIN users ON users.uuid = servers.owner_uuid
+            LEFT JOIN roles ON roles.uuid = users.role_uuid
+            JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
+            JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            WHERE servers.uuid_short = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid_short as i32)
+        .fetch_optional(database.read())
+        .await?;
+
+        Ok(row.try_map(|row| Self::map(None, &row))?)
+    }
 }
 
 impl Server {
@@ -528,51 +578,48 @@ impl Server {
 
     /// Get a server by its identifier, ensuring the user has access to it.
     ///
-    /// Cached for 5 seconds.
+    /// The server is cached until it is written to; subuser access is checked live.
     pub async fn by_user_identifier(
         database: &crate::database::Database,
         user: &super::user::User,
         identifier: &str,
     ) -> Result<Option<Self>, anyhow::Error> {
-        database
-            .cache
-            .cached(&format!("user::{}::server::{identifier}", user.uuid), 5, || async {
-                let query = format!(
-                    r#"
-                    SELECT {}, server_subusers.permissions, server_subusers.ignored_files
-                    FROM servers
-                    LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
-                    LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
-                    JOIN users ON users.uuid = servers.owner_uuid
-                    LEFT JOIN roles ON roles.uuid = users.role_uuid
-                    JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
-                    LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
-                    JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                    WHERE servers.{} = $3 AND (servers.owner_uuid = $1 OR server_subusers.user_uuid = $1 OR $2)
-                    "#,
-                    Self::columns_sql(None),
-                    match identifier.len() {
-                        8 => "uuid_short",
-                        36 => "uuid",
-                        _ => return Ok::<_, anyhow::Error>(None),
-                    }
-                );
+        let server = match identifier.len() {
+            8 => Self::resolve_cached(database, identifier).await?,
+            36 => match uuid::Uuid::parse_str(identifier) {
+                Ok(uuid) => Self::by_uuid_optional_cached(database, uuid).await?,
+                Err(_) => None,
+            },
+            _ => None,
+        };
 
-                let mut row = sqlx::query(sqlx::AssertSqlSafe(query))
-                    .bind(user.uuid)
-                    .bind(
-                        user.role.as_ref().map_or(user.admin, |r| r.admin_permissions.iter().any(|p| p == "servers.read"))
-                    );
-                row = match identifier.len() {
-                    8 => row.bind(u32::from_str_radix(identifier, 16)? as i32),
-                    36 => row.bind(uuid::Uuid::parse_str(identifier)?),
-                    _ => return Ok(None),
-                };
-                let row = row.fetch_optional(database.read()).await?;
+        let Some(mut server) = server else {
+            return Ok(None);
+        };
 
-                Ok(row.try_map(|row| Self::map(None, &row))?)
-            })
-            .await
+        if server.owner.uuid == user.uuid {
+            return Ok(Some(server));
+        }
+
+        if let Some((permissions, ignored_files)) =
+            super::server_subuser::ServerSubuser::permissions_by_server_uuid_user_uuid(
+                database,
+                server.uuid,
+                user.uuid,
+            )
+            .await?
+        {
+            server.subuser_permissions = Some(Arc::new(permissions));
+            server.subuser_ignored_files = Some(ignored_files);
+
+            return Ok(Some(server));
+        }
+
+        let admin_bypass = user.role.as_ref().map_or(user.admin, |role| {
+            role.admin_permissions.iter().any(|p| p == "servers.read")
+        });
+
+        Ok(admin_bypass.then_some(server))
     }
 
     pub async fn by_user_uuids(
@@ -1583,6 +1630,8 @@ impl Server {
         }
 
         transaction.commit().await?;
+
+        Self::invalidate_cached(&state.database, self.uuid).await;
 
         Server::get_event_emitter().emit(
             state.clone(),
@@ -2912,6 +2961,8 @@ impl DeletableModel for Server {
                 Ok(_) => {
                     transaction.commit().await?;
 
+                    Self::invalidate_cached(&state.database, server_uuid).await;
+
                     if on_mesh {
                         crate::tunnel::poke_nodes(&state.database).await;
                     }
@@ -2923,6 +2974,8 @@ impl DeletableModel for Server {
 
                     if options.force {
                         transaction.commit().await?;
+
+                        Self::invalidate_cached(&state.database, server_uuid).await;
 
                         if on_mesh {
                             crate::tunnel::poke_nodes(&state.database).await;

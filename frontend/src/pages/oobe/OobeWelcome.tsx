@@ -1,9 +1,9 @@
 import { faCheckCircle, faRocket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button from '@/elements/Button.tsx';
-import List from '@/elements/List.tsx';
-import Text from '@/elements/Text.tsx';
-import ThemeIcon from '@/elements/ThemeIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
+import List from '@/elements/layout/List.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 

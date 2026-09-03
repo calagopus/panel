@@ -8,7 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid } from '@mantine/core';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createNodeTunnel from '@/api/admin/nodes/tunnel/createNodeTunnel.ts';
 import deleteNodeTunnel from '@/api/admin/nodes/tunnel/deleteNodeTunnel.ts';
@@ -16,38 +16,27 @@ import getNodeTunnel from '@/api/admin/nodes/tunnel/getNodeTunnel.ts';
 import rotateNodeTunnel from '@/api/admin/nodes/tunnel/rotateNodeTunnel.ts';
 import updateNodeTunnel from '@/api/admin/nodes/tunnel/updateNodeTunnel.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
+import InfoRow from '@/elements/admin/InfoRow.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { NODE_TUNNEL_DEFAULT_PORT } from '@/lib/domain/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminNodeTunnelMetrics from './AdminNodeTunnelMetrics.tsx';
-
-const DEFAULT_PORT = 7100;
-
-function InfoRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className='flex items-start justify-between gap-4 py-1.5 border-b border-(--mantine-color-default-border) last:border-b-0'>
-      <Text size='sm' c='dimmed' className='shrink-0'>
-        {label}
-      </Text>
-      <div className='text-right text-sm'>{children}</div>
-    </div>
-  );
-}
 
 export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
@@ -59,7 +48,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
   });
 
   const [host, setHost] = useState('');
-  const [port, setPort] = useState(DEFAULT_PORT);
+  const [port, setPort] = useState(NODE_TUNNEL_DEFAULT_PORT);
   const [saving, setSaving] = useState(false);
   const [disabling, setDisabling] = useState(false);
   const [rotating, setRotating] = useState(false);
@@ -68,7 +57,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
     if (!tunnel.data) return;
 
     setHost(tunnel.data.tunnel?.host ?? new URL(node.url).hostname);
-    setPort(tunnel.data.tunnel?.port ?? DEFAULT_PORT);
+    setPort(tunnel.data.tunnel?.port ?? NODE_TUNNEL_DEFAULT_PORT);
   }, [tunnel.data]);
 
   const doSave = async (alreadyOnNetwork: boolean) => {

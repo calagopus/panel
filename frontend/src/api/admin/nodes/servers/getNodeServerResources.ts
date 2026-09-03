@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 const resourcesSchema = z.record(z.string(), serverResourceUsageSchema);
 

@@ -7,33 +7,30 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import getServerBackups from '@/api/admin/servers/backups/getServerBackups.ts';
 import postTransfer from '@/api/admin/servers/postTransfer.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import { MAX_TRANSFER_MULTIPLEX_CHANNELS, NODE_AIO_UUID } from '@/lib/domain/node.ts';
+import { formatAllocation } from '@/lib/domain/server.ts';
 import { compressionLevelLabelMapping, mappingToSelectData, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
-import { MAX_TRANSFER_MULTIPLEX_CHANNELS, NODE_AIO_UUID } from '@/lib/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
-import { formatAllocation } from '@/lib/server.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerTransferModal({
-  server,
-  ...props
-}: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+export default function ServerTransferModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();

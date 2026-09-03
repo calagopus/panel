@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import getRoleUsers from '@/api/admin/roles/users/getRoleUsers.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { userTableColumns } from '@/lib/tableColumns.ts';
 import UserRow from '@/pages/admin/users/UserRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminRoleUsers({ role }: { role: z.infer<typeof roleSchema> }) {

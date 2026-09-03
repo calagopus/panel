@@ -1,8 +1,8 @@
 import classNames from 'classnames';
-import Badge from '@/elements/Badge.tsx';
-import Card from '@/elements/Card.tsx';
-import Group from '@/elements/Group.tsx';
-import Title from '@/elements/Title.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type PermissionTone = 'added' | 'existing' | 'removed';

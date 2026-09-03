@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { serverScheduleStepDynamicSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

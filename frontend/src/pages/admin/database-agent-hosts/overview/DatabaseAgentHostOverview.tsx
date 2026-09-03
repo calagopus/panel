@@ -13,19 +13,19 @@ import getDatabaseAgentHostCapacity from '@/api/admin/database-agent-hosts/getDa
 import getDatabaseAgentHostSystemOverview from '@/api/admin/database-agent-hosts/getDatabaseAgentHostSystemOverview.ts';
 import CapacityCard from '@/elements/admin/CapacityCard.tsx';
 import InfoRow from '@/elements/admin/InfoRow.tsx';
-import Badge from '@/elements/Badge.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { formatDateTime } from '@/lib/format/time.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { formatDateTime } from '@/lib/time.ts';
 import { parseVersion } from '@/lib/version.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 

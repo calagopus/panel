@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 import { isValidCronExpression } from '../server/schedules.ts';
 import { adminBackupConfigurationSchema } from './backupConfigurations.ts';
 import { adminLocationSchema } from './locations.ts';

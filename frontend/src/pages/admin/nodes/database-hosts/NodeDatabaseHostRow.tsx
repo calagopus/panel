@@ -1,18 +1,17 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { z } from 'zod';
 import deleteNodeDatabaseHost from '@/api/admin/nodes/database-hosts/deleteNodeDatabaseHost.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminNodeDatabaseHostSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { AdminNode, AdminNodeDatabaseHost } from '@/lib/schemas/admin/nodes.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -20,8 +19,8 @@ export default function NodeDatabaseHostRow({
   node,
   databaseHost,
 }: {
-  node: z.infer<typeof adminNodeSchema>;
-  databaseHost: z.infer<typeof adminNodeDatabaseHostSchema>;
+  node: AdminNode;
+  databaseHost: AdminNodeDatabaseHost;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();

@@ -203,6 +203,8 @@ nestify::nest! {
         pub sources: Vec<compact_str::CompactString>,
         #[schema(inline)]
         pub ports: Option<Vec<u32>>,
+        #[schema(inline)]
+        pub source_file: Option<compact_str::CompactString>,
     }
 }
 
@@ -2707,6 +2709,22 @@ pub mod system_config {
                     },
 
                     #[schema(inline)]
+                    pub websocket: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemWebsocket {
+                        #[schema(inline)]
+                        pub max_message_size: u64,
+                        #[schema(inline)]
+                        pub max_frame_size: u64,
+                        #[schema(inline)]
+                        pub read_buffer_size: u64,
+                        #[schema(inline)]
+                        pub authentication_timeout: u64,
+                        #[schema(inline)]
+                        pub unauthenticated_connections_per_ip: u64,
+                        #[schema(inline)]
+                        pub max_connections_total: u64,
+                    },
+
+                    #[schema(inline)]
                     pub backups: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200SystemBackups {
                         #[schema(inline)]
                         pub write_limit: MiB,
@@ -2856,6 +2874,10 @@ pub mod system_config {
                     pub firewall: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerFirewall {
                         #[schema(inline)]
                         pub backend: FirewallBackendKind,
+                        #[schema(inline)]
+                        pub source_file_max_entries: u64,
+                        #[schema(inline)]
+                        pub source_file_max_bytes: u64,
                     },
 
                     #[schema(inline)]
@@ -2973,6 +2995,22 @@ pub mod system_config {
                     pub lines: u64,
                     #[schema(inline)]
                     pub line_reset_interval: u64,
+                },
+
+                #[schema(inline)]
+                pub tundra: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200Tundra {
+                    #[schema(inline)]
+                    pub enabled: bool,
+                    #[schema(inline)]
+                    pub data_directory: SystemPath,
+                    #[schema(inline)]
+                    pub binary: SystemPath,
+                    #[schema(inline)]
+                    pub image: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub source_image: compact_str::CompactString,
+                    #[schema(inline)]
+                    pub metrics_port: u32,
                 },
 
                 #[schema(inline)]
@@ -3410,6 +3448,73 @@ pub mod transfers_server {
         }
 
         pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod tundra {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub supported: bool,
+                #[schema(inline)]
+                pub connected: bool,
+                #[schema(inline)]
+                pub epoch: Option<u64>,
+            }
+        }
+
+        pub type Response = Response200;
+    }
+}
+pub mod tundra_metrics {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = serde_json::Value;
+
+        pub type Response501 = ApiError;
+
+        pub type Response503 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod tundra_rotate {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response501 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod tundra_sync {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response501 = ApiError;
 
         pub type Response = Response200;
     }

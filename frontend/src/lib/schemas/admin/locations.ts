@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 import { adminDatabaseAgentHostSchema } from './databaseAgentHosts.ts';
 import { adminDatabaseHostSchema } from './databaseHosts.ts';
 

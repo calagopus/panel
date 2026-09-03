@@ -8,7 +8,7 @@ mod post {
         models::{
             ByUuid, EventEmittingModel,
             node::{GetNode, Node},
-            server::ServerStatus,
+            server::{Server, ServerStatus},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -21,15 +21,16 @@ mod post {
         (status = OK, body = inline(Response)),
     ))]
     pub async fn route(state: GetState, node: GetNode) -> ApiResponseResult {
-        let (_, backups, server_transfers) = tokio::try_join!(
+        let (reset_servers, backups, server_transfers) = tokio::try_join!(
             sqlx::query!(
                 "UPDATE servers
                 SET status = $2
-                WHERE servers.node_uuid = $1 AND servers.status = 'RESTORING_BACKUP'",
+                WHERE servers.node_uuid = $1 AND servers.status = 'RESTORING_BACKUP'
+                RETURNING servers.uuid",
                 node.uuid,
                 ServerStatus::BackupRestoreFailed as ServerStatus
             )
-            .execute(state.database.write()),
+            .fetch_all(state.database.write()),
             sqlx::query!(
                 "SELECT server_backups.uuid FROM server_backups
                 JOIN servers ON servers.uuid = server_backups.server_uuid
@@ -45,6 +46,10 @@ mod post {
             )
             .fetch_all(state.database.read()),
         )?;
+
+        for server in &reset_servers {
+            Server::invalidate_cached(&state.database, server.uuid).await;
+        }
 
         sqlx::query!(
             "UPDATE server_backups
@@ -115,6 +120,8 @@ mod post {
                         }
 
                         transaction.commit().await?;
+
+                        Server::invalidate_cached(&state.database, server.uuid).await;
 
                         Ok(())
                     };

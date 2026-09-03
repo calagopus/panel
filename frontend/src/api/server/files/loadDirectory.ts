@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { serverDirectoryEntrySchema, serverDirectorySortingModeSchema } from '@/lib/schemas/server/files.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 export interface DirectoryResponse {
   isFilesystemPrimary: boolean;

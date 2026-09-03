@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import {
   adminDatabaseAgentTemplateCreateSchema,
   adminDatabaseAgentTemplateSchema,
 } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
+import { formExtensionSchemas, parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   templateData: z.infer<typeof adminDatabaseAgentTemplateCreateSchema>,

@@ -1,6 +1,6 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useMemo, useRef } from 'react';
-import { useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
+import { useKeyboardShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { FormField } from './FormField.tsx';
 import { FieldDef, FormId } from './types.ts';
 import { useAdvancedMode } from './useAdvancedMode.ts';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const userToastPosition = z.enum([
   'top_left',

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 interface Props {
   uuid: string;

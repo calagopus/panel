@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 import { databaseAgentType } from '../generic.ts';
 
 export const adminDatabaseAgentTemplateSchema = z.looseObject({

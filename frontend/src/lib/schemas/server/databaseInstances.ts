@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { databaseAgentType } from '@/lib/schemas/generic.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const serverDatabaseInstanceSchema = z.looseObject({
   uuid: z.string(),

@@ -1,6 +1,6 @@
 import { ReactNode, startTransition, useEffect, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
-import { bestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/size.ts';
+import { bestUnit, formatUnitBytes, mapUnitToLocale, mbToBytes, UNITS, unitToBytes } from '@/lib/format/size.ts';
 import NumberInput from './NumberInput.tsx';
 import Select from './Select.tsx';
 

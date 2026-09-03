@@ -1,10 +1,6 @@
-import { BadgeProps, Badge as MantineBadge } from '@mantine/core';
-import classNames from 'classnames';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Badge = forwardRef<HTMLDivElement, BadgeProps>(({ className, ...rest }, ref) => {
-  return <MantineBadge ref={ref} className={classNames(className, 'font-semibold!')} {...rest} />;
-});
-
-export default makeComponentHookable(Badge);
+/**
+ * @deprecated `@/elements/Badge.tsx` has moved to `@/elements/data-display/Badge.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/data-display/Badge.tsx';

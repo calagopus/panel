@@ -1,4 +1,5 @@
 use crate::{
+    crypt::EncryptedString,
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
@@ -20,7 +21,7 @@ pub struct OAuthProvider {
     pub description: Option<compact_str::CompactString>,
 
     pub client_id: compact_str::CompactString,
-    pub client_secret: Vec<u8>,
+    pub client_secret: EncryptedString,
     pub auth_url: String,
     pub token_url: String,
     pub info_url: String,
@@ -372,7 +373,7 @@ impl IntoAdminApiObject for OAuthProvider {
                 name: self.name,
                 description: self.description,
                 client_id: self.client_id,
-                client_secret: state.database.decrypt(self.client_secret).await?,
+                client_secret: self.client_secret.decrypt(&state.database).await?,
                 auth_url: self.auth_url,
                 token_url: self.token_url,
                 info_url: self.info_url,
@@ -562,11 +563,10 @@ impl CreatableModel for OAuthProvider {
 
         Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
-        let encrypted_client_secret = state
-            .database
-            .encrypt(options.client_secret.to_string())
-            .await
-            .map_err(|err| sqlx::Error::Encode(err.into()))?;
+        let encrypted_client_secret =
+            EncryptedString::from_plaintext(options.client_secret.to_string(), &state.database)
+                .await
+                .map_err(|err| sqlx::Error::Encode(err.into()))?;
 
         query_builder
             .set("name", &options.name)
@@ -725,9 +725,7 @@ impl UpdatableModel for OAuthProvider {
 
         let encrypted_client_secret = if let Some(ref client_secret) = options.client_secret {
             Some(
-                state
-                    .database
-                    .encrypt(client_secret.to_string())
+                EncryptedString::from_plaintext(client_secret.to_string(), &state.database)
                     .await
                     .map_err(|err| sqlx::Error::Encode(err.into()))?,
             )
@@ -802,9 +800,7 @@ impl UpdatableModel for OAuthProvider {
             self.client_id = client_id;
         }
         if let Some(client_secret) = options.client_secret {
-            self.client_secret = state
-                .database
-                .encrypt(client_secret)
+            self.client_secret = EncryptedString::from_plaintext(client_secret, &state.database)
                 .await
                 .map_err(|err| sqlx::Error::Encode(err.into()))?;
         }

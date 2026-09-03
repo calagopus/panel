@@ -5,7 +5,7 @@ import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
 export const adminNodeSchema = z.looseObject({
@@ -126,3 +126,13 @@ export const adminNodeTransferProgressSchema = z.object({
 });
 
 export const adminNodeTransfersSchema = z.record(z.string(), adminNodeTransferProgressSchema);
+
+export type AdminNode = z.infer<typeof adminNodeSchema>;
+export type AdminNodeToken = z.infer<typeof adminNodeTokenSchema>;
+export type AdminNodeAllocation = z.infer<typeof adminNodeAllocationSchema>;
+export type AdminNodeAllocationFilter = z.infer<typeof adminNodeAllocationFilterSchema>;
+export type AdminNodeAllocationSelector = z.infer<typeof adminNodeAllocationSelectorSchema>;
+export type AdminNodeMount = z.infer<typeof adminNodeMountSchema>;
+export type AdminNodeDatabaseHost = z.infer<typeof adminNodeDatabaseHostSchema>;
+export type AdminNodeDatabaseAgentHost = z.infer<typeof adminNodeDatabaseAgentHostSchema>;
+export type AdminNodeServerBackup = z.infer<typeof adminNodeServerBackupSchema>;

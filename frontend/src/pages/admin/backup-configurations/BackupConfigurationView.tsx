@@ -2,14 +2,14 @@ import { faArchive, faChartBar, faCog, faDesktop, faEarthAmerica, faServer } fro
 import { useParams } from 'react-router';
 import getBackupConfiguration from '@/api/admin/backup-configurations/getBackupConfiguration.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminBackupConfigurationLocations from '@/pages/admin/backup-configurations/locations/AdminBackupConfigurationLocations.tsx';
 import AdminBackupConfigurationNodes from '@/pages/admin/backup-configurations/nodes/AdminBackupConfigurationNodes.tsx';
 import AdminBackupConfigurationServers from '@/pages/admin/backup-configurations/servers/AdminBackupConfigurationServers.tsx';
 import AdminBackupConfigurationStats from '@/pages/admin/backup-configurations/stats/AdminBackupConfigurationStats.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupConfigurationCreateOrUpdate from './BackupConfigurationCreateOrUpdate.tsx';
 import AdminBackupConfigurationBackups from './backups/AdminBackupConfigurationBackups.tsx';

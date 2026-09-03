@@ -7,38 +7,50 @@ import {
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import getDebugMode from '@/api/admin/system/debug/getDebugMode.ts';
 import setDebugMode from '@/api/admin/system/debug/setDebugMode.ts';
 import getGeneralHealth from '@/api/admin/system/health/getGeneralHealth.ts';
 import getNodesHealth from '@/api/admin/system/health/getNodesHealth.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Card from '@/elements/Card.tsx';
-import Code from '@/elements/Code.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Table, { TableData, TableRow } from '@/elements/Table.tsx';
-import Title from '@/elements/Title.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import StatCard from '@/elements/data-display/StatCard.tsx';
+import Table, { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import ResourceView from '@/elements/ResourceView.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import { percentString } from '@/lib/format/usage.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { nodeTableColumns } from '@/lib/tableColumns.ts';
+import { desyncNodeTableColumns } from '@/lib/tableColumns.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
+import OutdatedResourceCard from '../updates/OutdatedResourceCard.tsx';
 
 export default function AdminOverviewHealth() {
   const { addToast } = useToast();
   const { t, tReact } = useTranslations();
 
-  const [general, setGeneral] = useState<Awaited<ReturnType<typeof getGeneralHealth>> | null>(null);
-  const [debugMode, setDebugModeState] = useState<Awaited<ReturnType<typeof getDebugMode>> | null>(null);
-  const [debugLoading, setDebugLoading] = useState(false);
   const canReadSettings = useAdminCan('settings.read');
   const canReadNodes = useAdminCan('nodes.read');
+
+  const [debugLoading, setDebugLoading] = useState(false);
+
+  const generalHealth = useResource({
+    queryKey: queryKeys.admin.health.general(),
+    queryFn: getGeneralHealth,
+  });
+  const debug = useResource({
+    queryKey: queryKeys.admin.system.debug(),
+    queryFn: getDebugMode,
+    enabled: canReadSettings,
+  });
 
   const {
     data: nodes,
@@ -52,27 +64,21 @@ export default function AdminOverviewHealth() {
     canRequest: canReadNodes,
   });
 
-  useEffect(() => {
-    getGeneralHealth()
-      .then(setGeneral)
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      });
+  const avgNtpOffsetMs = useMemo(() => {
+    const offsets = Object.values(generalHealth.data?.ntpOffsets ?? {})
+      .map((entry) => Math.abs(entry.offsetMicros))
+      .filter((micros) => micros !== 0);
 
-    if (canReadSettings) {
-      getDebugMode()
-        .then(setDebugModeState)
-        .catch((err) => {
-          addToast(httpErrorToHuman(err), 'error');
-        });
-    }
-  }, []);
+    if (!offsets.length) return 0;
+
+    return offsets.reduce((acc, micros) => acc + micros, 0) / offsets.length / 1000;
+  }, [generalHealth.data]);
 
   const handleToggleDebug = (enabled: boolean) => {
     setDebugLoading(true);
     setDebugMode(enabled)
       .then(() => {
-        setDebugModeState((prev) => prev && { ...prev, enabled });
+        debug.refetch();
         addToast(
           enabled
             ? t('pages.admin.home.tabs.health.page.toast.debugEnabled', {})
@@ -86,103 +92,84 @@ export default function AdminOverviewHealth() {
       .finally(() => setDebugLoading(false));
   };
 
-  const avgNtpOffset =
-    general && general.ntpOffsets
-      ? Object.values(general.ntpOffsets)
-          .filter((o) => o.offsetMicros !== 0)
-          .reduce((acc, o) => acc + Math.abs(o.offsetMicros), 0) /
-        Object.values(general.ntpOffsets).length /
-        1000
-      : 0;
-
   return (
-    <>
-      <div className='2xl:columns-2 gap-4 space-y-4'>
-        {window.extensionContext.extensionRegistry.pages.admin.home.health.cards.prependedComponents.map(
-          (Component, index) => (
-            <Component key={`health-prepended-${index}`} />
-          ),
-        )}
+    <div className='2xl:columns-2 gap-4 space-y-4'>
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.admin.home.health.cards.prependedComponents}
+        name='health-prepended'
+      />
 
-        <TitleCard
-          title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})}
-          icon={<FontAwesomeIcon icon={faInfoCircle} />}
-        >
-          {!general ? (
-            <Spinner.Centered />
-          ) : (
-            <>
-              <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
-                <Card className='flex col-span-2'>
-                  <Title order={3}>
-                    {t('pages.admin.home.tabs.health.page.migrationsValue', {
-                      applied: general.migrations.applied,
-                      total: general.migrations.total,
-                    })}
-                  </Title>
-                  {t('pages.admin.home.tabs.health.page.appliedMigrations', {
-                    percent: ((general.migrations.applied / general.migrations.total) * 100).toFixed(2),
-                  })}
-                </Card>
-                <Card className='flex col-span-2'>
-                  <Title order={3} c={avgNtpOffset > 100 ? 'yellow' : 'white'}>
-                    {avgNtpOffset.toFixed(2)} ms
-                  </Title>
-                  {t('pages.admin.home.tabs.health.page.avgNtpOffset', {})}
-                </Card>
-              </div>
-            </>
+      <TitleCard
+        title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})}
+        icon={<FontAwesomeIcon icon={faInfoCircle} />}
+      >
+        <ResourceView resource={generalHealth}>
+          {(general) => (
+            <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
+              <StatCard
+                className='col-span-2'
+                value={t('pages.admin.home.tabs.health.page.migrationsValue', {
+                  applied: general.migrations.applied,
+                  total: general.migrations.total,
+                })}
+                label={t('pages.admin.home.tabs.health.page.appliedMigrations', {
+                  percent: percentString(general.migrations.applied, general.migrations.total, { whenEmpty: 100 }),
+                })}
+              />
+              <StatCard
+                className='col-span-2'
+                valueColor={avgNtpOffsetMs > 100 ? 'yellow' : undefined}
+                value={`${avgNtpOffsetMs.toFixed(2)} ms`}
+                label={t('pages.admin.home.tabs.health.page.avgNtpOffset', {})}
+              />
+            </div>
           )}
-        </TitleCard>
-        <TitleCard
-          title={t('pages.admin.home.tabs.health.page.card.extensionMigrationHealth', {})}
-          icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
-        >
-          {!general ? (
-            <Spinner.Centered />
-          ) : !Object.keys(general.migrations.extensions).length ? (
-            <>{t('pages.admin.home.tabs.health.page.noExtensions', {})}</>
-          ) : (
-            <>
-              {Object.keys(general.migrations.extensions).length > 0 && (
-                <Table
-                  columns={[
-                    t('pages.admin.home.tabs.health.page.table.packageName', {}),
-                    t('pages.admin.home.tabs.health.page.table.applied', {}),
-                    t('pages.admin.home.tabs.health.page.table.total', {}),
-                  ]}
-                  loading={loading}
-                >
-                  {Object.entries(general.migrations.extensions).map(([identifier, migrations]) => (
-                    <TableRow key={identifier}>
-                      <TableData>
-                        <Code>{identifier}</Code>
-                      </TableData>
-                      <TableData>
-                        {t('pages.admin.home.tabs.health.page.table.appliedValue', {
-                          applied: migrations.applied,
-                          percent: (migrations.total === 0
-                            ? 100
-                            : (migrations.applied / migrations.total) * 100
-                          ).toFixed(2),
-                        })}
-                      </TableData>
-                      <TableData>{migrations.total}</TableData>
-                    </TableRow>
-                  ))}
-                </Table>
-              )}
-            </>
-          )}
-        </TitleCard>
-        <AdminCan action='settings.read'>
-          <TitleCard
-            title={t('pages.admin.home.tabs.health.page.card.debugMode', {})}
-            icon={<FontAwesomeIcon icon={faBug} />}
-          >
-            {!debugMode ? (
-              <Spinner.Centered />
+        </ResourceView>
+      </TitleCard>
+
+      <TitleCard
+        title={t('pages.admin.home.tabs.health.page.card.extensionMigrationHealth', {})}
+        icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
+      >
+        <ResourceView resource={generalHealth}>
+          {(general) =>
+            Object.keys(general.migrations.extensions).length === 0 ? (
+              t('pages.admin.home.tabs.health.page.noExtensions', {})
             ) : (
+              <Table
+                columns={[
+                  t('pages.admin.home.tabs.health.page.table.packageName', {}),
+                  t('pages.admin.home.tabs.health.page.table.applied', {}),
+                  t('pages.admin.home.tabs.health.page.table.total', {}),
+                ]}
+              >
+                {Object.entries(general.migrations.extensions).map(([identifier, migrations]) => (
+                  <TableRow key={identifier}>
+                    <TableData>
+                      <Code>{identifier}</Code>
+                    </TableData>
+                    <TableData>
+                      {t('pages.admin.home.tabs.health.page.table.appliedValue', {
+                        applied: migrations.applied,
+                        percent: percentString(migrations.applied, migrations.total, { whenEmpty: 100 }),
+                      })}
+                    </TableData>
+                    <TableData>{migrations.total}</TableData>
+                  </TableRow>
+                ))}
+              </Table>
+            )
+          }
+        </ResourceView>
+      </TitleCard>
+
+      <AdminCan action='settings.read'>
+        <TitleCard
+          title={t('pages.admin.home.tabs.health.page.card.debugMode', {})}
+          icon={<FontAwesomeIcon icon={faBug} />}
+        >
+          <ResourceView resource={debug}>
+            {(debugMode) => (
               <div className='flex flex-col md:flex-row gap-2 justify-between'>
                 <span>
                   <FontAwesomeIcon icon={debugMode.enabled ? faExclamationTriangle : faCheck} />{' '}
@@ -218,59 +205,43 @@ export default function AdminOverviewHealth() {
                 </AdminCan>
               </div>
             )}
-          </TitleCard>
-        </AdminCan>
-        <AdminCan action='nodes.read'>
-          <TitleCard
-            title={t('pages.admin.home.tabs.health.page.card.desyncNodes', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
-          >
-            {loading || !nodes?.desyncNodes ? (
-              <Spinner.Centered />
-            ) : !nodes?.desyncNodes.total ? (
-              <>
-                <FontAwesomeIcon icon={faCheck} />{' '}
-                {t('pages.admin.home.tabs.health.page.nodesSynced', { failed: nodes?.failedNodes ?? 0 })}
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faExclamationTriangle} />{' '}
-                {t('pages.admin.home.tabs.health.page.nodesDesync', {
-                  desync: nodes?.desyncNodes.total ?? 0,
-                  failed: nodes?.failedNodes ?? 0,
-                })}
-                <div className='mt-4' />
-                <Table
-                  columns={[
-                    '',
-                    t('pages.admin.home.tabs.health.page.table.id', {}),
-                    t('pages.admin.home.tabs.health.page.table.desync', {}),
-                    ...nodeTableColumns().slice(2),
-                  ]}
-                  loading={loading}
-                  error={error}
-                  pagination={nodes.desyncNodes}
-                  onPageSelect={setPage}
-                >
-                  {nodes.desyncNodes.data.map((node) => (
-                    <NodeRow
-                      key={node.node.uuid}
-                      node={node.node}
-                      desync={Math.abs(new Date(node.localTime).getTime() - new Date(node.panelLocalTime).getTime())}
-                    />
-                  ))}
-                </Table>
-              </>
-            )}
-          </TitleCard>
-        </AdminCan>
+          </ResourceView>
+        </TitleCard>
+      </AdminCan>
 
-        {window.extensionContext.extensionRegistry.pages.admin.home.health.cards.appendedComponents.map(
-          (Component, index) => (
-            <Component key={`health-appended-${index}`} />
-          ),
-        )}
-      </div>
-    </>
+      <AdminCan action='nodes.read'>
+        <OutdatedResourceCard
+          title={t('pages.admin.home.tabs.health.page.card.desyncNodes', {})}
+          icon={<FontAwesomeIcon icon={faServer} />}
+          table={{
+            loading,
+            error,
+            data: nodes?.desyncNodes,
+            columns: desyncNodeTableColumns(),
+            onPageSelect: setPage,
+          }}
+          status={{
+            upToDate: t('pages.admin.home.tabs.health.page.nodesSynced', { failed: nodes?.failedNodes ?? 0 }),
+            outdated: t('pages.admin.home.tabs.health.page.nodesDesync', {
+              desync: nodes?.desyncNodes.total ?? 0,
+              failed: nodes?.failedNodes ?? 0,
+            }),
+          }}
+        >
+          {nodes?.desyncNodes?.data.map((node) => (
+            <NodeRow
+              key={node.node.uuid}
+              node={node.node}
+              desync={Math.abs(new Date(node.localTime).getTime() - new Date(node.panelLocalTime).getTime())}
+            />
+          ))}
+        </OutdatedResourceCard>
+      </AdminCan>
+
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.admin.home.health.cards.appendedComponents}
+        name='health-appended'
+      />
+    </div>
   );
 }

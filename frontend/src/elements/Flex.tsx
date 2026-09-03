@@ -1,9 +1,6 @@
-import { FlexProps, Flex as MantineFlex } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Flex = forwardRef<HTMLDivElement, FlexProps>(({ ...rest }, ref) => {
-  return <MantineFlex ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(Flex);
+/**
+ * @deprecated `@/elements/Flex.tsx` has moved to `@/elements/layout/Flex.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/Flex.tsx';

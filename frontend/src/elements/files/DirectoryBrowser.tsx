@@ -14,13 +14,13 @@ import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import createDirectory from '@/api/server/files/createDirectory.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Breadcrumbs from '@/elements/data-display/Breadcrumbs.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
-import Spinner from '@/elements/Spinner.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

@@ -1,6 +1,6 @@
 import { Terminal as XTerm } from '@xterm/xterm';
 import { RefObject, useEffect } from 'react';
-import { attachTouchScrolling } from '@/lib/xterm.ts';
+import { attachTouchScrolling } from '@/lib/editor/xterm.ts';
 
 interface UseTerminalTouchScrollOptions {
   terminalRef: RefObject<HTMLDivElement | null>;

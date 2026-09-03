@@ -12,15 +12,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
-import Progress from '@/elements/Progress.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useUserSetting } from '@/lib/userSettings.ts';
-import { matchesShortcut, useKeyboardShortcut } from '@/plugins/useKeyboardShortcuts.ts';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
-import { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { matchesShortcut, useKeyboardShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
+import { SocketEvent, SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -37,7 +37,7 @@ import { useTerminalInit } from './useTerminalInit.ts';
 import { useTerminalTouchScroll } from './useTerminalTouchScroll.ts';
 
 import '@xterm/xterm/css/xterm.css';
-import '@/lib/xterm.css';
+import '@/lib/editor/xterm.css';
 
 export default function Terminal({ popout = false }: { popout?: boolean }) {
   const { t } = useTranslations();

@@ -5,26 +5,26 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFirewall from '@/api/server/firewall/getFirewall.ts';
 import updateFirewall from '@/api/server/firewall/updateFirewall.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
-import Group from '@/elements/Group.tsx';
+import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
+import { DndContainer, DndItem, SortableItem } from '@/elements/dnd/DragAndDrop.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Paper from '@/elements/layout/Paper.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Paper from '@/elements/Paper.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import ThemeIcon from '@/elements/ThemeIcon.tsx';
-import Title from '@/elements/Title.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { restrictToVerticalAxis } from '@/lib/dragAndDrop.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFirewallRuleSchema } from '@/lib/schemas/server/firewall.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -40,10 +40,10 @@ interface DndRule extends DndItem {
   rule: Rule;
 }
 
-const denyAllRule: Rule = { action: 'deny', protocols: [], sources: [], ports: null };
+const denyAllRule: Rule = { action: 'deny', protocols: [], sources: [], ports: null, sourceFile: null };
 
 function isCatchAll(rule: Rule): boolean {
-  return rule.protocols.length === 0 && rule.sources.length === 0 && rule.ports === null;
+  return rule.protocols.length === 0 && rule.sources.length === 0 && rule.sourceFile === null && rule.ports === null;
 }
 
 function shadowedRulePositions(rules: Rule[]): number[] {
@@ -53,8 +53,9 @@ function shadowedRulePositions(rules: Rule[]): number[] {
       if (!later.protocols.every((protocol) => earlier.protocols.includes(protocol))) return false;
     }
 
-    if (earlier.sources.length > 0) {
-      if (later.sources.length === 0) return false;
+    if (earlier.sources.length > 0 || earlier.sourceFile !== null) {
+      if (later.sources.length === 0 && later.sourceFile === null) return false;
+      if (later.sourceFile !== earlier.sourceFile) return false;
       if (!later.sources.every((source) => earlier.sources.includes(source))) return false;
     }
 

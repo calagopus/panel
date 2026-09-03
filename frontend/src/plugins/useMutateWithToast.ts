@@ -1,19 +1,6 @@
-import { useCallback } from 'react';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
-
-export function useMutateWithToast() {
-  const { addToast } = useToast();
-
-  return useCallback(
-    <T>(promise: Promise<T>, onSuccess?: (result: T) => void, onError?: (error: unknown) => void) => {
-      promise
-        .then((result) => onSuccess?.(result))
-        .catch((error) => {
-          addToast(httpErrorToHuman(error), 'error');
-          onError?.(error);
-        });
-    },
-    [addToast],
-  );
-}
+/**
+ * @deprecated `@/plugins/useMutateWithToast.ts` has moved to `@/plugins/toast/useMutateWithToast.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/plugins/toast/useMutateWithToast.ts';

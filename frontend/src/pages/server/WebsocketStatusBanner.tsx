@@ -1,9 +1,9 @@
 import { faExclamationTriangle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import Alert from '@/elements/Alert.tsx';
-import { formatMilliseconds } from '@/lib/time.ts';
-import { SocketErrorType } from '@/plugins/Websocket.ts';
+import Alert from '@/elements/feedback/Alert.tsx';
+import { formatMilliseconds } from '@/lib/format/time.ts';
+import { SocketErrorType } from '@/plugins/websocket/Websocket.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

@@ -2,6 +2,7 @@ import { TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useMemo } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useGlobalStore } from '@/stores/global.ts';
+import ExtensionSlot from '../ExtensionSlot.tsx';
 import ContentContainer from './ContentContainer.tsx';
 import ContentContainerHeader from './ContentContainerHeader.tsx';
 
@@ -46,9 +47,11 @@ function AdminSubContentContainer<P>(props: Props<P>) {
 
   return (
     <ContentContainer title={`${title} | ${settings.app.name}`}>
-      {registry?.prependedComponents.map((Component, index) => (
-        <Component key={`prepended-sub-${index}`} {...modifiedProps} {...registryProps} />
-      ))}
+      <ExtensionSlot
+        components={registry?.prependedComponents ?? []}
+        name='prepended-sub'
+        props={{ ...modifiedProps, ...registryProps }}
+      />
 
       <ContentContainerHeader
         title={title}
@@ -59,15 +62,19 @@ function AdminSubContentContainer<P>(props: Props<P>) {
         setSearch={setSearch}
         contentRight={contentRight}
       />
-      {registry?.prependedContentComponents.map((Component, index) => (
-        <Component key={`prepended-sub-content-${index}`} {...modifiedProps} {...registryProps} />
-      ))}
+      <ExtensionSlot
+        components={registry?.prependedContentComponents ?? []}
+        name='prepended-sub-content'
+        props={{ ...modifiedProps, ...registryProps }}
+      />
 
       {children}
 
-      {registry?.appendedContentComponents.map((Component, index) => (
-        <Component key={`appended-sub-content-${index}`} {...modifiedProps} {...registryProps} />
-      ))}
+      <ExtensionSlot
+        components={registry?.appendedContentComponents ?? []}
+        name='appended-sub-content'
+        props={{ ...modifiedProps, ...registryProps }}
+      />
     </ContentContainer>
   );
 }

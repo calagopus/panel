@@ -8,7 +8,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::user::{GetPermissionManager, GetUser},
+        models::{
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -54,6 +57,8 @@ mod get {
         .execute(state.database.write())
         .await?;
 
+        User::invalidate_cached(&state.database, user.uuid).await;
+
         let settings = state.settings.get().await?;
 
         ApiResponse::new_serialized(Response {
@@ -76,7 +81,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetPermissionManager, GetUser},
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_recovery_code::UserRecoveryCode,
         },
@@ -176,6 +182,8 @@ mod post {
         .execute(state.database.write())
         .await?;
 
+        User::invalidate_cached(&state.database, user.uuid).await;
+
         activity_logger
             .log("account:two-factor.enable", serde_json::json!({}))
             .await;
@@ -191,7 +199,8 @@ mod delete {
     use shared::{
         ApiError, GetState,
         models::{
-            user::{GetPermissionManager, GetUser},
+            ByUuid,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_recovery_code::UserRecoveryCode,
         },
@@ -299,6 +308,8 @@ mod delete {
         )
         .execute(state.database.write())
         .await?;
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         activity_logger
             .log("account:two-factor.disable", serde_json::json!({}))

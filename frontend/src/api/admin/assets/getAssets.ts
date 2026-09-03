@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (page: number, directory: string): Promise<Pagination<z.infer<typeof storageAssetSchema>>> => {
   const { data } = await axiosInstance.get('/api/admin/assets', {

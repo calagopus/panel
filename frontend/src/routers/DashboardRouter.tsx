@@ -2,19 +2,20 @@ import { faArrowUpRightFromSquare, faGraduationCap, faServer } from '@fortawesom
 import { Suspense, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
 import AppIcon from '@/elements/AppIcon.tsx';
-import Container from '@/elements/Container.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Container from '@/elements/layout/Container.tsx';
+import ServerSwitcher from '@/elements/navigation/ServerSwitcher.tsx';
+import Sidebar from '@/elements/navigation/Sidebar.tsx';
 import QuickActionsTrigger from '@/elements/quickActions/QuickActionsTrigger.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
-import ServerSwitcher from '@/elements/ServerSwitcher.tsx';
-import Sidebar from '@/elements/Sidebar.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import { isAdmin } from '@/lib/auth/permissions.ts';
 import { resolveString } from '@/lib/lazy.ts';
-import { isAdmin } from '@/lib/permissions.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import DashboardHomeAll from '@/pages/dashboard/home/DashboardHomeAll.tsx';
 import DashboardHomeGrouped from '@/pages/dashboard/home/DashboardHomeGrouped.tsx';
-import { useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
+import { useStartOnGroupedServers } from '@/plugins/server/useStartOnGroupedServers.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutes from '@/routers/routes/accountRoutes.ts';
@@ -153,9 +154,10 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
             />
           ) : (
             <>
-              {window.extensionContext.extensionRegistry.pages.dashboard.prependedComponents.map((Component, i) => (
-                <Component key={`dashboard-prepended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.dashboard.prependedComponents}
+                name='dashboard-prepended-component'
+              />
 
               <Suspense fallback={<Spinner.Centered />}>
                 <Routes>
@@ -190,9 +192,10 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                 </Routes>
               </Suspense>
 
-              {window.extensionContext.extensionRegistry.pages.dashboard.appendedComponents.map((Component, i) => (
-                <Component key={`dashboard-appended-component-${i}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.dashboard.appendedComponents}
+                name='dashboard-appended-component'
+              />
             </>
           )}
         </Container>

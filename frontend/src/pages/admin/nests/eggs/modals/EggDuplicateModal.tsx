@@ -1,17 +1,17 @@
 import { ModalProps } from '@mantine/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import duplicateEgg from '@/api/admin/nests/eggs/duplicateEgg.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import NestSelect from '@/elements/input/NestSelect.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -27,59 +27,53 @@ export default function EggDuplicateModal({
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [targetNestUuid, setTargetNestUuid] = useState(nest.uuid);
+  const { form, handleClose, handleSubmit, loading } = useModalForm<{ name: string; targetNestUuid: string }>({
+    initialValues: { name: '', targetNestUuid: nest.uuid },
+    onClose: props.onClose,
+    onSubmit: async ({ name, targetNestUuid }) => {
+      const duplicated = await duplicateEgg(nest.uuid, egg.uuid, name, targetNestUuid);
+      addToast(
+        t('common.toast.duplicated', { resource: t('pages.admin.nests.tabs.eggs.page.resourceName', {}) }),
+        'success',
+      );
+      navigate(`/admin/nests/${targetNestUuid}/eggs/${duplicated.uuid}`);
+    },
+  });
 
   useEffect(() => {
-    setName(`${egg.name} (copy)`);
-    setTargetNestUuid(nest.uuid);
+    if (props.opened) {
+      form.setValues({ name: `${egg.name} (copy)`, targetNestUuid: nest.uuid });
+    }
   }, [egg, nest, props.opened]);
-
-  const doDuplicate = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-
-    duplicateEgg(nest.uuid, egg.uuid, name, targetNestUuid)
-      .then((duplicated) => {
-        addToast(
-          t('common.toast.duplicated', { resource: t('pages.admin.nests.tabs.eggs.page.resourceName', {}) }),
-          'success',
-        );
-        props.onClose();
-        navigate(`/admin/nests/${targetNestUuid}/eggs/${duplicated.uuid}`);
-      })
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
-      .finally(() => setLoading(false));
-  };
 
   return (
     <FormModal
       title={t('common.modal.duplicate.title', { resource: t('pages.admin.nests.tabs.eggs.page.resourceName', {}) })}
       loading={loading}
       {...props}
-      onSubmit={doDuplicate}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
     >
       <Stack>
         <TextInput
           withAsterisk
           label={t('common.form.newName', {})}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          key={form.key('name')}
+          {...form.getInputProps('name')}
         />
         <NestSelect
           withAsterisk
           label={t('common.form.nest', {})}
-          value={targetNestUuid}
-          onChange={(uuid) => setTargetNestUuid(uuid ?? nest.uuid)}
+          value={form.getValues().targetNestUuid}
+          onChange={(uuid) => form.setFieldValue('targetNestUuid', uuid ?? nest.uuid)}
           includeItems={[nest]}
         />
 
         <ModalFooter>
-          <Button type='submit' loading={loading} disabled={name.length < 1}>
+          <Button type='submit' loading={loading} disabled={form.getValues().name.length < 1}>
             {t('common.button.duplicate', {})}
           </Button>
-          <Button variant='default' onClick={props.onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

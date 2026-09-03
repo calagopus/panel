@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   eggRepositoryUuid: string,

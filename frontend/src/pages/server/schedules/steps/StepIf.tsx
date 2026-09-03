@@ -1,6 +1,6 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
-import Stack from '@/elements/Stack.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import ScheduleConditionBuilder from '../forms/ScheduleConditionBuilder.tsx';
 

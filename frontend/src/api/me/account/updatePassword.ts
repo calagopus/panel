@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const updatePasswordSchema = z.object({
   password: z.string(),

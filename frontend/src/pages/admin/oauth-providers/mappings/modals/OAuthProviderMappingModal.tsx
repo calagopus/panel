@@ -1,48 +1,37 @@
 import { ModalProps } from '@mantine/core';
-import { useEffect } from 'react';
 import { z } from 'zod';
 import createOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/createOAuthProviderMapping.ts';
 import updateOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/updateOAuthProviderMapping.ts';
 import getRoles from '@/api/admin/roles/getRoles.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
-import Button from '@/elements/Button.tsx';
-import Divider from '@/elements/Divider.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import {
-  AdminOAuthProviderMappingMatcher,
-  adminOAuthProviderMappingSchema,
-  adminOAuthProviderSchema,
-} from '@/lib/schemas/admin/oauthProviders.ts';
+import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import OAuthProviderMappingMatcherBuilder from '../OAuthProviderMappingMatcherBuilder.tsx';
-
-type MappingType = 'role' | 'server_subuser';
-
-type FormValues = {
-  matcher: AdminOAuthProviderMappingMatcher;
-  type: MappingType;
-  roleUuid: string;
-  serverUuid: string;
-  permissions: string[];
-  ignoredFiles: string[];
-  revokeUnmatched: boolean;
-};
+import {
+  type OAuthProviderMappingFormValues,
+  oauthProviderMappingEmptyFormValues,
+  oauthProviderMappingFormValuesToPayload,
+  oauthProviderMappingToFormValues,
+} from '../oauthProviderMappingFormValues.ts';
 
 export default function OAuthProviderMappingModal({
   oauthProvider,
@@ -67,30 +56,13 @@ export default function OAuthProviderMappingModal({
     canRequest: canReadRoles,
   });
 
-  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<FormValues>({
-    initialValues: {
-      matcher: { type: 'none' },
-      type: 'role',
-      roleUuid: '',
-      serverUuid: '',
-      permissions: [],
-      ignoredFiles: [],
-      revokeUnmatched: false,
-    },
+  const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<OAuthProviderMappingFormValues>({
+    initialValues: oauthProviderMappingEmptyFormValues,
+    opened: props.opened,
+    hydrate: () => (mapping ? oauthProviderMappingToFormValues(mapping) : undefined),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const mappingData =
-        values.type === 'role'
-          ? { type: 'role' as const, roleUuid: values.roleUuid, revokeUnmatched: values.revokeUnmatched }
-          : {
-              type: 'server_subuser' as const,
-              serverUuid: values.serverUuid,
-              permissions: values.permissions,
-              ignoredFiles: values.ignoredFiles,
-              revokeUnmatched: values.revokeUnmatched,
-            };
-
-      const payload = { matcher: values.matcher, mapping: mappingData };
+      const payload = oauthProviderMappingFormValuesToPayload(values);
 
       if (isEdit) {
         await updateOAuthProviderMapping(oauthProvider.uuid, mapping.uuid, payload);
@@ -103,29 +75,6 @@ export default function OAuthProviderMappingModal({
       onSaved();
     },
   });
-
-  useEffect(() => {
-    if (!props.opened) {
-      return;
-    }
-
-    if (mapping) {
-      const values = {
-        matcher: mapping.matcher,
-        type: mapping.mapping.type,
-        roleUuid: mapping.mapping.type === 'role' ? mapping.mapping.roleUuid : '',
-        serverUuid: mapping.mapping.type === 'server_subuser' ? mapping.mapping.serverUuid : '',
-        permissions: mapping.mapping.type === 'server_subuser' ? mapping.mapping.permissions : [],
-        ignoredFiles: mapping.mapping.type === 'server_subuser' ? mapping.mapping.ignoredFiles : [],
-        revokeUnmatched: mapping.mapping.revokeUnmatched,
-      };
-
-      form.setValues(values);
-      form.resetDirty(values);
-    } else {
-      form.reset();
-    }
-  }, [props.opened]);
 
   const roleOptions = roles.items.map((role) => ({ label: role.name, value: role.uuid }));
   if (form.values.roleUuid && !roleOptions.some((o) => o.value === form.values.roleUuid)) {

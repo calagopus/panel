@@ -1,11 +1,12 @@
 import { faCloudDownload, faMemory, faMicrochip, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useRef } from 'react';
-import ChartBlock from '@/elements/ChartBlock.tsx';
-import ChartLegend from '@/elements/ChartLegend.tsx';
-import StreamChart from '@/elements/StreamChart.tsx';
+import ChartBlock from '@/elements/charts/ChartBlock.tsx';
+import ChartLegend from '@/elements/charts/ChartLegend.tsx';
+import StreamChart from '@/elements/charts/StreamChart.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import { formatBytes, formatBytesRate, formatPercent, useStreamChart } from '@/lib/chart.ts';
-import { mbToBytes } from '@/lib/size.ts';
+import { mbToBytes } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -91,9 +92,10 @@ export default function ServerStats() {
       >
         <StreamChart {...network.props} />
       </ChartBlock>
-      {window.extensionContext.extensionRegistry.pages.server.console.statBlocks.map((StatBlock, i) => (
-        <StatBlock key={`console-stat-block-${i}`} />
-      ))}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.server.console.statBlocks}
+        name='console-stat-block'
+      />
     </div>
   );
 }

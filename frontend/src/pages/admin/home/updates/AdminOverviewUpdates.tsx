@@ -8,49 +8,60 @@ import {
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import getDatabaseAgentHostUpdates from '@/api/admin/system/updates/getDatabaseAgentHostUpdates.ts';
 import getNodeUpdates from '@/api/admin/system/updates/getNodeUpdates.ts';
 import getUpdateHistory from '@/api/admin/system/updates/getUpdateHistory.ts';
 import recheckUpdates from '@/api/admin/system/updates/recheckUpdates.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
+import Table, { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import Select from '@/elements/input/Select.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Table, { TableData, TableRow } from '@/elements/Table.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import ResourceView from '@/elements/ResourceView.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminExtensionUpdateCheckResultErrorSchema,
   adminExtensionUpdateCheckResultUpdateAvailableSchema,
 } from '@/lib/schemas/admin/system.ts';
 import { databaseAgentHostTableColumns, nodeTableColumns } from '@/lib/tableColumns.ts';
-import { parseVersion } from '@/lib/version.ts';
 import DatabaseAgentHostRow from '@/pages/admin/database-agent-hosts/DatabaseAgentHostRow.tsx';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
 import NodeRow from '../../nodes/NodeRow.tsx';
+import PanelUpdateAlert, { usePanelUpdateAvailable } from '../PanelUpdateAlert.tsx';
 import OutdatedResourceCard from './OutdatedResourceCard.tsx';
+
+type ExtensionUpdateEntry = [string, z.infer<typeof adminExtensionUpdateCheckResultUpdateAvailableSchema>];
+type ExtensionErrorEntry = [string, z.infer<typeof adminExtensionUpdateCheckResultErrorSchema>];
 
 export default function AdminOverviewUpdates() {
   const { addToast } = useToast();
   const { t } = useTranslations();
   const updateInformation = useAdminStore((state) => state.updateInformation);
   const setUpdateInformation = useAdminStore((state) => state.setUpdateInformation);
+  const panelUpdateAvailable = usePanelUpdateAvailable();
   const canReadNodes = useAdminCan('nodes.read');
   const canReadDatabaseAgentHosts = useAdminCan('database-agent-hosts.read');
 
-  const [updateHistory, setUpdateHistory] = useState<Awaited<ReturnType<typeof getUpdateHistory>> | null>(null);
   const [selectedUpdateHistory, setSelectedUpdateHistory] = useState<string | null>(null);
   const [recheckLoading, setRecheckLoading] = useState(false);
+
+  const updateHistory = useResource({
+    queryKey: queryKeys.admin.updates.history(),
+    queryFn: () => getUpdateHistory().then((history) => history ?? { panel: [], extensions: {} }),
+  });
 
   const {
     data: nodes,
@@ -78,38 +89,24 @@ export default function AdminOverviewUpdates() {
     canRequest: canReadDatabaseAgentHosts,
   });
 
-  useEffect(() => {
-    getUpdateHistory()
-      .then((history) => setUpdateHistory(history))
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  }, []);
+  const { extensionUpdates, extensionUpdateErrors } = useMemo(() => {
+    const entries = Object.entries(updateInformation?.extensions ?? {});
 
-  const extensionUpdates = useMemo(
-    () =>
-      Object.entries(updateInformation?.extensions || {}).filter(
-        ([_, update]) => update.type === 'update_available',
-      ) as [string, z.infer<typeof adminExtensionUpdateCheckResultUpdateAvailableSchema>][],
-    [updateInformation],
-  );
-  const extensionUpdateErrors = useMemo(
-    () =>
-      Object.entries(updateInformation?.extensions || {}).filter(([_, update]) => update.type === 'error') as [
-        string,
-        z.infer<typeof adminExtensionUpdateCheckResultErrorSchema>,
-      ][],
-    [updateInformation],
-  );
+    return {
+      extensionUpdates: entries.filter((entry): entry is ExtensionUpdateEntry => entry[1].type === 'update_available'),
+      extensionUpdateErrors: entries.filter((entry): entry is ExtensionErrorEntry => entry[1].type === 'error'),
+    };
+  }, [updateInformation]);
 
   const doRecheck = () => {
     setRecheckLoading(true);
 
     recheckUpdates()
-      .then((updateInformation) => {
-        setUpdateInformation(updateInformation);
+      .then((information) => {
+        setUpdateInformation(information);
         refetch();
         refetchDatabaseAgentHosts();
+        updateHistory.refetch();
         addToast(t('pages.admin.home.tabs.updates.page.toast.recheckComplete', {}), 'success');
       })
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
@@ -120,23 +117,13 @@ export default function AdminOverviewUpdates() {
 
   return (
     <>
-      {updateInformation &&
-        parseVersion(updateInformation.latestPanelVersion).isNewerThan(updateInformation.panelVersion) && (
-          <Alert className='mb-4' color='yellow'>
-            {t('pages.admin.home.alert.newPanelVersion', {
-              current: updateInformation.panelVersion,
-              latest: updateInformation.latestPanelVersion,
-              upgradeUrl: 'https://calagopus.com/docs/panel/updating',
-            }).md()}
-          </Alert>
-        )}
+      <PanelUpdateAlert />
 
       <div className='2xl:columns-2 gap-4 space-y-4'>
-        {window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.prependedComponents.map(
-          (Component, index) => (
-            <Component key={`updates-prepended-${index}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.prependedComponents}
+          name='updates-prepended'
+        />
 
         <TitleCard
           title={t('pages.admin.home.tabs.updates.page.card.panelVersion', {})}
@@ -144,14 +131,7 @@ export default function AdminOverviewUpdates() {
         >
           <div className='flex flex-col md:flex-row gap-2 justify-between'>
             <span>
-              <FontAwesomeIcon
-                icon={
-                  updateInformation &&
-                  parseVersion(updateInformation.latestPanelVersion).isNewerThan(updateInformation.panelVersion)
-                    ? faExclamationTriangle
-                    : faCheck
-                }
-              />{' '}
+              <FontAwesomeIcon icon={panelUpdateAvailable ? faExclamationTriangle : faCheck} />{' '}
               {t('pages.admin.home.tabs.updates.page.panelVersion', {
                 current: updateInformation?.panelVersion || unknownLabel,
                 latest: updateInformation?.latestPanelVersion || unknownLabel,
@@ -168,6 +148,7 @@ export default function AdminOverviewUpdates() {
             </Button>
           </div>
         </TitleCard>
+
         <TitleCard
           title={t('pages.admin.home.tabs.updates.page.card.versionHistory', {})}
           icon={<FontAwesomeIcon icon={faClockRotateLeft} />}
@@ -178,12 +159,10 @@ export default function AdminOverviewUpdates() {
               onChange={(value) => setSelectedUpdateHistory(value || null)}
               data={[
                 { label: t('pages.admin.home.tabs.updates.page.historyPanel', {}), value: '' },
-                ...(updateHistory
-                  ? Object.keys(updateHistory.extensions).map((ext) => ({
-                      label: t('pages.admin.home.tabs.updates.page.historyExtension', { name: ext }),
-                      value: ext,
-                    }))
-                  : []),
+                ...Object.keys(updateHistory.data?.extensions ?? {}).map((ext) => ({
+                  label: t('pages.admin.home.tabs.updates.page.historyExtension', { name: ext }),
+                  value: ext,
+                })),
               ]}
               className='ml-auto'
               size='xs'
@@ -191,33 +170,31 @@ export default function AdminOverviewUpdates() {
           }
           wrapperClassName='max-h-72 overflow-y-auto'
         >
-          {!updateHistory ? (
-            <Spinner.Centered />
-          ) : (
-            <>
+          <ResourceView resource={updateHistory}>
+            {(history) => (
               <Table
                 columns={[
                   t('pages.admin.home.tabs.updates.page.table.version', {}),
                   t('pages.admin.home.tabs.updates.page.table.installed', {}),
                 ]}
               >
-                {(!selectedUpdateHistory
-                  ? updateHistory.panel
-                  : updateHistory.extensions[selectedUpdateHistory] || []
-                ).map((entry) => (
-                  <TableRow key={entry.version}>
-                    <TableData>
-                      <Code>{entry.version}</Code>
-                    </TableData>
-                    <TableData>
-                      <FormattedTimestamp timestamp={entry.timestamp} />
-                    </TableData>
-                  </TableRow>
-                ))}
+                {(selectedUpdateHistory ? history.extensions[selectedUpdateHistory] || [] : history.panel).map(
+                  (entry) => (
+                    <TableRow key={entry.version}>
+                      <TableData>
+                        <Code>{entry.version}</Code>
+                      </TableData>
+                      <TableData>
+                        <FormattedTimestamp timestamp={entry.timestamp} />
+                      </TableData>
+                    </TableRow>
+                  ),
+                )}
               </Table>
-            </>
-          )}
+            )}
+          </ResourceView>
         </TitleCard>
+
         <TitleCard
           title={t('pages.admin.home.tabs.updates.page.card.outdatedExtensions', {})}
           icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
@@ -242,7 +219,6 @@ export default function AdminOverviewUpdates() {
                       t('pages.admin.home.tabs.updates.page.table.latestVersion', {}),
                       t('pages.admin.home.tabs.updates.page.table.changes', {}),
                     ]}
-                    loading={loading}
                   >
                     {extensionUpdates.map(([identifier, update]) => (
                       <TableRow key={identifier}>
@@ -282,7 +258,6 @@ export default function AdminOverviewUpdates() {
                       t('pages.admin.home.tabs.updates.page.table.packageName', {}),
                       t('pages.admin.home.tabs.updates.page.table.error', {}),
                     ]}
-                    loading={loading}
                   >
                     {extensionUpdateErrors.map(([identifier, update]) => (
                       <TableRow key={identifier}>
@@ -300,6 +275,7 @@ export default function AdminOverviewUpdates() {
             </>
           )}
         </TitleCard>
+
         <AdminCan action='nodes.read'>
           <OutdatedResourceCard
             title={t('pages.admin.home.tabs.updates.page.card.outdatedNodes', {})}
@@ -347,11 +323,10 @@ export default function AdminOverviewUpdates() {
           </OutdatedResourceCard>
         </AdminCan>
 
-        {window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.appendedComponents.map(
-          (Component, index) => (
-            <Component key={`updates-appended-${index}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={window.extensionContext.extensionRegistry.pages.admin.home.updates.cards.appendedComponents}
+          name='updates-appended'
+        />
       </div>
     </>
   );

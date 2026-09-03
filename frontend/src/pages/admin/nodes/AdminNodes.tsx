@@ -1,21 +1,22 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Ref, useEffect, useState } from 'react';
+import { Ref, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import { z } from 'zod';
 import getLocations from '@/api/admin/locations/getLocations.ts';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import SelectionArea from '@/elements/SelectionArea.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
+import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import LocationCreateOrUpdateModal from '@/pages/admin/locations/modals/LocationCreateOrUpdateModal.tsx';
-import { useAdminTableSelection } from '@/plugins/useAdminTableSelection.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useAdminTableSelection } from '@/plugins/selection/useAdminTableSelection.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import NodeActionBar from './NodeActionBar.tsx';
@@ -26,8 +27,7 @@ import NodeView from './NodeView.tsx';
 function NodesContainer() {
   const { t } = useTranslations();
   const navigate = useNavigate();
-  const [showLocationModal, setShowLocationModal] = useState(false);
-  const [checkingLocations, setCheckingLocations] = useState(true);
+  const [locationModalDismissed, setLocationModalDismissed] = useState(false);
 
   const {
     data: nodes,
@@ -48,21 +48,12 @@ function NodesContainer() {
     selectionAreaProps,
   } = useAdminTableSelection<z.infer<typeof adminNodeSchema>>({ items: nodes?.data });
 
-  useEffect(() => {
-    getLocations(1)
-      .then((response) => {
-        if (response.data.length === 0) {
-          setShowLocationModal(true);
-        }
-      })
-      .finally(() => {
-        setCheckingLocations(false);
-      });
-  }, []);
-
-  const handleLocationCreated = () => {
-    setShowLocationModal(false);
-  };
+  const { data: locationsProbe } = useResource({
+    queryKey: [...queryKeys.admin.locations.all(), 'probe'],
+    queryFn: () => getLocations(1),
+    silent: true,
+  });
+  const showLocationModal = !locationModalDismissed && locationsProbe !== undefined && locationsProbe.data.length === 0;
 
   const columns = ['', ...nodeTableColumns()];
 
@@ -114,9 +105,9 @@ function NodesContainer() {
       </AdminContentContainer>
 
       <LocationCreateOrUpdateModal
-        opened={showLocationModal && !checkingLocations}
-        onClose={() => setShowLocationModal(false)}
-        onLocationCreated={handleLocationCreated}
+        opened={showLocationModal}
+        onClose={() => setLocationModalDismissed(true)}
+        onLocationCreated={() => setLocationModalDismissed(true)}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import Divider from '@/elements/Divider.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Title from '@/elements/Title.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Title from '@/elements/typography/Title.tsx';
 
 export default function BackupProviderSection({ title, children }: { title: string; children: ReactNode }) {
   return (

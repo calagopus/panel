@@ -1,18 +1,19 @@
 import { Suspense, useEffect, useMemo } from 'react';
 import { Route, Routes } from 'react-router';
-import Spinner from './elements/Spinner.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { AuthProvider } from './providers/AuthProvider.tsx';
 import AdminGuard from './routers/guards/AdminGuard.tsx';
 import AuthenticatedGuard from './routers/guards/AuthenticatedGuard.tsx';
 import UnauthenticatedGuard from './routers/guards/UnauthenticatedGuard.tsx';
 import '@mantine/core/styles.css';
 import { lazy } from 'react';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
+import { ContextMenuProvider } from '@/elements/overlays/ContextMenu.tsx';
 import OobeGuard from '@/routers/guards/OobeGuard.tsx';
-import { ContextMenuProvider } from './elements/ContextMenu.tsx';
 import ContentContainer from './elements/containers/ContentContainer.tsx';
+import ExtensionSlot from './elements/ExtensionSlot.tsx';
 import UploadsCard from './elements/files/UploadsCard.tsx';
 import QuickActionsPalette from './elements/quickActions/QuickActionsPalette.tsx';
-import ScreenBlock from './elements/ScreenBlock.tsx';
 import { useCurrentWindow } from './providers/CurrentWindowProvider.tsx';
 import { useTranslations } from './providers/TranslationProvider.tsx';
 import { useWindows } from './providers/WindowProvider.tsx';
@@ -66,9 +67,10 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
         <AdminStoreContextProvider createStore={createAdminStore}>
           <ServerStoreContextProvider createStore={createServerStore}>
             <AuthProvider>
-              {window.extensionContext.extensionRegistry.pages.global.prependedComponents.map((Component, index) => (
-                <Component key={`pagesGlobal-prepended-${index}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.global.prependedComponents}
+                name='pagesGlobal-prepended'
+              />
 
               <Suspense fallback={<Spinner.Centered />}>
                 <Routes>
@@ -112,9 +114,10 @@ export default function RouterRoutes({ isNormal }: { isNormal: boolean }) {
               {isNormal && <UploadsCard />}
               {isNormal && <QuickActionsPalette />}
 
-              {window.extensionContext.extensionRegistry.pages.global.appendedComponents.map((Component, index) => (
-                <Component key={`pagesGlobal-appended-${index}`} />
-              ))}
+              <ExtensionSlot
+                components={window.extensionContext.extensionRegistry.pages.global.appendedComponents}
+                name='pagesGlobal-appended'
+              />
               <RelativePageListener />
             </AuthProvider>
           </ServerStoreContextProvider>

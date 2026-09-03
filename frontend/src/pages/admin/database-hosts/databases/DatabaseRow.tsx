@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { adminDatabaseHostSchema } from '@/lib/schemas/admin/databaseHosts.ts';
 import { adminServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
 import DatabaseTableRow from './DatabaseTableRow.tsx';

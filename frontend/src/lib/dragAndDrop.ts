@@ -13,7 +13,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useEffect, useMemo, useState } from 'react';
-import { DndCallbacks, DndConfig, DndItem } from '@/elements/DragAndDrop.tsx';
+import { DndCallbacks, DndConfig, DndItem } from '@/elements/dnd/DragAndDrop.tsx';
 
 export const restrictToVerticalAxis: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 

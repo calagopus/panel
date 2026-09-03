@@ -8,7 +8,7 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, EventEmittingModel,
+            ByUuid, CreatableModel, EventEmittingModel,
             node::GetNode,
             server::{Server, ServerStatus},
             server_activity::ServerActivity,
@@ -83,6 +83,8 @@ mod post {
                 .with_status(StatusCode::EXPECTATION_FAILED)
                 .ok();
         }
+
+        Server::invalidate_cached(&state.database, server_uuid).await;
 
         if let Err(err) = ServerActivity::create(
             &state,

@@ -5,19 +5,18 @@ import { z } from 'zod';
 import deleteSystemBackupPolicyNode from '@/api/admin/system-backup-policies/nodes/deleteSystemBackupPolicyNode.ts';
 import getSystemBackupPolicyNodes from '@/api/admin/system-backup-policies/nodes/getSystemBackupPolicyNodes.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Table from '@/elements/Table.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { nodeTableColumns } from '@/lib/tableColumns.ts';
 import NodeRow from '@/pages/admin/nodes/NodeRow.tsx';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import SystemBackupPolicyAddNodeModal from './modals/SystemBackupPolicyAddNodeModal.tsx';
@@ -25,10 +24,12 @@ import SystemBackupPolicyAddNodeModal from './modals/SystemBackupPolicyAddNodeMo
 function SystemBackupPolicyNodeRow({
   node,
   systemBackupPolicy,
+  canRemove,
   refetch,
 }: {
   node: z.infer<typeof adminNodeSchema>;
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
+  canRemove: boolean;
   refetch: () => void;
 }) {
   const { addToast } = useToast();
@@ -71,7 +72,7 @@ function SystemBackupPolicyNodeRow({
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
-            canAccess: useAdminCan('system-backup-policies.update'),
+            canAccess: canRemove,
           },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.nodes.contextMenu}
@@ -89,6 +90,7 @@ export default function AdminSystemBackupPolicyNodes({
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
 }) {
   const { t } = useTranslations();
+  const canUpdate = useAdminCan('system-backup-policies.update');
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -113,21 +115,21 @@ export default function AdminSystemBackupPolicyNodes({
       registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.nodes.subContainer}
       registryProps={{ systemBackupPolicy }}
       contentRight={
-        <AdminCan action='system-backup-policies.update'>
+        canUpdate ? (
           <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
             {t('common.button.add', {})}
           </Button>
-        </AdminCan>
+        ) : undefined
       }
     >
-      <AdminCan action='system-backup-policies.update'>
+      {canUpdate && (
         <SystemBackupPolicyAddNodeModal
           systemBackupPolicy={systemBackupPolicy}
           refetch={refetch}
           opened={openModal === 'add'}
           onClose={() => setOpenModal(null)}
         />
-      </AdminCan>
+      )}
 
       <Table
         columns={[...nodeTableColumns(), '']}
@@ -141,6 +143,7 @@ export default function AdminSystemBackupPolicyNodes({
             key={systemBackupPolicyNode.node.uuid}
             node={systemBackupPolicyNode.node}
             systemBackupPolicy={systemBackupPolicy}
+            canRemove={canUpdate}
             refetch={refetch}
           />
         ))}

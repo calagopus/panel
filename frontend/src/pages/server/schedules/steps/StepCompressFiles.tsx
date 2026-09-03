@@ -3,7 +3,7 @@ import { z } from 'zod';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { archiveFormatLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

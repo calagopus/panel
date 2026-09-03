@@ -1,18 +1,17 @@
-import { z } from 'zod';
 import getServerDatabases from '@/api/admin/servers/databases/getServerDatabases.ts';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverDatabaseTableColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminServerDatabaseInstances from './AdminServerDatabaseInstances.tsx';
 import AdminServerDatabaseRow from './AdminServerDatabaseRow.tsx';
 
-export default function AdminServerDatabases({ server }: { server: z.infer<typeof adminServerSchema> }) {
+export default function AdminServerDatabases({ server }: { server: AdminServer }) {
   const { t } = useTranslations();
   const {
     data: databases,

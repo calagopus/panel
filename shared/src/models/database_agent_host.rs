@@ -1,4 +1,5 @@
 use crate::{
+    crypt::EncryptedString,
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
 };
@@ -91,7 +92,7 @@ pub struct DatabaseAgentHost {
 
     pub types: DatabaseAgentHostTypes,
 
-    pub token: Vec<u8>,
+    pub token: EncryptedString,
 
     pub created: chrono::NaiveDateTime,
 
@@ -294,7 +295,9 @@ impl DatabaseAgentHost {
     }
 
     pub async fn reset_token(&self, state: &crate::State) -> Result<String, anyhow::Error> {
-        let token = Self::generate_token();
+        let (token, encrypted_token) =
+            EncryptedString::from_plaintext_with_input(Self::generate_token(), &state.database)
+                .await?;
 
         sqlx::query(
             r#"
@@ -304,7 +307,7 @@ impl DatabaseAgentHost {
             "#,
         )
         .bind(self.uuid)
-        .bind(state.database.encrypt(token.clone()).await?)
+        .bind(encrypted_token)
         .execute(state.database.write())
         .await?;
 
@@ -318,7 +321,7 @@ impl DatabaseAgentHost {
     ) -> Result<db_agent_api::client::DbAgentClient, anyhow::Error> {
         Ok(db_agent_api::client::DbAgentClient::new(
             self.url.to_string(),
-            database.decrypt(self.token.to_vec()).await?.into(),
+            self.token.decrypt(database).await?.into(),
         ))
     }
 
@@ -536,7 +539,10 @@ impl CreatableModel for DatabaseAgentHost {
             .set("memory", options.memory)
             .set("disk", options.disk)
             .set("types", serde_json::to_value(&options.types)?)
-            .set("token", state.database.encrypt(token.clone()).await?);
+            .set(
+                "token",
+                EncryptedString::from_plaintext(token, &state.database).await?,
+            );
 
         let row = query_builder
             .returning(&Self::columns_sql(None))

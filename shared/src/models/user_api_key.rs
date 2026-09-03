@@ -15,6 +15,7 @@ use utoipa::ToSchema;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserApiKey {
     pub uuid: uuid::Uuid,
+    pub user_uuid: uuid::Uuid,
 
     pub name: compact_str::CompactString,
     pub key_start: compact_str::CompactString,
@@ -55,6 +56,10 @@ impl BaseModel for UserApiKey {
             (
                 "user_api_keys.uuid",
                 compact_str::format_compact!("{prefix}uuid"),
+            ),
+            (
+                "user_api_keys.user_uuid",
+                compact_str::format_compact!("{prefix}user_uuid"),
             ),
             (
                 "user_api_keys.name",
@@ -105,6 +110,7 @@ impl BaseModel for UserApiKey {
 
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
+            user_uuid: row.try_get(compact_str::format_compact!("{prefix}user_uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             key_start: row.try_get(compact_str::format_compact!("{prefix}key_start").as_str())?,
             allowed_ips: row
@@ -124,6 +130,91 @@ impl BaseModel for UserApiKey {
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
+    }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
+}
+
+#[async_trait::async_trait]
+impl ResolvableModel for UserApiKey {
+    type Fingerprint = compact_str::CompactString;
+
+    fn uuid(&self) -> uuid::Uuid {
+        self.uuid
+    }
+
+    fn fingerprint(&self) -> Self::Fingerprint {
+        self.key_start.clone()
+    }
+
+    async fn resolve(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error> {
+        let digest = crate::crypt::token_digest(identifier);
+
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM user_api_keys
+            WHERE user_api_keys.key = $1
+            AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(&digest)
+        .fetch_optional(database.read())
+        .await?;
+
+        if let Some(row) = row {
+            return Ok(Some(Self::map(None, &row)?));
+        }
+
+        let Some(key_start) = identifier.get(0..16) else {
+            return Ok(None);
+        };
+
+        let Some(row) = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            WITH user_api_keys AS MATERIALIZED (
+                SELECT * FROM user_api_keys
+                WHERE user_api_keys.key_start = $1
+                AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
+            )
+            SELECT {}, user_api_keys.key AS key_hash
+            FROM user_api_keys
+            WHERE user_api_keys.key = crypt($2, user_api_keys.key)
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(key_start)
+        .bind(identifier)
+        .fetch_optional(database.read())
+        .await?
+        else {
+            return Ok(None);
+        };
+
+        sqlx::query(
+            r#"
+            UPDATE user_api_keys
+            SET key = $2
+            WHERE user_api_keys.uuid = $1 AND user_api_keys.key = $3
+            "#,
+        )
+        .bind(row.try_get::<uuid::Uuid, _>("uuid")?)
+        .bind(&digest)
+        .bind(row.try_get::<String, _>("key_hash")?)
+        .execute(database.write())
+        .await?;
+
+        Ok(Some(Self::map(None, &row)?))
     }
 }
 
@@ -259,17 +350,19 @@ impl UserApiKey {
         sqlx::query(
             r#"
             UPDATE user_api_keys
-            SET key_start = $1, key = crypt($2, gen_salt('bf', 12))
+            SET key_start = $1, key = $2
             WHERE user_api_keys.uuid = $3
             "#,
         )
         .bind(&new_key[0..16])
-        .bind(&new_key)
+        .bind(crate::crypt::token_digest(&new_key))
         .bind(self.uuid)
         .execute(database.write())
         .await?;
 
         self.key_start = new_key[0..16].into();
+
+        Self::invalidate_cached(database, self.uuid).await;
 
         Ok(new_key)
     }
@@ -383,7 +476,7 @@ impl CreatableModel for UserApiKey {
             .set("user_uuid", options.user_uuid)
             .set("name", &options.name)
             .set("key_start", &key[0..16])
-            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&key])
+            .set("key", crate::crypt::token_digest(&key))
             .set("allowed_ips", &options.allowed_ips)
             .set("enabled", options.enabled)
             .set("user_permissions", &options.user_permissions)

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { authRegisterSchema } from '@/lib/schemas/auth.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const registerWithCaptchaSchema = authRegisterSchema.extend({ captcha: z.string().nullable().optional() });
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Route, Routes } from 'react-router';
 import ContentContainer from '@/elements/containers/ContentContainer.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import authenticationRoutes from '@/routers/routes/authenticationRoutes.ts';
 

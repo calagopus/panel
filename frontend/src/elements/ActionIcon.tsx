@@ -1,11 +1,6 @@
-import { ActionIconProps, ActionIcon as MantineActionIcon, PolymorphicComponentProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const ActionIcon = forwardRef<HTMLButtonElement, PolymorphicComponentProps<'button', ActionIconProps>>(
-  ({ className, ...rest }, ref) => {
-    return <MantineActionIcon ref={ref} className={className} {...rest} />;
-  },
-);
-
-export default makeComponentHookable(ActionIcon);
+/**
+ * @deprecated `@/elements/ActionIcon.tsx` has moved to `@/elements/buttons/ActionIcon.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/buttons/ActionIcon.tsx';

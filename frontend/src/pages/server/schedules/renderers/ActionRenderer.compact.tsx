@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { serverScheduleStepActionSchema } from '@/lib/schemas/server/schedules.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ScheduleDynamicParameterRenderer from '../renderers/ScheduleDynamicParameterRenderer.tsx';
 
@@ -167,6 +167,15 @@ export function renderCompact(action: Action, { t, tReact, tItem }: Translations
         <span>
           {tReact('pages.server.schedules.steps.decompressFile.renderer.compact', {
             file: <ScheduleDynamicParameterRenderer value={action.file} />,
+            root: <ScheduleDynamicParameterRenderer value={action.root} />,
+          })}
+        </span>
+      );
+    case 'pull_file':
+      return (
+        <span>
+          {tReact('pages.server.schedules.steps.pullFile.renderer.compact', {
+            url: <ScheduleDynamicParameterRenderer value={action.url} />,
             root: <ScheduleDynamicParameterRenderer value={action.root} />,
           })}
         </span>

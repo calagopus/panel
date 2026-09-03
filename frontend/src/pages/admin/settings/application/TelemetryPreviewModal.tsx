@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
-import Button from '@/elements/Button.tsx';
-import HljsCode from '@/elements/HljsCode.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import HljsCode from '@/elements/editors/HljsCode.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

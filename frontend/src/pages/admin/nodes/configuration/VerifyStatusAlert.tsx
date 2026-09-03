@@ -1,7 +1,7 @@
 import { faCheck, faCircleQuestion, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
-import Alert from '@/elements/Alert.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type VerifyResult = { ok: true; version: string } | { ok: false; error: string };

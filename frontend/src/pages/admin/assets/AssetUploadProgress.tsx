@@ -1,14 +1,14 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Progress from '@/elements/Progress.tsx';
-import RingProgress from '@/elements/RingProgress.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
-import UnstyledButton from '@/elements/UnstyledButton.tsx';
-import { bytesProgressString } from '@/lib/size.ts';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import RingProgress from '@/elements/feedback/RingProgress.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { UploadItem } from '@/stores/uploads.ts';
 

@@ -6,17 +6,17 @@ import deleteEggs from '@/api/admin/nests/eggs/deleteEggs.ts';
 import updateEggsUsingRepository from '@/api/admin/nests/eggs/updateEggsUsingRepository.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import EggsMoveModal from './modals/EggsMoveModal.tsx';
+import EggMoveModal from './modals/EggMoveModal.tsx';
 
 export default function EggActionBar({
   nest,
@@ -78,10 +78,10 @@ export default function EggActionBar({
 
   return (
     <>
-      <EggsMoveModal
+      <EggMoveModal
         nest={nest}
-        selectedEggs={selectedEggs}
-        invalidateEggs={invalidateEggs}
+        eggs={selectedEggs.values()}
+        onMoved={invalidateEggs}
         opened={openModal === 'move'}
         onClose={() => setOpenModal(null)}
       />

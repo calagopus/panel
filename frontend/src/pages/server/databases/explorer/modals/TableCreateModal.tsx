@@ -4,23 +4,23 @@ import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
-import Divider from '@/elements/Divider.tsx';
-import Group from '@/elements/Group.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Title from '@/elements/Title.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import {
   serverDatabaseColumnDefinitionSchema,
   serverDatabaseTableCreateSchema,
 } from '@/lib/schemas/server/databases.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useDatabaseExplorer } from '@/providers/contexts/databaseExplorerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

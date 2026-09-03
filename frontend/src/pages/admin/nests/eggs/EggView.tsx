@@ -2,15 +2,15 @@ import { faCodeCommit, faCog, faComputer, faFolderTree, faTerminal } from '@fort
 import { useParams } from 'react-router';
 import { z } from 'zod';
 import getEgg from '@/api/admin/nests/eggs/getEgg.ts';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
-import Title from '@/elements/Title.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggCreateOrUpdate from '@/pages/admin/nests/eggs/EggCreateOrUpdate.tsx';
 import AdminEggMounts from '@/pages/admin/nests/eggs/mounts/AdminEggMounts.tsx';
 import AdminEggVariables from '@/pages/admin/nests/eggs/variables/AdminEggVariables.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggInstallationScriptContainer from './installationScript/EggInstallationScriptContainer.tsx';
 import AdminEggServers from './servers/AdminEggServers.tsx';

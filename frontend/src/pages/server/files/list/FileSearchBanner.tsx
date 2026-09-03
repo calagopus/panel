@@ -1,8 +1,8 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useShallow } from 'zustand/react/shallow';
-import Alert from '@/elements/Alert.tsx';
-import { bytesToString } from '@/lib/size.ts';
+import Alert from '@/elements/feedback/Alert.tsx';
+import { bytesToString } from '@/lib/format/size.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

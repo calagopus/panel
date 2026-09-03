@@ -5,14 +5,14 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import createDatabaseInstanceDatabase from '@/api/server/databases/instances/createDatabaseInstanceDatabase.ts';
 import createDatabaseInstanceUser from '@/api/server/databases/instances/createDatabaseInstanceUser.ts';
-import Button from '@/elements/Button.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceDatabaseCreateSchema,
@@ -20,7 +20,7 @@ import {
   serverDatabaseInstanceSchema,
   serverDatabaseInstanceUserSchema,
 } from '@/lib/schemas/server/databaseInstances.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

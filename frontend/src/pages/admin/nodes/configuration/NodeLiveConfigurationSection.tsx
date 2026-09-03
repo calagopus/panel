@@ -1,6 +1,6 @@
 import LiveYamlConfigSection from '@/elements/admin/LiveYamlConfigSection.tsx';
-import { WINGS_DEFAULT_PORT } from '@/lib/node.ts';
-import { urlIsMissingPort } from '@/lib/url.ts';
+import { WINGS_DEFAULT_PORT } from '@/lib/domain/node.ts';
+import { urlIsMissingPort } from '@/lib/network/url.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export interface NodeLiveConfigState {

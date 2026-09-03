@@ -1,24 +1,22 @@
-import { countryFlagCodes } from 'virtual:country-flags';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import createLocation from '@/api/admin/locations/createLocation.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
-import Select from '@/elements/input/Select.tsx';
+import { FormEngine } from '@/elements/form-engine/index.ts';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { locationEmptyFormValues } from '../locationFormValues.ts';
+import { locationEmptyFormValues, useLocationFormFields } from '../locationFormValues.tsx';
 
 interface LocationCreateOrUpdateModalProps {
   opened: boolean;
@@ -33,7 +31,7 @@ export default function LocationCreateOrUpdateModal({
   onClose,
   onLocationCreated,
 }: LocationCreateOrUpdateModalProps) {
-  const { language, t } = useTranslations();
+  const { t } = useTranslations();
   const { addToast } = useToast();
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
@@ -60,53 +58,7 @@ export default function LocationCreateOrUpdateModal({
     canRequest: canReadBackupConfigurations,
   });
 
-  const fields: FieldDef<LocationFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'backupConfigurationUuid',
-      label: t('common.form.backupConfiguration', {}),
-      options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
-      props: {
-        placeholder: t('common.none', {}),
-        searchable: true,
-        searchValue: backupConfigurations.search,
-        onSearchChange: backupConfigurations.setSearch,
-        allowDeselect: true,
-        clearable: true,
-        disabled: !canReadBackupConfigurations,
-        loading: backupConfigurations.loading,
-      },
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
-    {
-      type: 'custom',
-      name: 'flag',
-      render: (f) => (
-        <Select
-          label={t('pages.admin.locations.tabs.general.page.form.flag', {})}
-          placeholder={t('common.none', {})}
-          renderOption={({ option }) => (
-            <div className='flex items-center gap-2'>
-              <img src={`/flags/${option.value}.svg`} alt={option.label} className='w-4 h-4 rounded-md shrink-0' />
-              <span className='truncate'>{option.label}</span>
-            </div>
-          )}
-          data={countryFlagCodes.map((countryCode) => {
-            const regionNames = new Intl.DisplayNames([language], { type: 'region' });
-            return {
-              label: regionNames.of(countryCode.toUpperCase()) || countryCode,
-              value: countryCode,
-            };
-          })}
-          clearable
-          searchable
-          key={f.key('flag')}
-          {...f.getInputProps('flag')}
-        />
-      ),
-    },
-  ];
+  const fields = useLocationFormFields(backupConfigurations, canReadBackupConfigurations);
 
   return (
     <FormModal

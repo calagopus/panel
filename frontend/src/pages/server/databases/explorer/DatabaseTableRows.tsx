@@ -4,22 +4,22 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
-import Group from '@/elements/Group.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   serverDatabaseBrowseFilterSchema,
   serverDatabaseQueryResultSchema,
   serverDatabaseQueryValueSchema,
   serverDatabaseSchemaTableSchema,
 } from '@/lib/schemas/server/databases.ts';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
-import { useResource } from '@/plugins/useResource.ts';
-import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
+import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
 import { useDatabaseExplorer } from '@/providers/contexts/databaseExplorerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

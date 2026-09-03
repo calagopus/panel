@@ -2,11 +2,11 @@ import { faMemory, faMicrochip, faPowerOff } from '@fortawesome/free-solid-svg-i
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
-import ChartBlock from '@/elements/ChartBlock.tsx';
-import StreamChart from '@/elements/StreamChart.tsx';
+import ChartBlock from '@/elements/charts/ChartBlock.tsx';
+import StreamChart from '@/elements/charts/StreamChart.tsx';
 import { formatBytes, formatPercent, useStreamChart } from '@/lib/chart.ts';
+import { mbToBytes } from '@/lib/format/size.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
-import { mbToBytes } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

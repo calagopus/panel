@@ -15,21 +15,21 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteDatabaseInstanceDatabase from '@/api/server/databases/instances/deleteDatabaseInstanceDatabase.ts';
 import getDatabaseInstanceDatabaseSize from '@/api/server/databases/instances/getDatabaseInstanceDatabaseSize.ts';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import { bytesToString } from '@/lib/format/size.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
   serverDatabaseInstanceSchema,
 } from '@/lib/schemas/server/databaseInstances.ts';
-import { bytesToString } from '@/lib/size.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';

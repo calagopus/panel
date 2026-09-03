@@ -1,9 +1,9 @@
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

@@ -1,8 +1,8 @@
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
-import Title from '@/elements/Title.tsx';
-import { useVisualViewportBottomInset } from '@/plugins/useVisualViewport.ts';
+import Group from '@/elements/layout/Group.tsx';
+import Title from '@/elements/typography/Title.tsx';
+import { useVisualViewportBottomInset } from '@/plugins/viewport/useVisualViewport.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import ServerDetails from './stats/ServerDetails.tsx';

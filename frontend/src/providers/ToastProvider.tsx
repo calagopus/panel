@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import { AnimatePresence, motion } from 'motion/react';
 import { FC, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Notification from '@/elements/Notification.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Notification from '@/elements/feedback/Notification.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
-import { useToastPosition } from '@/plugins/useToastPosition.ts';
+import { useToastPosition } from '@/plugins/toast/useToastPosition.ts';
 import { Toast, ToastAction, ToastContext, ToastType, toastTimeout } from '@/providers/contexts/toastContext.ts';
 
 const ToastActionButton: FC<{ action: ToastAction }> = ({ action }) => {

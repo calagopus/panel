@@ -1,10 +1,10 @@
 import { ModalProps } from '@mantine/core';
-import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = Omit<ModalProps, 'title' | 'opened'> & {

@@ -1,7 +1,7 @@
 import { useIntersection } from '@mantine/hooks';
 import { useEffect } from 'react';
-import Spinner from '@/elements/Spinner.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 
 export default function FileInfiniteScrollSentinel({ colSpan }: { colSpan: number }) {

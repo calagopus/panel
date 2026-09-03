@@ -1,17 +1,17 @@
 import { faCog, faReply } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { serverVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import Tooltip from './Tooltip.tsx';
 
 interface Props {
   variable: z.infer<typeof serverVariableSchema>;

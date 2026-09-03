@@ -1,23 +1,6 @@
-import {
-  Timeline as MantineTimeline,
-  TimelineItem as MantineTimelineItem,
-  TimelineItemProps,
-  TimelineProps,
-} from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const TimelineItem = forwardRef<HTMLDivElement, TimelineItemProps>(({ ...rest }, ref) => {
-  return <MantineTimelineItem ref={ref} {...rest} />;
-});
-
-const Timeline = makeComponentHookable(
-  forwardRef<HTMLDivElement, TimelineProps>(({ ...rest }, ref) => {
-    return <MantineTimeline ref={ref} {...rest} />;
-  }),
-  {
-    Item: makeComponentHookable(TimelineItem),
-  },
-);
-
-export default Timeline;
+/**
+ * @deprecated `@/elements/Timeline.tsx` has moved to `@/elements/layout/Timeline.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/Timeline.tsx';

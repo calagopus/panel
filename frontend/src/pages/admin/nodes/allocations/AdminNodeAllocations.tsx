@@ -4,15 +4,15 @@ import { Ref, useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import getNodeAllocationIps from '@/api/admin/nodes/allocations/getNodeAllocationIps.ts';
 import getNodeAllocations from '@/api/admin/nodes/allocations/getNodeAllocations.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import Table from '@/elements/data-display/Table.tsx';
+import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import SelectionArea from '@/elements/SelectionArea.tsx';
-import Table from '@/elements/Table.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -21,10 +21,10 @@ import {
   adminNodeSchema,
 } from '@/lib/schemas/admin/nodes.ts';
 import { nodeAllocationTableColumns } from '@/lib/tableColumns.ts';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
-import { useResource } from '@/plugins/useResource.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
-import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
+import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AllocationActionBar from './AllocationActionBar.tsx';
 import NodeAllocationsCreateModal from './modals/NodeAllocationsCreateModal.tsx';
@@ -113,10 +113,6 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
   const handleClearSelection = useCallback(() => {
     setSelectedNodeAllocations([]);
     setSelectedAllMatching(false);
-  }, []);
-
-  useEffect(() => {
-    handleClearSelection();
   }, []);
 
   useEffect(() => {

@@ -1,12 +1,14 @@
 import classNames from 'classnames';
-import Anchor from '@/elements/Anchor.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Anchor from '@/elements/typography/Anchor.tsx';
 
 export default function Copyright({ className }: { className?: string }) {
   return (
     <div className={classNames('flex flex-col text-xs transition-all text-(--mantine-color-dimmed)', className)}>
-      {window.extensionContext.extensionRegistry.elements.copyright.prependedComponents.map((Component, index) => (
-        <Component key={`global-copyright-prepended-${index}`} />
-      ))}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.elements.copyright.prependedComponents}
+        name='global-copyright-prepended'
+      />
 
       <span className='flex flex-row gap-2'>
         <Anchor size='xs' href='https://calagopus.com' target='_blank'>
@@ -15,9 +17,10 @@ export default function Copyright({ className }: { className?: string }) {
         &copy; 2025 - {new Date().getFullYear()}
       </span>
 
-      {window.extensionContext.extensionRegistry.elements.copyright.appendedComponents.map((Component, index) => (
-        <Component key={`global-copyright-appended-${index}`} />
-      ))}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.elements.copyright.appendedComponents}
+        name='global-copyright-appended'
+      />
     </div>
   );
 }

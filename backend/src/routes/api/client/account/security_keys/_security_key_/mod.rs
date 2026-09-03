@@ -10,8 +10,8 @@ mod delete {
     use shared::{
         ApiError, GetState,
         models::{
-            DeletableModel,
-            user::{GetPermissionManager, GetUser},
+            ByUuid, DeletableModel,
+            user::{GetPermissionManager, GetUser, User},
             user_activity::GetUserActivityLogger,
             user_security_key::UserSecurityKey,
         },
@@ -102,6 +102,8 @@ mod delete {
             .delete_with_transaction(&state, (), &mut transaction)
             .await?;
         transaction.commit().await?;
+
+        User::invalidate_cached(&state.database, user.uuid).await;
 
         if security_key.registration.is_none() {
             activity_logger

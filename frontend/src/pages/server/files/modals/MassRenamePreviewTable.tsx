@@ -1,11 +1,11 @@
 import { faArrowRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
+import Table, { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
-import Table, { TableData, TableRow } from '@/elements/Table.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { RenamePreviewRow, RenameStatus } from '@/lib/files/massRename.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

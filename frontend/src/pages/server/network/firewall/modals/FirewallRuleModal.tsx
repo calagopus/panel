@@ -2,18 +2,20 @@ import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
+import ServerFileInput from '@/elements/input/ServerFileInput.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { networkProtocolLabelMapping, serverFirewallRuleActionLabelMapping } from '@/lib/enums.ts';
-import { resolvePorts } from '@/lib/ip.ts';
+import { resolvePorts } from '@/lib/network/ip.ts';
 import { serverFirewallRuleSchema } from '@/lib/schemas/server/firewall.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
 
 type Rule = z.infer<typeof serverFirewallRuleSchema>;
 
@@ -27,10 +29,12 @@ const defaultValues: Rule = {
   protocols: [],
   sources: [],
   ports: null,
+  sourceFile: null,
 };
 
 export default function FirewallRuleModal({ rule, onSave, ...props }: Props) {
   const { t } = useTranslations();
+  const serverUuid = useServerStore((state) => state.server.uuid);
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<Rule>({
     initialValues: defaultValues,
@@ -96,6 +100,16 @@ export default function FirewallRuleModal({ rule, onSave, ...props }: Props) {
                   source: form.getValues().sources[Number(invalidSourceIndex)],
                 })
           }
+        />
+
+        <ServerFileInput
+          serverUuid={serverUuid}
+          label={t('pages.server.firewall.form.sourceFile', {})}
+          description={t('pages.server.firewall.form.sourceFileDescription', {})}
+          placeholder='e.g. firewall/allowed.txt'
+          value={form.getValues().sourceFile ?? ''}
+          onChange={(value) => form.setFieldValue('sourceFile', value === '' ? null : value)}
+          error={form.errors.sourceFile}
         />
 
         <TagsInput

@@ -19,7 +19,7 @@ import { createSearchParams, MemoryRouter } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
 import { z } from 'zod';
 import downloadFiles from '@/api/server/files/downloadFiles.ts';
-import ContextMenu, { ContextMenuItem } from '@/elements/ContextMenu.tsx';
+import ContextMenu, { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 import { isArchiveType } from '@/lib/files/files.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';

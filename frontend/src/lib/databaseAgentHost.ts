@@ -1,29 +1,6 @@
-import { dump } from 'js-yaml';
-
-export const DATABASE_AGENT_DEFAULT_PORT = 8090;
-
-interface DatabaseAgentHostConfigurationParams {
-  token: string;
-  apiPort: number;
-}
-
-export const getDatabaseAgentHostConfiguration = ({ token, apiPort }: DatabaseAgentHostConfigurationParams) => {
-  return {
-    api: {
-      bind: `0.0.0.0:${apiPort}`,
-      token,
-    },
-  };
-};
-
-export const getDatabaseAgentHostConfigurationCommand = (params: DatabaseAgentHostConfigurationParams) => {
-  const config = getDatabaseAgentHostConfiguration(params);
-  const yaml = dump(config, {
-    flowSkipCommaSpace: true,
-    flowSkipColonSpace: true,
-    quoteFlowKeys: true,
-    indent: 1,
-    seqNoIndent: true,
-  });
-  return `calagopus-db-agent configure --join-data ${btoa(yaml)}`;
-};
+/**
+ * @deprecated `@/lib/databaseAgentHost.ts` has moved to `@/lib/domain/databaseAgentHost.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/lib/domain/databaseAgentHost.ts';

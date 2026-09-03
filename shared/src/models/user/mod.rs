@@ -1,11 +1,11 @@
 use crate::{
+    crypt::BcryptString,
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
     storage::StorageUrlRetriever,
 };
 use garde::Validate;
 use serde::{Deserialize, Serialize};
-use sha2::Digest;
 use sqlx::{Row, postgres::PgRow};
 use std::{
     collections::BTreeMap,
@@ -200,6 +200,14 @@ impl BaseModel for User {
             extension_data: Self::map_extensions(prefix, row)?,
         })
     }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
 }
 
 impl User {
@@ -211,10 +219,12 @@ impl User {
         name_last: Option<&str>,
         password: &str,
     ) -> Result<uuid::Uuid, crate::database::DatabaseError> {
+        let password = BcryptString::hash(password).await?;
+
         let row = sqlx::query(
             r#"
             INSERT INTO users (username, email, name_first, name_last, password, admin)
-            VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf', 12)), (SELECT COUNT(*) = 0 FROM users))
+            VALUES ($1, $2, $3, $4, $5, (SELECT COUNT(*) = 0 FROM users))
             RETURNING users.uuid
             "#,
         )
@@ -251,105 +261,44 @@ impl User {
 
     /// Returns the user and session associated with the given session string, if valid.
     ///
-    /// Cached for 5 seconds.
+    /// Both rows are cached until they are written to.
     pub async fn by_session_cached(
         database: &crate::database::Database,
         session: &str,
     ) -> Result<Option<(Self, super::user_session::UserSession)>, anyhow::Error> {
-        let (key_id, key) = match session.split_once(':') {
-            Some((key_id, key)) => (key_id, key),
-            None => return Ok(None),
+        let Some(session) =
+            super::user_session::UserSession::resolve_cached(database, session).await?
+        else {
+            return Ok(None);
         };
 
-        database
-            .cache
-            .cached(
-                &format!(
-                    "user::session::{}",
-                    hex::encode(sha2::Sha256::digest(session.as_bytes()))
-                ),
-                5,
-                || async {
-                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
-                        r#"
-                        WITH user_sessions AS MATERIALIZED (
-                            SELECT * FROM user_sessions WHERE key_id = $1
-                        )
-                        SELECT {}, {}
-                        FROM users
-                        LEFT JOIN roles ON roles.uuid = users.role_uuid
-                        JOIN user_sessions ON user_sessions.user_uuid = users.uuid
-                        WHERE user_sessions.key = crypt($2, user_sessions.key)
-                        "#,
-                        Self::columns_sql(None),
-                        super::user_session::UserSession::columns_sql(Some("session_"))
-                    )))
-                    .bind(key_id)
-                    .bind(key)
-                    .fetch_optional(database.read())
-                    .await?;
-
-                    row.try_map(|row| {
-                        Ok::<_, anyhow::Error>((
-                            Self::map(None, &row)?,
-                            super::user_session::UserSession::map(Some("session_"), &row)?,
-                        ))
-                    })
-                },
-            )
-            .await
+        Ok(Self::by_uuid_optional_cached(database, session.user_uuid)
+            .await?
+            .map(|user| (user, session)))
     }
 
     /// Returns the user and API key associated with the given API key string, if valid.
     ///
-    /// Cached for 5 seconds.
+    /// Both rows are cached until they are written to.
     pub async fn by_api_key_cached(
         database: &crate::database::Database,
         key: &str,
     ) -> Result<Option<(Self, super::user_api_key::UserApiKey)>, anyhow::Error> {
-        database
-            .cache
-            .cached(
-                &format!(
-                    "user::api_key::{}",
-                    hex::encode(sha2::Sha256::digest(key.as_bytes()))
-                ),
-                5,
-                || async {
-                    let Some(key_start) = key.get(0..16) else {
-                        return Ok(None);
-                    };
+        let Some(api_key) = super::user_api_key::UserApiKey::resolve_cached(database, key).await?
+        else {
+            return Ok(None);
+        };
 
-                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
-                        r#"
-                        WITH user_api_keys AS MATERIALIZED (
-                            SELECT * FROM user_api_keys 
-                            WHERE user_api_keys.key_start = $1 
-                            AND (user_api_keys.expires IS NULL OR user_api_keys.expires > NOW())
-                        )
-                        SELECT {}, {}
-                        FROM users
-                        LEFT JOIN roles ON roles.uuid = users.role_uuid
-                        JOIN user_api_keys ON user_api_keys.user_uuid = users.uuid
-                        WHERE user_api_keys.key = crypt($2, user_api_keys.key)
-                        "#,
-                        Self::columns_sql(None),
-                        super::user_api_key::UserApiKey::columns_sql(Some("api_key_"))
-                    )))
-                    .bind(key_start)
-                    .bind(key)
-                    .fetch_optional(database.read())
-                    .await?;
+        if api_key
+            .expires
+            .is_some_and(|expires| expires <= chrono::Utc::now().naive_utc())
+        {
+            return Ok(None);
+        }
 
-                    row.try_map(|row| {
-                        Ok::<_, anyhow::Error>((
-                            Self::map(None, &row)?,
-                            super::user_api_key::UserApiKey::map(Some("api_key_"), &row)?,
-                        ))
-                    })
-                },
-            )
-            .await
+        Ok(Self::by_uuid_optional_cached(database, api_key.user_uuid)
+            .await?
+            .map(|user| (user, api_key)))
     }
 
     pub async fn by_credential_id(
@@ -409,19 +358,18 @@ impl User {
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            SELECT {}
+            SELECT {}, users.password AS password_hash
             FROM users
             LEFT JOIN roles ON roles.uuid = users.role_uuid
-            WHERE lower(users.email) = lower($1) AND users.password IS NOT NULL AND users.password = crypt($2, users.password)
+            WHERE lower(users.email) = lower($1)
             "#,
             Self::columns_sql(None)
         )))
         .bind(email)
-        .bind(password)
         .fetch_optional(database.read())
         .await?;
 
-        row.try_map(|row| Self::map(None, &row))
+        Self::verify_password_row(database, row, password).await
     }
 
     pub async fn by_username(
@@ -451,19 +399,75 @@ impl User {
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            SELECT {}
+            SELECT {}, users.password AS password_hash
             FROM users
             LEFT JOIN roles ON roles.uuid = users.role_uuid
-            WHERE lower(users.username) = lower($1) AND users.password IS NOT NULL AND users.password = crypt($2, users.password)
+            WHERE lower(users.username) = lower($1)
             "#,
             Self::columns_sql(None)
         )))
         .bind(username)
-        .bind(password)
         .fetch_optional(database.read())
         .await?;
 
-        row.try_map(|row| Self::map(None, &row))
+        Self::verify_password_row(database, row, password).await
+    }
+
+    async fn verify_password_row(
+        database: &crate::database::Database,
+        row: Option<PgRow>,
+        password: &str,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let Some(row) = row else {
+            BcryptString::verify_dummy(password).await?;
+
+            return Ok(None);
+        };
+
+        let Some(hash) = row.try_get::<Option<BcryptString>, _>("password_hash")? else {
+            BcryptString::verify_dummy(password).await?;
+
+            return Ok(None);
+        };
+
+        if !hash.verify(password).await? {
+            return Ok(None);
+        }
+
+        let user = Self::map(None, &row)?;
+        user.rehash_password(database, password, &hash).await?;
+
+        Ok(Some(user))
+    }
+
+    /// Rewrites a matching hash that was produced at a different cost or format (imports, older
+    /// versions) so every active account converges on the current parameters.
+    async fn rehash_password(
+        &self,
+        database: &crate::database::Database,
+        password: &str,
+        current_hash: &BcryptString,
+    ) -> Result<(), crate::database::DatabaseError> {
+        if !current_hash.needs_rehash() {
+            return Ok(());
+        }
+
+        let new_hash = BcryptString::hash(password).await?;
+
+        sqlx::query(
+            r#"
+            UPDATE users
+            SET password = $2
+            WHERE users.uuid = $1 AND users.password = $3
+            "#,
+        )
+        .bind(self.uuid)
+        .bind(new_hash)
+        .bind(current_hash)
+        .execute(database.write())
+        .await?;
+
+        Ok(())
     }
 
     pub async fn by_username_public_key(
@@ -594,17 +598,33 @@ impl User {
 
         let row = sqlx::query(
             r#"
-            SELECT 1
+            SELECT users.password
             FROM users
-            WHERE users.uuid = $1 AND users.password = crypt($2, users.password)
+            WHERE users.uuid = $1
             "#,
         )
         .bind(self.uuid)
-        .bind(password)
         .fetch_optional(database.read())
         .await?;
 
-        Ok(row.is_some())
+        let hash = match row {
+            Some(row) => row.try_get::<Option<BcryptString>, _>("password")?,
+            None => None,
+        };
+
+        let Some(hash) = hash else {
+            BcryptString::verify_dummy(password).await?;
+
+            return Ok(false);
+        };
+
+        if !hash.verify(password).await? {
+            return Ok(false);
+        }
+
+        self.rehash_password(database, password, &hash).await?;
+
+        Ok(true)
     }
 
     /// Update the User password, `None` will disallow password login and not require one when changing
@@ -614,10 +634,12 @@ impl User {
         password: Option<&str>,
     ) -> Result<(), crate::database::DatabaseError> {
         if let Some(password) = password {
+            let password = BcryptString::hash(password).await?;
+
             sqlx::query(
                 r#"
 		            UPDATE users
-		            SET password = crypt($2, gen_salt('bf', 12))
+		            SET password = $2
 		            WHERE users.uuid = $1
 		            "#,
             )
@@ -643,6 +665,8 @@ impl User {
             self.has_password = false;
         }
 
+        Self::invalidate_cached(database, self.uuid).await;
+
         Ok(())
     }
 
@@ -653,10 +677,12 @@ impl User {
         password: Option<&str>,
     ) -> Result<(), crate::database::DatabaseError> {
         if let Some(password) = password {
+            let password = BcryptString::hash(password).await?;
+
             sqlx::query(
                 r#"
 		            UPDATE users
-		            SET password = crypt($2, gen_salt('bf', 12))
+		            SET password = $2
 		            WHERE users.uuid = $1
 		            "#,
             )
@@ -985,7 +1011,7 @@ impl CreatableModel for User {
             .set("name_last", options.name_last.as_deref());
 
         if let Some(password) = &options.password {
-            query_builder.set_expr("password", "crypt($1, gen_salt('bf', 12))", vec![password]);
+            query_builder.set("password", BcryptString::hash(password).await?);
         }
 
         query_builder
@@ -1262,6 +1288,8 @@ impl DeletableModel for User {
         self.delete_with_transaction(state, options, &mut transaction)
             .await?;
         transaction.commit().await?;
+
+        Self::invalidate_cached(&state.database, self.uuid).await;
 
         state.storage.remove(self.avatar.as_deref()).await?;
 

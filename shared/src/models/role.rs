@@ -93,9 +93,45 @@ impl BaseModel for Role {
             extension_data: Self::map_extensions(prefix, row)?,
         })
     }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
 }
 
 impl Role {
+    async fn user_uuids(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<Vec<uuid::Uuid>, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT users.uuid
+            FROM users
+            WHERE users.role_uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .fetch_all(database.read())
+        .await
+    }
+
+    async fn invalidate_cached_with_users(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<(), sqlx::Error> {
+        Self::invalidate_cached(database, self.uuid).await;
+        for user_uuid in self.user_uuids(database).await? {
+            super::user::User::invalidate_cached(database, user_uuid).await;
+        }
+
+        Ok(())
+    }
+
     pub async fn all_with_pagination(
         database: &crate::database::Database,
         page: i64,
@@ -295,6 +331,28 @@ impl UpdatableModel for Role {
         &UPDATE_LISTENERS
     }
 
+    async fn update(
+        &mut self,
+        state: &crate::State,
+        options: Self::UpdateOptions,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .update_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        self.invalidate_cached_with_users(&state.database).await?;
+
+        Ok(())
+    }
+
     async fn update_with_transaction(
         &mut self,
         state: &crate::State,
@@ -352,6 +410,33 @@ impl DeletableModel for Role {
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
+    }
+
+    async fn delete(
+        &self,
+        state: &crate::State,
+        options: Self::DeleteOptions,
+    ) -> Result<(), anyhow::Error> {
+        let user_uuids = self.user_uuids(&state.database).await?;
+
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .delete_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        Self::invalidate_cached(&state.database, self.uuid).await;
+        for user_uuid in user_uuids {
+            super::user::User::invalidate_cached(&state.database, user_uuid).await;
+        }
+
+        Ok(())
     }
 
     async fn delete_with_transaction(

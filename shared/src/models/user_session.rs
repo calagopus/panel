@@ -22,6 +22,7 @@ use utoipa::ToSchema;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserSession {
     pub uuid: uuid::Uuid,
+    pub user_uuid: uuid::Uuid,
 
     pub ip: sqlx::types::ipnetwork::IpNetwork,
     pub user_agent: compact_str::CompactString,
@@ -56,6 +57,10 @@ impl BaseModel for UserSession {
                 compact_str::format_compact!("{prefix}uuid"),
             ),
             (
+                "user_sessions.user_uuid",
+                compact_str::format_compact!("{prefix}user_uuid"),
+            ),
+            (
                 "user_sessions.ip",
                 compact_str::format_compact!("{prefix}ip"),
             ),
@@ -80,12 +85,135 @@ impl BaseModel for UserSession {
 
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
+            user_uuid: row.try_get(compact_str::format_compact!("{prefix}user_uuid").as_str())?,
             ip: row.try_get(compact_str::format_compact!("{prefix}ip").as_str())?,
             user_agent: row.try_get(compact_str::format_compact!("{prefix}user_agent").as_str())?,
             last_used: row.try_get(compact_str::format_compact!("{prefix}last_used").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
+    }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
+}
+
+#[async_trait::async_trait]
+impl ByUuid for UserSession {
+    async fn by_uuid(
+        database: &crate::database::Database,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM user_sessions
+            WHERE user_sessions.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(database.read())
+        .await?;
+
+        Self::map(None, &row)
+    }
+
+    async fn by_uuid_with_transaction(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        uuid: uuid::Uuid,
+    ) -> Result<Self, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM user_sessions
+            WHERE user_sessions.uuid = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(uuid)
+        .fetch_one(&mut **transaction)
+        .await?;
+
+        Self::map(None, &row)
+    }
+}
+
+#[async_trait::async_trait]
+impl ResolvableModel for UserSession {
+    type Fingerprint = ();
+
+    fn uuid(&self) -> uuid::Uuid {
+        self.uuid
+    }
+
+    fn fingerprint(&self) -> Self::Fingerprint {}
+
+    async fn resolve(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error> {
+        let Some((key_id, key)) = identifier.split_once(':') else {
+            return Ok(None);
+        };
+
+        let digest = crate::crypt::token_digest(key);
+
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM user_sessions
+            WHERE user_sessions.key_id = $1 AND user_sessions.key = $2
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(key_id)
+        .bind(&digest)
+        .fetch_optional(database.read())
+        .await?;
+
+        if let Some(row) = row {
+            return Ok(Some(Self::map(None, &row)?));
+        }
+
+        let Some(row) = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            WITH user_sessions AS MATERIALIZED (
+                SELECT * FROM user_sessions WHERE key_id = $1
+            )
+            SELECT {}, user_sessions.key AS key_hash
+            FROM user_sessions
+            WHERE user_sessions.key = crypt($2, user_sessions.key)
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(key_id)
+        .bind(key)
+        .fetch_optional(database.read())
+        .await?
+        else {
+            return Ok(None);
+        };
+
+        sqlx::query(
+            r#"
+            UPDATE user_sessions
+            SET key = $2
+            WHERE user_sessions.uuid = $1 AND user_sessions.key = $3
+            "#,
+        )
+        .bind(row.try_get::<uuid::Uuid, _>("uuid")?)
+        .bind(&digest)
+        .bind(row.try_get::<String, _>("key_hash")?)
+        .execute(database.write())
+        .await?;
+
+        Ok(Some(Self::map(None, &row)?))
     }
 }
 
@@ -155,17 +283,23 @@ impl UserSession {
         user_uuid: uuid::Uuid,
         except: Option<uuid::Uuid>,
     ) -> Result<u64, sqlx::Error> {
-        Ok(sqlx::query(
+        let rows = sqlx::query(
             r#"
             DELETE FROM user_sessions
             WHERE user_sessions.user_uuid = $1 AND ($2 IS NULL OR user_sessions.uuid != $2)
+            RETURNING user_sessions.uuid
             "#,
         )
         .bind(user_uuid)
         .bind(except)
-        .execute(database.write())
-        .await?
-        .rows_affected())
+        .fetch_all(database.write())
+        .await?;
+
+        for row in &rows {
+            Self::invalidate_cached(database, row.try_get("uuid")?).await;
+        }
+
+        Ok(rows.len() as u64)
     }
 
     pub async fn delete_unused(
@@ -317,7 +451,7 @@ impl CreatableModel for UserSession {
         query_builder
             .set("user_uuid", options.user_uuid)
             .set("key_id", key_id.clone())
-            .set_expr("key", "crypt($1, gen_salt('bf', 12))", vec![&hash])
+            .set("key", crate::crypt::token_digest(&hash))
             .set("ip", options.ip)
             .set("user_agent", &options.user_agent);
 

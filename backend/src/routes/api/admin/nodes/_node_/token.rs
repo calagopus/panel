@@ -35,7 +35,7 @@ mod get {
 
         ApiResponse::new_serialized(Response {
             token_id: node.0.token_id,
-            token: state.database.decrypt(node.0.token.clone()).await?,
+            token: node.0.token.decrypt(&state.database).await?,
         })
         .ok()
     }

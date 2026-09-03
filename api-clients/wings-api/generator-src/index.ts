@@ -9,15 +9,13 @@ function rustIdent(name: string): string {
     return ['type', 'override', 'match', 'move', 'ref', 'virtual', 'self', 'use', 'mod'].includes(name) ? `r#${name}` : name
 }
 
-/**
- * Request body properties that must not become fields of the generated `RequestBody` structs.
- *
- * Extensions build these structs with plain struct literals, so every property added to one is a
- * source-breaking change for every extension compiled against an older panel. Properties listed
- * here are sent from somewhere the caller does not have to name: `client` takes the value off the
- * `WingsClient` (`.ignoring()`), `extra` takes it from the `_with` variant of the client method,
- * which uses the same `Default` + `__priv` shape as `Query` and so stays additive forever.
- */
+const handImplementedMethods = new Set([
+    'get /api/tundra',
+    'get /api/tundra/metrics',
+    'post /api/tundra/rotate',
+    'post /api/tundra/sync',
+])
+
 const compatBodyProperties: Record<string, Record<string, 'client' | 'extra'>> = {
     'post /api/backups/{backup}/export': { ignored: 'client' },
     'post /api/servers/{server}/files/chmod': { ignored: 'client' },
@@ -434,7 +432,7 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
             output.write('        }\n')
         }
 
-        {
+        if (!handImplementedMethods.has(`${method} ${path}`)) {
             const modName = snakeCase(path).slice(4)
             const args: string[] = []
 

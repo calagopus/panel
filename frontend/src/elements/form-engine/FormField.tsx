@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
-import Divider from '@/elements/Divider.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
@@ -19,7 +18,8 @@ import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { FieldDef, FieldOption, resolveString } from './types.ts';
 
 interface Props<T extends Record<string, unknown>> {

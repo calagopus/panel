@@ -7,18 +7,20 @@ import downloadNodeLog from '@/api/admin/nodes/system/downloadNodeLog.ts';
 import getNodeLog from '@/api/admin/nodes/system/getNodeLog.ts';
 import getNodeLogs, { NodeLogFile } from '@/api/admin/nodes/system/getNodeLogs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import MonacoEditor from '@/elements/MonacoEditor.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import { stripAnsi } from '@/lib/ansi.ts';
-import { downloadBlob } from '@/lib/download.ts';
+import { downloadBlob } from '@/lib/download/download.ts';
+import { stripAnsi } from '@/lib/format/ansi.ts';
+import { bytesToString } from '@/lib/format/size.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { bytesToString } from '@/lib/size.ts';
-import { useWebsocket } from '@/plugins/useWebsocket.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useWebsocket } from '@/plugins/websocket/useWebsocket.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -26,7 +28,6 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const { t } = useTranslations();
   const { addToast } = useToast();
 
-  const [logs, setLogs] = useState<NodeLogFile[]>([]);
   const [lines, setLines] = useState(1000);
   const [selectedLog, setSelectedLog] = useState<NodeLogFile | null>(null);
   const [content, setContent] = useState<string | null>(null);
@@ -42,15 +43,11 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
     linesRef.current = lines;
   });
 
-  useEffect(() => {
-    getNodeLogs(node.uuid)
-      .then((data) => {
-        setLogs(data.reverse());
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  }, [node.uuid]);
+  const { data: logFiles } = useResource({
+    queryKey: queryKeys.admin.nodes.logs(node.uuid),
+    queryFn: useCallback(() => getNodeLogs(node.uuid), [node.uuid]),
+  });
+  const logs = useMemo(() => (logFiles ? [...logFiles].reverse() : []), [logFiles]);
 
   useEffect(() => {
     setContent(null);

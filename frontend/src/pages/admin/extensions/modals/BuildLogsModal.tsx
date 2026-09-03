@@ -3,10 +3,10 @@ import { AxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import getExtensionBuildLogs from '@/api/admin/extensions/manage/getExtensionBuildLogs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

@@ -16,11 +16,11 @@ import {
 import { useParams } from 'react-router';
 import getNode from '@/api/admin/nodes/getNode.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
-import { isNodeAIO } from '@/lib/node.ts';
+import { isNodeAIO } from '@/lib/domain/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminNodeAllocations from './allocations/AdminNodeAllocations.tsx';
 import AdminNodeBackups from './backups/AdminNodeBackups.tsx';

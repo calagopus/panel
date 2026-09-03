@@ -8,8 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, EventEmittingModel,
-            server::{GetServer, ServerStatus},
+            ByUuid, CreatableModel, EventEmittingModel,
+            server::{GetServer, Server, ServerStatus},
             server_activity::ServerActivity,
             server_backup::{ServerBackup, ServerBackupEvent},
         },
@@ -191,6 +191,8 @@ mod post {
         };
 
         transaction.commit().await?;
+
+        Server::invalidate_cached(&state.database, server.uuid).await;
 
         if let Err(err) = ServerActivity::create(
             &state,

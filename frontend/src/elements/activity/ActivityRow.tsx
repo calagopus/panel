@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
-import Avatar from '@/elements/Avatar.tsx';
 import ActivityInfoButton from '@/elements/activity/ActivityInfoButton.tsx';
-import Code from '@/elements/Code.tsx';
-import Group from '@/elements/Group.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import Avatar from '@/elements/data-display/Avatar.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { activitySchema } from '@/lib/schemas/activity.ts';
 import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
 import { userActivitySchema } from '@/lib/schemas/user/activity.ts';

@@ -1,38 +1,38 @@
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import createDatabaseAgentTemplate from '@/api/admin/database-agent-templates/createDatabaseAgentTemplate.ts';
 import deleteDatabaseAgentTemplate from '@/api/admin/database-agent-templates/deleteDatabaseAgentTemplate.ts';
 import duplicateDatabaseAgentTemplate from '@/api/admin/database-agent-templates/duplicateDatabaseAgentTemplate.ts';
 import updateDatabaseAgentTemplate from '@/api/admin/database-agent-templates/updateDatabaseAgentTemplate.ts';
-import Anchor from '@/elements/Anchor.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
-import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { AdvancedModeToggle, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ResourceDuplicateModal from '@/elements/modals/ResourceDuplicateModal.tsx';
 import ResourceExportMenu from '@/elements/ResourceExportMenu.tsx';
-import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
-import { downloadResourceFile, type ResourceExportFormat } from '@/lib/export.ts';
+import Anchor from '@/elements/typography/Anchor.tsx';
+import { downloadResourceFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminDatabaseAgentTemplateCreateSchema,
   adminDatabaseAgentTemplateSchema,
   adminDatabaseAgentTemplateUpdateSchema,
 } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {
   type DatabaseAgentTemplateFormValues,
   databaseAgentTemplateEmptyFormValues,
   databaseAgentTemplateToFormValues,
-} from './databaseAgentTemplateFormValues.ts';
+  useDatabaseAgentTemplateFormFields,
+} from './databaseAgentTemplateFormValues.tsx';
 
 export default function DatabaseAgentTemplateCreateOrUpdate({
   contextDatabaseAgentTemplate,
@@ -74,13 +74,9 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
     resourceName: t('pages.admin.databaseAgentTemplates.resourceName', {}),
   });
 
-  const hydratedUuidRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (contextDatabaseAgentTemplate && hydratedUuidRef.current !== contextDatabaseAgentTemplate.uuid) {
-      hydratedUuidRef.current = contextDatabaseAgentTemplate.uuid;
-      form.setValues(databaseAgentTemplateToFormValues(contextDatabaseAgentTemplate));
-    }
-  }, [contextDatabaseAgentTemplate]);
+  useHydrateForm(form, contextDatabaseAgentTemplate, databaseAgentTemplateToFormValues, {
+    key: (template) => template.uuid,
+  });
 
   const doExport = (format: ResourceExportFormat) => {
     if (!contextDatabaseAgentTemplate) return;
@@ -95,132 +91,7 @@ export default function DatabaseAgentTemplateCreateOrUpdate({
     addToast(t('pages.admin.databaseAgentTemplates.tabs.general.page.toast.exported', {}), 'success');
   };
 
-  const fields: FieldDef<DatabaseAgentTemplateFormValues>[] = useMemo(
-    () => [
-      { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-      {
-        type: 'select',
-        name: 'type',
-        label: t('common.form.type', {}),
-        required: true,
-        options: Object.entries(databaseAgentTypeLabelMapping).map(([value, label]) => ({ value, label })),
-        props: { disabled: !!contextDatabaseAgentTemplate },
-      },
-      { type: 'textarea', name: 'description', label: t('common.form.description', {}), colSpan: 'full' },
-      {
-        type: 'custom',
-        name: 'dockerImages',
-        colSpan: 'full',
-        render: (f) => (
-          <MultiKeyValueInput
-            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.dockerImages', {})}
-            withAsterisk
-            options={f.getValues().dockerImages ?? {}}
-            onChange={(e) => f.setFieldValue('dockerImages', e)}
-          />
-        ),
-      },
-      {
-        type: 'custom',
-        name: 'env',
-        colSpan: 'full',
-        render: (f) => (
-          <MultiKeyValueInput
-            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.env', {})}
-            options={f.getValues().env ?? {}}
-            onChange={(e) => f.setFieldValue('env', e)}
-          />
-        ),
-      },
-      {
-        type: 'custom',
-        name: 'volumes',
-        colSpan: 'full',
-        render: (f) => (
-          <MultiKeyValueInput
-            label={t('pages.admin.databaseAgentTemplates.tabs.general.page.form.volumes', {})}
-            options={f.getValues().volumes ?? {}}
-            onChange={(e) => f.setFieldValue('volumes', e)}
-          />
-        ),
-      },
-      {
-        type: 'text',
-        name: 'socketPath',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPath', {}),
-        required: true,
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.socketPathDescription', {}),
-        colSpan: 'full',
-      },
-      {
-        type: 'number',
-        name: 'imageUid',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageUid', {}),
-        required: true,
-      },
-      {
-        type: 'number',
-        name: 'imageGid',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.imageGid', {}),
-        required: true,
-      },
-      {
-        type: 'tags',
-        name: 'cmd',
-        label: t('common.form.command', {}),
-        colSpan: 'full',
-        advanced: true,
-      },
-      {
-        type: 'size',
-        name: 'memory',
-        label: t('common.form.memory', {}),
-        required: true,
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryTooltip', {}),
-        mode: 'mb',
-        min: 0,
-      },
-      {
-        type: 'size',
-        name: 'swap',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swap', {}),
-        required: true,
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.swapTooltip', {}),
-        mode: 'mb',
-        min: -1,
-      },
-      {
-        type: 'size',
-        name: 'disk',
-        label: t('common.form.disk', {}),
-        required: true,
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.diskTooltip', {}),
-        mode: 'mb',
-        min: 0,
-      },
-      {
-        type: 'number',
-        name: 'cpu',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpu', {}),
-        required: true,
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.cpuTooltip', {}),
-      },
-      {
-        type: 'number',
-        name: 'ioWeight',
-        label: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeight', {}),
-        description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.ioWeightTooltip', {}),
-        advanced: true,
-      },
-      { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
-    ],
-    [t, contextDatabaseAgentTemplate],
-  );
+  const fields = useDatabaseAgentTemplateFormFields(!!contextDatabaseAgentTemplate);
 
   return (
     <AdminContentContainer

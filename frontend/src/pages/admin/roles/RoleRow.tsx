@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { roleSchema } from '@/lib/schemas/user.ts';
 
 export default function RoleRow({ role }: { role: z.infer<typeof roleSchema> }) {

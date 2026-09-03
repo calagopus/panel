@@ -1,9 +1,6 @@
-import { BoxProps, Box as MantineBox } from '@mantine/core';
-import { ComponentPropsWithoutRef, forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Box = forwardRef<HTMLDivElement, BoxProps & ComponentPropsWithoutRef<'div'>>(({ ...rest }, ref) => {
-  return <MantineBox ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(Box);
+/**
+ * @deprecated `@/elements/Box.tsx` has moved to `@/elements/layout/Box.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/Box.tsx';

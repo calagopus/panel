@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getUserServers from '@/api/admin/users/servers/getUserServers.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminUserServers({ user }: { user: z.infer<typeof adminFullUserSchema> }) {

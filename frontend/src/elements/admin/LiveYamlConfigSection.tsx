@@ -1,14 +1,14 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Group from '@/elements/Group.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Title from '@/elements/Title.tsx';
-import YamlEditor from '@/elements/YamlEditor.tsx';
+import YamlEditor from '@/elements/editors/YamlEditor.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Title from '@/elements/typography/Title.tsx';
 
 export default function LiveYamlConfigSection({
   title,

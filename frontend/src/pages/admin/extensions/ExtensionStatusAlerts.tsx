@@ -1,10 +1,10 @@
 import { faExclamationTriangle, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ExtensionStatus } from '@/api/admin/extensions/manage/getExtensionStatus.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ExtensionStatusAlerts({

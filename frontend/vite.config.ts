@@ -6,6 +6,7 @@ import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { countryFlags } from './vite-plugins/country-flags.ts';
+import { deprecatedPaths } from './vite-plugins/deprecated-paths.ts';
 import { extensionChunkGroups } from './vite-plugins/extension-chunks.ts';
 import { extensionOverrides } from './vite-plugins/extension-overrides.ts';
 import { precompressAssets } from './vite-plugins/precompress.ts';
@@ -23,6 +24,7 @@ const svgCountryFlagsDir = normalizePath(
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    deprecatedPaths(),
     extensionOverrides(),
     react({
       compiler: {
@@ -194,7 +196,7 @@ export default defineConfig({
     alias: [
       {
         find: 'monaco-editor/esm/vs/editor/editor.api.js',
-        replacement: path.resolve(import.meta.dirname, 'src/lib/monacoApiShim.ts'),
+        replacement: path.resolve(import.meta.dirname, 'src/lib/editor/monacoApiShim.ts'),
       },
     ],
   },

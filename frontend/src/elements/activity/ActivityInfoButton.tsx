@@ -2,13 +2,13 @@ import { faInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import HljsCode from '@/elements/editors/HljsCode.tsx';
 import { activitySchema } from '@/lib/schemas/activity.ts';
 import { serverActivitySchema } from '@/lib/schemas/server/activity.ts';
 import { userActivitySchema } from '@/lib/schemas/user/activity.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import Button from '../Button.tsx';
-import HljsCode from '../HljsCode.tsx';
 import { Modal, ModalFooter } from '../modals/Modal.tsx';
 
 const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((mod) => mod.default);

@@ -2,10 +2,10 @@ import { ModalProps } from '@mantine/core';
 import { load } from 'js-yaml';
 import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import YamlEditor from '@/elements/editors/YamlEditor.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import YamlEditor from '@/elements/YamlEditor.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

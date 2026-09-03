@@ -1,25 +1,19 @@
-import { faFileArrowDown, faFileExport, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileExport, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
 import { z } from 'zod';
-import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import Code from '@/elements/typography/Code.tsx';
 import { adminNodeServerBackupSchema } from '@/lib/schemas/admin/nodes.ts';
-import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
-import { bytesToString } from '@/lib/size.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { BackupStatusCells, getBackupState, useBackupDownload } from './backupRowShared.tsx';
 import NodeBackupsDeleteModal from './modals/NodeBackupsDeleteModal.tsx';
 import NodeBackupsExportModal from './modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
@@ -31,24 +25,13 @@ type Props<P> = {
 
 export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage, ...contextMenu }: Props<P>) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
+  const canBackups = useAdminCan('nodes.backups');
+  const { downloadMenuItem } = useBackupDownload(backup.node.uuid, downloadStartedMessage);
 
   const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | null>(null);
 
-  const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-    downloadNodeBackup(backup.node.uuid, backup.uuid, archiveFormat)
-      .then(({ url }) => {
-        addToast(downloadStartedMessage, 'success');
-        window.location.href = url;
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      });
-  };
-
-  const isFailed = !backup.isSuccessful && !!backup.completed;
-  const isDeleting = backup.deletionStatus === 'deleting';
-  const isDeleteFailed = backup.deletionStatus === 'failed';
+  const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
+  const actionsHidden = !backup.completed || isFailed || isDeleting || isDeleteFailed;
 
   return (
     <>
@@ -73,41 +56,24 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
 
       <ContextMenu<P>
         items={[
-          {
-            type: 'action',
-            icon: faFileArrowDown,
-            label: t('common.button.download', {}),
-            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
-            onClick: !backup.isStreaming ? () => doDownload('tar_gz') : undefined,
-            color: 'gray',
-            items: backup.isStreaming
-              ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
-                  type: 'action',
-                  icon: faFileArrowDown,
-                  label: t('common.button.downloadAs', { format: label }),
-                  onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
-                  color: 'gray',
-                }))
-              : [],
-            canAccess: useAdminCan('nodes.backups'),
-          },
+          downloadMenuItem(backup, { hidden: actionsHidden, canAccess: canBackups }),
           {
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
+            hidden: actionsHidden,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
-            canAccess: useAdminCan('nodes.backups'),
+            canAccess: canBackups,
           },
           {
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
+            hidden: actionsHidden,
             onClick: () => setOpenModal('export'),
             color: 'gray',
-            canAccess: useAdminCan('nodes.backups'),
+            canAccess: canBackups,
           },
           {
             type: 'action',
@@ -116,7 +82,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             hidden: !backup.completed || isDeleting,
             onClick: () => setOpenModal('delete'),
             color: 'red',
-            canAccess: useAdminCan('nodes.backups'),
+            canAccess: canBackups,
           },
         ]}
         {...contextMenu}
@@ -163,33 +129,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
               )}
             </TableData>
 
-            {isDeleting || isDeleteFailed ? (
-              <TableData colSpan={3}>
-                {isDeleting ? (
-                  <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
-                ) : (
-                  <Badge color='red'>{t('pages.server.backups.badge.deleteFailed', {})}</Badge>
-                )}
-              </TableData>
-            ) : !isFailed ? (
-              <>
-                <TableData>{backup.checksum && <Code>{backup.checksum}</Code>}</TableData>
-
-                {backup.completed ? (
-                  <TableData>{bytesToString(backup.bytes)}</TableData>
-                ) : (
-                  <TableData colSpan={2}>
-                    <Spinner size={16} />
-                  </TableData>
-                )}
-
-                {backup.completed ? <TableData>{backup.files}</TableData> : null}
-              </>
-            ) : (
-              <TableData colSpan={3}>
-                <Badge color='red'>{t('common.badge.failed', {})}</Badge>
-              </TableData>
-            )}
+            <BackupStatusCells backup={backup} />
 
             <TableData>
               <FormattedTimestamp timestamp={backup.created} />

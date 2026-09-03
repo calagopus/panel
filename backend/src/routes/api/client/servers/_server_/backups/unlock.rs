@@ -7,7 +7,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            server::{GetServer, GetServerActivityLogger, ServerStatus},
+            ByUuid,
+            server::{GetServer, GetServerActivityLogger, Server, ServerStatus},
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -48,6 +49,8 @@ mod post {
                 .with_status(StatusCode::CONFLICT)
                 .ok();
         }
+
+        Server::invalidate_cached(&state.database, server.uuid).await;
 
         activity_logger
             .log("server:backup.unlock-restore", serde_json::json!({}))

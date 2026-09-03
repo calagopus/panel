@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updateServerGroup from '@/api/me/servers/groups/updateServerGroup.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { serverSchema } from '@/lib/schemas/server/server.ts';

@@ -1,5 +1,5 @@
 import { Registry } from 'shared';
-import type { ItemProp } from '@/elements/SubNavigation.tsx';
+import type { ItemProp } from '@/elements/navigation/SubNavigation.tsx';
 
 type ItemInterceptor<P> = (items: ItemProp[], props: P) => void;
 

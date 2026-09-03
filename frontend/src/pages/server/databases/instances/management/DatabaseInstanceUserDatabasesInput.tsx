@@ -1,11 +1,11 @@
 import { Input } from '@mantine/core';
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import Group from '@/elements/Group.tsx';
-import ScrollArea from '@/elements/ScrollArea.tsx';
-import SegmentedControl from '@/elements/SegmentedControl.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import ScrollArea from '@/elements/layout/ScrollArea.tsx';
+import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { serverDatabaseInstanceUserPermissionLabelMapping } from '@/lib/enums.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,

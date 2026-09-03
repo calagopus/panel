@@ -1,22 +1,27 @@
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComponentProps, useEffect, useState } from 'react';
+import { ComponentProps, useState } from 'react';
 import { z } from 'zod';
 import createEggVariable from '@/api/admin/nests/eggs/variables/createEggVariable.ts';
 import deleteEggVariable from '@/api/admin/nests/eggs/variables/deleteEggVariable.ts';
 import updateEggVariable from '@/api/admin/nests/eggs/variables/updateEggVariable.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import Card from '@/elements/Card.tsx';
+import Card from '@/elements/data-display/Card.tsx';
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { adminEggSchema, adminEggVariableSchema, adminEggVariableUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import {
+  eggVariableEmptyFormValues,
+  eggVariableToFormValues,
+} from '@/pages/admin/nests/eggs/variables/eggVariableFormValues.ts';
 import EggVariableDuplicateModal from '@/pages/admin/nests/eggs/variables/modals/EggVariableDuplicateModal.tsx';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -49,38 +54,11 @@ export default function EggVariableContainer({
 
   const form = useFormEngine<VariableFormValues>('admin.nests.eggs.variables', {
     schema: adminEggVariableUpdateSchema.unwrap(),
-    initialValues: {
-      name: '',
-      nameTranslations: {},
-      description: null,
-      descriptionTranslations: {},
-      order: 0,
-      envVariable: '',
-      defaultValue: null,
-      userViewable: true,
-      userEditable: false,
-      secret: false,
-      rules: [],
-    },
+    initialValues: eggVariableEmptyFormValues,
     validateInputOnBlur: true,
   });
 
-  useEffect(() => {
-    if (contextVariable) {
-      form.setValues({
-        name: contextVariable.name,
-        description: contextVariable.description,
-        descriptionTranslations: contextVariable.descriptionTranslations,
-        order: contextVariable.order,
-        envVariable: contextVariable.envVariable,
-        defaultValue: contextVariable.defaultValue,
-        userViewable: contextVariable.userViewable,
-        userEditable: contextVariable.userEditable,
-        secret: contextVariable.isSecret,
-        rules: contextVariable.rules,
-      });
-    }
-  }, [contextVariable]);
+  useHydrateForm(form, contextVariable, eggVariableToFormValues);
 
   const doCreateOrUpdate = () => {
     setLoading(true);

@@ -1,9 +1,6 @@
-import { ThemeIcon as MantineThemeIcon, ThemeIconProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const ThemeIcon = forwardRef<HTMLDivElement, ThemeIconProps>(({ ...rest }, ref) => {
-  return <MantineThemeIcon ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(ThemeIcon);
+/**
+ * @deprecated `@/elements/ThemeIcon.tsx` has moved to `@/elements/data-display/ThemeIcon.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/data-display/ThemeIcon.tsx';

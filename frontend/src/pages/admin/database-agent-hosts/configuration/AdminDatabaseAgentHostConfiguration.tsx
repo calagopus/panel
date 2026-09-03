@@ -8,24 +8,24 @@ import getDatabaseAgentHostToken from '@/api/admin/database-agent-hosts/getDatab
 import testDatabaseAgentHost from '@/api/admin/database-agent-hosts/testDatabaseAgentHost.ts';
 import updateDatabaseAgentHostConfig from '@/api/admin/database-agent-hosts/updateDatabaseAgentHostConfig.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
 import LiveYamlConfigSection from '@/elements/admin/LiveYamlConfigSection.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Divider from '@/elements/Divider.tsx';
-import Group from '@/elements/Group.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import {
   DATABASE_AGENT_DEFAULT_PORT,
   getDatabaseAgentHostConfiguration,
   getDatabaseAgentHostConfigurationCommand,
-} from '@/lib/databaseAgentHost.ts';
+} from '@/lib/domain/databaseAgentHost.ts';
+import { getUrlConnectPort, getUrlPortOr, urlIsMissingPort } from '@/lib/network/url.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
-import { getUrlConnectPort, getUrlPortOr, urlIsMissingPort } from '@/lib/url.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DatabaseAgentHostInitialSetupSection, { VerifyResult } from './DatabaseAgentHostInitialSetupSection.tsx';

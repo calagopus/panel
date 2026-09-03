@@ -1,6 +1,6 @@
 import { useMergedRef } from '@mantine/hooks';
 import { memo, type Ref } from 'react';
-import SelectionArea from '@/elements/SelectionArea.tsx';
+import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
 import FileRow, { FileRowProps } from '@/pages/server/files/list/FileRow.tsx';
 
 interface VirtualFileRowProps extends Omit<FileRowProps, 'dataIndex'> {

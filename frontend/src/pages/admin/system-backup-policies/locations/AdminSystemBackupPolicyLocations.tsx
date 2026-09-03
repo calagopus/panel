@@ -5,20 +5,20 @@ import { z } from 'zod';
 import deleteSystemBackupPolicyLocation from '@/api/admin/system-backup-policies/locations/deleteSystemBackupPolicyLocation.ts';
 import getSystemBackupPolicyLocations from '@/api/admin/system-backup-policies/locations/getSystemBackupPolicyLocations.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Table, { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Table, { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
+import { systemBackupPolicyLocationTableColumns } from '@/lib/tableColumns.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import SystemBackupPolicyAddLocationModal from './modals/SystemBackupPolicyAddLocationModal.tsx';
@@ -27,11 +27,13 @@ function SystemBackupPolicyLocationRow({
   location,
   added,
   systemBackupPolicy,
+  canRemove,
   refetch,
 }: {
   location: z.infer<typeof adminLocationSchema>;
   added: Date;
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
+  canRemove: boolean;
   refetch: () => void;
 }) {
   const { addToast } = useToast();
@@ -74,7 +76,7 @@ function SystemBackupPolicyLocationRow({
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
-            canAccess: useAdminCan('system-backup-policies.update'),
+            canAccess: canRemove,
           },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.locations.contextMenu}
@@ -122,6 +124,7 @@ export default function AdminSystemBackupPolicyLocations({
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
 }) {
   const { t } = useTranslations();
+  const canUpdate = useAdminCan('system-backup-policies.update');
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -146,29 +149,24 @@ export default function AdminSystemBackupPolicyLocations({
       registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.locations.subContainer}
       registryProps={{ systemBackupPolicy }}
       contentRight={
-        <AdminCan action='system-backup-policies.update'>
+        canUpdate ? (
           <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
             {t('common.button.add', {})}
           </Button>
-        </AdminCan>
+        ) : undefined
       }
     >
-      <AdminCan action='system-backup-policies.update'>
+      {canUpdate && (
         <SystemBackupPolicyAddLocationModal
           systemBackupPolicy={systemBackupPolicy}
           refetch={refetch}
           opened={openModal === 'add'}
           onClose={() => setOpenModal(null)}
         />
-      </AdminCan>
+      )}
 
       <Table
-        columns={[
-          t('common.table.columns.id', {}),
-          t('common.table.columns.name', {}),
-          t('common.table.columns.added', {}),
-          '',
-        ]}
+        columns={systemBackupPolicyLocationTableColumns()}
         loading={loading}
         pagination={systemBackupPolicyLocations}
         onPageSelect={setPage}
@@ -180,6 +178,7 @@ export default function AdminSystemBackupPolicyLocations({
             location={systemBackupPolicyLocation.location}
             added={systemBackupPolicyLocation.created}
             systemBackupPolicy={systemBackupPolicy}
+            canRemove={canUpdate}
             refetch={refetch}
           />
         ))}

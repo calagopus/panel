@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parsePaginationFromApi } from '@/lib/api-transform.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
 
 const nestEggMountSchema = z.object({
   nest: adminNestSchema,

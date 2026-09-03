@@ -1,9 +1,9 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Progress from '@/elements/Progress.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
-import { bytesProgressString } from '@/lib/size.ts';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { AggregatedUploadProgress } from '@/stores/uploads.ts';
 

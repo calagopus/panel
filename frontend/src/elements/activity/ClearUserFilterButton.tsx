@@ -1,6 +1,6 @@
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ClearUserFilterButton({ onClick }: { onClick: () => void }) {

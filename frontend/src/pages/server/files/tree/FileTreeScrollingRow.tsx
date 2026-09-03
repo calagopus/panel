@@ -1,7 +1,7 @@
 import { faCheck, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
 import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 import { FileTreeRow as FileTreeRowData } from '@/pages/server/files/tree/fileTreeData.ts';

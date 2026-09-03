@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const instanceSelectorSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('uuids'), uuids: z.array(z.string()) }),

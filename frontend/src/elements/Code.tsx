@@ -1,13 +1,6 @@
-import { CodeProps, Code as MantineCode } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Code = forwardRef<HTMLPreElement, CodeProps>(({ children, className, ...rest }, ref) => {
-  return (
-    <MantineCode ref={ref} className={className} {...rest}>
-      {children}
-    </MantineCode>
-  );
-});
-
-export default makeComponentHookable(Code);
+/**
+ * @deprecated `@/elements/Code.tsx` has moved to `@/elements/typography/Code.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/typography/Code.tsx';

@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { serverScheduleStepActionSchema } from '@/lib/schemas/server/schedules.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ScheduleDynamicParameterRenderer from '../renderers/ScheduleDynamicParameterRenderer.tsx';
 import ConditionRenderer from './ConditionRenderer.tsx';
@@ -331,6 +331,36 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
+          <ForegroundText foreground={action.foreground} />
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+        </Stack>
+      );
+    case 'pull_file':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>
+            {tReact('pages.server.schedules.steps.pullFile.renderer.detail.url', {
+              url: <ScheduleDynamicParameterRenderer value={action.url} />,
+            })}
+          </Text>
+          <Text size='sm'>
+            {tReact('pages.server.schedules.steps.pullFile.renderer.detail.root', {
+              root: <ScheduleDynamicParameterRenderer value={action.root} />,
+            })}
+          </Text>
+          {action.fileName ? (
+            <Text size='sm'>
+              {tReact('pages.server.schedules.steps.pullFile.renderer.detail.fileName', {
+                fileName: <ScheduleDynamicParameterRenderer value={action.fileName} />,
+              })}
+            </Text>
+          ) : (
+            <Text size='xs' c='dimmed'>
+              {t('pages.server.schedules.steps.pullFile.renderer.detail.useHeader', {
+                value: yesNo(action.useHeader),
+              })}
+            </Text>
+          )}
           <ForegroundText foreground={action.foreground} />
           <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
         </Stack>

@@ -1,11 +1,11 @@
 import { faFileText, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRef } from 'react';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ExtensionInstallOverlay from './ExtensionInstallOverlay.tsx';
 import ExtensionStatusAlerts from './ExtensionStatusAlerts.tsx';

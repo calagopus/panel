@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { z } from 'zod';
 import getNodeBackups from '@/api/admin/nodes/backups/getNodeBackups.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeBackupRow from './NodeBackupRow.tsx';
 

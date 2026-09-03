@@ -4,6 +4,7 @@ use futures_util::{StreamExt, TryStreamExt};
 use garde::Validate;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use sha2::Digest;
 use sqlx::{
     Arguments, Postgres, QueryBuilder, Row,
     encode::IsNull,
@@ -280,6 +281,21 @@ pub trait BaseModel: Serialize + DeserializeOwned {
     }
 
     fn map(prefix: Option<&str>, row: &PgRow) -> Result<Self, crate::database::DatabaseError>;
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        Vec::new()
+    }
+}
+
+pub async fn invalidate_cache_keys(
+    database: &crate::database::Database,
+    keys: &[compact_str::CompactString],
+) {
+    for key in keys {
+        if let Err(err) = database.cache.invalidate(key).await {
+            tracing::warn!(key = %key, "failed to invalidate cache entry: {err:#?}");
+        }
+    }
 }
 
 pub trait EventEmittingModel: BaseModel {
@@ -562,6 +578,8 @@ pub trait UpdatableModel: BaseModel + Send + Sync + 'static {
 
         transaction.commit().await?;
 
+        invalidate_cache_keys(&state.database, &self.cache_invalidation_keys()).await;
+
         Ok(())
     }
 }
@@ -695,6 +713,8 @@ pub trait DeletableModel: BaseModel + Send + Sync + 'static {
         }
 
         transaction.commit().await?;
+
+        invalidate_cache_keys(&state.database, &self.cache_invalidation_keys()).await;
 
         Ok(())
     }
@@ -839,6 +859,8 @@ pub trait DuplicableModel: BaseModel + Send + Sync + 'static {
     }
 }
 
+pub const BY_UUID_CACHE_TTL: u64 = 10;
+
 #[async_trait::async_trait]
 pub trait ByUuid: BaseModel {
     async fn by_uuid(
@@ -857,9 +879,11 @@ pub trait ByUuid: BaseModel {
     ) -> Result<Self, anyhow::Error> {
         database
             .cache
-            .cached(&format!("{}::{uuid}", Self::NAME), 10, || {
-                Self::by_uuid(database, uuid)
-            })
+            .cached(
+                &format!("{}::{uuid}", Self::NAME),
+                BY_UUID_CACHE_TTL,
+                || Self::by_uuid(database, uuid),
+            )
             .await
     }
 
@@ -891,15 +915,17 @@ pub trait ByUuid: BaseModel {
     ) -> Result<Option<Self>, anyhow::Error> {
         match Self::by_uuid_cached(database, uuid).await {
             Ok(res) => Ok(Some(res)),
-            Err(err) => {
-                if let Some(DatabaseError::Sqlx(sqlx::Error::RowNotFound)) =
-                    err.downcast_ref::<DatabaseError>()
-                {
-                    Ok(None)
-                } else {
-                    Err(err)
-                }
+            Err(err)
+                if err.chain().any(|err| {
+                    matches!(
+                        err.downcast_ref::<DatabaseError>(),
+                        Some(DatabaseError::Sqlx(sqlx::Error::RowNotFound))
+                    )
+                }) =>
+            {
+                Ok(None)
             }
+            Err(err) => Err(err),
         }
     }
 
@@ -919,6 +945,87 @@ pub trait ByUuid: BaseModel {
                 _model: PhantomData,
             }),
             Err(_) => None,
+        }
+    }
+
+    async fn invalidate_cached(database: &crate::database::Database, uuid: uuid::Uuid) {
+        let key = compact_str::format_compact!("{}::{uuid}", Self::NAME);
+
+        invalidate_cache_keys(database, &[key]).await;
+    }
+}
+
+#[derive(Debug)]
+struct UnresolvedIdentifier;
+
+impl std::fmt::Display for UnresolvedIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("identifier does not resolve to a row")
+    }
+}
+
+impl std::error::Error for UnresolvedIdentifier {}
+
+#[async_trait::async_trait]
+pub trait ResolvableModel: ByUuid + Serialize + DeserializeOwned + Send + Sync {
+    type Fingerprint: Serialize + Send;
+
+    fn uuid(&self) -> uuid::Uuid;
+
+    fn fingerprint(&self) -> Self::Fingerprint;
+
+    async fn resolve(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error>;
+
+    async fn resolve_cached(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error> {
+        let key = format!(
+            "{}::resolve::{}",
+            Self::NAME,
+            hex::encode(sha2::Sha256::digest(identifier.as_bytes()))
+        );
+
+        if let Some(resolution) = database.cache.resolution(&key).await {
+            if let Some(row) = Self::by_uuid_optional_cached(database, resolution.uuid).await?
+                && rmp_serde::to_vec(&row.fingerprint())? == *resolution.fingerprint
+            {
+                return Ok(Some(row));
+            }
+
+            database.cache.remove_resolution(&key).await;
+        }
+
+        let resolution = database
+            .cache
+            .resolve(&key, || async {
+                let Some(row) = Self::resolve(database, identifier).await? else {
+                    return Err(UnresolvedIdentifier.into());
+                };
+
+                database
+                    .cache
+                    .set(
+                        &format!("{}::{}", Self::NAME, row.uuid()),
+                        BY_UUID_CACHE_TTL,
+                        &row,
+                    )
+                    .await?;
+
+                Ok(crate::cache::Resolution {
+                    uuid: row.uuid(),
+                    fingerprint: Arc::new(rmp_serde::to_vec(&row.fingerprint())?),
+                })
+            })
+            .await;
+
+        match resolution {
+            Ok(resolution) => Self::by_uuid_optional_cached(database, resolution.uuid).await,
+            Err(err) if err.chain().any(|err| err.is::<UnresolvedIdentifier>()) => Ok(None),
+            Err(err) => Err(err),
         }
     }
 }

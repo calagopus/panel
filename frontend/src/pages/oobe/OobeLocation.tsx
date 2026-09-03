@@ -11,12 +11,12 @@ import createLocation from '@/api/admin/locations/createLocation.ts';
 import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
-import Button from '@/elements/Button.tsx';
-import Group from '@/elements/Group.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Title from '@/elements/Title.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import {
   adminBackupConfigurationKopiaSchema,

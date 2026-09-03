@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/api/axios.ts';
-import { base64ToArrayBuffer } from '@/lib/transformers.ts';
+import { base64ToArrayBuffer } from '@/lib/serialization/transformers.ts';
 
 function prepareCredentialOptions(options: CredentialRequestOptions): CredentialRequestOptions {
   if (!options.publicKey) {

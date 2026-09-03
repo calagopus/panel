@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { dashboardEmailTwoFactorToggleSchema } from '@/lib/schemas/dashboard.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 const enableEmailTwoFactorResponseSchema = z.object({
   recoveryCodes: z.array(z.string()),

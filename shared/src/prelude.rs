@@ -1,8 +1,8 @@
 pub use crate::models::{
     BaseModel, ByUuid, CreatableModel, CreateListenerList, DeletableModel, DeleteHandlerList,
     DuplicableModel, DuplicateHandlerList, EventEmittingModel, Fetchable, IntoAdminApiObject,
-    IntoApiObject, ListenerPriority, ModelHandlerList, OrderedJson, UpdatableModel,
-    UpdateHandlerList,
+    IntoApiObject, ListenerPriority, ModelHandlerList, OrderedJson, ResolvableModel,
+    UpdatableModel, UpdateHandlerList,
 };
 use futures_util::{StreamExt, TryStreamExt};
 pub use schema_extension_core::finish_extendible;

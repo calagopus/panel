@@ -1,8 +1,9 @@
 import { KeyboardEvent, RefObject } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ServerCan } from '@/elements/Can.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
-import { commandSnippetFilter } from '@/lib/xterm.ts';
+import { commandSnippetFilter } from '@/lib/editor/xterm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -67,9 +68,10 @@ export default function ConsoleCommandInput({
           }}
         />
       </ServerCan>
-      {window.extensionContext.extensionRegistry.pages.server.console.terminalInputRowComponents.map((Component, i) => (
-        <Component key={`console-terminalInputRow-${i}`} />
-      ))}
+      <ExtensionSlot
+        components={window.extensionContext.extensionRegistry.pages.server.console.terminalInputRowComponents}
+        name='console-terminalInputRow'
+      />
     </div>
   );
 }

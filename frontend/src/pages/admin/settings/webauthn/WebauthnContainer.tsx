@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateWebauthnSettings from '@/api/admin/settings/updateWebauthnSettings.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { isIP } from '@/lib/ip.ts';
+import { isIP } from '@/lib/network/ip.ts';
 import { adminSettingsWebauthnSchema } from '@/lib/schemas/admin/settings.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
+import SettingsSaveButton from '../SettingsSaveButton.tsx';
+import { useSettingsSection } from '../useSettingsSection.ts';
+import { useWebauthnFormFields, webauthnEmptyFormValues, webauthnToFormValues } from './webauthnFormValues.tsx';
 
 type WebauthnFormValues = z.infer<typeof adminSettingsWebauthnSchema>;
 
@@ -21,41 +21,24 @@ export default function WebauthnContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
   const webauthn = useAdminStore((state) => state.webauthn);
-  const updateAdminSettings = useAdminStore((state) => state.updateSettings);
-  const settings = useGlobalStore((state) => state.settings);
-  const updateSettings = useGlobalStore((state) => state.updateSettings);
-
-  const [openModal, setOpenModal] = useState<'changeRpId' | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const form = useFormEngine<WebauthnFormValues>('admin.settings.webauthn', {
     schema: adminSettingsWebauthnSchema,
-    initialValues: {
-      enabled: true,
-      allowDiscoverable: true,
-      rpId: '',
-      rpOrigin: '',
-      authenticationTimeoutSeconds: 300,
-      registrationTimeoutSeconds: 300,
-    },
+    initialValues: webauthnEmptyFormValues,
     validateInputOnBlur: true,
   });
 
-  useEffect(() => {
-    form.setValues({ ...webauthn });
-  }, [webauthn]);
+  useHydrateForm(form, webauthn, webauthnToFormValues);
 
-  const doUpdate = () => {
-    setLoading(true);
-    updateWebauthnSettings(adminSettingsWebauthnSchema.parse(form.getValues()))
-      .then(() => {
-        addToast(t('pages.admin.settings.tabs.webauthn.page.toast.updated', {}), 'success');
-        updateSettings({ webauthn: { ...settings.webauthn, ...form.getValues() } });
-        updateAdminSettings({ webauthn: adminSettingsWebauthnSchema.parse(form.getValues()) });
-      })
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
-      .finally(() => setLoading(false));
-  };
+  const { loading, submit, confirmOpened, closeConfirm, confirmSave } = useSettingsSection({
+    form,
+    schema: adminSettingsWebauthnSchema,
+    storeKey: 'webauthn',
+    update: updateWebauthnSettings,
+    successMessage: t('pages.admin.settings.tabs.webauthn.page.toast.updated', {}),
+    syncGlobalKey: 'webauthn',
+    confirmBeforeSave: (values) => values.rpId !== webauthn.rpId,
+  });
 
   const doAutofill = () => {
     if (isIP(window.location.hostname)) {
@@ -68,71 +51,25 @@ export default function WebauthnContainer() {
     });
   };
 
-  const fields: FieldDef<WebauthnFormValues>[] = [
-    {
-      type: 'switch',
-      name: 'enabled',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.enabled', {}),
-      description: t('pages.admin.settings.tabs.webauthn.page.form.enabledDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'allowDiscoverable',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.allowDiscoverable', {}),
-      description: t('pages.admin.settings.tabs.webauthn.page.form.allowDiscoverableDescription', {}),
-    },
-    {
-      type: 'text',
-      name: 'rpId',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.rpId', {}),
-      required: true,
-    },
-    {
-      type: 'text',
-      name: 'rpOrigin',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.rpOrigin', {}),
-      required: true,
-    },
-    {
-      type: 'number',
-      name: 'authenticationTimeoutSeconds',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.authenticationTimeoutSeconds', {}),
-      required: true,
-    },
-    {
-      type: 'number',
-      name: 'registrationTimeoutSeconds',
-      label: t('pages.admin.settings.tabs.webauthn.page.form.registrationTimeoutSeconds', {}),
-      required: true,
-    },
-  ];
+  const fields = useWebauthnFormFields();
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.webauthn.page.title', {})} titleOrder={2}>
       <ConfirmationModal
-        opened={openModal === 'changeRpId'}
-        onClose={() => setOpenModal(null)}
+        opened={confirmOpened}
+        onClose={closeConfirm}
         title={t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.title', {})}
         confirm={t('common.button.update', {})}
-        onConfirmed={() => {
-          doUpdate();
-          setOpenModal(null);
-        }}
+        onConfirmed={confirmSave}
       >
         {t('pages.admin.settings.tabs.webauthn.page.modal.changeRpId.content', {})}
       </ConfirmationModal>
 
-      <form
-        onSubmit={form.onSubmit(() => (form.values.rpId !== webauthn.rpId ? setOpenModal('changeRpId') : doUpdate()))}
-      >
+      <form onSubmit={form.onSubmit(submit)}>
         <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
-          <AdminCan action='settings.update' cantSave>
-            <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              {t('common.button.save', {})}
-            </Button>
-          </AdminCan>
+          <SettingsSaveButton loading={loading} disabled={!form.isValid()} />
           <Button variant='outline' onClick={doAutofill} disabled={loading}>
             {t('pages.admin.settings.tabs.webauthn.page.button.autofill', {})}
           </Button>

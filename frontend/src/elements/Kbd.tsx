@@ -1,9 +1,6 @@
-import { KbdProps, Kbd as MantineKbd } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Kbd = forwardRef<HTMLElement, KbdProps>(({ ...rest }, ref) => {
-  return <MantineKbd ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(Kbd);
+/**
+ * @deprecated `@/elements/Kbd.tsx` has moved to `@/elements/typography/Kbd.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/typography/Kbd.tsx';

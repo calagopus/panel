@@ -1,10 +1,10 @@
 import { Input, Text, UnstyledButton } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { makeComponentHookable } from 'shared';
-import Group from '@/elements/Group.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };

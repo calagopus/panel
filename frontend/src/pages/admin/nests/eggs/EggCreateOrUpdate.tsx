@@ -1,9 +1,9 @@
-import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
-import { dump, load } from 'js-yaml';
+import { dump } from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
@@ -15,32 +15,35 @@ import updateEgg from '@/api/admin/nests/eggs/updateEgg.ts';
 import updateEggUsingImport from '@/api/admin/nests/eggs/updateEggUsingImport.ts';
 import updateEggUsingRepository from '@/api/admin/nests/eggs/updateEggUsingRepository.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
-import { downloadTextFile } from '@/lib/download.ts';
-import { toPterodactylEgg } from '@/lib/pterodactylEgg.ts';
+import { toPterodactylEgg } from '@/lib/domain/pterodactylEgg.ts';
+import { downloadTextFile } from '@/lib/download/download.ts';
+import { parseStructuredDocument } from '@/lib/parseStructuredDocument.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { adminEggSchema, adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { EggExportMenu, EggUpdateFromMenu } from './EggActionsMenu.tsx';
 import EggConfigFilesEditor from './EggConfigFilesEditor.tsx';
-import { eggEmptyFormValues, eggToFormValues } from './eggFormValues.ts';
+import EggStopConfigEditor from './EggStopConfigEditor.tsx';
+import { DEFAULT_EGG_CONFIG_SCRIPT, eggEmptyFormValues, eggToFormValues } from './eggFormValues.ts';
 import EggDuplicateModal from './modals/EggDuplicateModal.tsx';
 import EggMoveModal from './modals/EggMoveModal.tsx';
 import EggUpdateUrlModal from './modals/EggUpdateUrlModal.tsx';
@@ -69,9 +72,6 @@ export default function EggCreateOrUpdate({
     validate: zod4Resolver(adminEggUpdateSchema),
   });
 
-  const [stopType, setStopType] = useState(() => form.getValues().configStop.type);
-  form.watch('configStop.type', ({ value }) => setStopType(value));
-
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
     z.infer<typeof adminEggUpdateSchema>,
     z.infer<typeof adminEggSchema>
@@ -80,11 +80,7 @@ export default function EggCreateOrUpdate({
     createFn: () =>
       createEgg(contextNest.uuid, {
         ...adminEggUpdateSchema.parse(form.getValues()),
-        configScript: {
-          container: 'debian:latest',
-          entrypoint: '/bin/bash',
-          content: '#!/bin/bash\n\n# Install script content goes here\n',
-        },
+        configScript: DEFAULT_EGG_CONFIG_SCRIPT,
       }),
     updateFn: contextEgg
       ? () => updateEgg(contextNest.uuid, contextEgg.uuid, adminEggUpdateSchema.parse(form.getValues()))
@@ -95,11 +91,7 @@ export default function EggCreateOrUpdate({
     resourceName: t('pages.admin.nests.tabs.eggs.page.resourceName', {}),
   });
 
-  useEffect(() => {
-    if (contextEgg) {
-      form.setValues(eggToFormValues(contextEgg));
-    }
-  }, [contextEgg]);
+  useHydrateForm(form, contextEgg, eggToFormValues);
 
   const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
     queryKey: queryKeys.admin.eggRepositories.all(),
@@ -109,7 +101,7 @@ export default function EggCreateOrUpdate({
   const eggRepositoryEggs = useSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
     queryKey: selectedEggRepositoryUuid
       ? queryKeys.admin.eggRepositories.eggs(selectedEggRepositoryUuid)
-      : ['admin', 'egg-repository-eggs'],
+      : queryKeys.admin.eggRepositories.eggsUnscoped(),
     fetcher: (search) =>
       selectedEggRepositoryUuid
         ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)
@@ -146,10 +138,7 @@ export default function EggCreateOrUpdate({
 
     getEgg(contextNest.uuid, contextEgg.uuid)
       .then((egg) => {
-        form.setValues({
-          ...egg,
-          eggRepositoryEggUuid: egg.eggRepositoryEgg?.uuid || null,
-        });
+        form.setValues(eggToFormValues(egg));
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.updated', {}), 'success');
       })
       .catch((msg) => {
@@ -180,13 +169,7 @@ export default function EggCreateOrUpdate({
 
     let data: object;
     try {
-      const text = await file.text().then((t) => t.trim());
-
-      if (text.startsWith('{')) {
-        data = JSON.parse(text);
-      } else {
-        data = load(text) as object;
-      }
+      data = parseStructuredDocument(await file.text()) as object;
     } catch (err) {
       addToast(t('pages.admin.nests.tabs.eggs.page.toast.parseFailed', { error: String(err) }), 'error');
       setLoading(false);
@@ -216,7 +199,7 @@ export default function EggCreateOrUpdate({
           opened={openModal === 'move'}
           onClose={() => setOpenModal(null)}
           nest={contextNest}
-          egg={contextEgg}
+          eggs={[contextEgg]}
         />
       )}
       {contextEgg && (
@@ -336,68 +319,7 @@ export default function EggCreateOrUpdate({
             </Group>
           </TitleCard>
 
-          <TitleCard
-            title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.stopConfiguration', {})}
-            icon={<FontAwesomeIcon icon={faStop} size='sm' />}
-          >
-            <Group grow>
-              <Select
-                withAsterisk
-                label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopType', {})}
-                data={[
-                  {
-                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.command', {}),
-                    value: 'command',
-                  },
-                  {
-                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.signal', {}),
-                    value: 'signal',
-                  },
-                  {
-                    label: t('pages.admin.nests.tabs.eggs.page.tabs.general.page.enum.stopType.docker', {}),
-                    value: 'docker',
-                  },
-                ]}
-                key={form.key('configStop.type')}
-                {...form.getInputProps('configStop.type')}
-                onChange={(value) => {
-                  if (!value) return;
-                  form.setFieldValue('configStop.type', value as 'command' | 'signal' | 'docker');
-
-                  if (
-                    value === 'signal' &&
-                    !['SIGABRT', 'SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGKILL'].includes(
-                      form.getValues().configStop.value ?? '',
-                    )
-                  ) {
-                    form.setFieldValue('configStop.value', 'SIGKILL');
-                  }
-                }}
-              />
-              {stopType === 'command' ? (
-                <TextInput
-                  withAsterisk
-                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopCommand', {})}
-                  key={form.key('configStop.value')}
-                  {...form.getInputProps('configStop.value')}
-                />
-              ) : stopType === 'signal' ? (
-                <Select
-                  withAsterisk
-                  label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.stopSignal', {})}
-                  data={[
-                    { label: 'SIGABRT', value: 'SIGABRT' },
-                    { label: 'SIGINT (^C)', value: 'SIGINT' },
-                    { label: 'SIGTERM', value: 'SIGTERM' },
-                    { label: 'SIGQUIT', value: 'SIGQUIT' },
-                    { label: 'SIGKILL', value: 'SIGKILL' },
-                  ]}
-                  key={form.key('configStop.value')}
-                  {...form.getInputProps('configStop.value')}
-                />
-              ) : null}
-            </Group>
-          </TitleCard>
+          <EggStopConfigEditor form={form} />
 
           <EggConfigFilesEditor form={form} />
 

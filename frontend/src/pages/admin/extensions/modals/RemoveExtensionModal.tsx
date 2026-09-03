@@ -1,10 +1,10 @@
 import { ModalProps } from '@mantine/core';
 import { useState } from 'react';
 import { z } from 'zod';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { adminBackendExtensionSchema } from '@/lib/schemas/admin/backendExtension.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

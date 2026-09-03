@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { memo } from 'react';
 import { z } from 'zod';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import {
   isListenableAudio,
   isOpenableFile,

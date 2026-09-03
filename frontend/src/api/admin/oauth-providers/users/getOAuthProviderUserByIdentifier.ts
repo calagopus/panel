@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { adminOAuthUserLinkSchema } from '@/lib/schemas/admin/oauthProviders.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   oauthProviderUuid: string,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { adminEggEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const adminEggConfigScriptSchema = z.object({
   container: z.string().min(2).max(255),

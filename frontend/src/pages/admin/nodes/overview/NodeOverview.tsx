@@ -13,27 +13,26 @@ import getNodeCapacity from '@/api/admin/nodes/getNodeCapacity.ts';
 import getNodeSystemOverview from '@/api/admin/nodes/system/getNodeSystemOverview.ts';
 import CapacityCard from '@/elements/admin/CapacityCard.tsx';
 import InfoRow from '@/elements/admin/InfoRow.tsx';
-import Badge from '@/elements/Badge.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { formatDateTime } from '@/lib/format/time.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { formatDateTime } from '@/lib/time.ts';
-import { parseVersion } from '@/lib/version.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useNodeUpdateAvailable } from '@/plugins/nodes/useNodeVersion.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useAdminStore } from '@/stores/admin.tsx';
 
 type Node = z.infer<typeof adminNodeSchema>;
 
 export default function NodeOverview({ node }: { node: Node }) {
   const { t } = useTranslations();
-  const { updateInformation } = useAdminStore();
 
   const { data: capacity } = useResource({
     queryKey: queryKeys.admin.nodes.capacity(node.uuid),
@@ -47,10 +46,7 @@ export default function NodeOverview({ node }: { node: Node }) {
     silent: true,
   });
 
-  const hasUpdate =
-    overview && updateInformation
-      ? parseVersion(updateInformation.latestWingsVersion).isNewerThan(overview.version)
-      : false;
+  const hasUpdate = useNodeUpdateAvailable(overview?.version);
 
   return (
     <AdminSubContentContainer title={t('pages.admin.nodes.tabs.overview.page.title', {})} titleOrder={2}>
@@ -124,11 +120,14 @@ export default function NodeOverview({ node }: { node: Node }) {
               <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.createdAt', {})}>
                 <Text size='sm'>{formatDateTime(node.created)}</Text>
               </InfoRow>
-              {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.nodeDetails.appendedComponents.map(
-                (Component, index) => (
-                  <Component key={`node-details-ext-${index}`} node={node} />
-                ),
-              )}
+              <ExtensionSlot
+                components={
+                  window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.nodeDetails
+                    .appendedComponents
+                }
+                name='node-details-ext'
+                props={{ node }}
+              />
             </Stack>
           </TitleCard>
 
@@ -185,11 +184,13 @@ export default function NodeOverview({ node }: { node: Node }) {
                 </InfoRow>
               </Stack>
             )}
-            {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.systemInfo.appendedComponents.map(
-              (Component, index) => (
-                <Component key={`system-info-ext-${index}`} node={node} />
-              ),
-            )}
+            <ExtensionSlot
+              components={
+                window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.systemInfo.appendedComponents
+              }
+              name='system-info-ext'
+              props={{ node }}
+            />
           </TitleCard>
         </SimpleGrid>
 
@@ -264,19 +265,23 @@ export default function NodeOverview({ node }: { node: Node }) {
                   cores: (capacity.allocated.cpu / 100).toFixed(2),
                 })}
               />
-              {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.resources.appendedComponents.map(
-                (Component, index) => (
-                  <Component key={`resources-ext-${index}`} node={node} />
-                ),
-              )}
+              <ExtensionSlot
+                components={
+                  window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.resources.appendedComponents
+                }
+                name='resources-ext'
+                props={{ node }}
+              />
             </div>
           )}
         </TitleCard>
-        {window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.appendedCards.appendedComponents.map(
-          (Component, index) => (
-            <Component key={`overview-card-ext-${index}`} node={node} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.admin.nodes.view.overview.appendedCards.appendedComponents
+          }
+          name='overview-card-ext'
+          props={{ node }}
+        />
       </Stack>
     </AdminSubContentContainer>
   );

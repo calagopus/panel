@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { z } from 'zod';
 import getServerBackups from '@/api/admin/servers/backups/getServerBackups.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
+import { serverBackupTableColumns } from '@/lib/tableColumns.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminServerBackupRow from './AdminServerBackupRow.tsx';
 
-export default function AdminServerBackups({ server }: { server: z.infer<typeof adminServerSchema> }) {
+export default function AdminServerBackups({ server }: { server: AdminServer }) {
   const { t } = useTranslations();
   const [showPartiallyDetachedServerBackups, setShowPartiallyDetachedServerBackups] = useState(false);
 
@@ -45,15 +45,7 @@ export default function AdminServerBackups({ server }: { server: z.infer<typeof 
       registryProps={{ server }}
     >
       <Table
-        columns={[
-          t('common.table.columns.name', {}),
-          t('common.table.columns.node', {}),
-          t('common.table.columns.checksum', {}),
-          t('common.table.columns.size', {}),
-          t('common.table.columns.files', {}),
-          t('common.table.columns.created', {}),
-          '',
-        ]}
+        columns={serverBackupTableColumns()}
         loading={loading}
         error={error}
         pagination={serverBackups}

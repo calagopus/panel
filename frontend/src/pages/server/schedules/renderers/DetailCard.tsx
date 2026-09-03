@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import Card from '@/elements/Card.tsx';
-import ThemeIcon from '@/elements/ThemeIcon.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
 
 interface DetailCardProps {
   icon: React.ReactNode;

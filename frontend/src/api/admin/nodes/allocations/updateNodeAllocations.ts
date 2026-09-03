@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { adminNodeAllocationSelectorSchema } from '@/lib/schemas/admin/nodes.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const updateNodeAllocationsSchema = z.object({
   selector: adminNodeAllocationSelectorSchema,

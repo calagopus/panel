@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminDatabaseAgentTemplateUpdateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   templateUuid: string,

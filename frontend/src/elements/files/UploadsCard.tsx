@@ -4,16 +4,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
-import CloseButton from '@/elements/CloseButton.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import CloseButton from '@/elements/buttons/CloseButton.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import RingProgress from '@/elements/feedback/RingProgress.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Progress from '@/elements/Progress.tsx';
-import RingProgress from '@/elements/RingProgress.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   cancelAllUploads,
   cancelFileUpload,
@@ -26,7 +26,7 @@ import {
   resumeUpload,
   setUploadManagerExternals,
 } from '@/lib/files/uploadManager.ts';
-import { bytesProgressString } from '@/lib/size.ts';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {

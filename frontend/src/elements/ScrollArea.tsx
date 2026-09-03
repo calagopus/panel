@@ -1,9 +1,6 @@
-import { ScrollArea as MantineScrollArea, ScrollAreaProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ ...rest }, ref) => {
-  return <MantineScrollArea ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(ScrollArea);
+/**
+ * @deprecated `@/elements/ScrollArea.tsx` has moved to `@/elements/layout/ScrollArea.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/ScrollArea.tsx';

@@ -1,11 +1,6 @@
-import { UnstyledButton as MantineUnstyledButton, UnstyledButtonProps } from '@mantine/core';
-import { ComponentPropsWithoutRef, forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const UnstyledButton = forwardRef<HTMLButtonElement, UnstyledButtonProps & ComponentPropsWithoutRef<'button'>>(
-  ({ ...rest }, ref) => {
-    return <MantineUnstyledButton ref={ref} {...rest} />;
-  },
-);
-
-export default makeComponentHookable(UnstyledButton);
+/**
+ * @deprecated `@/elements/UnstyledButton.tsx` has moved to `@/elements/buttons/UnstyledButton.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/buttons/UnstyledButton.tsx';

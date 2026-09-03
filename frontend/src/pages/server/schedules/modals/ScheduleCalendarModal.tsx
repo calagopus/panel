@@ -7,13 +7,13 @@ import cronstrue from 'cronstrue/i18n';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

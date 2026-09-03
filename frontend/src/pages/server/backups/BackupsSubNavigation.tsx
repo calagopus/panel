@@ -2,7 +2,7 @@ import { faBoxArchive, faClockRotateLeft } from '@fortawesome/free-solid-svg-ico
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router';
 import getSystemBackups from '@/api/server/backups/getSystemBackups.ts';
-import SubNavigation from '@/elements/SubNavigation.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';

@@ -7,7 +7,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            server::{GetServer, GetServerActivityLogger},
+            ByUuid,
+            server::{GetServer, GetServerActivityLogger, Server},
             user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
@@ -72,6 +73,8 @@ mod post {
                 Ok(_) => {}
                 Err(wings_api::client::ApiHttpError::Http(StatusCode::CONFLICT, _)) => {
                     server.set_status(state.database.write(), None).await?;
+
+                    Server::invalidate_cached(&state.database, server.uuid).await;
 
                     return ApiResponse::new_serialized(Response {}).ok();
                 }

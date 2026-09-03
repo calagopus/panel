@@ -1,39 +1,26 @@
-import { faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UseFormReturnType } from '@mantine/form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import createEggRepository from '@/api/admin/egg-repositories/createEggRepository.ts';
 import deleteEggRepository from '@/api/admin/egg-repositories/deleteEggRepository.ts';
 import syncEggRepository from '@/api/admin/egg-repositories/syncEggRepository.ts';
 import updateEggRepository from '@/api/admin/egg-repositories/updateEggRepository.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
-import Select from '@/elements/input/Select.tsx';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { eggRepositoryCredentialTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import {
-  adminEggRepositoryCredentialsPasswordSchema,
-  adminEggRepositoryCredentialsPrivateKeySchema,
-  adminEggRepositorySchema,
-  adminEggRepositoryUpdateSchema,
-} from '@/lib/schemas/admin/eggRepositories.ts';
+import { adminEggRepositorySchema, adminEggRepositoryUpdateSchema } from '@/lib/schemas/admin/eggRepositories.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useHostAction } from '@/plugins/useHostAction.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {
-  type AdminEggRepositoryCredentialType,
-  adminEggRepositoryCredentialsDefaults,
   eggRepositoryEmptyFormValues,
   eggRepositoryToFormValues,
-} from './eggRepositoryFormValues.ts';
-import CredentialPassword from './forms/CredentialPassword.tsx';
-import CredentialPrivateKey from './forms/CredentialPrivateKey.tsx';
+  useEggRepositoryFormFields,
+} from './eggRepositoryFormValues.tsx';
 
 type EggRepositoryFormValues = z.infer<typeof adminEggRepositoryUpdateSchema>;
 
@@ -69,79 +56,14 @@ export default function EggRepositoryCreateOrUpdate({
 
   const runRepoAction = useHostAction(contextEggRepository?.uuid, setLoading);
 
-  useEffect(() => {
-    if (contextEggRepository) {
-      form.setValues(eggRepositoryToFormValues(contextEggRepository));
-    }
-  }, [contextEggRepository]);
+  useHydrateForm(form, contextEggRepository, eggRepositoryToFormValues);
 
   const doSync = () =>
     runRepoAction(syncEggRepository, (found) =>
       t('pages.admin.eggRepositories.tabs.general.page.toast.synced', { eggs: tItem('egg', found) }),
     );
 
-  const fields: FieldDef<EggRepositoryFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'text',
-      name: 'gitRepository',
-      label: t('pages.admin.eggRepositories.tabs.general.page.form.gitRepository', {}),
-      required: true,
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
-    {
-      type: 'custom',
-      name: 'credentials',
-      colSpan: 'full',
-      render: (f) => (
-        <CollapsibleSection
-          icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
-          enabled={!!f.values.credentials}
-          onToggle={(enabled) =>
-            f.setValues({
-              credentials: enabled
-                ? (contextEggRepository?.credentials ?? adminEggRepositoryCredentialsDefaults.none)
-                : undefined,
-            })
-          }
-          title={t('pages.admin.eggRepositories.tabs.general.page.form.credentials', {})}
-        >
-          <Select
-            withAsterisk
-            label={t('pages.admin.eggRepositories.tabs.general.page.form.credentialType', {})}
-            data={mappingToSelectData(eggRepositoryCredentialTypeLabelMapping)}
-            key={f.key('credentials.type')}
-            {...f.getInputProps('credentials.type')}
-            onChange={(value) => {
-              if (value && value !== f.values.credentials?.type) {
-                f.setValues({
-                  credentials: adminEggRepositoryCredentialsDefaults[value as AdminEggRepositoryCredentialType],
-                });
-              }
-            }}
-          />
-
-          {f.values.credentials?.type === 'password' ? (
-            <CredentialPassword
-              form={
-                f as UseFormReturnType<{
-                  credentials: z.infer<typeof adminEggRepositoryCredentialsPasswordSchema>;
-                }>
-              }
-            />
-          ) : f.values.credentials?.type === 'private_key' ? (
-            <CredentialPrivateKey
-              form={
-                f as UseFormReturnType<{
-                  credentials: z.infer<typeof adminEggRepositoryCredentialsPrivateKeySchema>;
-                }>
-              }
-            />
-          ) : null}
-        </CollapsibleSection>
-      ),
-    },
-  ];
+  const fields = useEggRepositoryFormFields(contextEggRepository);
 
   return (
     <AdminContentContainer

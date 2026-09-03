@@ -2,10 +2,10 @@ import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getAnnouncement from '@/api/admin/announcements/getAnnouncement.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AnnouncementCreateOrUpdate from './AnnouncementCreateOrUpdate.tsx';
 

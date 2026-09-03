@@ -6,7 +6,12 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{EventEmittingModel, node::GetNode, server::GetServer, server_backup::BackupDisk},
+        models::{
+            ByUuid, EventEmittingModel,
+            node::GetNode,
+            server::{GetServer, Server, ServerEvent},
+            server_backup::BackupDisk,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use std::collections::BTreeMap;
@@ -147,6 +152,8 @@ mod post {
 
         transaction.commit().await?;
 
+        Server::invalidate_cached(&state.database, server.uuid).await;
+
         if on_mesh {
             shared::tunnel::poke_nodes(&state.database).await;
         }
@@ -164,9 +171,9 @@ mod post {
         }
 
         if let Ok(destination_node) = destination_node.fetch_cached(&state.database).await {
-            shared::models::server::Server::get_event_emitter().emit(
+            Server::get_event_emitter().emit(
                 state.0,
-                shared::models::server::ServerEvent::TransferCompleted {
+                ServerEvent::TransferCompleted {
                     server: Box::new(server.0),
                     destination_node: Box::new(destination_node),
                     successful: true,

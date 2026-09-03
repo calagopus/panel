@@ -2,14 +2,14 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
-import Button from '@/elements/Button.tsx';
-import Divider from '@/elements/Divider.tsx';
-import Group from '@/elements/Group.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AssignToVariableInput from '@/elements/input/AssignToVariableInput.tsx';
 import PortRangeField from '@/elements/input/PortRangeField.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { eggConfigurationDeploymentDefaultMapping } from '@/lib/enums.ts';
 import {
   adminEggConfigurationUpdateSchema,
@@ -17,7 +17,7 @@ import {
 } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DeploymentItemEditor from './DeploymentItemEditor.tsx';
-import { defaultEggConfigurationPrimaryAllocation } from './eggConfigurationFormValues.ts';
+import { defaultEggConfigurationPrimaryAllocation } from './eggConfigurationFormValues.tsx';
 
 type EggConfigFormValues = z.infer<typeof adminEggConfigurationUpdateSchema>;
 

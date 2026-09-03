@@ -1,15 +1,14 @@
-import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import { adminServerSchema, adminServerServerDatabaseSchema } from '@/lib/schemas/admin/servers.ts';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import { AdminServer, AdminServerServerDatabase } from '@/lib/schemas/admin/servers.ts';
 import DatabaseTableRow from '@/pages/admin/database-hosts/databases/DatabaseTableRow.tsx';
 
 export default function AdminServerDatabaseRow({
   server,
   database,
 }: {
-  server: z.infer<typeof adminServerSchema>;
-  database: z.infer<typeof adminServerServerDatabaseSchema>;
+  server: AdminServer;
+  database: AdminServerServerDatabase;
 }) {
   return (
     <DatabaseTableRow

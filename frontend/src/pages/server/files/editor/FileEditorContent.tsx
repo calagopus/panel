@@ -3,9 +3,9 @@ import { type EditorChangeEvent } from '@pierre/diffs/edit';
 import { RefObject } from 'react';
 import { FileEditorActionContext } from 'shared/src/registries/pages/server/files';
 import { useShallow } from 'zustand/react/shallow';
-import MonacoEditor from '@/elements/MonacoEditor.tsx';
-import PierreEditor, { type PierreEditorHandle } from '@/elements/PierreEditor.tsx';
-import { registerHoconLanguage, registerTomlLanguage } from '@/lib/monaco.ts';
+import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
+import PierreEditor, { type PierreEditorHandle } from '@/elements/editors/PierreEditor.tsx';
+import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { FileAudioPreview, FileImagePreview } from './FileMediaPreview.tsx';
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { adminServerFeatureLimitsSchema, adminServerLimitsSchema } from '@/lib/schemas/admin/servers.ts';
-import { nullableString } from '../transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 import { hostnameSchema } from './generic.ts';
 
 export const oobeStepKey = z

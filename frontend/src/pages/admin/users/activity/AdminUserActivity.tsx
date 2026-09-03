@@ -2,11 +2,11 @@ import { z } from 'zod';
 import getUserActivity from '@/api/admin/users/getUserActivity.ts';
 import ActivityRow from '@/elements/activity/ActivityRow.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { activityColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminUserActivity({ user }: { user: z.infer<typeof adminFullUserSchema> }) {

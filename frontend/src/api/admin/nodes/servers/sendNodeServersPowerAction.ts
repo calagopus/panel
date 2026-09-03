@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { serializeForApi } from '@/lib/api-transform.ts';
 import { serverSelectorSchema } from '@/lib/schemas/generic.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
+import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 const sendNodeServersPowerActionSchema = z.object({
   servers: serverSelectorSchema,

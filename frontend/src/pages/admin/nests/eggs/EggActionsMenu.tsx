@@ -1,8 +1,8 @@
 import { faChevronDown, faFileDownload, faLink, faRefresh, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, useRef } from 'react';
-import Button from '@/elements/Button.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export function EggUpdateFromMenu({

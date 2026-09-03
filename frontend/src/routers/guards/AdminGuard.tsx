@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router';
-import { isAdmin } from '@/lib/permissions.ts';
+import { isAdmin } from '@/lib/auth/permissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 
 export default function AdminGuard() {

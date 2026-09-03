@@ -1,5 +1,5 @@
 import { createSearchParams, NavLink } from 'react-router';
-import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
+import Breadcrumbs from '@/elements/data-display/Breadcrumbs.tsx';
 import { pathSegments } from '@/lib/path.ts';
 
 const crumbClassName = 'text-(--mantine-color-anchor) hover:underline';

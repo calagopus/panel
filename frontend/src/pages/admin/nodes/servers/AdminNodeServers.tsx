@@ -3,43 +3,49 @@ import { z } from 'zod';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
 import sendNodeServersPowerAction from '@/api/admin/nodes/servers/sendNodeServersPowerAction.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
+import Table from '@/elements/data-display/Table.tsx';
+import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import SelectionArea from '@/elements/SelectionArea.tsx';
-import Table from '@/elements/Table.tsx';
-import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
-import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
+import { AdminNode } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { serverSelectorSchema } from '@/lib/schemas/generic.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
-import { useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
-import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useAdminTableSelection } from '@/plugins/selection/useAdminTableSelection.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BulkActionBar from './BulkActionBar.tsx';
 import ServersTransferModal from './modals/ServersTransferModal.tsx';
+import ServerPowerButtons from './ServerPowerButtons.tsx';
 
-export default function AdminNodeServers({ node }: { node: z.infer<typeof adminNodeSchema> }) {
+type PowerAction = z.infer<typeof serverPowerAction>;
+
+const ACTION_PAST_TENSE: Record<PowerAction, 'started' | 'stopped' | 'restarted' | 'killed'> = {
+  start: 'started',
+  stop: 'stopped',
+  restart: 'restarted',
+  kill: 'killed',
+};
+
+export default function AdminNodeServers({ node }: { node: AdminNode }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
-  const [selectedServers, setSelectedServers] = useState(
-    new ObjectSet<z.infer<typeof adminServerSchema>, 'uuid'>('uuid'),
-  );
+
   const [sKeyPressed, setSKeyPressed] = useState(false);
-  const [bulkActionLoading, setBulkActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
-  const [allActionLoading, setAllActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
+  const [bulkActionLoading, setBulkActionLoading] = useState<PowerAction | null>(null);
+  const [allActionLoading, setAllActionLoading] = useState<PowerAction | null>(null);
   const [openModal, setOpenModal] = useState<'transfer' | null>(null);
-  const [confirmPowerAction, setConfirmPowerAction] = useState<{
-    action: z.infer<typeof serverPowerAction>;
-    scope: 'bulk' | 'all';
-  } | null>(null);
+  const [confirmPowerAction, setConfirmPowerAction] = useState<{ action: PowerAction; scope: 'bulk' | 'all' } | null>(
+    null,
+  );
 
   const {
     data: nodeServers,
@@ -53,11 +59,12 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     fetcher: (page, search) => getNodeServers(node.uuid, page, search),
   });
 
-  const { onSelectedStart, onSelected } = useSelectionArea({
-    identify: (server) => server.uuid,
-    getSelected: () => selectedServers.values(),
-    setSelected: (servers) => setSelectedServers(new ObjectSet('uuid', servers)),
-  });
+  const {
+    selected: selectedServers,
+    clear: clearSelectedServers,
+    toggle: toggleServer,
+    selectionAreaProps,
+  } = useAdminTableSelection<z.infer<typeof adminServerSchema>>({ items: nodeServers?.data });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,50 +91,30 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     };
   }, []);
 
-  const handleServerSelectionChange = (server: z.infer<typeof adminServerSchema>, selected: boolean) => {
-    setSelectedServers((prev) => {
-      const newSet = prev.clone();
-      if (selected) {
-        newSet.add(server);
-      } else {
-        newSet.delete(server);
-      }
-      return newSet;
-    });
-  };
-
   const handleServerClick = (server: z.infer<typeof adminServerSchema>, event: React.MouseEvent) => {
     if (sKeyPressed || event.ctrlKey || event.metaKey) {
       event.preventDefault();
       event.stopPropagation();
-      handleServerSelectionChange(server, !selectedServers.has(server));
+      toggleServer(server, !selectedServers.has(server));
     }
   };
 
-  const handleBulkPowerAction = async (action: z.infer<typeof serverPowerAction>) => {
-    setBulkActionLoading(action);
+  const runPowerAction = (
+    selector: z.infer<typeof serverSelectorSchema>,
+    total: number,
+    setLoading: (action: PowerAction | null) => void,
+    action: PowerAction,
+  ) => {
+    setLoading(action);
 
-    sendNodeServersPowerAction(node.uuid, { type: 'uuids', uuids: selectedServers.keys() }, action)
+    sendNodeServersPowerAction(node.uuid, selector, action)
       .then((successful) => {
-        const failed = selectedServers.size - successful;
-
-        const actionPastTenseMap: Record<
-          z.infer<typeof serverPowerAction>,
-          'started' | 'stopped' | 'restarted' | 'killed'
-        > = {
-          start: 'started',
-          stop: 'stopped',
-          restart: 'restarted',
-          kill: 'killed',
-        };
-        const actionPastTense = actionPastTenseMap[action];
+        const failed = total - successful;
+        const pastTense = t(`common.enum.bulkActionServerAction.${ACTION_PAST_TENSE[action]}`, {});
 
         if (failed === 0) {
           addToast(
-            t('pages.account.home.bulkActions.success', {
-              servers: tItem('server', successful),
-              action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
-            }),
+            t('pages.account.home.bulkActions.success', { servers: tItem('server', successful), action: pastTense }),
             'success',
           );
         } else {
@@ -135,69 +122,24 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
             t('pages.account.home.bulkActions.partial', {
               successfulServers: tItem('server', successful),
               failedServers: tItem('server', failed),
-              action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
+              action: pastTense,
             }),
             'warning',
           );
         }
       })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
+      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
       .finally(() => {
-        setBulkActionLoading(null);
-        setSelectedServers(new ObjectSet('uuid'));
-      });
-  };
-
-  const handleAllPowerAction = async (action: z.infer<typeof serverPowerAction>) => {
-    setAllActionLoading(action);
-
-    sendNodeServersPowerAction(node.uuid, { type: 'all' }, action)
-      .then((successful) => {
-        const failed = (nodeServers?.total ?? 0) - successful;
-
-        const actionPastTenseMap: Record<
-          z.infer<typeof serverPowerAction>,
-          'started' | 'stopped' | 'restarted' | 'killed'
-        > = {
-          start: 'started',
-          stop: 'stopped',
-          restart: 'restarted',
-          kill: 'killed',
-        };
-        const actionPastTense = actionPastTenseMap[action];
-
-        if (failed === 0) {
-          addToast(
-            t('pages.account.home.bulkActions.success', {
-              servers: tItem('server', successful),
-              action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
-            }),
-            'success',
-          );
-        } else {
-          addToast(
-            t('pages.account.home.bulkActions.partial', {
-              successfulServers: tItem('server', successful),
-              failedServers: tItem('server', failed),
-              action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
-            }),
-            'warning',
-          );
+        setLoading(null);
+        if (selector.type === 'uuids') {
+          clearSelectedServers();
         }
-      })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      })
-      .finally(() => {
-        setAllActionLoading(null);
       });
   };
 
   const confirmCount = confirmPowerAction?.scope === 'all' ? (nodeServers?.total ?? 0) : selectedServers.size;
 
-  const onConfirmPowerAction = async () => {
+  const onConfirmPowerAction = () => {
     if (!confirmPowerAction) {
       return;
     }
@@ -206,26 +148,16 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
     setConfirmPowerAction(null);
 
     if (scope === 'all') {
-      await handleAllPowerAction(action);
+      runPowerAction({ type: 'all' }, nodeServers?.total ?? 0, setAllActionLoading, action);
     } else {
-      await handleBulkPowerAction(action);
+      runPowerAction(
+        { type: 'uuids', uuids: selectedServers.keys() },
+        selectedServers.size,
+        setBulkActionLoading,
+        action,
+      );
     }
   };
-
-  useKeyboardShortcuts({
-    shortcuts: [
-      {
-        key: 'a',
-        modifiers: ['ctrlOrMeta'],
-        callback: () => setSelectedServers(new ObjectSet('uuid', nodeServers?.data ?? [])),
-      },
-      {
-        key: 'Escape',
-        callback: () => setSelectedServers(new ObjectSet('uuid')),
-      },
-    ],
-    deps: [nodeServers?.data],
-  });
 
   const columns = ['', ...serverTableColumns()];
 
@@ -235,7 +167,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
         <ServersTransferModal
           contextNode={node}
           servers={selectedServers}
-          clearSelected={() => setSelectedServers(new ObjectSet('uuid'))}
+          clearSelected={clearSelectedServers}
           opened={openModal === 'transfer'}
           onClose={() => setOpenModal(null)}
         />
@@ -265,32 +197,12 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
         registryProps={{ node }}
         contentRight={
           <Group gap='sm'>
-            <AdminCan action='nodes.power'>
-              <Button
-                color='green'
-                onClick={() => setConfirmPowerAction({ action: 'start', scope: 'all' })}
-                loading={allActionLoading === 'start'}
-                disabled={(allActionLoading !== null && allActionLoading !== 'start') || nodeServers?.total === 0}
-              >
-                {t('common.enum.serverPowerAction.start', {})} ({nodeServers?.total})
-              </Button>
-              <Button
-                color='gray'
-                onClick={() => setConfirmPowerAction({ action: 'restart', scope: 'all' })}
-                loading={allActionLoading === 'restart'}
-                disabled={(allActionLoading !== null && allActionLoading !== 'restart') || nodeServers?.total === 0}
-              >
-                {t('common.enum.serverPowerAction.restart', {})} ({nodeServers?.total})
-              </Button>
-              <Button
-                color='red'
-                onClick={() => setConfirmPowerAction({ action: 'stop', scope: 'all' })}
-                loading={allActionLoading === 'stop'}
-                disabled={(allActionLoading !== null && allActionLoading !== 'stop') || nodeServers?.total === 0}
-              >
-                {t('common.enum.serverPowerAction.stop', {})} ({nodeServers?.total})
-              </Button>
-            </AdminCan>
+            <ServerPowerButtons
+              count={nodeServers?.total ?? 0}
+              loading={allActionLoading}
+              onAction={(action) => setConfirmPowerAction({ action, scope: 'all' })}
+              disabled={nodeServers?.total === 0}
+            />
             <AdminCan action='nodes.transfers'>
               <Button
                 color='gray'
@@ -303,7 +215,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
           </Group>
         }
       >
-        <SelectionArea onSelectedStart={onSelectedStart} onSelected={onSelected}>
+        <SelectionArea {...selectionAreaProps}>
           <Table
             columns={columns}
             loading={loading}
@@ -321,7 +233,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
                     ref={innerRef as Ref<HTMLTableRowElement>}
                     showSelection={true}
                     isSelected={selectedServers.has(server.uuid)}
-                    onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
+                    onSelectionChange={(selected) => toggleServer(server, selected)}
                     onClick={(e) => handleServerClick(server, e)}
                   />
                 )}
@@ -333,7 +245,7 @@ export default function AdminNodeServers({ node }: { node: z.infer<typeof adminN
 
       <BulkActionBar
         selectedCount={selectedServers.size}
-        onClear={() => setSelectedServers(new ObjectSet('uuid'))}
+        onClear={clearSelectedServers}
         onPowerAction={(action) => setConfirmPowerAction({ action, scope: 'bulk' })}
         onTransfer={() => setOpenModal('transfer')}
         loading={bulkActionLoading}

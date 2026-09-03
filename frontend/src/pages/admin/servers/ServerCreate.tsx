@@ -8,7 +8,7 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import getEggs from '@/api/admin/nests/eggs/getEggs.ts';
@@ -19,43 +19,33 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import createServer from '@/api/admin/servers/createServer.ts';
 import getUsers from '@/api/admin/users/getUsers.ts';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { AdvancedModeToggle, type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
+import { AdvancedModeToggle, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
+import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggSchema, adminEggVariableSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerCreateSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, adminServerCreateSchema } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
-import { formatAllocation } from '@/lib/server.ts';
-import { getTimezoneOptions } from '@/lib/timezones.ts';
+import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useResourceForm } from '@/plugins/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { serverCreateEmptyFormValues } from './serverCreateFormValues.ts';
-import {
-  buildBasicInfoFields,
-  buildFeatureLimitsFields,
-  buildNestSelectField,
-  buildResourceLimitsFields,
-  buildStartupField,
-} from './serverFormFields.tsx';
-
-const timezones = getTimezoneOptions();
+import { serverCreateEmptyFormValues, useEggDefaults, useServerFormFields } from './serverFormValues.tsx';
 
 type ServerCreateFormValues = z.infer<typeof adminServerCreateSchema>;
 
@@ -81,7 +71,7 @@ export default function ServerCreate() {
     validateInputOnBlur: true,
   });
 
-  const { loading, doCreateOrUpdate } = useResourceForm<ServerCreateFormValues, z.infer<typeof adminServerSchema>>({
+  const { loading, doCreateOrUpdate } = useResourceForm<ServerCreateFormValues, AdminServer>({
     form,
     createFn: () => createServer(form.getValues()),
     doUpdate: false,
@@ -160,15 +150,7 @@ export default function ServerCreate() {
 
   const eggImages = eggs.items.find((egg) => egg.uuid === selectedEggUuid)?.dockerImages || {};
 
-  useEffect(() => {
-    const egg = eggs.items.find((egg) => egg.uuid === selectedEggUuid);
-    if (!egg) {
-      return;
-    }
-
-    form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
-    form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
-  }, [selectedEggUuid]);
+  useEggDefaults(form, eggs, selectedEggUuid);
 
   useEffect(() => {
     if (!selectedNestUuid || !selectedEggUuid) {
@@ -186,166 +168,24 @@ export default function ServerCreate() {
       .finally(() => setEggVariablesLoading(false));
   }, [selectedNestUuid, selectedEggUuid]);
 
-  const basicInfoFields = useMemo(() => buildBasicInfoFields<ServerCreateFormValues>(t), [t]);
-
-  const serverAssignmentFields: FieldDef<ServerCreateFormValues>[] = useMemo(
-    (): FieldDef<ServerCreateFormValues>[] => [
-      {
-        type: 'select',
-        name: 'nodeUuid',
-        label: t('common.form.node', {}),
-        required: true,
-        options: nodes.items.map((node) => ({ label: node.name, value: node.uuid })),
-        props: {
-          searchable: true,
-          searchValue: nodes.search,
-          onSearchChange: nodes.setSearch,
-          disabled: !canReadNodes,
-          loading: nodes.loading,
-        },
-      },
-      {
-        type: 'select',
-        name: 'ownerUuid',
-        label: t('pages.admin.servers.tabs.general.page.form.owner', {}),
-        required: true,
-        options: users.items.map((user) => ({ label: user.username, value: user.uuid })),
-        props: {
-          searchable: true,
-          searchValue: users.search,
-          onSearchChange: users.setSearch,
-          loading: users.loading,
-          disabled: !canReadUsers,
-        },
-      },
-      buildNestSelectField<ServerCreateFormValues>(t, {
-        form,
-        selectedNestUuid,
-        setSelectedNestUuid,
-        nests,
-        canReadNests,
-      }),
-      {
-        type: 'select',
-        name: 'eggUuid',
-        label: t('pages.admin.servers.tabs.general.page.form.egg', {}),
-        required: true,
-        options: eggs.items.map((egg) => ({ label: egg.name, value: egg.uuid })),
-        props: {
-          searchable: true,
-          searchValue: eggs.search,
-          onSearchChange: eggs.setSearch,
-          loading: eggs.loading,
-          disabled: !canReadEggs || !selectedNestUuid,
-        },
-      },
-      {
-        type: 'select',
-        name: 'backupConfigurationUuid',
-        label: t('common.form.backupConfiguration', {}),
-        options: backupConfigurations.items.map((bc) => ({ label: bc.name, value: bc.uuid })),
-        props: {
-          placeholder: t('pages.admin.servers.tabs.general.page.form.backupConfigurationPlaceholder', {}),
-          searchable: true,
-          searchValue: backupConfigurations.search,
-          onSearchChange: backupConfigurations.setSearch,
-          allowDeselect: true,
-          clearable: true,
-          disabled: !canReadBackupConfigurations,
-          loading: backupConfigurations.loading,
-        },
-      },
-    ],
-    [
-      t,
+  const { basicInfoFields, serverAssignmentFields, resourceLimitsFields, serverConfigFields, featureLimitsFields } =
+    useServerFormFields<ServerCreateFormValues>({
+      mode: 'create',
+      form,
       nodes,
-      canReadNodes,
       users,
+      nests,
+      eggs,
+      backupConfigurations,
+      canReadNodes,
       canReadUsers,
+      canReadNests,
+      canReadEggs,
+      canReadBackupConfigurations,
       selectedNestUuid,
       setSelectedNestUuid,
-      nests,
-      canReadNests,
-      eggs,
-      canReadEggs,
-      backupConfigurations,
-      canReadBackupConfigurations,
-    ],
-  );
-
-  const resourceLimitsFields = useMemo(
-    () => buildResourceLimitsFields<ServerCreateFormValues>(t, { swapAdvanced: true }),
-    [t],
-  );
-
-  const serverConfigFields: FieldDef<ServerCreateFormValues>[] = [
-    {
-      type: 'custom',
-      name: '_predefinedImage',
-      render: (f) => (
-        <Select
-          label={t('pages.admin.servers.tabs.general.page.form.predefinedDockerImages', {})}
-          placeholder={t('pages.admin.servers.tabs.general.page.form.predefinedDockerImagesPlaceholder', {})}
-          data={Object.entries(eggImages).map(([label, value]) => ({ label, value }))}
-          allowDeselect
-          clearable
-          searchable
-          value={
-            Object.entries(eggImages).some(([, value]) => value === form.getValues().image)
-              ? form.getValues().image
-              : null
-          }
-          onChange={(value) => f.setFieldValue('image', value || '')}
-        />
-      ),
-    },
-    {
-      type: 'text',
-      name: 'image',
-      label: t('common.form.dockerImage', {}),
-      required: true,
-      props: { placeholder: 'ghcr.io/...' },
-    },
-    {
-      type: 'select',
-      name: 'timezone',
-      label: t('common.form.timezone', {}),
-      options: [{ label: t('common.form.timezoneSystem', {}), value: '' }, ...timezones],
-      props: {
-        placeholder: 'Europe/Amsterdam',
-        searchable: true,
-      },
-    },
-    buildStartupField<ServerCreateFormValues>(t, { form, eggs }),
-    {
-      type: 'switch',
-      name: 'startOnCompletion',
-      label: t('pages.admin.servers.tabs.general.page.form.startOnCompletion', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.startOnCompletionDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'skipInstaller',
-      label: t('pages.admin.servers.tabs.general.page.form.skipInstaller', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.skipInstallerDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'hugepagesPassthroughEnabled',
-      label: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabled', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.hugepagesPassthroughEnabledDescription', {}),
-      advanced: true,
-    },
-    {
-      type: 'switch',
-      name: 'kvmPassthroughEnabled',
-      label: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabled', {}),
-      description: t('pages.admin.servers.tabs.general.page.form.kvmPassthroughEnabledDescription', {}),
-      advanced: true,
-    },
-  ];
-
-  const featureLimitsFields = useMemo(() => buildFeatureLimitsFields<ServerCreateFormValues>(t), [t]);
+      eggImages,
+    });
 
   return (
     <AdminContentContainer

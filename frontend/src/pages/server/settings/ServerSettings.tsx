@@ -1,5 +1,6 @@
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AutokillContainer from './AutokillContainer.tsx';
 import AutostartContainer from './AutostartContainer.tsx';
@@ -17,11 +18,12 @@ export default function ServerSettings() {
       registry={window.extensionContext.extensionRegistry.pages.server.settings.container}
     >
       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-2'>
-        {window.extensionContext.extensionRegistry.pages.server.settings.settingContainers.prependedComponents.map(
-          (Component, i) => (
-            <Component key={`settings-settingContainer-prepended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.settings.settingContainers.prependedComponents
+          }
+          name='settings-settingContainer-prepended'
+        />
 
         <DebugInformationContainer />
         <ServerCan action='settings.rename'>
@@ -40,11 +42,12 @@ export default function ServerSettings() {
           <ReinstallContainer />
         </ServerCan>
 
-        {window.extensionContext.extensionRegistry.pages.server.settings.settingContainers.appendedComponents.map(
-          (Component, i) => (
-            <Component key={`settings-settingContainer-appended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.settings.settingContainers.appendedComponents
+          }
+          name='settings-settingContainer-appended'
+        />
       </div>
     </ServerContentContainer>
   );

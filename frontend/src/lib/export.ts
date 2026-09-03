@@ -1,39 +1,6 @@
-import { dump } from 'js-yaml';
-import { z } from 'zod';
-import { serializeForApi } from '@/lib/api-transform.ts';
-import { downloadTextFile } from '@/lib/download.ts';
-
-export type ResourceExportFormat = 'json' | 'yaml';
-
-export function serializeResourceFile<T extends z.ZodTypeAny>(
-  schema: T,
-  data: z.infer<T>,
-  format: ResourceExportFormat,
-  omit: string[] = [],
-): { contents: string; extension: 'json' | 'yml' } {
-  const serialized = serializeForApi(schema, data);
-
-  if (omit.length > 0 && serialized !== null && typeof serialized === 'object' && !Array.isArray(serialized)) {
-    for (const key of omit) {
-      delete (serialized as Record<string, unknown>)[key];
-    }
-  }
-
-  const contents =
-    format === 'json'
-      ? JSON.stringify(serialized, undefined, 2)
-      : dump(serialized, { flowLevel: -1, forceQuotes: true });
-
-  return { contents, extension: format === 'json' ? 'json' : 'yml' };
-}
-
-export function downloadResourceFile<T extends z.ZodTypeAny>(
-  schema: T,
-  data: z.infer<T>,
-  filenamePrefix: string,
-  format: ResourceExportFormat,
-  omit: string[] = [],
-): void {
-  const { contents, extension } = serializeResourceFile(schema, data, format, omit);
-  downloadTextFile(contents, `${filenamePrefix}.${extension}`);
-}
+/**
+ * @deprecated `@/lib/export.ts` has moved to `@/lib/download/export.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/lib/download/export.ts';

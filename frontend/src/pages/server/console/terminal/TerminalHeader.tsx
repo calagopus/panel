@@ -13,10 +13,11 @@ import { SearchAddon } from '@xterm/addon-search';
 import classNames from 'classnames';
 import { RefObject } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { useUserSetting } from '@/lib/userSettings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -54,11 +55,13 @@ export default function TerminalHeader({
   return (
     <div className='flex flex-row justify-between items-center mb-2 text-xs'>
       <div className='flex flex-row items-center'>
-        {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents.prependedComponents.map(
-          (Component, i) => (
-            <Component key={`console-terminalHeaderLeft-prepended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents
+              .prependedComponents
+          }
+          name='console-terminalHeaderLeft-prepended'
+        />
         <span
           className={classNames(
             'rounded-full size-3 animate-pulse mr-2',
@@ -70,18 +73,22 @@ export default function TerminalHeader({
               ping: websocketPing,
             })
           : t('pages.server.console.socketDisconnected', {})}
-        {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents.appendedComponents.map(
-          (Component, i) => (
-            <Component key={`console-terminalHeaderLeft-appended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderLeftComponents
+              .appendedComponents
+          }
+          name='console-terminalHeaderLeft-appended'
+        />
       </div>
       <div className='flex flex-row items-center gap-2'>
-        {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderRightComponents.prependedComponents.map(
-          (Component, i) => (
-            <Component key={`console-terminalHeaderRight-prepended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderRightComponents
+              .prependedComponents
+          }
+          name='console-terminalHeaderRight-prepended'
+        />
         <Popover
           trapFocus
           opened={openModal === 'search'}
@@ -89,8 +96,17 @@ export default function TerminalHeader({
         >
           <Popover.Target>
             <Tooltip label={t('pages.server.console.tooltip.search', {})}>
-              <ActionIcon size='xs' variant='subtle' color='gray' onClick={() => setOpenModal('search')}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              <ActionIcon
+                className='group'
+                size='xs'
+                radius={0}
+                variant='transparent'
+                onClick={() => setOpenModal('search')}
+              >
+                <FontAwesomeIcon
+                  icon={faMagnifyingGlass}
+                  className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+                />
               </ActionIcon>
             </Tooltip>
           </Popover.Target>
@@ -116,6 +132,7 @@ export default function TerminalHeader({
             />
             <ActionIcon
               size='input-sm'
+              radius={0}
               variant='light'
               color='gray'
               onClick={() => searchAddonRef.current?.findPrevious(searchText)}
@@ -124,6 +141,7 @@ export default function TerminalHeader({
             </ActionIcon>
             <ActionIcon
               size='input-sm'
+              radius={0}
               variant='light'
               color='gray'
               onClick={() => searchAddonRef.current?.findNext(searchText)}
@@ -134,43 +152,63 @@ export default function TerminalHeader({
         </Popover>
         {!popout && (
           <Tooltip label={t('pages.server.console.tooltip.popout', {})}>
-            <ActionIcon size='xs' variant='subtle' color='gray' onClick={() => openConsolePopout(server.uuidShort)}>
-              <FontAwesomeIcon icon={faUpRightFromSquare} />
+            <ActionIcon
+              className='group'
+              size='xs'
+              radius={0}
+              variant='transparent'
+              onClick={() => openConsolePopout(server.uuidShort)}
+            >
+              <FontAwesomeIcon
+                icon={faUpRightFromSquare}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
         )}
         <Tooltip label={t('pages.server.console.tooltip.sshDetails', {})}>
           <ActionIcon
+            className='group'
             size='xs'
-            variant='subtle'
-            color='gray'
+            radius={0}
+            variant='transparent'
             disabled={server.status !== null || server.isSuspended || server.isTransferring}
             onClick={() => setOpenModal('sshDetails')}
           >
-            <FontAwesomeIcon icon={faServer} />
+            <FontAwesomeIcon
+              icon={faServer}
+              className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+            />
           </ActionIcon>
         </Tooltip>
         <Tooltip label={t('pages.server.console.tooltip.commandHistory', {})}>
           <ActionIcon
+            className='group'
             size='xs'
-            variant='subtle'
-            color='gray'
+            radius={0}
+            variant='transparent'
             disabled={server.status !== null || server.isSuspended || server.isTransferring}
             onClick={() => setOpenModal('commandHistory')}
           >
-            <FontAwesomeIcon icon={faClockRotateLeft} />
+            <FontAwesomeIcon
+              icon={faClockRotateLeft}
+              className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+            />
           </ActionIcon>
         </Tooltip>
         <div className='flex flex-row items-center'>
           <Tooltip label={t('pages.server.console.tooltip.decreaseFontSize', {})}>
             <ActionIcon
-              className='mr-2'
+              className='group mr-2'
               size='xs'
-              variant='subtle'
-              color='gray'
+              radius={0}
+              variant='transparent'
               onClick={() => setConsoleFontSize((size) => Math.max(10, size - 1))}
             >
-              <FontAwesomeIcon icon={faMinus} />
+              <FontAwesomeIcon
+                icon={faMinus}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
           <UserSettingScopeMenu settingKey={CONSOLE_FONT_SIZE_KEY} value={consoleFontSize}>
@@ -178,21 +216,26 @@ export default function TerminalHeader({
           </UserSettingScopeMenu>
           <Tooltip label={t('pages.server.console.tooltip.increaseFontSize', {})}>
             <ActionIcon
-              className='ml-2'
+              className='group ml-2'
               size='xs'
-              variant='subtle'
-              color='gray'
+              radius={0}
+              variant='transparent'
               onClick={() => setConsoleFontSize((size) => Math.min(24, size + 1))}
             >
-              <FontAwesomeIcon icon={faPlus} />
+              <FontAwesomeIcon
+                icon={faPlus}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
         </div>
-        {window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderRightComponents.appendedComponents.map(
-          (Component, i) => (
-            <Component key={`console-terminalHeaderRight-appended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.server.console.terminalHeaderRightComponents
+              .appendedComponents
+          }
+          name='console-terminalHeaderRight-appended'
+        />
       </div>
     </div>
   );

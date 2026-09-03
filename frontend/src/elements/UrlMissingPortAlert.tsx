@@ -1,9 +1,9 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
-import { urlIsMissingPort } from '@/lib/url.ts';
+import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import { urlIsMissingPort } from '@/lib/network/url.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function UrlMissingPortAlert({

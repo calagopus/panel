@@ -1,6 +1,6 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
-import SubNavigation from '@/elements/SubNavigation.tsx';
-import { useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
+import { useStartOnGroupedServers } from '@/plugins/server/useStartOnGroupedServers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function DashboardHomeTitle() {

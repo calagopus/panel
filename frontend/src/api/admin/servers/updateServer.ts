@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { formExtensionSchemas, serializeForApi } from '@/lib/api-transform.ts';
 import { adminServerUpdateSchema } from '@/lib/schemas/admin/servers.ts';
+import { formExtensionSchemas, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   serverUuid: string,

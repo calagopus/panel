@@ -2,16 +2,17 @@ import { faApple, faWindows } from '@fortawesome/free-brands-svg-icons';
 import { faCloud, faCopy, faDesktop, faKeyboard, faPaste, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode, useState } from 'react';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import Flex from '@/elements/Flex.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Flex from '@/elements/layout/Flex.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
-import { handleRawCopyToClipboard } from '@/lib/copy.ts';
+import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
+import { handleRawPasteFromClipboard } from '@/lib/clipboard/paste.ts';
 import { resolveString } from '@/lib/lazy.ts';
-import { handleRawPasteFromClipboard } from '@/lib/paste.ts';
 import { buildCoreShortcutCategories, getShortcutDefinitions } from '@/lib/quickActions/coreShortcuts.tsx';
 import {
   importShortcutOverrides,
@@ -157,11 +158,13 @@ export default function DashboardShortcuts() {
       registry={window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.container}
     >
       <div className='md:columns-2 gap-4 space-y-4'>
-        {window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.shortcutSections.prependedComponents.map(
-          (Component, i) => (
-            <Component key={`shortcuts-shortcutSection-prepended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.shortcutSections
+              .prependedComponents
+          }
+          name='shortcuts-shortcutSection-prepended'
+        />
 
         {grouped.map(([category, defs]) => (
           <div key={category} className='break-inside-avoid'>
@@ -184,11 +187,13 @@ export default function DashboardShortcuts() {
           </div>
         ))}
 
-        {window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.shortcutSections.appendedComponents.map(
-          (Component, i) => (
-            <Component key={`shortcuts-shortcutSection-appended-${i}`} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.dashboard.keyboardShortcuts.shortcutSections
+              .appendedComponents
+          }
+          name='shortcuts-shortcutSection-appended'
+        />
       </div>
     </AccountContentContainer>
   );

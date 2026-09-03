@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { z } from 'zod';
 import deleteUserOAuthLink from '@/api/admin/users/oauthLinks/deleteUserOAuthLink.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Code from '@/elements/Code.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema, adminUserOAuthLinkSchema } from '@/lib/schemas/admin/users.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -26,7 +26,7 @@ export default function UserOAuthLinkRow({
   const { t } = useTranslations();
   const queryClient = useQueryClient();
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteUserOAuthLink(user.uuid, userOAuthLink.uuid)
@@ -90,7 +90,7 @@ export default function UserOAuthLinkRow({
             </TableData>
 
             <TableData>
-              {!userOAuthLink.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={userOAuthLink.lastUsed} />}
+              <FormattedTimestamp timestamp={userOAuthLink.lastUsed} showNA />
             </TableData>
 
             <TableData>

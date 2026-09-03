@@ -6,11 +6,11 @@ import ignore from 'ignore';
 import { join } from 'pathe';
 import { useMemo, useState } from 'react';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
-import Badge from '@/elements/Badge.tsx';
-import Breadcrumbs from '@/elements/Breadcrumbs.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Breadcrumbs from '@/elements/data-display/Breadcrumbs.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
-import Spinner from '@/elements/Spinner.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function IgnoredFilesBrowser({ serverUuid, patterns }: { serverUuid: string; patterns: string[] }) {

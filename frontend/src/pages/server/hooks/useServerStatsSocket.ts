@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { z } from 'zod';
 import { serverResourceUsageSchema } from '@/lib/schemas/server/server.ts';
-import { transformKeysToCamelCase } from '@/lib/transformers.ts';
-import useWebsocketEvent, { SocketEvent, SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { transformKeysToCamelCase } from '@/lib/serialization/transformers.ts';
+import useWebsocketEvent, { SocketEvent, SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 import { useUserStore } from '@/stores/user.ts';
 

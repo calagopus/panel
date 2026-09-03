@@ -1,14 +1,14 @@
 import { forwardRef, memo } from 'react';
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import Progress from '@/elements/Progress.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import { bytesProgressString, bytesToString } from '@/lib/format/size.ts';
 import { adminNodeTransferProgressSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { bytesProgressString, bytesToString } from '@/lib/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type TransferProgressWithRates = z.infer<typeof adminNodeTransferProgressSchema> & {

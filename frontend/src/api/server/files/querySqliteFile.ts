@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { axiosInstance, msgpackConfig } from '@/api/axios.ts';
-import { parseFromApi, serializeForApi } from '@/lib/api-transform.ts';
 import { serverDatabaseQueryResultSchema } from '@/lib/schemas/server/databases.ts';
 import { serverFileSqliteQuerySchema } from '@/lib/schemas/server/files.ts';
+import { parseFromApi, serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   uuid: string,

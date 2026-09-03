@@ -1,5 +1,5 @@
 import { UseFormReturnType } from '@mantine/form';
-import Group from '@/elements/Group.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import NumberInput from './NumberInput.tsx';
 
 interface PortRangeFieldProps<T extends Record<string, unknown>> {

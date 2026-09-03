@@ -1,15 +1,15 @@
 import cronstrue from 'cronstrue/i18n';
 import { useMemo, useState } from 'react';
-import Group from '@/elements/Group.tsx';
 import { CrontabEditor } from '@/elements/input/CronInput.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import TimeInput from '@/elements/input/TimeInput.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   CRON_WEEKDAYS,
   getLocalizedCronWeekdays,

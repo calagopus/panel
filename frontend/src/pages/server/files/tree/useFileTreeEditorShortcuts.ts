@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { matchesShortcut } from '@/plugins/useKeyboardShortcuts.ts';
+import { matchesShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 
 interface FileTreeEditorShortcutsOptions {
   tabIds: string[];

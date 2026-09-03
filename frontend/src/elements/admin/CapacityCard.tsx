@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
-import Card from '@/elements/Card.tsx';
-import SemiCircleProgress from '@/elements/SemiCircleProgress.tsx';
-import Title from '@/elements/Title.tsx';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
+import Card from '@/elements/data-display/Card.tsx';
+import SemiCircleProgress from '@/elements/feedback/SemiCircleProgress.tsx';
+import Title from '@/elements/typography/Title.tsx';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 
 const defaultFormatValue = (value: number) => bytesToString(mbToBytes(value));
 

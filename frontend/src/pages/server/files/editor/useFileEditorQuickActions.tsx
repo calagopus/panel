@@ -1,7 +1,7 @@
 import { faArrowsRotate, faClockRotateLeft, faFileCirclePlus, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
-import { useQuickActions } from '@/plugins/useQuickActions.ts';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileEditorQuickActionsOptions {

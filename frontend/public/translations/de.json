@@ -6149,6 +6149,23 @@
                 }
               }
             },
+            "pullFile": {
+              "title": "Datei herunterladen",
+              "description": "Lädt eine Datei von einer URL in einen Ordner herunter.",
+              "form": {
+                "useHeader": "Dateinamen aus Antwort verwenden",
+                "useHeaderDescription": "Benennt die Datei nach dem Content-Disposition-Header, wenn kein Dateiname gesetzt ist."
+              },
+              "renderer": {
+                "compact": "Lade {url} nach {root}",
+                "detail": {
+                  "url": "URL: {url}",
+                  "root": "Root: {root}",
+                  "fileName": "Dateiname: {fileName}",
+                  "useHeader": "Dateinamen aus Antwort verwenden: {value}"
+                }
+              }
+            },
             "updateStartupVariable": {
               "title": "Startvariable aktualisieren",
               "description": "Ändert den Wert einer Startvariable.",
@@ -6402,6 +6419,7 @@
             "anySource": "beliebiger Quelle",
             "anyProtocol": "TCP & UDP",
             "allAllocations": "allen Allocations",
+            "sourceFile": "Datei {file}",
             "summary": "{protocols} von {sources} an {ports}",
             "aria": {
               "reorder": "Firewall-Regel {position} verschieben"
@@ -6424,7 +6442,9 @@
             "sourcesDescription": "IP-Adressen oder Netzwerke wie 10.0.0.0/8. Bei einem Netzwerk müssen die Host-Bits null sein. Leer lassen, um jede Quelle zu treffen.",
             "ports": "Ports",
             "portsDescription": "Allocation-Ports, für die diese Regel gilt, Bereiche wie 25565-25570 werden aufgelöst. Leer lassen, um alle Allocations des Servers zu treffen.",
-            "invalidSource": "{source} ist keine gültige IP-Adresse und kein gültiges Netzwerk."
+            "invalidSource": "{source} ist keine gültige IP-Adresse und kein gültiges Netzwerk.",
+            "sourceFile": "Quelldatei",
+            "sourceFileDescription": "Pfad einer Datei im Serververzeichnis mit einer IP-Adresse oder einem Netzwerk pro Zeile, Zeilen die mit # beginnen werden ignoriert. Ihre Einträge werden zu den Quellen oben hinzugefügt, Änderungen an der Datei übernimmt der Node von selbst."
           },
           "toast": {
             "saved": "Firewall-Regeln gespeichert."

@@ -1,5 +1,5 @@
 import { faNetworkWired, faShareNodes, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
-import SubNavigation from '@/elements/SubNavigation.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';

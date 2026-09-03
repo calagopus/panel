@@ -1,9 +1,9 @@
 import { faClock, faEthernet, faHardDrive, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
 import { z } from 'zod';
-import StatCard from '@/elements/StatCard.tsx';
+import StatCard from '@/elements/data-display/StatCard.tsx';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { formatMilliseconds } from '@/lib/format/time.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { formatMilliseconds } from '@/lib/time.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

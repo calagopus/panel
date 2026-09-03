@@ -1,7 +1,14 @@
 import { z } from 'zod';
-import { adminEggSchema, adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
+import { adminEggConfigScriptSchema, adminEggSchema, adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 
 type EggFormValues = z.infer<typeof adminEggUpdateSchema>;
+
+/** Seed script a freshly-created egg gets; the installation-script tab edits it afterwards. */
+export const DEFAULT_EGG_CONFIG_SCRIPT: z.infer<typeof adminEggConfigScriptSchema> = {
+  container: 'debian:latest',
+  entrypoint: '/bin/bash',
+  content: '#!/bin/bash\n\n# Install script content goes here\n',
+};
 
 export const eggEmptyFormValues: EggFormValues = {
   eggRepositoryEggUuid: null,

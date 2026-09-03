@@ -6,11 +6,11 @@ import { z } from 'zod';
 import getEggVariables from '@/api/admin/nests/eggs/variables/getEggVariables.ts';
 import updateEggVariableOrder from '@/api/admin/nests/eggs/variables/updateEggVariableOrder.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import { DndContainer, DndItem, SortableItem } from '@/elements/DragAndDrop.tsx';
-import Spinner from '@/elements/Spinner.tsx';
+import { DndContainer, DndItem, SortableItem } from '@/elements/dnd/DragAndDrop.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { adminEggSchema, adminEggVariableSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import EggVariableContainer from '@/pages/admin/nests/eggs/variables/EggVariableContainer.tsx';
@@ -57,9 +57,7 @@ export default function AdminEggVariables({
       nameTranslations: {},
       description: null,
       descriptionTranslations: {},
-      order: Number.isFinite(Math.max(...eggVariables.map((s) => s.order)))
-        ? Math.max(...eggVariables.map((s) => s.order)) + 1
-        : 1,
+      order: eggVariables.reduce((max, v) => Math.max(max, v.order), 0) + 1,
       envVariable: '',
       defaultValue: null,
       userViewable: true,
@@ -73,10 +71,10 @@ export default function AdminEggVariables({
 
   const sortedEggVariables = useMemo(() => [...eggVariables].sort((a, b) => a.order - b.order), [eggVariables]);
 
-  const dndEggVariables: DndEggVariable[] = sortedEggVariables.map((variable) => ({
-    ...variable,
-    id: variable.uuid,
-  }));
+  const dndEggVariables: DndEggVariable[] = useMemo(
+    () => sortedEggVariables.map((variable) => ({ ...variable, id: variable.uuid })),
+    [sortedEggVariables],
+  );
 
   return (
     <AdminSubContentContainer

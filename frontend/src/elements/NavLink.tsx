@@ -1,9 +1,6 @@
-import { NavLink as MantineNavLink, NavLinkProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const NavLink = forwardRef<HTMLAnchorElement, NavLinkProps>(({ ...rest }, ref) => {
-  return <MantineNavLink ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(NavLink);
+/**
+ * @deprecated `@/elements/NavLink.tsx` has moved to `@/elements/navigation/NavLink.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/navigation/NavLink.tsx';

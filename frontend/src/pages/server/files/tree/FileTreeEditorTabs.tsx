@@ -2,8 +2,8 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { join } from 'pathe';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import UnstyledButton from '@/elements/UnstyledButton.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
 import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 import {

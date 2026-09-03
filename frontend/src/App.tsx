@@ -5,11 +5,12 @@ import { createBrowserHistory } from 'history';
 import { useEffect, useRef, useState } from 'react';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import getAnnouncements from './api/getAnnouncements.ts';
 import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
 import ErrorBoundary from './elements/ErrorBoundary.tsx';
-import Spinner from './elements/Spinner.tsx';
+import ExtensionSlot from './elements/ExtensionSlot.tsx';
 import { CurrentWindowProvider } from './providers/CurrentWindowProvider.tsx';
 import { HistoryContext } from './providers/contexts/historyContext.ts';
 import { ToastProvider } from './providers/ToastProvider.tsx';
@@ -131,15 +132,17 @@ export default function App({
                 <CurrentWindowProvider id={null}>
                   <HistoryContext.Provider value={browserHistory}>
                     <HistoryRouter history={browserHistory as never}>
-                      {window.extensionContext.extensionRegistry.global.prependedComponents.map((Component, index) => (
-                        <Component key={`global-prepended-${index}`} />
-                      ))}
+                      <ExtensionSlot
+                        components={window.extensionContext.extensionRegistry.global.prependedComponents}
+                        name='global-prepended'
+                      />
 
                       <RouterRoutes isNormal />
 
-                      {window.extensionContext.extensionRegistry.global.appendedComponents.map((Component, index) => (
-                        <Component key={`global-appended-${index}`} />
-                      ))}
+                      <ExtensionSlot
+                        components={window.extensionContext.extensionRegistry.global.appendedComponents}
+                        name='global-appended'
+                      />
                     </HistoryRouter>
                   </HistoryContext.Provider>
 

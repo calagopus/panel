@@ -1,18 +1,17 @@
 import classNames from 'classnames';
 import { forwardRef, memo } from 'react';
-import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { statusToColor } from '@/lib/server.ts';
-import { useServerStats } from '@/plugins/useServerStats.ts';
+import Code from '@/elements/typography/Code.tsx';
+import { statusToColor } from '@/lib/domain/server.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
+import { useServerStats } from '@/plugins/server/useServerStats.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerRowProps {
-  server: z.infer<typeof adminServerSchema>;
+  server: AdminServer;
   showSelection?: boolean;
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;

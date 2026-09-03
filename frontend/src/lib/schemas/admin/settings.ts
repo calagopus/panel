@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { oobeStepKey } from '@/lib/schemas/oobe.ts';
 import { twoFactorMethod } from '@/lib/schemas/user.ts';
-import { nullableNumber, nullableString } from '@/lib/transformers.ts';
+import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 import { eggConfigurationRouteItemSchema, hostnameSchema } from '../generic.ts';
 
 export const adminSettingsApplicationSchema = z.object({

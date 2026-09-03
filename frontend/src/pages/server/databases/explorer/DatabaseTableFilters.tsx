@@ -2,12 +2,12 @@ import { faFilter, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Popover from '@/elements/Popover.tsx';
-import Stack from '@/elements/Stack.tsx';
-import UnstyledButton from '@/elements/UnstyledButton.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Popover from '@/elements/overlays/Popover.tsx';
 import { databaseFilterOperatorLabelMapping, databaseFilterOperatorSymbolMapping } from '@/lib/enums.ts';
 import {
   serverDatabaseBrowseFilterSchema,

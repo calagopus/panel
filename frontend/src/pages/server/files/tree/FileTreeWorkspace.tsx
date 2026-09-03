@@ -23,8 +23,8 @@ import {
   storeFileTreeWorkspace,
 } from '@/pages/server/files/tree/fileTreeWorkspaceState.ts';
 import useFileTreeEditorShortcuts from '@/pages/server/files/tree/useFileTreeEditorShortcuts.ts';
-import { useContainerAutoHeight } from '@/plugins/useContainerAutoHeight.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
+import { useContainerAutoHeight } from '@/plugins/viewport/useContainerAutoHeight.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

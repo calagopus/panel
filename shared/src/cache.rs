@@ -49,6 +49,27 @@ struct LockEntry {
     semaphore: Arc<tokio::sync::Semaphore>,
 }
 
+#[derive(Clone, Debug)]
+pub struct Resolution {
+    pub uuid: uuid::Uuid,
+    pub fingerprint: Arc<Vec<u8>>,
+}
+
+#[derive(Debug)]
+pub struct SharedComputeError(pub Arc<anyhow::Error>);
+
+impl std::fmt::Display for SharedComputeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for SharedComputeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        Some(&**self.0)
+    }
+}
+
 struct DataExpiry;
 
 impl moka::Expiry<compact_str::CompactString, DataEntry> for DataExpiry {
@@ -70,6 +91,7 @@ pub struct Cache {
     local_locks: moka::future::Cache<compact_str::CompactString, LockEntry>,
     local_locks_task: tokio::task::JoinHandle<()>,
     local_ratelimits: moka::future::Cache<compact_str::CompactString, (u64, u64)>,
+    local_resolutions: moka::future::Cache<compact_str::CompactString, Resolution>,
 
     cache_calls: AtomicU64,
     cache_latency_ns_total: AtomicU64,
@@ -135,6 +157,10 @@ impl Cache {
         });
 
         let local_ratelimits = moka::future::Cache::builder().max_capacity(16384).build();
+        let local_resolutions = moka::future::Cache::builder()
+            .max_capacity(65536)
+            .time_to_idle(Duration::from_secs(3600))
+            .build();
 
         let instance = Arc::new(Self {
             client,
@@ -144,6 +170,7 @@ impl Cache {
             local_locks,
             local_locks_task,
             local_ratelimits,
+            local_resolutions,
             cache_calls: AtomicU64::new(0),
             cache_latency_ns_total: AtomicU64::new(0),
             cache_latency_ns_max: AtomicU64::new(0),
@@ -442,7 +469,7 @@ impl Cache {
 
         match entry {
             Ok(internal_entry) => Ok(rmp_serde::from_slice::<T>(&internal_entry.data)?),
-            Err(arc_error) => Err(anyhow::anyhow!("cache computation failed: {:?}", arc_error)),
+            Err(arc_error) => Err(anyhow::Error::new(SharedComputeError(arc_error))),
         }
     }
 
@@ -592,6 +619,28 @@ impl Cache {
         }
     }
 
+    pub async fn resolution(&self, key: &str) -> Option<Resolution> {
+        self.local_resolutions.get(key).await
+    }
+
+    pub async fn resolve<
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = Result<Resolution, anyhow::Error>>,
+    >(
+        &self,
+        key: &str,
+        fn_resolve: F,
+    ) -> Result<Resolution, anyhow::Error> {
+        self.local_resolutions
+            .try_get_with(key.to_compact_string(), fn_resolve())
+            .await
+            .map_err(|err| anyhow::Error::new(SharedComputeError(err)))
+    }
+
+    pub async fn remove_resolution(&self, key: &str) {
+        self.local_resolutions.invalidate(key).await;
+    }
+
     pub async fn invalidate(&self, key: &str) -> Result<(), anyhow::Error> {
         self.local.invalidate(key).await;
         if let Some(client) = &self.client {
@@ -689,5 +738,93 @@ impl Drop for CacheLock {
                 let _ = client.del(&redis_key).await;
             });
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::DatabaseError;
+
+    fn memory_only() -> Cache {
+        Cache {
+            client: None,
+            use_internal_cache: true,
+            local: moka::future::Cache::builder()
+                .max_capacity(16)
+                .expire_after(DataExpiry)
+                .build(),
+            local_task: tokio::spawn(async {}),
+            local_locks: moka::future::Cache::builder().max_capacity(16).build(),
+            local_locks_task: tokio::spawn(async {}),
+            local_ratelimits: moka::future::Cache::builder().max_capacity(16).build(),
+            local_resolutions: moka::future::Cache::builder().max_capacity(16).build(),
+            cache_calls: AtomicU64::new(0),
+            cache_latency_ns_total: AtomicU64::new(0),
+            cache_latency_ns_max: AtomicU64::new(0),
+            cache_misses: AtomicU64::new(0),
+        }
+    }
+
+    fn row_not_found() -> anyhow::Error {
+        DatabaseError::Sqlx(sqlx::Error::RowNotFound).into()
+    }
+
+    fn is_row_not_found(err: &anyhow::Error) -> bool {
+        err.chain().any(|err| {
+            matches!(
+                err.downcast_ref::<DatabaseError>(),
+                Some(DatabaseError::Sqlx(sqlx::Error::RowNotFound))
+            )
+        })
+    }
+
+    #[tokio::test]
+    async fn sole_caller_receives_the_original_error() {
+        let cache = memory_only();
+
+        let err = cache
+            .cached("key", 10, || async { Err::<u8, _>(row_not_found()) })
+            .await
+            .unwrap_err();
+
+        assert!(err.downcast_ref::<SharedComputeError>().is_some());
+        assert!(is_row_not_found(&err));
+    }
+
+    #[tokio::test]
+    async fn coalesced_callers_can_reach_the_original_error() {
+        let cache = Arc::new(memory_only());
+        let (release, released) = tokio::sync::oneshot::channel::<()>();
+
+        let first = tokio::spawn({
+            let cache = Arc::clone(&cache);
+            async move {
+                cache
+                    .cached("key", 10, || async {
+                        released.await.unwrap();
+                        Err::<u8, _>(row_not_found())
+                    })
+                    .await
+            }
+        });
+        tokio::time::sleep(Duration::from_millis(20)).await;
+
+        let second = tokio::spawn({
+            let cache = Arc::clone(&cache);
+            async move {
+                cache
+                    .cached("key", 10, || async { Ok::<u8, anyhow::Error>(1) })
+                    .await
+            }
+        });
+        tokio::time::sleep(Duration::from_millis(20)).await;
+        release.send(()).unwrap();
+
+        let first = first.await.unwrap().unwrap_err();
+        let second = second.await.unwrap().unwrap_err();
+
+        assert!(is_row_not_found(&first));
+        assert!(is_row_not_found(&second));
     }
 }

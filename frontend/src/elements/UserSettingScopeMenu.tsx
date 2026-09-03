@@ -8,11 +8,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Fragment, ReactNode } from 'react';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
-import Menu from '@/elements/Menu.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
-import UnstyledButton from '@/elements/UnstyledButton.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
+import Menu from '@/elements/overlays/Menu.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { UserSettingValue } from '@/lib/schemas/user/settings.ts';
 import {
   clearUserSettingOverride,

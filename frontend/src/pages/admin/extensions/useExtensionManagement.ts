@@ -11,10 +11,10 @@ import setExtensionEnabled from '@/api/admin/extensions/setExtensionEnabled.ts';
 import { computePendingRestart, getBuildPhase, removeByPackageName, upsertByPackageName } from '@/lib/extensions.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminBackendExtension } from '@/lib/schemas/admin/backendExtension.ts';
-import { useImportDragAndDrop } from '@/plugins/useImportDragAndDrop.ts';
-import { useMutateWithToast } from '@/plugins/useMutateWithToast.ts';
-import { usePollingResource } from '@/plugins/usePollingResource.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useImportDragAndDrop } from '@/plugins/import/useImportDragAndDrop.ts';
+import { usePollingResource } from '@/plugins/resource/usePollingResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
+import { useMutateWithToast } from '@/plugins/toast/useMutateWithToast.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

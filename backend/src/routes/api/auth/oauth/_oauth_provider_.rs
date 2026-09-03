@@ -118,9 +118,9 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
 
             let client = BasicClient::new(ClientId::new(oauth_provider.client_id.to_string()))
                 .set_client_secret(ClientSecret::new(
-                    state
-                        .database
-                        .decrypt(oauth_provider.client_secret.clone())
+                    oauth_provider
+                        .client_secret
+                        .decrypt(&state.database)
                         .await?
                         .into(),
                 ))

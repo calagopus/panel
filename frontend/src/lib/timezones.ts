@@ -1,10 +1,6 @@
-import { zones } from 'tzdata';
-
-export function getTimezoneOptions(): { value: string; label: string }[] {
-  return Object.keys(zones)
-    .sort()
-    .map((zone) => ({
-      value: zone,
-      label: zone,
-    }));
-}
+/**
+ * @deprecated `@/lib/timezones.ts` has moved to `@/lib/format/timezones.ts`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export * from '@/lib/format/timezones.ts';

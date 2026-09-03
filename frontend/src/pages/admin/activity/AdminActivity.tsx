@@ -2,10 +2,10 @@ import getAdminActivity from '@/api/admin/getAdminActivity.ts';
 import ActivityRow from '@/elements/activity/ActivityRow.tsx';
 import ClearUserFilterButton from '@/elements/activity/ClearUserFilterButton.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import Table from '@/elements/Table.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { activityColumns } from '@/lib/tableColumns.ts';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useUserFilter } from '@/plugins/useUserFilter.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

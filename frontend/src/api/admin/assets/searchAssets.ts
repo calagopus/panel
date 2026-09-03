@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (directory: string, search: string): Promise<z.infer<typeof storageAssetSchema>[]> => {
   const { data } = await axiosInstance.post('/api/admin/assets/search', {

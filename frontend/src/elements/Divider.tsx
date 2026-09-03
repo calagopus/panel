@@ -1,9 +1,6 @@
-import { DividerProps, Divider as MantineDivider } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Divider = forwardRef<HTMLDivElement, DividerProps>(({ className, ...rest }, ref) => {
-  return <MantineDivider ref={ref} className={className} {...rest} />;
-});
-
-export default makeComponentHookable(Divider);
+/**
+ * @deprecated `@/elements/Divider.tsx` has moved to `@/elements/layout/Divider.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/Divider.tsx';

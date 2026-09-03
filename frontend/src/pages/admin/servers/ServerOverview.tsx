@@ -12,21 +12,21 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid, Text } from '@mantine/core';
-import { z } from 'zod';
-import Badge from '@/elements/Badge.tsx';
-import Card from '@/elements/Card.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Group from '@/elements/Group.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { serverStatusInfo } from '@/lib/server.ts';
-import { bytesToString, mbToBytes } from '@/lib/size.ts';
-import { formatDateTime } from '@/lib/time.ts';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import { serverStatusInfo } from '@/lib/domain/server.ts';
+import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { formatDateTime } from '@/lib/format/time.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-type Server = z.infer<typeof adminServerSchema>;
+type Server = AdminServer;
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -55,6 +55,38 @@ function StatBox({ label, value, icon }: { label: string; value: React.ReactNode
       </Text>
     </Card>
   );
+}
+
+function LimitBytesValue({
+  value,
+  unlimitedValue = 0,
+  disabledValue,
+  unlimitedLabel,
+  disabledLabel,
+}: {
+  value: number;
+  unlimitedValue?: number;
+  disabledValue?: number;
+  unlimitedLabel: string;
+  disabledLabel?: string;
+}) {
+  if (value === unlimitedValue) {
+    return (
+      <Badge color='gray' variant='light'>
+        {unlimitedLabel}
+      </Badge>
+    );
+  }
+
+  if (disabledValue !== undefined && value === disabledValue && disabledLabel) {
+    return (
+      <Badge color='gray' variant='light'>
+        {disabledLabel}
+      </Badge>
+    );
+  }
+
+  return <>{bytesToString(mbToBytes(value))}</>;
 }
 
 export default function ServerOverview({ server }: { server: Server }) {
@@ -125,11 +157,13 @@ export default function ServerOverview({ server }: { server: Server }) {
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.createdAt', {})}>
                 <Text size='sm'>{formatDateTime(server.owner.created)}</Text>
               </InfoRow>
-              {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.owner.appendedComponents.map(
-                (Component, index) => (
-                  <Component key={`owner-ext-${index}`} server={server} />
-                ),
-              )}
+              <ExtensionSlot
+                components={
+                  window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.owner.appendedComponents
+                }
+                name='owner-ext'
+                props={{ server }}
+              />
             </Stack>
           </TitleCard>
 
@@ -168,11 +202,14 @@ export default function ServerOverview({ server }: { server: Server }) {
                   {server.node.disk === 0 ? unlimitedLabel : bytesToString(mbToBytes(server.node.disk))}
                 </Text>
               </InfoRow>
-              {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.nodeAndLocation.appendedComponents.map(
-                (Component, index) => (
-                  <Component key={`node-location-ext-${index}`} server={server} />
-                ),
-              )}
+              <ExtensionSlot
+                components={
+                  window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.nodeAndLocation
+                    .appendedComponents
+                }
+                name='node-location-ext'
+                props={{ server }}
+              />
             </Stack>
           </TitleCard>
         </SimpleGrid>
@@ -234,15 +271,18 @@ export default function ServerOverview({ server }: { server: Server }) {
                 </Text>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.createdAt', {})}>
-                <Text size='sm'>{server.created.toLocaleString()}</Text>
+                <Text size='sm'>{formatDateTime(server.created)}</Text>
               </InfoRow>
             </Stack>
           </SimpleGrid>
-          {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.serverDetails.appendedComponents.map(
-            (Component, index) => (
-              <Component key={`server-details-ext-${index}`} server={server} />
-            ),
-          )}
+          <ExtensionSlot
+            components={
+              window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.serverDetails
+                .appendedComponents
+            }
+            name='server-details-ext'
+            props={{ server }}
+          />
         </TitleCard>
 
         <TitleCard
@@ -266,51 +306,34 @@ export default function ServerOverview({ server }: { server: Server }) {
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.memory', {})}
               icon={<FontAwesomeIcon icon={faMemory} />}
-              value={
-                server.limits.memory === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.memory))
-                )
-              }
+              value={<LimitBytesValue value={server.limits.memory} unlimitedLabel={unlimitedLabel} />}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.disk', {})}
               icon={<FontAwesomeIcon icon={faHardDrive} />}
-              value={
-                server.limits.disk === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.disk))
-                )
-              }
+              value={<LimitBytesValue value={server.limits.disk} unlimitedLabel={unlimitedLabel} />}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.swap', {})}
               icon={<FontAwesomeIcon icon={faServer} />}
               value={
-                server.limits.swap === -1 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : server.limits.swap === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {t('common.form.disabled', {})}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.swap))
-                )
+                <LimitBytesValue
+                  value={server.limits.swap}
+                  unlimitedValue={-1}
+                  disabledValue={0}
+                  unlimitedLabel={unlimitedLabel}
+                  disabledLabel={t('common.form.disabled', {})}
+                />
               }
             />
-            {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.resourceLimits.appendedComponents.map(
-              (Component, index) => (
-                <Component key={`resource-limits-ext-${index}`} server={server} />
-              ),
-            )}
+            <ExtensionSlot
+              components={
+                window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.resourceLimits
+                  .appendedComponents
+              }
+              name='resource-limits-ext'
+              props={{ server }}
+            />
           </SimpleGrid>
         </TitleCard>
 
@@ -339,18 +362,23 @@ export default function ServerOverview({ server }: { server: Server }) {
               icon={<FontAwesomeIcon icon={faClock} />}
               value={server.featureLimits.schedules}
             />
-            {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.featureLimits.appendedComponents.map(
-              (Component, index) => (
-                <Component key={`feature-limit-ext-${index}`} server={server} />
-              ),
-            )}
+            <ExtensionSlot
+              components={
+                window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.featureLimits
+                  .appendedComponents
+              }
+              name='feature-limit-ext'
+              props={{ server }}
+            />
           </SimpleGrid>
         </TitleCard>
-        {window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.appendedCards.appendedComponents.map(
-          (Component, index) => (
-            <Component key={`overview-card-ext-${index}`} server={server} />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.admin.servers.view.overview.appendedCards.appendedComponents
+          }
+          name='overview-card-ext'
+          props={{ server }}
+        />
       </Stack>
     </AdminSubContentContainer>
   );

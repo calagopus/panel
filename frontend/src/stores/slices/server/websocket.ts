@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { SocketError, Websocket } from '@/plugins/Websocket.ts';
+import { SocketError, Websocket } from '@/plugins/websocket/Websocket.ts';
 import { ServerStore } from '@/stores/server.ts';
 
 export interface WebsocketSlice {

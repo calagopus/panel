@@ -1,13 +1,13 @@
 import { forwardRef } from 'react';
 import { z } from 'zod';
-import Badge from '@/elements/Badge.tsx';
-import Code from '@/elements/Code.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
-import Group from '@/elements/Group.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { adminServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

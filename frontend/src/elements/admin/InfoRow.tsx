@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import Text from '@/elements/Text.tsx';
+import Text from '@/elements/typography/Text.tsx';
 
 export default function InfoRow({ label, children }: { label: string; children: ReactNode }) {
   return (

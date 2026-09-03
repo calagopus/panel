@@ -1,9 +1,6 @@
-import { Stack as MantineStack, StackProps } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const Stack = forwardRef<HTMLDivElement, StackProps>(({ ...rest }, ref) => {
-  return <MantineStack ref={ref} {...rest} />;
-});
-
-export default makeComponentHookable(Stack);
+/**
+ * @deprecated `@/elements/Stack.tsx` has moved to `@/elements/layout/Stack.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/Stack.tsx';

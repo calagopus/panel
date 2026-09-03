@@ -7,8 +7,8 @@ import getBackup from '@/api/server/backups/getBackup.ts';
 import loadDirectory, { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
 import { registerUploadRefresh } from '@/lib/files/uploadManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useUploader } from '@/plugins/import/useUploader.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useUploader } from '@/plugins/useUploader.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import {
   bridgeFileManagerUserSettings,

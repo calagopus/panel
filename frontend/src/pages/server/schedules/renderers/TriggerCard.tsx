@@ -3,23 +3,23 @@ import { CronExpressionParser } from 'cron-parser';
 import cronstrue from 'cronstrue/i18n';
 import { z } from 'zod';
 import getSchedule from '@/api/server/schedules/getSchedule.ts';
-import Card from '@/elements/Card.tsx';
-import Code from '@/elements/Code.tsx';
-import Group from '@/elements/Group.tsx';
-import Text from '@/elements/Text.tsx';
-import ThemeIcon from '@/elements/ThemeIcon.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   scheduleComparatorLabelMapping,
   scheduleResourceMetricLabelMapping,
   scheduleTriggerColorMapping,
   scheduleTriggerIconMapping,
 } from '@/lib/enums.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleTriggerSchema } from '@/lib/schemas/server/schedules.ts';
-import { bytesToString } from '@/lib/size.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 

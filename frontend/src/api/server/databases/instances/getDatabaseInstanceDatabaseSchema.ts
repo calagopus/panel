@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { axiosInstance, msgpackResponseConfig } from '@/api/axios.ts';
-import { parseFromApi } from '@/lib/api-transform.ts';
 import { serverDatabaseSchemaSchema, serverDatabaseSchemaTableSchema } from '@/lib/schemas/server/databases.ts';
+import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
 export default async (
   uuid: string,

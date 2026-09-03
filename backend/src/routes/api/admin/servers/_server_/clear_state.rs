@@ -6,7 +6,9 @@ mod post {
     use shared::{
         GetState,
         models::{
-            EventEmittingModel, admin_activity::GetAdminActivityLogger, server::GetServer,
+            ByUuid, EventEmittingModel,
+            admin_activity::GetAdminActivityLogger,
+            server::{GetServer, Server, ServerEvent},
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -78,6 +80,8 @@ mod post {
 
         transaction.commit().await?;
 
+        Server::invalidate_cached(&state.database, server.uuid).await;
+
         activity_logger
             .log(
                 "server:clear-state",
@@ -87,9 +91,9 @@ mod post {
             )
             .await;
 
-        shared::models::server::Server::get_event_emitter().emit(
+        Server::get_event_emitter().emit(
             state.0,
-            shared::models::server::ServerEvent::StateReset {
+            ServerEvent::StateReset {
                 server: Box::new(server.0),
             },
         );

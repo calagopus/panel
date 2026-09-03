@@ -5,16 +5,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import getNodeToken from '@/api/admin/nodes/getNodeToken.ts';
 import getNodeSystemOverview from '@/api/admin/nodes/system/getNodeSystemOverview.ts';
 import { axiosInstance } from '@/api/axios.ts';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Alert from '@/elements/Alert.tsx';
 import AlertError from '@/elements/alerts/AlertError.tsx';
-import Button from '@/elements/Button.tsx';
-import Code from '@/elements/Code.tsx';
-import Group from '@/elements/Group.tsx';
-import HljsCode from '@/elements/HljsCode.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Title from '@/elements/Title.tsx';
-import { handleCopyToClipboard } from '@/lib/copy.ts';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import HljsCode from '@/elements/editors/HljsCode.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import Code from '@/elements/typography/Code.tsx';
+import Title from '@/elements/typography/Title.tsx';
+import { handleCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import {
   getNodeConfiguration,
   getNodeConfigurationCommand,
@@ -22,9 +22,9 @@ import {
   getNodeDefaultApiPort,
   getNodeUrl,
   isNodeAIO,
-} from '@/lib/node.ts';
+} from '@/lib/domain/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';

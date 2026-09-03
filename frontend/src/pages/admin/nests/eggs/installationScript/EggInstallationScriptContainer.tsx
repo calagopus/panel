@@ -1,20 +1,22 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import updateEggScript from '@/api/admin/nests/eggs/updateEggScript.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import Group from '@/elements/Group.tsx';
-import MonacoEditor from '@/elements/MonacoEditor.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggConfigScriptSchema, adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { eggScriptEmptyFormValues, eggToScriptFormValues } from './eggScriptFormValues.ts';
 
 type ScriptFormValues = z.infer<typeof adminEggConfigScriptSchema>;
 
@@ -33,23 +35,11 @@ export default function EggInstallationScriptContainer({
 
   const form = useFormEngine<ScriptFormValues>('admin.nests.eggs.installationScript', {
     schema: adminEggConfigScriptSchema,
-    initialValues: {
-      container: '',
-      entrypoint: '',
-      content: '',
-    },
+    initialValues: eggScriptEmptyFormValues,
     validateInputOnBlur: true,
   });
 
-  useEffect(() => {
-    if (contextEgg) {
-      form.setValues({
-        container: contextEgg.configScript.container,
-        entrypoint: contextEgg.configScript.entrypoint,
-        content: contextEgg.configScript.content,
-      });
-    }
-  }, [contextEgg]);
+  useHydrateForm(form, contextEgg, eggToScriptFormValues);
 
   const doUpdate = () => {
     setLoading(true);

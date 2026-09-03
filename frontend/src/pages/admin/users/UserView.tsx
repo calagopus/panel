@@ -2,12 +2,12 @@ import { faBriefcase, faCog, faComputer, faFingerprint } from '@fortawesome/free
 import { useParams } from 'react-router';
 import getUser from '@/api/admin/users/getUser.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminUserServers from '@/pages/admin/users/servers/AdminUserServers.tsx';
 import UserCreateOrUpdate from '@/pages/admin/users/UserCreateOrUpdate.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminUserActivity from './activity/AdminUserActivity.tsx';
 import AdminUserOAuthLinks from './oauthLinks/AdminUserOAuthLinks.tsx';

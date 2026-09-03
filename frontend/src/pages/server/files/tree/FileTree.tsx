@@ -6,8 +6,8 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import searchFiles from '@/api/server/files/searchFiles.ts';
-import Card from '@/elements/Card.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { registerUploadRefresh } from '@/lib/files/uploadManager.ts';
 import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import { getFilesFromDataTransfer } from '@/pages/server/files/hooks/useFileDragAndDrop.ts';
@@ -33,10 +33,14 @@ import {
   TreeSelectionItem,
 } from '@/pages/server/files/tree/fileTreeData.ts';
 import { setFileTreeEditorDragData } from '@/pages/server/files/tree/fileTreeEditor.ts';
-import { isInputFocused, matchesActiveShortcut, useKeyboardShortcuts } from '@/plugins/useKeyboardShortcuts.ts';
+import {
+  isInputFocused,
+  matchesActiveShortcut,
+  useKeyboardShortcuts,
+} from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useSelectionArea } from '@/plugins/useSelectionArea.ts';
-import useWebsocketEvent, { SocketEvent } from '@/plugins/useWebsocketEvent.ts';
+import useWebsocketEvent, { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';

@@ -4,17 +4,17 @@ import { useCallback } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import createOAuthProvider from '@/api/admin/oauth-providers/createOAuthProvider.ts';
 import getOAuthProviders from '@/api/admin/oauth-providers/getOAuthProviders.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import Table from '@/elements/data-display/Table.tsx';
 import ImportOverlay from '@/elements/ImportOverlay.tsx';
-import Table from '@/elements/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
+import { adminOAuthProviderUpdateSchema, oauthProviderSecretFields } from '@/lib/schemas/admin/oauthProviders.ts';
 import { oauthProviderTableColumns } from '@/lib/tableColumns.ts';
+import { useResourceImport } from '@/plugins/import/useResourceImport.tsx';
+import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
-import { useResourceImport } from '@/plugins/useResourceImport.tsx';
-import { useSearchablePaginatedTable } from '@/plugins/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import OAuthProviderCreateOrUpdate from './OAuthProviderCreateOrUpdate.tsx';
@@ -44,8 +44,7 @@ function OAuthProvidersContainer() {
       ...raw,
       // Exports and presets from before the login_bypass_two_factor rename only carry the old key.
       login_bypass_two_factor: raw.login_bypass_two_factor ?? raw.login_bypass_2fa,
-      client_id: 'example',
-      client_secret: 'example',
+      ...Object.fromEntries(oauthProviderSecretFields.map((field) => [field, 'example'])),
     }),
     [],
   );

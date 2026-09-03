@@ -1,18 +1,16 @@
 import { z } from 'zod';
-import Code from '@/elements/Code.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import BooleanText from '@/elements/typography/BooleanText.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function OAuthProviderRow({
   oauthProvider,
 }: {
   oauthProvider: z.infer<typeof adminOAuthProviderSchema>;
 }) {
-  const { t } = useTranslations();
-
   return (
     <TableRow>
       <TableData>
@@ -22,10 +20,18 @@ export default function OAuthProviderRow({
       </TableData>
 
       <TableData>{oauthProvider.name}</TableData>
-      <TableData>{oauthProvider.enabled ? t('common.yes', {}) : t('common.no', {})}</TableData>
-      <TableData>{oauthProvider.loginOnly ? t('common.yes', {}) : t('common.no', {})}</TableData>
-      <TableData>{oauthProvider.linkViewable ? t('common.yes', {}) : t('common.no', {})}</TableData>
-      <TableData>{oauthProvider.userManageable ? t('common.yes', {}) : t('common.no', {})}</TableData>
+      <TableData>
+        <BooleanText value={oauthProvider.enabled} />
+      </TableData>
+      <TableData>
+        <BooleanText value={oauthProvider.loginOnly} />
+      </TableData>
+      <TableData>
+        <BooleanText value={oauthProvider.linkViewable} />
+      </TableData>
+      <TableData>
+        <BooleanText value={oauthProvider.userManageable} />
+      </TableData>
       <TableData>
         <FormattedTimestamp timestamp={oauthProvider.created} />
       </TableData>

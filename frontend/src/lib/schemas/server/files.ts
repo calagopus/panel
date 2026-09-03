@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { archiveFormatLabelMapping } from '@/lib/enums.ts';
 import { userSchema } from '@/lib/schemas/user.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const serverFilesArchiveCreateSchema = z.object({
   name: z.string().nullable(),

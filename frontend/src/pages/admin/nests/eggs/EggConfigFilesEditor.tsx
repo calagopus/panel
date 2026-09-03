@@ -2,15 +2,15 @@ import { faFileText, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
-import Group from '@/elements/Group.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { processConfigurationParserLabelMapping } from '@/lib/enums.ts';
 import { adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -62,7 +62,7 @@ export default function EggConfigFilesEditor({
                 })}
               />
 
-              <EggConfigFileReplaceEditor form={form} configFileIndex={index} />
+              <EggConfigFileReplaceEditor form={form} index={index} />
             </Stack>
 
             <ActionIcon
@@ -70,12 +70,7 @@ export default function EggConfigFilesEditor({
               variant='light'
               size='input-md'
               className='ml-4'
-              onClick={() =>
-                form.setValues({
-                  ...form.getValues(),
-                  configFiles: form.getValues().configFiles.filter((_, i) => i !== index),
-                })
-              }
+              onClick={() => form.removeListItem('configFiles', index)}
             >
               <FontAwesomeIcon icon={faMinus} />
             </ActionIcon>
@@ -86,17 +81,11 @@ export default function EggConfigFilesEditor({
       <Button
         variant='light'
         onClick={() =>
-          form.setValues({
-            ...form.getValues(),
-            configFiles: [
-              ...form.getValues().configFiles,
-              {
-                file: '',
-                parser: 'file',
-                createNew: true,
-                replace: [],
-              },
-            ],
+          form.insertListItem('configFiles', {
+            file: '',
+            parser: 'file',
+            createNew: true,
+            replace: [],
           })
         }
         className='w-fit!'

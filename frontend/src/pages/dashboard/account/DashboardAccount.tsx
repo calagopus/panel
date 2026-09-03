@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import resendEmailVerification from '@/api/me/account/resendEmailVerification.ts';
-import Alert from '@/elements/Alert.tsx';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
-import Stack from '@/elements/Stack.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -91,14 +92,13 @@ export default function DashboardAccount() {
         }`}
         aria-disabled={frozen}
       >
-        {window.extensionContext.extensionRegistry.pages.dashboard.account.accountContainers.prependedComponents.map(
-          (Component, i) => (
-            <Component
-              key={`account-accountContainer-prepended-${i}`}
-              requireTwoFactorActivation={requireTwoFactorActivation}
-            />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.dashboard.account.accountContainers.prependedComponents
+          }
+          name='account-accountContainer-prepended'
+          props={{ requireTwoFactorActivation }}
+        />
 
         <PasswordContainer requireTwoFactorActivation={requireTwoFactorActivation} />
         <EmailContainer requireTwoFactorActivation={requireTwoFactorActivation} />
@@ -108,14 +108,13 @@ export default function DashboardAccount() {
         <PreferencesContainer requireTwoFactorActivation={requireTwoFactorActivation} />
         <AvatarContainer requireTwoFactorActivation={requireTwoFactorActivation} />
 
-        {window.extensionContext.extensionRegistry.pages.dashboard.account.accountContainers.appendedComponents.map(
-          (Component, i) => (
-            <Component
-              key={`account-accountContainer-appended-${i}`}
-              requireTwoFactorActivation={requireTwoFactorActivation}
-            />
-          ),
-        )}
+        <ExtensionSlot
+          components={
+            window.extensionContext.extensionRegistry.pages.dashboard.account.accountContainers.appendedComponents
+          }
+          name='account-accountContainer-appended'
+          props={{ requireTwoFactorActivation }}
+        />
       </div>
     </AccountContentContainer>
   );

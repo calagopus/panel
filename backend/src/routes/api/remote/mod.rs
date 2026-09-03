@@ -5,7 +5,10 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use shared::{models::node::Node, response::ApiResponse};
+use shared::{
+    models::{ResolvableModel, node::Node},
+    response::ApiResponse,
+};
 use utoipa_axum::router::OpenApiRouter;
 
 mod activity;
@@ -62,13 +65,7 @@ pub async fn auth(
             .into_response());
     }
 
-    let Some((token_id, token)) = token.split_once('.') else {
-        return Ok(ApiResponse::error("invalid authorization header")
-            .with_status(StatusCode::UNAUTHORIZED)
-            .into_response());
-    };
-
-    let node = Node::by_token_id_token_cached(&state.database, token_id, token).await;
+    let node = Node::resolve_cached(&state.database, token).await;
     let node = match node {
         Ok(Some(data)) => data,
         Ok(None) => {

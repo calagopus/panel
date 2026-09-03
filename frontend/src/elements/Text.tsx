@@ -1,20 +1,6 @@
-import { Text as MantineText, TextProps } from '@mantine/core';
-import { ComponentPropsWithoutRef, forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-type TextElementProps = TextProps &
-  ComponentPropsWithoutRef<'p'> & {
-    component?: React.ElementType;
-  };
-
-const Text = forwardRef<HTMLParagraphElement, TextElementProps>(({ component, ...rest }, ref) => {
-  return (
-    <MantineText
-      ref={ref as React.Ref<HTMLParagraphElement>}
-      {...(component ? { component: component as 'p' } : {})}
-      {...rest}
-    />
-  );
-});
-
-export default makeComponentHookable(Text);
+/**
+ * @deprecated `@/elements/Text.tsx` has moved to `@/elements/typography/Text.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/typography/Text.tsx';

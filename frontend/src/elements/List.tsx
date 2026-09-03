@@ -1,18 +1,6 @@
-import { ListItemProps, ListProps, List as MantineList, ListItem as MantineListItem } from '@mantine/core';
-import { forwardRef } from 'react';
-import { makeComponentHookable } from 'shared';
-
-const ListItem = forwardRef<HTMLLIElement, ListItemProps>(({ ...rest }, ref) => {
-  return <MantineListItem ref={ref} {...rest} />;
-});
-
-const List = makeComponentHookable(
-  ({ ...rest }: ListProps) => {
-    return <MantineList {...rest} />;
-  },
-  {
-    Item: makeComponentHookable(ListItem),
-  },
-);
-
-export default List;
+/**
+ * @deprecated `@/elements/List.tsx` has moved to `@/elements/layout/List.tsx`.
+ * This re-export is kept for backward compatibility and will be removed in a future release.
+ * Update imports to the new path.
+ */
+export { default } from '@/elements/layout/List.tsx';

@@ -2,7 +2,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Stack from '@/elements/Stack.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { mappingToSelectData, serverPowerActionLabelMapping } from '@/lib/enums.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';

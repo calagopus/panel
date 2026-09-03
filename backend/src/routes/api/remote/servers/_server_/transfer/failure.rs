@@ -6,7 +6,10 @@ mod post {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{EventEmittingModel, server::GetServer},
+        models::{
+            ByUuid, EventEmittingModel,
+            server::{GetServer, Server, ServerEvent},
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -71,6 +74,8 @@ mod post {
 
         transaction.commit().await?;
 
+        Server::invalidate_cached(&state.database, server.uuid).await;
+
         if let Err(err) = destination_node
             .api_client(&state.database)
             .await?
@@ -80,9 +85,9 @@ mod post {
             tracing::error!("failed to delete server on destination node: {:?}", err);
         }
 
-        shared::models::server::Server::get_event_emitter().emit(
+        Server::get_event_emitter().emit(
             state.0,
-            shared::models::server::ServerEvent::TransferCompleted {
+            ServerEvent::TransferCompleted {
                 server: Box::new(server.0),
                 destination_node: Box::new(destination_node),
                 successful: false,

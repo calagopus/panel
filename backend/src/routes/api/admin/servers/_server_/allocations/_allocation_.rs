@@ -81,9 +81,9 @@ mod patch {
     use shared::{
         ApiError, GetState,
         models::{
-            UpdatableModel,
+            ByUuid, UpdatableModel,
             admin_activity::GetAdminActivityLogger,
-            server::GetServer,
+            server::{GetServer, Server},
             server_allocation::{ServerAllocation, UpdateServerAllocationOptions},
             user::GetPermissionManager,
         },
@@ -199,6 +199,8 @@ mod patch {
         }
 
         transaction.commit().await?;
+
+        Server::invalidate_cached(&state.database, server.uuid).await;
 
         activity_logger
             .log(

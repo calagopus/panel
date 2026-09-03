@@ -2,13 +2,13 @@ import { faCog, faComputer, faEgg, faServer } from '@fortawesome/free-solid-svg-
 import { useParams } from 'react-router';
 import getMount from '@/api/admin/mounts/getMount.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
+import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
-import SubNavigation from '@/elements/SubNavigation.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import MountCreateOrUpdate from '@/pages/admin/mounts/MountCreateOrUpdate.tsx';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminMountEggs from './eggs/AdminMountEggs.tsx';
+import MountCreateOrUpdate from './MountCreateOrUpdate.tsx';
 import AdminMountNodes from './nodes/AdminMountNodes.tsx';
 import AdminMountServers from './servers/AdminMountServers.tsx';
 

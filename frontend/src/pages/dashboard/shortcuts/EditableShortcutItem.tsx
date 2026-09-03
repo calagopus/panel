@@ -12,14 +12,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Flex from '@/elements/Flex.tsx';
-import Group from '@/elements/Group.tsx';
-import KbdKey from '@/elements/KbdKey.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Flex from '@/elements/layout/Flex.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
-import Text from '@/elements/Text.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import KbdKey from '@/elements/typography/KbdKey.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { disableShortcut, resetShortcut, setShortcutBinding } from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   bindingFromEvent,

@@ -3,12 +3,12 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join } from 'pathe';
 import { z } from 'zod';
 import compressFiles from '@/api/server/files/compressFiles.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { archiveFormatLabelMapping } from '@/lib/enums.ts';
 import { generateArchiveName } from '@/lib/files/files.ts';
 import {
@@ -17,7 +17,7 @@ import {
   serverFilesArchiveCreateSchema,
 } from '@/lib/schemas/server/files.ts';
 import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

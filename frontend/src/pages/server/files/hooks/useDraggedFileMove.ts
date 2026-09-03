@@ -7,8 +7,8 @@ import {
   moveFileGroupsToDirectory,
   restoreFileGroupsFromDirectory,
 } from '@/pages/server/files/list/fileMove.ts';
+import { useUndoableToast } from '@/plugins/toast/useUndoableToast.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useUndoableToast } from '@/plugins/useUndoableToast.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { FileManagerStore, useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';

@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { ReactNode } from 'react';
-import Code from '@/elements/Code.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { toContainerPath } from '@/lib/files/files.ts';
 
 export default function FilePathPreview({ label, path, mt = true }: { label: ReactNode; path: string; mt?: boolean }) {

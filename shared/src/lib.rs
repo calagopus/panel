@@ -21,6 +21,7 @@ pub mod cache;
 pub mod cap;
 pub mod captcha;
 pub mod censor;
+pub mod crypt;
 pub mod database;
 pub mod deserialize;
 pub mod env;

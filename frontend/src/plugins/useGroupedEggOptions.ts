@@ -1,6 +1,6 @@
 import getAllEggs from '@/api/admin/nests/getAllEggs.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { useResource } from '@/plugins/useResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 
 export interface EggOptionGroup {
   group: string;

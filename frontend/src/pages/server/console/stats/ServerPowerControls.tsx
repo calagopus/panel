@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
-import { SocketRequest } from '@/plugins/useWebsocketEvent.ts';
+import { SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -52,11 +53,12 @@ export default function ServerPowerControls() {
         {t('pages.server.console.power.modal.forceStop.content', {}).md()}
       </ConfirmationModal>
 
-      {window.extensionContext.extensionRegistry.pages.server.console.powerButtonComponents.prependedComponents.map(
-        (Component, i) => (
-          <Component key={`console-powerbutton-prepended-${i}`} />
-        ),
-      )}
+      <ExtensionSlot
+        components={
+          window.extensionContext.extensionRegistry.pages.server.console.powerButtonComponents.prependedComponents
+        }
+        name='console-powerbutton-prepended'
+      />
 
       <ServerCan action='control.start'>
         <Button
@@ -94,11 +96,12 @@ export default function ServerPowerControls() {
         </Button>
       </ServerCan>
 
-      {window.extensionContext.extensionRegistry.pages.server.console.powerButtonComponents.appendedComponents.map(
-        (Component, i) => (
-          <Component key={`console-powerButton-appended-${i}`} />
-        ),
-      )}
+      <ExtensionSlot
+        components={
+          window.extensionContext.extensionRegistry.pages.server.console.powerButtonComponents.appendedComponents
+        }
+        name='console-powerButton-appended'
+      />
     </div>
   );
 }

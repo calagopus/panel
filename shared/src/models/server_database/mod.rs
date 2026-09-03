@@ -1,4 +1,5 @@
 use crate::{
+    crypt::EncryptedString,
     models::{
         InsertQueryBuilder, UpdateQueryBuilder,
         database_host::{DatabaseTransaction, DatabaseType},
@@ -34,7 +35,7 @@ pub struct ServerDatabase {
     pub locked: bool,
 
     pub username: compact_str::CompactString,
-    pub password: Vec<u8>,
+    pub password: EncryptedString,
 
     pub created: chrono::NaiveDateTime,
 
@@ -384,6 +385,9 @@ impl ServerDatabase {
             }
         }
 
+        let (new_password, encrypted_password) =
+            EncryptedString::from_plaintext_with_input(new_password, database).await?;
+
         sqlx::query(
             r#"
             UPDATE server_databases
@@ -391,7 +395,7 @@ impl ServerDatabase {
             WHERE server_databases.uuid = $2
             "#,
         )
-        .bind(database.encrypt(new_password.clone()).await?)
+        .bind(encrypted_password)
         .bind(self.uuid)
         .execute(database.write())
         .await?;
@@ -478,7 +482,7 @@ impl ServerDatabase {
 
                     db.drop().await?;
 
-                    let password = database.decrypt(self.password.clone()).await?;
+                    let password = self.password.decrypt(database).await?;
                     let cmd = mongodb::bson::doc! {
                         "createUser": self.username.to_string(),
                         "pwd": password.into_string(),
@@ -544,7 +548,7 @@ impl ServerDatabase {
                 name: self.name,
                 is_locked: self.locked,
                 username: self.username,
-                password: state.database.decrypt(self.password).await?,
+                password: self.password.decrypt(&state.database).await?,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -591,7 +595,7 @@ impl IntoAdminApiObject for ServerDatabase {
                 name: self.name,
                 is_locked: self.locked,
                 username: self.username,
-                password: state.database.decrypt(self.password).await?,
+                password: self.password.decrypt(&state.database).await?,
                 created: self.created.and_utc(),
             },
             api_object,
@@ -633,7 +637,7 @@ impl IntoApiObject for ServerDatabase {
                 is_locked: self.locked,
                 username: self.username,
                 password: if show_password {
-                    Some(state.database.decrypt(self.password).await?)
+                    Some(self.password.decrypt(&state.database).await?)
                 } else {
                     None
                 },
@@ -789,7 +793,10 @@ impl CreatableModel for ServerDatabase {
             .set("database_host_uuid", options.database_host.uuid)
             .set("name", &name)
             .set("username", &username)
-            .set("password", state.database.encrypt(password.clone()).await?);
+            .set(
+                "password",
+                EncryptedString::from_plaintext(password, &state.database).await?,
+            );
 
         let row = match query_builder
             .returning("uuid")

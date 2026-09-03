@@ -13,11 +13,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef } from 'react';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Collapse from '@/elements/Collapse.tsx';
-import ContextMenu from '@/elements/ContextMenu.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Collapse from '@/elements/layout/Collapse.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileTreeToolbarProps {
@@ -118,9 +119,10 @@ export default function FileTreeToolbar({
         </div>
 
         <div data-file-manager-tree-actions className='flex items-center gap-1'>
-          {registry.fileTreeToolbar.prependedComponents.map((Component, index) => (
-            <Component key={`files-fileTreeToolbar-prepended-${index}`} />
-          ))}
+          <ExtensionSlot
+            components={registry.fileTreeToolbar.prependedComponents}
+            name='files-fileTreeToolbar-prepended'
+          />
 
           {canCreateFiles && (
             <ActionIcon
@@ -237,9 +239,10 @@ export default function FileTreeToolbar({
             <FontAwesomeIcon icon={faRotate} />
           </ActionIcon>
 
-          {registry.fileTreeToolbar.appendedComponents.map((Component, index) => (
-            <Component key={`files-fileTreeToolbar-appended-${index}`} />
-          ))}
+          <ExtensionSlot
+            components={registry.fileTreeToolbar.appendedComponents}
+            name='files-fileTreeToolbar-appended'
+          />
         </div>
       </div>
 

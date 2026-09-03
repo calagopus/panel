@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE servers\n                SET status = $2\n                WHERE servers.node_uuid = $1 AND servers.status = 'RESTORING_BACKUP'\n                RETURNING servers.uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "server_status",
+            "kind": {
+              "Enum": [
+                "INSTALLING",
+                "INSTALL_FAILED",
+                "RESTORING_BACKUP",
+                "BACKUP_RESTORE_FAILED"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "9337cbfceb7257247364b55b7a4fe1d536db8103a107e2414c9e8fd120ded583"
+}

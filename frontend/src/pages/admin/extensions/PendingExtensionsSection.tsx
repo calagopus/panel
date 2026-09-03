@@ -1,11 +1,11 @@
 import { faBan, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ExtensionStatus } from '@/api/admin/extensions/manage/getExtensionStatus.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
-import ConditionalTooltip from '@/elements/ConditionalTooltip.tsx';
-import Group from '@/elements/Group.tsx';
-import Title from '@/elements/Title.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import Title from '@/elements/typography/Title.tsx';
 import { AdminBackendExtension } from '@/lib/schemas/admin/backendExtension.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ExtensionCard from './ExtensionCard.tsx';

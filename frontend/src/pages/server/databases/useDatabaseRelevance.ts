@@ -4,8 +4,8 @@ import getDatabases from '@/api/server/databases/getDatabases.ts';
 import getDatabaseInstances from '@/api/server/databases/instances/getDatabaseInstances.ts';
 import getDatabaseInstanceTemplates from '@/api/server/databases/instances/getDatabaseInstanceTemplates.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
-import { useResource } from '@/plugins/useResource.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 export function useDatabaseRelevance() {

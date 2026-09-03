@@ -2,25 +2,24 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Button from '@/elements/Button.tsx';
-import Card from '@/elements/Card.tsx';
-import Group from '@/elements/Group.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Card from '@/elements/data-display/Card.tsx';
 import JsonInput from '@/elements/input/JsonInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import { adminEggUpdateSchema } from '@/lib/schemas/admin/eggs.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggConfigFileReplaceEditor({
   form,
-  configFileIndex,
+  index,
 }: {
   form: UseFormReturnType<z.infer<typeof adminEggUpdateSchema>>;
-  configFileIndex: number;
+  index: number;
 }) {
   const { t } = useTranslations();
-  const index = configFileIndex;
 
   return (
     <div className='flex flex-col'>
@@ -77,18 +76,7 @@ export default function EggConfigFileReplaceEditor({
               variant='light'
               size='input-md'
               className='ml-4'
-              onClick={() =>
-                form.setValues({
-                  ...form.getValues(),
-                  configFiles: form.getValues().configFiles.map((configFile, i) => {
-                    if (i !== index) return configFile;
-                    return {
-                      ...configFile,
-                      replace: configFile.replace.filter((_, j) => j !== replaceIndex),
-                    };
-                  }),
-                })
-              }
+              onClick={() => form.removeListItem(`configFiles.${index}.replace`, replaceIndex)}
             >
               <FontAwesomeIcon icon={faMinus} />
             </ActionIcon>
@@ -99,24 +87,12 @@ export default function EggConfigFileReplaceEditor({
       <Button
         variant='light'
         onClick={() =>
-          form.setValues({
-            ...form.getValues(),
-            configFiles: form.getValues().configFiles.map((configFile, i) => {
-              if (i !== index) return configFile;
-              return {
-                ...configFile,
-                replace: [
-                  ...configFile.replace,
-                  {
-                    match: '',
-                    insertNew: false,
-                    updateExisting: true,
-                    ifValue: null,
-                    replaceWith: '',
-                  },
-                ],
-              };
-            }),
+          form.insertListItem(`configFiles.${index}.replace`, {
+            match: '',
+            insertNew: false,
+            updateExisting: true,
+            ifValue: null,
+            replaceWith: '',
           })
         }
         className='w-fit!'

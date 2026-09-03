@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import { z } from 'zod';
 import createScheduleStep from '@/api/server/schedules/steps/createScheduleStep.ts';
 import updateScheduleStep from '@/api/server/schedules/steps/updateScheduleStep.ts';
-import Button from '@/elements/Button.tsx';
-import Divider from '@/elements/Divider.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import Select from '@/elements/input/Select.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   ScheduleStepGroup,
   scheduleStepDefaultMapping,
@@ -25,7 +25,7 @@ import {
   serverScheduleStepSchema,
   serverScheduleStepUpdateSchema,
 } from '@/lib/schemas/server/schedules.ts';
-import { useModalForm } from '@/plugins/useModalForm.ts';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -43,6 +43,7 @@ import StepHttpRequest from '../steps/StepHttpRequest.tsx';
 import StepIf from '../steps/StepIf.tsx';
 import StepMatchRegex from '../steps/StepMatchRegex.tsx';
 import StepMoveBackup from '../steps/StepMoveBackup.tsx';
+import StepPullFile from '../steps/StepPullFile.tsx';
 import StepRenameFiles from '../steps/StepRenameFiles.tsx';
 import StepRestoreBackup from '../steps/StepRestoreBackup.tsx';
 import StepSendCommand from '../steps/StepSendCommand.tsx';
@@ -210,6 +211,8 @@ export default function StepCreateOrUpdateModal({
           <StepCompressFiles form={form} />
         ) : form.values.action.type === 'decompress_file' ? (
           <StepDecompressFile form={form} />
+        ) : form.values.action.type === 'pull_file' ? (
+          <StepPullFile form={form} />
         ) : form.values.action.type === 'update_startup_variable' ? (
           <StepUpdateStartupVariable form={form} />
         ) : form.values.action.type === 'update_startup_command' ? (

@@ -8,8 +8,8 @@ import { getTranslationMapping, setGlobalTranslationHandle, TranslationContext, 
 import { z } from 'zod';
 import { $ZodConfig } from 'zod/v4/core';
 import { axiosInstance } from '@/api/axios.ts';
-import Anchor from '@/elements/Anchor.tsx';
-import Code from '@/elements/Code.tsx';
+import Anchor from '@/elements/typography/Anchor.tsx';
+import Code from '@/elements/typography/Code.tsx';
 import { getGlobalStore } from '@/stores/global.ts';
 import baseTranslations from '@/translations.ts';
 

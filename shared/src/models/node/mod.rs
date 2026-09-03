@@ -1,4 +1,5 @@
 use crate::{
+    crypt::EncryptedString,
     models::{
         CreatableModel, CreateListenerList, InsertQueryBuilder, UpdatableModel, UpdateHandlerList,
         UpdateQueryBuilder,
@@ -9,7 +10,6 @@ use compact_str::ToCompactString;
 use garde::Validate;
 use rand::{RngExt, distr::SampleString};
 use serde::{Deserialize, Serialize};
-use sha2::Digest;
 use sqlx::{Row, postgres::PgRow};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -83,7 +83,7 @@ pub struct Node {
     pub disk: i64,
 
     pub token_id: compact_str::CompactString,
-    pub token: Vec<u8>,
+    pub token: EncryptedString,
 
     pub created: chrono::NaiveDateTime,
 
@@ -200,56 +200,66 @@ impl BaseModel for Node {
             extension_data: Self::map_extensions(prefix, row)?,
         })
     }
+
+    fn cache_invalidation_keys(&self) -> Vec<compact_str::CompactString> {
+        vec![compact_str::format_compact!(
+            "{}::{}",
+            Self::NAME,
+            self.uuid
+        )]
+    }
+}
+
+#[async_trait::async_trait]
+impl ResolvableModel for Node {
+    type Fingerprint = EncryptedString;
+
+    fn uuid(&self) -> uuid::Uuid {
+        self.uuid
+    }
+
+    fn fingerprint(&self) -> Self::Fingerprint {
+        self.token.clone()
+    }
+
+    async fn resolve(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, anyhow::Error> {
+        let Some((token_id, token)) = identifier.split_once('.') else {
+            return Ok(None);
+        };
+
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM nodes
+            JOIN locations ON locations.uuid = nodes.location_uuid
+            WHERE nodes.token_id = $1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(token_id)
+        .fetch_optional(database.read())
+        .await?;
+
+        let Some(node) = row.try_map(|row| Self::map(None, &row))? else {
+            return Ok(None);
+        };
+
+        if constant_time_eq::constant_time_eq(
+            node.token.decrypt(database).await?.as_bytes(),
+            token.as_bytes(),
+        ) {
+            Ok(Some(node))
+        } else {
+            Ok(None)
+        }
+    }
 }
 
 impl Node {
     pub const AIO_NODE_UUID: uuid::Uuid = uuid::uuid!("7dbbbb63-1734-48c4-e1de-d1a65f62cada");
-
-    pub async fn by_token_id_token_cached(
-        database: &crate::database::Database,
-        token_id: &str,
-        token: &str,
-    ) -> Result<Option<Self>, anyhow::Error> {
-        database
-            .cache
-            .cached(
-                &format!(
-                    "node::token::{token_id}.{}",
-                    hex::encode(sha2::Sha256::digest(token.as_bytes()))
-                ),
-                10,
-                || async {
-                    let row = sqlx::query(sqlx::AssertSqlSafe(format!(
-                        r#"
-                        SELECT {}
-                        FROM nodes
-                        JOIN locations ON locations.uuid = nodes.location_uuid
-                        WHERE nodes.token_id = $1
-                        "#,
-                        Self::columns_sql(None)
-                    )))
-                    .bind(token_id)
-                    .fetch_optional(database.read())
-                    .await?;
-
-                    Ok::<_, anyhow::Error>(
-                        if let Some(node) = row.try_map(|row| Self::map(None, &row))? {
-                            if constant_time_eq::constant_time_eq(
-                                database.decrypt(node.token.clone()).await?.as_bytes(),
-                                token.as_bytes(),
-                            ) {
-                                Some(node)
-                            } else {
-                                None
-                            }
-                        } else {
-                            None
-                        },
-                    )
-                },
-            )
-            .await
-    }
 
     pub async fn by_location_uuid_with_pagination(
         database: &crate::database::Database,
@@ -653,6 +663,8 @@ impl Node {
         state: &crate::State,
     ) -> Result<(String, String), anyhow::Error> {
         let (token_id, token) = Self::generate_token();
+        let (token, encrypted_token) =
+            EncryptedString::from_plaintext_with_input(token, &state.database).await?;
 
         sqlx::query(
             r#"
@@ -663,9 +675,11 @@ impl Node {
         )
         .bind(self.uuid)
         .bind(&token_id)
-        .bind(state.database.encrypt(token.clone()).await?)
+        .bind(encrypted_token)
         .execute(state.database.write())
         .await?;
+
+        Self::invalidate_cached(&state.database, self.uuid).await;
 
         Self::get_event_emitter().emit(
             state.clone(),
@@ -726,7 +740,7 @@ impl Node {
     ) -> Result<wings_api::client::WingsClient, anyhow::Error> {
         Ok(wings_api::client::WingsClient::new(
             self.url.to_string(),
-            database.decrypt(self.token.to_vec()).await?.into(),
+            self.token.decrypt(database).await?.into(),
         ))
     }
 
@@ -850,7 +864,7 @@ impl Node {
         jwt: &crate::jwt::Jwt,
         payload: &T,
     ) -> Result<String, anyhow::Error> {
-        Ok(jwt.create_custom(database.blocking_decrypt(&self.token)?.as_bytes(), payload)?)
+        Ok(jwt.create_custom(self.token.blocking_decrypt(database)?.as_bytes(), payload)?)
     }
 }
 
@@ -1049,7 +1063,10 @@ impl CreatableModel for Node {
             .set("memory", options.memory)
             .set("disk", options.disk)
             .set("token_id", token_id.clone())
-            .set("token", state.database.encrypt(token.clone()).await?);
+            .set(
+                "token",
+                EncryptedString::from_plaintext(token, &state.database).await?,
+            );
 
         let row = query_builder
             .returning("uuid")
@@ -1344,7 +1361,10 @@ impl DuplicableModel for Node {
             .set("memory", self.memory)
             .set("disk", self.disk)
             .set("token_id", token_id)
-            .set("token", state.database.encrypt(token).await?);
+            .set(
+                "token",
+                EncryptedString::from_plaintext(token, &state.database).await?,
+            );
 
         let row = query_builder
             .returning("uuid")

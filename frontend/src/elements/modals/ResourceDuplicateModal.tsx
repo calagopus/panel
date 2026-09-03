@@ -2,11 +2,11 @@ import { ModalProps } from '@mantine/core';
 import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -15,6 +15,7 @@ interface ResourceDuplicateModalProps<T extends { uuid: string }> extends ModalP
   sourceName: string;
   duplicate: (name: string) => Promise<T>;
   redirectTo: (duplicated: T) => string;
+  disabled?: boolean;
   children?: ReactNode;
 }
 
@@ -23,6 +24,7 @@ export default function ResourceDuplicateModal<T extends { uuid: string }>({
   sourceName,
   duplicate,
   redirectTo,
+  disabled = false,
   children,
   ...props
 }: ResourceDuplicateModalProps<T>) {
@@ -67,7 +69,7 @@ export default function ResourceDuplicateModal<T extends { uuid: string }>({
         {children}
 
         <ModalFooter>
-          <Button type='submit' loading={loading} disabled={name.length < 1}>
+          <Button type='submit' loading={loading} disabled={name.length < 1 || disabled}>
             {t('common.button.duplicate', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>

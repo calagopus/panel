@@ -1,8 +1,8 @@
 import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import PasswordLoginToggleButton from './actions/PasswordLoginToggleButton.tsx';

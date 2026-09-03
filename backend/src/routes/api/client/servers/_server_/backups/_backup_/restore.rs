@@ -8,7 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            server::{GetServer, GetServerActivityLogger, ServerStatus},
+            ByUuid,
+            server::{GetServer, GetServerActivityLogger, Server, ServerStatus},
             server_backup::ServerBackupRestoreOptions,
             user::GetPermissionManager,
         },
@@ -112,6 +113,8 @@ mod post {
             }
 
             transaction.commit().await?;
+
+            Server::invalidate_cached(&state.database, uuid).await;
 
             activity_logger
                 .log(

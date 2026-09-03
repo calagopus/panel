@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { getImpersonatedUser, httpErrorToHuman, setImpersonatedUser } from '@/api/axios.ts';
 import getMe from '@/api/me/getMe.ts';
 import logout from '@/api/me/logout.ts';
-import Spinner from '@/elements/Spinner.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { flushUserSettings, loadUserSettings, unloadUserSettings } from '@/lib/userSettings.ts';
 import { AuthContext } from '@/providers/contexts/authContext.ts';

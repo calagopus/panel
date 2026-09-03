@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { bytesToString } from '@/lib/size.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 
 export const CHART_WINDOW = 20_000;
 export const CHART_DELAY = 2_000;

@@ -21,10 +21,10 @@ import getAdminServers from '@/api/admin/servers/getServers.ts';
 import getAdminUsers from '@/api/admin/users/getUsers.ts';
 import { getImpersonatedUser } from '@/api/axios.ts';
 import getServers from '@/api/server/getServers.ts';
-import Avatar from '@/elements/Avatar.tsx';
-import Group from '@/elements/Group.tsx';
-import Text from '@/elements/Text.tsx';
-import { handleRawCopyToClipboard } from '@/lib/copy.ts';
+import Avatar from '@/elements/data-display/Avatar.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Text from '@/elements/typography/Text.tsx';
+import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import type {
   QuickActionCategory,
@@ -36,10 +36,10 @@ import { evaluateMathExpression, getLoadedMath, loadMath } from '@/lib/quickActi
 import type { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import type { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import type { serverSchema } from '@/lib/schemas/server/server.ts';
+import { useQuickActionLocation, useQuickActionTerm } from '@/plugins/quick-actions/useQuickActions.ts';
+import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
-import { useQuickActionLocation, useQuickActionTerm } from '@/plugins/useQuickActions.ts';
-import { useSearchableResource } from '@/plugins/useSearchableResource.ts';
-import { useServerListShowOthers } from '@/plugins/useServerListShowOthers.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';

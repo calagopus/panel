@@ -2,14 +2,14 @@ import { faBan, faCheck, faClone, faGripVertical, faPencil, faTrash } from '@for
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ComponentProps } from 'react';
 import { z } from 'zod';
-import ActionIcon from '@/elements/ActionIcon.tsx';
-import Badge from '@/elements/Badge.tsx';
-import Card from '@/elements/Card.tsx';
-import ContextMenu, { ContextMenuToggle } from '@/elements/ContextMenu.tsx';
-import Group from '@/elements/Group.tsx';
-import Stack from '@/elements/Stack.tsx';
-import Text from '@/elements/Text.tsx';
-import ThemeIcon from '@/elements/ThemeIcon.tsx';
+import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
+import Card from '@/elements/data-display/Card.tsx';
+import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import {
   networkProtocolLabelMapping,
   serverFirewallRuleActionColorMapping,
@@ -114,7 +114,14 @@ export default function FirewallRuleCard({
                             .join(', ')
                         : t('pages.server.firewall.rule.anyProtocol', {}),
                     sources:
-                      rule.sources.length > 0 ? rule.sources.join(', ') : t('pages.server.firewall.rule.anySource', {}),
+                      rule.sources.length > 0 || rule.sourceFile
+                        ? [
+                            ...rule.sources,
+                            ...(rule.sourceFile
+                              ? [t('pages.server.firewall.rule.sourceFile', { file: rule.sourceFile })]
+                              : []),
+                          ].join(', ')
+                        : t('pages.server.firewall.rule.anySource', {}),
                     ports: rule.ports ? rule.ports.join(', ') : t('pages.server.firewall.rule.allAllocations', {}),
                   })}
                 </Text>

@@ -1,16 +1,15 @@
 import { ModalProps } from '@mantine/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { z } from 'zod';
 import updateEggUsingUrl from '@/api/admin/nests/eggs/updateEggUsingUrl.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
-import Stack from '@/elements/Stack.tsx';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
+import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggUpdateUrlModal({
@@ -24,34 +23,27 @@ export default function EggUpdateUrlModal({
   onUpdated: () => void;
 }) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
 
-  const [loading, setLoading] = useState(false);
-  const [url, setUrl] = useState('');
+  const { form, handleClose, handleSubmit, loading } = useModalForm<{ url: string }>({
+    initialValues: { url: '' },
+    onClose: props.onClose,
+    onSubmit: async ({ url }) => {
+      await updateEggUsingUrl(nest.uuid, egg.uuid, url);
+      onUpdated();
+    },
+  });
 
   useEffect(() => {
-    setUrl('');
+    if (props.opened) form.reset();
   }, [props.opened]);
-
-  const doUpdate = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-
-    updateEggUsingUrl(nest.uuid, egg.uuid, url)
-      .then(() => {
-        onUpdated();
-        props.onClose();
-      })
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
-      .finally(() => setLoading(false));
-  };
 
   return (
     <FormModal
       title={t('pages.admin.nests.tabs.eggs.page.modal.updateUrl.title', {})}
       loading={loading}
       {...props}
-      onSubmit={doUpdate}
+      onClose={handleClose}
+      onSubmit={handleSubmit}
     >
       <Stack>
         <TextInput
@@ -59,15 +51,15 @@ export default function EggUpdateUrlModal({
           label={t('pages.admin.nests.tabs.eggs.page.modal.updateUrl.url', {})}
           description={t('pages.admin.nests.tabs.eggs.page.modal.updateUrl.urlDescription', {})}
           placeholder='https://example.com/egg.json'
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          key={form.key('url')}
+          {...form.getInputProps('url')}
         />
 
         <ModalFooter>
-          <Button type='submit' loading={loading} disabled={url.length < 1}>
+          <Button type='submit' loading={loading} disabled={form.getValues().url.length < 1}>
             {t('common.button.update', {})}
           </Button>
-          <Button variant='default' onClick={props.onClose}>
+          <Button variant='default' onClick={handleClose}>
             {t('common.button.close', {})}
           </Button>
         </ModalFooter>

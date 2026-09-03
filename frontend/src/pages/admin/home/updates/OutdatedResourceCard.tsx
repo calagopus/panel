@@ -1,9 +1,9 @@
 import { faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
-import Spinner from '@/elements/Spinner.tsx';
-import Table, { TableHeaderProps } from '@/elements/Table.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Table, { TableHeaderProps } from '@/elements/data-display/Table.tsx';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { LazyString } from '@/lib/lazy.ts';
 
 export interface OutdatedResourceTable {

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import ScreenBlock from '@/elements/ScreenBlock.tsx';
+import ScreenBlock from '@/elements/feedback/ScreenBlock.tsx';
 import { useCan, useServerPermissions } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

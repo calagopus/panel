@@ -1,7 +1,7 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import Flex from '@/elements/Flex.tsx';
-import KbdKey from '@/elements/KbdKey.tsx';
-import Text from '@/elements/Text.tsx';
+import Flex from '@/elements/layout/Flex.tsx';
+import KbdKey from '@/elements/typography/KbdKey.tsx';
+import Text from '@/elements/typography/Text.tsx';
 
 export interface ShortcutItemProps {
   keys: (string | { icon: IconDefinition })[];

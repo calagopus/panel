@@ -1,13 +1,13 @@
 import { faCrown, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
-import Avatar from '@/elements/Avatar.tsx';
-import Code from '@/elements/Code.tsx';
-import { TableData, TableRow } from '@/elements/Table.tsx';
-import TableLink from '@/elements/TableLink.tsx';
-import Tooltip from '@/elements/Tooltip.tsx';
+import Avatar from '@/elements/data-display/Avatar.tsx';
+import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { isAdmin } from '@/lib/permissions.ts';
+import Code from '@/elements/typography/Code.tsx';
+import { isAdmin } from '@/lib/auth/permissions.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

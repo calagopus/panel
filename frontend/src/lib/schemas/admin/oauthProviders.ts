@@ -1,6 +1,6 @@
 import { ZodType, z } from 'zod';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
-import { nullableString } from '@/lib/transformers.ts';
+import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const adminOAuthProviderSchema = z.looseObject({
   uuid: z.string(),
@@ -32,6 +32,12 @@ export const adminOAuthProviderUpdateSchema = z.lazy(() =>
     created: true,
   }),
 );
+
+/**
+ * API field names holding provider credentials: redacted when exporting a provider and seeded
+ * with placeholders when importing one (the backend requires non-empty values on create).
+ */
+export const oauthProviderSecretFields = ['client_id', 'client_secret'];
 
 export const adminOAuthUserLinkSchema = z.looseObject({
   uuid: z.string(),

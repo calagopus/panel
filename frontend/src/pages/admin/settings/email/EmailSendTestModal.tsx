@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import testSystemEmail from '@/api/admin/system/email/testSystemEmail.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/Button.tsx';
+import Button from '@/elements/buttons/Button.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { adminSettingsEmailTestSchema } from '@/lib/schemas/admin/settings.ts';

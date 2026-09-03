@@ -7,19 +7,20 @@ import { useShallow } from 'zustand/react/shallow';
 import cancelTransfer from '@/api/admin/servers/cancelTransfer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
+import Button from '@/elements/buttons/Button.tsx';
 import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
+import Notification from '@/elements/feedback/Notification.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import { bytesProgressString } from '@/lib/size.ts';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import Button from '../Button.tsx';
 import { AdminCan, ServerCan } from '../Can.tsx';
-import Notification from '../Notification.tsx';
-import Progress from '../Progress.tsx';
-import Tooltip from '../Tooltip.tsx';
+import ExtensionSlot from '../ExtensionSlot.tsx';
 import EstimatedTimeArrival from '../time/EstimatedTimeArrival.tsx';
 import ContentContainer from './ContentContainer.tsx';
 
@@ -251,9 +252,7 @@ function ServerContentContainer(props: Props) {
       ) : null}
 
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
-        {registry?.prependedComponents.map((Component, index) => (
-          <Component key={`prepended-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot components={registry?.prependedComponents ?? []} name='prepended' props={modifiedProps} />
 
         {hideTitleComponent ? null : setSearch ? (
           <Group justify='space-between' mb='md'>
@@ -298,15 +297,19 @@ function ServerContentContainer(props: Props) {
             ) : null}
           </div>
         )}
-        {registry?.prependedContentComponents.map((Component, index) => (
-          <Component key={`prepended-content-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot
+          components={registry?.prependedContentComponents ?? []}
+          name='prepended-content'
+          props={modifiedProps}
+        />
 
         {children}
 
-        {registry?.appendedContentComponents.map((Component, index) => (
-          <Component key={`appended-content-${index}`} {...modifiedProps} />
-        ))}
+        <ExtensionSlot
+          components={registry?.appendedContentComponents ?? []}
+          name='appended-content'
+          props={modifiedProps}
+        />
       </div>
     </ContentContainer>
   );

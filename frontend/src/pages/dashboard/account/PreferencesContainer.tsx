@@ -2,14 +2,14 @@ import { faSliders } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { z } from 'zod';
+import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
-import Stack from '@/elements/Stack.tsx';
-import TitleCard from '@/elements/TitleCard.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
-import { START_ON_GROUPED_SERVERS_KEY, useStartOnGroupedServers } from '@/plugins/useStartOnGroupedServers.ts';
-import { TOAST_POSITION_KEY, useToastPosition } from '@/plugins/useToastPosition.ts';
+import { START_ON_GROUPED_SERVERS_KEY, useStartOnGroupedServers } from '@/plugins/server/useStartOnGroupedServers.ts';
+import { TOAST_POSITION_KEY, useToastPosition } from '@/plugins/toast/useToastPosition.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { AccountCardProps } from './DashboardAccount.tsx';
 

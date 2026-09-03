@@ -419,6 +419,16 @@ export const serverScheduleStepDecompressFileSchema = z.object({
   file: serverScheduleStepDynamicSchema,
 });
 
+export const serverScheduleStepPullFileSchema = z.object({
+  type: z.literal('pull_file'),
+  ignoreFailure: z.boolean(),
+  foreground: z.boolean(),
+  root: serverScheduleStepDynamicSchema,
+  url: serverScheduleStepDynamicSchema,
+  fileName: serverScheduleStepDynamicSchema.nullable(),
+  useHeader: z.boolean(),
+});
+
 export const serverScheduleStepUpdateStartupVariableSchema = z.object({
   type: z.literal('update_startup_variable'),
   ignoreFailure: z.boolean(),
@@ -484,6 +494,7 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepRenameFilesSchema,
   serverScheduleStepCompressFilesSchema,
   serverScheduleStepDecompressFileSchema,
+  serverScheduleStepPullFileSchema,
   serverScheduleStepUpdateStartupVariableSchema,
   serverScheduleStepUpdateStartupCommandSchema,
   serverScheduleStepUpdateStartupDockerImageSchema,
