@@ -172,6 +172,13 @@ impl Default for ExtensionEmailTemplateBuilder {
                     default_enabled: true,
                 },
                 EmailTemplate {
+                    identifier: "session_created",
+                    available_variables: vec!["user", "ip", "user_agent", "sessions_link"],
+                    default_subject: "{{ settings.app.name }} - New Session Created",
+                    default_content: include_str!("../../mails/session_created.html"),
+                    default_enabled: false,
+                },
+                EmailTemplate {
                     identifier: "connection_test",
                     available_variables: vec![],
                     default_subject: "{{ settings.app.name }} - Connection Test",

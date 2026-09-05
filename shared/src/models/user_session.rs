@@ -1,7 +1,7 @@
 use crate::{
     models::{
         InsertQueryBuilder,
-        user::{AuthMethod, GetAuthMethod},
+        user::{AuthMethod, GetAuthMethod, User},
     },
     prelude::*,
 };
@@ -460,6 +460,34 @@ impl CreatableModel for UserSession {
         let mut result = format!("{key_id}:{hash}");
 
         Self::run_after_create_handlers(&mut result, &options, state, transaction).await?;
+
+        match User::by_uuid_with_transaction(transaction, options.user_uuid).await {
+            Ok(user) => {
+                let settings = state.settings.get().await?;
+
+                state
+                    .mail
+                    .send_template(
+                        state,
+                        "session_created",
+                        user.email.clone(),
+                        minijinja::context! {
+                            user => user,
+                            ip => options.ip.ip().to_compact_string(),
+                            user_agent => options.user_agent,
+                            sessions_link => format!("{}/account/sessions", settings.app.url),
+                        },
+                    )
+                    .await;
+            }
+            Err(err) => {
+                tracing::warn!(
+                    user = %options.user_uuid,
+                    "failed to fetch user for session created email: {:#?}",
+                    err
+                );
+            }
+        }
 
         Ok(result)
     }

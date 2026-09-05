@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>{{ subject }}</title>
+	</head>
+	<body
+		style="
+			margin: 0;
+			padding: 0;
+			background-color: #f4f5f7;
+			font-family:
+				-apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+				Helvetica, Arial, sans-serif;
+			color: #333333;
+		"
+	>
+		<div
+			style="
+				max-width: 600px;
+				margin: 40px auto;
+				background-color: #ffffff;
+				border-radius: 8px;
+				overflow: hidden;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+				border: 1px solid #eaebed;
+			"
+		>
+			<div
+				style="
+					background-color: #ffffff;
+					padding: 32px 32px 16px 32px;
+					text-align: center;
+					border-bottom: 1px solid #eaebed;
+				"
+			>
+				<h1
+					style="
+						margin: 0;
+						font-size: 24px;
+						color: #111827;
+						letter-spacing: -0.5px;
+					"
+				>
+					{{ settings.app.name }}
+				</h1>
+			</div>
+
+			<div style="padding: 32px">
+				<p
+					style="
+						margin-top: 0;
+						margin-bottom: 16px;
+						font-size: 16px;
+						line-height: 1.6;
+						color: #4b5563;
+					"
+				>
+					Hello <strong>{{ user.username }}</strong>,
+				</p>
+				<p
+					style="
+						margin-top: 0;
+						margin-bottom: 24px;
+						font-size: 16px;
+						line-height: 1.6;
+						color: #4b5563;
+					"
+				>
+					Your account was just signed in to on
+					<strong>{{ settings.app.name }}</strong>.
+				</p>
+
+				<table
+					style="
+						width: 100%;
+						margin-bottom: 32px;
+						border-collapse: collapse;
+						background-color: #f9fafb;
+						border: 1px solid #e5e7eb;
+						border-radius: 6px;
+					"
+				>
+					<tr>
+						<td
+							style="
+								padding: 12px 16px;
+								font-size: 14px;
+								color: #6b7280;
+								border-bottom: 1px solid #e5e7eb;
+							"
+						>
+							IP Address
+						</td>
+						<td
+							style="
+								padding: 12px 16px;
+								font-size: 14px;
+								color: #111827;
+								text-align: right;
+								font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+								border-bottom: 1px solid #e5e7eb;
+							"
+						>
+							{{ ip }}
+						</td>
+					</tr>
+					<tr>
+						<td style="padding: 12px 16px; font-size: 14px; color: #6b7280">
+							Device
+						</td>
+						<td
+							style="
+								padding: 12px 16px;
+								font-size: 14px;
+								color: #111827;
+								text-align: right;
+								word-break: break-word;
+							"
+						>
+							{{ user_agent }}
+						</td>
+					</tr>
+				</table>
+
+				<div style="text-align: center; margin-bottom: 32px">
+					<a
+						href="{{ sessions_link }}"
+						style="
+							display: inline-block;
+							padding: 14px 28px;
+							background-color: #2563eb;
+							color: #ffffff;
+							text-decoration: none;
+							font-size: 16px;
+							font-weight: 600;
+							border-radius: 6px;
+						"
+					>
+						Review Sessions
+					</a>
+				</div>
+
+				<div
+					style="
+						background-color: #f9fafb;
+						border-left: 4px solid #f59e0b;
+						padding: 16px;
+						border-radius: 4px;
+					"
+				>
+					<p
+						style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5"
+					>
+						<strong>Note:</strong> If this was you, no action is needed. You can
+						revoke any session you do not recognize from your account settings.
+					</p>
+				</div>
+			</div>
+
+			<div
+				style="
+					padding: 24px 32px;
+					background-color: #f9fafb;
+					border-top: 1px solid #eaebed;
+					text-align: center;
+				"
+			>
+				<p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5">
+					If you did not sign in, someone else may know your password. We
+					recommend changing it as soon as possible.
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
