@@ -242,7 +242,20 @@ mod delete {
                 .ok();
         };
 
+        let client = node.api_client(&state.database).await?;
         tunnel.delete(&state, ()).await?;
+
+        tokio::spawn(async move {
+            match tokio::time::timeout(std::time::Duration::from_secs(5), client.post_tundra_sync())
+                .await
+            {
+                Ok(Ok(())) => {}
+                Ok(Err(err)) => {
+                    tracing::warn!("failed to notify the removed tunnel node: {:?}", err)
+                }
+                Err(_) => tracing::warn!("notifying the removed tunnel node timed out"),
+            }
+        });
 
         activity_logger
             .log(
