@@ -509,6 +509,10 @@
           "finished": "Dokončené",
           "failed": "Zlyhalo"
         },
+        "serverBackupKind": {
+          "server": "Server",
+          "databaseInstance": "Database"
+        },
         "serverFirewallRuleAction": {
           "allow": "Allow",
           "deny": "Deny"
@@ -867,6 +871,8 @@
           "cancelledAll": "Všetky nahrávania boli zrušené.",
           "completedServer": "Finished uploading {files} to `{server}`.",
           "completedAssets": "Finished uploading {files} to the admin assets.",
+          "progressServer": "Uploading {files} to `{server}`...",
+          "progressAssets": "Uploading {files} to the admin assets...",
           "showFiles": "Show files"
         }
       }
@@ -4921,6 +4927,8 @@
             "filePullingStarted": "Sťahovanie súboru sa začalo.",
             "fileRenamed": "Súbor bol premenovaný.",
             "fileCouldNotBeRenamed": "Súbor sa nepodarilo premenovať.",
+            "closeDestinationBeforeRename": "Close the editor tab for the destination file before renaming.",
+            "closeTabsBeforeBulkRename": "Close affected editor tabs before renaming overlapping paths.",
             "filesRenamed": "{files} premenované.",
             "renameUndone": "Rename undone.",
             "renameCouldNotBeUndone": "Rename could not be undone.",
@@ -5363,6 +5371,7 @@
               "tabs": {
                 "databases": "Databases",
                 "users": "Users",
+                "backups": "Backups",
                 "logs": "Logs"
               },
               "stats": {
@@ -5513,6 +5522,36 @@
                   "completed": "Imported `{database}` from `{source}` in {time}.",
                   "failed": "Failed to import `{database}` from `{source}`:\n{error}",
                   "aborted": "Import of `{database}` from `{source}` was cancelled."
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "subtitle": "{current} of {max} maximum backups created on this server, shared with server backups.",
+              "badge": {
+                "restoring": "Restoring backup"
+              },
+              "notification": {
+                "restoring": "A backup is currently being restored into this managed database. Please wait..."
+              },
+              "tooltip": {
+                "limitReached": "This server is limited to {max} backups, shared between server and database backups.",
+                "offline": "The managed database must be running to take a backup.",
+                "restoring": "A backup is currently being restored into this managed database."
+              },
+              "toast": {
+                "restoring": "Restoring backup into the managed database...",
+                "restoreCompleted": "Managed database backup restore completed successfully.",
+                "restoreFailed": "Managed database backup restore failed."
+              },
+              "toggle": {
+                "allEngineBackups": "All {engine} backups on this server"
+              },
+              "modal": {
+                "restoreBackup": {
+                  "title": "Restore Database Backup",
+                  "content": "This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.",
+                  "targetInstance": "Target Managed Database"
                 }
               }
             },
@@ -5760,7 +5799,10 @@
             "rootPath": "Koreňová cesta",
             "outputInto": "Výstup do",
             "ignoreFailure": "Ignorovať zlyhanie",
-            "runInForeground": "Spustiť v popredí"
+            "runInForeground": "Spustiť v popredí",
+            "sourceDatabaseInstance": "Only Consider Backups From",
+            "sourceDatabaseInstanceDescription": "Only pick database backups that were taken from this managed database. Leave empty to consider backups from any managed database on this server.",
+            "sourceDatabaseInstanceAny": "Any managed database"
           },
           "condition": {
             "variable": "Premenná",
@@ -5838,6 +5880,15 @@
                 "content": "Keď záloha dosiahne stav `{status}`."
               }
             },
+            "databaseBackupStatus": {
+              "title": "Database Backup Status",
+              "form": {
+                "backupStatus": "Backup Status"
+              },
+              "card": {
+                "content": "When Database Backup reaches Status `{status}`."
+              }
+            },
             "scheduleCompletion": {
               "title": "Schedule Completion",
               "form": {
@@ -5874,7 +5925,14 @@
             "noActionSelected": "Vyberte typ akcie, ktorú chcete nakonfigurovať",
             "noActionDetails": "Podrobnosti o akcii nie sú k dispozícii",
             "ignoreFailure": "Ignorovať zlyhanie: {value}",
-            "foreground": "Popredie: {value}"
+            "foreground": "Popredie: {value}",
+            "sourceDatabaseInstance": "Only From Managed Database: {uuid}",
+            "sourceDatabaseInstanceAny": "Only From Managed Database: Any",
+            "backupSelector": {
+              "compact": "Backup {backup}",
+              "compactLatest": "The latest backup",
+              "compactOldest": "The oldest backup"
+            }
           },
           "steps": {
             "empty": {
@@ -6030,7 +6088,22 @@
                   "backupName": "Názov zálohy: {name}",
                   "backupNameAuto": "Backup Name: Auto-generated",
                   "outputInto": "Backup UUID into: {variable}",
-                  "ignoredFiles": "Ignorované súbory: {files}"
+                  "ignoredFiles": "Ignorované súbory: {files}",
+                  "backupGroup": "Backup Group: {uuid}"
+                }
+              }
+            },
+            "createDatabaseBackup": {
+              "title": "Create Database Backup",
+              "description": "Create a backup of a managed database.",
+              "form": {
+                "databaseInstance": "Managed Database"
+              },
+              "renderer": {
+                "compact": "Create database backup {name}",
+                "compactAuto": "Create a database backup with an auto-generated name",
+                "detail": {
+                  "databaseInstance": "Managed Database: {uuid}"
                 }
               }
             },
@@ -6053,9 +6126,6 @@
                 "warning": "Restoring stops the server and overwrites its files. The schedule waits until the restore has finished before continuing. Avoid combining this step with power or server state triggers that could re-trigger the schedule."
               },
               "renderer": {
-                "compact": "Restore backup {backup}",
-                "compactLatest": "Restore the latest backup",
-                "compactOldest": "Restore the oldest backup",
                 "detail": {
                   "backupLatest": "Backup: Latest successful backup",
                   "backupOldest": "Backup: Oldest successful backup",
@@ -6071,7 +6141,7 @@
               "description": "Delete a backup selected by the backup selector.",
               "form": {
                 "backupSelector": "Backup to Delete",
-                "warning": "This permanently deletes the selected backup, including its files on the node. Locked backups are skipped."
+                "warning": "This permanently deletes the selected backup, including its files on the node. If the selected backup is locked, the step fails."
               }
             },
             "moveBackup": {
@@ -6086,6 +6156,38 @@
                   "targetGroup": "Target Group: {uuid}",
                   "targetGroupNone": "Target Group: None (ungrouped)"
                 }
+              }
+            },
+            "restoreDatabaseBackup": {
+              "title": "Restore Database Backup",
+              "description": "Restore a database backup into a managed database.",
+              "form": {
+                "backupSelector": "Database Backup to Restore",
+                "targetDatabaseInstance": "Restore Into",
+                "targetDatabaseInstanceDescription": "The managed database the backup is imported into. Leave empty to restore into the database the backup was taken from.",
+                "targetDatabaseInstanceSource": "The database the backup was taken from",
+                "warning": "Restoring overwrites the contents of the target database. The schedule does not wait for the import to finish, so later steps can run while it is still in progress. If the database the backup was taken from has been deleted, the step fails unless you pick a target here."
+              },
+              "renderer": {
+                "detail": {
+                  "targetDatabaseInstance": "Restore Into: {uuid}",
+                  "targetDatabaseInstanceSource": "Restore Into: The database the backup was taken from"
+                }
+              }
+            },
+            "deleteDatabaseBackup": {
+              "title": "Delete Database Backup",
+              "description": "Delete a database backup selected by the backup selector.",
+              "form": {
+                "backupSelector": "Database Backup to Delete",
+                "warning": "This permanently deletes the selected database backup, including its dump on the node. Only database backups are considered, never file backups. If the selected backup is locked, the step fails."
+              }
+            },
+            "moveDatabaseBackup": {
+              "title": "Move Database Backup",
+              "description": "Move a database backup selected by the backup selector into a backup group.",
+              "form": {
+                "backupSelector": "Database Backup to Move"
               }
             },
             "createDirectory": {
@@ -6308,17 +6410,20 @@
         "backups": {
           "title": "Zálohy",
           "subtitle": "Vytvorené zálohy: {current} z {max}.",
+          "subtitleWithDatabase": "{current} of {max} maximum backups created ({server} server, {database} database).",
           "tooltip": {
             "limitReached": "Tento server má limit {max} záloh."
           },
           "table": {
             "columns": {
+              "kind": "Kind",
               "locked": "Zamknuté?"
             }
           },
           "badge": {
             "deleting": "Deleting…",
-            "deleteFailed": "Deletion failed"
+            "deleteFailed": "Deletion failed",
+            "sourceDeleted": "{name} (deleted)"
           },
           "button": {
             "browse": "Prehľadávať",
@@ -6335,6 +6440,10 @@
             "createBackup": {
               "title": "Vytvoriť zálohu",
               "noGroup": "No group",
+              "source": "Source",
+              "sourceFiles": "Server Files",
+              "sourceDatabase": "Managed Database",
+              "sourceInstance": "Managed Database",
               "toast": {
                 "created": "Záloha bola vytvorená."
               }
@@ -6570,7 +6679,7 @@
           },
           "form": {
             "name": "Hostname",
-            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters, and unique across the whole network.",
+            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.",
             "namePlaceholder": "Leave empty to derive one from the server name",
             "port": "Port",
             "protocols": "Protocols",
@@ -6588,7 +6697,7 @@
           "modal": {
             "join": {
               "title": "Join the Private Network",
-              "description": "Pick the hostname other servers will reach this one on. It has to be free across the whole network, and you can change it later."
+              "description": "Pick the hostname other servers will reach this one on. Other servers can use the same hostname as long as no server connects to both. You can change it later."
             },
             "rename": {
               "title": "Change Hostname",

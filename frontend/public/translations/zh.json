@@ -509,6 +509,10 @@
           "finished": "已完成",
           "failed": "失敗"
         },
+        "serverBackupKind": {
+          "server": "Server",
+          "databaseInstance": "Database"
+        },
         "serverFirewallRuleAction": {
           "allow": "Allow",
           "deny": "Deny"
@@ -867,6 +871,8 @@
           "cancelledAll": "所有上傳都已取消。",
           "completedServer": "已完成上傳 {files} 至 {server}。",
           "completedAssets": "已完成上傳 {files} 至管理員資源。",
+          "progressServer": "Uploading {files} to `{server}`...",
+          "progressAssets": "Uploading {files} to the admin assets...",
           "showFiles": "顯示檔案"
         }
       }
@@ -4921,6 +4927,8 @@
             "filePullingStarted": "已開始拉取檔案。",
             "fileRenamed": "檔案已重新命名。",
             "fileCouldNotBeRenamed": "無法重新命名檔案。",
+            "closeDestinationBeforeRename": "Close the editor tab for the destination file before renaming.",
+            "closeTabsBeforeBulkRename": "Close affected editor tabs before renaming overlapping paths.",
             "filesRenamed": "已重新命名 {files}。",
             "renameUndone": "已復原重新命名操作。",
             "renameCouldNotBeUndone": "無法復原重新命名操作。",
@@ -5363,6 +5371,7 @@
               "tabs": {
                 "databases": "資料庫",
                 "users": "使用者",
+                "backups": "Backups",
                 "logs": "記錄"
               },
               "stats": {
@@ -5513,6 +5522,36 @@
                   "completed": "已在 {time} 內從 {source} 匯入 {database}。",
                   "failed": "從 `{source}` 匯入 `{database}` 失敗：{error}",
                   "aborted": "從 `{source}` 匯入 `{database}` 的操作已取消。"
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "subtitle": "{current} of {max} maximum backups created on this server, shared with server backups.",
+              "badge": {
+                "restoring": "Restoring backup"
+              },
+              "notification": {
+                "restoring": "A backup is currently being restored into this managed database. Please wait..."
+              },
+              "tooltip": {
+                "limitReached": "This server is limited to {max} backups, shared between server and database backups.",
+                "offline": "The managed database must be running to take a backup.",
+                "restoring": "A backup is currently being restored into this managed database."
+              },
+              "toast": {
+                "restoring": "Restoring backup into the managed database...",
+                "restoreCompleted": "Managed database backup restore completed successfully.",
+                "restoreFailed": "Managed database backup restore failed."
+              },
+              "toggle": {
+                "allEngineBackups": "All {engine} backups on this server"
+              },
+              "modal": {
+                "restoreBackup": {
+                  "title": "Restore Database Backup",
+                  "content": "This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.",
+                  "targetInstance": "Target Managed Database"
                 }
               }
             },
@@ -5760,7 +5799,10 @@
             "rootPath": "根路徑",
             "outputInto": "輸出到",
             "ignoreFailure": "忽略失敗",
-            "runInForeground": "在前景執行"
+            "runInForeground": "在前景執行",
+            "sourceDatabaseInstance": "Only Consider Backups From",
+            "sourceDatabaseInstanceDescription": "Only pick database backups that were taken from this managed database. Leave empty to consider backups from any managed database on this server.",
+            "sourceDatabaseInstanceAny": "Any managed database"
           },
           "condition": {
             "variable": "變數",
@@ -5838,6 +5880,15 @@
                 "content": "當備份達到狀態 `{status}` 時。"
               }
             },
+            "databaseBackupStatus": {
+              "title": "Database Backup Status",
+              "form": {
+                "backupStatus": "Backup Status"
+              },
+              "card": {
+                "content": "When Database Backup reaches Status `{status}`."
+              }
+            },
             "scheduleCompletion": {
               "title": "排程完成",
               "form": {
@@ -5874,7 +5925,14 @@
             "noActionSelected": "選取要設定的動作類型",
             "noActionDetails": "沒有可用的動作詳細資訊",
             "ignoreFailure": "忽略失敗：{value}",
-            "foreground": "前景：{value}"
+            "foreground": "前景：{value}",
+            "sourceDatabaseInstance": "Only From Managed Database: {uuid}",
+            "sourceDatabaseInstanceAny": "Only From Managed Database: Any",
+            "backupSelector": {
+              "compact": "Backup {backup}",
+              "compactLatest": "The latest backup",
+              "compactOldest": "The oldest backup"
+            }
           },
           "steps": {
             "empty": {
@@ -6030,7 +6088,22 @@
                   "backupName": "備份名稱：{name}",
                   "backupNameAuto": "備份名稱：自動產生",
                   "outputInto": "備份 UUID 輸出至：{variable}",
-                  "ignoredFiles": "忽略的檔案：{files}"
+                  "ignoredFiles": "忽略的檔案：{files}",
+                  "backupGroup": "Backup Group: {uuid}"
+                }
+              }
+            },
+            "createDatabaseBackup": {
+              "title": "Create Database Backup",
+              "description": "Create a backup of a managed database.",
+              "form": {
+                "databaseInstance": "Managed Database"
+              },
+              "renderer": {
+                "compact": "Create database backup {name}",
+                "compactAuto": "Create a database backup with an auto-generated name",
+                "detail": {
+                  "databaseInstance": "Managed Database: {uuid}"
                 }
               }
             },
@@ -6053,9 +6126,6 @@
                 "warning": "還原會停止伺服器並覆寫其檔案。排程會等待還原完成後才繼續執行。請避免將此步驟與可能重新觸發排程的電源或伺服器狀態觸發器搭配使用。"
               },
               "renderer": {
-                "compact": "還原備份 {backup}",
-                "compactLatest": "還原最新的備份",
-                "compactOldest": "還原最舊的備份",
                 "detail": {
                   "backupLatest": "備份：最新的成功備份",
                   "backupOldest": "備份：最舊的成功備份",
@@ -6071,7 +6141,7 @@
               "description": "刪除由備份選擇器指定的備份。",
               "form": {
                 "backupSelector": "要刪除的備份",
-                "warning": "這會永久刪除所選的備份，包含其在節點上的檔案。已鎖定的備份將被略過。"
+                "warning": "This permanently deletes the selected backup, including its files on the node. If the selected backup is locked, the step fails."
               }
             },
             "moveBackup": {
@@ -6086,6 +6156,38 @@
                   "targetGroup": "目標群組：{uuid}",
                   "targetGroupNone": "目標群組：無（未分組）"
                 }
+              }
+            },
+            "restoreDatabaseBackup": {
+              "title": "Restore Database Backup",
+              "description": "Restore a database backup into a managed database.",
+              "form": {
+                "backupSelector": "Database Backup to Restore",
+                "targetDatabaseInstance": "Restore Into",
+                "targetDatabaseInstanceDescription": "The managed database the backup is imported into. Leave empty to restore into the database the backup was taken from.",
+                "targetDatabaseInstanceSource": "The database the backup was taken from",
+                "warning": "Restoring overwrites the contents of the target database. The schedule does not wait for the import to finish, so later steps can run while it is still in progress. If the database the backup was taken from has been deleted, the step fails unless you pick a target here."
+              },
+              "renderer": {
+                "detail": {
+                  "targetDatabaseInstance": "Restore Into: {uuid}",
+                  "targetDatabaseInstanceSource": "Restore Into: The database the backup was taken from"
+                }
+              }
+            },
+            "deleteDatabaseBackup": {
+              "title": "Delete Database Backup",
+              "description": "Delete a database backup selected by the backup selector.",
+              "form": {
+                "backupSelector": "Database Backup to Delete",
+                "warning": "This permanently deletes the selected database backup, including its dump on the node. Only database backups are considered, never file backups. If the selected backup is locked, the step fails."
+              }
+            },
+            "moveDatabaseBackup": {
+              "title": "Move Database Backup",
+              "description": "Move a database backup selected by the backup selector into a backup group.",
+              "form": {
+                "backupSelector": "Database Backup to Move"
               }
             },
             "createDirectory": {
@@ -6308,17 +6410,20 @@
         "backups": {
           "title": "備份",
           "subtitle": "已建立 {current} / {max} 個備份。",
+          "subtitleWithDatabase": "{current} of {max} maximum backups created ({server} server, {database} database).",
           "tooltip": {
             "limitReached": "此伺服器最多只能使用 {max} 個備份。"
           },
           "table": {
             "columns": {
+              "kind": "Kind",
               "locked": "已鎖定？"
             }
           },
           "badge": {
             "deleting": "刪除中…",
-            "deleteFailed": "刪除失敗"
+            "deleteFailed": "刪除失敗",
+            "sourceDeleted": "{name} (deleted)"
           },
           "button": {
             "browse": "瀏覽",
@@ -6335,6 +6440,10 @@
             "createBackup": {
               "title": "建立備份",
               "noGroup": "無群組",
+              "source": "Source",
+              "sourceFiles": "Server Files",
+              "sourceDatabase": "Managed Database",
+              "sourceInstance": "Managed Database",
               "toast": {
                 "created": "備份已建立。"
               }
@@ -6570,7 +6679,7 @@
           },
           "form": {
             "name": "Hostname",
-            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters, and unique across the whole network.",
+            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.",
             "namePlaceholder": "Leave empty to derive one from the server name",
             "port": "Port",
             "protocols": "Protocols",
@@ -6588,7 +6697,7 @@
           "modal": {
             "join": {
               "title": "Join the Private Network",
-              "description": "Pick the hostname other servers will reach this one on. It has to be free across the whole network, and you can change it later."
+              "description": "Pick the hostname other servers will reach this one on. Other servers can use the same hostname as long as no server connects to both. You can change it later."
             },
             "rename": {
               "title": "Change Hostname",
