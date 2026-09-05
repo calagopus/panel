@@ -33,6 +33,12 @@ export const adminOAuthProviderUpdateSchema = z.lazy(() =>
   }),
 );
 
+/**
+ * API field names holding provider credentials: redacted when exporting a provider and seeded
+ * with placeholders when importing one (the backend requires non-empty values on create).
+ */
+export const oauthProviderSecretFields = ['client_id', 'client_secret'];
+
 export const adminOAuthUserLinkSchema = z.looseObject({
   uuid: z.string(),
   user: z.lazy(() => adminFullUserSchema),

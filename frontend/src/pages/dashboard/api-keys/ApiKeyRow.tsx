@@ -158,11 +158,11 @@ export default function ApiKeyRow({ apiKey }: { apiKey: z.infer<typeof userApiKe
             </TableData>
 
             <TableData>
-              {!apiKey.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={apiKey.lastUsed} />}
+              <FormattedTimestamp timestamp={apiKey.lastUsed} showNA />
             </TableData>
 
             <TableData>
-              {!apiKey.expires ? t('common.na', {}) : <FormattedTimestamp timestamp={apiKey.expires} />}
+              <FormattedTimestamp timestamp={apiKey.expires} showNA />
             </TableData>
 
             <TableData>

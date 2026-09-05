@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { z } from 'zod';
 import getInstallLogs from '@/api/admin/servers/logs/getInstallLogs.ts';
 import getLogs from '@/api/admin/servers/logs/getLogs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -9,11 +8,11 @@ import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { stripAnsi } from '@/lib/format/ansi.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function AdminServerLogs({ server }: { server: z.infer<typeof adminServerSchema> }) {
+export default function AdminServerLogs({ server }: { server: AdminServer }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
 
@@ -60,8 +59,12 @@ export default function AdminServerLogs({ server }: { server: z.infer<typeof adm
               withAsterisk
               label={t('common.form.lines', {})}
               value={lines}
+              min={1}
               className='w-full'
-              onChange={(value) => setLines(Number(value))}
+              onChange={(value) => {
+                const parsed = Number(value);
+                setLines(Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : 1);
+              }}
             />
           </div>
 

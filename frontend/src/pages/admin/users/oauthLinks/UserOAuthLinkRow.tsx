@@ -26,7 +26,7 @@ export default function UserOAuthLinkRow({
   const { t } = useTranslations();
   const queryClient = useQueryClient();
 
-  const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'delete' | null>(null);
 
   const doDelete = async () => {
     await deleteUserOAuthLink(user.uuid, userOAuthLink.uuid)
@@ -90,7 +90,7 @@ export default function UserOAuthLinkRow({
             </TableData>
 
             <TableData>
-              {!userOAuthLink.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={userOAuthLink.lastUsed} />}
+              <FormattedTimestamp timestamp={userOAuthLink.lastUsed} showNA />
             </TableData>
 
             <TableData>

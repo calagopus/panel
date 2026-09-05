@@ -1,20 +1,19 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-import { z } from 'zod';
 import getServerMounts from '@/api/admin/servers/mounts/getServerMounts.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverMountTableColumns } from '@/lib/tableColumns.ts';
 import ServerMountAddModal from '@/pages/admin/servers/mounts/modals/ServerMountAddModal.tsx';
 import ServerMountRow from '@/pages/admin/servers/mounts/ServerMountRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function AdminServerMounts({ server }: { server: z.infer<typeof adminServerSchema> }) {
+export default function AdminServerMounts({ server }: { server: AdminServer }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 

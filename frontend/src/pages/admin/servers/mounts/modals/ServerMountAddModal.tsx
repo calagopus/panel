@@ -4,14 +4,11 @@ import createServerMount from '@/api/admin/servers/mounts/createServerMount.ts';
 import getAvailableServerMounts from '@/api/admin/servers/mounts/getAvailableServerMounts.ts';
 import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerMountSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, adminServerMountSchema } from '@/lib/schemas/admin/servers.ts';
 import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerMountAddModal({
-  server,
-  ...props
-}: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+export default function ServerMountAddModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
 
   const mounts = useSearchableResource<z.infer<typeof adminServerMountSchema>>({

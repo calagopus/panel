@@ -1,6 +1,6 @@
 import { UseFormInput, useForm } from '@mantine/form';
 import { deepmerge } from 'deepmerge-ts';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import type { ExtendableSchema, FormId } from '@/elements/form-engine/index.ts';
 import { resolveFormValidation, tagFormId } from '@/elements/form-engine/useFormEngine.ts';
@@ -12,6 +12,8 @@ interface UseModalFormOptions<T extends Record<string, unknown>> extends UseForm
   onClose: () => void;
   onSubmit: (values: T) => Promise<void> | void;
   onError?: (error: unknown) => void;
+  opened?: boolean;
+  hydrate?: () => T | undefined;
 }
 
 export function useModalForm<T extends Record<string, unknown>>({
@@ -20,6 +22,8 @@ export function useModalForm<T extends Record<string, unknown>>({
   onClose,
   onSubmit,
   onError,
+  opened,
+  hydrate,
   validateInputOnBlur = true,
   ...formInput
 }: UseModalFormOptions<T>) {
@@ -37,6 +41,18 @@ export function useModalForm<T extends Record<string, unknown>>({
   });
   if (formId) tagFormId(form, formId);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!opened) return;
+
+    const hydrated = hydrate?.();
+    if (hydrated) {
+      form.setValues(hydrated);
+      form.resetDirty(hydrated);
+    } else {
+      form.reset();
+    }
+  }, [opened]);
 
   const handleClose = () => {
     if (loading) return;

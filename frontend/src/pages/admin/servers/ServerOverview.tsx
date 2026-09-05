@@ -12,7 +12,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SimpleGrid, Text } from '@mantine/core';
-import { z } from 'zod';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import Card from '@/elements/data-display/Card.tsx';
@@ -24,10 +23,10 @@ import Stack from '@/elements/layout/Stack.tsx';
 import { serverStatusInfo } from '@/lib/domain/server.ts';
 import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { formatDateTime } from '@/lib/format/time.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-type Server = z.infer<typeof adminServerSchema>;
+type Server = AdminServer;
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -56,6 +55,38 @@ function StatBox({ label, value, icon }: { label: string; value: React.ReactNode
       </Text>
     </Card>
   );
+}
+
+function LimitBytesValue({
+  value,
+  unlimitedValue = 0,
+  disabledValue,
+  unlimitedLabel,
+  disabledLabel,
+}: {
+  value: number;
+  unlimitedValue?: number;
+  disabledValue?: number;
+  unlimitedLabel: string;
+  disabledLabel?: string;
+}) {
+  if (value === unlimitedValue) {
+    return (
+      <Badge color='gray' variant='light'>
+        {unlimitedLabel}
+      </Badge>
+    );
+  }
+
+  if (disabledValue !== undefined && value === disabledValue && disabledLabel) {
+    return (
+      <Badge color='gray' variant='light'>
+        {disabledLabel}
+      </Badge>
+    );
+  }
+
+  return <>{bytesToString(mbToBytes(value))}</>;
 }
 
 export default function ServerOverview({ server }: { server: Server }) {
@@ -240,7 +271,7 @@ export default function ServerOverview({ server }: { server: Server }) {
                 </Text>
               </InfoRow>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.createdAt', {})}>
-                <Text size='sm'>{server.created.toLocaleString()}</Text>
+                <Text size='sm'>{formatDateTime(server.created)}</Text>
               </InfoRow>
             </Stack>
           </SimpleGrid>
@@ -275,44 +306,24 @@ export default function ServerOverview({ server }: { server: Server }) {
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.memory', {})}
               icon={<FontAwesomeIcon icon={faMemory} />}
-              value={
-                server.limits.memory === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.memory))
-                )
-              }
+              value={<LimitBytesValue value={server.limits.memory} unlimitedLabel={unlimitedLabel} />}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.disk', {})}
               icon={<FontAwesomeIcon icon={faHardDrive} />}
-              value={
-                server.limits.disk === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.disk))
-                )
-              }
+              value={<LimitBytesValue value={server.limits.disk} unlimitedLabel={unlimitedLabel} />}
             />
             <StatBox
               label={t('pages.admin.servers.tabs.overview.page.label.swap', {})}
               icon={<FontAwesomeIcon icon={faServer} />}
               value={
-                server.limits.swap === -1 ? (
-                  <Badge color='gray' variant='light'>
-                    {unlimitedLabel}
-                  </Badge>
-                ) : server.limits.swap === 0 ? (
-                  <Badge color='gray' variant='light'>
-                    {t('common.form.disabled', {})}
-                  </Badge>
-                ) : (
-                  bytesToString(mbToBytes(server.limits.swap))
-                )
+                <LimitBytesValue
+                  value={server.limits.swap}
+                  unlimitedValue={-1}
+                  disabledValue={0}
+                  unlimitedLabel={unlimitedLabel}
+                  disabledLabel={t('common.form.disabled', {})}
+                />
               }
             />
             <ExtensionSlot

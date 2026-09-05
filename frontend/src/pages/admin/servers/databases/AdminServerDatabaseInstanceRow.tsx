@@ -1,6 +1,5 @@
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
-import { z } from 'zod';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
@@ -8,7 +7,7 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
-import { adminServerSchema, adminServerServerDatabaseAgentSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, AdminServerServerDatabaseAgent } from '@/lib/schemas/admin/servers.ts';
 import DatabaseAgentHostInstanceDeleteModal from '@/pages/admin/database-agent-hosts/modals/DatabaseAgentHostInstanceDeleteModal.tsx';
 import DatabaseAgentHostInstanceEditModal from '@/pages/admin/database-agent-hosts/modals/DatabaseAgentHostInstanceEditModal.tsx';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -18,8 +17,8 @@ export default function AdminServerDatabaseInstanceRow({
   server,
   databaseAgent,
 }: {
-  server: z.infer<typeof adminServerSchema>;
-  databaseAgent: z.infer<typeof adminServerServerDatabaseAgentSchema>;
+  server: AdminServer;
+  databaseAgent: AdminServerServerDatabaseAgent;
 }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);

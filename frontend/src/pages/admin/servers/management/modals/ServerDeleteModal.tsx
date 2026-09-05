@@ -1,9 +1,8 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { z } from 'zod';
 import deleteServer from '@/api/admin/servers/deleteServer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -14,14 +13,11 @@ import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Text from '@/elements/typography/Text.tsx';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerDeleteModal({
-  server,
-  ...props
-}: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+export default function ServerDeleteModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -30,6 +26,14 @@ export default function ServerDeleteModal({
   const [deleteDoForce, setDeleteDoForce] = useState(false);
   const [deleteDoDeleteBackups, setDeleteDoDeleteBackups] = useState(false);
   const [deleteServerName, setDeleteServerName] = useState('');
+
+  useEffect(() => {
+    if (!props.opened) {
+      setDeleteDoForce(false);
+      setDeleteDoDeleteBackups(false);
+      setDeleteServerName('');
+    }
+  }, [props.opened]);
 
   const doDelete = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,7 +70,7 @@ export default function ServerDeleteModal({
             label={t('common.form.force', {})}
             name='force'
             color='red'
-            defaultChecked={deleteDoForce}
+            checked={deleteDoForce}
             onChange={(e) => setDeleteDoForce(e.target.checked)}
           />
 
@@ -79,7 +83,7 @@ export default function ServerDeleteModal({
           <Switch
             label={t('pages.admin.servers.tabs.management.page.delete.modal.form.deleteBackups', {})}
             name='deleteBackups'
-            defaultChecked={deleteDoDeleteBackups}
+            checked={deleteDoDeleteBackups}
             onChange={(e) => setDeleteDoDeleteBackups(e.target.checked)}
           />
 

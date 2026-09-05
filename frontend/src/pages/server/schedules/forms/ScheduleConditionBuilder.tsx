@@ -1,15 +1,9 @@
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
-import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
-import Button from '@/elements/buttons/Button.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import SizeInput from '@/elements/input/SizeInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
-import Group from '@/elements/layout/Group.tsx';
-import Stack from '@/elements/layout/Stack.tsx';
-import Text from '@/elements/typography/Text.tsx';
+import RecursiveGroupBuilder from '@/elements/RecursiveGroupBuilder.tsx';
 import {
   mappingToSelectData,
   scheduleComparatorLabelMapping,
@@ -26,263 +20,164 @@ import { serverPowerState } from '@/lib/schemas/server/server.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ScheduleDynamicParameterInput from './ScheduleDynamicParameterInput.tsx';
 
-const maxConditionDepth = 3;
+type Condition = z.infer<typeof serverScheduleConditionSchema>;
+
+const conditionDefaults: Record<Condition['type'], () => Condition> = {
+  none: () => ({ type: 'none' }),
+  and: () => ({ type: 'and', conditions: [] }),
+  or: () => ({ type: 'or', conditions: [] }),
+  not: () => ({ type: 'not', condition: { type: 'none' } }),
+  server_state: () => ({ type: 'server_state', state: 'running' }),
+  uptime: () => ({ type: 'uptime', comparator: 'greater_than', value: 0 }),
+  resource_usage: () => ({ type: 'resource_usage', metric: 'cpu', comparator: 'greater_than', value: 0 }),
+  file_exists: () => ({ type: 'file_exists', file: '' }),
+  variable_exists: () => ({ type: 'variable_exists', variable: { variable: '' } }),
+  variable_equals: () => ({ type: 'variable_equals', variable: { variable: '' }, equals: '' }),
+  variable_contains: () => ({ type: 'variable_contains', variable: { variable: '' }, contains: '' }),
+  variable_starts_with: () => ({ type: 'variable_starts_with', variable: { variable: '' }, startsWith: '' }),
+  variable_ends_with: () => ({ type: 'variable_ends_with', variable: { variable: '' }, endsWith: '' }),
+};
 
 interface ConditionBuilderProps {
-  condition: z.infer<typeof serverScheduleConditionSchema>;
-  onChange: (condition: z.infer<typeof serverScheduleConditionSchema>) => void;
+  condition: Condition;
+  onChange: (condition: Condition) => void;
   depth?: number;
 }
 
 export default function ScheduleConditionBuilder({ condition, onChange, depth = 0 }: ConditionBuilderProps) {
   const { t } = useTranslations();
-  const handleTypeChange = (type: string) => {
-    switch (type) {
-      case 'none':
-        onChange({ type: 'none' });
-        break;
-      case 'and':
-        onChange({ type: 'and', conditions: [] });
-        break;
-      case 'or':
-        onChange({ type: 'or', conditions: [] });
-        break;
-      case 'not':
-        onChange({ type: 'not', condition: { type: 'none' } });
-        break;
-      case 'server_state':
-        onChange({ type: 'server_state', state: 'running' });
-        break;
-      case 'uptime':
-        onChange({ type: 'uptime', comparator: 'greater_than', value: 0 });
-        break;
-      case 'resource_usage':
-        onChange({ type: 'resource_usage', metric: 'cpu', comparator: 'greater_than', value: 0 });
-        break;
-      case 'file_exists':
-        onChange({ type: 'file_exists', file: '' });
-        break;
-      case 'variable_exists':
-        onChange({ type: 'variable_exists', variable: { variable: '' } });
-        break;
-      case 'variable_equals':
-        onChange({ type: 'variable_equals', variable: { variable: '' }, equals: '' });
-        break;
-      case 'variable_contains':
-        onChange({ type: 'variable_contains', variable: { variable: '' }, contains: '' });
-        break;
-      case 'variable_starts_with':
-        onChange({ type: 'variable_starts_with', variable: { variable: '' }, startsWith: '' });
-        break;
-      case 'variable_ends_with':
-        onChange({ type: 'variable_ends_with', variable: { variable: '' }, endsWith: '' });
-        break;
-    }
-  };
 
-  const handleNestedConditionChange = (index: number, newCondition: z.infer<typeof serverScheduleConditionSchema>) => {
-    if (condition.type === 'and' || condition.type === 'or') {
-      const newConditions = [...condition.conditions];
-      newConditions[index] = newCondition;
-      onChange({ ...condition, conditions: newConditions });
-    }
-  };
+  const renderLeaf = (node: Condition, change: (next: Condition) => void) => (
+    <>
+      {node.type === 'server_state' && (
+        <Select
+          label={t('pages.server.schedules.form.serverState', {})}
+          value={node.state}
+          onChange={(value) => value && change({ ...node, state: value as z.infer<typeof serverPowerState> })}
+          data={mappingToSelectData(serverPowerStateLabelMapping)}
+        />
+      )}
 
-  const addNestedCondition = () => {
-    if (condition.type === 'and' || condition.type === 'or') {
-      onChange({
-        ...condition,
-        conditions: [...condition.conditions, { type: 'none' }],
-      });
-    }
-  };
+      {(node.type === 'uptime' || node.type === 'resource_usage') && (
+        <div className='flex flex-col gap-2 sm:flex-row sm:[&>*]:flex-1 sm:[&>*]:min-w-0'>
+          {node.type === 'resource_usage' && (
+            <Select
+              label={t('pages.server.schedules.condition.metric', {})}
+              value={node.metric}
+              onChange={(value) =>
+                value && change({ ...node, metric: value as z.infer<typeof serverScheduleResourceMetric> })
+              }
+              data={mappingToSelectData(scheduleResourceMetricLabelMapping)}
+            />
+          )}
+          <Select
+            label={t('pages.server.schedules.form.comparator', {})}
+            value={node.comparator}
+            onChange={(value) =>
+              value && change({ ...node, comparator: value as z.infer<typeof serverScheduleComparator> })
+            }
+            data={mappingToSelectData(scheduleComparatorLabelMapping)}
+          />
+          {node.type === 'uptime' && (
+            <NumberInput
+              label={t('pages.server.schedules.preCondition.valueSeconds', {})}
+              value={Number(node.value) / 1000}
+              onChange={(value) => change({ ...node, value: Number(value) * 1000 || 0 })}
+              min={0}
+            />
+          )}
+          {node.type === 'resource_usage' && node.metric === 'cpu' && (
+            <NumberInput
+              label={t('pages.server.schedules.preCondition.valuePercent', {})}
+              value={node.value}
+              onChange={(value) => change({ ...node, value: Number(value) || 0 })}
+              min={0}
+            />
+          )}
+          {node.type === 'resource_usage' && node.metric !== 'cpu' && (
+            <SizeInput
+              label={t('pages.server.schedules.preCondition.value', {})}
+              mode='b'
+              min={0}
+              value={node.value}
+              onChange={(value) => change({ ...node, value })}
+            />
+          )}
+        </div>
+      )}
 
-  const removeNestedCondition = (index: number) => {
-    if (condition.type === 'and' || condition.type === 'or') {
-      const newConditions = condition.conditions.filter((_, i) => i !== index);
-      onChange({ ...condition, conditions: newConditions });
-    }
-  };
+      {node.type === 'file_exists' && (
+        <TextInput
+          label={t('common.form.filePath', {})}
+          value={node.file}
+          onChange={(e) => change({ ...node, file: e.target.value })}
+        />
+      )}
+
+      {(node.type === 'variable_exists' ||
+        node.type === 'variable_equals' ||
+        node.type === 'variable_contains' ||
+        node.type === 'variable_starts_with' ||
+        node.type === 'variable_ends_with') && (
+        <ScheduleDynamicParameterInput
+          label={t('pages.server.schedules.condition.variable', {})}
+          allowString={false}
+          value={node.variable}
+          onChange={(v) => change({ ...node, variable: v })}
+        />
+      )}
+
+      {node.type === 'variable_equals' && (
+        <ScheduleDynamicParameterInput
+          label={t('pages.server.schedules.condition.equals', {})}
+          value={node.equals}
+          onChange={(v) => change({ ...node, equals: v })}
+        />
+      )}
+      {node.type === 'variable_contains' && (
+        <ScheduleDynamicParameterInput
+          label={t('pages.server.schedules.condition.contains', {})}
+          value={node.contains}
+          onChange={(v) => change({ ...node, contains: v })}
+        />
+      )}
+      {node.type === 'variable_starts_with' && (
+        <ScheduleDynamicParameterInput
+          label={t('pages.server.schedules.condition.startsWith', {})}
+          value={node.startsWith}
+          onChange={(v) => change({ ...node, startsWith: v })}
+        />
+      )}
+      {node.type === 'variable_ends_with' && (
+        <ScheduleDynamicParameterInput
+          label={t('pages.server.schedules.condition.endsWith', {})}
+          value={node.endsWith}
+          onChange={(v) => change({ ...node, endsWith: v })}
+        />
+      )}
+    </>
+  );
 
   return (
-    <div
-      style={
-        depth > 0
-          ? {
-              marginLeft: 'clamp(6px, 3vw, 20px)',
-              paddingLeft: 10,
-              borderLeft: '2px solid var(--mantine-color-default-border)',
-            }
-          : undefined
-      }
-    >
-      <Stack>
-        <Select
-          label={t('pages.server.schedules.form.conditionType', {})}
-          value={condition.type}
-          onChange={(value) => value && handleTypeChange(value)}
-          data={mappingToSelectData(scheduleConditionLabelMapping).filter(
-            (c) => depth < maxConditionDepth || !['and', 'or', 'not'].includes(c.value),
-          )}
-        />
-
-        {condition.type === 'server_state' && (
-          <Select
-            label={t('pages.server.schedules.form.serverState', {})}
-            value={condition.state}
-            onChange={(value) => value && onChange({ ...condition, state: value as z.infer<typeof serverPowerState> })}
-            data={mappingToSelectData(serverPowerStateLabelMapping)}
-          />
-        )}
-
-        {(condition.type === 'uptime' || condition.type === 'resource_usage') && (
-          <div className='flex flex-col gap-2 sm:flex-row sm:[&>*]:flex-1 sm:[&>*]:min-w-0'>
-            {condition.type === 'resource_usage' && (
-              <Select
-                label={t('pages.server.schedules.condition.metric', {})}
-                value={condition.metric}
-                onChange={(value) =>
-                  value && onChange({ ...condition, metric: value as z.infer<typeof serverScheduleResourceMetric> })
-                }
-                data={mappingToSelectData(scheduleResourceMetricLabelMapping)}
-              />
-            )}
-            <Select
-              label={t('pages.server.schedules.form.comparator', {})}
-              value={condition.comparator}
-              onChange={(value) =>
-                value && onChange({ ...condition, comparator: value as z.infer<typeof serverScheduleComparator> })
-              }
-              data={mappingToSelectData(scheduleComparatorLabelMapping)}
-            />
-            {condition.type === 'uptime' && (
-              <NumberInput
-                label={t('pages.server.schedules.preCondition.valueSeconds', {})}
-                value={Number(condition.value) / 1000}
-                onChange={(value) => onChange({ ...condition, value: Number(value) * 1000 || 0 })}
-                min={0}
-              />
-            )}
-            {condition.type === 'resource_usage' && condition.metric === 'cpu' && (
-              <NumberInput
-                label={t('pages.server.schedules.preCondition.valuePercent', {})}
-                value={condition.value}
-                onChange={(value) => onChange({ ...condition, value: Number(value) || 0 })}
-                min={0}
-              />
-            )}
-            {condition.type === 'resource_usage' && condition.metric !== 'cpu' && (
-              <SizeInput
-                label={t('pages.server.schedules.preCondition.value', {})}
-                mode='b'
-                min={0}
-                value={condition.value}
-                onChange={(value) => onChange({ ...condition, value })}
-              />
-            )}
-          </div>
-        )}
-
-        {condition.type === 'file_exists' && (
-          <TextInput
-            label={t('common.form.filePath', {})}
-            value={condition.file}
-            onChange={(e) => onChange({ ...condition, file: e.target.value })}
-          />
-        )}
-
-        {(condition.type === 'variable_exists' ||
-          condition.type === 'variable_equals' ||
-          condition.type === 'variable_contains' ||
-          condition.type === 'variable_starts_with' ||
-          condition.type === 'variable_ends_with') && (
-          <ScheduleDynamicParameterInput
-            label={t('pages.server.schedules.condition.variable', {})}
-            allowString={false}
-            value={condition.variable}
-            onChange={(v) => onChange({ ...condition, variable: v })}
-          />
-        )}
-
-        {condition.type === 'variable_equals' && (
-          <ScheduleDynamicParameterInput
-            label={t('pages.server.schedules.condition.equals', {})}
-            value={condition.equals}
-            onChange={(v) => onChange({ ...condition, equals: v })}
-          />
-        )}
-        {condition.type === 'variable_contains' && (
-          <ScheduleDynamicParameterInput
-            label={t('pages.server.schedules.condition.contains', {})}
-            value={condition.contains}
-            onChange={(v) => onChange({ ...condition, contains: v })}
-          />
-        )}
-        {condition.type === 'variable_starts_with' && (
-          <ScheduleDynamicParameterInput
-            label={t('pages.server.schedules.condition.startsWith', {})}
-            value={condition.startsWith}
-            onChange={(v) => onChange({ ...condition, startsWith: v })}
-          />
-        )}
-        {condition.type === 'variable_ends_with' && (
-          <ScheduleDynamicParameterInput
-            label={t('pages.server.schedules.condition.endsWith', {})}
-            value={condition.endsWith}
-            onChange={(v) => onChange({ ...condition, endsWith: v })}
-          />
-        )}
-
-        {(condition.type === 'and' || condition.type === 'or') && (
-          <>
-            {depth < maxConditionDepth && (
-              <Group>
-                <Text size='sm'>
-                  {condition.type === 'and'
-                    ? t('pages.server.schedules.condition.allMustBeTrue', {})
-                    : t('pages.server.schedules.condition.anyMustBeTrue', {})}
-                </Text>
-                <Button
-                  size='xs'
-                  variant='light'
-                  leftSection={<FontAwesomeIcon icon={faPlus} />}
-                  onClick={addNestedCondition}
-                >
-                  {t('pages.server.schedules.button.addCondition', {})}
-                </Button>
-              </Group>
-            )}
-
-            {condition.conditions.map((nestedCondition, index) => (
-              <Group key={index} align='flex-start'>
-                <div style={{ flex: 1 }}>
-                  <ScheduleConditionBuilder
-                    condition={nestedCondition}
-                    onChange={(newCondition) => handleNestedConditionChange(index, newCondition)}
-                    depth={depth + 1}
-                  />
-                </div>
-                <ActionIcon color='red' variant='light' onClick={() => removeNestedCondition(index)}>
-                  <FontAwesomeIcon icon={faMinus} />
-                </ActionIcon>
-              </Group>
-            ))}
-          </>
-        )}
-        {condition.type === 'not' && (
-          <>
-            <Text size='sm'>{t('pages.server.schedules.condition.mustNotBeTrue', {})}</Text>
-
-            <div style={{ flex: 1 }}>
-              <ScheduleConditionBuilder
-                condition={condition.condition}
-                onChange={(nestedCondition) => onChange({ ...condition, condition: nestedCondition })}
-                depth={depth + 1}
-              />
-            </div>
-          </>
-        )}
-      </Stack>
-    </div>
+    <RecursiveGroupBuilder<Condition>
+      node={condition}
+      onChange={onChange}
+      depth={depth}
+      typeData={mappingToSelectData(scheduleConditionLabelMapping)}
+      makeDefault={(type) => conditionDefaults[type as Condition['type']]()}
+      getChildren={(node) => (node.type === 'and' || node.type === 'or' ? node.conditions : null)}
+      withChildren={(node, conditions) => ({ ...node, conditions }) as Condition}
+      getNotChild={(node) => (node.type === 'not' ? node.condition : null)}
+      withNotChild={(node, child) => ({ ...node, condition: child }) as Condition}
+      emptyNode={{ type: 'none' }}
+      renderLeaf={renderLeaf}
+      labels={{
+        type: t('pages.server.schedules.form.conditionType', {}),
+        allMustMatch: t('pages.server.schedules.condition.allMustBeTrue', {}),
+        anyMustMatch: t('pages.server.schedules.condition.anyMustBeTrue', {}),
+        mustNotMatch: t('pages.server.schedules.condition.mustNotBeTrue', {}),
+        addChild: t('pages.server.schedules.button.addCondition', {}),
+      }}
+    />
   );
 }

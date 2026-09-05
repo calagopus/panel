@@ -43,6 +43,27 @@ export const systemBackupPolicyTableColumns = (): string[] => {
   ];
 };
 
+export const systemBackupPolicyLocationTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('common.table.columns.added', {}),
+    '',
+  ];
+};
+
+export const systemBackupPolicyServerTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('common.table.columns.node', {}),
+    t('common.table.columns.added', {}),
+    '',
+  ];
+};
+
 export const databaseHostTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [
@@ -335,6 +356,19 @@ export const serverTableColumns = (): string[] => {
     t('common.table.columns.owner', {}),
     t('common.table.columns.allocation', {}),
     t('common.table.columns.created', {}),
+  ];
+};
+
+export const serverBackupTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.node', {}),
+    t('common.table.columns.checksum', {}),
+    t('common.table.columns.size', {}),
+    t('common.table.columns.files', {}),
+    t('common.table.columns.created', {}),
+    '',
   ];
 };
 

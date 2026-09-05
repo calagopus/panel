@@ -19,8 +19,7 @@ import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useLocationFormFields } from './locationFormFields.tsx';
-import { locationEmptyFormValues, locationToFormValues } from './locationFormValues.ts';
+import { locationEmptyFormValues, locationToFormValues, useLocationFormFields } from './locationFormValues.tsx';
 
 type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
 

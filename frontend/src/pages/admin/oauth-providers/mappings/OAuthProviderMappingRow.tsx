@@ -10,7 +10,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { oauthProviderMappingMatcherLabelMapping } from '@/lib/enums.ts';
+import { oauthProviderMappingMatcherSummary } from '@/lib/enums.ts';
 import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -116,12 +116,7 @@ export default function OAuthProviderMappingRow({
               )}
             </TableData>
 
-            <TableData>
-              {oauthProviderMappingMatcherLabelMapping[mapping.matcher.type]()}
-              {mapping.matcher.type === 'and' || mapping.matcher.type === 'or'
-                ? ` (${mapping.matcher.matchers.length})`
-                : ''}
-            </TableData>
+            <TableData>{oauthProviderMappingMatcherSummary(mapping.matcher)}</TableData>
 
             <TableData>
               <FormattedTimestamp timestamp={mapping.created} />

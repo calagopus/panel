@@ -1,21 +1,8 @@
-import { faEye, faMagnifyingGlass, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { z } from 'zod';
 import getOAuthProviderUserByIdentifier from '@/api/admin/oauth-providers/users/getOAuthProviderUserByIdentifier.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/buttons/Button.tsx';
-import TitleCard from '@/elements/data-display/TitleCard.tsx';
-import Alert from '@/elements/feedback/Alert.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
-import Group from '@/elements/layout/Group.tsx';
-import Stack from '@/elements/layout/Stack.tsx';
-import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Text from '@/elements/typography/Text.tsx';
-import { adminOAuthUserLinkSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
+import ResourceLookupModal from '@/elements/modals/ResourceLookupModal.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function IdentifierLookupModal({
@@ -23,123 +10,28 @@ export default function IdentifierLookupModal({
   ...props
 }: ModalProps & { oauthProviderUuid: string }) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
-  const navigate = useNavigate();
-
-  const [identifier, setIdentifier] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<z.infer<typeof adminOAuthUserLinkSchema> | null>(null);
-  const [notFound, setNotFound] = useState(false);
-
-  const doSearch = () => {
-    if (!identifier.trim()) return;
-
-    setLoading(true);
-    setResult(null);
-    setNotFound(false);
-
-    getOAuthProviderUserByIdentifier(oauthProviderUuid, identifier.trim())
-      .then((userOAuthLink) => setResult(userOAuthLink))
-      .catch((err) => {
-        const status =
-          err && typeof err === 'object' && 'response' in err && (err as { response?: { status?: number } }).response
-            ? (err as { response: { status: number } }).response.status
-            : null;
-
-        if (status === 404) {
-          setNotFound(true);
-        } else {
-          addToast(httpErrorToHuman(err), 'error');
-        }
-      })
-      .finally(() => setLoading(false));
-  };
-
-  const handleClose = () => {
-    setIdentifier('');
-    setResult(null);
-    setNotFound(false);
-    props.onClose();
-  };
-
-  const goToUser = () => {
-    if (!result) return;
-    navigate(`/admin/users/${result.user.uuid}`);
-  };
+  const tr = 'pages.admin.oAuthProviders.tabs.users.identifierLookup';
 
   return (
-    <Modal
-      title={t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.title', {})}
+    <ResourceLookupModal
       {...props}
-      onClose={handleClose}
-    >
-      <Stack>
-        <Group align='flex-end'>
-          <TextInput
-            label={t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.form.identifier', {})}
-            placeholder={t(
-              'pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.form.identifierPlaceholder',
-              {},
-            )}
-            value={identifier}
-            onChange={(e) => {
-              setIdentifier(e.target.value);
-              setResult(null);
-              setNotFound(false);
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && doSearch()}
-            style={{ flex: 1 }}
-          />
-          <Button onClick={doSearch} loading={loading} disabled={!identifier.trim()}>
-            {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.form.search', {})}
-          </Button>
-        </Group>
-
-        {notFound && (
-          <Alert icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}>
-            {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.notFound', {})}
-          </Alert>
-        )}
-
-        {result && (
-          <TitleCard
-            title={t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.result.title', {})}
-            icon={<FontAwesomeIcon icon={faUser} />}
-          >
-            <Stack gap='xs'>
-              <Group justify='space-between'>
-                <Text size='sm' fw={500}>
-                  {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.result.username', {})}
-                </Text>
-                <Text size='sm'>{result.user.username}</Text>
-              </Group>
-              <Group justify='space-between'>
-                <Text size='sm' fw={500}>
-                  {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.result.email', {})}
-                </Text>
-                <Text size='sm'>{result.user.email}</Text>
-              </Group>
-              <Group justify='space-between'>
-                <Text size='sm' fw={500}>
-                  {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.result.identifier', {})}
-                </Text>
-                <Text size='sm'>{result.identifier}</Text>
-              </Group>
-            </Stack>
-          </TitleCard>
-        )}
-      </Stack>
-
-      <ModalFooter>
-        {result && (
-          <Button color='blue' leftSection={<FontAwesomeIcon icon={faEye} />} onClick={goToUser}>
-            {t('pages.admin.oAuthProviders.tabs.users.identifierLookup.modal.result.viewUser', {})}
-          </Button>
-        )}
-        <Button variant='default' onClick={handleClose}>
-          {t('common.button.cancel', {})}
-        </Button>
-      </ModalFooter>
-    </Modal>
+      labels={{
+        title: t(`${tr}.modal.title`, {}),
+        inputLabel: t(`${tr}.modal.form.identifier`, {}),
+        inputPlaceholder: t(`${tr}.modal.form.identifierPlaceholder`, {}),
+        search: t(`${tr}.modal.form.search`, {}),
+        notFound: t(`${tr}.modal.notFound`, {}),
+        resultTitle: t(`${tr}.modal.result.title`, {}),
+        viewResult: t(`${tr}.modal.result.viewUser`, {}),
+      }}
+      resultIcon={<FontAwesomeIcon icon={faUser} />}
+      lookup={(identifier) => getOAuthProviderUserByIdentifier(oauthProviderUuid, identifier)}
+      fields={(link) => [
+        { label: t(`${tr}.modal.result.username`, {}), value: link.user.username },
+        { label: t(`${tr}.modal.result.email`, {}), value: link.user.email },
+        { label: t(`${tr}.modal.result.identifier`, {}), value: link.identifier },
+      ]}
+      href={(link) => `/admin/users/${link.user.uuid}`}
+    />
   );
 }

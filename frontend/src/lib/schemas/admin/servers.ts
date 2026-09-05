@@ -192,3 +192,15 @@ export const adminServerMountSchema = z.looseObject({
   mount: z.lazy(() => adminMountSchema),
   created: z.coerce.date().nullable(),
 });
+
+export type AdminServer = z.infer<typeof adminServerSchema>;
+export type AdminServerLimits = z.infer<typeof adminServerLimitsSchema>;
+export type AdminServerFeatureLimits = z.infer<typeof adminServerFeatureLimitsSchema>;
+export type AdminServerCreate = z.infer<typeof adminServerCreateSchema>;
+export type AdminServerUpdate = z.infer<typeof adminServerUpdateSchema>;
+export type AdminServerBackup = z.infer<typeof adminServerBackupSchema>;
+export type AdminServerDatabase = z.infer<typeof adminServerDatabaseSchema>;
+export type AdminServerServerDatabase = z.infer<typeof adminServerServerDatabaseSchema>;
+export type AdminServerDatabaseAgent = z.infer<typeof adminServerDatabaseAgentSchema>;
+export type AdminServerServerDatabaseAgent = z.infer<typeof adminServerServerDatabaseAgentSchema>;
+export type AdminServerMount = z.infer<typeof adminServerMountSchema>;

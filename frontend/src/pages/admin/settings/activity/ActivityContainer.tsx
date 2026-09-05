@@ -1,134 +1,49 @@
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateActivitySettings from '@/api/admin/settings/updateActivitySettings.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import Button from '@/elements/buttons/Button.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import NumberInput from '@/elements/input/NumberInput.tsx';
-import Switch from '@/elements/input/Switch.tsx';
+import { FormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
-import Stack from '@/elements/layout/Stack.tsx';
 import { adminSettingsActivitySchema } from '@/lib/schemas/admin/settings.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
+import SettingsSaveButton from '../SettingsSaveButton.tsx';
+import { useSettingsSection } from '../useSettingsSection.ts';
+import { activityEmptyFormValues, activityToFormValues, useActivityFormFields } from './activityFormValues.tsx';
+
+type ActivityValues = z.infer<typeof adminSettingsActivitySchema>;
 
 export default function ActivityContainer() {
-  const { addToast } = useToast();
   const { t } = useTranslations();
   const activity = useAdminStore((state) => state.activity);
-  const updateSettings = useAdminStore((state) => state.updateSettings);
 
-  const [loading, setLoading] = useState(false);
-
-  const form = useForm<z.infer<typeof adminSettingsActivitySchema>>({
-    initialValues: {
-      adminLogRetentionDays: 1,
-      adminLogRetentionCount: null,
-      userLogRetentionDays: 1,
-      userLogRetentionCount: null,
-      serverLogRetentionDays: 1,
-      serverLogRetentionCount: null,
-      serverLogAdminActivity: false,
-      serverLogScheduleActivity: false,
-    },
+  const form = useForm<ActivityValues>({
+    initialValues: activityEmptyFormValues,
     validateInputOnBlur: true,
     validate: zod4Resolver(adminSettingsActivitySchema),
   });
 
-  useEffect(() => {
-    form.setValues({
-      ...activity,
-    });
-  }, [activity]);
+  useHydrateForm(form, activity, activityToFormValues);
 
-  const doUpdate = () => {
-    setLoading(true);
+  const { loading, submit } = useSettingsSection({
+    form,
+    schema: adminSettingsActivitySchema,
+    storeKey: 'activity',
+    update: updateActivitySettings,
+    successMessage: t('pages.admin.settings.tabs.activity.page.toast.updated', {}),
+  });
 
-    updateActivitySettings(adminSettingsActivitySchema.parse(form.getValues()))
-      .then(() => {
-        addToast(t('pages.admin.settings.tabs.activity.page.toast.updated', {}), 'success');
-        updateSettings({ activity: adminSettingsActivitySchema.parse(form.getValues()) });
-      })
-      .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setLoading(false));
-  };
+  const fields = useActivityFormFields();
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.activity.page.title', {})} titleOrder={2}>
-      <form onSubmit={form.onSubmit(() => doUpdate())}>
-        <Stack>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-            <NumberInput
-              withAsterisk
-              label={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionDays', {})}
-              key={form.key('adminLogRetentionDays')}
-              {...form.getInputProps('adminLogRetentionDays')}
-            />
-
-            <NumberInput
-              withAsterisk
-              label={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionDays', {})}
-              key={form.key('userLogRetentionDays')}
-              {...form.getInputProps('userLogRetentionDays')}
-            />
-
-            <NumberInput
-              withAsterisk
-              label={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionDays', {})}
-              key={form.key('serverLogRetentionDays')}
-              {...form.getInputProps('serverLogRetentionDays')}
-            />
-          </div>
-
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-            <NumberInput
-              label={t('pages.admin.settings.tabs.activity.page.form.adminLogRetentionCount', {})}
-              key={form.key('adminLogRetentionCount')}
-              {...form.getInputProps('adminLogRetentionCount')}
-            />
-
-            <NumberInput
-              label={t('pages.admin.settings.tabs.activity.page.form.userLogRetentionCount', {})}
-              key={form.key('userLogRetentionCount')}
-              {...form.getInputProps('userLogRetentionCount')}
-            />
-
-            <NumberInput
-              label={t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionCount', {})}
-              key={form.key('serverLogRetentionCount')}
-              {...form.getInputProps('serverLogRetentionCount')}
-            />
-          </div>
-
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-            <Switch
-              label={t('pages.admin.settings.tabs.activity.page.form.serverLogAdminActivity', {})}
-              description={t('pages.admin.settings.tabs.activity.page.form.serverLogAdminActivityDescription', {})}
-              key={form.key('serverLogAdminActivity')}
-              {...form.getInputProps('serverLogAdminActivity', { type: 'checkbox' })}
-            />
-
-            <Switch
-              label={t('pages.admin.settings.tabs.activity.page.form.serverLogScheduleActivity', {})}
-              description={t('pages.admin.settings.tabs.activity.page.form.serverLogScheduleActivityDescription', {})}
-              key={form.key('serverLogScheduleActivity')}
-              {...form.getInputProps('serverLogScheduleActivity', { type: 'checkbox' })}
-            />
-          </div>
-        </Stack>
+      <form onSubmit={form.onSubmit(submit)}>
+        <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
-          <AdminCan action='settings.update' cantSave>
-            <Button type='submit' disabled={!form.isValid()} loading={loading}>
-              {t('common.button.save', {})}
-            </Button>
-          </AdminCan>
+          <SettingsSaveButton loading={loading} disabled={!form.isValid()} />
         </Group>
       </form>
     </AdminSubContentContainer>

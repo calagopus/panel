@@ -9,7 +9,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -18,7 +18,12 @@ import MountDuplicateModal from '@/pages/admin/mounts/modals/MountDuplicateModal
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { type MountFormValues, mountEmptyFormValues, mountToFormValues } from './mountFormValues.ts';
+import {
+  type MountFormValues,
+  mountEmptyFormValues,
+  mountToFormValues,
+  useMountFormFields,
+} from './mountFormValues.tsx';
 
 export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z.infer<typeof adminMountSchema> }) {
   const { t } = useTranslations();
@@ -44,14 +49,7 @@ export default function MountCreateOrUpdate({ contextMount }: { contextMount?: z
 
   useHydrateForm(form, contextMount, mountToFormValues, { key: (mount) => mount.uuid });
 
-  const fields: FieldDef<MountFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3 },
-    { type: 'text', name: 'source', label: t('common.form.source', {}), required: true },
-    { type: 'text', name: 'target', label: t('common.form.target', {}), required: true },
-    { type: 'switch', name: 'readOnly', label: t('common.readOnly', {}) },
-    { type: 'switch', name: 'userMountable', label: t('pages.admin.mounts.tabs.general.page.form.userMountable', {}) },
-  ];
+  const fields = useMountFormFields();
 
   return (
     <AdminContentContainer

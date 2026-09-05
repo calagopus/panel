@@ -6,6 +6,7 @@ import Badge from '@/elements/data-display/Badge.tsx';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
+import BooleanText from '@/elements/typography/BooleanText.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { serverDatabaseSchemaColumnSchema, serverDatabaseSchemaTableSchema } from '@/lib/schemas/server/databases.ts';
 import { useDatabaseExplorer } from '@/providers/contexts/databaseExplorerContext.ts';
@@ -108,7 +109,9 @@ export default function DatabaseColumnRow({
             <TableData>
               <Code>{column.typeName}</Code>
             </TableData>
-            <TableData>{t(column.nullable ? 'common.yes' : 'common.no', {})}</TableData>
+            <TableData>
+              <BooleanText value={column.nullable} />
+            </TableData>
             <TableData>
               {column.primaryKey && (
                 <Badge color='blue' size='xs'>

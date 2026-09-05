@@ -75,7 +75,7 @@ export default function OAuthLinkRow({ oauthLink }: { oauthLink: z.infer<typeof 
             </TableData>
 
             <TableData>
-              {!oauthLink.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={oauthLink.lastUsed} />}
+              <FormattedTimestamp timestamp={oauthLink.lastUsed} showNA />
             </TableData>
 
             <TableData>

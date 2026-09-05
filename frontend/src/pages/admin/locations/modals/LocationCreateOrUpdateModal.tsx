@@ -16,8 +16,7 @@ import { useSearchableResource } from '@/plugins/resource/useSearchableResource.
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useLocationFormFields } from '../locationFormFields.tsx';
-import { locationEmptyFormValues } from '../locationFormValues.ts';
+import { locationEmptyFormValues, useLocationFormFields } from '../locationFormValues.tsx';
 
 interface LocationCreateOrUpdateModalProps {
   opened: boolean;

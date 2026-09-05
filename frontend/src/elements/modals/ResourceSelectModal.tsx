@@ -12,8 +12,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ResourceSelectModalProps extends ModalProps {
   title: string;
-  label: string;
-  data: ComboboxData;
+  label?: string;
+  data?: ComboboxData;
   loading?: boolean;
   searchValue?: string;
   onSearchChange?: (search: string) => void;
@@ -23,13 +23,14 @@ interface ResourceSelectModalProps extends ModalProps {
   invalidateKeys?: QueryKey[];
   onAdded?: () => void;
   onConfirm: (value: string) => Promise<unknown>;
+  renderSelect?: (props: { value: string | null; onChange: (value: string | null) => void }) => ReactNode;
   children?: ReactNode;
 }
 
 export default function ResourceSelectModal({
   title,
   label,
-  data,
+  data = [],
   loading,
   searchValue,
   onSearchChange,
@@ -39,6 +40,7 @@ export default function ResourceSelectModal({
   invalidateKeys = [],
   onAdded,
   onConfirm,
+  renderSelect,
   children,
   ...props
 }: ResourceSelectModalProps) {
@@ -84,17 +86,21 @@ export default function ResourceSelectModal({
   return (
     <Modal title={title} {...props}>
       <Stack>
-        <Select
-          withAsterisk
-          label={label}
-          value={value}
-          onChange={(next) => setValue(next)}
-          data={data}
-          searchable
-          searchValue={searchValue}
-          onSearchChange={onSearchChange}
-          loading={loading}
-        />
+        {renderSelect ? (
+          renderSelect({ value, onChange: setValue })
+        ) : (
+          <Select
+            withAsterisk
+            label={label}
+            value={value}
+            onChange={(next) => setValue(next)}
+            data={data}
+            searchable
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            loading={loading}
+          />
+        )}
 
         {children}
 

@@ -43,6 +43,7 @@ const admin = {
     activity: (serverUuid: string) => ['admin', 'servers', serverUuid, 'activity'] as const,
     allocations: (serverUuid: string) => ['admin', 'servers', serverUuid, 'allocations'] as const,
     databases: (serverUuid: string) => ['admin', 'servers', serverUuid, 'databases'] as const,
+    variables: (serverUuid: string) => ['admin', 'servers', serverUuid, 'variables'] as const,
   },
 
   extensions: {

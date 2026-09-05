@@ -12,7 +12,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan, CantSaveTooltip } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
@@ -27,7 +27,7 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import { userEmptyFormValues, userToFormValues } from './userFormValues.ts';
+import { userEmptyFormValues, userToFormValues, useUserFormFields } from './userFormValues.tsx';
 
 type UserFormValues = z.infer<typeof adminUserUpdateSchema>;
 
@@ -122,72 +122,14 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       });
   };
 
-  const fields: FieldDef<UserFormValues>[] = [
-    { type: 'text', name: 'username', label: t('common.table.columns.username', {}), required: true },
-    {
-      type: 'text',
-      name: 'email',
-      label: t('common.form.email', {}),
-      required: true,
-      props: { type: 'email', disabled: !isRootAdmin && editingOtherUser },
-    },
-    { type: 'text', name: 'nameFirst', label: t('common.form.firstName', {}) },
-    { type: 'text', name: 'nameLast', label: t('common.form.lastName', {}) },
-    {
-      type: 'select',
-      name: 'language',
-      label: t('common.form.language', {}),
-      required: true,
-      options: languages.map((language) => ({
-        label: new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language,
-        value: language,
-      })),
-      props: { searchable: true },
-    },
-    {
-      type: 'select',
-      name: 'roleUuid',
-      label: t('pages.admin.users.tabs.general.page.form.role', {}),
-      when: () => isRootAdmin,
-      options: roles.items.map((role) => ({ label: role.name, value: role.uuid })),
-      props: {
-        placeholder: t('common.none', {}),
-        searchable: true,
-        searchValue: roles.search,
-        onSearchChange: roles.setSearch,
-        allowDeselect: true,
-        clearable: true,
-        disabled: !canReadRoles,
-        loading: roles.loading,
-      },
-    },
-    { type: 'text', name: 'externalId', label: t('common.form.externalId', {}) },
-    {
-      type: 'password',
-      name: 'password',
-      label: t('common.form.password', {}),
-      props: { withAsterisk: !contextUser, disabled: !isRootAdmin && editingOtherUser },
-    },
-    {
-      type: 'switch',
-      name: 'admin',
-      label: t('pages.admin.users.tabs.general.page.form.admin', {}),
-      when: () => isRootAdmin,
-      description: t('pages.admin.users.tabs.general.page.form.adminDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'frozen',
-      label: t('pages.admin.users.tabs.general.page.form.frozen', {}),
-      description: t('pages.admin.users.tabs.general.page.form.frozenDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'suspended',
-      label: t('pages.admin.users.tabs.general.page.form.suspended', {}),
-      description: t('pages.admin.users.tabs.general.page.form.suspendedDescription', {}),
-    },
-  ];
+  const fields = useUserFormFields({
+    isRootAdmin,
+    editingOtherUser,
+    isUpdate: !!contextUser,
+    languages,
+    roles,
+    canReadRoles,
+  });
 
   return (
     <AdminContentContainer
@@ -256,7 +198,11 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                 {t('common.button.save', {})}
               </Button>
               {!contextUser && (
-                <Button onClick={() => doCreateOrUpdate(true)} disabled={!form.isValid()} loading={loading}>
+                <Button
+                  onClick={() => doCreateOrUpdate(true, queryKeys.admin.users.all())}
+                  disabled={!form.isValid()}
+                  loading={loading}
+                >
                   {t('common.button.saveAndStay', {})}
                 </Button>
               )}

@@ -6,7 +6,7 @@ import updateNest from '@/api/admin/nests/updateNest.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -15,7 +15,7 @@ import { adminNestSchema, adminNestUpdateSchema } from '@/lib/schemas/admin/nest
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { nestEmptyFormValues, nestToFormValues } from './nestFormValues.ts';
+import { nestEmptyFormValues, nestToFormValues, useNestFormFields } from './nestFormValues.tsx';
 
 type NestFormValues = z.infer<typeof adminNestUpdateSchema>;
 
@@ -44,11 +44,7 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
 
   useHydrateForm(form, contextNest, nestToFormValues);
 
-  const fields: FieldDef<NestFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    { type: 'text', name: 'author', label: t('common.form.author', {}), required: true },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
-  ];
+  const fields = useNestFormFields();
 
   return (
     <AdminContentContainer

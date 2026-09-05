@@ -2,14 +2,12 @@ import { z } from 'zod';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import BooleanText from '@/elements/typography/BooleanText.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { announcementTypeLabelMapping } from '@/lib/enums.ts';
 import { adminAnnouncementSchema } from '@/lib/schemas/admin/announcements.ts';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AnnouncementRow({ announcement }: { announcement: z.infer<typeof adminAnnouncementSchema> }) {
-  const { t } = useTranslations();
-
   return (
     <TableRow>
       <TableData>
@@ -22,7 +20,9 @@ export default function AnnouncementRow({ announcement }: { announcement: z.infe
 
       <TableData>{announcement.title}</TableData>
 
-      <TableData>{announcement.enabled ? t('common.yes', {}) : t('common.no', {})}</TableData>
+      <TableData>
+        <BooleanText value={announcement.enabled} />
+      </TableData>
 
       <TableData>
         <FormattedTimestamp timestamp={announcement.created} />

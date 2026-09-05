@@ -10,10 +10,9 @@ import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
-import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminBackupConfigurationKopiaSchema,
@@ -36,7 +35,8 @@ import {
   backupConfigurationResticEmptyFormValues,
   backupConfigurationS3EmptyFormValues,
   backupConfigurationToFormValues,
-} from './backupConfigurationFormValues.ts';
+  useBackupConfigurationFormFields,
+} from './backupConfigurationFormValues.tsx';
 import BackupKopia from './forms/BackupKopia.tsx';
 
 type BackupConfigFormValues = Partial<z.infer<typeof adminBackupConfigurationUpdateSchema>>;
@@ -187,29 +187,7 @@ export default function BackupConfigurationCreateOrUpdate({
     }
   }, [contextBackupConfiguration]);
 
-  const fields: FieldDef<BackupConfigFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'backupDisk',
-      label: t('pages.admin.backupConfigurations.tabs.general.page.form.backupDisk', {}),
-      required: true,
-      options: Object.entries(backupDiskLabelMapping).map(([value, label]) => ({ value, label })),
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
-    {
-      type: 'switch',
-      name: 'maintenanceEnabled',
-      label: t('common.form.maintenanceEnabled', {}),
-      description: t('pages.admin.backupConfigurations.tabs.general.page.form.maintenanceEnabledDescription', {}),
-    },
-    {
-      type: 'switch',
-      name: 'shared',
-      label: t('pages.admin.backupConfigurations.tabs.general.page.form.shared', {}),
-      description: t('pages.admin.backupConfigurations.tabs.general.page.form.sharedDescription', {}),
-    },
-  ];
+  const fields = useBackupConfigurationFormFields();
 
   const activeAlert = backupDisk ? DISK_ALERTS[backupDisk] : undefined;
 

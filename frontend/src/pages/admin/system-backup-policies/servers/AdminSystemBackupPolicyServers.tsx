@@ -6,7 +6,6 @@ import deleteSystemBackupPolicyServer from '@/api/admin/system-backup-policies/s
 import getSystemBackupPolicyServers from '@/api/admin/system-backup-policies/servers/getSystemBackupPolicyServers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
-import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table, { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
@@ -17,6 +16,7 @@ import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
+import { systemBackupPolicyServerTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -27,11 +27,13 @@ function SystemBackupPolicyServerRow({
   server,
   added,
   systemBackupPolicy,
+  canRemove,
   refetch,
 }: {
   server: z.infer<typeof adminServerSchema>;
   added: Date;
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
+  canRemove: boolean;
   refetch: () => void;
 }) {
   const { addToast } = useToast();
@@ -74,7 +76,7 @@ function SystemBackupPolicyServerRow({
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('remove'),
             color: 'red',
-            canAccess: useAdminCan('system-backup-policies.update'),
+            canAccess: canRemove,
           },
         ]}
         registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.servers.contextMenu}
@@ -119,6 +121,7 @@ export default function AdminSystemBackupPolicyServers({
   systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
 }) {
   const { t } = useTranslations();
+  const canUpdate = useAdminCan('system-backup-policies.update');
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -143,30 +146,24 @@ export default function AdminSystemBackupPolicyServers({
       registry={window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.servers.subContainer}
       registryProps={{ systemBackupPolicy }}
       contentRight={
-        <AdminCan action='system-backup-policies.update'>
+        canUpdate ? (
           <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
             {t('common.button.add', {})}
           </Button>
-        </AdminCan>
+        ) : undefined
       }
     >
-      <AdminCan action='system-backup-policies.update'>
+      {canUpdate && (
         <SystemBackupPolicyAddServerModal
           systemBackupPolicy={systemBackupPolicy}
           refetch={refetch}
           opened={openModal === 'add'}
           onClose={() => setOpenModal(null)}
         />
-      </AdminCan>
+      )}
 
       <Table
-        columns={[
-          t('common.table.columns.id', {}),
-          t('common.table.columns.name', {}),
-          t('common.table.columns.node', {}),
-          t('common.table.columns.added', {}),
-          '',
-        ]}
+        columns={systemBackupPolicyServerTableColumns()}
         loading={loading}
         pagination={systemBackupPolicyServers}
         onPageSelect={setPage}
@@ -178,6 +175,7 @@ export default function AdminSystemBackupPolicyServers({
             server={systemBackupPolicyServer.server}
             added={systemBackupPolicyServer.created}
             systemBackupPolicy={systemBackupPolicy}
+            canRemove={canUpdate}
             refetch={refetch}
           />
         ))}

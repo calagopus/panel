@@ -96,8 +96,17 @@ export default function TerminalHeader({
         >
           <Popover.Target>
             <Tooltip label={t('pages.server.console.tooltip.search', {})}>
-              <ActionIcon size='xs' variant='subtle' color='gray' onClick={() => setOpenModal('search')}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              <ActionIcon
+                className='group'
+                size='xs'
+                radius={0}
+                variant='transparent'
+                onClick={() => setOpenModal('search')}
+              >
+                <FontAwesomeIcon
+                  icon={faMagnifyingGlass}
+                  className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+                />
               </ActionIcon>
             </Tooltip>
           </Popover.Target>
@@ -123,6 +132,7 @@ export default function TerminalHeader({
             />
             <ActionIcon
               size='input-sm'
+              radius={0}
               variant='light'
               color='gray'
               onClick={() => searchAddonRef.current?.findPrevious(searchText)}
@@ -131,6 +141,7 @@ export default function TerminalHeader({
             </ActionIcon>
             <ActionIcon
               size='input-sm'
+              radius={0}
               variant='light'
               color='gray'
               onClick={() => searchAddonRef.current?.findNext(searchText)}
@@ -141,43 +152,63 @@ export default function TerminalHeader({
         </Popover>
         {!popout && (
           <Tooltip label={t('pages.server.console.tooltip.popout', {})}>
-            <ActionIcon size='xs' variant='subtle' color='gray' onClick={() => openConsolePopout(server.uuidShort)}>
-              <FontAwesomeIcon icon={faUpRightFromSquare} />
+            <ActionIcon
+              className='group'
+              size='xs'
+              radius={0}
+              variant='transparent'
+              onClick={() => openConsolePopout(server.uuidShort)}
+            >
+              <FontAwesomeIcon
+                icon={faUpRightFromSquare}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
         )}
         <Tooltip label={t('pages.server.console.tooltip.sshDetails', {})}>
           <ActionIcon
+            className='group'
             size='xs'
-            variant='subtle'
-            color='gray'
+            radius={0}
+            variant='transparent'
             disabled={server.status !== null || server.isSuspended || server.isTransferring}
             onClick={() => setOpenModal('sshDetails')}
           >
-            <FontAwesomeIcon icon={faServer} />
+            <FontAwesomeIcon
+              icon={faServer}
+              className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+            />
           </ActionIcon>
         </Tooltip>
         <Tooltip label={t('pages.server.console.tooltip.commandHistory', {})}>
           <ActionIcon
+            className='group'
             size='xs'
-            variant='subtle'
-            color='gray'
+            radius={0}
+            variant='transparent'
             disabled={server.status !== null || server.isSuspended || server.isTransferring}
             onClick={() => setOpenModal('commandHistory')}
           >
-            <FontAwesomeIcon icon={faClockRotateLeft} />
+            <FontAwesomeIcon
+              icon={faClockRotateLeft}
+              className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+            />
           </ActionIcon>
         </Tooltip>
         <div className='flex flex-row items-center'>
           <Tooltip label={t('pages.server.console.tooltip.decreaseFontSize', {})}>
             <ActionIcon
-              className='mr-2'
+              className='group mr-2'
               size='xs'
-              variant='subtle'
-              color='gray'
+              radius={0}
+              variant='transparent'
               onClick={() => setConsoleFontSize((size) => Math.max(10, size - 1))}
             >
-              <FontAwesomeIcon icon={faMinus} />
+              <FontAwesomeIcon
+                icon={faMinus}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
           <UserSettingScopeMenu settingKey={CONSOLE_FONT_SIZE_KEY} value={consoleFontSize}>
@@ -185,13 +216,16 @@ export default function TerminalHeader({
           </UserSettingScopeMenu>
           <Tooltip label={t('pages.server.console.tooltip.increaseFontSize', {})}>
             <ActionIcon
-              className='ml-2'
+              className='group ml-2'
               size='xs'
-              variant='subtle'
-              color='gray'
+              radius={0}
+              variant='transparent'
               onClick={() => setConsoleFontSize((size) => Math.min(24, size + 1))}
             >
-              <FontAwesomeIcon icon={faPlus} />
+              <FontAwesomeIcon
+                icon={faPlus}
+                className='text-(--mantine-color-dimmed) group-hover:text-(--mantine-color-text)'
+              />
             </ActionIcon>
           </Tooltip>
         </div>

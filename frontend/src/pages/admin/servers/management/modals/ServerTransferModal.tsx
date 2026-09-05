@@ -22,7 +22,7 @@ import { formatAllocation } from '@/lib/domain/server.ts';
 import { compressionLevelLabelMapping, mappingToSelectData, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer, adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
 import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
@@ -30,10 +30,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function ServerTransferModal({
-  server,
-  ...props
-}: ModalProps & { server: z.infer<typeof adminServerSchema> }) {
+export default function ServerTransferModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();

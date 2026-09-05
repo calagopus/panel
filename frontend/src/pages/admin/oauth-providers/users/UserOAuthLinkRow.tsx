@@ -4,15 +4,12 @@ import TableLink from '@/elements/data-display/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { adminOAuthUserLinkSchema } from '@/lib/schemas/admin/oauthProviders.ts';
-import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function UserOAuthLinkRow({
   userOAuthLink,
 }: {
   userOAuthLink: z.infer<typeof adminOAuthUserLinkSchema>;
 }) {
-  const { t } = useTranslations();
-
   return (
     <TableRow>
       <TableData>
@@ -30,7 +27,7 @@ export default function UserOAuthLinkRow({
       </TableData>
 
       <TableData>
-        {!userOAuthLink.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={userOAuthLink.lastUsed} />}
+        <FormattedTimestamp timestamp={userOAuthLink.lastUsed} showNA />
       </TableData>
 
       <TableData>

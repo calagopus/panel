@@ -70,7 +70,7 @@ export default function SecurityKeyRow({
             </TableData>
 
             <TableData>
-              {!securityKey.lastUsed ? t('common.na', {}) : <FormattedTimestamp timestamp={securityKey.lastUsed} />}
+              <FormattedTimestamp timestamp={securityKey.lastUsed} showNA />
             </TableData>
 
             <TableData>

@@ -17,7 +17,7 @@ import {
 } from '@/lib/schemas/admin/eggConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import DeploymentItemEditor from './DeploymentItemEditor.tsx';
-import { defaultEggConfigurationPrimaryAllocation } from './eggConfigurationFormValues.ts';
+import { defaultEggConfigurationPrimaryAllocation } from './eggConfigurationFormValues.tsx';
 
 type EggConfigFormValues = z.infer<typeof adminEggConfigurationUpdateSchema>;
 

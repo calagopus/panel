@@ -1,8 +1,8 @@
 import { faStar, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import debounce from 'debounce';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import deleteServerAllocation from '@/api/admin/servers/allocations/deleteServerAllocation.ts';
 import updateServerAllocation from '@/api/admin/servers/allocations/updateServerAllocation.ts';
@@ -16,7 +16,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -25,7 +25,7 @@ export default function ServerAllocationRow({
   server,
   allocation,
 }: {
-  server: z.infer<typeof adminServerSchema>;
+  server: AdminServer;
   allocation: z.infer<typeof serverAllocationSchema>;
 }) {
   const { t } = useTranslations();
@@ -35,45 +35,39 @@ export default function ServerAllocationRow({
   const [openModal, setOpenModal] = useState<'remove' | null>(null);
   const [notes, setNotes] = useState(allocation.notes ?? '');
 
-  const setDebouncedNotes = useMemo(
-    () =>
-      debounce((notes: string) => {
-        updateServerAllocation(server.uuid, allocation.uuid, {
-          notes: notes || null,
-        })
-          .then(() => {
-            addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
-            queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
-          })
-          .catch((msg) => {
-            addToast(httpErrorToHuman(msg), 'error');
-          });
-      }, 500),
-    [server.uuid, allocation.uuid, t, addToast, queryClient],
-  );
+  const invalidateAllocations = () =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
 
-  useEffect(() => {
-    if (notes !== (allocation.notes ?? '')) {
-      setDebouncedNotes(notes);
-    }
-  }, [notes]);
-
-  const doSetPrimary = () => {
-    updateServerAllocation(server.uuid, allocation.uuid, { primary: true })
+  const saveNotes = useDebouncedCallback((value: string) => {
+    updateServerAllocation(server.uuid, allocation.uuid, { notes: value || null })
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
-        addToast(t('pages.admin.servers.tabs.allocations.page.toast.setPrimary', {}), 'success');
+        addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
+        invalidateAllocations();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
+  }, 500);
 
-  const doUnsetPrimary = () => {
-    updateServerAllocation(server.uuid, allocation.uuid, { primary: false })
+  useEffect(() => {
+    if (notes !== (allocation.notes ?? '')) {
+      saveNotes(notes);
+    }
+  }, [notes]);
+
+  const setPrimary = (next: boolean) => {
+    updateServerAllocation(server.uuid, allocation.uuid, { primary: next })
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
-        addToast(t('pages.admin.servers.tabs.allocations.page.toast.unsetPrimary', {}), 'success');
+        invalidateAllocations();
+        addToast(
+          t(
+            next
+              ? 'pages.admin.servers.tabs.allocations.page.toast.setPrimary'
+              : 'pages.admin.servers.tabs.allocations.page.toast.unsetPrimary',
+            {},
+          ),
+          'success',
+        );
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -83,7 +77,7 @@ export default function ServerAllocationRow({
   const doRemove = async () => {
     await deleteServerAllocation(server.uuid, allocation.uuid)
       .then(async () => {
-        await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+        await invalidateAllocations();
         await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
         setOpenModal(null);
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');
@@ -114,7 +108,7 @@ export default function ServerAllocationRow({
             icon: faStar,
             label: t('common.button.setPrimary', {}),
             hidden: allocation.isPrimary,
-            onClick: doSetPrimary,
+            onClick: () => setPrimary(true),
             color: 'gray',
           },
           {
@@ -122,7 +116,7 @@ export default function ServerAllocationRow({
             icon: faStar,
             label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
-            onClick: doUnsetPrimary,
+            onClick: () => setPrimary(false),
             color: 'red',
           },
           {

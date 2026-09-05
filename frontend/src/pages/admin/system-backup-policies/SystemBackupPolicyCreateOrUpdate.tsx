@@ -13,8 +13,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
-import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
-import CronInput from '@/elements/input/CronInput.tsx';
+import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -31,9 +30,12 @@ import { useSearchableResource } from '@/plugins/resource/useSearchableResource.
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { systemBackupPolicyEmptyFormValues, systemBackupPolicyToFormValues } from './systemBackupPolicyFormValues.ts';
-
-type SystemBackupPolicyFormValues = z.infer<typeof adminSystemBackupPolicyUpdateSchema>;
+import {
+  type SystemBackupPolicyFormValues,
+  systemBackupPolicyEmptyFormValues,
+  systemBackupPolicyToFormValues,
+  useSystemBackupPolicyFormFields,
+} from './systemBackupPolicyFormValues.tsx';
 
 export default function SystemBackupPolicyCreateOrUpdate({
   contextSystemBackupPolicy,
@@ -104,74 +106,7 @@ export default function SystemBackupPolicyCreateOrUpdate({
     canRequest: canReadBackupConfigurations,
   });
 
-  const fields: FieldDef<SystemBackupPolicyFormValues>[] = [
-    { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
-    {
-      type: 'select',
-      name: 'backupConfigurationUuid',
-      label: t('common.form.backupConfiguration', {}),
-      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
-      props: {
-        placeholder: t('pages.admin.systemBackupPolicies.form.backupConfigurationPlaceholder', {}),
-        searchable: true,
-        searchValue: backupConfigurations.search,
-        onSearchChange: backupConfigurations.setSearch,
-        allowDeselect: true,
-        clearable: true,
-        disabled: !canReadBackupConfigurations,
-        loading: backupConfigurations.loading,
-      },
-    },
-    { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
-    {
-      type: 'custom',
-      name: 'cron',
-      render: (form) => {
-        const inputProps = form.getInputProps('cron');
-
-        return (
-          <CronInput
-            label={t('pages.admin.systemBackupPolicies.form.cron', {})}
-            description={t('pages.admin.systemBackupPolicies.form.cronDescription', {})}
-            required
-            placeholder='0 0 0 * * *'
-            value={form.values.cron}
-            onChange={inputProps.onChange}
-            onBlur={inputProps.onBlur}
-            error={inputProps.error}
-          />
-        );
-      },
-    },
-    {
-      type: 'number',
-      name: 'parallelism',
-      label: t('pages.admin.systemBackupPolicies.form.parallelism', {}),
-      description: t('pages.admin.systemBackupPolicies.form.parallelismDescription', {}),
-      required: true,
-      props: { min: 1, max: 100, allowDecimal: false },
-    },
-    {
-      type: 'number',
-      name: 'retentionCount',
-      label: t('pages.admin.systemBackupPolicies.form.retentionCount', {}),
-      description: t('pages.admin.systemBackupPolicies.form.retentionCountDescription', {}),
-      props: { min: 1, allowDecimal: false },
-    },
-    {
-      type: 'number',
-      name: 'retentionDays',
-      label: t('pages.admin.systemBackupPolicies.form.retentionDays', {}),
-      description: t('pages.admin.systemBackupPolicies.form.retentionDaysDescription', {}),
-      props: { min: 1, allowDecimal: false },
-    },
-    {
-      type: 'switch',
-      name: 'enabled',
-      label: t('common.form.enabled', {}),
-      description: t('pages.admin.systemBackupPolicies.form.enabledDescription', {}),
-    },
-  ];
+  const fields = useSystemBackupPolicyFormFields({ backupConfigurations, canReadBackupConfigurations });
 
   return (
     <AdminContentContainer

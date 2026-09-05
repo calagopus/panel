@@ -141,6 +141,27 @@ export function httpErrorToHuman(error: unknown): string {
   }
 }
 
+/**
+ * Pulls the HTTP status code off an axios-style error, or `null` when the error carries no
+ * response (network failure, non-axios throw). Saves callers from re-deriving the same
+ * `'response' in error` narrowing by hand.
+ */
+export function getHttpStatus(error: unknown): number | null {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response &&
+    typeof error.response === 'object' &&
+    'status' in error.response &&
+    typeof error.response.status === 'number'
+  ) {
+    return error.response.status;
+  }
+
+  return null;
+}
+
 export function getEmptyPaginationSet<T>(): Pagination<T> {
   return {
     total: 0,

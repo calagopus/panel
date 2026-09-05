@@ -91,10 +91,12 @@ import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts
 import { adminEggRepositoryCredentialsSchema } from './schemas/admin/eggRepositories.ts';
 import { announcementType } from './schemas/announcements.ts';
 
-export function mappingToSelectData<T extends string>(mapping: Record<T, () => string>): { value: T; label: string }[] {
+export function mappingToSelectData<T extends string>(
+  mapping: Record<T, string | (() => string)>,
+): { value: T; label: string }[] {
   return Object.entries(mapping).map(([value, label]) => ({
     value: value as T,
-    label: (label as () => string)(),
+    label: typeof label === 'function' ? (label as () => string)() : (label as string),
   }));
 }
 
@@ -345,6 +347,12 @@ export const oauthProviderMappingMatcherLabelMapping: Record<AdminOAuthProviderM
   field_ends_with: () =>
     getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldEndsWith', {}),
 };
+
+export function oauthProviderMappingMatcherSummary(matcher: AdminOAuthProviderMappingMatcher): string {
+  const label = oauthProviderMappingMatcherLabelMapping[matcher.type]();
+
+  return matcher.type === 'and' || matcher.type === 'or' ? `${label} (${matcher.matchers.length})` : label;
+}
 
 export const scheduleConditionLabelMapping: Record<
   z.infer<typeof serverScheduleConditionSchema>['type'],

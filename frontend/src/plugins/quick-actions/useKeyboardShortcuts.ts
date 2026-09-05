@@ -107,10 +107,18 @@ export function matchesActiveShortcut(event: KeyboardEvent): boolean {
   return false;
 }
 
+function deepActiveElement(): Element | null {
+  let element = document.activeElement;
+  while (element?.shadowRoot?.activeElement) element = element.shadowRoot.activeElement;
+  return element;
+}
+
 export function isInputFocused(): boolean {
-  const target = document.activeElement as HTMLElement | null;
+  const target = deepActiveElement() as HTMLElement | null;
   if (target instanceof HTMLInputElement) return target.type !== 'checkbox' && target.type !== 'radio';
-  return target?.tagName === 'TEXTAREA' || target?.isContentEditable === true;
+  return (
+    target?.tagName === 'TEXTAREA' || target?.isContentEditable === true || target?.getAttribute('role') === 'textbox'
+  );
 }
 
 export function useKeyboardShortcuts({ shortcuts, enabled = true, deps = [] }: UseKeyboardShortcutsOptions) {

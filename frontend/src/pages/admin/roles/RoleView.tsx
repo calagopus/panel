@@ -12,11 +12,11 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function RoleView() {
   const { t } = useTranslations();
-  const params = useParams<'id'>();
+  const { id } = useParams<'id'>();
 
   const resource = useResource({
-    queryKey: queryKeys.admin.roles.detail(params.id!),
-    queryFn: () => getRole(params.id!),
+    queryKey: queryKeys.admin.roles.detail(id!),
+    queryFn: () => getRole(id!),
   });
 
   return (
@@ -27,7 +27,7 @@ export default function RoleView() {
           registry={window.extensionContext.extensionRegistry.pages.admin.roles.container}
         >
           <SubNavigation
-            baseUrl={`/admin/roles/${params.id}`}
+            baseUrl={`/admin/roles/${id}`}
             registry={window.extensionContext.extensionRegistry.pages.admin.roles.view.subNavigation}
             registryProps={{ role }}
             items={[

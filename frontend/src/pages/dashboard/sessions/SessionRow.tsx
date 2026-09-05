@@ -9,6 +9,7 @@ import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import BooleanText from '@/elements/typography/BooleanText.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSessionSchema } from '@/lib/schemas/user/sessions.ts';
@@ -74,7 +75,9 @@ export default function SessionRow({ session }: { session: z.infer<typeof userSe
                 <Code>{session.ip}</Code>
               </CopyOnClick>
             </TableData>
-            <TableData>{session.isUsing ? t('common.yes', {}) : t('common.no', {})}</TableData>
+            <TableData>
+              <BooleanText value={session.isUsing} />
+            </TableData>
             <TableData>{session.userAgent}</TableData>
             <TableData>
               <FormattedTimestamp timestamp={session.lastUsed} />
