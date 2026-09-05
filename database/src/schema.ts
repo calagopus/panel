@@ -5,6 +5,7 @@ import {
   char,
   check,
   customType,
+  foreignKey,
   index,
   inet,
   integer,
@@ -1063,7 +1064,10 @@ export const serverTunnelsTable = pgTable(
     name: varchar({ length: 63 }).notNull(),
     created: timestamp().defaultNow().notNull(),
   },
-  (cols) => [uniqueIndex('server_tunnels_idx_idx').on(cols.idx), uniqueIndex('server_tunnels_name_idx').on(cols.name)],
+  (cols) => [
+    uniqueIndex('server_tunnels_idx_idx').on(cols.idx),
+    uniqueIndex('server_tunnels_server_uuid_name_idx').on(cols.server_uuid, cols.name),
+  ],
 );
 
 export const serverTunnelPortsTable = pgTable(
@@ -1088,13 +1092,19 @@ export const serverTunnelConnectionsTable = pgTable(
     src_server_uuid: uuid()
       .references(() => serverTunnelsTable.server_uuid, { onDelete: 'cascade' })
       .notNull(),
-    dst_server_uuid: uuid()
-      .references(() => serverTunnelsTable.server_uuid, { onDelete: 'cascade' })
-      .notNull(),
+    dst_server_uuid: uuid().notNull(),
+    dst_name: varchar({ length: 63 }).notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
     primaryKey({ name: 'server_tunnel_connections_pk', columns: [cols.src_server_uuid, cols.dst_server_uuid] }),
+    foreignKey({
+      columns: [cols.dst_server_uuid, cols.dst_name],
+      foreignColumns: [serverTunnelsTable.server_uuid, serverTunnelsTable.name],
+    })
+      .onUpdate('cascade')
+      .onDelete('cascade'),
+    uniqueIndex('server_tunnel_connections_src_server_uuid_dst_name_idx').on(cols.src_server_uuid, cols.dst_name),
     index('server_tunnel_connections_src_server_uuid_idx').on(cols.src_server_uuid),
     index('server_tunnel_connections_dst_server_uuid_idx').on(cols.dst_server_uuid),
   ],

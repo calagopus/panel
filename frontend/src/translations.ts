@@ -6749,7 +6749,7 @@ const baseTranslations = defineTranslations({
           form: {
             name: 'Hostname',
             nameDescription:
-              'Lowercase letters, digits and dashes, up to 63 characters, and unique across the whole network.',
+              'Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.',
             namePlaceholder: 'Leave empty to derive one from the server name',
             port: 'Port',
             protocols: 'Protocols',
@@ -6768,7 +6768,7 @@ const baseTranslations = defineTranslations({
             join: {
               title: 'Join the Private Network',
               description:
-                'Pick the hostname other servers will reach this one on. It has to be free across the whole network, and you can change it later.',
+                'Pick the hostname other servers will reach this one on. Other servers can use the same hostname as long as no server connects to both. You can change it later.',
             },
             rename: {
               title: 'Change Hostname',

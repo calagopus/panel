@@ -186,10 +186,7 @@ impl ServerTunnel {
         ServerTunnelPort::by_server_uuid(database, self.server.uuid).await
     }
 
-    pub async fn suggest_name(
-        database: &crate::database::Database,
-        server_name: &str,
-    ) -> Result<compact_str::CompactString, crate::database::DatabaseError> {
+    pub fn suggest_name(server_name: &str) -> compact_str::CompactString {
         let mut base = String::with_capacity(server_name.len());
         for character in server_name.chars() {
             match character {
@@ -204,32 +201,11 @@ impl ServerTunnel {
         let base = base.trim_matches('-');
         let base = if base.is_empty() { "server" } else { base };
 
-        for suffix in 0..100 {
-            let candidate: compact_str::CompactString = if suffix == 0 {
-                base.into()
-            } else {
-                compact_str::format_compact!("{base}-{suffix}")
-            };
-
-            if validate_name(&candidate, &()).is_err() {
-                continue;
-            }
-
-            let taken: bool = sqlx::query_scalar(
-                "SELECT EXISTS (SELECT 1 FROM server_tunnels WHERE server_tunnels.name = $1)",
-            )
-            .bind(candidate.as_str())
-            .fetch_one(database.read())
-            .await?;
-
-            if !taken {
-                return Ok(candidate);
-            }
+        if crate::tunnel::is_alias_shaped(base) {
+            compact_str::format_compact!("{base}-1")
+        } else {
+            base.into()
         }
-
-        Err(crate::database::DatabaseError::Any(anyhow::anyhow!(
-            "could not derive a free hostname for this server"
-        )))
     }
 }
 
@@ -496,15 +472,28 @@ impl ServerTunnelConnection {
 
         let mut transaction = database.write().begin().await?;
 
+        let dst_name: compact_str::CompactString = sqlx::query_scalar(
+            r#"
+            SELECT server_tunnels.name
+            FROM server_tunnels
+            WHERE server_tunnels.server_uuid = $1
+            FOR KEY SHARE
+            "#,
+        )
+        .bind(dst_server_uuid)
+        .fetch_one(&mut *transaction)
+        .await?;
+
         let affected = sqlx::query(
             r#"
-            INSERT INTO server_tunnel_connections (src_server_uuid, dst_server_uuid)
-            VALUES ($1, $2)
+            INSERT INTO server_tunnel_connections (src_server_uuid, dst_server_uuid, dst_name)
+            VALUES ($1, $2, $3)
             ON CONFLICT (src_server_uuid, dst_server_uuid) DO NOTHING
             "#,
         )
         .bind(src_server_uuid)
         .bind(dst_server_uuid)
+        .bind(dst_name.as_str())
         .execute(&mut *transaction)
         .await?
         .rows_affected();

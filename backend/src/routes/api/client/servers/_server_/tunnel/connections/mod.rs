@@ -126,7 +126,21 @@ mod post {
             .ok();
         }
 
-        ServerTunnelConnection::create(&state.database, server.uuid, target.uuid).await?;
+        match ServerTunnelConnection::create(&state.database, server.uuid, target.uuid).await {
+            Ok(()) => {}
+            Err(err)
+                if err.is_unique_constraint_violation(
+                    "server_tunnel_connections_src_server_uuid_dst_name_idx",
+                ) =>
+            {
+                return ApiResponse::error(
+                    "this server already reaches another server with that hostname",
+                )
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+            }
+            Err(err) => return Err(err.into()),
+        }
 
         drop(connections_lock);
 

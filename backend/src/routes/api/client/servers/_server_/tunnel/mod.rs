@@ -157,7 +157,7 @@ mod post {
 
         let name = match data.name {
             Some(name) => name,
-            None => ServerTunnel::suggest_name(&state.database, &server.name).await?,
+            None => ServerTunnel::suggest_name(&server.name),
         };
 
         let tunnel = match ServerTunnel::create(
@@ -170,8 +170,8 @@ mod post {
         .await
         {
             Ok(tunnel) => tunnel,
-            Err(err) if err.is_unique_violation() => {
-                return ApiResponse::error("that hostname is already taken")
+            Err(err) if err.is_unique_constraint_violation("server_tunnels_pkey") => {
+                return ApiResponse::error("this server is already on the private network")
                     .with_status(StatusCode::CONFLICT)
                     .ok();
             }
@@ -261,10 +261,16 @@ mod patch {
 
         match tunnel.update(&state, options).await {
             Ok(()) => {}
-            Err(err) if err.is_unique_violation() => {
-                return ApiResponse::error("that hostname is already taken")
-                    .with_status(StatusCode::CONFLICT)
-                    .ok();
+            Err(err)
+                if err.is_unique_constraint_violation(
+                    "server_tunnel_connections_src_server_uuid_dst_name_idx",
+                ) =>
+            {
+                return ApiResponse::error(
+                    "a server connected to this one already reaches another server with that hostname",
+                )
+                .with_status(StatusCode::CONFLICT)
+                .ok();
             }
             Err(err) => return Err(err.into()),
         }

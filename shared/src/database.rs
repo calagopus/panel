@@ -443,6 +443,16 @@ impl From<InvalidRelationError> for DatabaseError {
 
 impl DatabaseError {
     #[inline]
+    pub fn is_unique_constraint_violation(&self, constraint: &str) -> bool {
+        match self {
+            Self::Sqlx(sqlx_value) => sqlx_value
+                .as_database_error()
+                .is_some_and(|e| e.is_unique_violation() && e.constraint() == Some(constraint)),
+            _ => false,
+        }
+    }
+
+    #[inline]
     pub fn is_unique_violation(&self) -> bool {
         match self {
             Self::Sqlx(sqlx_value) => sqlx_value
