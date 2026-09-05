@@ -509,6 +509,10 @@
           "finished": "Đã hoàn thành",
           "failed": "Thất bại"
         },
+        "serverBackupKind": {
+          "server": "Server",
+          "databaseInstance": "Database"
+        },
         "serverFirewallRuleAction": {
           "allow": "Allow",
           "deny": "Deny"
@@ -867,6 +871,8 @@
           "cancelledAll": "Tất cả các tải lên đã bị hủy.",
           "completedServer": "Đã tải xong {files} lên `{server}`.",
           "completedAssets": "Hoàn thành tải lên {files} vào admin assets.",
+          "progressServer": "Uploading {files} to `{server}`...",
+          "progressAssets": "Uploading {files} to the admin assets...",
           "showFiles": "Hiển thị tệp"
         }
       }
@@ -4921,6 +4927,8 @@
             "filePullingStarted": "Kéo tệp đã bắt đầu.",
             "fileRenamed": "Tệp đã được đổi tên.",
             "fileCouldNotBeRenamed": "Tệp không thể được đổi tên.",
+            "closeDestinationBeforeRename": "Close the editor tab for the destination file before renaming.",
+            "closeTabsBeforeBulkRename": "Close affected editor tabs before renaming overlapping paths.",
             "filesRenamed": "{files} đã được đổi tên.",
             "renameUndone": "Đã hoàn tác đổi tên.",
             "renameCouldNotBeUndone": "Permissions restored.",
@@ -5363,6 +5371,7 @@
               "tabs": {
                 "databases": "Cơ sở dữ liệu",
                 "users": "Người dùng",
+                "backups": "Backups",
                 "logs": "Nhật ký"
               },
               "stats": {
@@ -5513,6 +5522,36 @@
                   "completed": "Đã nhập `{database}` từ `{source}` trong `{time}.`.",
                   "failed": "Nhập thất bại `{database}` từ `{source}`: {error}",
                   "aborted": "Việc nhập `{database}` từ `{source}` đã bị hủy."
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "subtitle": "{current} of {max} maximum backups created on this server, shared with server backups.",
+              "badge": {
+                "restoring": "Restoring backup"
+              },
+              "notification": {
+                "restoring": "A backup is currently being restored into this managed database. Please wait..."
+              },
+              "tooltip": {
+                "limitReached": "This server is limited to {max} backups, shared between server and database backups.",
+                "offline": "The managed database must be running to take a backup.",
+                "restoring": "A backup is currently being restored into this managed database."
+              },
+              "toast": {
+                "restoring": "Restoring backup into the managed database...",
+                "restoreCompleted": "Managed database backup restore completed successfully.",
+                "restoreFailed": "Managed database backup restore failed."
+              },
+              "toggle": {
+                "allEngineBackups": "All {engine} backups on this server"
+              },
+              "modal": {
+                "restoreBackup": {
+                  "title": "Restore Database Backup",
+                  "content": "This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.",
+                  "targetInstance": "Target Managed Database"
                 }
               }
             },
@@ -5760,7 +5799,10 @@
             "rootPath": "Đường Dẫn Root",
             "outputInto": "Đầu Ra Thành",
             "ignoreFailure": "Bỏ Qua Lỗi",
-            "runInForeground": "Chạy Ở Nền Trước"
+            "runInForeground": "Chạy Ở Nền Trước",
+            "sourceDatabaseInstance": "Only Consider Backups From",
+            "sourceDatabaseInstanceDescription": "Only pick database backups that were taken from this managed database. Leave empty to consider backups from any managed database on this server.",
+            "sourceDatabaseInstanceAny": "Any managed database"
           },
           "condition": {
             "variable": "Biến",
@@ -5838,6 +5880,15 @@
                 "content": "Khi Sao Lưu Đạt Tới Trạng Thái `{status}`."
               }
             },
+            "databaseBackupStatus": {
+              "title": "Database Backup Status",
+              "form": {
+                "backupStatus": "Backup Status"
+              },
+              "card": {
+                "content": "When Database Backup reaches Status `{status}`."
+              }
+            },
             "scheduleCompletion": {
               "title": "Hoàn Thành Lịch Trình",
               "form": {
@@ -5874,7 +5925,14 @@
             "noActionSelected": "Chọn loại hành động để cấu hình",
             "noActionDetails": "Chi tiết hành động không khả dụng",
             "ignoreFailure": "Bỏ Qua Lỗi: {value}",
-            "foreground": "Nền Trước: {value}"
+            "foreground": "Nền Trước: {value}",
+            "sourceDatabaseInstance": "Only From Managed Database: {uuid}",
+            "sourceDatabaseInstanceAny": "Only From Managed Database: Any",
+            "backupSelector": {
+              "compact": "Backup {backup}",
+              "compactLatest": "The latest backup",
+              "compactOldest": "The oldest backup"
+            }
           },
           "steps": {
             "empty": {
@@ -6030,7 +6088,22 @@
                   "backupName": "Tên Sao Lưu: {name}",
                   "backupNameAuto": "Tên Sao Lưu: Tự động tạo",
                   "outputInto": "Sao lưu UUID vào: {variable}",
-                  "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
+                  "ignoredFiles": "Tệp Bị Bỏ Qua: {files}",
+                  "backupGroup": "Backup Group: {uuid}"
+                }
+              }
+            },
+            "createDatabaseBackup": {
+              "title": "Create Database Backup",
+              "description": "Create a backup of a managed database.",
+              "form": {
+                "databaseInstance": "Managed Database"
+              },
+              "renderer": {
+                "compact": "Create database backup {name}",
+                "compactAuto": "Create a database backup with an auto-generated name",
+                "detail": {
+                  "databaseInstance": "Managed Database: {uuid}"
                 }
               }
             },
@@ -6053,9 +6126,6 @@
                 "warning": "Việc khôi phục sẽ dừng máy chủ và ghi đè lên các tệp của nó. Lịch trình sẽ chờ cho đến khi quá trình khôi phục hoàn thành trước khi tiếp tục. Tránh kết hợp bước này với các trigger nguồn điện hoặc trạng thái máy chủ có thể kích hoạt lại lịch trình."
               },
               "renderer": {
-                "compact": "Khôi phục bản sao lưu {backup}",
-                "compactLatest": "Khôi phục bản sao lưu mới nhất",
-                "compactOldest": "Khôi phục bản sao lưu cũ nhất",
                 "detail": {
                   "backupLatest": "Bản sao lưu: Bản sao lưu thành công mới nhất",
                   "backupOldest": "Sao lưu: Bản sao lưu thành công cũ nhất",
@@ -6071,7 +6141,7 @@
               "description": "Xóa bản sao lưu được chọn bởi bộ chọn bản sao lưu.",
               "form": {
                 "backupSelector": "Bản Sao Lưu cần xóa",
-                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu đã chọn, bao gồm cả các tệp tin của nó trên nút. Các bản sao lưu bị khóa sẽ được bỏ qua."
+                "warning": "This permanently deletes the selected backup, including its files on the node. If the selected backup is locked, the step fails."
               }
             },
             "moveBackup": {
@@ -6086,6 +6156,38 @@
                   "targetGroup": "Nhóm mục tiêu: {uuid}",
                   "targetGroupNone": "Nhóm mục tiêu: Không có (không được nhóm)"
                 }
+              }
+            },
+            "restoreDatabaseBackup": {
+              "title": "Restore Database Backup",
+              "description": "Restore a database backup into a managed database.",
+              "form": {
+                "backupSelector": "Database Backup to Restore",
+                "targetDatabaseInstance": "Restore Into",
+                "targetDatabaseInstanceDescription": "The managed database the backup is imported into. Leave empty to restore into the database the backup was taken from.",
+                "targetDatabaseInstanceSource": "The database the backup was taken from",
+                "warning": "Restoring overwrites the contents of the target database. The schedule does not wait for the import to finish, so later steps can run while it is still in progress. If the database the backup was taken from has been deleted, the step fails unless you pick a target here."
+              },
+              "renderer": {
+                "detail": {
+                  "targetDatabaseInstance": "Restore Into: {uuid}",
+                  "targetDatabaseInstanceSource": "Restore Into: The database the backup was taken from"
+                }
+              }
+            },
+            "deleteDatabaseBackup": {
+              "title": "Delete Database Backup",
+              "description": "Delete a database backup selected by the backup selector.",
+              "form": {
+                "backupSelector": "Database Backup to Delete",
+                "warning": "This permanently deletes the selected database backup, including its dump on the node. Only database backups are considered, never file backups. If the selected backup is locked, the step fails."
+              }
+            },
+            "moveDatabaseBackup": {
+              "title": "Move Database Backup",
+              "description": "Move a database backup selected by the backup selector into a backup group.",
+              "form": {
+                "backupSelector": "Database Backup to Move"
               }
             },
             "createDirectory": {
@@ -6308,17 +6410,20 @@
         "backups": {
           "title": "Sao Lưu",
           "subtitle": "{current} của {max} sao lưu tối đa đã được tạo.",
+          "subtitleWithDatabase": "{current} of {max} maximum backups created ({server} server, {database} database).",
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} sao lưu."
           },
           "table": {
             "columns": {
+              "kind": "Kind",
               "locked": "Khóa?"
             }
           },
           "badge": {
             "deleting": "Đang xóa…",
-            "deleteFailed": "Xóa thất bại"
+            "deleteFailed": "Xóa thất bại",
+            "sourceDeleted": "{name} (deleted)"
           },
           "button": {
             "browse": "Duyệt",
@@ -6335,6 +6440,10 @@
             "createBackup": {
               "title": "Tạo Sao Lưu",
               "noGroup": "Không có nhóm",
+              "source": "Source",
+              "sourceFiles": "Server Files",
+              "sourceDatabase": "Managed Database",
+              "sourceInstance": "Managed Database",
               "toast": {
                 "created": "Sao lưu đã được tạo."
               }
@@ -6570,7 +6679,7 @@
           },
           "form": {
             "name": "Hostname",
-            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters, and unique across the whole network.",
+            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.",
             "namePlaceholder": "Leave empty to derive one from the server name",
             "port": "Port",
             "protocols": "Protocols",
@@ -6588,7 +6697,7 @@
           "modal": {
             "join": {
               "title": "Join the Private Network",
-              "description": "Pick the hostname other servers will reach this one on. It has to be free across the whole network, and you can change it later."
+              "description": "Pick the hostname other servers will reach this one on. Other servers can use the same hostname as long as no server connects to both. You can change it later."
             },
             "rename": {
               "title": "Change Hostname",
