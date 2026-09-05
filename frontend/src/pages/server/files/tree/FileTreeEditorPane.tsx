@@ -55,6 +55,8 @@ interface FileTreeEditorPaneProps {
   dirtyTabIds: ReadonlySet<string>;
   selection: FileTreeEditorSelection | null;
   draftContent?: string;
+  restoreContent?: string;
+  onRestoreContent: (tabId: string) => void;
   onSelectTab: (tabId: string) => void;
   onCloseTab: (tabId: string) => void;
   onClose: () => void;
@@ -73,6 +75,8 @@ export default function FileTreeEditorPane({
   dirtyTabIds,
   selection,
   draftContent,
+  restoreContent,
+  onRestoreContent,
   onSelectTab,
   onCloseTab,
   onClose,
@@ -151,6 +155,10 @@ export default function FileTreeEditorPane({
     enabled: selection?.action === 'edit' && selection.primary && !loading,
     engine: editorEngine,
     filePath,
+    restoreContent: canUpdate && selection?.writable ? restoreContent : undefined,
+    onRestoreContent: () => {
+      if (activeTabId) onRestoreContent(activeTabId);
+    },
     onActivated: (serverDirty) => {
       collabActiveRef.current = true;
       if (!serverDirty) savedContentRef.current = contentRef.current;
@@ -230,7 +238,16 @@ export default function FileTreeEditorPane({
         }
       })
       .catch((error) => {
-        if (!cancelled) reportFileError(error);
+        if (cancelled) return;
+        const draft = initialDraftContentRef.current;
+        if (error instanceof AxiosError && error.response?.status === 404 && draft !== undefined) {
+          contentRef.current = draft;
+          setContent(draft);
+          setDirty(true);
+          addToast(httpErrorToHuman(error), 'error');
+        } else {
+          reportFileError(error);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

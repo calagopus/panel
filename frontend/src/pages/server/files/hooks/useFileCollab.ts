@@ -37,6 +37,8 @@ interface UseFileCollabOptions {
   enabled: boolean;
   engine: 'monaco' | 'pierre';
   filePath: string;
+  restoreContent?: string;
+  onRestoreContent?: () => void;
   onActivated: (dirty: boolean) => void;
   onSaved: (payload: CollabSavedPayload) => void;
   onConflict: (conflict: CollabConflict | null) => void;
@@ -51,6 +53,8 @@ export default function useFileCollab({
   enabled,
   engine,
   filePath,
+  restoreContent,
+  onRestoreContent,
   onActivated,
   onSaved,
   onConflict,
@@ -76,6 +80,8 @@ export default function useFileCollab({
   const authGappedRef = useRef(false);
   const pendingSaveRef = useRef<string[] | null>(null);
   const pierreChangeHandlerRef = useRef<((event: EditorChangeEvent<undefined>) => void) | null>(null);
+  const restoreContentRef = useRef(restoreContent);
+  const onRestoreContentRef = useRef(onRestoreContent);
 
   const callbacksRef = useRef({ onActivated, onSaved, onConflict, onError });
   useEffect(() => {
@@ -190,6 +196,23 @@ export default function useFileCollab({
         sendUpdate(update);
       });
 
+      for (const [updatePath, update] of pendingUpdates) {
+        if (matchesSession(updatePath)) Y.applyUpdate(doc, fromBase64(update), 'remote');
+      }
+      pendingUpdates = [];
+      if (restoreContentRef.current !== undefined) {
+        const restored = model?.getValue() ?? (editor as PierreEditorHandle).getValue();
+        restoreContentRef.current = undefined;
+        if (text.toString() !== restored) {
+          doc.transact(() => {
+            text.delete(0, text.length);
+            text.insert(0, restored);
+          });
+          dirty = true;
+        }
+        onRestoreContentRef.current?.();
+      }
+
       if (monacoEditor && model) {
         const awareness = new Awareness(doc);
         awareness.setLocalStateField('user', {
@@ -227,12 +250,6 @@ export default function useFileCollab({
       }
 
       docRef.current = doc;
-      for (const [updatePath, update] of pendingUpdates) {
-        if (matchesSession(updatePath)) {
-          Y.applyUpdate(doc, fromBase64(update), 'remote');
-        }
-      }
-      pendingUpdates = [];
       setActive(true);
 
       setConflict(syncConflict);

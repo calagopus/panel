@@ -141,7 +141,6 @@ export default function FileTreeVirtualList({
     paddingEnd: 8,
     directDomUpdates: true,
     isScrollingResetDelay: 80,
-    useScrollendEvent: true,
     useFlushSync: true,
   });
   const virtualRows = useSyncExternalStore(

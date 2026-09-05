@@ -1,4 +1,6 @@
+import { basename, dirname, join } from 'pathe';
 import { z } from 'zod';
+import { FileRename, renameFilePath } from '@/lib/files/fileRenames.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { FileTreeEditorSelection, getFileTreeEditorTabId } from './fileTreeEditor.ts';
 
@@ -116,4 +118,29 @@ export const storeFileTreeWorkspace = (serverUuid: string, workspace: FileTreeEd
   } catch {
     // A private or full browser store should not stop files from opening.
   }
+};
+
+export const renameFileTreeWorkspace = (workspace: FileTreeEditorWorkspaceState, files: FileRename[]) => {
+  const ids = new Map<string, string>();
+  const tabs = workspace.tabs.map((tab) => {
+    const path = join(tab.directory, tab.file.name);
+    const renamed = renameFilePath(path, files);
+    if (renamed === path) return tab;
+    const next = { ...tab, directory: dirname(renamed), file: { ...tab.file, name: basename(renamed) } };
+    ids.set(getFileTreeEditorTabId(tab), getFileTreeEditorTabId(next));
+    return next;
+  });
+  const remapId = (id: string) => ids.get(id) ?? id;
+  return {
+    ids,
+    workspace: normalizeFileTreeWorkspace({
+      ...workspace,
+      tabs,
+      panes: workspace.panes.map((pane) => ({
+        ...pane,
+        tabIds: pane.tabIds.map(remapId),
+        activeTabId: pane.activeTabId ? remapId(pane.activeTabId) : null,
+      })),
+    }),
+  };
 };

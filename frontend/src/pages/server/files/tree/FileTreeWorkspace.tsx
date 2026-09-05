@@ -3,6 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import {
+  hasOverlappingFileRenames,
+  isWithinRenamedPath,
+  registerFileRenameListener,
+  resolveFileRenames,
+} from '@/lib/files/fileRenames.ts';
 import { isOpenableFile } from '@/lib/files/files.ts';
 import FileTree from '@/pages/server/files/tree/FileTree.tsx';
 import FileTreeEditorPane from '@/pages/server/files/tree/FileTreeEditorPane.tsx';
@@ -19,6 +25,7 @@ import {
   createFileTreePaneId,
   FileTreeEditorWorkspaceState,
   normalizeFileTreeWorkspace,
+  renameFileTreeWorkspace,
   restoreFileTreeWorkspace,
   storeFileTreeWorkspace,
 } from '@/pages/server/files/tree/fileTreeWorkspaceState.ts';
@@ -59,7 +66,13 @@ export default function FileTreeWorkspace({
   const [workspace, setWorkspace] = useState<FileTreeEditorWorkspaceState>(() => restoreFileTreeWorkspace(server.uuid));
   const [dirtyTabIds, setDirtyTabIds] = useState(() => new Set<string>());
   const draftContentsRef = useRef(new Map<string, string>());
+  const renameDraftsRef = useRef(new Map<string, string>());
+  const workspaceStateRef = useRef(workspace);
   const [pendingClose, setPendingClose] = useState<PendingTabClose | null>(null);
+
+  useEffect(() => {
+    workspaceStateRef.current = workspace;
+  });
 
   const tabsById = useMemo(
     () => new Map(workspace.tabs.map((tab) => [getFileTreeEditorTabId(tab), tab])),
@@ -69,6 +82,64 @@ export default function FileTreeWorkspace({
   const activeSelection = (activePane?.activeTabId && tabsById.get(activePane.activeTabId)) || null;
 
   useEffect(() => storeFileTreeWorkspace(server.uuid, workspace), [server.uuid, workspace]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const unregister = registerFileRenameListener(server.uuid, {
+      before: (files) => {
+        const current = workspaceStateRef.current;
+        if (
+          hasOverlappingFileRenames(files) &&
+          current.tabs.some((tab) =>
+            files.some((file) => isWithinRenamedPath(join(tab.directory, tab.file.name), file.from)),
+          )
+        ) {
+          throw new Error(t('pages.server.files.toast.closeTabsBeforeBulkRename', {}));
+        }
+        const renamed = renameFileTreeWorkspace(current, files);
+        const ids = current.tabs.map((tab) => {
+          const id = getFileTreeEditorTabId(tab);
+          return renamed.ids.get(id) ?? id;
+        });
+        if (new Set(ids).size !== ids.length) {
+          throw new Error(t('pages.server.files.toast.closeDestinationBeforeRename', {}));
+        }
+      },
+      after: async (result) => {
+        const files = await resolveFileRenames(
+          server.uuid,
+          result,
+          workspaceStateRef.current.tabs.map((tab) => join(tab.directory, tab.file.name)),
+        );
+        if (cancelled || files.length === 0) return;
+        const renamed = renameFileTreeWorkspace(workspaceStateRef.current, files);
+        if (renamed.ids.size === 0) return;
+        const remapId = (id: string) => renamed.ids.get(id) ?? id;
+        draftContentsRef.current = new Map(
+          Array.from(draftContentsRef.current, ([id, content]) => [remapId(id), content]),
+        );
+        renameDraftsRef.current = new Map(
+          Array.from(renameDraftsRef.current, ([id, content]) => [remapId(id), content]),
+        );
+        for (const id of renamed.ids.values()) {
+          const content = draftContentsRef.current.get(id);
+          if (content !== undefined) renameDraftsRef.current.set(id, content);
+        }
+        workspaceStateRef.current = renamed.workspace;
+        setWorkspace(renamed.workspace);
+        setDirtyTabIds((current) => new Set(Array.from(current, remapId)));
+        setPendingClose((current) => (current ? { ...current, tabId: remapId(current.tabId) } : null));
+      },
+    });
+    return () => {
+      cancelled = true;
+      unregister();
+    };
+  }, [server.uuid, t]);
+
+  const handleRenameDraftRestored = useCallback((tabId: string) => {
+    renameDraftsRef.current.delete(tabId);
+  }, []);
 
   // The CSS fallback guesses how much page chrome sits above the workspace; measure it instead so
   // the panes end exactly at the viewport bottom rather than pushing the page into a short scroll.
@@ -147,8 +218,12 @@ export default function FileTreeWorkspace({
   }, []);
 
   const handleDraftChange = useCallback((tabId: string, content: string | null) => {
-    if (content === null) draftContentsRef.current.delete(tabId);
-    else draftContentsRef.current.set(tabId, content);
+    if (content === null) {
+      draftContentsRef.current.delete(tabId);
+      renameDraftsRef.current.delete(tabId);
+    } else {
+      draftContentsRef.current.set(tabId, content);
+    }
   }, []);
 
   const requestSelectTab = useCallback((paneId: string, tabId: string) => {
@@ -233,6 +308,7 @@ export default function FileTreeWorkspace({
         });
       });
       draftContentsRef.current.delete(tabId);
+      renameDraftsRef.current.delete(tabId);
       clearDirty(tabId);
     },
     [clearDirty],
@@ -495,6 +571,8 @@ export default function FileTreeWorkspace({
                     onClose={() => pane.activeTabId && requestCloseTab(pane.id, pane.activeTabId)}
                     onMissing={(tabId) => commitCloseTab(pane.id, tabId)}
                     onDirtyChange={handleDirtyChange}
+                    restoreContent={pane.activeTabId ? renameDraftsRef.current.get(pane.activeTabId) : undefined}
+                    onRestoreContent={handleRenameDraftRestored}
                     onDraftChange={handleDraftChange}
                   />
                 );

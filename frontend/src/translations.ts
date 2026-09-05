@@ -4949,6 +4949,8 @@ const baseTranslations = defineTranslations({
             filePullingStarted: 'File pulling has started.',
             fileRenamed: 'File has been renamed.',
             fileCouldNotBeRenamed: 'File could not be renamed.',
+            closeDestinationBeforeRename: 'Close the editor tab for the destination file before renaming.',
+            closeTabsBeforeBulkRename: 'Close affected editor tabs before renaming overlapping paths.',
             filesRenamed: '{files} renamed.',
             renameUndone: 'Rename undone.',
             renameCouldNotBeUndone: 'Rename could not be undone.',

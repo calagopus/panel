@@ -68,7 +68,7 @@ export default function ServerBackups({
   createDefaults,
   createBlockedReason = null,
   headerActions,
-  modifyParams = variant === 'page',
+  modifyParams,
 }: ServerBackupsProps) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
@@ -104,7 +104,7 @@ export default function ServerBackups({
     fetcher: (page, search) => getBackups(server.uuid, page, search, showGroups && canReadGroups, filter),
     deps: [filter],
     setStoreData: setBackups,
-    modifyParams,
+    modifyParams: modifyParams ?? variant === 'page',
   });
 
   const { data: groups } = useQuery({

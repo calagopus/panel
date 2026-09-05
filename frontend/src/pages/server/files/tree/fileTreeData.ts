@@ -181,7 +181,12 @@ export const groupTreeItems = (items: TreeSelectionItem[]): FileMoveGroup[] => {
  * that root as its parent - deriving one from the hit's own path would double the shared segments
  * when the entry name is later resolved against it.
  */
-export const searchRow = (root: string, entry: DirectoryEntry, fast: boolean): FileTreeRow => {
+export const searchRow = (
+  root: string,
+  entry: DirectoryEntry,
+  fast: boolean,
+  expandedDirectories: Set<string>,
+): FileTreeRow => {
   const path = join(root, entry.name);
 
   return {
@@ -192,7 +197,7 @@ export const searchRow = (root: string, entry: DirectoryEntry, fast: boolean): F
     depth: 0,
     entry,
     expandable: isExpandableEntry(entry, fast),
-    expanded: false,
+    expanded: isExpandableEntry(entry, fast) && expandedDirectories.has(path),
   };
 };
 
@@ -245,3 +250,23 @@ export const appendDirectoryRows = (
     });
   }
 };
+
+export const appendSearchRows = (
+  rows: FileTreeRow[],
+  root: string,
+  entries: DirectoryEntry[],
+  directories: Record<string, DirectoryState>,
+  expandedDirectories: Set<string>,
+) => {
+  const { fast } = resolveDirectoryCapabilities(directories, root);
+
+  for (const entry of entries) {
+    const row = searchRow(root, entry, fast, expandedDirectories);
+    rows.push(row);
+    if (row.type === 'entry' && row.expanded) {
+      appendDirectoryRows(rows, row.path, 1, directories, expandedDirectories);
+    }
+  }
+};
+
+export const escapeFileTreeSearch = (query: string) => query.replace(/[\\*?[\]{}]/g, '\\$&');

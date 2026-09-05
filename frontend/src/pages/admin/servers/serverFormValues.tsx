@@ -1,5 +1,5 @@
 import { UseFormReturnType } from '@mantine/form';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
 import Select from '@/elements/input/Select.tsx';
@@ -94,22 +94,29 @@ export function useEggDefaults<T extends ServerEggAssignmentFormValues>(
   selectedEggUuid: string,
   { skip = false }: { skip?: boolean } = {},
 ) {
+  const formRef = useRef(form);
+  const eggsRef = useRef(eggs);
+
+  useEffect(() => {
+    formRef.current = form;
+    eggsRef.current = eggs;
+  });
+
   useEffect(() => {
     if (!selectedEggUuid || skip) {
       return;
     }
 
-    const egg = eggs.items.find((e) => e.uuid === selectedEggUuid);
+    const egg = eggsRef.current.items.find((e) => e.uuid === selectedEggUuid);
     if (!egg) {
       return;
     }
 
-    form.setFieldValue('image', (Object.values(egg.dockerImages)[0] ?? '') as never);
-    form.setFieldValue(
+    formRef.current.setFieldValue('image', (Object.values(egg.dockerImages)[0] ?? '') as never);
+    formRef.current.setFieldValue(
       'startup',
       (egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '') as never,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEggUuid, skip]);
 }
 

@@ -16,10 +16,12 @@ import FileTreeToolbar from '@/pages/server/files/tree/FileTreeToolbar.tsx';
 import FileTreeVirtualList from '@/pages/server/files/tree/FileTreeVirtualList.tsx';
 import {
   appendDirectoryRows,
+  appendSearchRows,
   collapseNestedTreeItems,
   DirectoryEntry,
   DirectoryState,
   EMPTY_DIRECTORY_STATE,
+  escapeFileTreeSearch,
   FileTreeProps,
   FileTreeRow as FileTreeRowData,
   groupTreeItems,
@@ -27,7 +29,6 @@ import {
   isExternalFileDrag,
   ROOT_DIRECTORY,
   resolveDirectoryCapabilities,
-  searchRow,
   TREE_ROW_HEIGHT,
   TreeDirectoryCapabilities,
   TreeSelectionItem,
@@ -322,7 +323,7 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
     const timeout = window.setTimeout(() => {
       searchFiles(server.uuid, {
         root: ROOT_DIRECTORY,
-        pathFilter: { include: [`**/*${query}*`], exclude: [], caseInsensitive: true },
+        pathFilter: { include: [`**/*${escapeFileTreeSearch(query)}*`], exclude: [], caseInsensitive: true },
         sizeFilter: null,
         contentFilter: null,
       })
@@ -357,10 +358,9 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
         return [{ type: 'searchEmpty', key: 'search:empty', depth: 0 } satisfies FileTreeRowData];
       }
 
-      return searchResults.map(
-        (entry): FileTreeRowData =>
-          searchRow(ROOT_DIRECTORY, entry, resolveDirectoryCapabilities(directories, ROOT_DIRECTORY).fast),
-      );
+      const result: FileTreeRowData[] = [];
+      appendSearchRows(result, ROOT_DIRECTORY, searchResults, directories, expandedDirectories);
+      return result;
     }
 
     if (modalSearchInfo && modalSearchEntries) {
@@ -368,10 +368,9 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
         return [{ type: 'searchEmpty', key: 'search:empty', depth: 0 } satisfies FileTreeRowData];
       }
 
-      return modalSearchEntries.data.map(
-        (entry): FileTreeRowData =>
-          searchRow(modalSearchInfo.root, entry, resolveDirectoryCapabilities(directories, modalSearchInfo.root).fast),
-      );
+      const result: FileTreeRowData[] = [];
+      appendSearchRows(result, modalSearchInfo.root, modalSearchEntries.data, directories, expandedDirectories);
+      return result;
     }
 
     const result: FileTreeRowData[] = [];
@@ -449,12 +448,16 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
     selectedItems.length === 1
       ? selectedItems[0].entry.directory
         ? selectedItems[0].path
-        : selectedItems[0].parent
+        : dirname(selectedItems[0].path)
       : ROOT_DIRECTORY;
   const createTargetWritable =
     selectedItems.length === 1 && selectedItems[0].entry.directory
       ? isDirectoryWritable(selectedItems[0].path, selectedItems[0].parent, selectedItems[0].entry.virtual)
       : (directories[createTarget]?.writable ?? false);
+  useEffect(() => {
+    if (!directories[createTarget]) void loadPage(createTarget, 1);
+  }, [createTarget, directories, loadPage]);
+
   const treeLoading = Object.values(directories).some((directory) => directory.loading);
   const rowHeight = TREE_ROW_HEIGHT;
   const massSelectionDirectory =
