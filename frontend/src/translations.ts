@@ -753,6 +753,8 @@ const baseTranslations = defineTranslations({
           cancelledAll: 'All uploads have been cancelled.',
           completedServer: 'Finished uploading {files} to `{server}`.',
           completedAssets: 'Finished uploading {files} to the admin assets.',
+          progressServer: 'Uploading {files} to `{server}`...',
+          progressAssets: 'Uploading {files} to the admin assets...',
           showFiles: 'Show files',
         },
       },

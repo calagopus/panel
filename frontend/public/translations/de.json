@@ -870,6 +870,8 @@
           "cancelledAll": "Alle Uploads wurden abgebrochen.",
           "completedServer": "Upload von {files} nach `{server}` abgeschlossen.",
           "completedAssets": "Upload von {files} in die Admin-Assets abgeschlossen.",
+          "progressServer": "Lade {files} nach `{server}` hoch...",
+          "progressAssets": "Lade {files} in die Admin-Assets hoch...",
           "showFiles": "Dateien anzeigen"
         }
       }

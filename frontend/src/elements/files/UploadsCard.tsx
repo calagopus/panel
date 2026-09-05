@@ -14,6 +14,7 @@ import RingProgress from '@/elements/feedback/RingProgress.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { uploadDestinationPath } from '@/lib/files/uploadDestination.ts';
 import {
   cancelAllUploads,
   cancelFileUpload,
@@ -27,6 +28,7 @@ import {
   setUploadManagerExternals,
 } from '@/lib/files/uploadManager.ts';
 import { bytesProgressString } from '@/lib/format/size.ts';
+import { useUploadProgressToasts } from '@/plugins/toast/useUploadProgressToasts.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {
@@ -36,12 +38,6 @@ import {
   uploadScopeKey,
   useUploadsStore,
 } from '@/stores/uploads.ts';
-
-function destinationPath(destination: UploadDestination): string {
-  return destination.type === 'server'
-    ? `/server/${destination.routeId}/files?directory=${encodeURIComponent(destination.directory)}`
-    : `/admin/assets${destination.directory ? `?directory=${encodeURIComponent(destination.directory)}` : ''}`;
-}
 
 function isCoveredByPage(pathname: string, destination: UploadDestination): boolean {
   const normalized = pathname.replace(/\/+$/, '');
@@ -65,6 +61,8 @@ export default function UploadsCard() {
   const navigate = useNavigate();
   const location = useLocation();
   const uploads = useUploadsStore((state) => state.uploads);
+
+  useUploadProgressToasts();
 
   const [collapsed, setCollapsed] = useState(false);
   const [cancelAllScope, setCancelAllScope] = useState<string | null>(null);
@@ -93,7 +91,7 @@ export default function UploadsCard() {
           {
             name: t('elements.fileUpload.toast.showFiles', {}),
             icon: faFolderOpen,
-            onClick: () => navigate(destinationPath(destination)),
+            onClick: () => navigate(uploadDestinationPath(destination)),
           },
         ]);
       },
@@ -174,7 +172,7 @@ export default function UploadsCard() {
       padding='sm'
       withBorder
       className={classNames(
-        'fixed bottom-4 z-998 w-80 max-h-96 overflow-y-auto',
+        'fixed! bottom-4 z-998 w-80 max-h-96 overflow-y-auto',
         toastPosition === 'bottom_right' ? 'left-4' : 'right-4',
       )}
     >

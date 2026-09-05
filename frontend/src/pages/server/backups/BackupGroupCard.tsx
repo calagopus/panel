@@ -34,7 +34,7 @@ export default function BackupGroupCard({
     <Card p={0} className='overflow-hidden rounded-xl!'>
       <div
         className={classNames(
-          'flex flex-row items-end sm:items-center gap-3 px-3 justify-between',
+          'flex flex-col sm:flex-row items-stretch sm:items-center gap-3 px-3 justify-between',
           isExpanded && 'border-b border-(--mantine-color-default-border)',
         )}
       >
@@ -55,7 +55,7 @@ export default function BackupGroupCard({
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className='flex items-center gap-2.5 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity'
+              className='flex flex-wrap items-center gap-x-2.5 gap-y-1 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity'
             >
               <FontAwesomeIcon
                 icon={faChevronRight}
@@ -70,7 +70,7 @@ export default function BackupGroupCard({
         </div>
 
         {actions && (
-          <div className='flex flex-col sm:flex-row items-center gap-1 mb-1.5 sm:mb-0 py-2.5 flex-1 sm:flex-0 justify-end'>
+          <div className='flex flex-row items-center gap-1 mb-1.5 sm:mb-0 py-2.5 flex-1 sm:flex-0 justify-end'>
             {actions}
           </div>
         )}

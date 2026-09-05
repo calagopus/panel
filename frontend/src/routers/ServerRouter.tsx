@@ -24,6 +24,7 @@ import { resolveString } from '@/lib/lazy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import ServerStatusPoller from '@/pages/server/ServerStatusPoller.tsx';
+import ServerStatusToast from '@/pages/server/ServerStatusToast.tsx';
 import WebsocketHandler from '@/pages/server/WebsocketHandler.tsx';
 import WebsocketListener from '@/pages/server/WebsocketListener.tsx';
 import WebsocketStatusBanner from '@/pages/server/WebsocketStatusBanner.tsx';
@@ -274,6 +275,7 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
               <WebsocketHandler />
               <WebsocketListener />
               <ServerStatusPoller />
+              {isNormal && <ServerStatusToast />}
               <ExtensionSlot
                 components={window.extensionContext.extensionRegistry.pages.server.prependedComponents}
                 name='server-prepended-component'

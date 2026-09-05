@@ -19,6 +19,24 @@ export interface Toast {
   message: ReactNode;
   type: ToastType;
   actions?: ToastAction[];
+  progress?: number | null;
+  withCloseButton: boolean;
+  onClose?: () => void;
+}
+
+export interface ProgressToastOptions {
+  type?: ToastType;
+  actions?: ToastAction[];
+  progress?: number | null;
+  withCloseButton?: boolean;
+  onClose?: () => void;
+}
+
+export interface ToastUpdate {
+  message?: ReactNode;
+  type?: ToastType;
+  actions?: ToastAction[];
+  progress?: number | null;
 }
 
 export interface AddToast {
@@ -30,6 +48,8 @@ interface ToastContextType {
   toastPosition: z.infer<typeof userToastPosition>;
 
   addToast: AddToast;
+  addProgressToast: (message: ReactNode, options?: ProgressToastOptions) => number;
+  updateToast: (id: number, update: ToastUpdate) => void;
   dismissToast: (id: number) => void;
 }
 

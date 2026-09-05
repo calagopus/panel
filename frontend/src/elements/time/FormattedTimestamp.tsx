@@ -25,6 +25,10 @@ function FormattedTimestamp({
   showNA = false,
   withTooltip = true,
 }: FormattedTimestampProps) {
+  // formatTimestamp() reads the current time, so its result cannot be cached on `timestamp` alone;
+  // the compiler would otherwise freeze the relative label at whatever it rendered first.
+  'use no memo';
+
   const { t } = useTranslations();
 
   const [, forceRender] = useState(0);

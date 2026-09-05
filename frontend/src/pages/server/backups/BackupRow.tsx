@@ -291,7 +291,7 @@ export default function BackupRow({
 
             {columns.kind && (
               <TableData>
-                <Badge variant='light' color={backup.kind === 'server' ? 'gray' : 'blue'}>
+                <Badge className='w-max!' variant='light' color={backup.kind === 'server' ? 'gray' : 'blue'}>
                   {serverBackupKindLabelMapping[backup.kind]()}
                 </Badge>
               </TableData>
@@ -338,9 +338,13 @@ export default function BackupRow({
             {isDeleting || isDeleteFailed ? (
               <TableData colSpan={columns.statusColSpan}>
                 {isDeleting ? (
-                  <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
+                  <Badge className='w-max!' color='yellow'>
+                    {t('pages.server.backups.badge.deleting', {})}
+                  </Badge>
                 ) : (
-                  <Badge color='red'>{t('pages.server.backups.badge.deleteFailed', {})}</Badge>
+                  <Badge className='w-max!' color='red'>
+                    {t('pages.server.backups.badge.deleteFailed', {})}
+                  </Badge>
                 )}
               </TableData>
             ) : !isFailed ? (
@@ -373,7 +377,9 @@ export default function BackupRow({
               </>
             ) : (
               <TableData colSpan={columns.statusColSpan}>
-                <Badge color='red'>{t('common.badge.failed', {})}</Badge>
+                <Badge className='w-max!' color='red'>
+                  {t('common.badge.failed', {})}
+                </Badge>
               </TableData>
             )}
 
