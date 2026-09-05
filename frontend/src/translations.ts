@@ -2389,6 +2389,11 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm User Deletion',
                     content: 'Are you sure you want to delete **{username}**?',
                   },
+                  grantAdmin: {
+                    title: 'Confirm Admin Access',
+                    content:
+                      'Are you sure you want to grant **{username}** admin access? This account will have full, unrestricted access to everything on the panel.',
+                  },
                   verifyEmail: {
                     title: 'Mark Email Verified',
                     content: 'Are you sure you want to mark **{email}** as verified without confirmation?',

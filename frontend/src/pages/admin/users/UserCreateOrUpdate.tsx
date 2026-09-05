@@ -43,8 +43,9 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   const editingOtherUser = !!contextUser && contextUser.uuid !== user?.uuid;
 
   const [openModal, setOpenModal] = useState<
-    'delete' | 'disable_two_factor' | 'send_password_reset_email' | 'verify_email' | null
+    'grant_admin' | 'delete' | 'disable_two_factor' | 'send_password_reset_email' | 'verify_email' | null
   >(null);
+  const [confirmStay, setConfirmStay] = useState(false);
 
   const form = useFormEngine<UserFormValues>('admin.users.createOrUpdate', {
     schema: adminUserUpdateSchema.unwrap(),
@@ -64,6 +65,15 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   });
 
   useHydrateForm(form, contextUser, userToFormValues);
+
+  const doSave = (stay: boolean) => {
+    if (!contextUser?.admin && form.getValues().admin) {
+      setConfirmStay(stay);
+      setOpenModal('grant_admin');
+    } else {
+      doCreateOrUpdate(stay, queryKeys.admin.users.all());
+    }
+  };
 
   const roles = useSearchableResource<z.infer<typeof roleSchema>>({
     queryKey: queryKeys.admin.roles.all(),
@@ -143,6 +153,20 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
       titleOrder={2}
     >
       <ConfirmationModal
+        opened={openModal === 'grant_admin'}
+        onClose={() => setOpenModal(null)}
+        title={t('pages.admin.users.tabs.general.page.modal.grantAdmin.title', {})}
+        confirm={t(contextUser ? 'common.button.save' : 'common.button.create', {})}
+        onConfirmed={() => {
+          setOpenModal(null);
+          doCreateOrUpdate(confirmStay, queryKeys.admin.users.all());
+        }}
+      >
+        {t('pages.admin.users.tabs.general.page.modal.grantAdmin.content', {
+          username: form.getValues().username,
+        }).md()}
+      </ConfirmationModal>
+      <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
         title={t('pages.admin.users.tabs.general.page.modal.delete.title', {})}
@@ -186,7 +210,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
         }).md()}
       </ConfirmationModal>
 
-      <form onSubmit={form.onSubmit(() => doCreateOrUpdate(false, queryKeys.admin.users.all()))}>
+      <form onSubmit={form.onSubmit(() => doSave(false))}>
         <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
@@ -198,11 +222,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                 {t('common.button.save', {})}
               </Button>
               {!contextUser && (
-                <Button
-                  onClick={() => doCreateOrUpdate(true, queryKeys.admin.users.all())}
-                  disabled={!form.isValid()}
-                  loading={loading}
-                >
+                <Button onClick={() => doSave(true)} disabled={!form.isValid()} loading={loading}>
                   {t('common.button.saveAndStay', {})}
                 </Button>
               )}

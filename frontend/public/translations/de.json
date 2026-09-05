@@ -2449,6 +2449,10 @@
                     "title": "Benutzerlöschung bestätigen",
                     "content": "Bist du sicher, dass du **{username}** löschen möchtest?"
                   },
+                  "grantAdmin": {
+                    "title": "Administratorzugriff bestätigen",
+                    "content": "Bist du sicher, dass du **{username}** Administratorzugriff gewähren möchtest? Dieses Konto erhält vollen, uneingeschränkten Zugriff auf alles im Panel."
+                  },
                   "verifyEmail": {
                     "title": "E-Mail als bestätigt markieren",
                     "content": "Möchtest du **{email}** wirklich ohne Bestätigung als verifiziert markieren?",
