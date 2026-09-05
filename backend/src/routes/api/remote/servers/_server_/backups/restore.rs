@@ -11,7 +11,9 @@ mod post {
             ByUuid, CreatableModel, EventEmittingModel,
             server::{GetServer, Server, ServerStatus},
             server_activity::ServerActivity,
-            server_backup::{ServerBackup, ServerBackupEvent},
+            server_backup::{
+                ServerBackup, ServerBackupEvent, ServerBackupFilter, ServerBackupKind,
+            },
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -86,13 +88,20 @@ mod post {
         let backup = match data.backup_uuid {
             Some(uuid) => ServerBackup::by_server_uuid_uuid(&state.database, server.uuid, uuid)
                 .await?
-                .filter(|backup| backup.deleted.is_none()),
+                .filter(|backup| {
+                    backup.deleted.is_none() && backup.kind == ServerBackupKind::Server
+                }),
             None => {
                 ServerBackup::select_completed_by_server_uuid(
                     &state.database,
                     server.uuid,
                     data.backup_name.as_deref(),
                     data.backup_group_uuid,
+                    &ServerBackupFilter {
+                        kind: Some(ServerBackupKind::Server),
+                        database_instance_uuid: None,
+                        database_type: None,
+                    },
                     data.oldest,
                 )
                 .await?

@@ -20,6 +20,7 @@ import downloadBackup from '@/api/server/backups/downloadBackup.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
+import TableLink from '@/elements/data-display/TableLink.tsx';
 import HljsCode from '@/elements/editors/HljsCode.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -28,16 +29,23 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { getBackupSourceInstance } from '@/lib/domain/server.ts';
+import {
+  databaseAgentTypeLabelMapping,
+  serverBackupKindLabelMapping,
+  streamingArchiveFormatLabelMapping,
+} from '@/lib/enums.ts';
 import { bytesProgressString, bytesToString } from '@/lib/format/size.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
+import DatabaseInstanceBackupRestoreModal from '@/pages/server/databases/instances/modals/DatabaseInstanceBackupRestoreModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import { BackupColumns } from './columns.ts';
 import BackupEditModal from './modals/BackupEditModal.tsx';
 import BackupExportModal from './modals/BackupExportModal.tsx';
 import BackupRestoreModal from './modals/BackupRestoreModal.tsx';
@@ -46,9 +54,13 @@ const loadJsonLanguage = () => import('highlight.js/lib/languages/json').then((m
 
 export default function BackupRow({
   backup,
+  backupGroupName,
+  columns,
   readOnly,
 }: {
   backup: z.infer<typeof serverBackupSchema>;
+  backupGroupName?: string;
+  columns: BackupColumns;
   readOnly?: boolean;
 }) {
   const { t, tItem } = useTranslations();
@@ -60,9 +72,13 @@ export default function BackupRow({
   const progress = useServerStore((state) => state.backupProgress.get(backup.uuid));
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const canReadDatabaseInstances = useServerCan('database-instances.read');
 
-  const [openModal, setOpenModal] = useState<'edit' | 'restore' | 'export' | 'delete' | 'metadata' | null>(null);
+  const [openModal, setOpenModal] = useState<
+    'edit' | 'restore' | 'restoreDatabase' | 'export' | 'delete' | 'metadata' | null
+  >(null);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
+  const sourceInstance = useMemo(() => getBackupSourceInstance(backup), [backup]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadBackup(server.uuid, backup.uuid, archiveFormat)
@@ -117,22 +133,23 @@ export default function BackupRow({
       updateBackup(backup.uuid, { deletionStatus: 'deleting' });
     }
 
-    if (backup.backupGroupUuid) {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.server(server.uuid).backups.groups.detail(backup.backupGroupUuid),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.groups.all() });
-    }
+    queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.all() });
   };
 
   const isFailed = !backup.isSuccessful && !!backup.completed;
   const isDeleting = backup.deletionStatus === 'deleting';
   const isDeleteFailed = backup.deletionStatus === 'failed';
+  const streamingDownload = backup.kind === 'server' && backup.isStreaming;
 
   return (
     <>
       <BackupEditModal backup={backup} opened={openModal === 'edit'} onClose={() => setOpenModal(null)} />
       <BackupRestoreModal backup={backup} opened={openModal === 'restore'} onClose={() => setOpenModal(null)} />
+      <DatabaseInstanceBackupRestoreModal
+        backup={backup}
+        opened={openModal === 'restoreDatabase'}
+        onClose={() => setOpenModal(null)}
+      />
       <BackupExportModal backup={backup} opened={openModal === 'export'} onClose={() => setOpenModal(null)} />
 
       <Modal
@@ -179,7 +196,13 @@ export default function BackupRow({
             type: 'action',
             icon: faShare,
             label: t('pages.server.backups.button.browse', {}),
-            hidden: !backup.completed || !backup.isBrowsable || isFailed || isDeleting || isDeleteFailed,
+            hidden:
+              backup.kind !== 'server' ||
+              !backup.completed ||
+              !backup.isBrowsable ||
+              isFailed ||
+              isDeleting ||
+              isDeleteFailed,
             onClick: () =>
               navigate(
                 `/server/${server?.uuidShort}/files?${createSearchParams({
@@ -194,9 +217,9 @@ export default function BackupRow({
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
-            onClick: !backup.isStreaming ? () => doDownload('tar_gz') : undefined,
+            onClick: !streamingDownload ? () => doDownload('tar_gz') : undefined,
             color: 'gray',
-            items: backup.isStreaming
+            items: streamingDownload
               ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
                   type: 'action',
                   icon: faFileArrowDown,
@@ -212,7 +235,7 @@ export default function BackupRow({
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
             hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
-            onClick: () => setOpenModal('restore'),
+            onClick: () => setOpenModal(backup.kind === 'server' ? 'restore' : 'restoreDatabase'),
             color: 'gray',
             canAccess: useServerCan('backups.restore'),
           },
@@ -220,7 +243,7 @@ export default function BackupRow({
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
+            hidden: backup.kind !== 'server' || !backup.completed || isFailed || isDeleting || isDeleteFailed,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: useServerCan(['backups.download', 'files.create'], false),
@@ -229,7 +252,7 @@ export default function BackupRow({
             type: 'action',
             icon: faInfo,
             label: t('pages.server.backups.modal.viewMetadata.title', {}),
-            hidden: Object.keys(backup.metadata).length === 0,
+            hidden: backup.kind !== 'server' || Object.keys(backup.metadata).length === 0,
             onClick: () => setOpenModal('metadata'),
             color: 'gray',
           },
@@ -255,10 +278,65 @@ export default function BackupRow({
               openMenu(e.clientX, e.clientY);
             }}
           >
-            <TableData>{backup.name}</TableData>
+            <TableData>
+              <div className='min-w-0'>
+                <div className='truncate'>{backup.name}</div>
+                {backupGroupName && (
+                  <div className='truncate text-xs text-(--mantine-color-dimmed)'>
+                    {t('pages.server.backupGroups.group', {})}: {backupGroupName}
+                  </div>
+                )}
+              </div>
+            </TableData>
+
+            {columns.kind && (
+              <TableData>
+                <Badge variant='light' color={backup.kind === 'server' ? 'gray' : 'blue'}>
+                  {serverBackupKindLabelMapping[backup.kind]()}
+                </Badge>
+              </TableData>
+            )}
+
+            {columns.source && (
+              <TableData>
+                {backup.kind === 'server' ? (
+                  <span className='text-sm text-(--mantine-color-dimmed)'>
+                    {t('pages.server.backups.modal.createBackup.sourceFiles', {})}
+                  </span>
+                ) : sourceInstance ? (
+                  <div className='flex flex-col'>
+                    {backup.databaseInstanceUuid && canReadDatabaseInstances ? (
+                      <TableLink
+                        className='w-max max-w-full truncate font-medium'
+                        to={`/server/${server.uuidShort}/databases/instances/${backup.databaseInstanceUuid}`}
+                      >
+                        {sourceInstance.name}
+                      </TableLink>
+                    ) : (
+                      <span className='font-medium'>
+                        {backup.databaseInstanceUuid
+                          ? sourceInstance.name
+                          : t('pages.server.backups.badge.sourceDeleted', { name: sourceInstance.name })}
+                      </span>
+                    )}
+                    <span className='text-xs text-(--mantine-color-dimmed)'>
+                      {backup.databaseType
+                        ? databaseAgentTypeLabelMapping[backup.databaseType]
+                        : serverBackupKindLabelMapping.database_instance()}
+                    </span>
+                  </div>
+                ) : (
+                  <span className='text-sm text-(--mantine-color-dimmed)'>
+                    {backup.databaseType
+                      ? databaseAgentTypeLabelMapping[backup.databaseType]
+                      : serverBackupKindLabelMapping.database_instance()}
+                  </span>
+                )}
+              </TableData>
+            )}
 
             {isDeleting || isDeleteFailed ? (
-              <TableData colSpan={3}>
+              <TableData colSpan={columns.statusColSpan}>
                 {isDeleting ? (
                   <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
                 ) : (
@@ -272,9 +350,13 @@ export default function BackupRow({
                 {backup.completed ? (
                   <TableData>{bytesToString(backup.bytes)}</TableData>
                 ) : (
-                  <TableData colSpan={2}>
+                  <TableData colSpan={columns.progressColSpan}>
                     <Tooltip
-                      label={`${bytesProgressString(progress?.progress || 0, progress?.total || 0)} · ${tItem('file', progress?.files || 0)}`}
+                      label={
+                        columns.files
+                          ? `${bytesProgressString(progress?.progress || 0, progress?.total || 0)} · ${tItem('file', progress?.files || 0)}`
+                          : bytesProgressString(progress?.progress || 0, progress?.total || 0)
+                      }
                       innerClassName='w-full'
                     >
                       <Progress
@@ -285,10 +367,12 @@ export default function BackupRow({
                   </TableData>
                 )}
 
-                <TableData hidden={!backup.completed}>{backup.completed ? backup.files : null}</TableData>
+                {columns.files && (
+                  <TableData hidden={!backup.completed}>{backup.completed ? backup.files : null}</TableData>
+                )}
               </>
             ) : (
-              <TableData colSpan={3}>
+              <TableData colSpan={columns.statusColSpan}>
                 <Badge color='red'>{t('common.badge.failed', {})}</Badge>
               </TableData>
             )}
@@ -297,7 +381,7 @@ export default function BackupRow({
               <FormattedTimestamp timestamp={backup.created} />
             </TableData>
 
-            {!readOnly && (
+            {columns.locked && (
               <TableData>
                 {backup.isLocked ? (
                   <FontAwesomeIcon className='text-green-500' icon={faLock} />

@@ -80,9 +80,15 @@ mod post {
             .await
         {
             Ok(response) => response.database.name,
-            Err(db_agent_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
+            Err(db_agent_api::client::ApiHttpError::Http(
+                status @ (StatusCode::NOT_FOUND
+                | StatusCode::BAD_REQUEST
+                | StatusCode::CONFLICT
+                | StatusCode::EXPECTATION_FAILED),
+                err,
+            )) => {
                 return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                    .with_status(StatusCode::NOT_FOUND)
+                    .with_status(status)
                     .ok();
             }
             Err(err) => return Err(err.into()),
@@ -97,32 +103,21 @@ mod post {
                         source_db: data.source_db.clone(),
                         db: Some(db),
                         wipe: data.wipe,
+                        lock: false,
                     },
                 )
                 .await
             {
                 Ok(import) => import,
-                Err(db_agent_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
-                    return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                        .with_status(StatusCode::NOT_FOUND)
-                        .ok();
-                }
-                Err(db_agent_api::client::ApiHttpError::Http(StatusCode::BAD_REQUEST, err)) => {
-                    return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                        .with_status(StatusCode::BAD_REQUEST)
-                        .ok();
-                }
-                Err(db_agent_api::client::ApiHttpError::Http(StatusCode::CONFLICT, err)) => {
-                    return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                        .with_status(StatusCode::CONFLICT)
-                        .ok();
-                }
                 Err(db_agent_api::client::ApiHttpError::Http(
-                    StatusCode::EXPECTATION_FAILED,
+                    status @ (StatusCode::NOT_FOUND
+                    | StatusCode::BAD_REQUEST
+                    | StatusCode::CONFLICT
+                    | StatusCode::EXPECTATION_FAILED),
                     err,
                 )) => {
                     return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                        .with_status(StatusCode::EXPECTATION_FAILED)
+                        .with_status(status)
                         .ok();
                 }
                 Err(err) => return Err(err.into()),

@@ -380,6 +380,63 @@ pub enum ScheduleActionInner {
         #[serde(default)]
         backup_group_uuid: Option<uuid::Uuid>,
     },
+    CreateDatabaseBackup {
+        #[garde(skip)]
+        ignore_failure: bool,
+        #[garde(skip)]
+        foreground: bool,
+
+        #[garde(dive)]
+        name: Option<ScheduleDynamicParameter>,
+        #[garde(skip)]
+        database_instance_uuid: uuid::Uuid,
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+
+        #[garde(dive)]
+        #[serde(default)]
+        output_into: Option<ScheduleVariable>,
+    },
+    DeleteDatabaseBackup {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
+        #[garde(skip)]
+        #[serde(default)]
+        database_instance_uuid: Option<uuid::Uuid>,
+    },
+    MoveDatabaseBackup {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
+        #[garde(skip)]
+        #[serde(default)]
+        database_instance_uuid: Option<uuid::Uuid>,
+        #[garde(skip)]
+        #[serde(default)]
+        backup_group_uuid: Option<uuid::Uuid>,
+    },
+    RestoreDatabaseBackup {
+        #[garde(skip)]
+        #[serde(default)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        backup: ScheduleBackupSelector,
+        #[garde(skip)]
+        #[serde(default)]
+        source_database_instance_uuid: Option<uuid::Uuid>,
+        #[garde(skip)]
+        #[serde(default)]
+        database_instance_uuid: Option<uuid::Uuid>,
+    },
     CreateDirectory {
         #[garde(skip)]
         ignore_failure: bool,
@@ -530,42 +587,54 @@ pub enum ScheduleActionInner {
 }
 
 impl ScheduleActionInner {
-    pub fn permission(&self) -> Option<&'static str> {
+    pub fn permissions(&self) -> &'static [&'static str] {
         match self {
-            ScheduleActionInner::Sleep { .. } => None,
-            ScheduleActionInner::Ensure { .. } => None,
-            ScheduleActionInner::If { .. } => None,
-            ScheduleActionInner::ElseIf { .. } => None,
-            ScheduleActionInner::Else => None,
-            ScheduleActionInner::EndIf => None,
-            ScheduleActionInner::Exit { .. } => None,
-            ScheduleActionInner::WaitForState { .. } => None,
-            ScheduleActionInner::Format { .. } => None,
-            ScheduleActionInner::MatchRegex { .. } => None,
-            ScheduleActionInner::WaitForConsoleLine { .. } => Some("control.read-console"),
+            ScheduleActionInner::Sleep { .. } => &[],
+            ScheduleActionInner::Ensure { .. } => &[],
+            ScheduleActionInner::If { .. } => &[],
+            ScheduleActionInner::ElseIf { .. } => &[],
+            ScheduleActionInner::Else => &[],
+            ScheduleActionInner::EndIf => &[],
+            ScheduleActionInner::Exit { .. } => &[],
+            ScheduleActionInner::WaitForState { .. } => &[],
+            ScheduleActionInner::Format { .. } => &[],
+            ScheduleActionInner::MatchRegex { .. } => &[],
+            ScheduleActionInner::WaitForConsoleLine { .. } => &["control.read-console"],
             ScheduleActionInner::SendPower { action, .. } => match action {
-                super::ServerPowerAction::Start => Some("control.start"),
-                super::ServerPowerAction::Stop => Some("control.stop"),
-                super::ServerPowerAction::Restart => Some("control.restart"),
-                super::ServerPowerAction::Kill => Some("control.stop"),
+                super::ServerPowerAction::Start => &["control.start"],
+                super::ServerPowerAction::Stop => &["control.stop"],
+                super::ServerPowerAction::Restart => &["control.restart"],
+                super::ServerPowerAction::Kill => &["control.stop"],
             },
-            ScheduleActionInner::SendCommand { .. } => Some("control.console"),
-            ScheduleActionInner::CreateBackup { .. } => Some("backups.create"),
-            ScheduleActionInner::RestoreBackup { .. } => Some("backups.restore"),
-            ScheduleActionInner::DeleteBackup { .. } => Some("backups.delete"),
-            ScheduleActionInner::MoveBackup { .. } => Some("backups.update"),
-            ScheduleActionInner::CreateDirectory { .. } => Some("files.create"),
-            ScheduleActionInner::WriteFile { .. } => Some("files.update"),
-            ScheduleActionInner::CopyFile { .. } => Some("files.update"),
-            ScheduleActionInner::DeleteFiles { .. } => Some("files.delete"),
-            ScheduleActionInner::RenameFiles { .. } => Some("files.update"),
-            ScheduleActionInner::CompressFiles { .. } => Some("files.archive"),
-            ScheduleActionInner::DecompressFile { .. } => Some("files.archive"),
-            ScheduleActionInner::PullFile { .. } => Some("files.create"),
-            ScheduleActionInner::UpdateStartupVariable { .. } => Some("startup.update"),
-            ScheduleActionInner::UpdateStartupCommand { .. } => Some("startup.command"),
-            ScheduleActionInner::UpdateStartupDockerImage { .. } => Some("startup.docker-image"),
-            ScheduleActionInner::HttpRequest { .. } => None,
+            ScheduleActionInner::SendCommand { .. } => &["control.console"],
+            ScheduleActionInner::CreateBackup { .. } => &["backups.create"],
+            ScheduleActionInner::RestoreBackup { .. } => &["backups.restore"],
+            ScheduleActionInner::DeleteBackup { .. } => &["backups.delete"],
+            ScheduleActionInner::MoveBackup { .. } => &["backups.update"],
+            ScheduleActionInner::CreateDatabaseBackup { .. } => {
+                &["backups.create", "database-instances.read"]
+            }
+            ScheduleActionInner::DeleteDatabaseBackup { .. } => {
+                &["backups.delete", "database-instances.read"]
+            }
+            ScheduleActionInner::MoveDatabaseBackup { .. } => {
+                &["backups.update", "database-instances.read"]
+            }
+            ScheduleActionInner::RestoreDatabaseBackup { .. } => {
+                &["backups.restore", "database-instances.read"]
+            }
+            ScheduleActionInner::CreateDirectory { .. } => &["files.create"],
+            ScheduleActionInner::WriteFile { .. } => &["files.update"],
+            ScheduleActionInner::CopyFile { .. } => &["files.update"],
+            ScheduleActionInner::DeleteFiles { .. } => &["files.delete"],
+            ScheduleActionInner::RenameFiles { .. } => &["files.update"],
+            ScheduleActionInner::CompressFiles { .. } => &["files.archive"],
+            ScheduleActionInner::DecompressFile { .. } => &["files.archive"],
+            ScheduleActionInner::PullFile { .. } => &["files.create"],
+            ScheduleActionInner::UpdateStartupVariable { .. } => &["startup.update"],
+            ScheduleActionInner::UpdateStartupCommand { .. } => &["startup.command"],
+            ScheduleActionInner::UpdateStartupDockerImage { .. } => &["startup.docker-image"],
+            ScheduleActionInner::HttpRequest { .. } => &[],
         }
     }
 }
@@ -588,6 +657,10 @@ pub enum ScheduleTrigger {
         state: super::ServerState,
     },
     BackupStatus {
+        #[garde(skip)]
+        status: ServerBackupStatus,
+    },
+    DatabaseBackupStatus {
         #[garde(skip)]
         status: ServerBackupStatus,
     },

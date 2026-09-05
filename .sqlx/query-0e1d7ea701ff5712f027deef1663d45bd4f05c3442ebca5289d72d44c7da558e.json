@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_database_instances\n            SET status = $2\n            WHERE server_database_instances.uuid = $1 AND server_database_instances.status IS NOT DISTINCT FROM $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "server_database_instance_status",
+            "kind": {
+              "Enum": [
+                "RESTORING_BACKUP"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "server_database_instance_status",
+            "kind": {
+              "Enum": [
+                "RESTORING_BACKUP"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0e1d7ea701ff5712f027deef1663d45bd4f05c3442ebca5289d72d44c7da558e"
+}

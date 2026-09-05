@@ -478,6 +478,38 @@ impl WingsClient {
         .await
     }
 
+    pub async fn post_servers_server_database_backup(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_database_backup::post::RequestBody,
+    ) -> Result<super::servers_server_database_backup::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/database-backup"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_database_backup_backup_restore(
+        &self,
+        server: uuid::Uuid,
+        backup: uuid::Uuid,
+        data: &super::servers_server_database_backup_backup_restore::post::RequestBody,
+    ) -> Result<super::servers_server_database_backup_backup_restore::post::Response, ApiHttpError>
+    {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/database-backup/{backup}/restore"),
+            Some(data),
+            None,
+        )
+        .await
+    }
+
     pub async fn post_servers_server_files_chmod(
         &self,
         server: uuid::Uuid,

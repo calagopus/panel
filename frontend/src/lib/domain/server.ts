@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { isAdmin } from '@/lib/auth/permissions.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
+import { serverBackupSchema, serverBackupSourceInstanceSchema } from '@/lib/schemas/server/backups.ts';
 import { serverPowerState, serverSchema, serverStatus } from '@/lib/schemas/server/server.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
@@ -90,4 +91,10 @@ export function generateBackupName() {
   const tzFormatted = `${tzSign}${tzHours}${tzMinutes}`;
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${tzFormatted}`;
+}
+
+export function getBackupSourceInstance(
+  backup: z.infer<typeof serverBackupSchema>,
+): z.infer<typeof serverBackupSourceInstanceSchema> | null {
+  return serverBackupSourceInstanceSchema.safeParse(backup.metadata.source_instance).data ?? null;
 }

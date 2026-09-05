@@ -5,12 +5,22 @@ use crate::{
 use garde::Validate;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use sqlx::{Row, postgres::PgRow};
+use sqlx::{Row, postgres::PgRow, prelude::Type};
 use std::{
     collections::BTreeMap,
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
+
+#[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(
+    type_name = "server_database_instance_status",
+    rename_all = "SCREAMING_SNAKE_CASE"
+)]
+pub enum ServerDatabaseInstanceStatus {
+    RestoringBackup,
+}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ServerDatabaseInstance {
@@ -24,6 +34,7 @@ pub struct ServerDatabaseInstance {
     pub r#type: db_agent_api::DatabaseAgentType,
 
     pub name: compact_str::CompactString,
+    pub status: Option<ServerDatabaseInstanceStatus>,
     pub locked: bool,
 
     pub image: Option<compact_str::CompactString>,
@@ -109,6 +120,10 @@ impl BaseModel for ServerDatabaseInstance {
                 compact_str::format_compact!("{prefix}name"),
             ),
             (
+                "server_database_instances.status",
+                compact_str::format_compact!("{prefix}status"),
+            ),
+            (
                 "server_database_instances.locked",
                 compact_str::format_compact!("{prefix}locked"),
             ),
@@ -167,6 +182,7 @@ impl BaseModel for ServerDatabaseInstance {
                 .try_get(compact_str::format_compact!("{prefix}template_version").as_str())?,
             r#type: row.try_get(compact_str::format_compact!("{prefix}type").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
+            status: row.try_get(compact_str::format_compact!("{prefix}status").as_str())?,
             locked: row.try_get(compact_str::format_compact!("{prefix}locked").as_str())?,
             image: row.try_get(compact_str::format_compact!("{prefix}image").as_str())?,
             env: row
@@ -187,6 +203,50 @@ impl BaseModel for ServerDatabaseInstance {
 }
 
 impl ServerDatabaseInstance {
+    pub async fn status_by_uuid(
+        database: &crate::database::Database,
+        uuid: uuid::Uuid,
+    ) -> Result<Option<ServerDatabaseInstanceStatus>, sqlx::Error> {
+        sqlx::query_scalar!(
+            r#"
+            SELECT server_database_instances.status AS "status: ServerDatabaseInstanceStatus"
+            FROM server_database_instances
+            WHERE server_database_instances.uuid = $1
+            "#,
+            uuid
+        )
+        .fetch_one(database.read())
+        .await
+    }
+
+    /// Atomically moves the database instance from the `from` status to the `to` status, returning
+    /// `false` if the instance was not in the `from` status and nothing was changed.
+    pub async fn try_set_status_by_uuid(
+        executor: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        uuid: uuid::Uuid,
+        from: Option<ServerDatabaseInstanceStatus>,
+        to: Option<ServerDatabaseInstanceStatus>,
+    ) -> Result<bool, sqlx::Error> {
+        let rows_affected = sqlx::query!(
+            "UPDATE server_database_instances
+            SET status = $2
+            WHERE server_database_instances.uuid = $1 AND server_database_instances.status IS NOT DISTINCT FROM $3",
+            uuid,
+            to as Option<ServerDatabaseInstanceStatus>,
+            from as Option<ServerDatabaseInstanceStatus>
+        )
+        .execute(executor)
+        .await?
+        .rows_affected();
+
+        Ok(rows_affected > 0)
+    }
+
+    #[inline]
+    pub fn is_restoring(&self) -> bool {
+        self.status == Some(ServerDatabaseInstanceStatus::RestoringBackup)
+    }
+
     pub fn resolve_spec(
         &self,
         template: Option<&super::database_agent_template::DatabaseAgentTemplate>,
@@ -706,6 +766,7 @@ impl IntoApiObject for ServerDatabaseInstance {
                 ),
                 name: self.name,
                 is_locked: self.locked,
+                status: self.status,
                 update_available,
                 memory: self
                     .memory
@@ -1261,6 +1322,7 @@ pub struct ApiServerDatabaseInstance {
 
     pub name: compact_str::CompactString,
     pub is_locked: bool,
+    pub status: Option<ServerDatabaseInstanceStatus>,
 
     pub memory: i64,
     pub swap: i64,

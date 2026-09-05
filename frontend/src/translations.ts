@@ -382,6 +382,10 @@ const baseTranslations = defineTranslations({
           finished: 'Finished',
           failed: 'Failed',
         },
+        serverBackupKind: {
+          server: 'Server',
+          databaseInstance: 'Database',
+        },
         serverFirewallRuleAction: {
           allow: 'Allow',
           deny: 'Deny',
@@ -5393,6 +5397,7 @@ const baseTranslations = defineTranslations({
               tabs: {
                 databases: 'Databases',
                 users: 'Users',
+                backups: 'Backups',
                 logs: 'Logs',
               },
               stats: {
@@ -5548,6 +5553,37 @@ const baseTranslations = defineTranslations({
                   completed: 'Imported `{database}` from `{source}` in {time}.',
                   failed: 'Failed to import `{database}` from `{source}`:\n{error}',
                   aborted: 'Import of `{database}` from `{source}` was cancelled.',
+                },
+              },
+            },
+            backups: {
+              title: 'Backups',
+              subtitle: '{current} of {max} maximum backups created on this server, shared with server backups.',
+              badge: {
+                restoring: 'Restoring backup',
+              },
+              notification: {
+                restoring: 'A backup is currently being restored into this managed database. Please wait...',
+              },
+              tooltip: {
+                limitReached: 'This server is limited to {max} backups, shared between server and database backups.',
+                offline: 'The managed database must be running to take a backup.',
+                restoring: 'A backup is currently being restored into this managed database.',
+              },
+              toast: {
+                restoring: 'Restoring backup into the managed database...',
+                restoreCompleted: 'Managed database backup restore completed successfully.',
+                restoreFailed: 'Managed database backup restore failed.',
+              },
+              toggle: {
+                allEngineBackups: 'All {engine} backups on this server',
+              },
+              modal: {
+                restoreBackup: {
+                  title: 'Restore Database Backup',
+                  content:
+                    'This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.',
+                  targetInstance: 'Target Managed Database',
                 },
               },
             },
@@ -5804,6 +5840,10 @@ const baseTranslations = defineTranslations({
             outputInto: 'Output into',
             ignoreFailure: 'Ignore Failure',
             runInForeground: 'Run in Foreground',
+            sourceDatabaseInstance: 'Only Consider Backups From',
+            sourceDatabaseInstanceDescription:
+              'Only pick database backups that were taken from this managed database. Leave empty to consider backups from any managed database on this server.',
+            sourceDatabaseInstanceAny: 'Any managed database',
           },
           condition: {
             variable: 'Variable',
@@ -5881,6 +5921,15 @@ const baseTranslations = defineTranslations({
                 content: 'When Backup reaches Status `{status}`.',
               },
             },
+            databaseBackupStatus: {
+              title: 'Database Backup Status',
+              form: {
+                backupStatus: 'Backup Status',
+              },
+              card: {
+                content: 'When Database Backup reaches Status `{status}`.',
+              },
+            },
             scheduleCompletion: {
               title: 'Schedule Completion',
               form: {
@@ -5918,6 +5967,13 @@ const baseTranslations = defineTranslations({
             noActionDetails: 'Action details not available',
             ignoreFailure: 'Ignore Failure: {value}',
             foreground: 'Foreground: {value}',
+            sourceDatabaseInstance: 'Only From Managed Database: {uuid}',
+            sourceDatabaseInstanceAny: 'Only From Managed Database: Any',
+            backupSelector: {
+              compact: 'Backup {backup}',
+              compactLatest: 'The latest backup',
+              compactOldest: 'The oldest backup',
+            },
           },
           steps: {
             empty: {
@@ -6076,6 +6132,21 @@ const baseTranslations = defineTranslations({
                   backupNameAuto: 'Backup Name: Auto-generated',
                   outputInto: 'Backup UUID into: {variable}',
                   ignoredFiles: 'Ignored Files: {files}',
+                  backupGroup: 'Backup Group: {uuid}',
+                },
+              },
+            },
+            createDatabaseBackup: {
+              title: 'Create Database Backup',
+              description: 'Create a backup of a managed database.',
+              form: {
+                databaseInstance: 'Managed Database',
+              },
+              renderer: {
+                compact: 'Create database backup {name}',
+                compactAuto: 'Create a database backup with an auto-generated name',
+                detail: {
+                  databaseInstance: 'Managed Database: {uuid}',
                 },
               },
             },
@@ -6099,9 +6170,6 @@ const baseTranslations = defineTranslations({
                   'Restoring stops the server and overwrites its files. The schedule waits until the restore has finished before continuing. Avoid combining this step with power or server state triggers that could re-trigger the schedule.',
               },
               renderer: {
-                compact: 'Restore backup {backup}',
-                compactLatest: 'Restore the latest backup',
-                compactOldest: 'Restore the oldest backup',
                 detail: {
                   backupLatest: 'Backup: Latest successful backup',
                   backupOldest: 'Backup: Oldest successful backup',
@@ -6118,7 +6186,7 @@ const baseTranslations = defineTranslations({
               form: {
                 backupSelector: 'Backup to Delete',
                 warning:
-                  'This permanently deletes the selected backup, including its files on the node. Locked backups are skipped.',
+                  'This permanently deletes the selected backup, including its files on the node. If the selected backup is locked, the step fails.',
               },
             },
             moveBackup: {
@@ -6133,6 +6201,41 @@ const baseTranslations = defineTranslations({
                   targetGroup: 'Target Group: {uuid}',
                   targetGroupNone: 'Target Group: None (ungrouped)',
                 },
+              },
+            },
+            restoreDatabaseBackup: {
+              title: 'Restore Database Backup',
+              description: 'Restore a database backup into a managed database.',
+              form: {
+                backupSelector: 'Database Backup to Restore',
+                targetDatabaseInstance: 'Restore Into',
+                targetDatabaseInstanceDescription:
+                  'The managed database the backup is imported into. Leave empty to restore into the database the backup was taken from.',
+                targetDatabaseInstanceSource: 'The database the backup was taken from',
+                warning:
+                  'Restoring overwrites the contents of the target database. The schedule does not wait for the import to finish, so later steps can run while it is still in progress. If the database the backup was taken from has been deleted, the step fails unless you pick a target here.',
+              },
+              renderer: {
+                detail: {
+                  targetDatabaseInstance: 'Restore Into: {uuid}',
+                  targetDatabaseInstanceSource: 'Restore Into: The database the backup was taken from',
+                },
+              },
+            },
+            deleteDatabaseBackup: {
+              title: 'Delete Database Backup',
+              description: 'Delete a database backup selected by the backup selector.',
+              form: {
+                backupSelector: 'Database Backup to Delete',
+                warning:
+                  'This permanently deletes the selected database backup, including its dump on the node. Only database backups are considered, never file backups. If the selected backup is locked, the step fails.',
+              },
+            },
+            moveDatabaseBackup: {
+              title: 'Move Database Backup',
+              description: 'Move a database backup selected by the backup selector into a backup group.',
+              form: {
+                backupSelector: 'Database Backup to Move',
               },
             },
             createDirectory: {
@@ -6357,17 +6460,20 @@ const baseTranslations = defineTranslations({
         backups: {
           title: 'Backups',
           subtitle: '{current} of {max} maximum backups created.',
+          subtitleWithDatabase: '{current} of {max} maximum backups created ({server} server, {database} database).',
           tooltip: {
             limitReached: 'This server is limited to {max} backups.',
           },
           table: {
             columns: {
+              kind: 'Kind',
               locked: 'Locked?',
             },
           },
           badge: {
             deleting: 'Deleting…',
             deleteFailed: 'Deletion failed',
+            sourceDeleted: '{name} (deleted)',
           },
           button: {
             browse: 'Browse',
@@ -6384,6 +6490,10 @@ const baseTranslations = defineTranslations({
             createBackup: {
               title: 'Create Backup',
               noGroup: 'No group',
+              source: 'Source',
+              sourceFiles: 'Server Files',
+              sourceDatabase: 'Managed Database',
+              sourceInstance: 'Managed Database',
               toast: {
                 created: 'Backup created.',
               },

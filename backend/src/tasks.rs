@@ -694,6 +694,7 @@ pub async fn define_background_tasks(
                             name: ServerBackup::default_name(),
                             backup_group_uuid: None,
                             system_backup_policy_uuid: Some(policy.uuid),
+                            database_instance: None,
                             backup_configuration: Some(backup_configuration),
                             ignored_files: Vec::new(),
                             metadata,

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import getSystemBackups from '@/api/server/backups/getSystemBackups.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table from '@/elements/data-display/Table.tsx';
@@ -7,10 +8,13 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import BackupRow from '../BackupRow.tsx';
 import BackupsSubNavigation from '../BackupsSubNavigation.tsx';
+import { getBackupColumns } from '../columns.ts';
 
 export default function ServerSystemBackups() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
+
+  const columns = useMemo(() => getBackupColumns({ kind: false, source: false, files: true, locked: false }), []);
 
   const {
     data: backups,
@@ -34,22 +38,9 @@ export default function ServerSystemBackups() {
     >
       <BackupsSubNavigation />
 
-      <Table
-        columns={[
-          t('common.table.columns.name', {}),
-          t('common.table.columns.checksum', {}),
-          t('common.table.columns.size', {}),
-          t('common.table.columns.files', {}),
-          t('common.table.columns.created', {}),
-          '',
-        ]}
-        loading={loading}
-        pagination={backups}
-        onPageSelect={setPage}
-        error={error}
-      >
+      <Table columns={columns.headers} loading={loading} pagination={backups} onPageSelect={setPage} error={error}>
         {backups?.data.map((backup) => (
-          <BackupRow backup={backup} key={backup.uuid} readOnly />
+          <BackupRow backup={backup} columns={columns} key={backup.uuid} readOnly />
         ))}
       </Table>
     </ServerContentContainer>

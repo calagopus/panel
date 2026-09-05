@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT server_database_instances.status AS \"status: ServerDatabaseInstanceStatus\"\n            FROM server_database_instances\n            WHERE server_database_instances.uuid = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "status: ServerDatabaseInstanceStatus",
+        "type_info": {
+          "Custom": {
+            "name": "server_database_instance_status",
+            "kind": {
+              "Enum": [
+                "RESTORING_BACKUP"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "server_database_instances",
+            "name": "status"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "4d903464f522558e1820b5282423d54308fb3e4b34b4fc514caaeba1b90607bc"
+}

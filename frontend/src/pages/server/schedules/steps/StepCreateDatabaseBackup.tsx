@@ -1,0 +1,84 @@
+import { UseFormReturnType } from '@mantine/form';
+import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
+import getBackupGroups from '@/api/server/backups/groups/getBackupGroups.ts';
+import Select from '@/elements/input/Select.tsx';
+import Switch from '@/elements/input/Switch.tsx';
+import Group from '@/elements/layout/Group.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
+import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
+import DatabaseInstanceSelectorInput from '../forms/DatabaseInstanceSelectorInput.tsx';
+import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
+
+export default function StepCreateDatabaseBackup({
+  form,
+}: {
+  form: UseFormReturnType<z.infer<typeof serverScheduleStepUpdateSchema>>;
+}) {
+  const { t } = useTranslations();
+  const server = useServerStore((state) => state.server);
+
+  const canReadGroups = useServerCan('backup-groups.read');
+  const { data: groups } = useQuery({
+    queryKey: queryKeys.server(server.uuid).backups.groups.all(),
+    queryFn: () => getBackupGroups(server.uuid),
+    enabled: canReadGroups,
+  });
+
+  return (
+    <Stack>
+      <DatabaseInstanceSelectorInput
+        form={form}
+        field='action.databaseInstanceUuid'
+        label={t('pages.server.schedules.steps.createDatabaseBackup.form.databaseInstance', {})}
+        withAsterisk
+        allowNull={false}
+      />
+      <ScheduleDynamicParameterInput
+        label={t('pages.server.schedules.steps.createBackup.form.backupName', {})}
+        placeholder={t('pages.server.schedules.steps.createBackup.form.backupName', {})}
+        allowNull
+        value={form.getInputProps('action.name').value}
+        error={form.getInputProps('action.name').error}
+        onChange={(v) => form.setFieldValue('action.name', v)}
+      />
+      {groups && groups.length > 0 && (
+        <Select
+          label={t('pages.server.backupGroups.group', {})}
+          placeholder={t('pages.server.backups.modal.createBackup.noGroup', {})}
+          clearable
+          data={groups.map((group) => ({
+            value: group.uuid,
+            label: group.name,
+          }))}
+          value={form.getInputProps('action.backupGroupUuid').value ?? null}
+          error={form.getInputProps('action.backupGroupUuid').error}
+          onChange={(v) => form.setFieldValue('action.backupGroupUuid', v)}
+        />
+      )}
+      <Group>
+        <Switch
+          label={t('pages.server.schedules.form.runInForeground', {})}
+          {...form.getInputProps('action.foreground', { type: 'checkbox' })}
+        />
+        <Switch
+          label={t('pages.server.schedules.form.ignoreFailure', {})}
+          {...form.getInputProps('action.ignoreFailure', { type: 'checkbox' })}
+        />
+      </Group>
+      <ScheduleDynamicParameterInput
+        label={t('pages.server.schedules.steps.createBackup.form.outputInto', {})}
+        allowNull
+        output
+        allowString={false}
+        value={form.getInputProps('action.outputInto').value}
+        error={form.getInputProps('action.outputInto').error}
+        onChange={(v) => form.setFieldValue('action.outputInto', v)}
+      />
+    </Stack>
+  );
+}

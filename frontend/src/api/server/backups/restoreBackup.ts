@@ -1,15 +1,15 @@
 import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
+import { serverBackupRestoreSchema } from '@/lib/schemas/server/backups.ts';
 import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
-const restoreBackupSchema = z.object({
-  truncateDirectory: z.boolean(),
-  restoreStartup: z.boolean(),
-});
-
-export default async (uuid: string, backupUuid: string, data: z.infer<typeof restoreBackupSchema>): Promise<void> => {
+export default async (
+  uuid: string,
+  backupUuid: string,
+  data: z.infer<typeof serverBackupRestoreSchema>,
+): Promise<void> => {
   await axiosInstance.post(
     `/api/client/servers/${uuid}/backups/${backupUuid}/restore`,
-    serializeForApi(restoreBackupSchema, data),
+    serializeForApi(serverBackupRestoreSchema, data),
   );
 };

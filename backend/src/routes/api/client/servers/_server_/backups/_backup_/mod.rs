@@ -111,6 +111,7 @@ mod delete {
         models::{
             DeletableModel,
             server::{GetServer, GetServerActivityLogger},
+            server_backup::ServerBackupKind,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -184,11 +185,15 @@ mod delete {
 
             activity_logger
                 .log(
-                    "server:backup.delete",
+                    match backup.kind {
+                        ServerBackupKind::Server => "server:backup.delete",
+                        ServerBackupKind::DatabaseInstance => "server:database-backup.delete",
+                    },
                     serde_json::json!({
                         "source": "user",
                         "uuid": backup.uuid,
                         "name": backup.name,
+                        "database_instance_uuid": backup.database_instance_uuid,
                     }),
                 )
                 .await;
@@ -210,7 +215,7 @@ mod patch {
         models::{
             UpdatableModel,
             server::{GetServer, GetServerActivityLogger},
-            server_backup::UpdateServerBackupOptions,
+            server_backup::{ServerBackupKind, UpdateServerBackupOptions},
             server_backup_group::ServerBackupGroup,
             user::GetPermissionManager,
         },
@@ -274,10 +279,14 @@ mod patch {
 
         activity_logger
             .log(
-                "server:backup.update",
+                match backup.kind {
+                    ServerBackupKind::Server => "server:backup.update",
+                    ServerBackupKind::DatabaseInstance => "server:database-backup.update",
+                },
                 serde_json::json!({
                     "uuid": backup.uuid,
                     "name": backup.name,
+                    "database_instance_uuid": backup.database_instance_uuid,
                     "backup_group_uuid": backup.backup_group_uuid,
                     "locked": backup.locked,
                 }),

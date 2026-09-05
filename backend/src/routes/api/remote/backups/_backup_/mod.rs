@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod database;
 mod deletion;
 mod kopia;
 mod pbs;
@@ -57,7 +58,7 @@ mod post {
             node::GetNode,
             server::Server,
             server_activity::ServerActivity,
-            server_backup::{BackupDisk, ServerBackup, ServerBackupEvent},
+            server_backup::{BackupDisk, ServerBackup, ServerBackupEvent, ServerBackupKind},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -158,7 +159,7 @@ mod post {
             let compression_type = s3_configuration.compression_type;
             let (client, bucket) = s3_configuration.into_client();
 
-            let file_path = ServerBackup::s3_path(server.uuid, backup.uuid, compression_type);
+            let file_path = backup.s3_path(server.uuid, compression_type);
 
             if data.successful {
                 let completed_parts: Vec<_> = data
@@ -265,16 +266,22 @@ mod post {
                     impersonator_uuid: None,
                     api_key_uuid: None,
                     schedule_uuid: None,
-                    event: if data.successful {
-                        "server:backup.complete"
-                    } else {
-                        "server:backup.fail"
+                    event: match (backup.kind, data.successful) {
+                        (ServerBackupKind::Server, true) => "server:backup.complete",
+                        (ServerBackupKind::Server, false) => "server:backup.fail",
+                        (ServerBackupKind::DatabaseInstance, true) => {
+                            "server:database-backup.complete"
+                        }
+                        (ServerBackupKind::DatabaseInstance, false) => {
+                            "server:database-backup.fail"
+                        }
                     }
                     .into(),
                     ip: None,
                     data: serde_json::json!({
                         "uuid": backup.uuid,
                         "name": backup.name,
+                        "database_instance_uuid": backup.database_instance_uuid,
                     }),
                     created: None,
                 },
@@ -309,6 +316,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/restic", restic::router(state))
         .nest("/kopia", kopia::router(state))
         .nest("/restore", restore::router(state))
+        .nest("/database", database::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
         .with_state(state.clone())
 }

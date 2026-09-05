@@ -1,5 +1,6 @@
 import {
   faArrowsRotate,
+  faBoxArchive,
   faDatabase,
   faDownload,
   faFileLines,
@@ -20,13 +21,18 @@ import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
+import Notification from '@/elements/feedback/Notification.tsx';
+import Progress from '@/elements/feedback/Progress.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import Tabs from '@/elements/layout/Tabs.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
+import EstimatedTimeArrival from '@/elements/time/EstimatedTimeArrival.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
+import { bytesProgressString } from '@/lib/format/size.ts';
 import { formatMilliseconds } from '@/lib/format/time.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
@@ -45,6 +51,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
+import DatabaseInstanceBackups from './backups/DatabaseInstanceBackups.tsx';
 import DatabaseInstanceDatabases from './management/DatabaseInstanceDatabases.tsx';
 import DatabaseInstanceUsers from './management/DatabaseInstanceUsers.tsx';
 import DatabaseInstanceApplyUpdateModal from './modals/DatabaseInstanceApplyUpdateModal.tsx';
@@ -80,6 +87,9 @@ export default function DatabaseInstanceView() {
   const settings = useGlobalStore((state) => state.settings);
   const powerState = useServerStore((state) => state.databaseInstanceUsage?.state);
   const powerAction = useServerStore((state) => state.databaseInstancePowerAction);
+  const restoring = useServerStore((state) => state.databaseInstance?.status === 'restoring_backup');
+  const restoreProgress = useServerStore((state) => state.databaseInstanceRestoreProgress);
+  const restoreTotal = useServerStore((state) => state.databaseInstanceRestoreTotal);
   const {
     setDatabaseInstance,
     clearDatabaseInstance,
@@ -117,6 +127,7 @@ export default function DatabaseInstanceView() {
   );
   const canSeeDatabaseInstanceDatabases = useServerCan('database-instances.databases');
   const canSeeDatabaseInstanceUsers = useServerCan('database-instances.users');
+  const canSeeBackups = useServerCan('backups.read');
   const canSeeLogs = useServerCan('database-instances.logs');
 
   const resource = useResource({
@@ -312,7 +323,7 @@ export default function DatabaseInstanceView() {
       {(instance) => {
         const showDatabasesTab = canSeeDatabaseInstanceDatabases && instance.type !== 'redis';
         const showUsersTab = canSeeDatabaseInstanceUsers;
-        const anyTab = showDatabasesTab || showUsersTab || canSeeLogs;
+        const anyTab = showDatabasesTab || showUsersTab || canSeeBackups || canSeeLogs;
         const offline = !powerState || powerState === 'offline';
 
         return (
@@ -358,6 +369,19 @@ export default function DatabaseInstanceView() {
             )}
 
             <Stack gap='lg'>
+              {restoring && (
+                <Notification loading>
+                  <span className='flex flex-row items-center'>
+                    {t('pages.server.databases.instance.backups.notification.restoring', {})}
+                    <EstimatedTimeArrival className='ml-1' progress={restoreProgress} total={restoreTotal} />
+                  </span>
+
+                  <Tooltip label={bytesProgressString(restoreProgress, restoreTotal)} innerClassName='w-full'>
+                    <Progress indeterminate={!restoreTotal} value={(restoreProgress / restoreTotal) * 100} />
+                  </Tooltip>
+                </Notification>
+              )}
+
               <Group justify='space-between'>
                 <Group gap='md'>
                   <Title order={1}>{instance.name}</Title>
@@ -374,6 +398,11 @@ export default function DatabaseInstanceView() {
                       {t('pages.server.databases.instance.updateAvailable', {})}
                     </Badge>
                   )}
+                  {restoring && (
+                    <Badge color='orange' size='lg'>
+                      {t('pages.server.databases.instance.backups.badge.restoring', {})}
+                    </Badge>
+                  )}
                 </Group>
 
                 <Group>
@@ -381,7 +410,7 @@ export default function DatabaseInstanceView() {
                   <ServerCan action='database-instances.power'>
                     <Button
                       color='green'
-                      disabled={!connected || powerState !== 'offline' || powerAction !== null}
+                      disabled={!connected || restoring || powerState !== 'offline' || powerAction !== null}
                       loading={powerState === 'starting' || powerAction === 'start'}
                       onClick={() => onPowerAction('start')}
                     >
@@ -389,7 +418,7 @@ export default function DatabaseInstanceView() {
                     </Button>
                     <Button
                       color='gray'
-                      disabled={!connected || !powerState || powerAction !== null}
+                      disabled={!connected || restoring || !powerState || powerAction !== null}
                       loading={powerAction === 'restart'}
                       onClick={() => onPowerAction('restart')}
                     >
@@ -397,7 +426,9 @@ export default function DatabaseInstanceView() {
                     </Button>
                     <Button
                       color='red'
-                      disabled={!connected || !powerState || powerState === 'offline' || powerAction !== null}
+                      disabled={
+                        !connected || restoring || !powerState || powerState === 'offline' || powerAction !== null
+                      }
                       loading={powerAction === 'stop'}
                       onClick={() => (killable ? setOpenModal('kill') : onPowerAction('stop'))}
                     >
@@ -476,7 +507,9 @@ export default function DatabaseInstanceView() {
 
               {anyTab && (
                 <Tabs
-                  defaultValue={showDatabasesTab ? 'databases' : showUsersTab ? 'users' : 'logs'}
+                  defaultValue={
+                    showDatabasesTab ? 'databases' : showUsersTab ? 'users' : canSeeBackups ? 'backups' : 'logs'
+                  }
                   keepMounted={false}
                 >
                   <Tabs.List>
@@ -488,6 +521,11 @@ export default function DatabaseInstanceView() {
                     {showUsersTab && (
                       <Tabs.Tab value='users' leftSection={<FontAwesomeIcon icon={faUsers} />}>
                         {t('pages.server.databases.instance.view.tabs.users', {})}
+                      </Tabs.Tab>
+                    )}
+                    {canSeeBackups && (
+                      <Tabs.Tab value='backups' leftSection={<FontAwesomeIcon icon={faBoxArchive} />}>
+                        {t('pages.server.databases.instance.view.tabs.backups', {})}
                       </Tabs.Tab>
                     )}
                     {canSeeLogs && (
@@ -505,6 +543,11 @@ export default function DatabaseInstanceView() {
                   {showUsersTab && (
                     <Tabs.Panel value='users' pt='xs'>
                       <DatabaseInstanceUsers instance={instance} offline={offline} />
+                    </Tabs.Panel>
+                  )}
+                  {canSeeBackups && (
+                    <Tabs.Panel value='backups' pt='xs'>
+                      <DatabaseInstanceBackups instance={instance} offline={offline} />
                     </Tabs.Panel>
                   )}
                   {canSeeLogs && (

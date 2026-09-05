@@ -51,14 +51,25 @@ mod post {
             Server::invalidate_cached(&state.database, server.uuid).await;
         }
 
-        sqlx::query!(
-            "UPDATE server_backups
-            SET successful = false, completed = NOW()
-            WHERE server_backups.uuid = ANY($1)",
-            &backups.into_iter().map(|b| b.uuid).collect::<Vec<_>>()
-        )
-        .execute(state.database.write())
-        .await?;
+        tokio::try_join!(
+            sqlx::query!(
+                "UPDATE server_database_instances
+                SET status = NULL
+                FROM servers
+                WHERE servers.uuid = server_database_instances.server_uuid
+                    AND servers.node_uuid = $1
+                    AND server_database_instances.status IS NOT NULL",
+                node.uuid
+            )
+            .execute(state.database.write()),
+            sqlx::query!(
+                "UPDATE server_backups
+                SET successful = false, completed = NOW()
+                WHERE server_backups.uuid = ANY($1)",
+                &backups.into_iter().map(|b| b.uuid).collect::<Vec<_>>()
+            )
+            .execute(state.database.write())
+        )?;
 
         tokio::spawn({
             let state = state.clone();

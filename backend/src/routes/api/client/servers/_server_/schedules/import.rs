@@ -95,16 +95,16 @@ mod post {
             .await?;
 
         for (index, schedule_step) in data.steps.iter().take(max_schedule_step_count).enumerate() {
-            if let Some(permission) = schedule_step.action.permission()
-                && permissions.has_server_permission(permission).is_err()
-            {
-                transaction.rollback().await.ok();
-                return ApiResponse::error(format!(
-                    "unable to import schedule step #{} that requires permission: {permission}",
-                    index + 1
-                ))
-                .with_status(StatusCode::FORBIDDEN)
-                .ok();
+            for permission in schedule_step.action.permissions() {
+                if permissions.has_server_permission(permission).is_err() {
+                    transaction.rollback().await.ok();
+                    return ApiResponse::error(format!(
+                        "unable to import schedule step #{} that requires permission: {permission}",
+                        index + 1
+                    ))
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+                }
             }
 
             let options = shared::models::server_schedule_step::CreateServerScheduleStepOptions {

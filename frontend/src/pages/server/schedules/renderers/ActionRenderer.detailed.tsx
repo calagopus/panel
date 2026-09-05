@@ -172,6 +172,46 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
               })}
             </Text>
           )}
+          {action.backupGroupUuid && (
+            <Text size='xs' c='dimmed'>
+              {t('pages.server.schedules.steps.createBackup.renderer.detail.backupGroup', {
+                uuid: action.backupGroupUuid,
+              })}
+            </Text>
+          )}
+        </Stack>
+      );
+    case 'create_database_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>
+            {!action.name
+              ? t('pages.server.schedules.steps.createBackup.renderer.detail.backupNameAuto', {})
+              : tReact('pages.server.schedules.steps.createBackup.renderer.detail.backupName', {
+                  name: <ScheduleDynamicParameterRenderer value={action.name} />,
+                })}
+          </Text>
+          <Text size='sm'>
+            {t('pages.server.schedules.steps.createDatabaseBackup.renderer.detail.databaseInstance', {
+              uuid: action.databaseInstanceUuid,
+            })}
+          </Text>
+          <ForegroundText foreground={action.foreground} />
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+          {action.outputInto && (
+            <Text size='sm'>
+              {tReact('pages.server.schedules.steps.createBackup.renderer.detail.outputInto', {
+                variable: <ScheduleDynamicParameterRenderer value={action.outputInto} />,
+              })}
+            </Text>
+          )}
+          {action.backupGroupUuid && (
+            <Text size='xs' c='dimmed'>
+              {t('pages.server.schedules.steps.createBackup.renderer.detail.backupGroup', {
+                uuid: action.backupGroupUuid,
+              })}
+            </Text>
+          )}
         </Stack>
       );
     case 'restore_backup':
@@ -202,6 +242,61 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
       return (
         <Stack gap='xs'>
           <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {action.backupGroupUuid
+              ? t('pages.server.schedules.steps.moveBackup.renderer.detail.targetGroup', {
+                  uuid: action.backupGroupUuid,
+                })
+              : t('pages.server.schedules.steps.moveBackup.renderer.detail.targetGroupNone', {})}
+          </Text>
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+        </Stack>
+      );
+    case 'restore_database_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {action.sourceDatabaseInstanceUuid
+              ? t('pages.server.schedules.renderer.sourceDatabaseInstance', {
+                  uuid: action.sourceDatabaseInstanceUuid,
+                })
+              : t('pages.server.schedules.renderer.sourceDatabaseInstanceAny', {})}
+          </Text>
+          <Text size='sm'>
+            {action.databaseInstanceUuid
+              ? t('pages.server.schedules.steps.restoreDatabaseBackup.renderer.detail.targetDatabaseInstance', {
+                  uuid: action.databaseInstanceUuid,
+                })
+              : t(
+                  'pages.server.schedules.steps.restoreDatabaseBackup.renderer.detail.targetDatabaseInstanceSource',
+                  {},
+                )}
+          </Text>
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+        </Stack>
+      );
+    case 'delete_database_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {action.databaseInstanceUuid
+              ? t('pages.server.schedules.renderer.sourceDatabaseInstance', { uuid: action.databaseInstanceUuid })
+              : t('pages.server.schedules.renderer.sourceDatabaseInstanceAny', {})}
+          </Text>
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+        </Stack>
+      );
+    case 'move_database_backup':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>{renderBackupSelector(action.backup)}</Text>
+          <Text size='xs' c='dimmed'>
+            {action.databaseInstanceUuid
+              ? t('pages.server.schedules.renderer.sourceDatabaseInstance', { uuid: action.databaseInstanceUuid })
+              : t('pages.server.schedules.renderer.sourceDatabaseInstanceAny', {})}
+          </Text>
           <Text size='xs' c='dimmed'>
             {action.backupGroupUuid
               ? t('pages.server.schedules.steps.moveBackup.renderer.detail.targetGroup', {

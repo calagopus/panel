@@ -19,6 +19,9 @@ mod delete {
         (status = OK, body = inline(Response)),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
+        (status = BAD_REQUEST, body = ApiError),
+        (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "server" = uuid::Uuid,
@@ -54,9 +57,15 @@ mod delete {
                 .await
             {
                 Ok(_) => {}
-                Err(db_agent_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, err)) => {
+                Err(db_agent_api::client::ApiHttpError::Http(
+                    status @ (StatusCode::NOT_FOUND
+                    | StatusCode::BAD_REQUEST
+                    | StatusCode::CONFLICT
+                    | StatusCode::EXPECTATION_FAILED),
+                    err,
+                )) => {
                     return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                        .with_status(StatusCode::NOT_FOUND)
+                        .with_status(status)
                         .ok();
                 }
                 Err(err) => return Err(err.into()),

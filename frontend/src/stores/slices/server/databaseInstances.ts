@@ -20,6 +20,8 @@ export interface DatabaseInstancesSlice {
   databaseInstanceUsage: z.infer<typeof serverDatabaseInstanceResourceUsageSchema> | null;
   databaseInstanceLogs: string[];
   databaseInstancePowerAction: z.infer<typeof serverDatabaseInstancePowerAction> | null;
+  databaseInstanceRestoreProgress: number;
+  databaseInstanceRestoreTotal: number;
   databaseInstanceImagePulls: Map<string, z.infer<typeof serverDatabaseInstanceImagePullProgressSchema>>;
   databaseInstanceOperations: Map<string, z.infer<typeof serverDatabaseInstanceOperationSchema>>;
   failedDatabaseInstanceOperations: Map<string, number>;
@@ -27,9 +29,11 @@ export interface DatabaseInstancesSlice {
   _failedDatabaseInstanceOperationTimeouts: Map<string, ReturnType<typeof setTimeout>>;
 
   setDatabaseInstance: (instance: z.infer<typeof serverDatabaseInstanceSchema>) => void;
+  updateDatabaseInstance: (updatedProps: Partial<z.infer<typeof serverDatabaseInstanceSchema>>) => void;
   setDatabaseInstanceUsage: (usage: z.infer<typeof serverDatabaseInstanceResourceUsageSchema>) => void;
   setDatabaseInstanceState: (state: z.infer<typeof serverDatabaseInstancePowerStateSchema>) => void;
   setDatabaseInstancePowerAction: (action: z.infer<typeof serverDatabaseInstancePowerAction> | null) => void;
+  setDatabaseInstanceRestoreProgress: (progress: number, total: number) => void;
   addDatabaseInstanceLog: (line: string) => void;
   clearDatabaseInstanceLogs: () => void;
 
@@ -67,6 +71,8 @@ export const createDatabaseInstancesSlice: StateCreator<ServerStore, [], [], Dat
     databaseInstanceUsage: null,
     databaseInstanceLogs: [],
     databaseInstancePowerAction: null,
+    databaseInstanceRestoreProgress: 0,
+    databaseInstanceRestoreTotal: 0,
     databaseInstanceImagePulls: new Map<string, z.infer<typeof serverDatabaseInstanceImagePullProgressSchema>>(),
     databaseInstanceOperations: new Map<string, z.infer<typeof serverDatabaseInstanceOperationSchema>>(),
     failedDatabaseInstanceOperations: new Map<string, number>(),
@@ -87,11 +93,17 @@ export const createDatabaseInstancesSlice: StateCreator<ServerStore, [], [], Dat
           databaseInstanceUsage: null,
           databaseInstanceLogs: [],
           databaseInstancePowerAction: null,
+          databaseInstanceRestoreProgress: 0,
+          databaseInstanceRestoreTotal: 0,
           databaseInstanceImagePulls: new Map(),
           databaseInstanceOperations: new Map(),
           failedDatabaseInstanceOperations: new Map(),
         };
       }),
+    updateDatabaseInstance: (updatedProps) =>
+      set((state) =>
+        state.databaseInstance ? { ...state, databaseInstance: { ...state.databaseInstance, ...updatedProps } } : state,
+      ),
     setDatabaseInstanceUsage: (usage) =>
       set((state) => ({
         ...state,
@@ -115,6 +127,8 @@ export const createDatabaseInstancesSlice: StateCreator<ServerStore, [], [], Dat
       set((state) =>
         state.databaseInstancePowerAction === action ? state : { ...state, databaseInstancePowerAction: action },
       ),
+    setDatabaseInstanceRestoreProgress: (progress, total) =>
+      set((state) => ({ ...state, databaseInstanceRestoreProgress: progress, databaseInstanceRestoreTotal: total })),
     addDatabaseInstanceLog: (line) =>
       set((state) => {
         const lines = [...state.databaseInstanceLogs, line];
@@ -207,6 +221,8 @@ export const createDatabaseInstancesSlice: StateCreator<ServerStore, [], [], Dat
           databaseInstanceUsage: null,
           databaseInstanceLogs: [],
           databaseInstancePowerAction: null,
+          databaseInstanceRestoreProgress: 0,
+          databaseInstanceRestoreTotal: 0,
           databaseInstanceImagePulls: new Map(),
           databaseInstanceOperations: new Map(),
           failedDatabaseInstanceOperations: new Map(),

@@ -3,7 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
     use crate::routes::api::client::servers::_server_::databases::instances::_instance_::GetServerDatabaseInstance;
-    use axum::extract::Path;
+    use axum::{extract::Path, http::StatusCode};
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
@@ -19,6 +19,9 @@ mod post {
         (status = OK, body = inline(Response)),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
+        (status = BAD_REQUEST, body = ApiError),
+        (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "server" = uuid::Uuid,
@@ -46,7 +49,7 @@ mod post {
         permissions.has_server_permission("database-instances.recreate")?;
 
         tokio::spawn(async move {
-            database_instance
+            match database_instance
                 .database_agent_host
                 .api_client(&state.database)
                 .await?
@@ -54,7 +57,22 @@ mod post {
                     database_instance.uuid,
                     database,
                 )
-                .await?;
+                .await
+            {
+                Ok(_) => {}
+                Err(db_agent_api::client::ApiHttpError::Http(
+                    status @ (StatusCode::NOT_FOUND
+                    | StatusCode::BAD_REQUEST
+                    | StatusCode::CONFLICT
+                    | StatusCode::EXPECTATION_FAILED),
+                    err,
+                )) => {
+                    return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
+                        .with_status(status)
+                        .ok();
+                }
+                Err(err) => return Err(err.into()),
+            }
 
             activity_logger
                 .log(

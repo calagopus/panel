@@ -62,6 +62,20 @@ impl BackupDisk {
     }
 }
 
+#[derive(Debug, ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "server_backup_kind", rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ServerBackupKind {
+    Server,
+    DatabaseInstance,
+}
+
+pub struct ServerBackupFilter {
+    pub kind: Option<ServerBackupKind>,
+    pub database_instance_uuid: Option<uuid::Uuid>,
+    pub database_type: Option<db_agent_api::DatabaseAgentType>,
+}
+
 pub struct ServerBackupRestoreOptions {
     pub truncate_directory: bool,
     pub restore_startup: bool,
@@ -113,7 +127,10 @@ pub struct ServerBackup {
     pub backup_configuration: Option<Fetchable<super::backup_configuration::BackupConfiguration>>,
     pub backup_group_uuid: Option<uuid::Uuid>,
     pub system_backup_policy_uuid: Option<uuid::Uuid>,
+    pub database_instance_uuid: Option<uuid::Uuid>,
 
+    pub kind: ServerBackupKind,
+    pub database_type: Option<db_agent_api::DatabaseAgentType>,
     pub name: compact_str::CompactString,
     pub successful: bool,
     pub browsable: bool,
@@ -189,6 +206,18 @@ impl BaseModel for ServerBackup {
             (
                 "server_backups.system_backup_policy_uuid",
                 compact_str::format_compact!("{prefix}system_backup_policy_uuid"),
+            ),
+            (
+                "server_backups.database_instance_uuid",
+                compact_str::format_compact!("{prefix}database_instance_uuid"),
+            ),
+            (
+                "server_backups.kind",
+                compact_str::format_compact!("{prefix}kind"),
+            ),
+            (
+                "server_backups.database_type",
+                compact_str::format_compact!("{prefix}database_type"),
             ),
             (
                 "server_backups.name",
@@ -292,6 +321,11 @@ impl BaseModel for ServerBackup {
             system_backup_policy_uuid: row.try_get(
                 compact_str::format_compact!("{prefix}system_backup_policy_uuid").as_str(),
             )?,
+            database_instance_uuid: row
+                .try_get(compact_str::format_compact!("{prefix}database_instance_uuid").as_str())?,
+            kind: row.try_get(compact_str::format_compact!("{prefix}kind").as_str())?,
+            database_type: row
+                .try_get(compact_str::format_compact!("{prefix}database_type").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             successful: row.try_get(compact_str::format_compact!("{prefix}successful").as_str())?,
             browsable: row.try_get(compact_str::format_compact!("{prefix}browsable").as_str())?,
@@ -346,6 +380,19 @@ impl ServerBackup {
             .into());
         }
 
+        if options.database_instance.is_some()
+            && matches!(
+                backup_configuration.backup_disk,
+                BackupDisk::Btrfs | BackupDisk::Zfs
+            )
+        {
+            return Err(crate::response::DisplayError::new(
+                "database backups cannot be created on a btrfs or zfs backup configuration",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
         let mut transaction = state.database.write().begin().await?;
 
         let mut query_builder = InsertQueryBuilder::new("server_backups");
@@ -361,6 +408,15 @@ impl ServerBackup {
             .set(
                 "system_backup_policy_uuid",
                 options.system_backup_policy_uuid,
+            )
+            .set(
+                "database_instance_uuid",
+                options.database_instance.map(|instance| instance.uuid),
+            )
+            .set("kind", options.kind())
+            .set(
+                "database_type",
+                options.database_instance.map(|instance| instance.r#type),
             )
             .set("name", &options.name)
             .set("ignored_files", &options.ignored_files)
@@ -408,6 +464,7 @@ impl ServerBackup {
         server_uuid: uuid::Uuid,
         name: Option<&str>,
         backup_group_uuid: Option<uuid::Uuid>,
+        filter: &ServerBackupFilter,
         oldest: bool,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
@@ -423,6 +480,9 @@ impl ServerBackup {
                 AND server_backups.system_backup_policy_uuid IS NULL
                 AND ($2 IS NULL OR server_backups.name = $2)
                 AND ($3::uuid IS NULL OR server_backups.backup_group_uuid = $3)
+                AND ($4::server_backup_kind IS NULL OR server_backups.kind = $4)
+                AND ($5::uuid IS NULL OR server_backups.database_instance_uuid = $5)
+                AND ($6::database_agent_type IS NULL OR server_backups.database_type = $6)
             ORDER BY server_backups.created {}
             LIMIT 1
             "#,
@@ -432,6 +492,9 @@ impl ServerBackup {
         .bind(server_uuid)
         .bind(name)
         .bind(backup_group_uuid)
+        .bind(filter.kind)
+        .bind(filter.database_instance_uuid)
+        .bind(filter.database_type)
         .fetch_optional(database.read())
         .await?;
 
@@ -508,6 +571,7 @@ impl ServerBackup {
         page: i64,
         per_page: i64,
         search: Option<&str>,
+        filter: &ServerBackupFilter,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
@@ -521,14 +585,20 @@ impl ServerBackup {
                 AND server_backups.system_backup_policy_uuid IS NULL
                 AND server_backups.deleted IS NULL
                 AND ($3 IS NULL OR server_backups.name ILIKE '%' || $3 || '%')
+                AND ($4::server_backup_kind IS NULL OR server_backups.kind = $4)
+                AND ($5::uuid IS NULL OR server_backups.database_instance_uuid = $5)
+                AND ($6::database_agent_type IS NULL OR server_backups.database_type = $6)
             ORDER BY server_backups.created
-            LIMIT $4 OFFSET $5
+            LIMIT $7 OFFSET $8
             "#,
             Self::columns_sql(None)
         )))
         .bind(server_uuid)
         .bind(node_uuid)
         .bind(search)
+        .bind(filter.kind)
+        .bind(filter.database_instance_uuid)
+        .bind(filter.database_type)
         .bind(per_page)
         .bind(offset)
         .fetch_all(database.read())
@@ -602,6 +672,7 @@ impl ServerBackup {
         page: i64,
         per_page: i64,
         search: Option<&str>,
+        filter: &ServerBackupFilter,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         let offset = (page - 1) * per_page;
 
@@ -616,14 +687,20 @@ impl ServerBackup {
                 AND server_backups.system_backup_policy_uuid IS NULL
                 AND server_backups.deleted IS NULL
                 AND ($3 IS NULL OR server_backups.name ILIKE '%' || $3 || '%')
+                AND ($4::server_backup_kind IS NULL OR server_backups.kind = $4)
+                AND ($5::uuid IS NULL OR server_backups.database_instance_uuid = $5)
+                AND ($6::database_agent_type IS NULL OR server_backups.database_type = $6)
             ORDER BY server_backups.created
-            LIMIT $4 OFFSET $5
+            LIMIT $7 OFFSET $8
             "#,
             Self::columns_sql(None)
         )))
         .bind(server_uuid)
         .bind(node_uuid)
         .bind(search)
+        .bind(filter.kind)
+        .bind(filter.database_instance_uuid)
+        .bind(filter.database_type)
         .bind(per_page)
         .bind(offset)
         .fetch_all(database.read())
@@ -639,6 +716,32 @@ impl ServerBackup {
                 .into_iter()
                 .map(|row| Self::map(None, &row))
                 .try_collect_vec()?,
+        })
+    }
+
+    pub async fn usage_by_server_uuid(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+    ) -> Result<ServerBackupUsage, sqlx::Error> {
+        let row = sqlx::query!(
+            r#"
+            SELECT
+                COUNT(*) FILTER (WHERE server_backups.kind = 'SERVER') AS "server!",
+                COUNT(*) FILTER (WHERE server_backups.kind = 'DATABASE_INSTANCE') AS "database_instance!"
+            FROM server_backups
+            WHERE
+                server_backups.server_uuid = $1
+                AND server_backups.system_backup_policy_uuid IS NULL
+                AND server_backups.deleted IS NULL
+            "#,
+            server_uuid
+        )
+        .fetch_one(database.read())
+        .await?;
+
+        Ok(ServerBackupUsage {
+            server: row.server,
+            database_instance: row.database_instance,
         })
     }
 
@@ -1056,6 +1159,31 @@ impl ServerBackup {
         }))
     }
 
+    #[inline]
+    pub fn generate_database_metadata(
+        database_instance: &super::server_database_instance::ServerDatabaseInstance,
+    ) -> serde_json::Value {
+        serde_json::json!({
+            "source_instance": {
+                "uuid": database_instance.uuid,
+                "name": database_instance.name,
+            },
+            "image": database_instance.image,
+            "template_version": database_instance.template_version,
+        })
+    }
+
+    /// The file name (without compression suffix) wings stores a database dump under.
+    #[inline]
+    pub fn database_dump_name(&self) -> compact_str::CompactString {
+        compact_str::format_compact!(
+            "{}.{}",
+            self.uuid,
+            self.database_type
+                .map_or("dump", db_agent_api::DatabaseAgentType::dump_extension)
+        )
+    }
+
     pub async fn download_url(
         &self,
         state: &crate::State,
@@ -1121,6 +1249,7 @@ impl ServerBackup {
 
             backup_uuid: uuid::Uuid,
             unique_id: uuid::Uuid,
+            database: bool,
         }
 
         let token = node.create_jwt(
@@ -1139,6 +1268,7 @@ impl ServerBackup {
                 },
                 backup_uuid: self.uuid,
                 unique_id: uuid::Uuid::new_v4(),
+                database: self.kind == ServerBackupKind::DatabaseInstance,
             },
         )?;
 
@@ -1159,6 +1289,14 @@ impl ServerBackup {
         mut server: super::server::Server,
         options: ServerBackupRestoreOptions,
     ) -> Result<(), anyhow::Error> {
+        if self.kind != ServerBackupKind::Server {
+            return Err(crate::response::DisplayError::new(
+                "database instance backups cannot be restored to server files",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
         let backup_configuration = self
             .backup_configuration
             .as_ref()
@@ -1197,6 +1335,86 @@ impl ServerBackup {
                     adapter: self.disk.to_wings_adapter(),
                     download_url: self.wings_restore_download_url(state, server.uuid).await?,
                     truncate_directory: options.truncate_directory,
+                },
+            )
+            .await?;
+
+        Self::get_event_emitter().emit(
+            state.clone(),
+            ServerBackupEvent::RestoreStarted {
+                backup: Box::new(self),
+                server: Box::new(server),
+            },
+        );
+
+        Ok(())
+    }
+
+    pub async fn restore_database(
+        self,
+        state: &crate::State,
+        server: super::server::Server,
+        database_instance: &super::server_database_instance::ServerDatabaseInstance,
+        request_uuid: Option<uuid::Uuid>,
+    ) -> Result<(), anyhow::Error> {
+        if self.kind != ServerBackupKind::DatabaseInstance {
+            return Err(crate::response::DisplayError::new(
+                "only database instance backups can be restored into a database instance",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        if self.server.as_ref().map(|server| server.uuid) != Some(database_instance.server.uuid) {
+            return Err(crate::response::DisplayError::new(
+                "backup does not belong to this database instance's server",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        if self.database_type != Some(database_instance.r#type) {
+            return Err(crate::response::DisplayError::new(
+                "backup was taken from a different database engine",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        let backup_configuration = self
+            .backup_configuration
+            .as_ref()
+            .ok_or_else(|| {
+                crate::response::DisplayError::new(
+                    "no backup configuration available, unable to restore backup",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED)
+            })?
+            .fetch_cached(&state.database)
+            .await?;
+
+        if backup_configuration.maintenance_enabled {
+            return Err(crate::response::DisplayError::new(
+                "cannot restore backup while backup configuration is in maintenance mode",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .into());
+        }
+
+        server
+            .node
+            .fetch_cached(&state.database)
+            .await?
+            .api_client(&state.database)
+            .await?
+            .post_servers_server_database_backup_backup_restore(
+                server.uuid,
+                self.uuid,
+                &wings_api::servers_server_database_backup_backup_restore::post::RequestBody {
+                    adapter: self.disk.to_wings_adapter(),
+                    database_instance: database_instance.uuid,
+                    download_url: self.wings_restore_download_url(state, server.uuid).await?,
+                    request_uuid,
                 },
             )
             .await?;
@@ -1393,7 +1611,7 @@ impl ServerBackup {
 
         let file_path = match &self.upload_path {
             Some(path) => path.as_str(),
-            None => &Self::s3_path(server_uuid, self.uuid, compression_type),
+            None => &self.s3_path(server_uuid, compression_type),
         };
 
         let presigning_config = aws_sdk_s3::presigning::PresigningConfig::expires_in(
@@ -1500,9 +1718,10 @@ impl ServerBackup {
         }
     }
 
-    pub async fn evict_one_by_server_uuid(
+    pub async fn evict_one_by_server_uuid_kind(
         state: &crate::State,
         server: &super::server::Server,
+        kind: ServerBackupKind,
     ) -> Result<(), anyhow::Error> {
         let row = sqlx::query(
             r#"
@@ -1517,6 +1736,7 @@ impl ServerBackup {
                             SELECT COUNT(*)
                             FROM server_backups b2
                             WHERE b2.backup_group_uuid = server_backups.backup_group_uuid
+                                AND b2.kind = $2
                                 AND b2.deleted IS NULL
                                 AND b2.deleting IS NULL
                                 AND b2.successful
@@ -1530,6 +1750,7 @@ impl ServerBackup {
                 FROM server_backups
                 LEFT JOIN server_backup_groups g ON g.uuid = server_backups.backup_group_uuid
                 WHERE server_backups.server_uuid = $1
+                    AND server_backups.kind = $2
                     AND server_backups.system_backup_policy_uuid IS NULL
                     AND server_backups.locked = false
                     AND server_backups.completed IS NOT NULL
@@ -1541,6 +1762,7 @@ impl ServerBackup {
             "#,
         )
         .bind(server.uuid)
+        .bind(kind)
         .fetch_optional(state.database.read())
         .await?;
 
@@ -1579,8 +1801,7 @@ impl ServerBackup {
         Self::log_eviction_activity(
             state,
             server.uuid,
-            backup.uuid,
-            &backup.name,
+            &backup,
             rule,
             match row_group_name.as_deref() {
                 Some(group_name) => EvictionScope::Group(group_name),
@@ -1595,6 +1816,7 @@ impl ServerBackup {
     pub async fn rotate_group_for_create(
         state: &crate::State,
         group: &super::server_backup_group::ServerBackupGroup,
+        kind: ServerBackupKind,
     ) -> Result<GroupRotationOutcome, anyhow::Error> {
         let Some(retention_count) = group.retention_count else {
             return Ok(GroupRotationOutcome::NotConfigured);
@@ -1606,6 +1828,7 @@ impl ServerBackup {
                 (SELECT COUNT(*)
                     FROM server_backups
                     WHERE server_backups.backup_group_uuid = $1
+                        AND server_backups.kind = $2
                         AND server_backups.deleted IS NULL
                         AND server_backups.deleting IS NULL
                         AND server_backups.successful
@@ -1613,6 +1836,7 @@ impl ServerBackup {
                 (SELECT server_backups.uuid
                     FROM server_backups
                     WHERE server_backups.backup_group_uuid = $1
+                        AND server_backups.kind = $2
                         AND server_backups.deleted IS NULL
                         AND server_backups.deleting IS NULL
                         AND server_backups.successful
@@ -1623,6 +1847,7 @@ impl ServerBackup {
             "#,
         )
         .bind(group.uuid)
+        .bind(kind)
         .fetch_one(state.database.read())
         .await?;
 
@@ -1648,8 +1873,7 @@ impl ServerBackup {
         Self::log_eviction_activity(
             state,
             group.server_uuid,
-            backup.uuid,
-            &backup.name,
+            &backup,
             "group-rotation",
             EvictionScope::Group(group.name.as_str()),
         )
@@ -1695,8 +1919,7 @@ impl ServerBackup {
                 Self::log_eviction_activity(
                     state,
                     server_uuid,
-                    backup.uuid,
-                    &backup.name,
+                    &backup,
                     "retention-days",
                     EvictionScope::Group(group_name.as_str()),
                 )
@@ -1748,8 +1971,7 @@ impl ServerBackup {
             Self::log_eviction_activity(
                 state,
                 server_uuid,
-                backup.uuid,
-                &backup.name,
+                &backup,
                 "system-failed",
                 EvictionScope::Policy(system_backup_policy.name.as_str()),
             )
@@ -1811,8 +2033,7 @@ impl ServerBackup {
         Self::log_eviction_activity(
             state,
             server_uuid,
-            backup.uuid,
-            &backup.name,
+            &backup,
             "system-rotation",
             EvictionScope::Policy(system_backup_policy.name.as_str()),
         )
@@ -1911,8 +2132,7 @@ impl ServerBackup {
                 Self::log_eviction_activity(
                     state,
                     server_uuid,
-                    backup.uuid,
-                    &backup.name,
+                    &backup,
                     &rule,
                     EvictionScope::Policy(policy_name.as_str()),
                 )
@@ -1928,8 +2148,7 @@ impl ServerBackup {
     async fn log_eviction_activity(
         state: &crate::State,
         server_uuid: uuid::Uuid,
-        backup_uuid: uuid::Uuid,
-        backup_name: &str,
+        backup: &Self,
         rule: &str,
         scope: EvictionScope<'_>,
     ) {
@@ -1941,12 +2160,16 @@ impl ServerBackup {
                 impersonator_uuid: None,
                 api_key_uuid: None,
                 schedule_uuid: None,
-                event: "server:backup.delete".into(),
+                event: match backup.kind {
+                    ServerBackupKind::Server => "server:backup.delete".into(),
+                    ServerBackupKind::DatabaseInstance => "server:database-backup.delete".into(),
+                },
                 ip: None,
                 data: serde_json::json!({
                     "source": "eviction",
-                    "uuid": backup_uuid,
-                    "name": backup_name,
+                    "uuid": backup.uuid,
+                    "name": backup.name,
+                    "database_instance_uuid": backup.database_instance_uuid,
                     "rule": rule,
                     "group": scope.group_name(),
                     "policy": scope.policy_name(),
@@ -1973,12 +2196,17 @@ impl ServerBackup {
 
     #[inline]
     pub fn s3_path(
+        &self,
         server_uuid: uuid::Uuid,
-        backup_uuid: uuid::Uuid,
         compression_type: wings_api::CompressionType,
     ) -> compact_str::CompactString {
+        let base_name = match self.kind {
+            ServerBackupKind::Server => compact_str::format_compact!("{}.tar", self.uuid),
+            ServerBackupKind::DatabaseInstance => self.database_dump_name(),
+        };
+
         compact_str::format_compact!(
-            "{server_uuid}/{backup_uuid}.tar{}",
+            "{server_uuid}/{base_name}{}",
             match compression_type {
                 wings_api::CompressionType::None => "",
                 wings_api::CompressionType::Gz => ".gz",
@@ -1993,19 +2221,19 @@ impl ServerBackup {
 
     #[inline]
     pub fn s3_content_type(name: &str) -> &'static str {
-        if name.ends_with("tar") {
+        if name.ends_with(".tar") {
             "application/x-tar"
-        } else if name.ends_with(".tar.gz") {
+        } else if name.ends_with(".gz") {
             "application/x-gzip"
-        } else if name.ends_with(".tar.xz") {
+        } else if name.ends_with(".xz") {
             "application/x-xz"
-        } else if name.ends_with(".tar.lz") {
+        } else if name.ends_with(".lz") {
             "application/x-lzip"
-        } else if name.ends_with(".tar.bz2") {
+        } else if name.ends_with(".bz2") {
             "application/x-bzip2"
-        } else if name.ends_with(".tar.lz4") {
+        } else if name.ends_with(".lz4") {
             "application/x-lz4"
-        } else if name.ends_with(".tar.zst") {
+        } else if name.ends_with(".zst") {
             "application/zstd"
         } else {
             "application/octet-stream"
@@ -2039,6 +2267,9 @@ impl ServerBackup {
                 .await?,
             backup_group_uuid: self.backup_group_uuid,
             system_backup_policy_uuid: self.system_backup_policy_uuid,
+            database_instance_uuid: self.database_instance_uuid,
+            kind: self.kind,
+            database_type: self.database_type,
             name: self.name,
             ignored_files: self.ignored_files,
             is_successful: self.successful,
@@ -2085,6 +2316,9 @@ impl IntoAdminApiObject for ServerBackup {
                 },
                 backup_group_uuid: self.backup_group_uuid,
                 system_backup_policy_uuid: self.system_backup_policy_uuid,
+                database_instance_uuid: self.database_instance_uuid,
+                kind: self.kind,
+                database_type: self.database_type,
                 name: self.name,
                 ignored_files: self.ignored_files,
                 is_successful: self.successful,
@@ -2125,6 +2359,9 @@ impl IntoApiObject for ServerBackup {
             ApiServerBackup {
                 uuid: self.uuid,
                 backup_group_uuid: self.backup_group_uuid,
+                database_instance_uuid: self.database_instance_uuid,
+                kind: self.kind,
+                database_type: self.database_type,
                 name: self.name,
                 ignored_files: self.ignored_files,
                 is_successful: self.successful,
@@ -2158,11 +2395,24 @@ pub struct CreateServerBackupOptions<'a> {
     #[garde(skip)]
     pub system_backup_policy_uuid: Option<uuid::Uuid>,
     #[garde(skip)]
+    pub database_instance: Option<&'a super::server_database_instance::ServerDatabaseInstance>,
+    #[garde(skip)]
     pub backup_configuration: Option<super::backup_configuration::BackupConfiguration>,
     #[garde(skip)]
     pub ignored_files: Vec<compact_str::CompactString>,
     #[garde(skip)]
     pub metadata: serde_json::Value,
+}
+
+impl CreateServerBackupOptions<'_> {
+    #[inline]
+    pub fn kind(&self) -> ServerBackupKind {
+        if self.database_instance.is_some() {
+            ServerBackupKind::DatabaseInstance
+        } else {
+            ServerBackupKind::Server
+        }
+    }
 }
 
 #[async_trait::async_trait]
@@ -2217,6 +2467,21 @@ impl CreatableModel for ServerBackup {
             .into());
         }
 
+        if options.database_instance.is_some()
+            && matches!(
+                backup_configuration.backup_disk,
+                BackupDisk::Btrfs | BackupDisk::Zfs
+            )
+        {
+            return Err(anyhow::Error::new(
+                crate::response::DisplayError::new(
+                    "database backups cannot be created on a btrfs or zfs backup configuration",
+                )
+                .with_status(StatusCode::EXPECTATION_FAILED),
+            )
+            .into());
+        }
+
         let mut transaction = state.database.write().begin().await?;
 
         let mut query_builder = InsertQueryBuilder::new("server_backups");
@@ -2232,6 +2497,15 @@ impl CreatableModel for ServerBackup {
             .set(
                 "system_backup_policy_uuid",
                 options.system_backup_policy_uuid,
+            )
+            .set(
+                "database_instance_uuid",
+                options.database_instance.map(|instance| instance.uuid),
+            )
+            .set("kind", options.kind())
+            .set(
+                "database_type",
+                options.database_instance.map(|instance| instance.r#type),
             )
             .set("name", &options.name)
             .set("ignored_files", &options.ignored_files)
@@ -2253,7 +2527,10 @@ impl CreatableModel for ServerBackup {
         let server = options.server.clone();
         let database = Arc::clone(&state.database);
         let backup_uuid = backup.uuid;
-        let backup_disk = backup_configuration.backup_disk;
+        let backup_disk = backup.disk;
+        let database_dump = options
+            .database_instance
+            .map(|instance| (instance.uuid, instance.r#type.dump_extension()));
         let ignored_files_str = options
             .ignored_files
             .iter()
@@ -2306,17 +2583,33 @@ impl CreatableModel for ServerBackup {
                 }
             };
 
-            if let Err(err) = api_client
-                .post_servers_server_backup(
-                    server.uuid,
-                    &wings_api::servers_server_backup::post::RequestBody {
-                        adapter: backup_disk.to_wings_adapter(),
-                        uuid: backup_uuid,
-                        ignore: ignored_files_str.into(),
-                    },
-                )
-                .await
-            {
+            let result = match database_dump {
+                Some((database_instance, extension)) => api_client
+                    .post_servers_server_database_backup(
+                        server.uuid,
+                        &wings_api::servers_server_database_backup::post::RequestBody {
+                            adapter: backup_disk.to_wings_adapter(),
+                            uuid: backup_uuid,
+                            database_instance,
+                            extension: extension.into(),
+                        },
+                    )
+                    .await
+                    .map(|_| ()),
+                None => api_client
+                    .post_servers_server_backup(
+                        server.uuid,
+                        &wings_api::servers_server_backup::post::RequestBody {
+                            adapter: backup_disk.to_wings_adapter(),
+                            uuid: backup_uuid,
+                            ignore: ignored_files_str.into(),
+                        },
+                    )
+                    .await
+                    .map(|_| ()),
+            };
+
+            if let Err(err) = result {
                 tracing::error!(backup = %backup_uuid, "failed to create server backup: {:?}", err);
 
                 if let Err(err) = sqlx::query!(
@@ -2367,6 +2660,24 @@ impl UpdatableModel for ServerBackup {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
+
+        if let Some(Some(backup_group_uuid)) = options.backup_group_uuid {
+            let group = super::server_backup_group::ServerBackupGroup::by_uuid_with_transaction(
+                transaction,
+                backup_group_uuid,
+            )
+            .await?;
+
+            if Some(group.server_uuid) != self.server.as_ref().map(|server| server.uuid) {
+                return Err(anyhow::Error::new(
+                    crate::response::DisplayError::new(
+                        "backup group does not belong to this backup's server",
+                    )
+                    .with_status(StatusCode::EXPECTATION_FAILED),
+                )
+                .into());
+            }
+        }
 
         let mut query_builder = UpdateQueryBuilder::new("server_backups");
 
@@ -2514,7 +2825,7 @@ impl ServerBackup {
                 Some(path) => path,
                 None => {
                     if let Some(server) = &self.server {
-                        &Self::s3_path(server.uuid, self.uuid, compression_type)
+                        &self.s3_path(server.uuid, compression_type)
                     } else {
                         return Err(anyhow::anyhow!("backup upload path not found"));
                     }
@@ -2631,11 +2942,18 @@ impl ServerBackup {
                         impersonator_uuid: None,
                         api_key_uuid: None,
                         schedule_uuid: None,
-                        event: "server:backup.delete-failed".into(),
+                        event: match self.kind {
+                            ServerBackupKind::Server => "server:backup.delete-failed",
+                            ServerBackupKind::DatabaseInstance => {
+                                "server:database-backup.delete-failed"
+                            }
+                        }
+                        .into(),
                         ip: None,
                         data: serde_json::json!({
                             "uuid": self.uuid,
                             "name": self.name,
+                            "database_instance_uuid": self.database_instance_uuid,
                         }),
                         created: None,
                     },
@@ -2852,7 +3170,10 @@ pub struct AdminApiNodeServerBackup {
     pub node: super::node::AdminApiNode,
     pub backup_group_uuid: Option<uuid::Uuid>,
     pub system_backup_policy_uuid: Option<uuid::Uuid>,
+    pub database_instance_uuid: Option<uuid::Uuid>,
 
+    pub kind: ServerBackupKind,
+    pub database_type: Option<db_agent_api::DatabaseAgentType>,
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,
 
@@ -2883,7 +3204,10 @@ pub struct AdminApiServerBackup {
     pub server: Option<super::server::AdminApiServer>,
     pub backup_group_uuid: Option<uuid::Uuid>,
     pub system_backup_policy_uuid: Option<uuid::Uuid>,
+    pub database_instance_uuid: Option<uuid::Uuid>,
 
+    pub kind: ServerBackupKind,
+    pub database_type: Option<db_agent_api::DatabaseAgentType>,
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,
 
@@ -2904,6 +3228,13 @@ pub struct AdminApiServerBackup {
     pub created: chrono::DateTime<chrono::Utc>,
 }
 
+#[derive(ToSchema, Serialize)]
+#[schema(title = "ServerBackupUsage")]
+pub struct ServerBackupUsage {
+    pub server: i64,
+    pub database_instance: i64,
+}
+
 #[schema_extension_derive::extendible]
 #[init_args(ServerBackup, crate::State)]
 #[hook_args(crate::State)]
@@ -2912,7 +3243,10 @@ pub struct AdminApiServerBackup {
 pub struct ApiServerBackup {
     pub uuid: uuid::Uuid,
     pub backup_group_uuid: Option<uuid::Uuid>,
+    pub database_instance_uuid: Option<uuid::Uuid>,
 
+    pub kind: ServerBackupKind,
+    pub database_type: Option<db_agent_api::DatabaseAgentType>,
     pub name: compact_str::CompactString,
     pub ignored_files: Vec<compact_str::CompactString>,
 

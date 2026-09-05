@@ -241,9 +241,15 @@ mod patch {
             .await
         {
             Ok(_) => {}
-            Err(db_agent_api::client::ApiHttpError::Http(StatusCode::EXPECTATION_FAILED, err)) => {
+            Err(db_agent_api::client::ApiHttpError::Http(
+                status @ (StatusCode::NOT_FOUND
+                | StatusCode::BAD_REQUEST
+                | StatusCode::CONFLICT
+                | StatusCode::EXPECTATION_FAILED),
+                err,
+            )) => {
                 return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
-                    .with_status(StatusCode::EXPECTATION_FAILED)
+                    .with_status(status)
                     .ok();
             }
             Err(err) => return Err(err.into()),

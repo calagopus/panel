@@ -7,7 +7,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::server_backup::BackupDisk,
+        models::server_backup::{BackupDisk, ServerBackupKind},
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -23,6 +23,7 @@ mod get {
         backup_id_prefix: Option<compact_str::CompactString>,
 
         server_uuid: Option<uuid::Uuid>,
+        kind: ServerBackupKind,
         backup_created: chrono::DateTime<chrono::Utc>,
     }
 
@@ -73,6 +74,7 @@ mod get {
             fingerprint: pbs_configuration.fingerprint,
             backup_id_prefix: pbs_configuration.backup_id_prefix,
             server_uuid: backup.0.server.map(|server| server.uuid),
+            kind: backup.0.kind,
             backup_created: backup.0.created.and_utc(),
         })
         .ok()

@@ -71,8 +71,7 @@ export default function useServerBackupSocket() {
       isStreaming: wsData.streaming,
       completed: new Date(),
     });
-    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
-    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.system());
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.all());
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_DELETED, (uuid, data) => {
@@ -90,8 +89,7 @@ export default function useServerBackupSocket() {
       updateBackup(uuid, { deletionStatus: 'failed' });
     }
 
-    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.groups.all());
-    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.system());
+    invalidateCacheKey(queryKeys.server(serverStoreApi.getState().server.uuid).backups.all());
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_RESTORE_STARTED, () => {
@@ -120,5 +118,49 @@ export default function useServerBackupSocket() {
         : t('elements.serverWebsocket.listener.toast.backupRestoreCompleted', {}),
       failed ? 'error' : 'success',
     );
+  });
+
+  useWebsocketEvent(SocketEvent.DATABASE_BACKUP_RESTORE_STARTED, (_uuid, instanceUuid) => {
+    const state = serverStoreApi.getState();
+    if (state.databaseInstance?.uuid === instanceUuid) {
+      state.updateDatabaseInstance({ status: 'restoring_backup' });
+      state.setDatabaseInstanceRestoreProgress(0, 0);
+    }
+
+    invalidateCacheKey(queryKeys.server(state.server.uuid).databases.instances.all());
+  });
+
+  useWebsocketEvent(SocketEvent.DATABASE_BACKUP_RESTORE_PROGRESS, (_uuid, instanceUuid, data) => {
+    const state = serverStoreApi.getState();
+    if (state.databaseInstance?.uuid !== instanceUuid) {
+      return;
+    }
+
+    let wsData: { bytes_processed: number; bytes_total: number };
+    try {
+      wsData = JSON.parse(data);
+    } catch {
+      return;
+    }
+
+    state.setDatabaseInstanceRestoreProgress(wsData.bytes_processed, wsData.bytes_total);
+  });
+
+  useWebsocketEvent(SocketEvent.DATABASE_BACKUP_RESTORE_COMPLETED, (_uuid, instanceUuid, successful) => {
+    const state = serverStoreApi.getState();
+    if (state.databaseInstance?.uuid === instanceUuid) {
+      state.updateDatabaseInstance({ status: null });
+      state.setDatabaseInstanceRestoreProgress(0, 0);
+    }
+
+    const failed = successful === 'false';
+    addToast(
+      failed
+        ? t('pages.server.databases.instance.backups.toast.restoreFailed', {})
+        : t('pages.server.databases.instance.backups.toast.restoreCompleted', {}),
+      failed ? 'error' : 'success',
+    );
+
+    invalidateCacheKey(queryKeys.server(state.server.uuid).databases.instances.all());
   });
 }

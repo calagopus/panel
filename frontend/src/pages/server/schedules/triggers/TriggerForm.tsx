@@ -76,6 +76,22 @@ function BackupStatusTriggerForm({ form, index }: TriggerFormProps) {
   );
 }
 
+function DatabaseBackupStatusTriggerForm({ form, index }: TriggerFormProps) {
+  const { t } = useTranslations();
+
+  if (form.values.triggers[index].type !== 'database_backup_status') return null;
+
+  return (
+    <Select
+      withAsterisk
+      label={t('pages.server.schedules.triggers.databaseBackupStatus.form.backupStatus', {})}
+      className='flex-1'
+      data={mappingToSelectData(serverBackupStatusLabelMapping)}
+      {...form.getInputProps(`triggers.${index}.status`)}
+    />
+  );
+}
+
 function ScheduleCompletionTriggerForm({ form, index }: TriggerFormProps) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
@@ -227,6 +243,7 @@ const TRIGGER_INLINE_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFo
   power_action: PowerActionTriggerForm,
   server_state: ServerStateTriggerForm,
   backup_status: BackupStatusTriggerForm,
+  database_backup_status: DatabaseBackupStatusTriggerForm,
   schedule_completion: ScheduleCompletionTriggerForm,
   resource_usage: ResourceUsageTriggerForm,
   console_line: ConsoleLineTriggerForm,
@@ -238,6 +255,7 @@ const TRIGGER_EXTRA_FORMS: Record<ServerScheduleTriggerType, React.FC<TriggerFor
   power_action: null,
   server_state: null,
   backup_status: null,
+  database_backup_status: null,
   schedule_completion: ScheduleCompletionExtraForm,
   resource_usage: ResourceUsageExtraForm,
   console_line: ConsoleLineExtraForm,

@@ -130,14 +130,14 @@ mod post {
 
         permissions.has_server_permission("schedules.update")?;
 
-        if let Some(permission) = data.action.permission()
-            && permissions.has_server_permission(permission).is_err()
-        {
-            return ApiResponse::error(format!(
-                "unable to create schedule step that requires permission: {permission}"
-            ))
-            .with_status(StatusCode::FORBIDDEN)
-            .ok();
+        for permission in data.action.permissions() {
+            if permissions.has_server_permission(permission).is_err() {
+                return ApiResponse::error(format!(
+                    "unable to create schedule step that requires permission: {permission}"
+                ))
+                .with_status(StatusCode::FORBIDDEN)
+                .ok();
+            }
         }
 
         let steps_lock = state

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_database_instances\n                SET status = NULL\n                FROM servers\n                WHERE servers.uuid = server_database_instances.server_uuid\n                    AND servers.node_uuid = $1\n                    AND server_database_instances.status IS NOT NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2c34c6ed3ac94bdc893182e8579f94ee5ad4676bff31a4dd3bec20344f3db502"
+}

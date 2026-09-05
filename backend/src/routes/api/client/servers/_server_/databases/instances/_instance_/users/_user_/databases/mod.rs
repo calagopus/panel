@@ -38,6 +38,8 @@ mod put {
         (status = BAD_REQUEST, body = ApiError),
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
+        (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "server" = uuid::Uuid,
@@ -78,7 +80,7 @@ mod put {
             .collect();
 
         tokio::spawn(async move {
-            let response = database_instance
+            let response = match database_instance
                 .database_agent_host
                 .api_client(&state.database)
                 .await?
@@ -89,7 +91,22 @@ mod put {
                         databases,
                     },
                 )
-                .await?;
+                .await
+            {
+                Ok(response) => response,
+                Err(db_agent_api::client::ApiHttpError::Http(
+                    status @ (StatusCode::NOT_FOUND
+                    | StatusCode::BAD_REQUEST
+                    | StatusCode::CONFLICT
+                    | StatusCode::EXPECTATION_FAILED),
+                    err,
+                )) => {
+                    return ApiResponse::new_serialized(ApiError::new_database_agent_value(err))
+                        .with_status(status)
+                        .ok();
+                }
+                Err(err) => return Err(err.into()),
+            };
 
             activity_logger
                 .log(

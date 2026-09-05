@@ -51,6 +51,11 @@ export const serverScheduleTriggerBackupStatusSchema = z.object({
   status: z.enum(['starting', 'finished', 'failed']),
 });
 
+export const serverScheduleTriggerDatabaseBackupStatusSchema = z.object({
+  type: z.literal('database_backup_status'),
+  status: z.enum(['starting', 'finished', 'failed']),
+});
+
 export const serverScheduleTriggerConsoleLineSchema = z.object({
   type: z.literal('console_line'),
   contains: z.string(),
@@ -90,6 +95,7 @@ export const serverScheduleTriggerSchema = z.discriminatedUnion('type', [
   serverScheduleTriggerPowerActionSchema,
   serverScheduleTriggerServerStateSchema,
   serverScheduleTriggerBackupStatusSchema,
+  serverScheduleTriggerDatabaseBackupStatusSchema,
   serverScheduleTriggerScheduleCompletionSchema,
   serverScheduleTriggerResourceUsageSchema,
   serverScheduleTriggerConsoleLineSchema,
@@ -315,6 +321,16 @@ export const serverScheduleStepCreateBackupSchema = z.object({
   outputInto: serverScheduleStepVariableSchema.nullable(),
 });
 
+export const serverScheduleStepCreateDatabaseBackupSchema = z.object({
+  type: z.literal('create_database_backup'),
+  ignoreFailure: z.boolean(),
+  foreground: z.boolean(),
+  name: serverScheduleStepDynamicSchema.nullable(),
+  databaseInstanceUuid: z.uuid(),
+  backupGroupUuid: z.uuid().nullable().optional(),
+  outputInto: serverScheduleStepVariableSchema.nullable(),
+});
+
 export const serverScheduleStepBackupSelectorSchema = z.discriminatedUnion('mode', [
   z.object({
     mode: z.literal('latest'),
@@ -355,6 +371,29 @@ export const serverScheduleStepMoveBackupSchema = z.object({
   ignoreFailure: z.boolean(),
   backup: serverScheduleStepBackupSelectorSchema,
   backupGroupUuid: z.uuid().nullable().optional(),
+});
+
+export const serverScheduleStepDeleteDatabaseBackupSchema = z.object({
+  type: z.literal('delete_database_backup'),
+  ignoreFailure: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+  databaseInstanceUuid: z.uuid().nullable().optional(),
+});
+
+export const serverScheduleStepMoveDatabaseBackupSchema = z.object({
+  type: z.literal('move_database_backup'),
+  ignoreFailure: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+  databaseInstanceUuid: z.uuid().nullable().optional(),
+  backupGroupUuid: z.uuid().nullable().optional(),
+});
+
+export const serverScheduleStepRestoreDatabaseBackupSchema = z.object({
+  type: z.literal('restore_database_backup'),
+  ignoreFailure: z.boolean(),
+  backup: serverScheduleStepBackupSelectorSchema,
+  sourceDatabaseInstanceUuid: z.uuid().nullable().optional(),
+  databaseInstanceUuid: z.uuid().nullable().optional(),
 });
 
 export const serverScheduleStepCreateDirectorySchema = z.object({
@@ -484,9 +523,13 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepSendPowerSchema,
   serverScheduleStepSendCommandSchema,
   serverScheduleStepCreateBackupSchema,
+  serverScheduleStepCreateDatabaseBackupSchema,
   serverScheduleStepRestoreBackupSchema,
   serverScheduleStepDeleteBackupSchema,
   serverScheduleStepMoveBackupSchema,
+  serverScheduleStepDeleteDatabaseBackupSchema,
+  serverScheduleStepMoveDatabaseBackupSchema,
+  serverScheduleStepRestoreDatabaseBackupSchema,
   serverScheduleStepCreateDirectorySchema,
   serverScheduleStepWriteFileSchema,
   serverScheduleStepCopyFileSchema,

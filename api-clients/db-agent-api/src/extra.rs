@@ -130,6 +130,15 @@ impl DatabaseAgentType {
     }
 }
 
+impl PartialEq for DatabaseAgentType {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
+}
+
+impl Eq for DatabaseAgentType {}
+
 impl sqlx::Type<sqlx::Postgres> for DatabaseAgentType {
     fn type_info() -> sqlx::postgres::PgTypeInfo {
         sqlx::postgres::PgTypeInfo::with_name("database_agent_type")

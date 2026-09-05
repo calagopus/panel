@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { databaseAgentType } from '@/lib/schemas/generic.ts';
 import { nullableString } from '@/lib/serialization/transformers.ts';
 
+export const serverDatabaseInstanceStatus = z.enum(['restoring_backup']);
+
 export const serverDatabaseInstanceSchema = z.looseObject({
   uuid: z.string(),
   updateAvailable: z.boolean(),
@@ -10,6 +12,7 @@ export const serverDatabaseInstanceSchema = z.looseObject({
   port: z.number().nullable(),
   name: z.string(),
   isLocked: z.boolean(),
+  status: serverDatabaseInstanceStatus.nullable(),
   memory: z.number(),
   swap: z.number(),
   disk: z.number(),

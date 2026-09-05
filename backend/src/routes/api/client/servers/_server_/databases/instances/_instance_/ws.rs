@@ -10,7 +10,7 @@ use shared::{
     GetIp, GetState,
     models::{
         server::{GetServerActivityLogger, ServerActivityLogger},
-        server_database_instance::ServerDatabaseInstance,
+        server_database_instance::{ServerDatabaseInstance, ServerDatabaseInstanceStatus},
         user::{GetPermissionManager, PermissionManager},
     },
     response::ApiResponse,
@@ -27,6 +27,7 @@ type Upstream = SplitSink<
 >;
 
 struct InstanceWebsocketHandler {
+    state: State,
     sender: Mutex<SplitSink<WebSocket, Message>>,
     upstream: Mutex<Upstream>,
     permissions: PermissionManager,
@@ -98,6 +99,22 @@ impl InstanceWebsocketHandler {
                     {
                         self.send_error(
                             "cannot send power actions while database agent host is in maintenance mode",
+                        )
+                        .await;
+
+                        return true;
+                    }
+
+                    if matches!(
+                        ServerDatabaseInstance::status_by_uuid(
+                            &self.state.database,
+                            self.database_instance.uuid,
+                        )
+                        .await,
+                        Ok(Some(ServerDatabaseInstanceStatus::RestoringBackup))
+                    ) {
+                        self.send_error(
+                            "cannot send power actions while a backup is being restored into the database instance",
                         )
                         .await;
 
@@ -193,6 +210,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                         let (upstream_tx, mut upstream_rx) = upstream.split();
 
                         let websocket_handler = Arc::new(InstanceWebsocketHandler {
+                            state: Arc::clone(&state.0),
                             sender: Mutex::new(client_tx),
                             upstream: Mutex::new(upstream_tx),
                             permissions: permissions.0,

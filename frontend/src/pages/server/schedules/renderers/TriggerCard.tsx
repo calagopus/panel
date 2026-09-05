@@ -113,6 +113,12 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
               status: trigger.status,
             }).md()}
           </Text>
+        ) : trigger.type === 'database_backup_status' ? (
+          <Text component='div'>
+            {t('pages.server.schedules.triggers.databaseBackupStatus.card.content', {
+              status: trigger.status,
+            }).md()}
+          </Text>
         ) : trigger.type === 'schedule_completion' ? (
           <Text component='div'>
             {t('pages.server.schedules.triggers.scheduleCompletion.card.content', {

@@ -241,7 +241,6 @@ nestify::nest! {
         #[schema(inline)]
         pub rows_affected: u64,
         #[schema(inline)]
-        #[serde(default)]
         pub truncated: bool,
     }
 }
@@ -928,7 +927,6 @@ pub mod instances_instance_databases_database_explorer_schema {
                 #[schema(inline)]
                 pub tables: Vec<SchemaTable>,
                 #[schema(inline)]
-                #[serde(default)]
                 pub truncated: bool,
             }
         }
@@ -1220,12 +1218,15 @@ pub mod instances_instance_export {
 
         pub type Response404 = ApiError;
 
+        pub type Response409 = ApiError;
+
         pub type Response = Response200;
 
         #[derive(Debug, Clone, Default)]
         #[allow(clippy::manual_non_exhaustive)]
         pub struct Query {
             pub db: Option<compact_str::CompactString>,
+            pub lock: Option<bool>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1248,6 +1249,8 @@ pub mod instances_instance_import {
 
         pub type Response404 = ApiError;
 
+        pub type Response409 = ApiError;
+
         pub type Response = Response200;
 
         #[derive(Debug, Clone, Default)]
@@ -1256,6 +1259,7 @@ pub mod instances_instance_import {
             pub source_db: Option<compact_str::CompactString>,
             pub db: Option<compact_str::CompactString>,
             pub wipe: Option<bool>,
+            pub lock: Option<bool>,
             #[doc(hidden)]
             pub __priv: (),
         }
@@ -1277,6 +1281,8 @@ pub mod instances_instance_import_remote {
                 pub db: Option<compact_str::CompactString>,
                 #[schema(inline)]
                 pub wipe: bool,
+                #[schema(inline)]
+                pub lock: bool,
             }
         }
 
@@ -1403,6 +1409,8 @@ pub mod instances_instance_query {
         pub type Response400 = ApiError;
 
         pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
 
         pub type Response = Response200;
     }
@@ -1642,6 +1650,8 @@ pub mod system_config {
                 pub disk_check_interval: u64,
                 #[schema(inline)]
                 pub disk_check_concurrency: u64,
+                #[schema(inline)]
+                pub boot_autostart_concurrency: u64,
                 #[schema(inline)]
                 pub websocket_log_count: u64,
                 #[schema(inline)]

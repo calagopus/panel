@@ -12,6 +12,7 @@ pub enum DDLEntry {
     Tables { name: String },
     Sequences { name: String },
     Enums { name: String },
+    Checks { name: String },
     Columns { table: String, name: String },
     Indexes { table: String, name: String },
     Fks { table: String, name: String },

@@ -9,6 +9,7 @@ mod post {
         ApiError, GetState,
         models::{
             server::{GetServer, GetServerActivityLogger},
+            server_backup::ServerBackupKind,
             user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
@@ -91,6 +92,8 @@ mod post {
         }
 
         let backup_uuid = backup.uuid;
+        let backup_kind = backup.kind;
+        let database_instance_uuid = backup.database_instance_uuid;
         let backup_name = backup.name.clone();
         let path = data.path.clone();
 
@@ -120,10 +123,14 @@ mod post {
 
             activity_logger
                 .log(
-                    "server:backup.export",
+                    match backup_kind {
+                        ServerBackupKind::Server => "server:backup.export",
+                        ServerBackupKind::DatabaseInstance => "server:database-backup.export",
+                    },
                     serde_json::json!({
                         "uuid": backup_uuid,
                         "name": backup_name,
+                        "database_instance_uuid": database_instance_uuid,
                         "path": path,
                     }),
                 )

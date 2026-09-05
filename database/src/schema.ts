@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   char,
+  check,
   customType,
   index,
   inet,
@@ -66,6 +67,8 @@ export const backupDiskEnum = pgEnum('backup_disk', [
   'PROXMOX_BACKUP_SERVER',
   'KOPIA',
 ]);
+export const serverBackupKindEnum = pgEnum('server_backup_kind', ['SERVER', 'DATABASE_INSTANCE']);
+export const serverDatabaseInstanceStatusEnum = pgEnum('server_database_instance_status', ['RESTORING_BACKUP']);
 export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 export const tunnelProtocolEnum = pgEnum('tunnel_protocol', ['TCP', 'UDP']);
 
@@ -1217,6 +1220,9 @@ export const serverBackupsTable = pgTable(
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     backup_group_uuid: uuid().references(() => serverBackupGroupsTable.uuid, { onDelete: 'set null' }),
     system_backup_policy_uuid: uuid().references(() => systemBackupPoliciesTable.uuid, { onDelete: 'set null' }),
+    database_instance_uuid: uuid().references(() => serverDatabaseInstancesTable.uuid, { onDelete: 'set null' }),
+    database_type: databaseAgentTypeEnum(),
+    kind: serverBackupKindEnum().default('SERVER').notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     successful: boolean().default(false).notNull(),
     browsable: boolean().default(false).notNull(),
@@ -1243,8 +1249,13 @@ export const serverBackupsTable = pgTable(
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     index('server_backups_backup_group_uuid_idx').on(cols.backup_group_uuid),
     index('server_backups_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('server_backups_database_instance_uuid_idx').on(cols.database_instance_uuid),
     index('server_backups_successful_idx').on(cols.successful),
     index('server_backups_deleting_idx').on(cols.deleting),
+    check(
+      'server_backups_kind_database_type_check',
+      sql`(${cols.kind} = 'SERVER') = (${cols.database_type} IS NULL)`,
+    ),
   ],
 );
 
@@ -1286,6 +1297,7 @@ export const serverDatabaseInstancesTable = pgTable(
     }),
     type: databaseAgentTypeEnum().notNull(),
     name: varchar({ length: 31 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    status: serverDatabaseInstanceStatusEnum(),
     locked: boolean().default(false).notNull(),
     template_version: integer(),
     image: text(),

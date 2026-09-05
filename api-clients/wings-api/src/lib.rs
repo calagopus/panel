@@ -800,6 +800,12 @@ pub enum WebsocketEvent {
     BackupRestoreProgress,
     #[serde(rename = "backup restore completed")]
     BackupRestoreCompleted,
+    #[serde(rename = "database backup restore started")]
+    DatabaseBackupRestoreStarted,
+    #[serde(rename = "database backup restore progress")]
+    DatabaseBackupRestoreProgress,
+    #[serde(rename = "database backup restore completed")]
+    DatabaseBackupRestoreCompleted,
     #[serde(rename = "transfer logs")]
     TransferLogs,
     #[serde(rename = "transfer status")]
@@ -1210,6 +1216,68 @@ pub mod servers_server_commands {
         pub type Response417 = ApiError;
 
         pub type Response = Response200;
+    }
+}
+pub mod servers_server_database_backup {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub adapter: BackupAdapter,
+                #[schema(inline)]
+                pub uuid: uuid::Uuid,
+                #[schema(inline)]
+                pub database_instance: uuid::Uuid,
+                #[schema(inline)]
+                pub extension: compact_str::CompactString,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response409 = ApiError;
+
+        pub type Response = Response202;
+    }
+}
+pub mod servers_server_database_backup_backup_restore {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub adapter: BackupAdapter,
+                #[schema(inline)]
+                pub database_instance: uuid::Uuid,
+                #[schema(inline)]
+                pub download_url: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub request_uuid: Option<uuid::Uuid>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response202 {
+            }
+        }
+
+        pub type Response400 = ApiError;
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response202;
     }
 }
 pub mod servers_server_files_chmod {

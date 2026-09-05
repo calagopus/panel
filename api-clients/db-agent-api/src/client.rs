@@ -652,6 +652,9 @@ impl DbAgentClient {
         if let Some(value) = &query.db {
             query_parts.push(format!("db={}", urlencoding::encode(value)).into());
         }
+        if let Some(value) = query.lock {
+            query_parts.push(format!("lock={}", value).into());
+        }
         let query = if query_parts.is_empty() {
             String::new()
         } else {
@@ -682,6 +685,9 @@ impl DbAgentClient {
         }
         if let Some(value) = query.wipe {
             query_parts.push(format!("wipe={}", value).into());
+        }
+        if let Some(value) = query.lock {
+            query_parts.push(format!("lock={}", value).into());
         }
         let query = if query_parts.is_empty() {
             String::new()

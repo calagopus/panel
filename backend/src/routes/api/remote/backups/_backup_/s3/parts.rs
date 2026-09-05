@@ -66,7 +66,7 @@ mod get {
                 .ok();
         }
 
-        let backup_configuration = match backup.0.backup_configuration {
+        let backup_configuration = match &backup.0.backup_configuration {
             Some(backup_configuration) => {
                 backup_configuration.fetch_cached(&state.database).await?
             }
@@ -111,10 +111,10 @@ mod get {
         let compression_type = s3_configuration.compression_type;
         let (client, bucket) = s3_configuration.into_client();
 
-        let (file_path, upload_id) = match (backup.0.upload_path, backup.0.upload_id) {
-            (Some(upload_path), Some(upload_id)) => (upload_path, upload_id),
+        let (file_path, upload_id) = match (&backup.0.upload_path, &backup.0.upload_id) {
+            (Some(upload_path), Some(upload_id)) => (upload_path.clone(), upload_id.clone()),
             _ => {
-                let file_path = ServerBackup::s3_path(server_uuid, backup.0.uuid, compression_type);
+                let file_path = backup.0.s3_path(server_uuid, compression_type);
                 let content_type = ServerBackup::s3_content_type(&file_path);
 
                 let multipart = match client

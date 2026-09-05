@@ -1,0 +1,3 @@
+ALTER TABLE "server_backups" RENAME COLUMN "database_engine" TO "database_type";
+ALTER TABLE "server_backups" RENAME CONSTRAINT "server_backups_kind_database_engine_check" TO "server_backups_kind_database_type_check";
+ALTER TABLE "server_backups" DROP CONSTRAINT "server_backups_kind_database_type_check", ADD CONSTRAINT "server_backups_kind_database_type_check" CHECK (("kind" = 'SERVER') = ("database_type" IS NULL));

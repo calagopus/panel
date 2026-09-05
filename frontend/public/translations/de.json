@@ -508,6 +508,10 @@
           "finished": "Abgeschlossen",
           "failed": "Fehlgeschlagen"
         },
+        "serverBackupKind": {
+          "server": "Server",
+          "databaseInstance": "Datenbank"
+        },
         "serverFirewallRuleAction": {
           "allow": "Erlauben",
           "deny": "Verweigern"
@@ -5325,6 +5329,7 @@
               "tabs": {
                 "databases": "Datenbanken",
                 "users": "Benutzer",
+                "backups": "Backups",
                 "logs": "Logs"
               },
               "stats": {
@@ -5475,6 +5480,36 @@
                   "completed": "`{database}` in {time} von `{source}` importiert.",
                   "failed": "`{database}` konnte nicht von `{source}` importiert werden:\n{error}",
                   "aborted": "Import von `{database}` von `{source}` wurde abgebrochen."
+                }
+              }
+            },
+            "backups": {
+              "title": "Backups",
+              "subtitle": "{current} von maximal {max} Backups auf diesem Server erstellt, geteilt mit Server-Backups.",
+              "badge": {
+                "restoring": "Backup wird wiederhergestellt"
+              },
+              "notification": {
+                "restoring": "In diese verwaltete Datenbank wird gerade ein Backup wiederhergestellt. Bitte warten..."
+              },
+              "tooltip": {
+                "limitReached": "Dieser Server ist auf {max} Backups limitiert, geteilt zwischen Server- und Datenbank-Backups.",
+                "offline": "Die verwaltete Datenbank muss laufen, um ein Backup zu erstellen.",
+                "restoring": "In diese verwaltete Datenbank wird gerade ein Backup wiederhergestellt."
+              },
+              "toast": {
+                "restoring": "Backup wird in die verwaltete Datenbank wiederhergestellt...",
+                "restoreCompleted": "Wiederherstellung des Datenbank-Backups erfolgreich abgeschlossen.",
+                "restoreFailed": "Wiederherstellung des Datenbank-Backups fehlgeschlagen."
+              },
+              "toggle": {
+                "allEngineBackups": "Alle {engine}-Backups auf diesem Server"
+              },
+              "modal": {
+                "restoreBackup": {
+                  "title": "Datenbank-Backup wiederherstellen",
+                  "content": "Dadurch wird **{backup}** in **{name}** importiert. Vorhandene Tabellen und Collections aus dem Dump werden ersetzt, und Power-Aktionen sind bis zum Abschluss der Wiederherstellung gesperrt.",
+                  "targetInstance": "Ziel-Datenbank"
                 }
               }
             },
@@ -5722,7 +5757,10 @@
             "rootPath": "Root-Pfad",
             "outputInto": "Ausgabe in",
             "ignoreFailure": "Fehler ignorieren",
-            "runInForeground": "Im Vordergrund ausführen"
+            "runInForeground": "Im Vordergrund ausführen",
+            "sourceDatabaseInstance": "Nur Backups berücksichtigen von",
+            "sourceDatabaseInstanceDescription": "Es werden nur Datenbank-Backups ausgewählt, die aus dieser verwalteten Datenbank erstellt wurden. Leer lassen, um Backups jeder verwalteten Datenbank dieses Servers zu berücksichtigen.",
+            "sourceDatabaseInstanceAny": "Beliebige verwaltete Datenbank"
           },
           "condition": {
             "variable": "Variable",
@@ -5800,6 +5838,15 @@
                 "content": "Wenn das Backup den Status `{status}` erreicht."
               }
             },
+            "databaseBackupStatus": {
+              "title": "Datenbank-Backup-Status",
+              "form": {
+                "backupStatus": "Backup-Status"
+              },
+              "card": {
+                "content": "Wenn das Datenbank-Backup den Status `{status}` erreicht."
+              }
+            },
             "scheduleCompletion": {
               "title": "Zeitplan-Abschluss",
               "form": {
@@ -5836,7 +5883,14 @@
             "noActionSelected": "Wähle einen Aktionstyp zur Konfiguration aus",
             "noActionDetails": "Aktionsdetails nicht verfügbar",
             "ignoreFailure": "Fehler ignorieren: {value}",
-            "foreground": "Vordergrund: {value}"
+            "foreground": "Vordergrund: {value}",
+            "sourceDatabaseInstance": "Nur aus verwalteter Datenbank: {uuid}",
+            "sourceDatabaseInstanceAny": "Nur aus verwalteter Datenbank: Beliebig",
+            "backupSelector": {
+              "compact": "Backup {backup}",
+              "compactLatest": "Das neueste Backup",
+              "compactOldest": "Das älteste Backup"
+            }
           },
           "steps": {
             "empty": {
@@ -5992,7 +6046,22 @@
                   "backupName": "Backup-Name: {name}",
                   "backupNameAuto": "Backup-Name: Automatisch generiert",
                   "outputInto": "Backup-UUID in: {variable}",
-                  "ignoredFiles": "Ignorierte Dateien: {files}"
+                  "ignoredFiles": "Ignorierte Dateien: {files}",
+                  "backupGroup": "Backup-Gruppe: {uuid}"
+                }
+              }
+            },
+            "createDatabaseBackup": {
+              "title": "Datenbank-Backup erstellen",
+              "description": "Erstellt ein Backup einer verwalteten Datenbank.",
+              "form": {
+                "databaseInstance": "Verwaltete Datenbank"
+              },
+              "renderer": {
+                "compact": "Erstelle Datenbank-Backup {name}",
+                "compactAuto": "Erstelle ein Datenbank-Backup mit automatisch generiertem Namen",
+                "detail": {
+                  "databaseInstance": "Verwaltete Datenbank: {uuid}"
                 }
               }
             },
@@ -6015,9 +6084,6 @@
                 "warning": "Beim Wiederherstellen wird der Server gestoppt und seine Dateien werden überschrieben. Der Zeitplan wartet, bis die Wiederherstellung abgeschlossen ist, bevor er fortfährt. Kombiniere diesen Schritt nicht mit Power- oder Serverstatus-Auslösern, die den Zeitplan erneut auslösen könnten."
               },
               "renderer": {
-                "compact": "Backup {backup} wiederherstellen",
-                "compactLatest": "Neuestes Backup wiederherstellen",
-                "compactOldest": "Ältestes Backup wiederherstellen",
                 "detail": {
                   "backupLatest": "Backup: Neuestes erfolgreiches Backup",
                   "backupOldest": "Backup: Ältestes erfolgreiches Backup",
@@ -6033,7 +6099,7 @@
               "description": "Lösche ein durch die Backup-Auswahl ausgewähltes Backup.",
               "form": {
                 "backupSelector": "Zu löschendes Backup",
-                "warning": "Dadurch wird das ausgewählte Backup einschließlich seiner Dateien auf dem Node dauerhaft gelöscht. Gesperrte Backups werden übersprungen."
+                "warning": "Dadurch wird das ausgewählte Backup einschließlich seiner Dateien auf dem Node dauerhaft gelöscht. Ist das ausgewählte Backup gesperrt, schlägt der Schritt fehl."
               }
             },
             "moveBackup": {
@@ -6048,6 +6114,38 @@
                   "targetGroup": "Zielgruppe: {uuid}",
                   "targetGroupNone": "Zielgruppe: Keine (ungruppiert)"
                 }
+              }
+            },
+            "restoreDatabaseBackup": {
+              "title": "Datenbank-Backup wiederherstellen",
+              "description": "Stelle ein Datenbank-Backup in einer verwalteten Datenbank wieder her.",
+              "form": {
+                "backupSelector": "Wiederherzustellendes Datenbank-Backup",
+                "targetDatabaseInstance": "Wiederherstellen in",
+                "targetDatabaseInstanceDescription": "Die verwaltete Datenbank, in die das Backup importiert wird. Leer lassen, um in die Datenbank wiederherzustellen, aus der das Backup erstellt wurde.",
+                "targetDatabaseInstanceSource": "Die Datenbank, aus der das Backup erstellt wurde",
+                "warning": "Beim Wiederherstellen wird der Inhalt der Zieldatenbank überschrieben. Der Zeitplan wartet nicht auf das Ende des Imports, spätere Schritte laufen also möglicherweise, während er noch läuft. Wurde die Datenbank gelöscht, aus der das Backup erstellt wurde, schlägt der Schritt fehl, sofern hier kein Ziel ausgewählt ist."
+              },
+              "renderer": {
+                "detail": {
+                  "targetDatabaseInstance": "Wiederherstellen in: {uuid}",
+                  "targetDatabaseInstanceSource": "Wiederherstellen in: Die Datenbank, aus der das Backup erstellt wurde"
+                }
+              }
+            },
+            "deleteDatabaseBackup": {
+              "title": "Datenbank-Backup löschen",
+              "description": "Lösche ein durch die Backup-Auswahl ausgewähltes Datenbank-Backup.",
+              "form": {
+                "backupSelector": "Zu löschendes Datenbank-Backup",
+                "warning": "Dies löscht das ausgewählte Datenbank-Backup dauerhaft, einschließlich des Dumps auf der Node. Es werden nur Datenbank-Backups berücksichtigt, niemals Datei-Backups. Ist das ausgewählte Backup gesperrt, schlägt der Schritt fehl."
+              }
+            },
+            "moveDatabaseBackup": {
+              "title": "Datenbank-Backup verschieben",
+              "description": "Verschiebe ein durch die Backup-Auswahl ausgewähltes Datenbank-Backup in eine Backup-Gruppe.",
+              "form": {
+                "backupSelector": "Zu verschiebendes Datenbank-Backup"
               }
             },
             "createDirectory": {
@@ -6270,17 +6368,20 @@
         "backups": {
           "title": "Backups",
           "subtitle": "{current} von maximal {max} Backups erstellt.",
+          "subtitleWithDatabase": "{current} von maximal {max} Backups erstellt ({server} Server, {database} Datenbank).",
           "tooltip": {
             "limitReached": "Dieser Server ist auf {max} Backups limitiert."
           },
           "table": {
             "columns": {
+              "kind": "Art",
               "locked": "Gesperrt?"
             }
           },
           "badge": {
             "deleting": "Wird gelöscht…",
-            "deleteFailed": "Löschen fehlgeschlagen"
+            "deleteFailed": "Löschen fehlgeschlagen",
+            "sourceDeleted": "{name} (gelöscht)"
           },
           "button": {
             "browse": "Durchsuchen",
@@ -6297,6 +6398,10 @@
             "createBackup": {
               "title": "Backup erstellen",
               "noGroup": "Keine Gruppe",
+              "source": "Quelle",
+              "sourceFiles": "Server-Dateien",
+              "sourceDatabase": "Verwaltete Datenbank",
+              "sourceInstance": "Verwaltete Datenbank",
               "toast": {
                 "created": "Backup erstellt."
               }

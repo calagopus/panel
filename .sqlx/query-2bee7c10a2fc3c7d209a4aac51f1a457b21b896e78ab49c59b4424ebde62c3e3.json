@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                COUNT(*) FILTER (WHERE server_backups.kind = 'SERVER') AS \"server!\",\n                COUNT(*) FILTER (WHERE server_backups.kind = 'DATABASE_INSTANCE') AS \"database_instance!\"\n            FROM server_backups\n            WHERE\n                server_backups.server_uuid = $1\n                AND server_backups.system_backup_policy_uuid IS NULL\n                AND server_backups.deleted IS NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "server!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "database_instance!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "2bee7c10a2fc3c7d209a4aac51f1a457b21b896e78ab49c59b4424ebde62c3e3"
+}

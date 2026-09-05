@@ -21,14 +21,17 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import BackupGroupCard from './BackupGroupCard.tsx';
+import { BackupColumns } from './columns.ts';
 import BackupGroupDeleteModal from './modals/BackupGroupDeleteModal.tsx';
 import BackupGroupEditModal from './modals/BackupGroupEditModal.tsx';
 
 export default function BackupGroupItem({
   group,
+  columns,
   dragHandleProps,
 }: {
   group: z.infer<typeof serverBackupGroupSchema>;
+  columns: BackupColumns;
   dragHandleProps?: ComponentProps<'button'>;
 }) {
   const { t, tItem } = useTranslations();
@@ -148,21 +151,9 @@ export default function BackupGroupItem({
             )}
           </div>
         ) : (
-          <Table
-            flush
-            columns={[
-              t('common.table.columns.name', {}),
-              t('common.table.columns.checksum', {}),
-              t('common.table.columns.size', {}),
-              t('common.table.columns.files', {}),
-              t('common.table.columns.created', {}),
-              t('pages.server.backups.table.columns.locked', {}),
-              '',
-            ]}
-            pagination={backups}
-          >
+          <Table flush columns={columns.headers} pagination={backups}>
             {backups.data.map((backup) => (
-              <BackupRow backup={backup} key={backup.uuid} />
+              <BackupRow backup={backup} columns={columns} key={backup.uuid} />
             ))}
           </Table>
         )}

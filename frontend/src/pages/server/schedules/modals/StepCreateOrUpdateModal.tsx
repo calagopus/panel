@@ -18,6 +18,7 @@ import {
   scheduleStepGroupLabelMapping,
   scheduleStepGroupMapping,
   scheduleStepLabelMapping,
+  scheduleStepSelectionOrder,
 } from '@/lib/enums.ts';
 import {
   serverScheduleSchema,
@@ -32,9 +33,11 @@ import { useServerStore } from '@/stores/server.ts';
 import StepCompressFiles from '../steps/StepCompressFiles.tsx';
 import StepCopyFile from '../steps/StepCopyFile.tsx';
 import StepCreateBackup from '../steps/StepCreateBackup.tsx';
+import StepCreateDatabaseBackup from '../steps/StepCreateDatabaseBackup.tsx';
 import StepCreateDirectory from '../steps/StepCreateDirectory.tsx';
 import StepDecompressFile from '../steps/StepDecompressFile.tsx';
 import StepDeleteBackup from '../steps/StepDeleteBackup.tsx';
+import StepDeleteDatabaseBackup from '../steps/StepDeleteDatabaseBackup.tsx';
 import StepDeleteFiles from '../steps/StepDeleteFiles.tsx';
 import StepEnsure from '../steps/StepEnsure.tsx';
 import StepExit from '../steps/StepExit.tsx';
@@ -43,9 +46,11 @@ import StepHttpRequest from '../steps/StepHttpRequest.tsx';
 import StepIf from '../steps/StepIf.tsx';
 import StepMatchRegex from '../steps/StepMatchRegex.tsx';
 import StepMoveBackup from '../steps/StepMoveBackup.tsx';
+import StepMoveDatabaseBackup from '../steps/StepMoveDatabaseBackup.tsx';
 import StepPullFile from '../steps/StepPullFile.tsx';
 import StepRenameFiles from '../steps/StepRenameFiles.tsx';
 import StepRestoreBackup from '../steps/StepRestoreBackup.tsx';
+import StepRestoreDatabaseBackup from '../steps/StepRestoreDatabaseBackup.tsx';
 import StepSendCommand from '../steps/StepSendCommand.tsx';
 import StepSendPower from '../steps/StepSendPower.tsx';
 import StepSleep from '../steps/StepSleep.tsx';
@@ -111,7 +116,8 @@ export default function StepCreateOrUpdateModal({
       const values = {
         order: propStep.order,
         action:
-          propStep.action.type === 'create_backup' && !propStep.action.name
+          (propStep.action.type === 'create_backup' || propStep.action.type === 'create_database_backup') &&
+          !propStep.action.name
             ? { ...propStep.action, name: null }
             : propStep.action,
       };
@@ -140,11 +146,11 @@ export default function StepCreateOrUpdateModal({
           label={t('pages.server.schedules.form.actionType', {})}
           data={(['server', 'backups', 'files', 'startup', 'advanced'] as ScheduleStepGroup[]).map((group) => ({
             group: scheduleStepGroupLabelMapping[group](),
-            items: Object.entries(scheduleStepLabelMapping)
-              .filter(([value]) => scheduleStepGroupMapping[value as keyof typeof scheduleStepGroupMapping] === group)
-              .map(([value, label]) => ({
+            items: scheduleStepSelectionOrder
+              .filter((value) => scheduleStepGroupMapping[value] === group)
+              .map((value) => ({
                 value,
-                label: label(),
+                label: scheduleStepLabelMapping[value](),
               })),
           }))}
           renderOption={({ option }) => (
@@ -191,12 +197,20 @@ export default function StepCreateOrUpdateModal({
           <StepSendCommand form={form} />
         ) : form.values.action.type === 'create_backup' ? (
           <StepCreateBackup form={form} />
+        ) : form.values.action.type === 'create_database_backup' ? (
+          <StepCreateDatabaseBackup form={form} />
         ) : form.values.action.type === 'restore_backup' ? (
           <StepRestoreBackup form={form} />
         ) : form.values.action.type === 'delete_backup' ? (
           <StepDeleteBackup form={form} />
         ) : form.values.action.type === 'move_backup' ? (
           <StepMoveBackup form={form} />
+        ) : form.values.action.type === 'restore_database_backup' ? (
+          <StepRestoreDatabaseBackup form={form} />
+        ) : form.values.action.type === 'delete_database_backup' ? (
+          <StepDeleteDatabaseBackup form={form} />
+        ) : form.values.action.type === 'move_database_backup' ? (
+          <StepMoveDatabaseBackup form={form} />
         ) : form.values.action.type === 'create_directory' ? (
           <StepCreateDirectory form={form} />
         ) : form.values.action.type === 'write_file' ? (

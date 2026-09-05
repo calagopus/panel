@@ -89,19 +89,32 @@ export function renderCompact(action: Action, { t, tReact, tItem }: Translations
           })}
         </span>
       );
+    case 'create_database_backup':
+      return !action.name ? (
+        <span>{t('pages.server.schedules.steps.createDatabaseBackup.renderer.compactAuto', {})}</span>
+      ) : (
+        <span>
+          {tReact('pages.server.schedules.steps.createDatabaseBackup.renderer.compact', {
+            name: <ScheduleDynamicParameterRenderer value={action.name} />,
+          })}
+        </span>
+      );
     case 'restore_backup':
     case 'delete_backup':
     case 'move_backup':
+    case 'restore_database_backup':
+    case 'delete_database_backup':
+    case 'move_database_backup':
       return action.backup.mode === 'latest' || action.backup.mode === 'oldest' ? (
         <span>
           {t(
-            `pages.server.schedules.steps.restoreBackup.renderer.compact${action.backup.mode === 'oldest' ? 'Oldest' : 'Latest'}`,
+            `pages.server.schedules.renderer.backupSelector.compact${action.backup.mode === 'oldest' ? 'Oldest' : 'Latest'}`,
             {},
           )}
         </span>
       ) : (
         <span>
-          {tReact('pages.server.schedules.steps.restoreBackup.renderer.compact', {
+          {tReact('pages.server.schedules.renderer.backupSelector.compact', {
             backup: (
               <ScheduleDynamicParameterRenderer
                 value={action.backup.mode === 'uuid' ? action.backup.uuid : action.backup.name}

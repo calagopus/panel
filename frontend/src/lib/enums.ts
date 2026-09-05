@@ -71,6 +71,7 @@ import {
   streamingArchiveFormat,
   transferArchiveFormat,
 } from '@/lib/schemas/generic.ts';
+import { serverBackupKind } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceUserPermission } from '@/lib/schemas/server/databaseInstances.ts';
 import { serverDatabaseFilterOperator } from '@/lib/schemas/server/databases.ts';
 import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
@@ -442,6 +443,11 @@ export const serverBackupStatusLabelMapping: Record<z.infer<typeof serverBackupS
   failed: () => getTranslations().t('common.enum.serverBackupStatus.failed', {}),
 };
 
+export const serverBackupKindLabelMapping: Record<z.infer<typeof serverBackupKind>, () => string> = {
+  server: () => getTranslations().t('common.enum.serverBackupKind.server', {}),
+  database_instance: () => getTranslations().t('common.enum.serverBackupKind.databaseInstance', {}),
+};
+
 export const serverFirewallRuleActionLabelMapping: Record<z.infer<typeof serverFirewallRuleAction>, () => string> = {
   allow: () => getTranslations().t('common.enum.serverFirewallRuleAction.allow', {}),
   deny: () => getTranslations().t('common.enum.serverFirewallRuleAction.deny', {}),
@@ -481,9 +487,13 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
   send_power: () => getTranslations().t('pages.server.schedules.steps.sendPower.title', {}),
   send_command: () => getTranslations().t('pages.server.schedules.steps.sendCommand.title', {}),
   create_backup: () => getTranslations().t('pages.server.schedules.steps.createBackup.title', {}),
+  create_database_backup: () => getTranslations().t('pages.server.schedules.steps.createDatabaseBackup.title', {}),
   restore_backup: () => getTranslations().t('pages.server.schedules.steps.restoreBackup.title', {}),
   delete_backup: () => getTranslations().t('pages.server.schedules.steps.deleteBackup.title', {}),
   move_backup: () => getTranslations().t('pages.server.schedules.steps.moveBackup.title', {}),
+  delete_database_backup: () => getTranslations().t('pages.server.schedules.steps.deleteDatabaseBackup.title', {}),
+  move_database_backup: () => getTranslations().t('pages.server.schedules.steps.moveDatabaseBackup.title', {}),
+  restore_database_backup: () => getTranslations().t('pages.server.schedules.steps.restoreDatabaseBackup.title', {}),
   create_directory: () => getTranslations().t('pages.server.schedules.steps.createDirectory.title', {}),
   write_file: () => getTranslations().t('pages.server.schedules.steps.writeFile.title', {}),
   copy_file: () => getTranslations().t('pages.server.schedules.steps.copyFile.title', {}),
@@ -527,9 +537,13 @@ export const scheduleStepGroupMapping: Record<
   send_power: 'server',
   send_command: 'server',
   create_backup: 'backups',
+  create_database_backup: 'backups',
   restore_backup: 'backups',
   delete_backup: 'backups',
   move_backup: 'backups',
+  delete_database_backup: 'backups',
+  move_database_backup: 'backups',
+  restore_database_backup: 'backups',
   create_directory: 'files',
   write_file: 'files',
   copy_file: 'files',
@@ -543,6 +557,42 @@ export const scheduleStepGroupMapping: Record<
   update_startup_docker_image: 'startup',
   http_request: 'advanced',
 };
+
+export const scheduleStepSelectionOrder = [
+  'send_command',
+  'send_power',
+  'wait_for_state',
+  'create_backup',
+  'restore_backup',
+  'delete_backup',
+  'move_backup',
+  'create_database_backup',
+  'delete_database_backup',
+  'move_database_backup',
+  'restore_database_backup',
+  'compress_files',
+  'copy_file',
+  'create_directory',
+  'decompress_file',
+  'delete_files',
+  'pull_file',
+  'rename_files',
+  'write_file',
+  'update_startup_docker_image',
+  'update_startup_command',
+  'update_startup_variable',
+  'if',
+  'else_if',
+  'else',
+  'end_if',
+  'ensure',
+  'exit',
+  'format',
+  'http_request',
+  'match_regex',
+  'sleep',
+  'wait_for_console_line',
+] as const satisfies readonly z.infer<typeof serverScheduleStepActionSchema>['type'][];
 
 export const scheduleStepDescriptionMapping: Record<
   z.infer<typeof serverScheduleStepActionSchema>['type'],
@@ -562,9 +612,16 @@ export const scheduleStepDescriptionMapping: Record<
   send_power: () => getTranslations().t('pages.server.schedules.steps.sendPower.description', {}),
   send_command: () => getTranslations().t('pages.server.schedules.steps.sendCommand.description', {}),
   create_backup: () => getTranslations().t('pages.server.schedules.steps.createBackup.description', {}),
+  create_database_backup: () =>
+    getTranslations().t('pages.server.schedules.steps.createDatabaseBackup.description', {}),
   restore_backup: () => getTranslations().t('pages.server.schedules.steps.restoreBackup.description', {}),
   delete_backup: () => getTranslations().t('pages.server.schedules.steps.deleteBackup.description', {}),
   move_backup: () => getTranslations().t('pages.server.schedules.steps.moveBackup.description', {}),
+  delete_database_backup: () =>
+    getTranslations().t('pages.server.schedules.steps.deleteDatabaseBackup.description', {}),
+  move_database_backup: () => getTranslations().t('pages.server.schedules.steps.moveDatabaseBackup.description', {}),
+  restore_database_backup: () =>
+    getTranslations().t('pages.server.schedules.steps.restoreDatabaseBackup.description', {}),
   create_directory: () => getTranslations().t('pages.server.schedules.steps.createDirectory.description', {}),
   write_file: () => getTranslations().t('pages.server.schedules.steps.writeFile.description', {}),
   copy_file: () => getTranslations().t('pages.server.schedules.steps.copyFile.description', {}),
@@ -655,6 +712,14 @@ export const scheduleStepDefaultMapping: Record<
     ignoredFiles: [],
     outputInto: null,
   },
+  create_database_backup: {
+    type: 'create_database_backup',
+    ignoreFailure: false,
+    foreground: false,
+    name: null,
+    databaseInstanceUuid: '',
+    outputInto: null,
+  },
   restore_backup: {
     type: 'restore_backup',
     ignoreFailure: false,
@@ -672,6 +737,26 @@ export const scheduleStepDefaultMapping: Record<
     ignoreFailure: false,
     backup: { mode: 'oldest' },
     backupGroupUuid: null,
+  },
+  delete_database_backup: {
+    type: 'delete_database_backup',
+    ignoreFailure: false,
+    backup: { mode: 'oldest' },
+    databaseInstanceUuid: null,
+  },
+  move_database_backup: {
+    type: 'move_database_backup',
+    ignoreFailure: false,
+    backup: { mode: 'oldest' },
+    databaseInstanceUuid: null,
+    backupGroupUuid: null,
+  },
+  restore_database_backup: {
+    type: 'restore_database_backup',
+    ignoreFailure: false,
+    backup: { mode: 'latest' },
+    sourceDatabaseInstanceUuid: null,
+    databaseInstanceUuid: null,
   },
   create_directory: {
     type: 'create_directory',
@@ -775,9 +860,13 @@ export const scheduleStepIconMapping: Record<z.infer<typeof serverScheduleStepAc
   send_power: faPowerOff,
   send_command: faTerminal,
   create_backup: faDatabase,
+  create_database_backup: faDatabase,
   restore_backup: faClockRotateLeft,
   delete_backup: faTrash,
   move_backup: faRightLeft,
+  delete_database_backup: faTrash,
+  move_database_backup: faRightLeft,
+  restore_database_backup: faClockRotateLeft,
   create_directory: faFolder,
   write_file: faFile,
   copy_file: faCopy,
@@ -848,6 +937,7 @@ export const scheduleTriggerIconMapping: Record<z.infer<typeof serverScheduleTri
   power_action: faPowerOff,
   server_state: faServer,
   backup_status: faBoxArchive,
+  database_backup_status: faDatabase,
   schedule_completion: faStopwatch,
   resource_usage: faChartPie,
   console_line: faTerminal,
@@ -859,6 +949,7 @@ export const scheduleTriggerColorMapping: Record<z.infer<typeof serverScheduleTr
   power_action: 'orange',
   server_state: 'green',
   backup_status: 'green',
+  database_backup_status: 'green',
   schedule_completion: 'blue',
   resource_usage: 'orange',
   console_line: 'gray',
@@ -870,6 +961,7 @@ export const scheduleTriggerLabelMapping: Record<z.infer<typeof serverScheduleTr
   power_action: () => getTranslations().t('pages.server.schedules.triggers.powerAction.title', {}),
   server_state: () => getTranslations().t('pages.server.schedules.triggers.serverState.title', {}),
   backup_status: () => getTranslations().t('pages.server.schedules.triggers.backupStatus.title', {}),
+  database_backup_status: () => getTranslations().t('pages.server.schedules.triggers.databaseBackupStatus.title', {}),
   schedule_completion: () => getTranslations().t('pages.server.schedules.triggers.scheduleCompletion.title', {}),
   resource_usage: () => getTranslations().t('pages.server.schedules.triggers.resourceUsage.title', {}),
   console_line: () => getTranslations().t('pages.server.schedules.triggers.consoleLine.title', {}),
@@ -884,6 +976,7 @@ export const scheduleTriggerDefaultMapping: Record<
   power_action: { type: 'power_action', action: 'start' },
   server_state: { type: 'server_state', state: 'running' },
   backup_status: { type: 'backup_status', status: 'starting' },
+  database_backup_status: { type: 'database_backup_status', status: 'starting' },
   schedule_completion: { type: 'schedule_completion', schedule: '', successful: true },
   resource_usage: {
     type: 'resource_usage',

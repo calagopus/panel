@@ -9,6 +9,7 @@ mod get {
         ApiError, GetState,
         models::{
             server::{GetServer, GetServerActivityLogger},
+            server_backup::ServerBackupKind,
             user::{GetPermissionManager, GetUser},
         },
         response::{ApiResponse, ApiResponseResult},
@@ -85,10 +86,14 @@ mod get {
 
         activity_logger
             .log(
-                "server:backup.download",
+                match backup.kind {
+                    ServerBackupKind::Server => "server:backup.download",
+                    ServerBackupKind::DatabaseInstance => "server:database-backup.download",
+                },
                 serde_json::json!({
                     "uuid": backup.uuid,
                     "name": backup.name,
+                    "database_instance_uuid": backup.database_instance_uuid,
                 }),
             )
             .await;
