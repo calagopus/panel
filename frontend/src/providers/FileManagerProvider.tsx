@@ -49,6 +49,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     data: infiniteData,
     error: directoryError,
     isFetching,
+    isPlaceholderData,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -141,8 +142,8 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => bridgeFileManagerUserSettings(store), [store]);
 
   useEffect(() => {
-    store.setState({ isLoading: isFetching && !isFetchingNextPage });
-  }, [isFetching, isFetchingNextPage]);
+    store.setState({ isLoading: isFetching && (!infiniteData || isPlaceholderData) });
+  }, [isFetching, infiniteData, isPlaceholderData]);
 
   useEffect(() => {
     store.setState({

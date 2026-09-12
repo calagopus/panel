@@ -1,4 +1,4 @@
-import { InfiniteData, QueryClient } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { join } from 'pathe';
 import { createRef, RefObject, startTransition } from 'react';
 import { z } from 'zod';
@@ -431,7 +431,7 @@ export const createFileManagerStore = (
       invalidateFilemanager: (notifyListeners = true) => {
         if (notifyListeners) refreshListeners.forEach((listener) => listener());
 
-        const { searchInfo, browsingDirectory, sortMode, doSelectFiles, clearActingFiles, externals } = get();
+        const { searchInfo, doSelectFiles, clearActingFiles, externals } = get();
         const { serverUuid, queryClient } = externals;
 
         queryClient
@@ -466,19 +466,6 @@ export const createFileManagerStore = (
 
           return;
         }
-
-        let trimmed = false;
-        queryClient.setQueryData<InfiniteData<DirectoryResponse, number>>(
-          queryKeys.server(serverUuid).files.directory(browsingDirectory, sortMode),
-          (data) => {
-            if (!data || data.pages.length <= 1) return data;
-
-            trimmed = true;
-            return { pages: data.pages.slice(0, 1), pageParams: data.pageParams.slice(0, 1) };
-          },
-        );
-
-        if (trimmed) window.scrollTo({ top: 0 });
 
         queryClient
           .invalidateQueries({

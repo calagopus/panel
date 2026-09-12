@@ -8,7 +8,6 @@ import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import searchFiles from '@/api/server/files/searchFiles.ts';
 import Card from '@/elements/data-display/Card.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
-import { registerUploadRefresh } from '@/lib/files/uploadManager.ts';
 import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import { getFilesFromDataTransfer } from '@/pages/server/files/hooks/useFileDragAndDrop.ts';
 import FileMassContextMenu from '@/pages/server/files/list/FileMassContextMenu.tsx';
@@ -177,6 +176,7 @@ function FileTree({
       const loadingKey = `${requestServerUuid}:${directory}`;
       if (loadingDirectoriesRef.current.has(loadingKey)) return;
 
+      const lastPage = page === 1 ? Math.max(1, directoriesRef.current[directory]?.page ?? 1) : page;
       loadingDirectoriesRef.current.add(loadingKey);
       setDirectories((current) => {
         const previous = current[directory] ?? EMPTY_DIRECTORY_STATE;
@@ -185,7 +185,6 @@ function FileTree({
           ...current,
           [directory]: {
             ...previous,
-            entries: page === 1 ? [] : previous.entries,
             loading: true,
             error: null,
           },
@@ -193,12 +192,22 @@ function FileTree({
       });
 
       try {
-        const response = await loadDirectory(requestServerUuid, directory, page, 'name_asc');
+        let response = await loadDirectory(requestServerUuid, directory, page, 'name_asc');
+        const refreshedEntries = [...response.entries.data];
+
+        // Keep the displayed rows until every previously loaded page has been refreshed.
+        for (let nextPage = page + 1; nextPage <= lastPage; nextPage++) {
+          if (activeServerRef.current !== requestServerUuid) return;
+          if (refreshedEntries.length >= response.entries.total) break;
+          response = await loadDirectory(requestServerUuid, directory, nextPage, 'name_asc');
+          refreshedEntries.push(...response.entries.data);
+        }
+
         if (activeServerRef.current === requestServerUuid) {
           setDirectories((current) => {
             const existingEntries = page === 1 ? [] : (current[directory]?.entries ?? []);
             const entriesByName = new Map(existingEntries.map((entry) => [entry.name, entry]));
-            for (const entry of response.entries.data) entriesByName.set(entry.name, entry);
+            for (const entry of refreshedEntries) entriesByName.set(entry.name, entry);
 
             return {
               ...current,
@@ -228,8 +237,9 @@ function FileTree({
           }));
           addToast(message, 'error');
         }
+      } finally {
+        loadingDirectoriesRef.current.delete(loadingKey);
       }
-      loadingDirectoriesRef.current.delete(loadingKey);
     },
     [server.uuid, addToast],
   );
@@ -270,17 +280,6 @@ function FileTree({
       if (!directoriesRef.current[path]) void loadPage(path, 1);
     }
   }, [initialDirectory, loadPage]);
-
-  useEffect(
-    () =>
-      registerUploadRefresh(`server:${server.uuid}`, () => {
-        const paths = [ROOT_DIRECTORY, ...expandedDirectoriesRef.current].filter(
-          (path) => !!directoriesRef.current[path],
-        );
-        for (const path of paths) void loadPage(path, 1);
-      }),
-    [server.uuid, loadPage],
-  );
 
   useEffect(() => store.getState().registerRefreshListener(() => reloadTreeRef.current()), [store]);
   useEffect(
@@ -896,18 +895,12 @@ function FileTree({
     [canUpdateFiles, dragDisabled, getDirectoryCapabilities, getSelectedItems, setHorizontalDragScrollLocked, store],
   );
 
-  const refreshDirectories = (paths: string[]) => {
-    for (const path of new Set(paths)) void loadPage(path, 1);
-    store.getState().invalidateFilemanager(false);
-  };
-
   const uploadDroppedFiles = async (dataTransfer: DataTransfer, target: string) => {
     try {
       const files = await getFilesFromDataTransfer(dataTransfer);
       if (files.length === 0) return;
 
       await store.getState().fileUploader.uploadFilesToDirectory(target, files);
-      refreshDirectories([target]);
     } catch (error) {
       addToast(httpErrorToHuman(error), 'error');
     }
