@@ -10,6 +10,7 @@ interface LocalizedTextInputProps extends Omit<TextInputProps, 'value' | 'onChan
   valueTranslations: Record<string, string>;
   setValueTranslations: (translations: Record<string, string>) => void;
   languageLabels?: Record<string, string>;
+  placeholders?: Record<string, string>;
 }
 
 const EN = 'en';
@@ -31,6 +32,7 @@ function LocalizedTextInput({
   valueTranslations,
   setValueTranslations,
   languageLabels,
+  placeholders,
   label,
   disabled,
   required,
@@ -110,7 +112,7 @@ function LocalizedTextInput({
       }
       labelProps={{ labelElement: 'div', style: { display: 'block', width: '100%' } }}
       value={currentValue}
-      placeholder={typeof label === 'string' ? label : undefined}
+      placeholder={placeholders?.[selectedLang] ?? (typeof label === 'string' ? label : undefined)}
       onChange={handleChange}
       disabled={disabled}
     />

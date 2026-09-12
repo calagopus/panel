@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="{{ language }}">
 	<head>
 		<meta charset="utf-8" />
 		<title>{{ subject }}</title>
@@ -56,7 +56,7 @@
 						color: #4b5563;
 					"
 				>
-					Hello <strong>{{ user.username }}</strong>,
+					{{ vars.greeting }}
 				</p>
 				<p
 					style="
@@ -67,8 +67,7 @@
 						color: #4b5563;
 					"
 				>
-					Use the code below to finish signing in to
-					<strong>{{ settings.app.name }}</strong>.
+					{{ vars.intro }}
 				</p>
 
 				<div style="text-align: center; margin-bottom: 32px">
@@ -101,8 +100,7 @@
 					<p
 						style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5"
 					>
-						<strong>Note:</strong> This code will expire in
-						<strong>10 minutes</strong> and can only be used once.
+						{{ vars.note }}
 					</p>
 				</div>
 			</div>
@@ -116,8 +114,7 @@
 				"
 			>
 				<p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5">
-					If you did not try to sign in, someone else may know your password. We
-					recommend changing it as soon as possible.
+					{{ vars.footer }}
 				</p>
 			</div>
 		</div>

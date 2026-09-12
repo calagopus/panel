@@ -127,6 +127,22 @@ export const emailTemplatesTable = pgTable('email_templates', {
   content: text().notNull(),
 });
 
+export const emailVariablesTable = pgTable(
+  'email_variables',
+  {
+    template_identifier: varchar({ length: 255 }).notNull(),
+    name: varchar({ length: 64 }).notNull(),
+    value: text(),
+    value_translations: jsonb().default({}).notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'email_variables_template_identifier_name_pk',
+      columns: [cols.template_identifier, cols.name],
+    }),
+  ],
+);
+
 export const usersTable = pgTable(
   'users',
   {

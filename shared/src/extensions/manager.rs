@@ -116,7 +116,9 @@ impl ExtensionManager {
             );
         }
 
-        *state.mail.templates.templates.write() = email_templates_builder.finish();
+        let (templates, variables) = email_templates_builder.finish();
+        *state.mail.templates.templates.write() = templates;
+        *state.mail.templates.variables.write() = variables;
 
         crate::permissions::USER_PERMISSIONS
             .write()

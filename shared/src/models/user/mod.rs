@@ -1061,7 +1061,7 @@ impl CreatableModel for User {
                         .send_template(
                             state,
                             "account_created",
-                            result.email.clone(),
+                            &result,
                             minijinja::context! {
                                 user => result,
                                 reset_link => format!(

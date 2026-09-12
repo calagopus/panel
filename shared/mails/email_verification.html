@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="{{ language }}">
 	<head>
 		<meta charset="utf-8" />
 		<title>{{ subject }}</title>
@@ -56,7 +56,7 @@
 						color: #4b5563;
 					"
 				>
-					Hello <strong>{{ user.username }}</strong>,
+					{{ vars.greeting }}
 				</p>
 				<p
 					style="
@@ -67,8 +67,7 @@
 						color: #4b5563;
 					"
 				>
-					Please confirm that <strong>{{ email }}</strong> belongs to you to finish
-					setting up your account on <strong>{{ settings.app.name }}</strong>.
+					{{ vars.intro }}
 				</p>
 
 				<div style="text-align: center; margin-bottom: 32px">
@@ -85,7 +84,7 @@
 							border-radius: 6px;
 						"
 					>
-						Verify Email
+						{{ vars.button }}
 					</a>
 				</div>
 
@@ -100,8 +99,7 @@
 					<p
 						style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5"
 					>
-						<strong>Note:</strong> This link will expire in
-						<strong>24 hours</strong>.
+						{{ vars.note }}
 					</p>
 				</div>
 			</div>
@@ -115,8 +113,7 @@
 				"
 			>
 				<p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5">
-					If you did not create this account or request this change, please ignore
-					this email. Nothing will be changed.
+					{{ vars.footer }}
 				</p>
 			</div>
 		</div>

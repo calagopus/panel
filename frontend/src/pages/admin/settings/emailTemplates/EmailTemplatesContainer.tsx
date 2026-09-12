@@ -6,11 +6,11 @@ import { z } from 'zod';
 import getEmailTemplate from '@/api/admin/settings/email-templates/getEmailTemplate.ts';
 import getEmailTemplates from '@/api/admin/settings/email-templates/getEmailTemplates.ts';
 import updateEmailTemplate from '@/api/admin/settings/email-templates/updateEmailTemplate.ts';
+import getEmailVariables from '@/api/admin/settings/email-templates/variables/getEmailVariables.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
-import Badge from '@/elements/data-display/Badge.tsx';
 import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -18,7 +18,6 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Paper from '@/elements/layout/Paper.tsx';
-import ScrollArea from '@/elements/layout/ScrollArea.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import NavLink from '@/elements/navigation/NavLink.tsx';
@@ -29,6 +28,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import EmailVariablesSection from './EmailVariablesSection.tsx';
 
 const templateFormSchema = z.object({
   subject: z.string().min(1).max(255),
@@ -62,6 +62,22 @@ export default function EmailTemplatesContainer() {
     enabled: selectedIdentifier !== null,
   });
 
+  const { data: templateVariables } = useResource({
+    queryKey: queryKeys.admin.emailTemplates.variables(selectedIdentifier),
+    queryFn: () => getEmailVariables(selectedIdentifier),
+    enabled: selectedIdentifier !== null,
+  });
+
+  const { data: globalVariables } = useResource({
+    queryKey: queryKeys.admin.emailTemplates.variables(null),
+    queryFn: () => getEmailVariables(null),
+    enabled: selectedIdentifier !== null,
+  });
+
+  const variableNames = [
+    ...new Set([...(templateVariables ?? []), ...(globalVariables ?? [])].map((variable) => `vars.${variable.name}`)),
+  ];
+
   useEffect(() => {
     if (!template) return;
 
@@ -75,7 +91,7 @@ export default function EmailTemplatesContainer() {
     setEditorContent('');
   }, [template]);
 
-  const handleSelect = (identifier: string) => {
+  const handleSelect = (identifier: string | null) => {
     setSelectedIdentifier(identifier);
     setEditorContent('');
   };
@@ -128,36 +144,43 @@ export default function EmailTemplatesContainer() {
   };
 
   const sidebar = (
-    <Paper withBorder radius='md' className='flex flex-col overflow-hidden shrink-0 md:w-72 w-full md:h-full'>
+    <Paper withBorder radius='md' className='flex! flex-col overflow-hidden shrink-0 md:w-72 w-full md:self-start'>
       <div className='px-3 py-2.5 bg-(--mantine-color-default)'>
         <Text size='xs' fw={600} c='dimmed' tt='uppercase' style={{ letterSpacing: '0.05em' }}>
           {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.templates', {})}
         </Text>
       </div>
       <Divider />
-      <ScrollArea className='flex-1' type='auto'>
-        <Stack gap={0} p='xs'>
-          {templatesLoading && (
-            <Text size='sm' c='dimmed' p='xs'>
-              {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.loading', {})}
-            </Text>
-          )}
-          {templates?.map((tpl) => (
-            <NavLink
-              key={tpl.identifier}
-              label={tpl.identifier}
-              active={selectedIdentifier === tpl.identifier}
-              onClick={() => handleSelect(tpl.identifier)}
-              styles={{
-                label: {
-                  fontSize: 'var(--mantine-font-size-sm)',
-                  fontFamily: 'var(--mantine-font-family-monospace)',
-                },
-              }}
-            />
-          ))}
-        </Stack>
-      </ScrollArea>
+      <Stack gap={0} p='xs'>
+        <NavLink
+          label={t('pages.admin.settings.tabs.mailTemplates.page.sidebar.globalVariables', {})}
+          active={selectedIdentifier === null}
+          onClick={() => handleSelect(null)}
+          styles={{ label: { fontSize: 'var(--mantine-font-size-sm)' } }}
+        />
+      </Stack>
+      <Divider />
+      <Stack gap={0} p='xs'>
+        {templatesLoading && (
+          <Text size='sm' c='dimmed' p='xs'>
+            {t('pages.admin.settings.tabs.mailTemplates.page.sidebar.loading', {})}
+          </Text>
+        )}
+        {templates?.map((tpl) => (
+          <NavLink
+            key={tpl.identifier}
+            label={tpl.identifier}
+            active={selectedIdentifier === tpl.identifier}
+            onClick={() => handleSelect(tpl.identifier)}
+            styles={{
+              label: {
+                fontSize: 'var(--mantine-font-size-sm)',
+                fontFamily: 'var(--mantine-font-family-monospace)',
+              },
+            }}
+          />
+        ))}
+      </Stack>
 
       {template && (
         <>
@@ -168,20 +191,19 @@ export default function EmailTemplatesContainer() {
             </Text>
           </div>
           <Divider />
-          <ScrollArea type='auto' mah={180}>
-            <Group gap='xs' p='sm'>
-              {template.availableVariables.map((variable) => (
-                <Badge
-                  key={variable}
-                  variant='light'
-                  color='blue'
-                  style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}
-                >
-                  {`{{ ${variable} }}`}
-                </Badge>
-              ))}
-            </Group>
-          </ScrollArea>
+          <Stack gap={2} p='xs'>
+            {[...template.availableVariables, ...variableNames].map((variable) => (
+              <Text
+                key={variable}
+                size='xs'
+                px='xs'
+                py={2}
+                style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}
+              >
+                {`{{ ${variable} }}`}
+              </Text>
+            ))}
+          </Stack>
         </>
       )}
     </Paper>
@@ -212,88 +234,104 @@ export default function EmailTemplatesContainer() {
           {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxMiddle', {})} <Code>{'{{ variable }}'}</Code>{' '}
           {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAnd', {})} <Code>{'{% if %}'}</Code>{' '}
           {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxOr', {})} <Code>{'{% for %}'}</Code>{' '}
-          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAfter', {})}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.syntaxAfter', {})}{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.variablesBefore', {})} <Code>{'{{ vars.name }}'}</Code>{' '}
+          {t('pages.admin.settings.tabs.mailTemplates.page.alert.variablesAfter', {})}
         </Text>
       </Alert>
 
       <div className='mt-4 flex flex-col md:flex-row gap-4'>
         {sidebar}
 
-        <Paper withBorder radius='md' className='flex flex-col flex-1 min-w-0 overflow-hidden'>
-          {selectedIdentifier === null ? (
-            <div className='flex items-center justify-center h-64'>
-              <Text c='dimmed' size='sm'>
-                {t('pages.admin.settings.tabs.mailTemplates.page.empty', {})}
-              </Text>
-            </div>
-          ) : templateLoading ? (
-            <div className='flex items-center justify-center h-64'>
-              <Text c='dimmed' size='sm'>
-                {t('pages.admin.settings.tabs.mailTemplates.page.loadingTemplate', {})}
-              </Text>
-            </div>
-          ) : template ? (
-            <>
-              <div className='px-4 py-2.5 bg-(--mantine-color-default) shrink-0'>
-                <Group justify='space-between'>
-                  <Group gap='xs'>
-                    <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
-                      {selectedIdentifier}
-                    </Text>
-                  </Group>
-                  <Group gap='xs'>
-                    <AdminCan action={['settings.read', 'email-templates.update']}>
-                      <Button size='xs' variant='subtle' onClick={() => setConfirmReset(true)} disabled={saving}>
-                        {t('common.tooltip.resetToDefault', {})}
-                      </Button>
-                    </AdminCan>
-                    <AdminCan action={['settings.read', 'email-templates.update']} cantSave>
-                      <Button size='xs' loading={saving} disabled={!isContentDirty && !form.isDirty()} onClick={doSave}>
-                        {t('common.button.save', {})}
-                      </Button>
-                    </AdminCan>
-                  </Group>
-                </Group>
-              </div>
-              <Divider />
-              <Stack gap='md' p='md'>
-                <Group align='flex-start'>
-                  <TextInput
-                    label={t('pages.admin.settings.tabs.mailTemplates.page.form.subject', {})}
-                    className='flex-1'
-                    required
-                    key={form.key('subject')}
-                    {...form.getInputProps('subject')}
-                  />
-                  <Switch
-                    label={t('common.form.enabled', {})}
-                    mt='xl'
-                    key={form.key('enabled')}
-                    {...form.getInputProps('enabled', { type: 'checkbox' })}
-                  />
-                </Group>
-              </Stack>
+        {selectedIdentifier === null ? (
+          <EmailVariablesSection templateIdentifier={null} className='flex-1 min-w-0' />
+        ) : (
+          <>
+            <Paper withBorder radius='md' className='flex! flex-col flex-1 min-w-0 overflow-hidden'>
+              {templateLoading ? (
+                <div className='flex items-center justify-center h-64'>
+                  <Text c='dimmed' size='sm'>
+                    {t('pages.admin.settings.tabs.mailTemplates.page.loadingTemplate', {})}
+                  </Text>
+                </div>
+              ) : template ? (
+                <>
+                  <div className='px-4 py-2.5 bg-(--mantine-color-default) shrink-0'>
+                    <Group justify='space-between'>
+                      <Group gap='xs'>
+                        <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
+                          {selectedIdentifier}
+                        </Text>
+                      </Group>
+                      <Group gap='xs'>
+                        <AdminCan action={['settings.read', 'email-templates.update']}>
+                          <Button size='xs' variant='subtle' onClick={() => setConfirmReset(true)} disabled={saving}>
+                            {t('common.tooltip.resetToDefault', {})}
+                          </Button>
+                        </AdminCan>
+                        <AdminCan action={['settings.read', 'email-templates.update']} cantSave>
+                          <Button
+                            size='xs'
+                            loading={saving}
+                            disabled={!isContentDirty && !form.isDirty()}
+                            onClick={doSave}
+                          >
+                            {t('common.button.save', {})}
+                          </Button>
+                        </AdminCan>
+                      </Group>
+                    </Group>
+                  </div>
+                  <Divider />
+                  <Stack gap='md' p='md'>
+                    <Group align='flex-start'>
+                      <TextInput
+                        label={t('pages.admin.settings.tabs.mailTemplates.page.form.subject', {})}
+                        className='flex-1'
+                        required
+                        key={form.key('subject')}
+                        {...form.getInputProps('subject')}
+                      />
+                      <Switch
+                        label={t('common.form.enabled', {})}
+                        mt='xl'
+                        key={form.key('enabled')}
+                        {...form.getInputProps('enabled', { type: 'checkbox' })}
+                      />
+                    </Group>
+                  </Stack>
 
-              <Divider />
+                  <Divider />
 
-              <MonacoEditor
-                height='60vh'
-                language='html'
-                value={effectiveContent}
-                options={{
-                  stickyScroll: { enabled: false },
-                  minimap: { enabled: false },
-                  codeLens: false,
-                  scrollBeyondLastLine: false,
-                  smoothScrolling: false,
-                  inertialScroll: true,
-                  wordWrap: 'on',
-                }}
-                onChange={(value) => setEditorContent(value ?? '')}
-              />
-            </>
-          ) : null}
-        </Paper>
+                  <div className='relative flex-1 min-h-[60vh]'>
+                    <div className='absolute inset-0'>
+                      <MonacoEditor
+                        height='100%'
+                        language='html'
+                        value={effectiveContent}
+                        options={{
+                          automaticLayout: true,
+                          stickyScroll: { enabled: false },
+                          minimap: { enabled: false },
+                          codeLens: false,
+                          scrollBeyondLastLine: false,
+                          smoothScrolling: false,
+                          inertialScroll: true,
+                          wordWrap: 'on',
+                        }}
+                        onChange={(value) => setEditorContent(value ?? '')}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </Paper>
+
+            <div className='shrink-0 md:w-[26rem] w-full md:relative'>
+              <EmailVariablesSection templateIdentifier={selectedIdentifier} className='md:absolute md:inset-0' />
+            </div>
+          </>
+        )}
       </div>
     </AdminSubContentContainer>
   );

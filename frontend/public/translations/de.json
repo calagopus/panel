@@ -2064,6 +2064,7 @@
                 "title": "E-Mail-Vorlagen-Einstellungen",
                 "sidebar": {
                   "templates": "Vorlagen",
+                  "globalVariables": "Globale Variablen",
                   "loading": "Wird geladen…",
                   "availableVariables": "Verfügbare Variablen"
                 },
@@ -2073,9 +2074,44 @@
                   "syntaxMiddle": "Templating-Syntax. Variablen werden referenziert mit",
                   "syntaxAnd": "und Kontrollstrukturen wie",
                   "syntaxOr": "und",
-                  "syntaxAfter": "werden unterstützt."
+                  "syntaxAfter": "werden unterstützt.",
+                  "variablesBefore": "Textbausteine werden referenziert mit",
+                  "variablesAfter": "und im Abschnitt Variablen pro Sprache übersetzt, sodass eine Vorlage nur ein Layout für alle wählbaren Sprachen braucht."
                 },
-                "empty": "Wähle eine Vorlage aus der Seitenleiste zum Bearbeiten aus",
+                "variables": {
+                  "title": "Variablen",
+                  "description": "Textbausteine, die diese Vorlage referenziert als",
+                  "globalDescription": "Textbausteine, die jede Vorlage referenzieren kann als",
+                  "descriptionAfter": "Bausteine sind MiniJinja-Schnipsel mit Zugriff auf dieselben Variablen wie die Vorlage. Ein leeres Feld verwendet den darin angezeigten Standard; Sprachen ohne Wert greifen auf den englischen Wert zurück, danach auf die eingebaute Übersetzung.",
+                  "custom": "Benutzerdefiniert",
+                  "add": "Variable hinzufügen",
+                  "loading": "Wird geladen…",
+                  "empty": "Keine Variablen definiert.",
+                  "error": {
+                    "valueRequired": "Benutzerdefinierte Variablen benötigen einen englischen Wert."
+                  },
+                  "toast": {
+                    "saved": "E-Mail-Variable gespeichert.",
+                    "created": "E-Mail-Variable erstellt.",
+                    "reset": "E-Mail-Variable auf Standard zurückgesetzt.",
+                    "deleted": "E-Mail-Variable gelöscht."
+                  },
+                  "modal": {
+                    "create": {
+                      "title": "Variable erstellen",
+                      "nameDescription": "Kleinbuchstaben, Ziffern und Unterstriche, beginnend mit einem Buchstaben.",
+                      "valueDescription": "Der englische Wert. Übersetzungen können nach dem Erstellen der Variable hinzugefügt werden."
+                    },
+                    "reset": {
+                      "title": "Auf Standard zurücksetzen",
+                      "content": "Dies verwirft deine benutzerdefinierten Werte für **{name}** in allen Sprachen und stellt die eingebauten Standards wieder her. Dies kann nicht rückgängig gemacht werden."
+                    },
+                    "delete": {
+                      "title": "Variable löschen",
+                      "content": "Dies löscht die benutzerdefinierte Variable **{name}** in allen Sprachen. Vorlagen, die sie referenzieren, geben an ihrer Stelle nichts aus. Dies kann nicht rückgängig gemacht werden."
+                    }
+                  }
+                },
                 "loadingTemplate": "Vorlage wird geladen…",
                 "form": {
                   "subject": "Betreff"

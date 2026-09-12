@@ -117,7 +117,7 @@ mod post {
             .send_template_foreground(
                 &state,
                 "two_factor_code",
-                user.email.clone(),
+                &user,
                 minijinja::context! {
                     user => user,
                     code => code,

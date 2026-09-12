@@ -7,7 +7,11 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
+        mail::MailRecipient,
+        models::{
+            admin_activity::GetAdminActivityLogger,
+            user::{GetPermissionManager, GetUser},
+        },
         response::{ApiResponse, ApiResponseResult},
         settings::MailMode,
     };
@@ -29,6 +33,7 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        user: GetUser,
         activity_logger: GetAdminActivityLogger,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
@@ -56,7 +61,7 @@ mod post {
                 state.mail.send_template_foreground(
                     &state,
                     "connection_test",
-                    data.email.clone(),
+                    MailRecipient::new(data.email.clone(), user.language.clone()),
                     minijinja::context! {},
                 ),
             )

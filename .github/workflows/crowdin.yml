@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'frontend/public/translations/en.json'
+      - 'shared/mails/variables/en.json'
       - 'crowdin.yml'
   schedule:
     - cron: '0 9 * * 1'

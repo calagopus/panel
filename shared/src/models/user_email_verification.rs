@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{mail::MailRecipient, prelude::*};
 use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
@@ -195,7 +195,7 @@ impl UserEmailVerification {
             .send_template_foreground(
                 state,
                 "email_verification",
-                email.into(),
+                MailRecipient::new(email, user.language.clone()),
                 minijinja::context! {
                     user => user,
                     email => email,

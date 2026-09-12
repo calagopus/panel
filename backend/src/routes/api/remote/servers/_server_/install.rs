@@ -80,7 +80,7 @@ mod post {
             .send_template(
                 &state,
                 "server_installed",
-                server.owner.email.clone(),
+                &server.owner,
                 minijinja::context! {
                     user => server.owner,
                     server => *server,

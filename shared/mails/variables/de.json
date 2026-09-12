@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Konto erstellt",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil für dich ein Konto auf <strong>{{ settings.app.name }}</strong> erstellt wurde.",
+    "instruction": "Bitte klicke auf die Schaltfläche unten, um sicher dein Passwort festzulegen und auf dein Konto zuzugreifen:",
+    "button": "Passwort festlegen",
+    "note": "<strong>Hinweis:</strong> Aus Sicherheitsgründen läuft dieser Link in <strong>20 Minuten</strong> ab.",
+    "footer": "Falls du dieses Konto nicht angefordert hast, kannst du diese E-Mail ignorieren."
+  },
+  "password_reset": {
+    "subject": "Passwort zurücksetzen",
+    "greeting": "Hallo <strong>{{ user.username }}</strong>,",
+    "intro": "Wir haben eine Anfrage erhalten, das Passwort deines Kontos auf <strong>{{ settings.app.name }}</strong> zurückzusetzen.",
+    "instruction": "Falls du diese Anfrage gestellt hast, klicke bitte auf die Schaltfläche unten, um ein neues Passwort zu wählen:",
+    "button": "Passwort zurücksetzen",
+    "note": "<strong>Hinweis:</strong> Dieser Link läuft in <strong>20 Minuten</strong> ab.",
+    "footer": "Falls du kein Zurücksetzen des Passworts angefordert hast, ignoriere diese E-Mail bitte. Dein Passwort bleibt unverändert und dein Konto ist sicher."
+  },
+  "email_verification": {
+    "subject": "E-Mail-Adresse bestätigen",
+    "greeting": "Hallo <strong>{{ user.username }}</strong>,",
+    "intro": "Bitte bestätige, dass <strong>{{ email }}</strong> dir gehört, um die Einrichtung deines Kontos auf <strong>{{ settings.app.name }}</strong> abzuschließen.",
+    "button": "E-Mail-Adresse bestätigen",
+    "note": "<strong>Hinweis:</strong> Dieser Link läuft in <strong>24 Stunden</strong> ab.",
+    "footer": "Falls du dieses Konto nicht erstellt oder diese Änderung nicht angefordert hast, ignoriere diese E-Mail bitte. Es wird nichts geändert."
+  },
+  "two_factor_code": {
+    "subject": "Dein Anmeldecode",
+    "greeting": "Hallo <strong>{{ user.username }}</strong>,",
+    "intro": "Verwende den folgenden Code, um die Anmeldung bei <strong>{{ settings.app.name }}</strong> abzuschließen.",
+    "note": "<strong>Hinweis:</strong> Dieser Code läuft in <strong>10 Minuten</strong> ab und kann nur einmal verwendet werden.",
+    "footer": "Falls du dich nicht anmelden wolltest, kennt möglicherweise jemand anderes dein Passwort. Wir empfehlen, es so bald wie möglich zu ändern."
+  },
+  "session_created": {
+    "subject": "Neue Sitzung erstellt",
+    "greeting": "Hallo <strong>{{ user.username }}</strong>,",
+    "intro": "Es wurde soeben eine Anmeldung bei deinem Konto auf <strong>{{ settings.app.name }}</strong> durchgeführt.",
+    "ip_label": "IP-Adresse",
+    "device_label": "Gerät",
+    "button": "Sitzungen überprüfen",
+    "note": "<strong>Hinweis:</strong> Falls du das warst, ist nichts weiter zu tun. Sitzungen, die du nicht kennst, kannst du in deinen Kontoeinstellungen beenden.",
+    "footer": "Falls du dich nicht angemeldet hast, kennt möglicherweise jemand anderes dein Passwort. Wir empfehlen, es so bald wie möglich zu ändern."
+  },
+  "connection_test": {
+    "subject": "Verbindungstest",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil ein Administrator auf <strong>{{ settings.app.name }}</strong> eine Testnachricht angefordert hat, um die Einstellungen für ausgehende E-Mails zu überprüfen.",
+    "success": "🎉 Erfolg! Die E-Mail-Verbindung funktioniert.",
+    "footer": "Dies ist eine automatische Testnachricht deiner Anwendung. Es ist nichts weiter zu tun."
+  },
+  "added_to_server": {
+    "subject": "Zu Server hinzugefügt",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil du als Unterbenutzer zu <strong>{{ server.name }}</strong> hinzugefügt wurdest.",
+    "instruction": "Klicke auf die Schaltfläche unten, um auf den Server zuzugreifen:",
+    "button": "Server öffnen"
+  },
+  "removed_from_server": {
+    "subject": "Von Server entfernt",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil du als Unterbenutzer von <strong>{{ server.name }}</strong> entfernt wurdest.",
+    "footer": "Du musst nichts weiter tun. Falls du glaubst, dass dies ein Fehler war, wende dich bitte an den Administrator des Servers."
+  },
+  "server_installed": {
+    "subject": "Server installiert",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil die Installation deines Servers <strong>{{ server.name }}</strong> abgeschlossen ist.",
+    "instruction": "Klicke auf die Schaltfläche unten, um auf den Server zuzugreifen:",
+    "button": "Server öffnen"
+  },
+  "server_restored": {
+    "subject": "Server wiederhergestellt",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil dein Server <strong>{{ server.name }}</strong> aus einem Backup wiederhergestellt wurde.",
+    "instruction": "Klicke auf die Schaltfläche unten, um auf den Server zuzugreifen:",
+    "button": "Server öffnen"
+  }
+}

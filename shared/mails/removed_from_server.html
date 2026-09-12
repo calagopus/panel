@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="{{ language }}">
   <head>
     <meta charset="utf-8" />
     <title>{{ subject }}</title>
@@ -56,7 +56,7 @@
             color: #4b5563;
           "
         >
-          Hello,
+          {{ vars.greeting }}
         </p>
         <p
           style="
@@ -67,9 +67,7 @@
             color: #4b5563;
           "
         >
-          You are receiving this email because you have been removed as a
-          subuser from
-          <strong>{{ server.name }}</strong>.
+          {{ vars.intro }}
         </p>
 
         <div
@@ -83,8 +81,7 @@
           <p
             style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5"
           >
-            There is no action required on your side. If you believe this was a mistake,
-						please contact the server's administrator for more information.
+            {{ vars.footer }}
           </p>
         </div>
       </div>

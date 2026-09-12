@@ -475,7 +475,7 @@ impl CreatableModel for UserSession {
                     .send_template(
                         state,
                         "session_created",
-                        user.email.clone(),
+                        &user,
                         minijinja::context! {
                             user => user,
                             ip => options.ip.ip().to_compact_string(),

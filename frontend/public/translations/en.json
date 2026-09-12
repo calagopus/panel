@@ -2064,6 +2064,7 @@
                 "title": "Email Template Settings",
                 "sidebar": {
                   "templates": "Templates",
+                  "globalVariables": "Global Variables",
                   "loading": "Loading...",
                   "availableVariables": "Available Variables"
                 },
@@ -2073,9 +2074,44 @@
                   "syntaxMiddle": "templating syntax. Variables are referenced with",
                   "syntaxAnd": "and control structures like",
                   "syntaxOr": "and",
-                  "syntaxAfter": "are supported."
+                  "syntaxAfter": "are supported.",
+                  "variablesBefore": "Text fragments are referenced with",
+                  "variablesAfter": "and are translated per language in the Variables section, so a template only needs one layout for every language a user can pick."
                 },
-                "empty": "Select a template from the sidebar to edit it.",
+                "variables": {
+                  "title": "Variables",
+                  "description": "Text fragments this template references as",
+                  "globalDescription": "Text fragments every template can reference as",
+                  "descriptionAfter": "Fragments are MiniJinja snippets with access to the same variables as the template. An empty field uses the default shown in it; languages without a value fall back to the English value, then to the built-in translation.",
+                  "custom": "Custom",
+                  "add": "Add Variable",
+                  "loading": "Loading...",
+                  "empty": "No variables defined.",
+                  "error": {
+                    "valueRequired": "Custom variables need an English value."
+                  },
+                  "toast": {
+                    "saved": "Email variable saved.",
+                    "created": "Email variable created.",
+                    "reset": "Email variable reset to default.",
+                    "deleted": "Email variable deleted."
+                  },
+                  "modal": {
+                    "create": {
+                      "title": "Create Variable",
+                      "nameDescription": "Lowercase letters, digits and underscores, starting with a letter.",
+                      "valueDescription": "The English value. Translations can be added after creating the variable."
+                    },
+                    "reset": {
+                      "title": "Reset to default",
+                      "content": "This will discard your custom values for **{name}** in every language and restore the built-in defaults. This cannot be undone."
+                    },
+                    "delete": {
+                      "title": "Delete Variable",
+                      "content": "This will delete the custom variable **{name}** in every language. Templates referencing it will render nothing in its place. This cannot be undone."
+                    }
+                  }
+                },
                 "loadingTemplate": "Loading template...",
                 "form": {
                   "subject": "Subject"

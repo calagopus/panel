@@ -1,7 +1,9 @@
-base_path: frontend/public/translations
-
 files:
-  - source: en.json
-    translation: "%two_letters_code%.json"
+  - source: frontend/public/translations/en.json
+    translation: frontend/public/translations/%two_letters_code%.json
+    excluded_target_languages:
+      - de
+  - source: shared/mails/variables/en.json
+    translation: shared/mails/variables/%two_letters_code%.json
     excluded_target_languages:
       - de

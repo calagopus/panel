@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Account Created",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because an account was created for you on <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Please click the button below to securely set your password and access your account:",
+    "button": "Set Your Password",
+    "note": "<strong>Note:</strong> For security reasons, this link will expire in <strong>20 minutes</strong>.",
+    "footer": "If you did not request this account, you can safely ignore this email."
+  },
+  "password_reset": {
+    "subject": "Password Reset",
+    "greeting": "Hello <strong>{{ user.username }}</strong>,",
+    "intro": "We received a request to reset the password for your account on <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "If you made this request, please click the button below to choose a new password:",
+    "button": "Reset Password",
+    "note": "<strong>Note:</strong> This link will expire in <strong>20 minutes</strong>.",
+    "footer": "If you did not request a password reset, please ignore this email. Your password will remain unchanged and your account is secure."
+  },
+  "email_verification": {
+    "subject": "Verify Your Email",
+    "greeting": "Hello <strong>{{ user.username }}</strong>,",
+    "intro": "Please confirm that <strong>{{ email }}</strong> belongs to you to finish setting up your account on <strong>{{ settings.app.name }}</strong>.",
+    "button": "Verify Email",
+    "note": "<strong>Note:</strong> This link will expire in <strong>24 hours</strong>.",
+    "footer": "If you did not create this account or request this change, please ignore this email. Nothing will be changed."
+  },
+  "two_factor_code": {
+    "subject": "Your Login Code",
+    "greeting": "Hello <strong>{{ user.username }}</strong>,",
+    "intro": "Use the code below to finish signing in to <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Note:</strong> This code will expire in <strong>10 minutes</strong> and can only be used once.",
+    "footer": "If you did not try to sign in, someone else may know your password. We recommend changing it as soon as possible."
+  },
+  "session_created": {
+    "subject": "New Session Created",
+    "greeting": "Hello <strong>{{ user.username }}</strong>,",
+    "intro": "Your account was just signed in to on <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "IP Address",
+    "device_label": "Device",
+    "button": "Review Sessions",
+    "note": "<strong>Note:</strong> If this was you, no action is needed. You can revoke any session you do not recognize from your account settings.",
+    "footer": "If you did not sign in, someone else may know your password. We recommend changing it as soon as possible."
+  },
+  "connection_test": {
+    "subject": "Connection Test",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because an administrator on <strong>{{ settings.app.name }}</strong> requested a test message to verify the system's outbound mail settings.",
+    "success": "🎉 Success! The email connection works.",
+    "footer": "This is an automated test message from your application. No further action is required."
+  },
+  "added_to_server": {
+    "subject": "Added to Server",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because you have been added as a subuser on <strong>{{ server.name }}</strong>.",
+    "instruction": "Click the button below to access the server:",
+    "button": "Access Server"
+  },
+  "removed_from_server": {
+    "subject": "Removed from Server",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because you have been removed as a subuser from <strong>{{ server.name }}</strong>.",
+    "footer": "There is no action required on your side. If you believe this was a mistake, please contact the server's administrator for more information."
+  },
+  "server_installed": {
+    "subject": "Server Installed",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because your server, <strong>{{ server.name }}</strong>, has finished its installation.",
+    "instruction": "Click the button below to access the server:",
+    "button": "Access Server"
+  },
+  "server_restored": {
+    "subject": "Server Restored",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because your server, <strong>{{ server.name }}</strong>, has finished its restoration from a backup.",
+    "instruction": "Click the button below to access the server:",
+    "button": "Access Server"
+  }
+}

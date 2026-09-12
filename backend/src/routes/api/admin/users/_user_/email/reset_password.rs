@@ -89,7 +89,7 @@ mod post {
                 .send_template(
                     &state,
                     "password_reset",
-                    user.email.clone(),
+                    &**user,
                     minijinja::context! {
                         user => **user,
                         reset_link => format!(

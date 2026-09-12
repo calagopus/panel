@@ -124,6 +124,31 @@ export const adminSettingsEmailTemplateUpdateSchema = z.object({
   enabled: z.boolean().optional(),
 });
 
+export const adminSettingsEmailVariableSchema = z.object({
+  templateIdentifier: z.string().nullable(),
+  name: z.string(),
+  system: z.boolean(),
+  defaultValue: z.string().nullable(),
+  defaultTranslations: z.record(z.string(), z.string()),
+  value: z.string().nullable(),
+  valueTranslations: z.record(z.string(), z.string()),
+});
+
+export const adminSettingsEmailVariableCreateSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z][a-z0-9_]{0,63}$/),
+  value: z.string().min(1).max(8192),
+  valueTranslations: z.record(z.string(), z.string().min(1).max(8192)),
+});
+
+export const adminSettingsEmailVariableUpdateSchema = z.object({
+  value: z.string().min(1).max(8192).nullable().optional(),
+  valueTranslations: z.record(z.string(), z.string().min(1).max(8192)).optional(),
+});
+
 export const adminSettingsServerSchema = z.object({
   maxFileManagerViewSize: z.number().min(0),
   maxFileManagerContentSearchSize: z.number().min(0),

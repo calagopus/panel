@@ -256,10 +256,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
             (
                 "email-templates",
                 PermissionGroup {
-                    description: "Permissions that control the ability to manage email templates for the panel.",
+                    description: "Permissions that control the ability to manage email templates and variables for the panel.",
                     permissions: IndexMap::from([
-                        ("read", "Allows viewing email templates."),
-                        ("update", "Allows modifying email templates."),
+                        ("read", "Allows viewing email templates and variables."),
+                        ("update", "Allows modifying email templates and variables."),
                     ]),
                 },
             ),

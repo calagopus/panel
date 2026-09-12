@@ -353,7 +353,7 @@ impl CreatableModel for ServerSubuser {
             .send_template(
                 state,
                 "added_to_server",
-                user.email.clone(),
+                &user,
                 minijinja::context! {
                     user => user,
                     server => options.server,
@@ -466,7 +466,7 @@ impl DeletableModel for ServerSubuser {
             .send_template(
                 state,
                 "removed_from_server",
-                self.user.email.clone(),
+                &self.user,
                 minijinja::context! {
                     user => self.user,
                 },

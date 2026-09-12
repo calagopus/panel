@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="{{ language }}">
   <head>
     <meta charset="utf-8" />
     <title>{{ subject }}</title>
@@ -56,7 +56,7 @@
             color: #4b5563;
           "
         >
-          Hello,
+          {{ vars.greeting }}
         </p>
         <p
           style="
@@ -67,8 +67,7 @@
             color: #4b5563;
           "
         >
-          You are receiving this email because your server,
-          <strong>{{ server.name }}</strong>, has finished its installation.
+          {{ vars.intro }}
         </p>
         <p
           style="
@@ -79,7 +78,7 @@
             color: #4b5563;
           "
         >
-          Click the button below to access the server:
+          {{ vars.instruction }}
         </p>
 
         <div style="text-align: center; margin-bottom: 32px">
@@ -96,7 +95,7 @@
               border-radius: 6px;
             "
           >
-            Access Server
+            {{ vars.button }}
           </a>
         </div>
       </div>
