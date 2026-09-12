@@ -1,4 +1,10 @@
-import { faPause, faPlay, faSatellite, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlugCircleCheck,
+  faPlugCircleXmark,
+  faSatellite,
+  faTrash,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import clearServerState from '@/api/admin/servers/clearServerState.ts';
@@ -19,25 +25,25 @@ type ServerAction = 'suspend' | 'unsuspend' | 'clearState' | 'delete';
 
 const ACTIONS = [
   {
-    action: 'suspend',
-    icon: faPause,
-    color: undefined,
-    permission: 'servers.update',
-    label: 'pages.admin.servers.tabs.management.page.suspend.button',
-  },
-  {
-    action: 'unsuspend',
-    icon: faPlay,
-    color: undefined,
-    permission: 'servers.update',
-    label: 'pages.admin.servers.tabs.management.page.unsuspend.button',
-  },
-  {
     action: 'clearState',
     icon: faSatellite,
     color: undefined,
     permission: 'servers.update',
     label: 'pages.admin.servers.tabs.management.page.clearState.button',
+  },
+  {
+    action: 'unsuspend',
+    icon: faPlugCircleCheck,
+    color: undefined,
+    permission: 'servers.update',
+    label: 'pages.admin.servers.tabs.management.page.unsuspend.button',
+  },
+  {
+    action: 'suspend',
+    icon: faPlugCircleXmark,
+    color: 'red',
+    permission: 'servers.update',
+    label: 'pages.admin.servers.tabs.management.page.suspend.button',
   },
   {
     action: 'delete',

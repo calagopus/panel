@@ -1,4 +1,11 @@
-import { faPause, faPlay, faReply, faSatellite, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlugCircleCheck,
+  faPlugCircleXmark,
+  faReply,
+  faSatellite,
+  faTrash,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -45,7 +52,7 @@ export function useServerManagementActions(server: AdminServer): ServerManagemen
       !server.isSuspended && {
         id: 'suspend',
         modal: 'suspend',
-        icon: faPause,
+        icon: faPlugCircleXmark,
         color: 'red',
         danger: true,
         orderClass: 'order-20',
@@ -58,7 +65,7 @@ export function useServerManagementActions(server: AdminServer): ServerManagemen
       server.isSuspended && {
         id: 'unsuspend',
         modal: 'unsuspend',
-        icon: faPlay,
+        icon: faPlugCircleCheck,
         color: 'green',
         danger: false,
         orderClass: 'order-20',
