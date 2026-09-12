@@ -250,7 +250,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.variant }}
 
       - name: Attach source SBOM attestation to image (GHCR)
-        uses: actions/attest-sbom@v4
+        uses: actions/attest@v4
         with:
           subject-name: ${{ env.GHCR_IMAGE }}
           subject-digest: ${{ steps.build.outputs.digest }}
@@ -258,7 +258,7 @@ jobs:
           push-to-registry: true
 
       - name: Attach source SBOM attestation to image (Docker Hub)
-        uses: actions/attest-sbom@v4
+        uses: actions/attest@v4
         with:
           subject-name: ${{ env.DOCKERHUB_IMAGE }}
           subject-digest: ${{ steps.build.outputs.digest }}
