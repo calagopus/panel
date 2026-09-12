@@ -8,6 +8,7 @@ on:
     paths:
       - 'frontend/public/translations/en.json'
       - 'shared/mails/variables/en.json'
+      - '.github/workflows/crowdin.yml'
       - 'crowdin.yml'
   schedule:
     - cron: '0 9 * * 1'
