@@ -1,3 +1,5 @@
+import { faBan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { forwardRef, memo } from 'react';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
@@ -16,6 +18,26 @@ interface ServerRowProps {
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
   onClick?: (event: React.MouseEvent) => void;
+}
+
+function ServerStatus({ server, stats }: { server: AdminServer; stats: ReturnType<typeof useServerStats> }) {
+  const { t } = useTranslations();
+
+  if (server.isSuspended) {
+    return (
+      <>
+        <FontAwesomeIcon icon={faBan} className='size-3 mr-2 text-server-status-offline' />
+        {t('common.server.state.suspended', {})}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className={classNames('rounded-full size-3 animate-pulse mr-2', statusToColor(stats?.state))} />
+      {!stats ? t('common.enum.serverState.unknown', {}) : t(`common.enum.serverState.${stats.state}`, {})}
+    </>
+  );
 }
 
 const ServerRow = memo(
@@ -50,8 +72,7 @@ const ServerRow = memo(
 
         <TableData>
           <div className='flex flex-row items-center'>
-            <span className={classNames('rounded-full size-3 animate-pulse mr-2', statusToColor(stats?.state))} />
-            {!stats ? t('common.enum.serverState.unknown', {}) : t(`common.enum.serverState.${stats.state}`, {})}
+            <ServerStatus server={server} stats={stats} />
           </div>
         </TableData>
 

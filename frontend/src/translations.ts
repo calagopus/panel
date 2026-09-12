@@ -438,6 +438,10 @@ const baseTranslations = defineTranslations({
           stopped: 'Stopped',
           restarted: 'Restarted',
           killed: 'Killed',
+          suspended: 'Suspended',
+          unsuspended: 'Unsuspended',
+          clearedState: 'Cleared the state of',
+          deleted: 'Deleted',
         },
         compressionLevel: {
           bestSpeed: 'Best Speed',
@@ -3179,6 +3183,22 @@ const baseTranslations = defineTranslations({
             unsuspend: 'Unsuspend Server',
             clearState: 'Clear Server State',
             delete: 'Delete Server',
+          },
+          bulkActions: {
+            verb: {
+              suspend: 'suspend',
+              unsuspend: 'unsuspend',
+              clearState: 'clear the state of',
+              delete: 'delete',
+            },
+            modal: {
+              title: 'Confirm Bulk Action',
+              content: 'Are you sure you want to {action} **{servers}**?',
+              deleteContent:
+                'Are you sure you want to permanently delete **{servers}** and everything on them? This cannot be undone.',
+            },
+            successWithSkipped: 'Successfully {action} {servers}. {skippedServers} skipped.',
+            nothingToDo: 'Every selected server is already in that state.',
           },
           externalIdLookup: {
             button: 'Find by External ID',
