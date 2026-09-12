@@ -41,6 +41,13 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     telemetryEnabled: true,
     registrationEnabled: true,
   },
+  metadata: {
+    description: null,
+    themeColor: '#6c5ce7',
+    ogImage: null,
+    twitterCard: 'summary_large_image',
+    indexable: true,
+  },
   server: {
     maxFileManagerViewSize: 10 * 1024 * 1024 * 1024,
     maxFileManagerContentSearchSize: 5 * 1024 * 1024 * 1024,

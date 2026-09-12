@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ settings.app.language }}">
 
 <head>
     <meta charset="UTF-8"/>
@@ -13,25 +13,24 @@
     <!-- Primary & Social Embed Meta Tags (Discord, Twitter, OpenGraph) -->
     <title>{{ settings.app.name }}</title>
     <meta name="title" content="{{ settings.app.name }}"/>
-    <meta name="description" content="Manage your game servers and services with {{ settings.app.name }}."/>
-    <meta name="theme-color" content="#6c5ce7" id="meta-theme-color"/>
+    <meta name="description" content="{{ metadata.description }}"/>
+    <meta name="theme-color" content="{{ metadata.theme_color }}" id="meta-theme-color"/>
+    <meta name="robots" content="{{ metadata.robots }}"/>
 
     <!-- Open Graph / Facebook / Discord -->
     <meta property="og:type" content="website"/>
     <meta property="og:url" content="{{ settings.app.url }}"/>
     <meta property="og:title" content="{{ settings.app.name }}" id="meta-og-title"/>
-    <meta property="og:description" content="Manage your game servers and services with {{ settings.app.name }}."
-          id="meta-og-desc"/>
-    <meta property="og:image" content="{{ settings.app.url }}/icon.svg" id="meta-og-image"/>
+    <meta property="og:description" content="{{ metadata.description }}" id="meta-og-desc"/>
+    <meta property="og:image" content="{{ metadata.og_image }}" id="meta-og-image"/>
     <meta property="og:site_name" content="{{ settings.app.name }}"/>
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:card" content="{{ metadata.twitter_card }}"/>
     <meta property="twitter:url" content="{{ settings.app.url }}"/>
     <meta property="twitter:title" content="{{ settings.app.name }}" id="meta-tw-title"/>
-    <meta property="twitter:description" content="Manage your game servers and services with {{ settings.app.name }}."
-          id="meta-tw-desc"/>
-    <meta property="twitter:image" content="{{ settings.app.url }}/icon.svg" id="meta-tw-image"/>
+    <meta property="twitter:description" content="{{ metadata.description }}" id="meta-tw-desc"/>
+    <meta property="twitter:image" content="{{ metadata.og_image }}" id="meta-tw-image"/>
 </head>
 
 <body>

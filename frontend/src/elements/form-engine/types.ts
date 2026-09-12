@@ -223,6 +223,7 @@ export interface RegisteredFormIds {
   'admin.settings.server': true;
   'admin.settings.webauthn': true;
   'admin.settings.application': true;
+  'admin.settings.metadata': true;
   'admin.settings.user': true;
   'admin.settings.captcha.hcaptcha': true;
   'admin.settings.captcha.recaptcha': true;

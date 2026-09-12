@@ -1990,6 +1990,37 @@
                 }
               }
             },
+            "metadata": {
+              "title": "Metadata",
+              "page": {
+                "title": "Metadata Settings",
+                "form": {
+                  "description": "Description",
+                  "descriptionDescription": "Shown under the title in search results and link previews.",
+                  "ogImage": "Preview Image",
+                  "ogImageDescription": "Shown in link previews. Must be a PNG or JPEG, not SVG.",
+                  "themeColor": "Theme Color",
+                  "themeColorDescription": "Tints the browser UI on mobile and link previews.",
+                  "indexable": "Allow Search Engine Indexing",
+                  "twitterCard": "Twitter Card Type"
+                },
+                "enum": {
+                  "twitterCard": {
+                    "summary": "Summary",
+                    "summaryLargeImage": "Summary with Large Image"
+                  }
+                },
+                "placeholder": {
+                  "description": "Manage your game servers and services with {name}."
+                },
+                "button": {
+                  "autofill": "Autofill"
+                },
+                "toast": {
+                  "updated": "Metadata settings updated."
+                }
+              }
+            },
             "storage": {
               "title": "Storage",
               "page": {

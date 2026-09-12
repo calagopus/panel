@@ -25,6 +25,7 @@ use utoipa::ToSchema;
 
 pub mod activity;
 pub mod app;
+pub mod metadata;
 pub mod ratelimits;
 pub mod server;
 pub mod user;
@@ -310,6 +311,8 @@ pub struct AppSettings {
     #[schema(inline)]
     pub app: app::AppSettingsApp,
     #[schema(inline)]
+    pub metadata: metadata::AppSettingsMetadata,
+    #[schema(inline)]
     pub webauthn: webauthn::AppSettingsWebauthn,
     #[schema(inline)]
     pub server: server::AppSettingsServer,
@@ -579,6 +582,8 @@ impl SettingsSerializeExt for AppSettings {
         serializer = serializer
             .nest("app", &self.app)
             .await?
+            .nest("metadata", &self.metadata)
+            .await?
             .nest("webauthn", &self.webauthn)
             .await?
             .nest("server", &self.server)
@@ -823,6 +828,9 @@ impl SettingsDeserializeExt for AppSettingsDeserializer {
             app: deserializer
                 .nest("app", &app::AppSettingsAppDeserializer)
                 .await?,
+            metadata: deserializer
+                .nest("metadata", &metadata::AppSettingsMetadataDeserializer)
+                .await?,
             webauthn: deserializer
                 .nest("webauthn", &webauthn::AppSettingsWebauthnDeserializer)
                 .await?,
@@ -888,6 +896,18 @@ impl Deref for SettingsReadGuard<'_> {
 }
 
 const INDEX_HTML: &str = include_str!("../../../frontend/dist/index.html");
+
+fn render_index_html(settings: &AppSettings) -> Result<String, anyhow::Error> {
+    let mut environment = minijinja::Environment::new();
+    environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
+    environment.add_global("settings", minijinja::Value::from_serialize(settings));
+    environment.add_global(
+        "metadata",
+        minijinja::Value::from_serialize(settings.metadata.resolve(&settings.app)),
+    );
+
+    Ok(environment.render_str(INDEX_HTML, minijinja::context! {})?)
+}
 
 #[derive(Clone)]
 pub struct ArcedIndexHtml(Arc<String>);
@@ -960,16 +980,7 @@ impl<'a> SettingsWriteGuard<'a> {
             .cached_index
             .fetch_update(Ordering::Release, Ordering::Relaxed, |i| Some((i + 1) % 2));
 
-        let mut environment = minijinja::Environment::new();
-        environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
-        environment.add_global(
-            "settings",
-            minijinja::Value::from_serialize(&settings_guard.settings),
-        );
-
-        let rendered_index_html = environment
-            .render_str(INDEX_HTML, minijinja::context! {})
-            .map_err(anyhow::Error::new)?;
+        let rendered_index_html = render_index_html(&settings_guard.settings)?;
         self.parent
             .rendered_index_html
             .store(ArcedIndexHtml(Arc::new(rendered_index_html)));
@@ -1068,11 +1079,7 @@ impl Settings {
             Self::fetch_settings(&database)
         )?;
 
-        let mut environment = minijinja::Environment::new();
-        environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
-        environment.add_global("settings", minijinja::Value::from_serialize(&s1));
-
-        let rendered_index_html = environment.render_str(INDEX_HTML, minijinja::context! {})?;
+        let rendered_index_html = render_index_html(&s1)?;
         let rendered_index_html =
             arc_swap::ArcSwapAny::new(ArcedIndexHtml(Arc::new(rendered_index_html)));
 

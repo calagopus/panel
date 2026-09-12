@@ -247,6 +247,14 @@ export const adminSettingsWebauthnSchema = z.object({
   registrationTimeoutSeconds: z.number().min(30).max(600),
 });
 
+export const adminSettingsMetadataSchema = z.object({
+  description: z.preprocess(nullableString, z.string().min(1).max(320).nullable()),
+  themeColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  ogImage: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  twitterCard: z.enum(['summary', 'summary_large_image']),
+  indexable: z.boolean(),
+});
+
 export const twoFactorRequirement = z.enum(['admins', 'all_users', 'none']);
 
 export const adminSettingsSchema = z.object({
@@ -257,6 +265,7 @@ export const adminSettingsSchema = z.object({
   mailMode: adminSettingsEmailSchema,
   captchaProvider: adminSettingsCaptchaProviderSchema,
   app: adminSettingsApplicationSchema,
+  metadata: adminSettingsMetadataSchema,
   webauthn: adminSettingsWebauthnSchema,
   server: adminSettingsServerSchema,
   user: adminSettingsUserSchema,

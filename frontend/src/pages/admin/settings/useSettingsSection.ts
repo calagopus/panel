@@ -14,6 +14,7 @@ type PublicSettings = z.infer<typeof publicSettingsSchema>;
 /** Keys of the admin settings store that back a single settings section form. */
 type SettingsStoreKey =
   | 'app'
+  | 'metadata'
   | 'webauthn'
   | 'server'
   | 'user'

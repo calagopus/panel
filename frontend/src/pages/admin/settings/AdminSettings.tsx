@@ -6,6 +6,7 @@ import {
   faLayerGroup,
   faRobot,
   faServer,
+  faShareNodes,
   faToolbox,
   faUser,
   faUserCheck,
@@ -24,6 +25,7 @@ import ActivityContainer from './activity/ActivityContainer.tsx';
 import ApplicationContainer from './application/ApplicationContainer.tsx';
 import CaptchaContainer from './captcha/CaptchaContainer.tsx';
 import EmailContainer from './email/EmailContainer.tsx';
+import MetadataContainer from './metadata/MetadataContainer.tsx';
 import RatelimitsContainer from './ratelimits/RatelimitsContainer.tsx';
 import ServerContainer from './server/ServerContainer.tsx';
 import StorageContainer from './storage/StorageContainer.tsx';
@@ -58,6 +60,12 @@ export default function AdminSettings() {
             icon: faLayerGroup,
             path: '/',
             element: <ApplicationContainer />,
+          },
+          {
+            name: t('pages.admin.settings.tabs.metadata.title', {}),
+            icon: faShareNodes,
+            path: '/metadata',
+            element: <MetadataContainer />,
           },
           {
             name: t('pages.admin.settings.tabs.storage.title', {}),

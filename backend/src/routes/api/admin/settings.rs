@@ -86,6 +86,22 @@ mod put {
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
+    pub struct PayloadMetadata {
+        #[garde(length(chars, min = 1, max = 320))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        description: Option<Option<compact_str::CompactString>>,
+        #[garde(pattern("^#[0-9a-fA-F]{6}$"))]
+        theme_color: Option<compact_str::CompactString>,
+        #[garde(length(chars, min = 1, max = 255))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        og_image: Option<Option<compact_str::CompactString>>,
+        #[garde(skip)]
+        twitter_card: Option<shared::settings::metadata::TwitterCard>,
+        #[garde(skip)]
+        indexable: Option<bool>,
+    }
+
+    #[derive(ToSchema, Validate, Deserialize)]
     pub struct PayloadWebauthn {
         #[garde(skip)]
         enabled: Option<bool>,
@@ -260,6 +276,9 @@ mod put {
         app: Option<PayloadApp>,
         #[schema(inline)]
         #[garde(dive)]
+        metadata: Option<PayloadMetadata>,
+        #[schema(inline)]
+        #[garde(dive)]
         webauthn: Option<PayloadWebauthn>,
         #[schema(inline)]
         #[garde(dive)]
@@ -363,6 +382,23 @@ mod put {
             }
             if let Some(registration_enabled) = app.registration_enabled {
                 settings.app.registration_enabled = registration_enabled;
+            }
+        }
+        if let Some(metadata) = data.metadata {
+            if let Some(description) = metadata.description {
+                settings.metadata.description = description;
+            }
+            if let Some(theme_color) = metadata.theme_color {
+                settings.metadata.theme_color = theme_color;
+            }
+            if let Some(og_image) = metadata.og_image {
+                settings.metadata.og_image = og_image;
+            }
+            if let Some(twitter_card) = metadata.twitter_card {
+                settings.metadata.twitter_card = twitter_card;
+            }
+            if let Some(indexable) = metadata.indexable {
+                settings.metadata.indexable = indexable;
             }
         }
         if let Some(user) = data.user {

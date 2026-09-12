@@ -1986,6 +1986,37 @@
                 }
               }
             },
+            "metadata": {
+              "title": "Metadaten",
+              "page": {
+                "title": "Metadaten-Einstellungen",
+                "form": {
+                  "description": "Beschreibung",
+                  "descriptionDescription": "Wird in Suchergebnissen und Link-Vorschauen unter dem Titel angezeigt.",
+                  "ogImage": "Vorschaubild",
+                  "ogImageDescription": "Wird in Link-Vorschauen angezeigt. Muss ein PNG oder JPEG sein, kein SVG.",
+                  "themeColor": "Themenfarbe",
+                  "themeColorDescription": "Färbt die Browser-Oberfläche auf Mobilgeräten und Link-Vorschauen.",
+                  "indexable": "Indexierung durch Suchmaschinen erlauben",
+                  "twitterCard": "Twitter-Card-Typ"
+                },
+                "enum": {
+                  "twitterCard": {
+                    "summary": "Zusammenfassung",
+                    "summaryLargeImage": "Zusammenfassung mit großem Bild"
+                  }
+                },
+                "placeholder": {
+                  "description": "Verwalte deine Gameserver und Dienste mit {name}."
+                },
+                "button": {
+                  "autofill": "Automatisch ausfüllen"
+                },
+                "toast": {
+                  "updated": "Metadaten-Einstellungen aktualisiert."
+                }
+              }
+            },
             "storage": {
               "title": "Speicher",
               "page": {
