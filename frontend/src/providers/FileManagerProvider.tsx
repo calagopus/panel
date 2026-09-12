@@ -63,6 +63,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     },
     enabled: canReadFiles,
     staleTime: 30_000,
+    refetchOnMount: 'always',
     placeholderData: keepPreviousData,
   });
 

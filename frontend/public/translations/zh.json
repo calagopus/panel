@@ -143,14 +143,6 @@
       "few": "{count} 項變更",
       "many": "{count} 項變更",
       "other": "{count} 項變更"
-    },
-    "session": {
-      "zero": "{count} Sessions",
-      "one": "{count} Session",
-      "two": "{count} Sessions",
-      "few": "{count} Sessions",
-      "many": "{count} Sessions",
-      "other": "{count} Sessions"
     }
   },
   "translations": {
@@ -167,8 +159,6 @@
         "remove": "移除",
         "enable": "啟用",
         "disable": "停用",
-        "disableTwoFactor": "Disable Two-Factor",
-        "verify": "Verify",
         "update": "更新",
         "close": "關閉",
         "cancel": "取消",
@@ -202,9 +192,7 @@
         "unsetPrimary": "取消主要",
         "leavePage": "離開頁面",
         "viewDocumentation": "檢視文件",
-        "undo": "還原",
-        "clearUserFilter": "Clear User Filter",
-        "deleteFailedBackups": "Delete {count} Failed"
+        "undo": "還原"
       },
       "alert": {
         "error": "錯誤",
@@ -231,16 +219,11 @@
             }
           },
           "textMode": "文字",
-          "jsonMode": "JSON",
           "invalidJson": "JSON 格式無效"
         },
         "tagsInput": {
           "copyAll": "複製全部",
           "pasteReplace": "貼上（取代）"
-        },
-        "serverFileInput": {
-          "notFound": "No file with this name exists yet.",
-          "isDirectory": "This is a directory, not a file."
         },
         "ignoredFilesInput": {
           "onePatternPerLine": "每行一個模式。",
@@ -249,68 +232,15 @@
           "noMatches": "沒有相符項目",
           "exception": "例外",
           "tooManyPatterns": "超過 {max} 個模式時不會自動計算相符數量。"
-        },
-        "cronInput": {
-          "segments": {
-            "second": "Second",
-            "minute": "Minute",
-            "hour": "Hour",
-            "day": "Day",
-            "month": "Month",
-            "weekday": "Weekday"
-          },
-          "nextRun": "Next run is {timestamp}."
-        },
-        "backupRetention": {
-          "title": "Retention",
-          "disabled": "No retention rules",
-          "description": "Keep a successful backup when any rule selects it: the latest count, all backups within the recent number of days, or the newest backup in each daily, weekly, monthly or yearly period containing backups. Periods use UTC; weeks start on Monday. Missed periods do not consume the count. Leave a rule empty or set it to 0 to disable it. With all rules disabled, successful backups are kept.",
-          "sourcesDescription": "Retention is evaluated separately for server files and each database. Locked backups are protected. Retention does not schedule backups.",
-          "capacityDescription": "At the server backup limit, backups your rules no longer keep are removed to make room. Scheduled backups additionally evict the oldest unlocked backup; manual backups are refused instead.",
-          "failedDescription": "Unlocked failed backups are cleaned up after 24 hours, grouped or not.",
-          "count": "Keep latest",
-          "days": "Keep all within days",
-          "daily": "Keep daily",
-          "weekly": "Keep weekly",
-          "monthly": "Keep monthly",
-          "yearly": "Keep yearly",
-          "ruleSummary": "{rule}: {count}"
         }
       },
       "modal": {
         "duplicate": {
           "title": "複製 {resource}"
-        },
-        "delete": {
-          "content": "Are you sure you want to delete **{name}**?"
-        },
-        "deleteFailedBackups": {
-          "title": "Confirm Failed Backup Deletion",
-          "content": "Are you sure you want to delete `{count}` failed backups? Locked backups and backups whose configuration is in maintenance are kept. Deletion runs in the background and may take a while to finish.",
-          "alert": {
-            "forceWarning": "Force deletion removes these backups even if their configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind."
-          }
         }
       },
       "toast": {
-        "duplicated": "{resource} 已複製。",
-        "failedBackupDeletionStarted": "Deleting {count} failed backups in the background."
-      },
-      "settingScope": {
-        "account": "Sync With Account",
-        "device": "Only This Device",
-        "useAccountValue": "Use the Account Value",
-        "saveToAccount": "Save This Value to My Account",
-        "stateAccount": "Account",
-        "stateDevice": "This Device",
-        "tooltip": {
-          "account": "This setting is synced with your account.",
-          "device": "This setting is overridden on this device only."
-        },
-        "toast": {
-          "saved": "Setting saved to your account.",
-          "saveFailed": "Failed to save this setting to your account."
-        }
+        "duplicated": "{resource} 已複製。"
       },
       "tooltip": {
         "resetToDefault": "重設為預設值",
@@ -332,7 +262,6 @@
         "username": "使用者名稱",
         "usernameOrEmail": "使用者名稱/電子郵件",
         "server": "伺服器",
-        "url": "URL",
         "email": "電子郵件",
         "path": "路徑",
         "port": "連接埠",
@@ -378,7 +307,6 @@
         "additionalAllocations": "額外分配",
         "externalId": "外部 ID",
         "mount": "掛載",
-        "nest": "Nest",
         "lines": "行數",
         "databaseHost": "資料庫主機",
         "databaseAgentHost": "資料庫代理主機",
@@ -389,14 +317,11 @@
         "destination": "目的地",
         "destinationDirectory": "目標資料夾",
         "directoryName": "目錄名稱",
-        "symlinkName": "Symlink Name",
-        "symlinkTarget": "Symlink Target",
         "locked": "已鎖定",
         "portRanges": "連接埠範圍",
         "portRangesPlaceholder": "連接埠範圍（例如 3000-4000）",
         "currentPassword": "目前密碼",
         "confirmPassword": "確認密碼",
-        "passwordRequired": "Password is required",
         "authenticationCode": "驗證代碼",
         "restoreStartup": "從此備份還原啟動指令、映像檔及變數。",
         "lineContains": "行包含",
@@ -409,10 +334,6 @@
         "yourControlPanelPassword": "你的控制面板密碼",
         "deploymentEnabled": "部署已啟用",
         "maintenanceEnabled": "維護已啟用",
-        "source": "Source",
-        "target": "Target",
-        "replaceWith": "Replace With",
-        "caseInsensitive": "Case Insensitive",
         "truncateDirectory": "你要在執行此動作前刪除此伺服器的所有檔案嗎？此操作無法復原。"
       },
       "table": {
@@ -421,7 +342,6 @@
           "empty": "找不到任何項目，它們好像躲起來了。"
         },
         "columns": {
-          "id": "ID",
           "name": "名稱",
           "author": "作者",
           "type": "類型",
@@ -435,7 +355,6 @@
           "updated": "更新時間",
           "actor": "操作者",
           "event": "事件",
-          "ip": "IP",
           "when": "時間",
           "command": "指令",
           "location": "位置",
@@ -460,18 +379,6 @@
       },
       "tabs": {
         "general": "一般"
-      },
-      "stat": {
-        "cpu": "CPU",
-        "cpuLoad": "CPU Load",
-        "memoryUsage": "Memory Usage",
-        "memoryLoad": "Memory Load",
-        "diskUsage": "Disk Usage",
-        "network": "Network",
-        "inbound": "Inbound",
-        "outbound": "Outbound",
-        "uptime": "Uptime",
-        "resources": "Resources"
       },
       "badge": {
         "active": "作用中",
@@ -529,14 +436,6 @@
           "finished": "已完成",
           "failed": "失敗"
         },
-        "serverBackupKind": {
-          "server": "Server",
-          "databaseInstance": "Database"
-        },
-        "serverFirewallRuleAction": {
-          "allow": "Allow",
-          "deny": "Deny"
-        },
         "connectionStatus": {
           "connected": "已連線",
           "offline": "離線"
@@ -559,18 +458,7 @@
           "bestCompression": "最高壓縮率"
         }
       },
-      "unit": {
-        "bytes": {
-          "bytes": "B",
-          "kibibytes": "KiB",
-          "mebibytes": "MiB",
-          "gibibytes": "GiB",
-          "tebibytes": "TiB",
-          "pebibytes": "PiB"
-        }
-      },
       "unlimited": "無限制",
-      "readOnly": "Read Only",
       "na": "不適用",
       "never": "永不",
       "none": "無",
@@ -578,7 +466,6 @@
       "yes": "是",
       "no": "否",
       "web": "網頁",
-      "api": "API",
       "default": "預設",
       "custom": "自訂",
       "system": "系統",
@@ -668,8 +555,7 @@
           "theme": "主題",
           "themeAuto": "自動",
           "themeDark": "深色",
-          "themeLight": "淺色",
-          "resetDeviceOverrides": "Reset Device Overrides ({count})"
+          "themeLight": "淺色"
         },
         "modal": {
           "logout": {
@@ -876,7 +762,6 @@
           "paused": "已暫停"
         },
         "rateLimited": "你的上傳受到速率限制。等待中...",
-        "cancelAllUploads": "Cancel All Uploads",
         "modal": {
           "cancelAllUploads": {
             "content": "確定要取消所有進行中的上傳嗎?部分已上傳的檔案將會被捨棄。"
@@ -891,8 +776,6 @@
           "cancelledAll": "所有上傳都已取消。",
           "completedServer": "已完成上傳 {files} 至 {server}。",
           "completedAssets": "已完成上傳 {files} 至管理員資源。",
-          "progressServer": "Uploading {files} to `{server}`...",
-          "progressAssets": "Uploading {files} to the admin assets...",
           "showFiles": "顯示檔案"
         }
       }
@@ -921,11 +804,7 @@
             "description": "請選擇強密碼。此帳戶將擁有所有伺服器與設定的完整管理權限。"
           },
           "form": {
-            "usernamePlaceholder": "admin",
             "email": "電子郵件地址",
-            "emailPlaceholder": "admin@example.com",
-            "firstNamePlaceholder": "Alan",
-            "lastNamePlaceholder": "Turing",
             "passwordPlaceholder": "輸入強密碼",
             "confirmPasswordPlaceholder": "重新輸入你的密碼"
           },
@@ -937,7 +816,6 @@
           "title": "重新登入",
           "alert": "你在設定過程中被登出。請重新登入以從離開的地方繼續。",
           "form": {
-            "usernamePlaceholder": "admin",
             "passwordPlaceholder": "輸入強密碼"
           },
           "button": {
@@ -952,7 +830,6 @@
             "locationFlag": "位置旗幟",
             "locationFlagPlaceholder": "最棒的國家",
             "backupName": "備份設定名稱",
-            "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "備份磁碟",
             "backupDiskPlaceholder": "備份磁碟"
           },
@@ -965,9 +842,7 @@
           "allocationsTitle": "分配設定",
           "form": {
             "namePlaceholder": "我的伺服器",
-            "urlDescription": "Used for internal communication with the node.",
-            "publicUrlDescription": "用於 websocket/下載",
-            "ip": "IP"
+            "publicUrlDescription": "用於 websocket/下載"
           },
           "error": {
             "noLocations": "發生錯誤。找不到任何位置。"
@@ -993,7 +868,6 @@
           "title": "應用程式設定",
           "form": {
             "applicationName": "應用程式名稱",
-            "applicationNamePlaceholder": "Calagopus",
             "applicationUrl": "應用程式 URL",
             "registration": "啟用註冊",
             "registrationDescription": "允許新使用者自行註冊帳戶。",
@@ -1026,7 +900,6 @@
           "title": "伺服器",
           "existingServer": "已建立伺服器。你稍後可以在管理選單中變更設定。",
           "egg": {
-            "title": "Egg",
             "description": "讓我們啟動並執行你的第一台伺服器。你想使用哪個 Egg？",
             "nestDescription": "若要開始使用此 Egg，你需要建立一個 Nest；Nest 是 Egg 的集合。請為它命名："
           },
@@ -1077,8 +950,7 @@
           "error": {
             "usernameRequired": "請輸入使用者名稱",
             "registrationDisabled": "找不到相符帳戶，且目前已停用註冊。",
-            "userAlreadyExists": "已有使用此使用者名稱或電子郵件的帳戶。",
-            "securityKeyRequired": "This account requires two-factor authentication, sign in with a security key instead."
+            "userAlreadyExists": "已有使用此使用者名稱或電子郵件的帳戶。"
           },
           "passkey": {
             "error": {
@@ -1140,16 +1012,6 @@
                 "useTotp": "使用 TOTP"
               }
             },
-            "email": {
-              "subtitle": "We can email you a one-time code to finish signing in.",
-              "enterCode": "Enter the 6-digit code we sent to your email address",
-              "button": {
-                "useEmail": "Email me a code",
-                "sendCode": "Send Code",
-                "resend": "Resend Code",
-                "resendIn": "Resend Code ({seconds}s)"
-              }
-            },
             "totpRecovery": {
               "subtitle": "輸入復原代碼",
               "form": {
@@ -1162,13 +1024,6 @@
         "register": {
           "title": "註冊",
           "subtitle": "請輸入你的詳細資料以註冊",
-          "form": {
-            "usernamePlaceholder": "Your username",
-            "emailPlaceholder": "you@example.com",
-            "firstNamePlaceholder": "Your first name",
-            "lastNamePlaceholder": "Your last name",
-            "passwordPlaceholder": "Enter a strong password"
-          },
           "button": {
             "register": "註冊"
           }
@@ -1176,29 +1031,14 @@
         "forgotPassword": {
           "title": "忘記密碼",
           "subtitle": "輸入你的電子郵件以接收重設密碼的指示",
-          "form": {
-            "emailPlaceholder": "you@example.com"
-          },
           "button": {
             "request": "要求重設密碼"
           },
           "success": "已寄出一封包含重設密碼指示的電子郵件給你。"
         },
-        "verifyEmail": {
-          "title": "Verify Email",
-          "success": "Your email address **{email}** has been verified.",
-          "failed": "This verification link is invalid or has expired. Request a new one and try again.",
-          "button": {
-            "continue": "Continue"
-          }
-        },
         "resetPassword": {
           "title": "重設密碼",
           "subtitle": "請輸入你的新密碼",
-          "form": {
-            "passwordPlaceholder": "Enter a strong password",
-            "confirmPasswordPlaceholder": "Re-enter your password"
-          },
           "button": {
             "reset": "重設密碼"
           },
@@ -1265,21 +1105,6 @@
                     }
                   }
                 },
-                "drag": {
-                  "blocked": {
-                    "alreadyInGroup": {
-                      "title": "Already in this group",
-                      "description": "This server is already part of {group}."
-                    },
-                    "groupFull": {
-                      "title": "Group is full",
-                      "description": "A group cannot hold more than {max} servers."
-                    }
-                  },
-                  "toast": {
-                    "moved": "Server moved to {group}."
-                  }
-                },
                 "noGroups": "找不到任何群組，要建立一個嗎？"
               }
             },
@@ -1320,14 +1145,6 @@
               "title": "需要雙因素驗證",
               "description": "你的帳戶需要雙因素驗證。請在下方設定後繼續使用面板。"
             },
-            "verifyEmail": {
-              "title": "Email Verification Required",
-              "description": "Please verify **{email}** to continue using the panel. Check your inbox for the verification link.",
-              "sent": "Verification email sent to {email}.",
-              "button": {
-                "resend": "Resend Verification Email"
-              }
-            },
             "frozen": {
               "title": "帳戶已凍結",
               "description": "你的帳戶已被凍結，在解除凍結前無法對帳戶進行任何變更。請聯絡管理員以取得更多資訊。"
@@ -1336,31 +1153,18 @@
           "containers": {
             "password": {
               "title": "密碼",
-              "button": {
-                "logOutOthers": "Log Out Others"
-              },
               "toast": {
                 "updated": "密碼已成功更新。"
               },
               "form": {
                 "newPassword": "新密碼",
                 "confirmNewPassword": "確認新密碼"
-              },
-              "modal": {
-                "logOutOtherSessions": {
-                  "title": "Log Out Other Sessions",
-                  "content": "Your password has been updated. Do you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.",
-                  "toast": {
-                    "deleted": "{sessions} deleted."
-                  }
-                }
               }
             },
             "email": {
               "title": "電子郵件",
               "toast": {
-                "updated": "電子郵件已成功更新。",
-                "pending": "Confirmation link sent to {email}. Your address changes once you open it."
+                "updated": "電子郵件已成功更新。"
               },
               "form": {
                 "newEmail": "新電子郵件"
@@ -1388,56 +1192,9 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "設定雙因素",
-                "enableEmail": "Enable Email",
-                "disableEmail": "Disable Email",
-                "securityKeys": "Security Keys"
+                "setupTwoFactor": "設定雙因素"
               },
-              "twoFactorLastUsed": "上次使用：{timestamp}",
-              "none": "No second factor is set up on your account yet.",
-              "requirementMet": "Your account meets the two-factor requirement.",
-              "requirementUnmet": "Your account does not meet the two-factor requirement yet.",
-              "method": {
-                "totp": "Authenticator App",
-                "securityKey": "Security Key",
-                "email": "Email"
-              }
-            },
-            "emailTwoFactor": {
-              "toast": {
-                "disabled": "Email two-factor disabled successfully."
-              },
-              "modal": {
-                "enable": {
-                  "title": "Enable Email Two-Factor",
-                  "description": "A one-time code will be sent to **{email}** each time you sign in. Anyone with access to that mailbox can sign in as you."
-                },
-                "disable": {
-                  "title": "Disable Email Two-Factor",
-                  "description": "Disabling email two-factor will make your account less secure."
-                }
-              }
-            },
-            "passwordLogin": {
-              "title": "Password Login",
-              "enabled": "You can sign in with your password.",
-              "disabled": "Password login is turned off. Only your security keys can sign you in.",
-              "toast": {
-                "updated": "Password login updated successfully."
-              },
-              "tooltip": {
-                "needsSecurityKey": "Add a security key before turning off password login."
-              },
-              "modal": {
-                "disable": {
-                  "title": "Disable Password Login",
-                  "description": "Your password will no longer sign you in anywhere, including SFTP. Only your security keys will work, so make sure you can use one before continuing."
-                },
-                "enable": {
-                  "title": "Enable Password Login",
-                  "description": "Your password will be able to sign you in again."
-                }
-              }
+              "twoFactorLastUsed": "上次使用：{timestamp}"
             },
             "account": {
               "title": "帳戶詳細資料",
@@ -1445,19 +1202,11 @@
                 "updated": "帳戶詳細資料已成功更新。"
               }
             },
-            "preferences": {
-              "title": "Preferences",
-              "form": {
-                "toastPosition": "Toast Position",
-                "startOnGroupedServers": "Start on the Grouped Servers page"
-              }
-            },
             "avatar": {
               "title": "頭像",
               "toast": {
                 "updated": "頭像已成功更新。",
-                "removed": "頭像已成功移除。",
-                "loadFailed": "Failed to load image preview. Please ensure the file is a valid image."
+                "removed": "頭像已成功移除。"
               },
               "form": {
                 "avatar": "頭像"
@@ -1508,12 +1257,6 @@
         },
         "sessions": {
           "title": "工作階段",
-          "button": {
-            "deleteOthers": "Log Out Others"
-          },
-          "tooltip": {
-            "noOtherSessions": "There are no other sessions to log out."
-          },
           "table": {
             "columns": {
               "thisDevice": "此裝置？",
@@ -1526,13 +1269,6 @@
               "content": "你確定要從你的帳戶刪除工作階段 **{ip}** 嗎？",
               "toast": {
                 "deleted": "工作階段已刪除。"
-              }
-            },
-            "deleteOtherSessions": {
-              "title": "Confirm Session Deletion",
-              "content": "Are you sure you want to log out every session except the one you are currently using? Any other device signed into your account will have to log in again.",
-              "toast": {
-                "deleted": "{sessions} deleted."
               }
             }
           }
@@ -1562,8 +1298,7 @@
           "general": {
             "title": "一般",
             "undo": "復原上一步操作",
-            "quickActions": "開啟快速操作",
-            "save": "Save the current form"
+            "quickActions": "開啟快速操作"
           },
           "fileManager": {
             "title": "檔案管理器",
@@ -1578,10 +1313,7 @@
             "moveDownSelection": "將選取項目下移",
             "renameFile": "重新命名檔案",
             "deselectAll": "取消選取所有檔案",
-            "deleteFiles": "刪除選取的檔案",
-            "closeEditorTab": "Close the active editor tab",
-            "nextEditorTab": "Next editor tab",
-            "previousEditorTab": "Previous editor tab"
+            "deleteFiles": "刪除選取的檔案"
           },
           "table": {
             "title": "表格導覽",
@@ -1704,8 +1436,7 @@
           "title": "API 金鑰",
           "subtitle": "已建立 {current} / {max} 個 API 金鑰。",
           "button": {
-            "apiDocumentation": "API 文件",
-            "copyUuid": "Copy UUID"
+            "apiDocumentation": "API 文件"
           },
           "tooltip": {
             "limitReached": "你最多只能使用 {max} 個 API 金鑰。"
@@ -1716,10 +1447,6 @@
               "permissions": "使用者 / 伺服器 / 管理員權限",
               "expires": "到期"
             }
-          },
-          "toast": {
-            "enabled": "API key enabled.",
-            "disabled": "API key disabled."
           },
           "modal": {
             "createApiKey": {
@@ -1797,7 +1524,6 @@
       "admin": {
         "categories": {
           "infrastructure": "基礎設施",
-          "eggs": "Nests & Eggs",
           "databases": "資料庫",
           "storage": "儲存空間",
           "access": "使用者與存取",
@@ -1898,7 +1624,6 @@
                   "debugMode": "偵錯模式"
                 },
                 "appliedMigrations": "已套用遷移（{percent}%）",
-                "migrationsValue": "{applied} / {total}",
                 "avgNtpOffset": "平均 NTP 偏移",
                 "noExtensions": "找不到任何擴充功能。",
                 "nodesSynced": "所有節點的時鐘似乎已同步（與面板時鐘相差在 5 秒內）。（{failed} 個檢查失敗）",
@@ -1910,7 +1635,6 @@
                   "packageName": "套件名稱",
                   "applied": "已套用",
                   "total": "總計",
-                  "id": "ID",
                   "desync": "不同步",
                   "appliedValue": "{applied}（{percent}%）"
                 },
@@ -1941,22 +1665,11 @@
                   "sessionCookie": "工作階段 Cookie",
                   "sessionDurationSeconds": "工作階段持續時間（秒）",
                   "twoFactorRequirement": "雙因素驗證需求",
-                  "emailTwoFactorEnabled": "Email Two-Factor",
-                  "emailTwoFactorEnabledDescription": "Let users receive a one-time login code by email. Requires a configured mail transport.",
-                  "twoFactorAcceptedMethods": "Accepted Two-Factor Methods",
-                  "twoFactorAcceptedMethodsDescription": "Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.",
-                  "emailVerificationRequired": "Require Email Verification",
-                  "emailVerificationRequiredDescription": "New users must confirm their email address before they can use the panel. Requires a configured mail transport.",
                   "telemetryEnabled": "啟用遙測",
                   "telemetryEnabledDescription": "允許 Calagopus 收集有限且匿名的使用資料以協助改善應用程式。",
                   "registrationEnabled": "啟用註冊"
                 },
                 "enum": {
-                  "twoFactorMethod": {
-                    "totp": "Authenticator App (TOTP)",
-                    "securityKey": "Security Key",
-                    "email": "Email"
-                  },
                   "twoFactorRequirement": {
                     "admins": "管理員",
                     "allUsers": "所有使用者",
@@ -1993,8 +1706,7 @@
                 },
                 "enum": {
                   "driver": {
-                    "filesystem": "檔案系統",
-                    "s3": "S3"
+                    "filesystem": "檔案系統"
                   }
                 },
                 "toast": {
@@ -2027,13 +1739,11 @@
                 "enum": {
                   "provider": {
                     "none": "無",
-                    "smtp": "SMTP",
                     "sendmail": "Sendmail 指令",
                     "filesystem": "檔案系統"
                   },
                   "tlsMode": {
                     "none": "無",
-                    "startTls": "STARTTLS",
                     "implicitTls": "隱式 TLS"
                   }
                 },
@@ -2051,9 +1761,7 @@
                 "smtp": {
                   "form": {
                     "tlsMode": "TLS 模式",
-                    "skipCertValidation": "略過憑證驗證",
-                    "heloDomain": "HELO/EHLO Domain",
-                    "heloDomainDescription": "Domain sent in the HELO/EHLO greeting. Some providers, such as Google Workspace, reject the default."
+                    "skipCertValidation": "略過憑證驗證"
                   }
                 }
               }
@@ -2069,13 +1777,11 @@
                 },
                 "alert": {
                   "syntaxBefore": "範本使用",
-                  "syntaxLink": "MiniJinja",
                   "syntaxMiddle": "範本語法。變數以",
                   "syntaxAnd": "參考，且支援",
                   "syntaxOr": "和",
                   "syntaxAfter": "等控制結構。"
                 },
-                "empty": "從側邊欄選取範本以進行編輯。",
                 "loadingTemplate": "正在載入範本...",
                 "form": {
                   "subject": "主旨"
@@ -2098,16 +1804,10 @@
                 "title": "驗證碼設定",
                 "toast": {
                   "updated": "驗證碼設定已更新。"
-                },
-                "recaptcha": {
-                  "form": {
-                    "v3": "V3"
-                  }
                 }
               }
             },
             "webauthn": {
-              "title": "Webauthn",
               "page": {
                 "title": "Webauthn 設定",
                 "form": {
@@ -2142,10 +1842,6 @@
                 "form": {
                   "maxFileManagerViewSize": "檔案管理器最大檢視大小",
                   "maxScheduleStepCount": "最大排程步驟數",
-                  "maxFirewallRuleCount": "Max Firewall Rules",
-                  "maxFirewallRuleSourceCount": "Max Firewall Rule Sources",
-                  "maxTunnelConnectionCount": "Max Private Connections per Server",
-                  "maxTunnelPortCount": "Max Private Ports per Server",
                   "maxFileManagerContentSearchSize": "檔案管理器最大內容搜尋大小",
                   "maxFileManagerSearchResults": "檔案管理器最大搜尋結果數",
                   "maxSubuserCount": "最大子使用者數量",
@@ -2178,8 +1874,6 @@
                   "maxCommandSnippetCount": "最大指令片段數",
                   "maxSecurityKeyCount": "最大安全性金鑰數",
                   "maxSshKeyCount": "最大 SSH 金鑰數",
-                  "maxSettingsCount": "Max Synced Settings",
-                  "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
                   "allowChangingLanguage": "允許變更語言",
                   "allowChangingLanguageDescription": "若啟用，使用者將能變更其語言偏好。"
                 },
@@ -2221,15 +1915,6 @@
                   "hitsDescription": "每個時間視窗內允許的最大請求次數。",
                   "windowSeconds": "時間視窗",
                   "windowSecondsDescription": "時間視窗持續時間（秒）。"
-                },
-                "exemptions": {
-                  "title": "Exemptions",
-                  "form": {
-                    "exemptIps": "Exempt IPs",
-                    "exemptIpsDescription": "IP addresses or CIDR ranges that skip the client and remote ratelimits. Login and per-server limits still apply.",
-                    "exemptApiKeys": "Exempt API Keys",
-                    "exemptApiKeysDescription": "UUIDs of API keys that skip the client ratelimit. Users can copy the UUID from the context menu of their API keys. Deleted keys are removed automatically."
-                  }
                 },
                 "toast": {
                   "updated": "速率限制設定已更新。"
@@ -2293,7 +1978,6 @@
             "deleteSelection": "刪除選取項目"
           },
           "dropzone": {
-            "title": "Drop files or folders here to upload",
             "subtitle": "放開即可開始上傳"
           },
           "toast": {
@@ -2328,10 +2012,6 @@
             "buildFailed": {
               "title": "上一次擴充功能建置失敗",
               "content": "這些擴充功能在有變更之前不會重新建置，除非您手動重試建置。"
-            },
-            "pendingRestart": {
-              "title": "Some extensions were enabled or disabled",
-              "content": "The panel picks up the change the next time it starts."
             }
           },
           "button": {
@@ -2341,7 +2021,6 @@
             "retryBuild": "重試建置",
             "cancelBuild": "取消建置",
             "configure": "設定",
-            "restart": "Restart the panel",
             "back": "返回擴充功能",
             "accept": "接受",
             "decline": "拒絕"
@@ -2352,10 +2031,7 @@
             "cancelling": "建置將在目前步驟結束後停止。",
             "noBackend": "設定此擴充功能需要後端擴充功能。",
             "noConfigurationPage": "此擴充功能未定義設定頁面。",
-            "extensionDisabled": "This extension is disabled, its frontend is not loaded.",
-            "removeExtension": "移除擴充功能",
-            "enableExtension": "Enable extension",
-            "disableExtension": "Disable extension"
+            "removeExtension": "移除擴充功能"
           },
           "phase": {
             "queued": "排隊中…",
@@ -2373,9 +2049,7 @@
             "frontendMissing": "前端遺失",
             "backendMissing": "後端遺失",
             "pendingBuild": "待建置",
-            "pendingRemoval": "待移除",
-            "pendingRestart": "Pending restart",
-            "disabled": "Disabled"
+            "pendingRemoval": "待移除"
           },
           "card": {
             "version": "版本",
@@ -2395,10 +2069,7 @@
             "buildFailed": "擴充套件建置失敗:{reason}",
             "cancelRequested": "已請求取消,建置將在目前步驟結束後停止。",
             "added": "擴充功能 `{packageName}` 已成功新增。",
-            "removed": "擴充功能 `{packageName}` 已成功移除。",
-            "enabled": "Extension `{packageName}` is enabled again once the panel restarts.",
-            "disabled": "Extension `{packageName}` is disabled once the panel restarts.",
-            "restarting": "The panel is restarting."
+            "removed": "擴充功能 `{packageName}` 已成功移除。"
           },
           "notFound": {
             "title": "找不到擴充功能",
@@ -2465,7 +2136,6 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "傳送密碼重設郵件",
-                  "verifyEmail": "Mark Email Verified",
                   "impersonate": "模擬身分"
                 },
                 "form": {
@@ -2481,17 +2151,6 @@
                   "delete": {
                     "title": "確認刪除使用者",
                     "content": "你確定要刪除 **{username}** 嗎？"
-                  },
-                  "grantAdmin": {
-                    "title": "Confirm Admin Access",
-                    "content": "Are you sure you want to grant **{username}** admin access? This account will have full, unrestricted access to everything on the panel."
-                  },
-                  "verifyEmail": {
-                    "title": "Mark Email Verified",
-                    "content": "Are you sure you want to mark **{email}** as verified without confirmation?",
-                    "toast": {
-                      "verified": "Email marked as verified."
-                    }
                   },
                   "disableTwoFactor": {
                     "title": "停用使用者雙因素驗證",
@@ -2715,7 +2374,6 @@
                 },
                 "alert": {
                   "couldNotReach": "無法連線到節點：{error}",
-                  "integratedNode": "This node runs inside the panel. Its identity, panel URL and API bind settings are rewritten every time the panel starts, so changes to those are not kept. Everything else you change here is.",
                   "tokenWarning": "下方的設定內容包含節點權杖，請僅在需要時才顯示。",
                   "portMismatch": "節點網址指向通訊埠 {connectPort}，但此設定讓 Wings 監聽通訊埠 {apiPort}。除非反向代理將通訊埠 {connectPort} 轉送至 Wings，否則面板將無法連線至此節點。",
                   "verifyBackend": "後端至 Wings",
@@ -3010,116 +2668,6 @@
                   }
                 }
               }
-            },
-            "tunnel": {
-              "title": "Private Network",
-              "page": {
-                "title": "Node Private Network",
-                "description": "Servers on this node can then be connected privately to servers on any other node that is also on the network. Traffic goes node to node over an encrypted tunnel and never touches the public internet.",
-                "alert": {
-                  "unreachable": "The node could not be reached, so its side of the network could not be checked.",
-                  "notSupported": "This node **cannot run the private network**. It is either turned off in the node configuration, or the node uses rootless Docker, which is unsupported.",
-                  "noCertificate": "This node has **not reported a certificate**, so no peer can open a connection to it. Restart the node's tunnel daemon to re-enrol it."
-                },
-                "form": {
-                  "host": "Host",
-                  "hostDescription": "The hostname or IP other nodes dial this one on. Resolved at connection time.",
-                  "port": "Port",
-                  "portDescription": "The UDP port the node listens on for other nodes. Must be reachable from them."
-                },
-                "section": {
-                  "settings": "Network Settings"
-                },
-                "state": {
-                  "title": "Node State",
-                  "daemon": "Daemon",
-                  "connected": "Connected",
-                  "disconnected": "Disconnected",
-                  "unknown": "Unknown",
-                  "epoch": "State version",
-                  "certificate": "Certificate fingerprint",
-                  "noCertificate": "Not reported yet"
-                },
-                "metrics": {
-                  "title": "Live Peer Links",
-                  "loading": "Asking the node for its metrics...",
-                  "unreachable": "The node could not be reached, so live metrics are unavailable.",
-                  "applied": "State version {epoch}, {snapshots} applied",
-                  "stat": {
-                    "peers": "Peers Connected",
-                    "uptime": "Daemon Uptime",
-                    "controlLink": "Control Link",
-                    "frontends": "Bound Frontends",
-                    "flowsOpen": "{count} flows open",
-                    "localDrops": "Same-Node Drops",
-                    "frozenFlows": "{count} flows frozen"
-                  },
-                  "column": {
-                    "peer": "Peer",
-                    "role": "Role",
-                    "address": "Address",
-                    "path": "Path",
-                    "loss": "Loss",
-                    "transferred": "Transferred",
-                    "streams": "Streams",
-                    "flows": "Flows",
-                    "drops": "Drops",
-                    "connected": "Connected"
-                  },
-                  "hint": {
-                    "rttMtu": "RTT / MTU",
-                    "packetsEvents": "packets / congestion",
-                    "inOut": "in / out",
-                    "openTotal": "open / total",
-                    "udpOpenTotal": "UDP open / total",
-                    "datagrams": "datagrams"
-                  },
-                  "value": {
-                    "path": "{rtt} ms / {mtu}",
-                    "tcpOpen": "{count} TCP open",
-                    "linkUp": "Up",
-                    "linkDown": "Down"
-                  },
-                  "role": {
-                    "initiator": "Dialled Out",
-                    "acceptor": "Accepted"
-                  },
-                  "tooltip": {
-                    "roleInitiator": "This node opened the connection, dialling the peer on its host and port.",
-                    "roleAcceptor": "The peer opened the connection, dialling this node on its host and port."
-                  },
-                  "drop": {
-                    "sendBufferFull": "Send buffer full",
-                    "unknownFlow": "Unknown flow",
-                    "fragTimeout": "Fragment timeout",
-                    "fragLimit": "Fragment limit",
-                    "oversize": "Oversized",
-                    "malformed": "Malformed"
-                  }
-                },
-                "button": {
-                  "enable": "Enable",
-                  "disable": "Disable",
-                  "rotate": "Rotate Identity"
-                },
-                "toast": {
-                  "connectionLost": "Lost connection to the node tunnel metrics stream.",
-                  "enabled": "Node added to the private network.",
-                  "updated": "Private network settings saved.",
-                  "disabled": "Node removed from the private network.",
-                  "rotated": "Node identity rotated."
-                },
-                "modal": {
-                  "disable": {
-                    "title": "Confirm Removal From the Private Network",
-                    "content": "Every connection to and from the servers on this node is dropped, and those servers lose their private addresses."
-                  },
-                  "rotate": {
-                    "title": "Confirm Identity Rotation",
-                    "content": "Peers sever their connections to this node immediately. It re-admits itself with a fresh certificate within a minute, and connections re-establish on their own."
-                  }
-                }
-              }
             }
           },
           "modal": {
@@ -3189,7 +2737,6 @@
                   "diskLimit": "磁碟限制",
                   "sftpAddress": "SFTP位址",
                   "none": "無",
-                  "egg": "Egg",
                   "autoKill": "自動終止",
                   "memory": "記憶體",
                   "disk": "磁碟",
@@ -3201,8 +2748,7 @@
                   "schedules": "排程",
                   "unlimited": "無限制",
                   "autoKillSeconds": "{seconds}秒",
-                  "autoKillDisabled": "已停用",
-                  "uuid": "UUID"
+                  "autoKillDisabled": "已停用"
                 },
                 "badge": {
                   "suspended": "已停權",
@@ -3236,8 +2782,6 @@
                   "externalIdPlaceholder": "選填外部識別碼",
                   "descriptionPlaceholder": "伺服器描述",
                   "owner": "擁有者",
-                  "ownerCreateHint": "Can't find them? Create a new user",
-                  "egg": "Egg",
                   "backupConfigurationPlaceholder": "繼承自節點/位置",
                   "cpuLimit": "CPU 限制（%）",
                   "cpuLimitDescription": "伺服器可使用的 CPU 限制百分比。",
@@ -3476,7 +3020,6 @@
         },
         "nests": {
           "title": "Nest",
-          "resourceName": "Nest",
           "tabs": {
             "general": {
               "page": {
@@ -3496,21 +3039,15 @@
               "title": "Egg",
               "page": {
                 "title": "Egg",
-                "resourceName": "Egg",
                 "dropzone": {
                   "title": "將一些檔案拖放到此處以匯入為 Egg",
                   "subtitle": "放開即可開始匯入"
                 },
                 "button": {
-                  "updateFromRepository": "從儲存庫更新",
-                  "fromFile": "from File",
-                  "fromUrl": "from URL",
-                  "fromRepository": "from Repository"
+                  "updateFromRepository": "從儲存庫更新"
                 },
                 "toast": {
                   "imported": "Egg 已匯入。",
-                  "importedBulk": "{eggs} imported.",
-                  "importFailed": "Failed to import {url}: {error}",
                   "moved": "Egg 已移動。",
                   "movedBulk": "已移動 {eggs}。",
                   "deletedBulk": "已刪除 {eggs}。",
@@ -3518,16 +3055,6 @@
                   "parseFailed": "無法剖析 Egg：{error}"
                 },
                 "modal": {
-                  "importUrl": {
-                    "title": "Import Eggs from URL",
-                    "urls": "URLs",
-                    "urlsDescription": "Direct links to exported eggs in JSON or YAML format."
-                  },
-                  "updateUrl": {
-                    "title": "Update Egg from URL",
-                    "url": "URL",
-                    "urlDescription": "Direct link to an exported egg in JSON or YAML format."
-                  },
                   "move": {
                     "title": "移動 Egg"
                   },
@@ -3619,9 +3146,6 @@
                     "title": "變數",
                     "page": {
                       "title": "Egg 變數",
-                      "aria": {
-                        "reorder": "Reorder variable"
-                      },
                       "form": {
                         "supportsMarkdown": "支援 Markdown 格式。",
                         "defaultValue": "預設值",
@@ -3811,15 +3335,6 @@
                     "path": "路徑"
                   }
                 },
-                "toast": {
-                  "installed": "{eggs} installed."
-                },
-                "modal": {
-                  "install": {
-                    "title": "Install {eggs}",
-                    "button": "Install {eggs}"
-                  }
-                },
                 "drawer": {
                   "noReadme": "這個 Egg 沒有 README。"
                 }
@@ -3829,7 +3344,6 @@
         },
         "databaseHosts": {
           "title": "資料庫主機",
-          "resourceName": "Database Host",
           "tabs": {
             "general": {
               "page": {
@@ -3885,7 +3399,6 @@
         },
         "databaseAgentHosts": {
           "title": "資料庫代理主機",
-          "resourceName": "Database Agent Host",
           "tabs": {
             "general": {
               "page": {
@@ -4070,7 +3583,6 @@
         },
         "databaseAgentTemplates": {
           "title": "資料庫代理範本",
-          "resourceName": "Database Agent Template",
           "dropzone": {
             "title": "將檔案拖曳至此匯入為資料庫代理範本",
             "subtitle": "放開即開始匯入"
@@ -4191,8 +3703,6 @@
                   "nameLastPath": "姓氏路徑",
                   "nameLastPathDescription": "用於從資訊 URL 回應中擷取姓氏的路徑（https://serdejsonpath.live）。",
                   "loginOnly": "僅允許登入",
-                  "loginBypassTwoFactor": "Bypass 2FA on Login",
-                  "loginBypassTwoFactorDescription": "Allows users logging in with this provider to bypass their panel 2FA.",
                   "linkViewable": "連結對使用者可見",
                   "linkViewableDescription": "允許使用者在客戶端 UI 中看到連線及其識別碼。",
                   "userManageable": "連結可由使用者管理",
@@ -4314,7 +3824,6 @@
         },
         "backupConfigurations": {
           "title": "備份設定",
-          "resourceName": "Backup Configuration",
           "table": {
             "columns": {
               "disk": "磁碟"
@@ -4451,7 +3960,6 @@
         },
         "systemBackupPolicies": {
           "title": "系統備份政策",
-          "resourceName": "System Backup Policy",
           "badge": {
             "runPending": "等待執行"
           },
@@ -4595,10 +4103,7 @@
                 },
                 "modal": {
                   "add": {
-                    "title": "新增掛載 Egg",
-                    "form": {
-                      "egg": "Egg"
-                    }
+                    "title": "新增掛載 Egg"
                   },
                   "remove": {
                     "title": "確認移除掛載 Egg",
@@ -4729,17 +4234,11 @@
             "commandHistory": "指令歷史紀錄",
             "decreaseFontSize": "縮小字型大小",
             "increaseFontSize": "放大字型大小",
-            "copySelection": "複製所選內容",
-            "popout": "Open in Separate Window"
+            "copySelection": "複製所選內容"
           },
           "quickAction": {
             "search": "搜尋主控台",
-            "scrollToBottom": "捲動至底部",
-            "popout": "Pop Out Console"
-          },
-          "popout": {
-            "windowTitle": "Console",
-            "returnHint": "This console is running in its own window. You can close it at any time."
+            "scrollToBottom": "捲動至底部"
           },
           "drawer": {
             "commandHistory": {
@@ -4798,47 +4297,6 @@
         },
         "files": {
           "title": "檔案",
-          "editorNotFound": {
-            "title": "Not Found",
-            "content": "Editor not found."
-          },
-          "view": {
-            "list": "List",
-            "tree": "Tree"
-          },
-          "searchPreview": {
-            "expand": "Expand content preview for {file}",
-            "collapse": "Collapse content preview for {file}",
-            "lines": "Lines {start}-{end}",
-            "loading": "Loading preview...",
-            "empty": "Empty file",
-            "unavailable": "Preview unavailable",
-            "noContext": "Match found, preview unavailable",
-            "moreMatches": "More matches not shown",
-            "restricted": "Content permission required"
-          },
-          "tree": {
-            "empty": "This folder is empty",
-            "loadMore": "Load more",
-            "retry": "Retry",
-            "reload": "Reload files",
-            "show": "Show file tree",
-            "hide": "Hide file tree",
-            "searchPlaceholder": "Search files...",
-            "noSearchResults": "No matching files",
-            "upload": "Upload",
-            "uploadFromComputer": "Upload from computer",
-            "uploadFromUrl": "Upload from URL",
-            "selectItem": "Select {name}",
-            "deselectItem": "Deselect {name}",
-            "selectFileToOpen": "Select a file from the tree to open it.",
-            "noEditorAvailable": "No editor is available for this file type.",
-            "editorTabsLabel": "Open files",
-            "closeEditorTab": "Close {name}",
-            "unsavedTab": "{name} has unsaved changes",
-            "dropToSplit": "Drop to open in a new editor pane",
-            "resizeEditorPanes": "Resize editor panes"
-          },
           "titleEditorViewing": "正在檢視 {file}",
           "titleEditorPlaying": "正在播放 {file}",
           "titleEditorEditing": "正在編輯 {file}",
@@ -4871,7 +4329,6 @@
             "exitBackup": "離開備份",
             "fileFromEditor": "建立檔案",
             "directory": "建立目錄",
-            "symlink": "Symlink",
             "fileFromPull": "從網址匯入",
             "fileFromUpload": "上傳檔案",
             "directoryFromUpload": "上傳目錄",
@@ -4912,13 +4369,10 @@
           },
           "searchBanner": {
             "resultsTitle": "搜尋結果（找到 {files}）",
-            "root": "Root:",
             "query": "查詢：",
             "excluded": "已排除：",
             "content": "內容：",
-            "size": "大小：",
-            "min": "最小：",
-            "max": "最大："
+            "size": "大小："
           },
           "operations": {
             "compressing": "正在從 {path} 壓縮 {files}",
@@ -4927,14 +4381,10 @@
             "copying": "正在將 {path} 複製到 {destination}",
             "copyingMany": "正在複製 {files}",
             "receivingRemote": "正在從遠端伺服器接收 {files}",
-            "receivingRemoteFrom": "Receiving {files} from {server}",
             "sendingRemote": "正在傳送 {files} 到遠端伺服器",
-            "sendingRemoteTo": "Sending {files} to {server}",
-            "exportingBackup": "正在將備份匯出至 {destination}",
-            "cancelAllOperations": "Cancel All Operations"
+            "exportingBackup": "正在將備份匯出至 {destination}"
           },
           "dropzone": {
-            "title": "Drop files or folders here to upload",
             "subtitle": "放開即可開始上傳"
           },
           "settings": {
@@ -4964,14 +4414,10 @@
             "archiveCreationStarted": "已開始建立壓縮檔。",
             "decompressionStarted": "已開始解壓縮封存檔。",
             "fileCopyingStarted": "已開始複製檔案。",
-            "fileCopyingStartedMany": "File copying to {servers} has started.",
-            "fileCopyingStartedPartial": "File copying to {successfulServers} has started. {failedServers} failed:",
             "fileInfoRetrieved": "已成功取得檔案資訊。",
             "filePullingStarted": "已開始拉取檔案。",
             "fileRenamed": "檔案已重新命名。",
             "fileCouldNotBeRenamed": "無法重新命名檔案。",
-            "closeDestinationBeforeRename": "Close the editor tab for the destination file before renaming.",
-            "closeTabsBeforeBulkRename": "Close affected editor tabs before renaming overlapping paths.",
             "filesRenamed": "已重新命名 {files}。",
             "renameUndone": "已復原重新命名操作。",
             "renameCouldNotBeUndone": "無法復原重新命名操作。",
@@ -4985,8 +4431,6 @@
             "fileTooLargeToOpen": "此檔案太大，無法在檔案管理員中開啟。"
           },
           "tooltip": {
-            "settings": "Settings",
-            "advancedSearch": "Advanced search",
             "fileHistory": "檔案歷史",
             "revertToDisk": "捨棄變更並從磁碟重新載入檔案",
             "collabEditing": "{user} 正在編輯此檔案",
@@ -4998,8 +4442,7 @@
             "play": "播放",
             "pause": "暫停",
             "mute": "靜音",
-            "unmute": "取消靜音",
-            "playbackRate": "Playback speed"
+            "unmute": "取消靜音"
           },
           "drawer": {
             "revisions": {
@@ -5056,12 +4499,6 @@
               "title": "建立目錄",
               "createdAs": "此目錄將建立為 "
             },
-            "createSymlink": {
-              "title": "Create Symlink",
-              "targetDescription": "Relative to the directory the symlink is created in.",
-              "createdAs": "This symlink will be created as ",
-              "pointsTo": "It will point to "
-            },
             "copyFile": {
               "title": "複製檔案",
               "createdAs": "此檔案將建立為 ",
@@ -5080,12 +4517,7 @@
               "confirm": "複製 {files}"
             },
             "copyRemote": {
-              "title": "遠端複製檔案",
-              "servers": "Destination Servers",
-              "addFromGroup": "Add servers from a group",
-              "browsingOn": "Browsing {server}, the chosen path is used on every destination server.",
-              "noCreatePermission": "You do not have permission to create files on {servers}.",
-              "createdAs": "These files will be created on {servers} under "
+              "title": "遠端複製檔案"
             },
             "fileFingerprints": {
               "title": "檔案指紋",
@@ -5197,12 +4629,9 @@
               "advancedFilters": "進階篩選",
               "pathPatterns": "路徑模式",
               "include": "包含",
-              "includePlaceholder": "e.g., *.js, src/**",
               "exclude": "排除",
-              "excludePlaceholder": "e.g., node_modules/**",
               "fileContent": "檔案內容",
               "searchText": "搜尋文字",
-              "contentPlaceholder": "Text to find in files",
               "maxFileSize": "最大檔案大小",
               "includeOversized": "包含超大檔案",
               "includeOversizedDescription": "包含匹配其他筛选条件但过大而无法搜索的文件。",
@@ -5329,9 +4758,6 @@
               "title": "資料表",
               "empty": "此資料庫目前還沒有任何資料表。",
               "noMatches": "沒有符合搜尋條件的資料表。",
-              "noMatchesTruncated": "No tables match your search. Only the first {tables} tables were loaded, so the rest cannot be searched.",
-              "truncated": "This database has too many tables to load. Only the first {tables} are shown.",
-              "tableBeyondLimit": "This table is outside the first {tables} tables, which is all this database can load.",
               "rowEstimate": "約 {rows}",
               "badge": {
                 "view": "檢視"
@@ -5349,8 +4775,7 @@
               "add": "篩選",
               "column": "欄位",
               "operator": "運算子",
-              "value": "值",
-              "apply": "Apply"
+              "value": "值"
             },
             "enum": {
               "filterOperator": {
@@ -5377,7 +4802,6 @@
             },
             "badge": {
               "primaryKey": "主鍵",
-              "autoIncrement": "auto_increment",
               "generated": "自動生成",
               "binary": "二進位"
             },
@@ -5395,9 +4819,7 @@
             },
             "cell": {
               "setNull": "設為 NULL",
-              "null": "NULL",
               "empty": "空白",
-              "truncated": "This value was too large to load in full and cannot be edited.",
               "editorHint": "{enter} 套用數值，{shiftEnter} 插入新的一行。"
             }
           },
@@ -5414,7 +4836,6 @@
               "tabs": {
                 "databases": "資料庫",
                 "users": "使用者",
-                "backups": "Backups",
                 "logs": "記錄"
               },
               "stats": {
@@ -5434,12 +4855,7 @@
               },
               "modal": {
                 "createDatabase": {
-                  "title": "建立資料庫",
-                  "content": "Creates a new database inside this managed database instance.",
-                  "form": {
-                    "createUser": "Create a user for this database",
-                    "createUserHint": "Creates a user named after the database, grants it access and shows its credentials once the database is created."
-                  }
+                  "title": "建立資料庫"
                 },
                 "deleteDatabase": {
                   "title": "確認刪除資料庫",
@@ -5491,37 +4907,13 @@
             "users": {
               "title": "使用者",
               "subtitle": "已建立 {current} 個使用者，上限為 {max} 個。",
-              "button": {
-                "permissions": "Permissions"
-              },
               "tooltip": {
-                "offline": "The instance must be running to create users.",
                 "limitReached": "此執行個體最多只能有 {max} 個使用者。"
-              },
-              "enum": {
-                "permission": {
-                  "none": "No Access",
-                  "readOnly": "Read Only",
-                  "readWrite": "Read & Write"
-                }
-              },
-              "form": {
-                "databases": "Database Access",
-                "noDatabases": "This instance has no databases yet."
-              },
-              "table": {
-                "columns": {
-                  "databases": "Databases"
-                }
               },
               "modal": {
                 "createUser": {
                   "title": "建立使用者",
                   "content": "在此受管理的資料庫執行個體中，建立一個新的使用者。憑證將於建立後顯示在表格中。"
-                },
-                "permissions": {
-                  "title": "Database Permissions",
-                  "content": "Controls which databases **{username}** can access, and what it may do in them."
                 },
                 "deleteUser": {
                   "title": "確認刪除使用者",
@@ -5530,8 +4922,7 @@
               },
               "toast": {
                 "created": "使用者已建立。",
-                "deleted": "使用者已刪除。",
-                "permissionsUpdated": "User permissions updated."
+                "deleted": "使用者已刪除。"
               }
             },
             "power": {
@@ -5554,8 +4945,7 @@
               "extracting": "解壓縮中"
             },
             "operations": {
-              "remoteImport": "正在從 {source} 匯入 {database}",
-              "cancelAllOperations": "Cancel All Operations"
+              "remoteImport": "正在從 {source} 匯入 {database}"
             },
             "toast": {
               "operationCancelled": "操作已取消",
@@ -5565,36 +4955,6 @@
                   "completed": "已在 {time} 內從 {source} 匯入 {database}。",
                   "failed": "從 `{source}` 匯入 `{database}` 失敗：{error}",
                   "aborted": "從 `{source}` 匯入 `{database}` 的操作已取消。"
-                }
-              }
-            },
-            "backups": {
-              "title": "Backups",
-              "subtitle": "{current} of {max} maximum backups created on this server, shared with server backups.",
-              "badge": {
-                "restoring": "Restoring backup"
-              },
-              "notification": {
-                "restoring": "A backup is currently being restored into this managed database. Please wait..."
-              },
-              "tooltip": {
-                "limitReached": "This server is limited to {max} backups, shared between server and database backups.",
-                "offline": "The managed database must be running to take a backup.",
-                "restoring": "A backup is currently being restored into this managed database."
-              },
-              "toast": {
-                "restoring": "Restoring backup into the managed database...",
-                "restoreCompleted": "Managed database backup restore completed successfully.",
-                "restoreFailed": "Managed database backup restore failed."
-              },
-              "toggle": {
-                "allEngineBackups": "All {engine} backups on this server"
-              },
-              "modal": {
-                "restoreBackup": {
-                  "title": "Restore Database Backup",
-                  "content": "This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.",
-                  "targetInstance": "Target Managed Database"
                 }
               }
             },
@@ -5633,7 +4993,6 @@
                 "title": "資料庫憑證",
                 "form": {
                   "database": "資料庫",
-                  "databaseHint": "The database the connection string below points at.",
                   "jdbcConnectionString": "JDBC 連線字串"
                 }
               },
@@ -5783,8 +5142,7 @@
               "truncatedWarning": "為維持行事曆的流暢度，部分即將執行的項目未顯示。"
             },
             "deleteSchedule": {
-              "title": "確認刪除排程",
-              "content": "Are you sure you want to delete **{name}** from this server?"
+              "title": "確認刪除排程"
             },
             "createStep": {
               "title": "建立排程步驟"
@@ -5842,10 +5200,7 @@
             "rootPath": "根路徑",
             "outputInto": "輸出到",
             "ignoreFailure": "忽略失敗",
-            "runInForeground": "在前景執行",
-            "sourceDatabaseInstance": "Only Consider Backups From",
-            "sourceDatabaseInstanceDescription": "Only pick database backups that were taken from this managed database. Leave empty to consider backups from any managed database on this server.",
-            "sourceDatabaseInstanceAny": "Any managed database"
+            "runInForeground": "在前景執行"
           },
           "condition": {
             "variable": "變數",
@@ -5858,11 +5213,9 @@
             "anyMustBeTrue": "任一條件必須為真：",
             "mustNotBeTrue": "條件不得為真：",
             "renderer": {
-              "none": "No condition - this always matches.",
               "empty": "尚未新增任何條件。",
               "serverState": "伺服器狀態為 {state}",
               "uptime": "運行時間 {comparator} {value}",
-              "resourceUsage": "{metric} {comparator} {value}",
               "fileExists": "檔案 {file} 存在",
               "variableExists": "變數 {variable} 已設定",
               "equals": "變數 {variable} 等於 {value}",
@@ -5923,15 +5276,6 @@
                 "content": "當備份達到狀態 `{status}` 時。"
               }
             },
-            "databaseBackupStatus": {
-              "title": "Database Backup Status",
-              "form": {
-                "backupStatus": "Backup Status"
-              },
-              "card": {
-                "content": "When Database Backup reaches Status `{status}`."
-              }
-            },
             "scheduleCompletion": {
               "title": "排程完成",
               "form": {
@@ -5968,14 +5312,7 @@
             "noActionSelected": "選取要設定的動作類型",
             "noActionDetails": "沒有可用的動作詳細資訊",
             "ignoreFailure": "忽略失敗：{value}",
-            "foreground": "前景：{value}",
-            "sourceDatabaseInstance": "Only From Managed Database: {uuid}",
-            "sourceDatabaseInstanceAny": "Only From Managed Database: Any",
-            "backupSelector": {
-              "compact": "Backup {backup}",
-              "compactLatest": "The latest backup",
-              "compactOldest": "The oldest backup"
-            }
+            "foreground": "前景：{value}"
           },
           "steps": {
             "empty": {
@@ -6011,28 +5348,24 @@
               }
             },
             "if": {
-              "title": "If",
               "description": "只有在條件成立時才執行以下步驟，直到 Else/End If 為止，系統會自動加上對應的 End If。",
               "renderer": {
                 "compact": "如果符合條件"
               }
             },
             "elseIf": {
-              "title": "Else If",
               "description": "當先前的分支皆未執行且條件成立時，執行以下步驟。",
               "renderer": {
                 "compact": "否則如果符合條件"
               }
             },
             "else": {
-              "title": "Else",
               "description": "當 If 區塊中先前的分支皆未執行時，執行以下步驟。",
               "renderer": {
                 "compact": "否則"
               }
             },
             "endIf": {
-              "title": "End If",
               "description": "結束目前的 If 區塊。",
               "renderer": {
                 "compact": "If 區塊結束"
@@ -6131,22 +5464,7 @@
                   "backupName": "備份名稱：{name}",
                   "backupNameAuto": "備份名稱：自動產生",
                   "outputInto": "備份 UUID 輸出至：{variable}",
-                  "ignoredFiles": "忽略的檔案：{files}",
-                  "backupGroup": "Backup Group: {uuid}"
-                }
-              }
-            },
-            "createDatabaseBackup": {
-              "title": "Create Database Backup",
-              "description": "Create a backup of a managed database.",
-              "form": {
-                "databaseInstance": "Managed Database"
-              },
-              "renderer": {
-                "compact": "Create database backup {name}",
-                "compactAuto": "Create a database backup with an auto-generated name",
-                "detail": {
-                  "databaseInstance": "Managed Database: {uuid}"
+                  "ignoredFiles": "忽略的檔案：{files}"
                 }
               }
             },
@@ -6183,8 +5501,7 @@
               "title": "刪除備份",
               "description": "刪除由備份選擇器指定的備份。",
               "form": {
-                "backupSelector": "要刪除的備份",
-                "warning": "This permanently deletes the selected backup, including its files on the node. If the selected backup is locked, the step fails."
+                "backupSelector": "要刪除的備份"
               }
             },
             "moveBackup": {
@@ -6199,38 +5516,6 @@
                   "targetGroup": "目標群組：{uuid}",
                   "targetGroupNone": "目標群組：無（未分組）"
                 }
-              }
-            },
-            "restoreDatabaseBackup": {
-              "title": "Restore Database Backup",
-              "description": "Restore a database backup into a managed database.",
-              "form": {
-                "backupSelector": "Database Backup to Restore",
-                "targetDatabaseInstance": "Restore Into",
-                "targetDatabaseInstanceDescription": "The managed database the backup is imported into. Leave empty to restore into the database the backup was taken from.",
-                "targetDatabaseInstanceSource": "The database the backup was taken from",
-                "warning": "Restoring overwrites the contents of the target database. The schedule does not wait for the import to finish, so later steps can run while it is still in progress. If the database the backup was taken from has been deleted, the step fails unless you pick a target here."
-              },
-              "renderer": {
-                "detail": {
-                  "targetDatabaseInstance": "Restore Into: {uuid}",
-                  "targetDatabaseInstanceSource": "Restore Into: The database the backup was taken from"
-                }
-              }
-            },
-            "deleteDatabaseBackup": {
-              "title": "Delete Database Backup",
-              "description": "Delete a database backup selected by the backup selector.",
-              "form": {
-                "backupSelector": "Database Backup to Delete",
-                "warning": "This permanently deletes the selected database backup, including its dump on the node. Only database backups are considered, never file backups. If the selected backup is locked, the step fails."
-              }
-            },
-            "moveDatabaseBackup": {
-              "title": "Move Database Backup",
-              "description": "Move a database backup selected by the backup selector into a backup group.",
-              "form": {
-                "backupSelector": "Database Backup to Move"
               }
             },
             "createDirectory": {
@@ -6332,23 +5617,6 @@
                 }
               }
             },
-            "pullFile": {
-              "title": "Pull File",
-              "description": "Download a file from a URL into a folder.",
-              "form": {
-                "useHeader": "Use Response File Name",
-                "useHeaderDescription": "Name the file after the Content-Disposition header when no file name is set."
-              },
-              "renderer": {
-                "compact": "Pull {url} into {root}",
-                "detail": {
-                  "url": "URL: {url}",
-                  "root": "Root: {root}",
-                  "fileName": "File Name: {fileName}",
-                  "useHeader": "Use Response File Name: {value}"
-                }
-              }
-            },
             "updateStartupVariable": {
               "title": "更新啟動變數",
               "description": "變更啟動變數的值。",
@@ -6431,8 +5699,7 @@
               "form": {
                 "emailPlaceholder": "輸入此子使用者應儲存使用的電子郵件。",
                 "permissions": "權限",
-                "ignoredFilesDescription": "符合這些模式的檔案和目錄將對此子使用者隱藏。使用 gitignore 風格的 glob 模式（例如 `*.env`、`secrets/`）。在模式前加上 `!` 可取消隱藏否則會被更廣泛模式排除的路徑。",
-                "ignoredFilesInherited": "The paths hidden from you are always applied on top of these, and cannot be granted away."
+                "ignoredFilesDescription": "符合這些模式的檔案和目錄將對此子使用者隱藏。使用 gitignore 風格的 glob 模式（例如 `*.env`、`secrets/`）。在模式前加上 `!` 可取消隱藏否則會被更廣泛模式排除的路徑。"
               }
             },
             "updateSubuser": {
@@ -6453,20 +5720,17 @@
         "backups": {
           "title": "備份",
           "subtitle": "已建立 {current} / {max} 個備份。",
-          "subtitleWithDatabase": "{current} of {max} maximum backups created ({server} server, {database} database).",
           "tooltip": {
             "limitReached": "此伺服器最多只能使用 {max} 個備份。"
           },
           "table": {
             "columns": {
-              "kind": "Kind",
               "locked": "已鎖定？"
             }
           },
           "badge": {
             "deleting": "刪除中…",
-            "deleteFailed": "刪除失敗",
-            "sourceDeleted": "{name} (deleted)"
+            "deleteFailed": "刪除失敗"
           },
           "button": {
             "browse": "瀏覽",
@@ -6483,10 +5747,6 @@
             "createBackup": {
               "title": "建立備份",
               "noGroup": "無群組",
-              "source": "Source",
-              "sourceFiles": "Server Files",
-              "sourceDatabase": "Managed Database",
-              "sourceInstance": "Managed Database",
               "toast": {
                 "created": "備份已建立。"
               }
@@ -6526,9 +5786,6 @@
           "badge": {
             "allLocked": "全部已鎖定"
           },
-          "form": {
-            "noRetentionDescription": "With no retention set, this group is just a label and never deletes successful backups automatically."
-          },
           "modal": {
             "createGroup": {
               "title": "建立備份群組"
@@ -6556,9 +5813,6 @@
         "network": {
           "title": "網路",
           "subtitle": "已指派 {current} / {max} 個分配。",
-          "allocations": {
-            "title": "Allocations"
-          },
           "tooltip": {
             "limitReached": "此伺服器最多只能使用 {max} 個分配。"
           },
@@ -6579,209 +5833,6 @@
             "removeAllocation": {
               "title": "確認移除分配",
               "content": "你確定要從此伺服器移除 **{allocation}** 嗎？"
-            }
-          }
-        },
-        "firewall": {
-          "title": "Firewall",
-          "subtitle": "Rules are checked from top to bottom, the first one that matches decides.",
-          "empty": {
-            "title": "No Firewall Rules",
-            "description": "Every connection to this server's allocations is allowed. Add a rule to start restricting who can reach it.",
-            "descriptionReadOnly": "Every connection to this server's allocations is allowed."
-          },
-          "button": {
-            "createFirstRule": "Create Rule",
-            "addRule": "Add Rule",
-            "addDenyAll": "Deny Everything Else"
-          },
-          "tooltip": {
-            "limitReached": "This server is limited to {max} firewall rules."
-          },
-          "rule": {
-            "anySource": "any source",
-            "anyProtocol": "TCP & UDP",
-            "allAllocations": "all allocations",
-            "sourceFile": "file {file}",
-            "summary": "{protocols} from {sources} to {ports}",
-            "moreSources": "+{count} more",
-            "position": "#{position}",
-            "badge": {
-              "shadowed": "Never matches"
-            },
-            "aria": {
-              "reorder": "Reorder firewall rule {position}",
-              "actions": "Firewall rule {position} actions"
-            }
-          },
-          "alert": {
-            "fallthrough": "Traffic that matches none of these rules is **allowed**. Add a deny rule at the bottom that matches everything to turn this into a default deny firewall.",
-            "notEnforced": "This node will not enforce firewall rules. Rules are saved but have no effect, and **this server may refuse to start while any are configured.**",
-            "unallocatedPorts": "These rules reference ports that are not allocated to this server: **{ports}**. The node ignores them until matching allocations exist.",
-            "limitations": "Rules cover traffic reaching this server from elsewhere, both through its published ports and directly on its container address. Connections opened by the node itself are not filtered.",
-            "shadowed": "Rule {position} can never match, an earlier rule already covers everything it does.",
-            "shadowedMany": "Rules {positions} can never match, earlier rules already cover everything they do.",
-            "unknownEnforcement": "The node could not be reached, so it is unknown whether it currently enforces firewall rules.",
-            "unsaved": "You have unsaved changes. Nothing is applied until you save."
-          },
-          "form": {
-            "action": "Action",
-            "protocols": "Protocols",
-            "protocolsDescription": "Leave empty to match both TCP and UDP.",
-            "anyProtocol": "TCP & UDP",
-            "sources": "Sources",
-            "sourcesDescription": "IP addresses or networks such as 10.0.0.0/8. A network must have its host bits zeroed. Leave empty to match any source.",
-            "sourceFile": "Source File",
-            "sourceFileDescription": "Path of a file in the server directory with one IP address or network per line, lines starting with # are ignored. Its entries are added to the sources above, and the node picks up edits to the file on its own.",
-            "ports": "Ports",
-            "portsDescription": "Allocation ports this rule applies to, as single ports or ranges like 25565-25570. Leave empty to match every allocation of the server.",
-            "preview": "Preview",
-            "sourcesCount": "{count} of {max} used",
-            "invalidSource": "{source} is not a valid IP address or network.",
-            "tooManySources": "A rule can have at most {max} sources.",
-            "invalidPort": "{port} is not a valid port or port range.",
-            "tooManyPorts": "A rule can cover at most {max} ports."
-          },
-          "toast": {
-            "saved": "Firewall rules saved."
-          },
-          "modal": {
-            "unsavedChanges": {
-              "title": "Unsaved Changes",
-              "content": "You have unsaved firewall rules. Leaving this page now discards them."
-            },
-            "createRule": {
-              "title": "Create Firewall Rule"
-            },
-            "editRule": {
-              "title": "Edit Firewall Rule"
-            },
-            "removeRule": {
-              "title": "Confirm Rule Removal",
-              "content": "Are you sure you want to remove this firewall rule?"
-            }
-          }
-        },
-        "tunnel": {
-          "title": "Connections",
-          "subtitle": "Reach other servers directly, without going over the public internet.",
-          "empty": {
-            "title": "Not on the Private Network",
-            "description": "Join to give this server a private address that the servers you connect it to can reach it on.",
-            "descriptionReadOnly": "This server has no private address, so no other server can reach it privately."
-          },
-          "ports": {
-            "empty": "No ports offered yet, so nothing can be reached on this server."
-          },
-          "outgoing": {
-            "empty": "This server cannot reach any other server yet. Connect one to start the graph."
-          },
-          "button": {
-            "join": "Join Private Network",
-            "leave": "Leave Private Network",
-            "connect": "Connect a Server",
-            "addPort": "Add Port",
-            "editPorts": "Offered Ports"
-          },
-          "action": {
-            "rename": "Change Hostname",
-            "editPorts": "Edit Offered Ports",
-            "removeOutgoing": "Stop Reaching This Server",
-            "removeIncoming": "Stop This Server Reaching Us",
-            "grantOutgoing": "Let This Server Reach It",
-            "grantIncoming": "Let It Reach This Server"
-          },
-          "canvas": {
-            "hint": "Click a connection to turn that direction on or off. Drag to move around, hold Ctrl and scroll to zoom, or pinch on a touchscreen.",
-            "legend": {
-              "outbound": "Outbound",
-              "inbound": "Inbound"
-            },
-            "edge": {
-              "outboundActive": "This server reaches {server}. Click to stop it.",
-              "outboundInactive": "This server cannot reach {server}. Click to allow it.",
-              "inboundActive": "{server} reaches this server. Click to stop it.",
-              "inboundInactive": "{server} cannot reach this server. Click to allow it."
-            },
-            "zoomIn": "Zoom in",
-            "zoomOut": "Zoom out",
-            "fit": "Recentre"
-          },
-          "node": {
-            "actions": "Server actions",
-            "noPorts": "Offers no ports, so nothing on it can be reached.",
-            "noPortsSelf": "You offer no ports, so nothing on this server can be reached.",
-            "inboundOnly": "Reaches this server. Nothing on it can be reached from here.",
-            "caption": {
-              "self": "Other servers reach this one at",
-              "peer": "This server reaches it at"
-            }
-          },
-          "tooltip": {
-            "nodeNotOnNetwork": "The node this server runs on is not on the private network.",
-            "connectionLimitReached": "This server is limited to {max} outgoing connections."
-          },
-          "alert": {
-            "nodeNotOnNetwork": "The node this server runs on is **not on the private network**, so it cannot join. Ask an administrator to enable it for the node.",
-            "nodeLeftNetwork": "The node this server runs on was **taken off the private network**, so none of its connections work. Ask an administrator to put the node back on.",
-            "bypassesFirewall": "Private connections do not pass through this server's firewall rules: the connection itself is the access grant. Every connection works in one direction only, so a server this one reaches cannot reach back unless that is granted separately."
-          },
-          "form": {
-            "name": "Hostname",
-            "nameDescription": "Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.",
-            "namePlaceholder": "Leave empty to derive one from the server name",
-            "port": "Port",
-            "protocols": "Protocols",
-            "server": "Server",
-            "serverDescription": "Only servers already on the private network are listed."
-          },
-          "toast": {
-            "joined": "Joined the private network.",
-            "left": "Left the private network.",
-            "renamed": "Hostname changed.",
-            "portsSaved": "Offered ports saved.",
-            "connected": "Server connected.",
-            "disconnected": "Connection removed."
-          },
-          "modal": {
-            "join": {
-              "title": "Join the Private Network",
-              "description": "Pick the hostname other servers will reach this one on. Other servers can use the same hostname as long as no server connects to both. You can change it later."
-            },
-            "rename": {
-              "title": "Change Hostname",
-              "warning": "Connected servers pick the new hostname up within a minute, and nothing is disconnected. Anything still using the old one stops resolving, so update it there too - or use **{alias}.tunnel**, which never changes."
-            },
-            "ports": {
-              "title": "Offered Ports",
-              "description": "The ports connected servers may reach. Not limited to your allocations.",
-              "fromAllocations": "Add from this server's allocations",
-              "count": "{count} of {max} used",
-              "duplicate": "The same port is listed more than once."
-            },
-            "connect": {
-              "title": "Connect a Server",
-              "empty": "No servers available. A server has to be on the private network before it can be connected.",
-              "outbound": "This server reaches {server}",
-              "inbound": "{server} reaches this server",
-              "alreadyOn": "Already connected in this direction.",
-              "collision": "This server uses port {port} for its own allocations, so it can never reach {server} on it.",
-              "collisionReverse": "{server} uses port {port} for its own allocations, so it can never reach this server on it.",
-              "noPermission": "You are not allowed to grant this from {server}.",
-              "noPermissionTo": "You are not allowed to connect to {server}.",
-              "offersNothing": "{server} offers no ports yet, so there would be nothing to reach.",
-              "youOfferNothing": "This server offers no ports yet, so there would be nothing for it to reach.",
-              "addPortTo": "Offer on {server}",
-              "offersNothingAlert": "**{server}** offers no ports. Connecting would give you a hostname that resolves but refuses every connection. Someone with access to {server} has to offer a port first."
-            },
-            "disconnect": {
-              "title": "Confirm Connection Removal",
-              "content": "Are you sure you want to stop this server from reaching **{server}**?",
-              "contentIncoming": "Are you sure you want to stop **{server}** from reaching this server?"
-            },
-            "leave": {
-              "title": "Confirm Leaving the Private Network",
-              "content": "This server loses its private address, its offered ports and every connection in both directions. Rejoining assigns a new address."
             }
           }
         },
