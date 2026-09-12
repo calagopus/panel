@@ -1242,8 +1242,7 @@
                   "cacheVersion": "Verzia vyrovnávacej pamäte",
                   "cacheCalls": "Volania cache",
                   "cacheHits": "Zásahy cache ({percent} %)",
-                  "cacheMisses": "Minutia cache ({percent} %)",
-                  "avgCachedCallLatency": "Priemerná latencia volaní z cache"
+                  "cacheMisses": "Minutia cache ({percent} %)"
                 },
                 "containerType": {
                   "none": "Žiadne zistené",

@@ -1553,8 +1553,7 @@
                   "cacheVersion": "快取版本",
                   "cacheCalls": "快取呼叫次數",
                   "cacheHits": "快取命中（{percent}%）",
-                  "cacheMisses": "快取未命中（{percent}%）",
-                  "avgCachedCallLatency": "平均快取呼叫延遲"
+                  "cacheMisses": "快取未命中（{percent}%）"
                 },
                 "containerType": {
                   "none": "未偵測到",
