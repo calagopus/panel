@@ -5,6 +5,9 @@ import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileEditorQuickActionsOptions {
+  enabled?: boolean;
+  loading?: boolean;
+  saveEnabled?: boolean;
   action?: string;
   fileName: string;
   writable: boolean;
@@ -20,6 +23,9 @@ interface FileEditorQuickActionsOptions {
 }
 
 export default function useFileEditorQuickActions({
+  enabled = true,
+  loading = false,
+  saveEnabled = true,
   action,
   fileName,
   writable,
@@ -35,44 +41,47 @@ export default function useFileEditorQuickActions({
 }: FileEditorQuickActionsOptions) {
   const { t } = useTranslations();
 
-  useQuickActions([
-    {
-      id: 'files.editor.save',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.quickAction.saveFile', {}),
-      icon: <FontAwesomeIcon icon={faFloppyDisk} />,
-      permission: collaborationActive ? 'files.update' : 'files.create',
-      isVisible: () => action === 'edit' && !!fileName && writable && !saving,
-      perform: onSave,
-    },
-    {
-      id: 'files.editor.create',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.quickAction.createFile', {}),
-      icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
-      permission: 'files.create',
-      isVisible: () => action === 'new' && writable && !saving,
-      perform: onCreate,
-    },
-    {
-      id: 'files.editor.revisions',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.tooltip.fileHistory', {}),
-      keywords: ['revisions', 'versions'],
-      icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
-      permission: 'files.read-content',
-      isVisible: () => action === 'edit' && !!fileName && primary,
-      perform: onShowRevisions,
-    },
-    {
-      id: 'files.editor.revertToDisk',
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => t('pages.server.files.tooltip.revertToDisk', {}),
-      keywords: ['revert', 'discard'],
-      icon: <FontAwesomeIcon icon={faArrowsRotate} />,
-      permission: collaborationActive ? 'files.update' : 'files.read-content',
-      isVisible: () => dirty && action === 'edit' && !!fileName && writable && !collaborationDeleted,
-      perform: onRevert,
-    },
-  ]);
+  useQuickActions(
+    [
+      {
+        id: 'files.editor.save',
+        category: CORE_QUICK_ACTION_CATEGORIES.page,
+        label: () => t('pages.server.files.quickAction.saveFile', {}),
+        icon: <FontAwesomeIcon icon={faFloppyDisk} />,
+        permission: collaborationActive ? 'files.update' : 'files.create',
+        isVisible: () => action === 'edit' && !!fileName && writable && saveEnabled && !saving,
+        perform: onSave,
+      },
+      {
+        id: 'files.editor.create',
+        category: CORE_QUICK_ACTION_CATEGORIES.page,
+        label: () => t('pages.server.files.quickAction.createFile', {}),
+        icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
+        permission: 'files.create',
+        isVisible: () => action === 'new' && writable && saveEnabled && !saving,
+        perform: onCreate,
+      },
+      {
+        id: 'files.editor.revisions',
+        category: CORE_QUICK_ACTION_CATEGORIES.page,
+        label: () => t('pages.server.files.tooltip.fileHistory', {}),
+        keywords: ['revisions', 'versions'],
+        icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
+        permission: 'files.read-content',
+        isVisible: () => action === 'edit' && !!fileName && primary,
+        perform: onShowRevisions,
+      },
+      {
+        id: 'files.editor.revertToDisk',
+        category: CORE_QUICK_ACTION_CATEGORIES.page,
+        label: () => t('pages.server.files.tooltip.revertToDisk', {}),
+        keywords: ['revert', 'discard'],
+        icon: <FontAwesomeIcon icon={faArrowsRotate} />,
+        permission: collaborationActive ? 'files.update' : 'files.read-content',
+        isVisible: () => dirty && action === 'edit' && !!fileName && writable && !collaborationDeleted,
+        perform: onRevert,
+      },
+    ],
+    enabled && !loading,
+  );
 }

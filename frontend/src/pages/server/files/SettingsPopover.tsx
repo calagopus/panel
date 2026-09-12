@@ -5,6 +5,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Popover from '@/elements/overlays/Popover.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function SettingsPopover({
   tooltip,
@@ -17,8 +18,13 @@ export default function SettingsPopover({
   keyPrefix: string;
   children: ReactNode;
 }) {
+  const { t } = useTranslations();
   const trigger = (
-    <Button variant='transparent' size='compact-xs'>
+    <Button
+      variant='transparent'
+      size='compact-xs'
+      aria-label={typeof tooltip === 'string' ? tooltip : t('pages.server.files.tooltip.settings', {})}
+    >
       <FontAwesomeIcon size='lg' icon={faCog} />
     </Button>
   );

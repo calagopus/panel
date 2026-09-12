@@ -106,28 +106,18 @@
   --file-manager-tree-collapsed-width: 2.75rem;
   --file-manager-tree-min-content-width: 39rem;
   --file-manager-tree-columns: 20rem 6.5rem 8.5rem 2rem;
-  --file-manager-editor-min-width: 40rem;
 }
 
 .file-manager-workspace-grid {
   display: grid;
   width: 100%;
-  min-width: calc(
-    var(--file-manager-tree-width) +
-    var(--file-manager-editor-min-width) +
-    var(--file-manager-workspace-gap)
-  );
-  grid-template-columns: var(--file-manager-tree-width) minmax(var(--file-manager-editor-min-width), 1fr);
+  min-width: 0;
+  grid-template-columns: var(--file-manager-tree-width) minmax(0, 1fr);
   gap: var(--file-manager-workspace-gap);
 }
 
 .file-manager-workspace-grid[data-file-manager-tree-visible="false"] {
-  min-width: calc(
-    var(--file-manager-tree-collapsed-width) +
-    var(--file-manager-editor-min-width) +
-    var(--file-manager-workspace-gap)
-  );
-  grid-template-columns: var(--file-manager-tree-collapsed-width) minmax(var(--file-manager-editor-min-width), 1fr);
+  grid-template-columns: var(--file-manager-tree-collapsed-width) minmax(0, 1fr);
 }
 
 [data-file-manager-tree-header],
@@ -177,10 +167,6 @@
   box-shadow: inset 3px 0 0 var(--mantine-color-blue-5) !important;
 }
 
-.file-manager-editor-tabs::-webkit-scrollbar {
-  height: 0.75rem;
-}
-
 .file-manager-tree-viewport {
   scrollbar-color: var(--mantine-color-default-border) transparent;
   scrollbar-gutter: stable;
@@ -206,11 +192,40 @@
   background-color: var(--mantine-color-dimmed);
 }
 
+@media (min-width: 48rem) {
+  [data-file-manager-editor-split]:has([data-file-manager-editor-tabs] [data-mantine-scrollbar][data-state="visible"]) {
+    --file-manager-editor-tab-gutter: 10px;
+  }
+}
+
 @media (max-width: 47.999rem) {
+  [data-file-manager-editor-tabs]:has([data-mantine-scrollbar][data-state="visible"]) {
+    --file-manager-editor-tab-gutter: 10px;
+  }
+
   .file-manager-workspace-grid,
   .file-manager-workspace-grid[data-file-manager-tree-visible="false"] {
-    grid-template-columns: minmax(var(--file-manager-tree-min-content-width), 1fr);
-    min-width: max(var(--file-manager-tree-min-content-width), var(--file-manager-editor-min-width));
+    --file-manager-workspace-min-height: 0px;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  [data-file-manager-tree-visible="true"] [data-file-manager-editor-group] {
+    display: none;
+  }
+
+  [data-file-manager-tree-visible="false"] [data-file-manager-editor-group] {
+    height: calc(var(--file-manager-workspace-height) - 2.75rem - var(--file-manager-workspace-gap));
+  }
+
+  [data-file-manager-editor-pane]:not([data-active]),
+  [data-file-manager-editor-resize-handle] {
+    display: none;
+  }
+
+  [data-file-manager-editor-pane][data-active] {
+    flex: 1 1 100% !important;
+    width: 100%;
   }
 }
 

@@ -1,7 +1,7 @@
 import { faFileCirclePlus, faFolderPlus, faLink } from '@fortawesome/free-solid-svg-icons';
-import { dirname, resolve } from 'pathe';
+import { basename, dirname, resolve } from 'pathe';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
 import loadDirectory from '@/api/server/files/loadDirectory.ts';
@@ -24,6 +24,7 @@ import {
   escapeFileTreeSearch,
   FileTreeProps,
   FileTreeRow as FileTreeRowData,
+  getFileTreeDirectoryChain,
   groupTreeItems,
   identifyTreeItem,
   isExternalFileDrag,
@@ -48,10 +49,17 @@ import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts'
 import { useServerStore } from '@/stores/server.ts';
 import { fileManagerUndoScope, runLastUndoEntry } from '@/stores/undoHistory.ts';
 
-function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggleCollapsed }: FileTreeProps) {
+function FileTree({
+  onOpenFile,
+  onCreateFile,
+  activePath,
+  initialDirectory,
+  collapsed,
+  onToggleCollapsed,
+  revealRequest,
+}: FileTreeProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const server = useServerStore((state) => state.server);
   const canCreateFiles = useServerCan('files.create');
@@ -248,15 +256,7 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
   }, [server.uuid, loadPage, clearDropTarget, store]);
 
   useEffect(() => {
-    const paths: string[] = [];
-    let current = resolve(ROOT_DIRECTORY, initialDirectory);
-
-    while (current !== ROOT_DIRECTORY) {
-      paths.unshift(current);
-      const parent = dirname(current);
-      if (parent === current) break;
-      current = parent;
-    }
+    const paths = getFileTreeDirectoryChain(initialDirectory).slice(1);
 
     if (paths.length === 0) return;
 
@@ -453,6 +453,91 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
 
   const clearSelectedItems = useCallback(() => setSelectedItems([]), [setSelectedItems]);
 
+  const pendingRevealRef = useRef<{ path: string; parents: string[]; loaded: Map<string, number> } | null>(null);
+
+  useEffect(() => {
+    if (!revealRequest) return;
+    const path = resolve(ROOT_DIRECTORY, revealRequest.path);
+    const parents = getFileTreeDirectoryChain(dirname(path));
+    pendingRevealRef.current = { path, parents, loaded: new Map() };
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setSearchError(null);
+    store.getState().setSearchInfo(null);
+    setExpandedDirectories((current) => new Set([...current, ...parents.slice(1)]));
+    return () => {
+      pendingRevealRef.current = null;
+    };
+  }, [revealRequest, store]);
+
+  useEffect(() => {
+    const pending = pendingRevealRef.current;
+    if (!pending || collapsed || searching || modalSearchInfo) return;
+
+    for (const [index, parent] of pending.parents.entries()) {
+      const state = directories[parent];
+      if (state?.loading) return;
+      const loadedCount = pending.loaded.get(parent);
+      if (state?.error && loadedCount !== undefined) {
+        pendingRevealRef.current = null;
+        return;
+      }
+      if (!state || state.page === 0 || state.error) {
+        pending.loaded.set(parent, state?.entries.length ?? 0);
+        void loadPage(parent, 1);
+        return;
+      }
+      const name = basename(pending.parents[index + 1] ?? pending.path);
+      if (state.entries.some((entry) => entry.name === name)) continue;
+      if (state.entries.length < state.total && state.entries.length !== loadedCount) {
+        pending.loaded.set(parent, state.entries.length);
+        void loadPage(parent, state.page + 1);
+        return;
+      }
+      if (loadedCount === undefined) {
+        pending.loaded.set(parent, state.entries.length);
+        void loadPage(parent, 1);
+        return;
+      }
+      pendingRevealRef.current = null;
+      addToast(t('pages.server.files.tree.revealNotFound', { path: pending.path }), 'warning');
+      return;
+    }
+
+    const index = rows.findIndex((row) => row.type === 'entry' && row.path === pending.path);
+    const row = rows[index];
+    const viewport = viewportRef.current;
+    if (!viewport || row?.type !== 'entry') return;
+    const reveal = () => {
+      if (pendingRevealRef.current !== pending || viewport.clientHeight < TREE_ROW_HEIGHT || !scrollToRowRef.current)
+        return;
+      pendingRevealRef.current = null;
+      setSelectedItems([row]);
+      viewport.scrollLeft = 0;
+      scrollToRowRef.current(index);
+      observer.disconnect();
+    };
+    const observer = new ResizeObserver(reveal);
+    observer.observe(viewport);
+    const frame = requestAnimationFrame(reveal);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [
+    revealRequest,
+    collapsed,
+    searching,
+    modalSearchInfo,
+    directories,
+    rows,
+    loadPage,
+    setSelectedItems,
+    addToast,
+    t,
+  ]);
+
   const createTarget =
     selectedItems.length === 1
       ? selectedItems[0].entry.directory
@@ -520,7 +605,7 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
 
   const openCreateFile = () => {
     prepareCreateTarget();
-    navigate(`/server/${server.uuidShort}/files/new?${createSearchParams({ directory: createTarget })}`);
+    onCreateFile(createTarget, getDirectoryCapabilities(createTarget));
   };
 
   const openCreateDirectory = () => {
@@ -943,7 +1028,7 @@ function FileTree({ onOpenFile, activePath, initialDirectory, collapsed, onToggl
         <Card
           ref={treeRef}
           p={0}
-          className='flex h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) w-full flex-col overflow-hidden transition-colors'
+          className='flex h-full min-h-full w-full flex-col overflow-hidden transition-colors'
           data-file-manager-tree
           data-file-tree-directory={ROOT_DIRECTORY}
           data-file-tree-drop-target={ROOT_DIRECTORY}

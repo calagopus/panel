@@ -8,6 +8,7 @@ export interface FileTreeEditorPaneState {
   id: string;
   tabIds: string[];
   activeTabId: string | null;
+  previewTabId?: string;
   size: number;
 }
 
@@ -30,6 +31,7 @@ const paneSchema = z.object({
   id: z.string(),
   tabIds: z.array(z.string()),
   activeTabId: z.string().nullable(),
+  previewTabId: z.string().optional(),
   size: z.number().positive().default(1),
 });
 
@@ -68,6 +70,7 @@ export const normalizeFileTreeWorkspace = (input: FileTreeEditorWorkspaceState):
       {
         ...pane,
         tabIds,
+        previewTabId: pane.previewTabId && tabIds.includes(pane.previewTabId) ? pane.previewTabId : undefined,
         activeTabId: pane.activeTabId && tabIds.includes(pane.activeTabId) ? pane.activeTabId : (tabIds[0] ?? null),
         size: Number.isFinite(pane.size) && pane.size > 0 ? pane.size : 1,
       },
@@ -96,6 +99,38 @@ export const normalizeFileTreeWorkspace = (input: FileTreeEditorWorkspaceState):
     panes,
     activePaneId: panes.some((pane) => pane.id === input.activePaneId) ? input.activePaneId : panes[0].id,
   };
+};
+
+export const closeFileTreeWorkspaceTabs = (
+  workspace: FileTreeEditorWorkspaceState,
+  tabIds: ReadonlySet<string>,
+): FileTreeEditorWorkspaceState => {
+  if (!workspace.tabs.some((tab) => tabIds.has(getFileTreeEditorTabId(tab)))) return workspace;
+  const panes = workspace.panes.map((pane) => {
+    const remaining = pane.tabIds.filter((id) => !tabIds.has(id));
+    if (remaining.length === pane.tabIds.length) return pane;
+    const activeIndex = pane.tabIds.indexOf(pane.activeTabId ?? '');
+    return {
+      ...pane,
+      tabIds: remaining,
+      activeTabId:
+        pane.activeTabId && !tabIds.has(pane.activeTabId)
+          ? pane.activeTabId
+          : (pane.tabIds.slice(activeIndex + 1).find((id) => !tabIds.has(id)) ?? remaining.at(-1) ?? null),
+    };
+  });
+  const activeIndex = workspace.panes.findIndex((pane) => pane.id === workspace.activePaneId);
+  const remainingPanes = panes.filter((pane) => pane.tabIds.length > 0);
+  const activePane =
+    panes.find((pane) => pane.id === workspace.activePaneId && pane.tabIds.length > 0) ??
+    panes.slice(activeIndex + 1).find((pane) => pane.tabIds.length > 0) ??
+    remainingPanes.at(-1) ??
+    panes[activeIndex];
+  return normalizeFileTreeWorkspace({
+    tabs: workspace.tabs.filter((tab) => !tabIds.has(getFileTreeEditorTabId(tab))),
+    panes: remainingPanes.length > 0 ? remainingPanes : [activePane],
+    activePaneId: activePane.id,
+  });
 };
 
 const storageKey = (serverUuid: string) => `file_tree_editor_workspace:${serverUuid}`;
@@ -139,6 +174,7 @@ export const renameFileTreeWorkspace = (workspace: FileTreeEditorWorkspaceState,
       panes: workspace.panes.map((pane) => ({
         ...pane,
         tabIds: pane.tabIds.map(remapId),
+        previewTabId: pane.previewTabId ? remapId(pane.previewTabId) : undefined,
         activeTabId: pane.activeTabId ? remapId(pane.activeTabId) : null,
       })),
     }),

@@ -131,6 +131,8 @@ export interface FileManagerStore {
   setEditorFontSize: (size: number) => void;
   editorEngine: 'monaco' | 'pierre';
   setEditorEngine: (engine: 'monaco' | 'pierre') => void;
+  editorPreviewTabs: boolean;
+  setEditorPreviewTabs: (state: boolean) => void;
   vscodeUriScheme: string;
   setVscodeUriScheme: (scheme: string) => void;
   imageViewerSmoothing: boolean;
@@ -188,6 +190,7 @@ export type FileManagerSettingField =
   | 'editorLineOverflow'
   | 'editorFontSize'
   | 'editorEngine'
+  | 'editorPreviewTabs'
   | 'vscodeUriScheme'
   | 'imageViewerSmoothing'
   | 'audioPlayerVolume';
@@ -214,6 +217,7 @@ const userSettingFields: {
     schema: z.enum(['monaco', 'pierre']),
     fallback: () => (window.matchMedia('(pointer: coarse)').matches ? 'pierre' : 'monaco'),
   },
+  editorPreviewTabs: { key: 'file_manager::editor_preview_tabs', schema: booleanSchema, fallback: () => true },
   vscodeUriScheme: {
     key: 'file_manager::vscode_uri_scheme',
     schema: z.string(),
@@ -392,6 +396,11 @@ export const createFileManagerStore = (
       setEditorEngine: (engine) => {
         writeUserSettingField('editorEngine', engine);
         set({ editorEngine: engine });
+      },
+      editorPreviewTabs: readUserSettingField('editorPreviewTabs'),
+      setEditorPreviewTabs: (state) => {
+        writeUserSettingField('editorPreviewTabs', state);
+        set({ editorPreviewTabs: state });
       },
       vscodeUriScheme: readUserSettingField('vscodeUriScheme'),
       setVscodeUriScheme: (scheme) => {

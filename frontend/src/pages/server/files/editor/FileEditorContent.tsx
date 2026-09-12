@@ -1,5 +1,5 @@
 import { type OnMount } from '@monaco-editor/react';
-import { RefObject } from 'react';
+import { RefObject, useId } from 'react';
 import { FileEditorActionContext } from 'shared/src/registries/pages/server/files';
 import { useShallow } from 'zustand/react/shallow';
 import MonacoEditor from '@/elements/editors/MonacoEditor.tsx';
@@ -8,8 +8,10 @@ import PierreEditor, {
   type PierreFileChangeEvent,
   type PierreLocalSelection,
 } from '@/elements/editors/PierreEditor.tsx';
+import { fileModelUri } from '@/lib/editor/fileModelUri.ts';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
+import { useServerStore } from '@/stores/server.ts';
 import { FileAudioPreview, FileImagePreview } from './FileMediaPreview.tsx';
 
 type FileEditorAction = (typeof window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions)[number];
@@ -59,6 +61,9 @@ export default function FileEditorContent({
   pierreEditorRef,
   saveShortcutRef,
 }: FileEditorContentProps) {
+  const instanceId = useId();
+  const serverUuid = useServerStore((state) => state.server.uuid);
+  const modelPath = fileModelUri(serverUuid, context?.path ?? fileName, instanceId);
   const { editorEngine, editorLineOverflow, editorFontSize, editorMinimap } = useFileManager(
     useShallow((state) => ({
       editorEngine: state.editorEngine,
@@ -96,7 +101,7 @@ export default function FileEditorContent({
         <PierreEditor
           height='100%'
           width='100%'
-          path={fileName}
+          path={modelPath}
           defaultValue={content}
           readOnly={readOnly}
           wordWrap={editorLineOverflow}
@@ -114,7 +119,7 @@ export default function FileEditorContent({
           height='100%'
           width='100%'
           defaultValue={content}
-          path={fileName}
+          path={modelPath}
           options={{
             readOnly,
             stickyScroll: { enabled: false },

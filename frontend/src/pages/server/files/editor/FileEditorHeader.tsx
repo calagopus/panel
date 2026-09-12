@@ -1,4 +1,4 @@
-import { faArrowsRotate, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faClockRotateLeft, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AvatarGroup } from '@mantine/core';
 import { join } from 'pathe';
@@ -7,6 +7,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Avatar from '@/elements/data-display/Avatar.tsx';
 import Group from '@/elements/layout/Group.tsx';
+import Menu from '@/elements/overlays/Menu.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -54,7 +55,7 @@ export default function FileEditorHeader({
   const browsingWritableDirectory = useFileManager((state) => state.browsingWritableDirectory);
 
   return (
-    <div className='flex justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
+    <div className='flex flex-wrap justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
       <Group wrap='nowrap' gap='xs' className='min-w-0 flex-1'>
         <Title className='truncate! min-w-0 text-lg! sm:text-[2.125rem]!'>{title}</Title>
 
@@ -88,7 +89,13 @@ export default function FileEditorHeader({
           {showRevertAction && (
             <div className='hidden sm:block'>
               <Tooltip label={t('pages.server.files.tooltip.revertToDisk', {})}>
-                <ActionIcon size='md' variant='subtle' color='gray' onClick={onRevertClick}>
+                <ActionIcon
+                  size='md'
+                  variant='subtle'
+                  color='gray'
+                  aria-label={t('pages.server.files.tooltip.revertToDisk', {})}
+                  onClick={onRevertClick}
+                >
                   <FontAwesomeIcon icon={faArrowsRotate} />
                 </ActionIcon>
               </Tooltip>
@@ -97,7 +104,13 @@ export default function FileEditorHeader({
           {showHistoryAction && (
             <div className='hidden sm:block'>
               <Tooltip label={t('pages.server.files.tooltip.fileHistory', {})}>
-                <ActionIcon size='md' variant='subtle' color='gray' onClick={onHistoryClick}>
+                <ActionIcon
+                  size='md'
+                  variant='subtle'
+                  color='gray'
+                  aria-label={t('pages.server.files.tooltip.fileHistory', {})}
+                  onClick={onHistoryClick}
+                >
                   <FontAwesomeIcon icon={faClockRotateLeft} />
                 </ActionIcon>
               </Tooltip>
@@ -107,6 +120,29 @@ export default function FileEditorHeader({
           <div className='hidden sm:block'>
             <FileConnectButton file={fileName ? join(browsingDirectory, fileName) : undefined} />
           </div>
+          {(showHistoryAction || showRevertAction) && (
+            <div className='sm:hidden'>
+              <Menu>
+                <Menu.Target>
+                  <ActionIcon
+                    variant='subtle'
+                    color='gray'
+                    aria-label={t('pages.server.files.button.editorActions', {})}
+                  >
+                    <FontAwesomeIcon icon={faEllipsis} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  {showHistoryAction && (
+                    <Menu.Item onClick={onHistoryClick}>{t('pages.server.files.tooltip.fileHistory', {})}</Menu.Item>
+                  )}
+                  {showRevertAction && (
+                    <Menu.Item onClick={onRevertClick}>{t('pages.server.files.tooltip.revertToDisk', {})}</Menu.Item>
+                  )}
+                </Menu.Dropdown>
+              </Menu>
+            </div>
+          )}
           <div hidden={!browsingWritableDirectory || action === 'image' || action === 'audio'}>
             {action === 'edit' ? (
               <ServerCan action={collabActive ? 'files.update' : 'files.create'}>

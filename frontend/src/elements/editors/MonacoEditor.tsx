@@ -6,6 +6,7 @@ import {
   TouchEvent as ReactTouchEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -230,6 +231,15 @@ export default function MonacoEditor(props: ComponentProps<typeof Editor>) {
 export function MonacoDiffEditor(props: ComponentProps<typeof DiffEditor>) {
   const computedColorScheme = useComputedColorScheme('dark');
   const { attach, items, openMenuRef, containerProps } = useMonacoContextMenu();
+  const cleanupRef = useRef<(() => void) | null>(null);
+
+  useLayoutEffect(
+    () => () => {
+      cleanupRef.current?.();
+      cleanupRef.current = null;
+    },
+    [],
+  );
 
   return (
     <ContextMenu items={items}>
@@ -243,6 +253,12 @@ export function MonacoDiffEditor(props: ComponentProps<typeof DiffEditor>) {
               theme={computedColorScheme === 'dark' ? 'vs-dark' : 'light'}
               options={{ ...props.options, contextmenu: false }}
               onMount={(e, m) => {
+                cleanupRef.current = () => {
+                  const model = e.getModel();
+                  e.setModel(null);
+                  if (!props.keepCurrentOriginalModel) model?.original.dispose();
+                  if (!props.keepCurrentModifiedModel) model?.modified.dispose();
+                };
                 attach(e.getModifiedEditor());
                 attach(e.getOriginalEditor());
                 forwardGlobalShortcuts(e.getModifiedEditor());

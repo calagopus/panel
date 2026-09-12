@@ -2,6 +2,7 @@ import { useComputedColorScheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import {
   type BaseCodeOptions,
+  DEFAULT_VIRTUAL_FILE_METRICS,
   type FileContents,
   type FileDiffMetadata,
   type FileDiffOptions,
@@ -73,7 +74,7 @@ export interface PierreDiffEditorProps extends CommonPierreProps {
   originalValue: string;
   modifiedPath: string;
   modifiedValue: string;
-  readOnly?: boolean;
+  readOnly?: true;
   onMount?: (handle: PierreEditorHandle) => void;
 }
 
@@ -147,7 +148,7 @@ function usePierreStyle(
       backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
       fontSize,
       ['--diffs-font-size' as string]: `${fontSize}px`,
-      ['--diffs-line-height' as string]: '20px',
+      ['--diffs-line-height' as string]: `${Math.ceil(fontSize * 1.5)}px`,
       ['--diffs-tab-size' as string]: '2',
       ['--diffs-font-family' as string]:
         'ui-monospace, SFMono-Regular, "JetBrains Mono", "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
@@ -193,6 +194,10 @@ export const PierreEditor = memo(
     const colorScheme = useComputedColorScheme('dark', { getInitialValueInEffect: false });
     const isDark = colorScheme === 'dark';
     const style = usePierreStyle(height, width, fontSize, isDark);
+    const metrics = useMemo(
+      () => ({ ...DEFAULT_VIRTUAL_FILE_METRICS, lineHeight: Math.ceil(fontSize * 1.5) }),
+      [fontSize],
+    );
     const baseOptions = useBaseOptions(colorScheme, wordWrap);
 
     const callbacks = useRef({ onMount, onChange, onChangeEvent, onPostRender, onSelectionChange });
@@ -309,8 +314,9 @@ export const PierreEditor = memo(
       <EditProvider<undefined, PierreCaretMetadata> key={colorScheme} createEditor={createEditor}>
         <Virtualizer style={style}>
           <File<undefined, PierreCaretMetadata>
-            key={colorScheme}
+            key={`${colorScheme}:${fontSize}`}
             file={file}
+            metrics={metrics}
             options={fileOptions}
             edit={!readOnly}
             selectedLines={selectedLines}
@@ -345,6 +351,10 @@ export const PierreDiffEditor = memo(
     const isDark = colorScheme === 'dark';
     const isMobile = useMediaQuery('(max-width: 768px)', false, { getInitialValueInEffect: false });
     const style = usePierreStyle(height, width, fontSize, isDark);
+    const metrics = useMemo(
+      () => ({ ...DEFAULT_VIRTUAL_FILE_METRICS, lineHeight: Math.ceil(fontSize * 1.5) }),
+      [fontSize],
+    );
     const baseOptions = useBaseOptions(colorScheme, wordWrap);
 
     const modifiedRef = useRef(modifiedValue);
@@ -396,13 +406,20 @@ export const PierreDiffEditor = memo(
       <Virtualizer style={style}>
         {originalValue === modifiedValue ? (
           <File
-            key={colorScheme}
+            key={`${colorScheme}:${fontSize}`}
             file={newFile}
             options={baseOptions as FileOptions<undefined, undefined>}
+            metrics={metrics}
             style={style}
           />
         ) : (
-          <FileDiff key={colorScheme} fileDiff={fileDiff} options={diffOptions} style={style} />
+          <FileDiff
+            key={`${colorScheme}:${fontSize}`}
+            fileDiff={fileDiff}
+            options={diffOptions}
+            metrics={metrics}
+            style={style}
+          />
         )}
       </Virtualizer>
     );

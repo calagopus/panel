@@ -29,6 +29,7 @@ interface Props extends DrawerProps {
   filePath: string;
   onRestore: (content: string) => void;
   getContent?: () => string | undefined;
+  onCompare?: (revisionId: number, previousRevisionId?: number) => void;
 }
 
 function RevisionRow({
@@ -37,12 +38,14 @@ function RevisionRow({
   previousRevisionId,
   onRestore,
   getContent,
+  onCompare,
 }: {
   revision: z.infer<typeof serverFileRevisionSchema>;
   filePath: string;
   previousRevisionId: number | null;
   onRestore: (content: string) => void;
   getContent?: () => string | undefined;
+  onCompare?: Props['onCompare'];
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -61,24 +64,20 @@ function RevisionRow({
       .finally(() => setLoading(false));
   };
 
-  const handleViewDiff = () => {
-    const currentContent = getContent?.();
+  const handleCompare = (previousRevisionId?: number) => {
+    if (onCompare) {
+      onCompare(revision.id, previousRevisionId);
+      return;
+    }
+
+    const currentContent = previousRevisionId === undefined ? getContent?.() : undefined;
     navigate(
       `/server/${server.uuidShort}/files/diff?${createSearchParams({
         file: filePath,
         revision: String(revision.id),
+        ...(previousRevisionId === undefined ? {} : { previousRevision: String(previousRevisionId) }),
       })}`,
       currentContent !== undefined ? { state: { currentContent } } : undefined,
-    );
-  };
-
-  const handleCompareToPrevious = () => {
-    navigate(
-      `/server/${server.uuidShort}/files/diff?${createSearchParams({
-        file: filePath,
-        revision: String(revision.id),
-        previousRevision: String(previousRevisionId),
-      })}`,
     );
   };
 
@@ -105,19 +104,38 @@ function RevisionRow({
         </div>
         <div className='flex items-center gap-1'>
           <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}>
-            <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleViewDiff}>
+            <ActionIcon
+              size='sm'
+              variant='subtle'
+              color='gray'
+              aria-label={t('pages.server.files.drawer.revisions.tooltip.viewDiff', {})}
+              onClick={() => handleCompare()}
+            >
               <FontAwesomeIcon icon={faCodeCompare} />
             </ActionIcon>
           </Tooltip>
           {previousRevisionId !== null && (
             <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.compareToPrevious', {})}>
-              <ActionIcon size='sm' variant='subtle' color='gray' onClick={handleCompareToPrevious}>
+              <ActionIcon
+                size='sm'
+                variant='subtle'
+                color='gray'
+                aria-label={t('pages.server.files.drawer.revisions.tooltip.compareToPrevious', {})}
+                onClick={() => handleCompare(previousRevisionId)}
+              >
                 <FontAwesomeIcon icon={faArrowsLeftRight} />
               </ActionIcon>
             </Tooltip>
           )}
           <Tooltip label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}>
-            <ActionIcon size='sm' variant='subtle' color='gray' loading={loading} onClick={handleRestore}>
+            <ActionIcon
+              size='sm'
+              variant='subtle'
+              color='gray'
+              aria-label={t('pages.server.files.drawer.revisions.tooltip.restore', {})}
+              loading={loading}
+              onClick={handleRestore}
+            >
               <FontAwesomeIcon icon={faRotateLeft} />
             </ActionIcon>
           </Tooltip>
@@ -127,7 +145,15 @@ function RevisionRow({
   );
 }
 
-export default function FileRevisionsDrawer({ filePath, onRestore, getContent, opened, onClose, ...props }: Props) {
+export default function FileRevisionsDrawer({
+  filePath,
+  onRestore,
+  getContent,
+  onCompare,
+  opened,
+  onClose,
+  ...props
+}: Props) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
@@ -136,6 +162,17 @@ export default function FileRevisionsDrawer({ filePath, onRestore, getContent, o
     queryFn: () => getFileRevisions(server.uuid, filePath),
     enabled: opened && !!filePath,
   });
+
+  const handleCompare = onCompare
+    ? (revisionId: number, previousRevisionId?: number) => {
+        onCompare(revisionId, previousRevisionId);
+        onClose();
+      }
+    : undefined;
+  const handleRestore = (content: string) => {
+    onRestore(content);
+    onClose();
+  };
 
   return (
     <Drawer
@@ -165,10 +202,8 @@ export default function FileRevisionsDrawer({ filePath, onRestore, getContent, o
                   filePath={filePath}
                   previousRevisionId={revisions[index + 1]?.id ?? null}
                   getContent={getContent}
-                  onRestore={(content) => {
-                    onRestore(content);
-                    onClose();
-                  }}
+                  onCompare={handleCompare}
+                  onRestore={handleRestore}
                 />
               ))}
             </Stack>

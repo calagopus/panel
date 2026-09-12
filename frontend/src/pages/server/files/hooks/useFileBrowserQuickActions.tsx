@@ -21,7 +21,13 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
 
-export function useFileBrowserQuickActions({ treeView = false }: { treeView?: boolean } = {}) {
+export function useFileBrowserQuickActions({
+  treeView = false,
+  onCreateFile,
+}: {
+  treeView?: boolean;
+  onCreateFile?: () => void;
+} = {}) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -40,10 +46,12 @@ export function useFileBrowserQuickActions({ treeView = false }: { treeView?: bo
       icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
       permission: 'files.create',
       isVisible: isWritable,
-      perform: () =>
-        navigate(
-          `/server/${server.uuidShort}/files/new?${createSearchParams({ directory: store.getState().browsingDirectory })}`,
-        ),
+      perform:
+        onCreateFile ??
+        (() =>
+          navigate(
+            `/server/${server.uuidShort}/files/new?${createSearchParams({ directory: store.getState().browsingDirectory })}`,
+          )),
     },
     {
       id: 'files.newDirectory',

@@ -20,7 +20,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import FileConnectButton from '../FileConnectButton.tsx';
 
-export default function FileToolbar() {
+export default function FileToolbar({ onCreateFile }: { onCreateFile?: () => void }) {
   const { t } = useTranslations();
   const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
@@ -49,10 +49,12 @@ export default function FileToolbar() {
                 type: 'action',
                 icon: faFileCirclePlus,
                 label: t('pages.server.files.button.fileFromEditor', {}),
-                onClick: () =>
-                  navigate(
-                    `/server/${server.uuidShort}/files/new?${createSearchParams({ directory: browsingDirectory })}`,
-                  ),
+                onClick:
+                  onCreateFile ??
+                  (() =>
+                    navigate(
+                      `/server/${server.uuidShort}/files/new?${createSearchParams({ directory: browsingDirectory })}`,
+                    )),
                 color: 'gray',
               },
               {

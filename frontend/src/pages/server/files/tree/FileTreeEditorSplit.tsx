@@ -1,9 +1,11 @@
 import { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import Select from '@/elements/input/Select.tsx';
 import {
   FILE_TREE_EDITOR_DRAG_TYPE,
   FILE_TREE_EDITOR_TAB_DRAG_TYPE,
 } from '@/pages/server/files/tree/fileTreeEditor.ts';
 import { FileTreeEditorPaneState } from '@/pages/server/files/tree/fileTreeWorkspaceState.ts';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileTreeEditorSplitProps {
   panes: FileTreeEditorPaneState[];
@@ -45,6 +47,7 @@ export default function FileTreeEditorSplit({
   onResize,
   renderPane,
 }: FileTreeEditorSplitProps) {
+  const { t } = useTranslations();
   const paneElements = useRef(new Map<string, HTMLDivElement>());
   const resizeSession = useRef<ResizeSession | null>(null);
   const [dropPaneId, setDropPaneId] = useState<string | null>(null);
@@ -121,7 +124,7 @@ export default function FileTreeEditorSplit({
     const leftWidth = leftElement.getBoundingClientRect().width;
     const rightWidth = rightElement.getBoundingClientRect().width;
     const minimumWidth = Math.min(
-      Number.isFinite(configuredMinimum) ? configuredMinimum : 320,
+      Math.max(Number.isFinite(configuredMinimum) ? configuredMinimum : 0, 200),
       (leftWidth + rightWidth) / 2,
     );
 
@@ -164,76 +167,103 @@ export default function FileTreeEditorSplit({
 
     event.preventDefault();
     event.stopPropagation();
+    if (
+      event.dataTransfer.types.includes(FILE_TREE_EDITOR_TAB_DRAG_TYPE) &&
+      (event.target as Element).closest('[data-file-manager-editor-tabs]')
+    ) {
+      setDropPaneId(null);
+      return;
+    }
     event.dataTransfer.dropEffect = 'copy';
     setDropPaneId(paneId);
   };
 
   return (
     <div
-      data-file-manager-editor-split
-      data-pane-count={panes.length}
-      className='flex h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) w-full min-w-(--file-manager-editor-min-width) overflow-x-auto overflow-y-hidden'
+      data-file-manager-editor-group
+      className='flex h-(--file-manager-workspace-height) min-h-(--file-manager-workspace-min-height) min-w-0 flex-col'
     >
-      {panes.map((pane, index) => {
-        const nextPane = panes[index + 1];
-        const active = pane.id === activePaneId;
+      {panes.length > 1 && (
+        <Select
+          className='mb-2 shrink-0 min-[48rem]:hidden'
+          aria-label={t('pages.server.files.tree.selectPane', {})}
+          value={activePaneId}
+          allowDeselect={false}
+          onChange={(paneId) => {
+            if (paneId) onActivatePane(paneId);
+          }}
+          data={panes.map((pane, index) => ({
+            value: pane.id,
+            label: t('pages.server.files.tree.editorPane', { number: index + 1 }),
+          }))}
+        />
+      )}
+      <div
+        data-file-manager-editor-split
+        data-pane-count={panes.length}
+        className='flex min-h-0 w-full min-w-0 flex-1 overflow-hidden'
+      >
+        {panes.map((pane, index) => {
+          const nextPane = panes[index + 1];
+          const active = pane.id === activePaneId;
 
-        return (
-          <Fragment key={pane.id}>
-            <div
-              ref={(element) => {
-                if (element) paneElements.current.set(pane.id, element);
-                else paneElements.current.delete(pane.id);
-              }}
-              data-file-manager-editor-pane
-              data-active={active || undefined}
-              className='relative flex h-full min-w-[30rem] overflow-hidden'
-              style={panes.length === 1 ? { flex: '1 0 100%', width: '100%' } : { flex: `${pane.size} 1 0` }}
-              onPointerDownCapture={() => onActivatePane(pane.id)}
-              onFocusCapture={() => onActivatePane(pane.id)}
-              onDragEnter={(event) => showDropTarget(event, pane.id)}
-              onDragOver={(event) => showDropTarget(event, pane.id)}
-              onDragLeave={(event) => {
-                if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-                setDropPaneId((current) => (current === pane.id ? null : current));
-              }}
-              onDrop={(event) => {
-                if (!acceptsEditorDrop(event.dataTransfer)) return;
-                event.preventDefault();
-                event.stopPropagation();
-                setDropPaneId(null);
-                onDrop(pane.id, event.dataTransfer);
-              }}
-            >
-              {renderPane(pane, index)}
-              {dropPaneId === pane.id && (
-                <div
-                  data-file-manager-editor-drop-overlay
-                  className='pointer-events-none absolute inset-2 z-50 flex items-center justify-center rounded-md border-2 border-dashed border-(--mantine-primary-color-filled) bg-(--mantine-color-body)/85 p-4 text-center font-medium text-(--mantine-primary-color-light-color)'
-                >
-                  {dropLabel}
-                </div>
-              )}
-            </div>
-
-            {nextPane && (
+          return (
+            <Fragment key={pane.id}>
               <div
-                role='separator'
-                tabIndex={0}
-                aria-orientation='vertical'
-                aria-label={resizeLabel}
-                data-file-manager-editor-resize-handle
-                className='file-manager-editor-resize-handle relative w-3 shrink-0 cursor-col-resize focus-visible:outline-none'
-                onPointerDown={(event) => startResize(event, pane, nextPane)}
-                onPointerMove={resize}
-                onPointerUp={finishResize}
-                onPointerCancel={finishResize}
-                onKeyDown={(event) => resizeWithKeyboard(event, pane, nextPane)}
-              />
-            )}
-          </Fragment>
-        );
-      })}
+                ref={(element) => {
+                  if (element) paneElements.current.set(pane.id, element);
+                  else paneElements.current.delete(pane.id);
+                }}
+                data-file-manager-editor-pane
+                data-active={active || undefined}
+                className='relative flex h-full min-w-0 overflow-hidden'
+                style={panes.length === 1 ? { flex: '1 0 100%', width: '100%' } : { flex: `${pane.size} 1 0` }}
+                onPointerDownCapture={() => onActivatePane(pane.id)}
+                onFocusCapture={() => onActivatePane(pane.id)}
+                onDragEnter={(event) => showDropTarget(event, pane.id)}
+                onDragOver={(event) => showDropTarget(event, pane.id)}
+                onDragLeave={(event) => {
+                  if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+                  setDropPaneId((current) => (current === pane.id ? null : current));
+                }}
+                onDrop={(event) => {
+                  if (!acceptsEditorDrop(event.dataTransfer)) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setDropPaneId(null);
+                  onDrop(pane.id, event.dataTransfer);
+                }}
+              >
+                {renderPane(pane, index)}
+                {dropPaneId === pane.id && (
+                  <div
+                    data-file-manager-editor-drop-overlay
+                    className='pointer-events-none absolute inset-2 z-50 flex items-center justify-center rounded-md border-2 border-dashed border-(--mantine-primary-color-filled) bg-(--mantine-color-body)/85 p-4 text-center font-medium text-(--mantine-primary-color-light-color)'
+                  >
+                    {dropLabel}
+                  </div>
+                )}
+              </div>
+
+              {nextPane && (
+                <div
+                  role='separator'
+                  tabIndex={0}
+                  aria-orientation='vertical'
+                  aria-label={resizeLabel}
+                  data-file-manager-editor-resize-handle
+                  className='file-manager-editor-resize-handle relative w-3 shrink-0 cursor-col-resize focus-visible:outline-none'
+                  onPointerDown={(event) => startResize(event, pane, nextPane)}
+                  onPointerMove={resize}
+                  onPointerUp={finishResize}
+                  onPointerCancel={finishResize}
+                  onKeyDown={(event) => resizeWithKeyboard(event, pane, nextPane)}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }

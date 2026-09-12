@@ -90,7 +90,12 @@ export default function useFileCollab({
   const callbacksRef = useRef({ onActivated, onSaved, onConflict, onError });
   useEffect(() => {
     callbacksRef.current = { onActivated, onSaved, onConflict, onError };
+    onRestoreContentRef.current = onRestoreContent;
   });
+
+  useEffect(() => {
+    restoreContentRef.current = restoreContent;
+  }, [restoreContent]);
 
   const destroySession = useCallback(() => {
     bindingRef.current?.destroy();

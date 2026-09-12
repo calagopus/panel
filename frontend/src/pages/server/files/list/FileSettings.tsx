@@ -9,17 +9,27 @@ import { fileManagerSettingKey } from '@/stores/fileManager.ts';
 
 export default function FileSettings() {
   const { t } = useTranslations();
-  const { clickOnce, preferPhysicalSize, vscodeUriScheme, setClickOnce, setPreferPhysicalSize, setVscodeUriScheme } =
-    useFileManager(
-      useShallow((state) => ({
-        clickOnce: state.clickOnce,
-        preferPhysicalSize: state.preferPhysicalSize,
-        vscodeUriScheme: state.vscodeUriScheme,
-        setClickOnce: state.setClickOnce,
-        setPreferPhysicalSize: state.setPreferPhysicalSize,
-        setVscodeUriScheme: state.setVscodeUriScheme,
-      })),
-    );
+  const {
+    clickOnce,
+    preferPhysicalSize,
+    vscodeUriScheme,
+    editorPreviewTabs,
+    setClickOnce,
+    setPreferPhysicalSize,
+    setVscodeUriScheme,
+    setEditorPreviewTabs,
+  } = useFileManager(
+    useShallow((state) => ({
+      clickOnce: state.clickOnce,
+      preferPhysicalSize: state.preferPhysicalSize,
+      vscodeUriScheme: state.vscodeUriScheme,
+      editorPreviewTabs: state.editorPreviewTabs,
+      setClickOnce: state.setClickOnce,
+      setPreferPhysicalSize: state.setPreferPhysicalSize,
+      setVscodeUriScheme: state.setVscodeUriScheme,
+      setEditorPreviewTabs: state.setEditorPreviewTabs,
+    })),
+  );
 
   return (
     <SettingsPopover
@@ -54,6 +64,21 @@ export default function FileSettings() {
         }
         checked={preferPhysicalSize}
         onChange={(e) => setPreferPhysicalSize(e.target.checked)}
+      />
+      <Checkbox
+        label={
+          <span className='inline-flex items-center gap-1'>
+            {t('pages.server.files.settings.editorPreviewTabs', {})}
+            <UserSettingScopeMenu
+              settingKey={fileManagerSettingKey('editorPreviewTabs')}
+              value={editorPreviewTabs}
+              withinPortal={false}
+            />
+          </span>
+        }
+        description={t('pages.server.files.settings.editorPreviewTabsDescription', {})}
+        checked={editorPreviewTabs}
+        onChange={(e) => setEditorPreviewTabs(e.target.checked)}
       />
       <TextInput
         label={t('pages.server.files.settings.vscodeUriScheme', {})}

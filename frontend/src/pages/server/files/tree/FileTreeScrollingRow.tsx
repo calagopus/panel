@@ -66,12 +66,16 @@ export default function FileTreeScrollingRow({
         {row.expandable ? (
           <FontAwesomeIcon
             icon={row.expanded ? faChevronDown : faChevronRight}
-            className='w-2.5 shrink-0 text-xs text-(--mantine-color-dimmed)'
+            className='w-2.5 shrink-0 text-xs text-(--mantine-color-dimmed) [--fa-width:0.625rem]'
           />
         ) : (
           <span className='w-2.5 shrink-0' />
         )}
-        <FileRowIcon file={row.entry} archive={row.expandable && !row.entry.directory} className='w-4 shrink-0' />
+        <FileRowIcon
+          file={row.entry}
+          archive={row.expandable && !row.entry.directory}
+          className='w-4 shrink-0 [--fa-width:1rem]'
+        />
         <FileTreeName name={row.entry.name} directory={row.entry.directory} className='flex-1' />
       </div>
       <span className='truncate text-xs text-(--mantine-color-dimmed)'>

@@ -26,6 +26,11 @@ export const getFileTreeEditorTabId = (selection: FileTreeEditorSelection) =>
     Object.entries(selection.params).sort(([left], [right]) => left.localeCompare(right)),
   ]);
 
+export const getFileTreeEditorDraftPath = (selection: FileTreeEditorSelection) =>
+  selection.action === 'new'
+    ? `new:${selection.directory}:${selection.params.draftId}`
+    : join(selection.directory, selection.file.name);
+
 export interface FileTreeEditorDragItem {
   item: TreeSelectionItem;
   capabilities: TreeDirectoryCapabilities;
@@ -66,6 +71,19 @@ export const getFileTreeEditorDragData = (dataTransfer: DataTransfer): FileTreeE
 export interface FileTreeEditorTabDragData {
   tabId: string;
   paneId: string;
+}
+
+export type FileTreeTabCloseAction = 'others' | 'right' | 'saved' | 'all';
+
+export const getRelativeFileTreeTabId = (tabIds: string[], activeTabId: string | null, offset: number) => {
+  if (tabIds.length < 2) return null;
+  const index = Math.max(0, tabIds.indexOf(activeTabId ?? ''));
+  return tabIds[(index + offset + tabIds.length) % tabIds.length];
+};
+
+export interface FileTreeTabPosition {
+  tabId: string;
+  after: boolean;
 }
 
 export const setFileTreeEditorTabDragData = (dataTransfer: DataTransfer, data: FileTreeEditorTabDragData) => {

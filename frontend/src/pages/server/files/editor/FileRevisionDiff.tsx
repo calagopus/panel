@@ -12,46 +12,81 @@ import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
-import { MonacoDiffEditor } from '@/elements/editors/MonacoEditor.tsx';
-import { PierreDiffEditor, type PierreEditorHandle } from '@/elements/editors/PierreEditor.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Group from '@/elements/layout/Group.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/typography/Title.tsx';
+import { readFileDraft, removeFileDraft } from '@/lib/files/fileDrafts.ts';
+import FileRevisionDiffEditor from '@/pages/server/files/editor/FileRevisionDiffEditor.tsx';
+import { useBlocker } from '@/plugins/useBlocker.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
+import { useContainerAutoHeight } from '@/plugins/viewport/useContainerAutoHeight.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { FileManagerProvider, useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import useFileDraft from '../hooks/useFileDraft.ts';
+import useFileDraftPersistence from '../hooks/useFileDraftPersistence.ts';
+import FileEditorDraftModal from '../modals/FileEditorDraftModal.tsx';
 
 function FileRevisionDiffComponent() {
   const { t } = useTranslations();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
+  const { setSavedContent, persistDraft } = useFileDraft(server.uuid);
   const { getParent } = useCurrentWindow();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const editorMinimap = useFileManager((state) => state.editorMinimap);
-  const editorLineOverflow = useFileManager((state) => state.editorLineOverflow);
   const editorEngine = useFileManager((state) => state.editorEngine);
 
   const filePath = searchParams.get('file') || '';
   const revisionId = parseInt(searchParams.get('revision') || '0', 10);
-  const previousRevisionId = parseInt(searchParams.get('previousRevision') || '0', 10) || null;
+  const previousRevisionId = parseInt(searchParams.get('previousRevision') || '0', 10) || undefined;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [originalContent, setOriginalContent] = useState('');
   const [modifiedContent, setModifiedContent] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const [restoreConfirm, setRestoreConfirm] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState<{ content: string; hashMismatch: boolean } | null>(null);
+  const modifiedRef = useRef('');
+  const mountedRef = useRef(true);
+  const handoffTargetRef = useRef<string | null>(null);
+  const canCreate = useServerCan('files.create');
+  const canSave = !previousRevisionId && canCreate && editorEngine === 'monaco';
+  const blocker = useBlocker(
+    dirty,
+    false,
+    (tx) =>
+      !(tx.location.pathname === location.pathname && tx.location.search === location.search) &&
+      handoffTargetRef.current !== tx.location.pathname + tx.location.search,
+  );
+  useFileDraftPersistence(server.uuid, filePath, dirty);
 
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
-  const pierreDiffRef = useRef<PierreEditorHandle | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    if (typeof location.state?.currentContent === 'string') {
+      navigate(location.pathname + location.search, {
+        replace: true,
+        state: { ...location.state, currentContent: undefined },
+      });
+    }
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!filePath || !revisionId) return;
 
     const passedContent: string | undefined = (location.state as { currentContent?: string } | null)?.currentContent;
+    let cancelled = false;
 
     const fetches: [Promise<string>, Promise<string>] = previousRevisionId
       ? [
@@ -60,83 +95,74 @@ function FileRevisionDiffComponent() {
         ]
       : [
           getFileRevisionContent(server.uuid, revisionId, filePath),
-          passedContent !== undefined
-            ? Promise.resolve(passedContent)
-            : getFileContent(server.uuid, filePath).then((blob) => blob.text()),
+          getFileContent(server.uuid, filePath).then((blob) => blob.text()),
         ];
 
     Promise.all(fetches)
       .then(([original, modified]) => {
+        if (cancelled) return;
+        const initial = !previousRevisionId && passedContent !== undefined ? passedContent : modified;
         setOriginalContent(original);
-        setModifiedContent(modified);
+        const hash = setSavedContent(modified);
+        modifiedRef.current = initial;
+        setModifiedContent(initial);
+        setDirty(initial !== modified);
+        if (initial !== modified) persistDraft(filePath, initial);
+        if (!previousRevisionId && passedContent === undefined) {
+          const draft = readFileDraft(server.uuid, filePath);
+          if (draft && draft.content !== modified)
+            setPendingDraft({ content: draft.content, hashMismatch: draft.originalHash !== hash });
+        }
       })
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) addToast(httpErrorToHuman(err), 'error');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [filePath, revisionId, previousRevisionId]);
 
-  useEffect(() => {
-    const el = editorContainerRef.current;
-    if (!el || loading) return;
+  useContainerAutoHeight({
+    containerRef: editorContainerRef,
+    loading,
+    getParent,
+    layout: () => diffEditorRef.current?.layout(),
+    deps: [loading, getParent],
+  });
 
-    const updateHeight = () => {
-      const virtualWindowEl = getParent();
-      const elRect = el.getBoundingClientRect();
-
-      let bottomEdge;
-      if (virtualWindowEl) {
-        bottomEdge = virtualWindowEl.getBoundingClientRect().bottom;
-      } else {
-        bottomEdge = window.innerHeight;
-      }
-
-      const newHeight = Math.max(0, bottomEdge - elRect.top);
-      el.style.height = `${newHeight}px`;
-
-      if (diffEditorRef.current?.layout) {
-        diffEditorRef.current.layout();
-      }
-    };
-
-    const observer = new ResizeObserver(() => updateHeight());
-
-    const virtualWindowEl = getParent();
-    if (virtualWindowEl) {
-      observer.observe(virtualWindowEl);
-    } else {
-      observer.observe(document.body);
-    }
-
-    updateHeight();
-
-    return () => observer.disconnect();
-  }, [loading, getParent]);
-
-  const handleSave = () => {
-    const content =
-      (editorEngine === 'pierre'
-        ? pierreDiffRef.current?.getValue()
-        : diffEditorRef.current?.getModifiedEditor().getValue()) ?? modifiedContent;
-    setSaving(true);
-    saveFileContent(server.uuid, filePath, content)
-      .then(() => addToast(t('pages.server.files.toast.fileSaved', {}), 'success'))
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
-      .finally(() => setSaving(false));
+  const updateContent = (value: string) => {
+    modifiedRef.current = value;
+    setModifiedContent(value);
+    const changed = persistDraft(filePath, value, { preserve: pendingDraft !== null });
+    setDirty(changed);
   };
 
-  const handleRestore = () => {
+  const handleSave = () => {
+    if (!canSave || saving || loading) return;
+    const content = modifiedRef.current;
     setSaving(true);
-    saveFileContent(server.uuid, filePath, originalContent)
+    saveFileContent(server.uuid, filePath, content)
       .then(() => {
-        addToast(t('pages.server.files.drawer.revisions.restored', {}), 'success');
-        navigate(
-          `/server/${server.uuidShort}/files/edit?${createSearchParams({
-            directory: dirname(filePath),
-            file: basename(filePath),
-          })}`,
-        );
+        if (!mountedRef.current) return;
+        setSavedContent(content);
+        updateContent(modifiedRef.current);
+        addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
       })
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
-      .finally(() => setSaving(false));
+      .catch((err) => {
+        if (mountedRef.current) addToast(httpErrorToHuman(err), 'error');
+      })
+      .finally(() => {
+        if (mountedRef.current) setSaving(false);
+      });
+  };
+
+  const editorUrl = `/server/${server.uuidShort}/files/edit?${createSearchParams({ directory: dirname(filePath), file: basename(filePath) })}`;
+  const openInEditor = (content: string) => {
+    handoffTargetRef.current = editorUrl;
+    navigate(editorUrl, { state: { editorContent: content } });
   };
 
   const title = previousRevisionId
@@ -150,18 +176,46 @@ function FileRevisionDiffComponent() {
         revision: String(revisionId),
       });
 
-  const originalModelPath = previousRevisionId
-    ? `revision-${previousRevisionId}-${filePath}`
-    : `revision-${revisionId}-${filePath}`;
-  const modifiedModelPath = previousRevisionId ? `revision-${revisionId}-${filePath}` : `current-${filePath}`;
-
   return (
     <ServerContentContainer hideTitleComponent fullscreen title={title}>
-      <div className='flex justify-between items-center lg:pt-6 px-4 lg:px-6 lg:pb-0'>
+      <ConfirmationModal
+        title={t('pages.server.files.modal.unsavedChanges.title', {})}
+        opened={blocker.state === 'blocked'}
+        onClose={blocker.reset}
+        onConfirmed={blocker.proceed}
+        confirm={t('common.button.leavePage', {})}
+      >
+        {t('pages.server.files.modal.unsavedChanges.content', {}).md()}
+      </ConfirmationModal>
+      <ConfirmationModal
+        title={t('pages.server.files.modal.unsavedChanges.title', {})}
+        opened={restoreConfirm}
+        onClose={() => setRestoreConfirm(false)}
+        onConfirmed={() => {
+          setRestoreConfirm(false);
+          openInEditor(originalContent);
+        }}
+        confirm={t('common.button.restore', {})}
+      >
+        {t('pages.server.files.modal.unsavedChanges.content', {}).md()}
+      </ConfirmationModal>
+      <FileEditorDraftModal
+        pendingDraft={pendingDraft}
+        onDiscard={() => {
+          removeFileDraft(server.uuid, filePath);
+          setPendingDraft(null);
+        }}
+        onRestore={(value) => {
+          updateContent(value);
+          setPendingDraft(null);
+        }}
+      />
+      <div className='flex flex-wrap justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
         <Group>
           <ActionIcon
             variant='subtle'
             color='gray'
+            aria-label={t('common.button.back', {})}
             onClick={() => {
               const backTo = (location.state as { backTo?: string } | null)?.backTo;
               if (backTo) {
@@ -169,13 +223,7 @@ function FileRevisionDiffComponent() {
                 return;
               }
 
-              navigate(
-                `/server/${server.uuidShort}/files/edit?${createSearchParams({
-                  directory: dirname(filePath),
-                  file: basename(filePath),
-                })}`,
-                { state: { openRevisions: true } },
-              );
+              navigate(editorUrl, { state: { openRevisions: true } });
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} />
@@ -189,13 +237,20 @@ function FileRevisionDiffComponent() {
                 loading={saving}
                 variant='outline'
                 leftSection={<FontAwesomeIcon icon={faRotateLeft} />}
-                onClick={handleRestore}
+                disabled={loading}
+                onClick={() => (dirty ? setRestoreConfirm(true) : openInEditor(originalContent))}
               >
                 {t('pages.server.files.drawer.revisions.tooltip.restore', {})}
               </Button>
-              <Button loading={saving} onClick={handleSave}>
-                {t('common.button.save', {})}
-              </Button>
+              {editorEngine === 'pierre' ? (
+                <Button disabled={loading} onClick={() => openInEditor(modifiedRef.current)}>
+                  {t('pages.server.files.button.openInEditor', {})}
+                </Button>
+              ) : (
+                <Button loading={saving} disabled={loading || !dirty} onClick={handleSave}>
+                  {t('common.button.save', {})}
+                </Button>
+              )}
             </Group>
           </ServerCan>
         )}
@@ -209,52 +264,19 @@ function FileRevisionDiffComponent() {
         <div className='flex flex-col relative mt-4'>
           <div className='relative'>
             <div ref={editorContainerRef} className='flex max-w-full w-full z-1 absolute'>
-              {editorEngine === 'pierre' ? (
-                <PierreDiffEditor
-                  height='100%'
-                  width='100%'
-                  originalPath={originalModelPath}
-                  originalValue={originalContent}
-                  modifiedPath={modifiedModelPath}
-                  modifiedValue={modifiedContent}
-                  readOnly={!!previousRevisionId}
-                  wordWrap={editorLineOverflow}
-                  onMount={(editor) => {
-                    pierreDiffRef.current = editor;
-                  }}
-                />
-              ) : (
-                <MonacoDiffEditor
-                  height='100%'
-                  width='100%'
-                  options={{
-                    readOnly: !!previousRevisionId,
-                    stickyScroll: { enabled: false },
-                    minimap: { enabled: editorMinimap },
-                    wordWrap: editorLineOverflow ? 'on' : 'off',
-                    codeLens: false,
-                    scrollBeyondLastLine: false,
-                    smoothScrolling: false,
-                    inertialScroll: true,
-                    fixedOverflowWidgets: true,
-                  }}
-                  onMount={(diffEditor, monaco) => {
-                    diffEditorRef.current = diffEditor;
-
-                    const originalUri = monaco.Uri.parse(originalModelPath);
-                    const modifiedUri = monaco.Uri.parse(modifiedModelPath);
-
-                    const originalModel =
-                      monaco.editor.getModel(originalUri) ??
-                      monaco.editor.createModel(originalContent, null, originalUri);
-                    const modifiedModel =
-                      monaco.editor.getModel(modifiedUri) ??
-                      monaco.editor.createModel(modifiedContent, null, modifiedUri);
-
-                    diffEditor.setModel({ original: originalModel, modified: modifiedModel });
-                  }}
-                />
-              )}
+              <FileRevisionDiffEditor
+                original={originalContent}
+                modified={modifiedContent}
+                filePath={filePath}
+                revisionId={revisionId}
+                previousRevisionId={previousRevisionId}
+                readOnly={!canSave}
+                onChange={updateContent}
+                onSave={handleSave}
+                onMount={(diffEditor) => {
+                  diffEditorRef.current = diffEditor;
+                }}
+              />
             </div>
           </div>
         </div>
@@ -264,8 +286,10 @@ function FileRevisionDiffComponent() {
 }
 
 export default function FileRevisionDiff() {
+  const [searchParams] = useSearchParams();
+  const serverUuid = useServerStore((state) => state.server.uuid);
   return (
-    <FileManagerProvider>
+    <FileManagerProvider key={`${serverUuid}:${searchParams}`}>
       <FileRevisionDiffComponent />
     </FileManagerProvider>
   );

@@ -110,7 +110,7 @@ export function FileSearchPreviewToggle({ path, compact = false }: { path: strin
         className='w-2.5 shrink-0 cursor-pointer text-xs text-(--mantine-color-dimmed)'
         {...handlers}
       >
-        <FontAwesomeIcon icon={expanded ? faChevronDown : faChevronRight} className='w-2.5' />
+        <FontAwesomeIcon icon={expanded ? faChevronDown : faChevronRight} className='w-2.5 [--fa-width:0.625rem]' />
       </button>
     );
   }

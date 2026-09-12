@@ -19,6 +19,8 @@ import Checkbox from '@/elements/input/Checkbox.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Collapse from '@/elements/layout/Collapse.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
+import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileTreeToolbarProps {
@@ -79,19 +81,57 @@ export default function FileTreeToolbar({
   const registry = window.extensionContext.extensionRegistry.pages.server.files;
 
   useEffect(() => {
-    if (!searchOpen) return;
+    if (!searchOpen || collapsed) return;
 
     const frame = requestAnimationFrame(() => searchInputRef.current?.focus());
     return () => cancelAnimationFrame(frame);
-  }, [searchOpen]);
+  }, [searchOpen, collapsed]);
+
+  useQuickActions([
+    {
+      id: 'files.tree.toggle',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t(collapsed ? 'pages.server.files.tree.show' : 'pages.server.files.tree.hide', {}),
+      icon: <FontAwesomeIcon icon={collapsed ? faAnglesRight : faAnglesLeft} />,
+      perform: onToggleCollapsed,
+    },
+    {
+      id: 'files.tree.search',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.quickAction.searchTree', {}),
+      icon: <FontAwesomeIcon icon={faMagnifyingGlass} />,
+      keywords: ['find', 'filename', 'filter'],
+      permission: 'files.read',
+      perform: () => {
+        if (collapsed) onToggleCollapsed();
+        onOpenSearch();
+        requestAnimationFrame(() => searchInputRef.current?.focus());
+      },
+    },
+    {
+      id: 'files.tree.refresh',
+      category: CORE_QUICK_ACTION_CATEGORIES.page,
+      label: () => t('pages.server.files.quickAction.refreshTree', {}),
+      icon: <FontAwesomeIcon icon={faRotate} />,
+      keywords: ['reload', 'files'],
+      permission: 'files.read',
+      isVisible: () => !treeLoading && !searchLoading,
+      perform: onReload,
+    },
+  ]);
 
   return (
-    <div data-file-manager-tree-toolbar className='shrink-0 border-b border-(--mantine-color-default-border)'>
-      <div className='flex h-11 items-center justify-between px-2'>
-        <div className='flex shrink-0 items-center gap-1'>
+    <div
+      data-file-manager-tree-toolbar
+      className={`shrink-0 ${collapsed ? 'h-[2.625rem]' : 'border-b border-(--mantine-color-default-border)'}`}
+    >
+      <div className={`flex items-center ${collapsed ? 'h-full' : 'h-11 justify-between px-2'}`}>
+        <div
+          className={`flex shrink-0 items-center ${collapsed ? 'h-full w-[2.625rem] justify-center max-[47.999rem]:w-full' : 'gap-1'}`}
+        >
           <ActionIcon
             type='button'
-            size='sm'
+            size={collapsed ? '100%' : 'sm'}
             variant='subtle'
             color='gray'
             aria-expanded={!collapsed}
@@ -102,7 +142,7 @@ export default function FileTreeToolbar({
             <FontAwesomeIcon icon={collapsed ? faAnglesRight : faAnglesLeft} />
           </ActionIcon>
 
-          <div data-file-manager-tree-selection-control>
+          <div data-file-manager-tree-selection-control className={collapsed ? 'hidden' : undefined}>
             <Checkbox
               size='xs'
               checked={allSelected}
@@ -118,7 +158,7 @@ export default function FileTreeToolbar({
           </div>
         </div>
 
-        <div data-file-manager-tree-actions className='flex items-center gap-1'>
+        <div data-file-manager-tree-actions className={collapsed ? 'hidden' : 'flex items-center gap-1'}>
           <ExtensionSlot
             components={registry.fileTreeToolbar.prependedComponents}
             name='files-fileTreeToolbar-prepended'

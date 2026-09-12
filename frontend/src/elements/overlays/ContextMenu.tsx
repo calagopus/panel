@@ -188,6 +188,12 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+export const useContextMenu = () => {
+  const context = useContext(ContextMenuContext);
+  if (!context) throw new Error('ContextMenu must be used within a ContextMenuProvider');
+  return context;
+};
+
 export const useHideContextMenu = () => {
   const context = useContext(ContextMenuContext);
 

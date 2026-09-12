@@ -10,7 +10,7 @@ import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type Props = ModalProps & {
-  onFileName: (name: string) => void;
+  onFileName: (name: string) => Promise<void> | void;
 };
 
 export default function FileNameModal({ onFileName, ...props }: Props) {
@@ -23,7 +23,7 @@ export default function FileNameModal({ onFileName, ...props }: Props) {
     validate: zod4Resolver(serverFilesNameSchema),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      onFileName(values.name);
+      await onFileName(values.name);
     },
   });
 

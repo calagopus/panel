@@ -4895,6 +4895,14 @@
             "restricted": "Berechtigung für Dateiinhalte erforderlich"
           },
           "tree": {
+            "closeOtherTabs": "Andere schließen",
+            "closeTabsToRight": "Rechts davon schließen",
+            "closeSavedTabs": "Gespeicherte schließen",
+            "closeAllTabs": "Alle schließen",
+            "revealInTree": "Im Dateibaum anzeigen",
+            "revealNotFound": "{path} konnte im Dateibaum nicht gefunden werden.",
+            "selectPane": "Editorbereich auswählen",
+            "editorPane": "Editorbereich {number}",
             "empty": "Dieser Ordner ist leer",
             "loadMore": "Mehr laden",
             "retry": "Erneut versuchen",
@@ -4953,11 +4961,19 @@
             "fileFromUpload": "Datei aus Upload",
             "directoryFromUpload": "Verzeichnis aus Upload",
             "viewDiff": "Unterschiede anzeigen",
+            "openInEditor": "Im Editor öffnen",
+            "editorActions": "Editoraktionen",
             "loadDisk": "Festplattenversion laden",
             "keepEditor": "Editor-Version behalten"
           },
           "quickAction": {
             "newFile": "Neue Datei",
+            "keepFileOpen": "Datei geöffnet lassen",
+            "copyFilePath": "Pfad der aktiven Datei kopieren",
+            "searchTree": "Dateibaum durchsuchen",
+            "refreshTree": "Dateibaum aktualisieren",
+            "switchToList": "Zur Listenansicht wechseln",
+            "switchToTree": "Zur Baumansicht wechseln",
             "newDirectory": "Neues Verzeichnis",
             "pullFile": "Datei von URL laden",
             "uploadFiles": "Dateien hochladen",
@@ -5025,6 +5041,8 @@
             "editorLineOverflow": "Zeilenumbruch für lange Zeilen im Editor",
             "editorFontSize": "Editor-Schriftgröße",
             "editorEngine": "Editor-Engine",
+            "editorPreviewTabs": "Dateivorschau in Baum-Tabs",
+            "editorPreviewTabsDescription": "Bearbeiten oder doppelklicken, um einen Tab offen zu halten.",
             "vscodeUriScheme": "VS Code URI-Schema",
             "imageViewerSmoothing": "Bildglättung (Anti-Aliasing)"
           },
@@ -5062,6 +5080,7 @@
             "permissionsRestored": "Berechtigungen wiederhergestellt.",
             "permissionsCouldNotBeRestored": "Berechtigungen konnten nicht wiederhergestellt werden.",
             "fileSaved": "Datei wurde gespeichert.",
+            "closeDestinationBeforeCreate": "Schließe den Editor-Tab der Zieldatei, bevor du diese Datei erstellst.",
             "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet.",
             "fileTooLargeToOpen": "Diese Datei ist zu groß, um sie im Dateimanager zu öffnen."
           },

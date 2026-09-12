@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getRelativeFileTreeTabId } from '@/pages/server/files/tree/fileTreeEditor.ts';
 import { matchesShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 
 interface FileTreeEditorShortcutsOptions {
@@ -16,11 +17,8 @@ export default function useFileTreeEditorShortcuts({
 }: FileTreeEditorShortcutsOptions) {
   useEffect(() => {
     const selectRelative = (offset: number) => {
-      if (tabIds.length < 2) return false;
-
-      const activeIndex = Math.max(0, tabIds.indexOf(activeTabId ?? ''));
-      onSelect(tabIds[(activeIndex + offset + tabIds.length) % tabIds.length]);
-      return true;
+      const tabId = getRelativeFileTreeTabId(tabIds, activeTabId, offset);
+      if (tabId) onSelect(tabId);
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
