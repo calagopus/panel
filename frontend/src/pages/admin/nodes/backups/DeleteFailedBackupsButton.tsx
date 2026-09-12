@@ -16,9 +16,11 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 export default function DeleteFailedBackupsButton({
   failed,
   onDelete,
+  action = 'nodes.backups',
 }: {
   failed: number;
   onDelete: (force: boolean) => Promise<number>;
+  action?: string;
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -45,7 +47,7 @@ export default function DeleteFailedBackupsButton({
   }
 
   return (
-    <AdminCan action='nodes.backups'>
+    <AdminCan action={action}>
       <ConfirmationModal
         opened={opened}
         onClose={doClose}

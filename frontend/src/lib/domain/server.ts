@@ -94,7 +94,7 @@ export function generateBackupName() {
 }
 
 export function getBackupSourceInstance(
-  backup: z.infer<typeof serverBackupSchema>,
+  backup: Pick<z.infer<typeof serverBackupSchema>, 'metadata'>,
 ): z.infer<typeof serverBackupSourceInstanceSchema> | null {
   return serverBackupSourceInstanceSchema.safeParse(backup.metadata.source_instance).data ?? null;
 }

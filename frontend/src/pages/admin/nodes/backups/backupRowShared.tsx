@@ -2,12 +2,13 @@ import { faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { z } from 'zod';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import BackupSourceLabel from '@/elements/data-display/BackupSourceLabel.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import { TableData } from '@/elements/data-display/Table.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import type { ContextMenuActionItem } from '@/elements/overlays/ContextMenu.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { serverBackupKindLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { bytesToString } from '@/lib/format/size.ts';
 import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
@@ -25,13 +26,41 @@ export function getBackupState(backup: Pick<ServerBackup, 'isSuccessful' | 'comp
   };
 }
 
-export function BackupStatusCells({ backup }: { backup: ServerBackup }) {
+export function BackupKindCells({
+  backup,
+  kind = true,
+  source = true,
+}: {
+  backup: ServerBackup;
+  kind?: boolean;
+  source?: boolean;
+}) {
+  return (
+    <>
+      {kind && (
+        <TableData>
+          <Badge className='w-max!' variant='light' color={backup.kind === 'server' ? 'gray' : 'blue'}>
+            {serverBackupKindLabelMapping[backup.kind]()}
+          </Badge>
+        </TableData>
+      )}
+
+      {source && (
+        <TableData>
+          <BackupSourceLabel backup={backup} />
+        </TableData>
+      )}
+    </>
+  );
+}
+
+export function BackupStatusCells({ backup, files = true }: { backup: ServerBackup; files?: boolean }) {
   const { t } = useTranslations();
   const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
 
   if (isDeleting || isDeleteFailed) {
     return (
-      <TableData colSpan={3}>
+      <TableData colSpan={files ? 3 : 2}>
         {isDeleting ? (
           <Badge color='yellow'>{t('pages.server.backups.badge.deleting', {})}</Badge>
         ) : (
@@ -43,7 +72,7 @@ export function BackupStatusCells({ backup }: { backup: ServerBackup }) {
 
   if (isFailed) {
     return (
-      <TableData colSpan={3}>
+      <TableData colSpan={files ? 3 : 2}>
         <Badge color='red'>{t('common.badge.failed', {})}</Badge>
       </TableData>
     );
@@ -56,12 +85,12 @@ export function BackupStatusCells({ backup }: { backup: ServerBackup }) {
       {backup.completed ? (
         <TableData>{bytesToString(backup.bytes)}</TableData>
       ) : (
-        <TableData colSpan={2}>
+        <TableData colSpan={files ? 2 : 1}>
           <Spinner size={16} />
         </TableData>
       )}
 
-      {backup.completed ? <TableData>{backup.files}</TableData> : null}
+      {backup.completed && files ? <TableData>{backup.files}</TableData> : null}
     </>
   );
 }

@@ -56,7 +56,9 @@ mod post {
         }
 
         sqlx::query!(
-            "UPDATE server_backups SET server_uuid = NULL WHERE uuid = $1",
+            "UPDATE server_backups
+            SET server_uuid = NULL, backup_group_uuid = NULL
+            WHERE uuid = $1",
             backup.uuid
         )
         .execute(state.database.write())

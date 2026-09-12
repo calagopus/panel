@@ -1,16 +1,67 @@
 use rand::RngExt;
 use shared::models::{
-    ByUuid, CreatableModel, admin_activity::AdminActivity, announcement::Announcement,
-    backup_configuration::BackupConfiguration, egg_configuration::EggConfiguration, node::Node,
-    oauth_provider_mapping::OAuthProviderMapping, server::Server, server_activity::ServerActivity,
-    server_backup::ServerBackup, system_backup_policy::SystemBackupPolicy,
-    user_activity::UserActivity, user_api_key::UserApiKey,
-    user_command_snippet::UserCommandSnippet, user_email_verification::UserEmailVerification,
-    user_password_reset::UserPasswordReset, user_security_key::UserSecurityKey,
-    user_server_group::UserServerGroup, user_session::UserSession,
+    ByUuid, CreatableModel,
+    admin_activity::AdminActivity,
+    announcement::Announcement,
+    backup_configuration::BackupConfiguration,
+    egg_configuration::EggConfiguration,
+    node::Node,
+    oauth_provider_mapping::OAuthProviderMapping,
+    server::Server,
+    server_activity::ServerActivity,
+    server_backup::{BackupDisk, ServerBackup},
+    server_database_instance::ServerDatabaseInstance,
+    system_backup_policy::SystemBackupPolicy,
+    user_activity::UserActivity,
+    user_api_key::UserApiKey,
+    user_command_snippet::UserCommandSnippet,
+    user_email_verification::UserEmailVerification,
+    user_password_reset::UserPasswordReset,
+    user_security_key::UserSecurityKey,
+    user_server_group::UserServerGroup,
+    user_session::UserSession,
     user_two_factor_code::UserTwoFactorCode,
 };
 use std::str::FromStr;
+
+async fn database_instance_running(
+    state: &shared::State,
+    database_instance: &ServerDatabaseInstance,
+) -> bool {
+    let api_client = match database_instance
+        .database_agent_host
+        .api_client(&state.database)
+        .await
+    {
+        Ok(api_client) => api_client,
+        Err(err) => {
+            tracing::warn!(
+                database_instance = %database_instance.uuid,
+                "failed to create database agent client for system backup: {err:#?}"
+            );
+
+            return false;
+        }
+    };
+
+    match api_client
+        .get_instances_instance_utilization(database_instance.uuid)
+        .await
+    {
+        Ok(utilization) => matches!(
+            utilization.utilization.state,
+            db_agent_api::ContainerState::Running
+        ),
+        Err(err) => {
+            tracing::debug!(
+                database_instance = %database_instance.uuid,
+                "failed to load database instance utilization for system backup: {err:#?}"
+            );
+
+            false
+        }
+    }
+}
 
 pub async fn define_background_tasks(
     background_task_builder: &shared::extensions::background_tasks::BackgroundTaskBuilder,
@@ -580,7 +631,7 @@ pub async fn define_background_tasks(
 
                     let candidate_count = candidates.len() as i64;
                     let mut pending_trigger = false;
-                    let mut node_inflight: std::collections::HashMap<uuid::Uuid, i64> =
+                    let mut inflight_by_scope: std::collections::HashMap<uuid::Uuid, i64> =
                         Default::default();
 
                     for candidate in candidates {
@@ -600,28 +651,37 @@ pub async fn define_background_tasks(
                                 .last_attempt
                                 .is_none_or(|last_attempt| last_attempt < triggered)
                         });
-                        if trigger_due {
-                            pending_trigger = true;
-                        }
                         if !cron_due && !trigger_due {
                             continue;
                         }
 
-                        let inflight = match node_inflight.entry(candidate.node_uuid) {
+                        let parallelism_scope = candidate
+                            .database_agent_host_uuid
+                            .unwrap_or(candidate.node_uuid);
+                        let inflight = match inflight_by_scope.entry(parallelism_scope) {
                             std::collections::hash_map::Entry::Occupied(entry) => entry.into_mut(),
                             std::collections::hash_map::Entry::Vacant(entry) => {
-                                match ServerBackup::count_system_inflight_by_system_backup_policy_uuid_node_uuid(
-                                    &state.database,
-                                    policy.uuid,
-                                    candidate.node_uuid,
-                                )
-                                .await
-                                {
+                                let count = match candidate.database_agent_host_uuid {
+                                    Some(database_agent_host_uuid) => ServerBackup::count_system_inflight_by_system_backup_policy_uuid_database_agent_host_uuid(
+                                        &state.database,
+                                        policy.uuid,
+                                        database_agent_host_uuid,
+                                    )
+                                    .await,
+                                    None => ServerBackup::count_system_inflight_by_system_backup_policy_uuid_node_uuid(
+                                        &state.database,
+                                        policy.uuid,
+                                        candidate.node_uuid,
+                                    )
+                                    .await,
+                                };
+
+                                match count {
                                     Ok(count) => entry.insert(count),
                                     Err(err) => {
                                         tracing::error!(
                                             policy = %policy.uuid,
-                                            node = %candidate.node_uuid,
+                                            scope = %parallelism_scope,
                                             "failed to count in-flight system backups: {err:#?}"
                                         );
                                         continue;
@@ -630,6 +690,7 @@ pub async fn define_background_tasks(
                             }
                         };
                         if *inflight >= policy.parallelism as i64 {
+                            pending_trigger = pending_trigger || trigger_due;
                             continue;
                         }
 
@@ -664,6 +725,29 @@ pub async fn define_background_tasks(
                             continue;
                         }
 
+                        let database_instance = match candidate.database_instance_uuid {
+                            Some(database_instance_uuid) => {
+                                match ServerDatabaseInstance::by_server_uuid_uuid(
+                                    &state.database,
+                                    server.uuid,
+                                    database_instance_uuid,
+                                )
+                                .await
+                                {
+                                    Ok(Some(database_instance)) => Some(database_instance),
+                                    Ok(None) => continue,
+                                    Err(err) => {
+                                        tracing::warn!(
+                                            database_instance = %database_instance_uuid,
+                                            "failed to load database instance for system backup: {err:#?}"
+                                        );
+                                        continue;
+                                    }
+                                }
+                            }
+                            None => None,
+                        };
+
                         let backup_configuration = match &policy.backup_configuration {
                             Some(backup_configuration) => {
                                 match backup_configuration.fetch_cached(&state.database).await {
@@ -686,8 +770,22 @@ pub async fn define_background_tasks(
                             continue;
                         }
 
-                        let metadata =
-                            match ServerBackup::generate_metadata(&state, &server).await {
+                        let metadata = match &database_instance {
+                            Some(database_instance) => {
+                                if matches!(
+                                    backup_configuration.backup_disk,
+                                    BackupDisk::Btrfs | BackupDisk::Zfs
+                                ) {
+                                    continue;
+                                }
+
+                                if !database_instance_running(&state, database_instance).await {
+                                    continue;
+                                }
+
+                                ServerBackup::generate_database_metadata(database_instance)
+                            }
+                            None => match ServerBackup::generate_metadata(&state, &server).await {
                                 Ok(metadata) => metadata,
                                 Err(err) => {
                                     tracing::warn!(
@@ -696,14 +794,15 @@ pub async fn define_background_tasks(
                                     );
                                     continue;
                                 }
-                            };
+                            },
+                        };
 
                         let options = shared::models::server_backup::CreateServerBackupOptions {
                             server: &server,
                             name: ServerBackup::default_name(),
                             backup_group_uuid: None,
                             system_backup_policy_uuid: Some(policy.uuid),
-                            database_instance: None,
+                            database_instance: database_instance.as_ref(),
                             backup_configuration: Some(backup_configuration),
                             ignored_files: Vec::new(),
                             metadata,
@@ -721,6 +820,30 @@ pub async fn define_background_tasks(
                         };
 
                         *inflight += 1;
+                        pending_trigger = pending_trigger || trigger_due;
+
+                        let (event, data) = match &database_instance {
+                            Some(database_instance) => (
+                                "server:database-backup.create",
+                                serde_json::json!({
+                                    "source": "system-backup-policy",
+                                    "uuid": backup.uuid,
+                                    "name": backup.name,
+                                    "policy": policy.name,
+                                    "database_instance_uuid": database_instance.uuid,
+                                    "database_instance_name": database_instance.name,
+                                }),
+                            ),
+                            None => (
+                                "server:backup.create",
+                                serde_json::json!({
+                                    "source": "system-backup-policy",
+                                    "uuid": backup.uuid,
+                                    "name": backup.name,
+                                    "policy": policy.name,
+                                }),
+                            ),
+                        };
 
                         if let Err(err) = ServerActivity::create(
                             &state,
@@ -730,14 +853,9 @@ pub async fn define_background_tasks(
                                 impersonator_uuid: None,
                                 api_key_uuid: None,
                                 schedule_uuid: None,
-                                event: "server:backup.create".into(),
+                                event: event.into(),
                                 ip: None,
-                                data: serde_json::json!({
-                                    "source": "system-backup-policy",
-                                    "uuid": backup.uuid,
-                                    "name": backup.name,
-                                    "policy": policy.name,
-                                }),
+                                data,
                                 created: None,
                             },
                         )

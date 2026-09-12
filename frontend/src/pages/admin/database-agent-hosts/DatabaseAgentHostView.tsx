@@ -1,4 +1,4 @@
-import { faCog, faDatabase, faHouse, faInfoCircle, faPenRuler } from '@fortawesome/free-solid-svg-icons';
+import { faArchive, faCog, faDatabase, faHouse, faInfoCircle, faPenRuler } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getDatabaseAgentHost from '@/api/admin/database-agent-hosts/getDatabaseAgentHost.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -7,6 +7,7 @@ import ResourceView from '@/elements/ResourceView.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import AdminDatabaseAgentHostBackups from './backups/AdminDatabaseAgentHostBackups.tsx';
 import AdminDatabaseAgentHostConfiguration from './configuration/AdminDatabaseAgentHostConfiguration.tsx';
 import DatabaseAgentHostCreateOrUpdate from './DatabaseAgentHostCreateOrUpdate.tsx';
 import AdminDatabaseAgentHostInstances from './instances/AdminDatabaseAgentHostInstances.tsx';
@@ -57,6 +58,13 @@ export default function DatabaseAgentHostView() {
                 icon: faDatabase,
                 path: `/instances`,
                 element: <AdminDatabaseAgentHostInstances databaseAgentHost={databaseAgentHost} />,
+              },
+              {
+                name: t('pages.admin.databaseAgentHosts.tabs.backups.title', {}),
+                icon: faArchive,
+                path: `/backups`,
+                permission: 'database-agent-hosts.backups',
+                element: <AdminDatabaseAgentHostBackups databaseAgentHost={databaseAgentHost} />,
               },
               {
                 name: t('pages.admin.databaseAgentHosts.tabs.statistics.title', {}),

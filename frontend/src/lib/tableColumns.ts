@@ -53,6 +53,16 @@ export const systemBackupPolicyLocationTableColumns = (): string[] => {
   ];
 };
 
+export const systemBackupPolicyDatabaseAgentHostTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('common.table.columns.added', {}),
+    '',
+  ];
+};
+
 export const systemBackupPolicyServerTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [
@@ -363,6 +373,8 @@ export const serverBackupTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [
     t('common.table.columns.name', {}),
+    t('pages.server.backups.table.columns.kind', {}),
+    t('common.table.columns.source', {}),
     t('common.table.columns.node', {}),
     t('common.table.columns.checksum', {}),
     t('common.table.columns.size', {}),

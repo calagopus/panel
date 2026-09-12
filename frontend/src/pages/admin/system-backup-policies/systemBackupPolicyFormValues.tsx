@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { type FieldDef } from '@/elements/form-engine/index.ts';
 import BackupRetentionInput from '@/elements/input/BackupRetentionInput.tsx';
 import CronInput from '@/elements/input/CronInput.tsx';
+import { serverBackupKindLabelMapping } from '@/lib/enums.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import {
   adminSystemBackupPolicySchema,
@@ -18,6 +19,7 @@ export const systemBackupPolicyEmptyFormValues: SystemBackupPolicyFormValues = {
   description: null,
   backupConfigurationUuid: null,
   enabled: true,
+  kind: 'server',
   cron: '0 0 0 * * *',
   retention: { ...emptyBackupRetention },
   parallelism: 2,
@@ -30,6 +32,7 @@ export const systemBackupPolicyToFormValues = (
   description: policy.description,
   backupConfigurationUuid: policy.backupConfiguration?.uuid ?? null,
   enabled: policy.enabled,
+  kind: policy.kind,
   cron: policy.cron,
   retention: policy.retention,
   parallelism: policy.parallelism,
@@ -38,14 +41,30 @@ export const systemBackupPolicyToFormValues = (
 export function useSystemBackupPolicyFormFields({
   backupConfigurations,
   canReadBackupConfigurations,
+  doUpdate,
 }: {
   backupConfigurations: ReturnType<typeof useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>>;
   canReadBackupConfigurations: boolean;
+  doUpdate: boolean;
 }): FieldDef<SystemBackupPolicyFormValues>[] {
   const { t } = useTranslations();
 
   return [
     { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
+    {
+      type: 'select',
+      name: 'kind',
+      label: t('pages.admin.systemBackupPolicies.form.kind', {}),
+      description: doUpdate
+        ? t('pages.admin.systemBackupPolicies.form.kindLockedDescription', {})
+        : t('pages.admin.systemBackupPolicies.form.kindDescription', {}),
+      required: true,
+      options: (['server', 'database_instance'] as const).map((kind) => ({
+        label: serverBackupKindLabelMapping[kind](),
+        value: kind,
+      })),
+      props: { allowDeselect: false, disabled: doUpdate },
+    },
     {
       type: 'select',
       name: 'backupConfigurationUuid',

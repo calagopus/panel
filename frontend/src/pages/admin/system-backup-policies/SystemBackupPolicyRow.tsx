@@ -5,6 +5,7 @@ import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { serverBackupKindLabelMapping } from '@/lib/enums.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -25,6 +26,9 @@ export default function SystemBackupPolicyRow({
 
       <TableData>
         {systemBackupPolicy.name}
+        <Badge color={systemBackupPolicy.kind === 'server' ? 'gray' : 'blue'} variant='light' className='ml-2'>
+          {serverBackupKindLabelMapping[systemBackupPolicy.kind]()}
+        </Badge>
         <BackupRetentionBadge retention={systemBackupPolicy.retention} className='ml-2' />
         {!systemBackupPolicy.enabled && (
           <Badge color='gray' className='ml-2'>

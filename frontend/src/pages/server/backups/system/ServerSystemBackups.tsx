@@ -14,7 +14,7 @@ export default function ServerSystemBackups() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
-  const columns = useMemo(() => getBackupColumns({ kind: false, source: false, files: true, locked: false }), []);
+  const columns = useMemo(() => getBackupColumns({ kind: true, source: true, files: true, locked: false }), []);
 
   const {
     data: backups,

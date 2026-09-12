@@ -16,7 +16,12 @@ import { adminNodeServerBackupSchema } from '@/lib/schemas/admin/nodes.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { BackupStatusCells, getBackupState, useBackupDownload } from '../../nodes/backups/backupRowShared.tsx';
+import {
+  BackupKindCells,
+  BackupStatusCells,
+  getBackupState,
+  useBackupDownload,
+} from '../../nodes/backups/backupRowShared.tsx';
 import NodeBackupsDeleteModal from '../../nodes/backups/modals/NodeBackupsDeleteModal.tsx';
 import NodeBackupsExportModal from '../../nodes/backups/modals/NodeBackupsExportModal.tsx';
 import NodeBackupsRestoreModal from '../../nodes/backups/modals/NodeBackupsRestoreModal.tsx';
@@ -43,6 +48,7 @@ export default function AdminServerBackupRow({
 
   const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
   const actionsHidden = !backup.completed || isFailed || isDeleting || isDeleteFailed;
+  const fileActionsHidden = actionsHidden || backup.kind !== 'server';
 
   return (
     <>
@@ -88,7 +94,7 @@ export default function AdminServerBackupRow({
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: canManageBackups,
@@ -97,7 +103,7 @@ export default function AdminServerBackupRow({
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: canManageBackups,
@@ -143,6 +149,8 @@ export default function AdminServerBackupRow({
                 )}
               </div>
             </TableData>
+
+            <BackupKindCells backup={backup} />
 
             <TableData className='flex flex-row items-center'>
               <Code>

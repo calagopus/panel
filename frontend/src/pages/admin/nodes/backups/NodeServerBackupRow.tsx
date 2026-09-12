@@ -1,4 +1,4 @@
-import { faFileExport, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faFileExport, faRightLeft, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
@@ -13,25 +13,38 @@ import Code from '@/elements/typography/Code.tsx';
 import { adminNodeServerBackupSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { BackupStatusCells, getBackupState, useBackupDownload } from './backupRowShared.tsx';
+import { BackupKindCells, BackupStatusCells, getBackupState, useBackupDownload } from './backupRowShared.tsx';
 import NodeBackupsDeleteModal from './modals/NodeBackupsDeleteModal.tsx';
 import NodeBackupsExportModal from './modals/NodeBackupsExportModal.tsx';
+import NodeBackupsReassignModal from './modals/NodeBackupsReassignModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
 type Props<P> = {
   backup: z.infer<typeof adminNodeServerBackupSchema>;
   downloadStartedMessage: string;
+  showKind?: boolean;
+  showSource?: boolean;
+  showFiles?: boolean;
 } & ({ registry: ContextMenuRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
-export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage, ...contextMenu }: Props<P>) {
+export default function NodeServerBackupRow<P>({
+  backup,
+  downloadStartedMessage,
+  showKind = false,
+  showSource = false,
+  showFiles = true,
+  ...contextMenu
+}: Props<P>) {
   const { t } = useTranslations();
   const canBackups = useAdminCan('nodes.backups');
+  const canReadDatabaseInstances = useAdminCan('database-agent-hosts.read');
   const { downloadMenuItem } = useBackupDownload(backup.node.uuid, downloadStartedMessage);
 
-  const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | null>(null);
+  const [openModal, setOpenModal] = useState<'restore' | 'export' | 'reassign' | 'delete' | null>(null);
 
   const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
   const actionsHidden = !backup.completed || isFailed || isDeleting || isDeleteFailed;
+  const fileActionsHidden = actionsHidden || backup.kind !== 'server';
 
   return (
     <>
@@ -53,6 +66,12 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
       />
+      <NodeBackupsReassignModal
+        node={backup.node}
+        backup={backup}
+        opened={openModal === 'reassign'}
+        onClose={() => setOpenModal(null)}
+      />
 
       <ContextMenu<P>
         items={[
@@ -61,7 +80,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: canBackups,
@@ -70,10 +89,19 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: canBackups,
+          },
+          {
+            type: 'action',
+            icon: faRightLeft,
+            label: t('common.button.reassign', {}),
+            hidden: actionsHidden || backup.kind === 'server',
+            onClick: () => setOpenModal('reassign'),
+            color: 'gray',
+            canAccess: canBackups && canReadDatabaseInstances,
           },
           {
             type: 'action',
@@ -108,6 +136,8 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
               </div>
             </TableData>
 
+            <BackupKindCells backup={backup} kind={showKind} source={showSource} />
+
             <TableData>
               <Code>
                 {backup.server ? (
@@ -129,7 +159,7 @@ export default function NodeServerBackupRow<P>({ backup, downloadStartedMessage,
               )}
             </TableData>
 
-            <BackupStatusCells backup={backup} />
+            <BackupStatusCells backup={backup} files={showFiles} />
 
             <TableData>
               <FormattedTimestamp timestamp={backup.created} />

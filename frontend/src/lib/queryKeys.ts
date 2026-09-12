@@ -120,6 +120,7 @@ const admin = {
     byNode: (nodeUuid: string) => ['admin', 'backups', 'node', nodeUuid] as const,
     byServer: (serverUuid: string) => ['admin', 'backups', 'server', serverUuid] as const,
     byBackupConfiguration: (uuid: string) => ['admin', 'backups', 'backup-configuration', uuid] as const,
+    byDatabaseAgentHost: (uuid: string) => ['admin', 'backups', 'database-agent-host', uuid] as const,
     bySystemBackupPolicy: (uuid: string) => ['admin', 'backups', 'system-backup-policy', uuid] as const,
   },
 
@@ -136,6 +137,7 @@ const admin = {
     all: () => ['admin', 'system-backup-policies'] as const,
     detail: (uuid: string) => ['admin', 'system-backup-policies', { uuid }] as const,
     nodes: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'nodes'] as const,
+    databaseAgentHosts: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'database-agent-hosts'] as const,
     locations: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'locations'] as const,
     servers: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'servers'] as const,
   },

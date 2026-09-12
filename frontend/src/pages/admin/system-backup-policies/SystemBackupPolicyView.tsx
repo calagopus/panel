@@ -1,4 +1,4 @@
-import { faArchive, faCog, faDesktop, faEarthAmerica, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faArchive, faCog, faDatabase, faDesktop, faEarthAmerica, faServer } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getSystemBackupPolicy from '@/api/admin/system-backup-policies/getSystemBackupPolicy.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -6,6 +6,7 @@ import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import AdminSystemBackupPolicyBackups from '@/pages/admin/system-backup-policies/backups/AdminSystemBackupPolicyBackups.tsx';
+import AdminSystemBackupPolicyDatabaseAgentHosts from '@/pages/admin/system-backup-policies/database-agent-hosts/AdminSystemBackupPolicyDatabaseAgentHosts.tsx';
 import AdminSystemBackupPolicyLocations from '@/pages/admin/system-backup-policies/locations/AdminSystemBackupPolicyLocations.tsx';
 import AdminSystemBackupPolicyNodes from '@/pages/admin/system-backup-policies/nodes/AdminSystemBackupPolicyNodes.tsx';
 import AdminSystemBackupPolicyServers from '@/pages/admin/system-backup-policies/servers/AdminSystemBackupPolicyServers.tsx';
@@ -54,13 +55,25 @@ export default function SystemBackupPolicyView() {
                 permission: 'locations.read',
                 element: <AdminSystemBackupPolicyLocations systemBackupPolicy={systemBackupPolicy} />,
               },
-              {
-                name: t('pages.admin.systemBackupPolicies.tabs.nodes.title', {}),
-                icon: faServer,
-                path: `/nodes`,
-                permission: 'nodes.read',
-                element: <AdminSystemBackupPolicyNodes systemBackupPolicy={systemBackupPolicy} />,
-              },
+              ...(systemBackupPolicy.kind === 'server'
+                ? [
+                    {
+                      name: t('pages.admin.systemBackupPolicies.tabs.nodes.title', {}),
+                      icon: faServer,
+                      path: `/nodes`,
+                      permission: 'nodes.read',
+                      element: <AdminSystemBackupPolicyNodes systemBackupPolicy={systemBackupPolicy} />,
+                    },
+                  ]
+                : [
+                    {
+                      name: t('pages.admin.systemBackupPolicies.tabs.databaseAgentHosts.title', {}),
+                      icon: faDatabase,
+                      path: `/database-agent-hosts`,
+                      permission: 'database-agent-hosts.read',
+                      element: <AdminSystemBackupPolicyDatabaseAgentHosts systemBackupPolicy={systemBackupPolicy} />,
+                    },
+                  ]),
               {
                 name: t('pages.admin.systemBackupPolicies.tabs.servers.title', {}),
                 icon: faDesktop,

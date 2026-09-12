@@ -1,4 +1,12 @@
-import { faFileExport, faInfo, faLink, faRotateLeft, faTrash, faWarning } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFileExport,
+  faInfo,
+  faLink,
+  faRightLeft,
+  faRotateLeft,
+  faTrash,
+  faWarning,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -21,9 +29,10 @@ import { adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { BackupStatusCells, getBackupState, useBackupDownload } from './backupRowShared.tsx';
+import { BackupKindCells, BackupStatusCells, getBackupState, useBackupDownload } from './backupRowShared.tsx';
 import NodeBackupsDeleteModal from './modals/NodeBackupsDeleteModal.tsx';
 import NodeBackupsExportModal from './modals/NodeBackupsExportModal.tsx';
+import NodeBackupsReassignModal from './modals/NodeBackupsReassignModal.tsx';
 import NodeBackupsReattachModal from './modals/NodeBackupsReattachModal.tsx';
 import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
@@ -40,13 +49,14 @@ export default function NodeBackupRow({
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const canBackups = useAdminCan('nodes.backups');
+  const canReadDatabaseInstances = useAdminCan('database-agent-hosts.read');
   const { downloadMenuItem } = useBackupDownload(
     node.uuid,
     t('pages.admin.nodes.tabs.backups.page.toast.downloadStarted', {}),
   );
 
   const [openModal, setOpenModal] = useState<
-    'restore' | 'export' | 'reattach' | 'detach' | 'delete' | 'metadata' | null
+    'restore' | 'export' | 'reattach' | 'reassign' | 'detach' | 'delete' | 'metadata' | null
   >(null);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
@@ -64,6 +74,7 @@ export default function NodeBackupRow({
 
   const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
   const actionsHidden = !backup.completed || isFailed || isDeleting || isDeleteFailed;
+  const fileActionsHidden = actionsHidden || backup.kind !== 'server';
 
   return (
     <>
@@ -101,6 +112,13 @@ export default function NodeBackupRow({
         onClose={() => setOpenModal(null)}
       />
 
+      <NodeBackupsReassignModal
+        node={node}
+        backup={backup}
+        opened={openModal === 'reassign'}
+        onClose={() => setOpenModal(null)}
+      />
+
       <Modal
         title={t('pages.server.backups.modal.viewMetadata.title', {})}
         onClose={() => setOpenModal(null)}
@@ -124,7 +142,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('restore'),
             color: 'gray',
             canAccess: canBackups,
@@ -133,7 +151,7 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faFileExport,
             label: t('pages.server.backups.button.exportToFiles', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('export'),
             color: 'gray',
             canAccess: canBackups,
@@ -142,16 +160,25 @@ export default function NodeBackupRow({
             type: 'action',
             icon: faLink,
             label: t('common.button.reattach', {}),
-            hidden: actionsHidden,
+            hidden: fileActionsHidden,
             onClick: () => setOpenModal('reattach'),
             color: 'gray',
             canAccess: canBackups,
           },
           {
             type: 'action',
+            icon: faRightLeft,
+            label: t('common.button.reassign', {}),
+            hidden: actionsHidden || backup.kind === 'server',
+            onClick: () => setOpenModal('reassign'),
+            color: 'gray',
+            canAccess: canBackups && canReadDatabaseInstances,
+          },
+          {
+            type: 'action',
             icon: faLink,
             label: t('common.button.detach', {}),
-            hidden: actionsHidden || !backup.server,
+            hidden: fileActionsHidden || !backup.server,
             onClick: () => setOpenModal('detach'),
             color: 'gray',
             canAccess: canBackups,
@@ -186,6 +213,8 @@ export default function NodeBackupRow({
             }}
           >
             <TableData>{backup.name}</TableData>
+
+            <BackupKindCells backup={backup} />
 
             <TableData className='flex flex-row items-center'>
               <Code>

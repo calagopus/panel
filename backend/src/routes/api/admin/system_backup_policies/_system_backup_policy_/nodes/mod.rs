@@ -88,7 +88,8 @@ mod post {
         ApiError, GetState,
         models::{
             CreatableModel, admin_activity::GetAdminActivityLogger,
-            system_backup_policy_node::SystemBackupPolicyNode, user::GetPermissionManager,
+            server_backup::ServerBackupKind, system_backup_policy_node::SystemBackupPolicyNode,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -107,6 +108,7 @@ mod post {
         (status = NOT_FOUND, body = ApiError),
         (status = BAD_REQUEST, body = ApiError),
         (status = CONFLICT, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "system_backup_policy" = uuid::Uuid,
@@ -122,6 +124,12 @@ mod post {
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("system-backup-policies.update")?;
+
+        if system_backup_policy.kind != ServerBackupKind::Server {
+            return ApiResponse::error("nodes can only be attached to server backup policies")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
 
         let options =
             shared::models::system_backup_policy_node::CreateSystemBackupPolicyNodeOptions {

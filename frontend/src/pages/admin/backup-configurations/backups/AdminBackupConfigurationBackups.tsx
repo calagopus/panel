@@ -49,6 +49,8 @@ export default function AdminBackupConfigurationBackups({
       <Table
         columns={[
           t('common.table.columns.name', {}),
+          t('pages.server.backups.table.columns.kind', {}),
+          t('common.table.columns.source', {}),
           t('common.table.columns.server', {}),
           t('common.table.columns.node', {}),
           t('common.table.columns.checksum', {}),
@@ -66,6 +68,8 @@ export default function AdminBackupConfigurationBackups({
           <NodeServerBackupRow
             key={backup.uuid}
             backup={backup}
+            showKind
+            showSource
             downloadStartedMessage={t('pages.admin.backupConfigurations.tabs.backups.page.toast.downloadStarted', {})}
             registry={
               window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.backups.contextMenu

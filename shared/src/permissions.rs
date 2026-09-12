@@ -388,7 +388,7 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing system backup policies."),
                         (
                             "update",
-                            "Allows modifying system backup policies and their attached nodes, locations and servers.",
+                            "Allows modifying system backup policies and their attached nodes, database agent hosts, locations and servers.",
                         ),
                         ("delete", "Allows deleting system backup policies."),
                         (
@@ -544,6 +544,10 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                             "Allows resetting database agent host tokens.",
                         ),
                         ("test", "Allows testing database agent host connections."),
+                        (
+                            "backups",
+                            "Allows viewing backups associated with a database agent host.",
+                        ),
                     ]),
                 },
             ),

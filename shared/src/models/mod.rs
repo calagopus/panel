@@ -59,6 +59,7 @@ pub mod server_subuser;
 pub mod server_tunnel;
 pub mod server_variable;
 pub mod system_backup_policy;
+pub mod system_backup_policy_database_agent_host;
 pub mod system_backup_policy_location;
 pub mod system_backup_policy_node;
 pub mod system_backup_policy_server;

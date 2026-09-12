@@ -533,6 +533,7 @@ export const systemBackupPoliciesTable = pgTable(
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     enabled: boolean().default(true).notNull(),
+    kind: serverBackupKindEnum().default('SERVER').notNull(),
     cron: varchar({ length: 255 }).notNull(),
     retention: jsonb().default({ count: 0, days: 0, daily: 0, weekly: 0, monthly: 0, yearly: 0 }).notNull(),
     parallelism: integer().default(2).notNull(),
@@ -563,6 +564,27 @@ export const systemBackupPolicyNodesTable = pgTable(
     }),
     index('system_backup_policy_nodes_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
     index('system_backup_policy_nodes_node_uuid_idx').on(cols.node_uuid),
+  ],
+);
+
+export const systemBackupPolicyDatabaseAgentHostsTable = pgTable(
+  'system_backup_policy_database_agent_hosts',
+  {
+    system_backup_policy_uuid: uuid()
+      .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    database_agent_host_uuid: uuid()
+      .references(() => databaseAgentHostsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({
+      name: 'system_backup_policy_database_agent_hosts_pk',
+      columns: [cols.system_backup_policy_uuid, cols.database_agent_host_uuid],
+    }),
+    index('system_backup_policy_database_agent_hosts_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('system_backup_policy_database_agent_hosts_database_agent_host_uuid_idx').on(cols.database_agent_host_uuid),
   ],
 );
 

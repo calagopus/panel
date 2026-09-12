@@ -118,7 +118,6 @@ impl FetchedEmailVariable {
         self.default_value.is_some()
     }
 
-
     pub fn resolve(&self, language: &str) -> &str {
         self.value_translations
             .get(language)

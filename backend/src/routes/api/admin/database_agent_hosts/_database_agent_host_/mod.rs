@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod backups;
 mod capacity;
 mod config;
 mod instances;
@@ -272,6 +273,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/backups", backups::router(state))
         .nest("/capacity", capacity::router(state))
         .nest("/instances", instances::router(state))
         .nest("/token", token::router(state))

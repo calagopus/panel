@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_backups\n            SET\n                database_instance_uuid = $2,\n                server_uuid = $3,\n                node_uuid = $4,\n                backup_group_uuid = $5,\n                metadata = jsonb_set(server_backups.metadata, '{source_instance}', $6)\n            WHERE\n                server_backups.uuid = $1\n                AND server_backups.deleted IS NULL\n                AND server_backups.deleting IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "153c0460188bcd500932a0825e2f3b4ed40a1b1c818e8fb410c7d7612f4f0054"
+}

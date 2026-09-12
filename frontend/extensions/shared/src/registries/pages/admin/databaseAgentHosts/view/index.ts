@@ -2,6 +2,7 @@ import { Registry } from 'shared';
 import { z } from 'zod';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts';
 import { SubNavigationRegistry } from '../../../../slices/subNavigation.ts';
+import { BackupsRegistry } from './backups.ts';
 import { ConfigurationRegistry } from './configuration.ts';
 import { InstancesRegistry } from './instances.ts';
 import { OverviewRegistry } from './overview.ts';
@@ -11,6 +12,7 @@ export class ViewRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subNavigation.mergeFrom(other.subNavigation);
     this.overview.mergeFrom(other.overview);
+    this.backups.mergeFrom(other.backups);
     this.instances.mergeFrom(other.instances);
     this.configuration.mergeFrom(other.configuration);
     this.statistics.mergeFrom(other.statistics);
@@ -22,6 +24,7 @@ export class ViewRegistry implements Registry {
     databaseAgentHost: z.infer<typeof adminDatabaseAgentHostSchema>;
   }>();
   public overview: OverviewRegistry = new OverviewRegistry();
+  public backups: BackupsRegistry = new BackupsRegistry();
   public instances: InstancesRegistry = new InstancesRegistry();
   public configuration: ConfigurationRegistry = new ConfigurationRegistry();
   public statistics: StatisticsRegistry = new StatisticsRegistry();
@@ -37,6 +40,11 @@ export class ViewRegistry implements Registry {
 
   public enterOverview(callback: (registry: OverviewRegistry) => unknown): this {
     callback(this.overview);
+    return this;
+  }
+
+  public enterBackups(callback: (registry: BackupsRegistry) => unknown): this {
+    callback(this.backups);
     return this;
   }
 

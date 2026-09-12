@@ -31,6 +31,8 @@ export default function AdminSystemBackupPolicyBackups({
       data?.backups.data.some((backup) => backup.deletionStatus === 'deleting') ? 5000 : false,
   });
 
+  const isDatabaseKind = systemBackupPolicy.kind === 'database_instance';
+
   return (
     <AdminSubContentContainer
       title={t('pages.admin.systemBackupPolicies.tabs.backups.page.title', {})}
@@ -49,11 +51,12 @@ export default function AdminSystemBackupPolicyBackups({
       <Table
         columns={[
           t('common.table.columns.name', {}),
+          ...(isDatabaseKind ? [t('common.table.columns.source', {})] : []),
           t('common.table.columns.server', {}),
           t('common.table.columns.node', {}),
           t('common.table.columns.checksum', {}),
           t('common.table.columns.size', {}),
-          t('common.table.columns.files', {}),
+          ...(isDatabaseKind ? [] : [t('common.table.columns.files', {})]),
           t('common.table.columns.created', {}),
           '',
         ]}
@@ -66,6 +69,8 @@ export default function AdminSystemBackupPolicyBackups({
           <NodeServerBackupRow
             key={backup.uuid}
             backup={backup}
+            showSource={isDatabaseKind}
+            showFiles={!isDatabaseKind}
             downloadStartedMessage={t('pages.admin.systemBackupPolicies.tabs.backups.page.toast.downloadStarted', {})}
             registry={
               window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.backups.contextMenu

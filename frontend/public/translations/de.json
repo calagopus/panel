@@ -190,6 +190,7 @@
         "move": "Verschieben",
         "transfer": "Übertragen",
         "reattach": "Wieder anhängen",
+        "reassign": "Neu zuweisen",
         "detach": "Lösen",
         "send": "Senden",
         "reset": "Zurücksetzen",
@@ -382,6 +383,7 @@
         "lines": "Zeilen",
         "databaseHost": "Datenbank-Host",
         "databaseAgentHost": "Datenbank-Agent-Host",
+        "databaseInstance": "Datenbankinstanz",
         "timezone": "Zeitzone",
         "timezoneSystem": "System",
         "protocol": "Protokoll",
@@ -2963,6 +2965,7 @@
                   "downloadStarted": "Download gestartet.",
                   "detached": "Backup erfolgreich gelöst.",
                   "reattached": "Backup erfolgreich an {name} wieder angehängt.",
+                  "reassigned": "Backup erfolgreich neu zugewiesen.",
                   "restoring": "Backup wird auf {name} wiederhergestellt...",
                   "exporting": "Backup wird in Dateien von {name} exportiert...",
                   "deletionStarted": "Node-Backup-Löschung gestartet."
@@ -2974,6 +2977,13 @@
                   "detach": {
                     "title": "Lösen des Backups bestätigen",
                     "content": "Bist du sicher, dass du dieses Backup von seinem Server lösen möchtest? Es wird nicht gelöscht und kann später wieder angehängt werden."
+                  },
+                  "reassign": {
+                    "title": "Datenbank-Backup neu zuweisen",
+                    "description": "Verschiebe dieses Backup zu einer anderen {type}-Datenbankinstanz. Die Instanz kann zu einem anderen Server gehören, solange das Backup von diesem Server aus erreichbar ist. Backups können nur einer Instanz desselben Datenbanktyps zugewiesen werden.",
+                    "instancePlaceholder": "Datenbankinstanz auswählen",
+                    "serverFirst": "Zuerst einen Server auswählen",
+                    "noInstances": "Keine passenden Datenbankinstanzen auf diesem Server"
                   },
                   "reattach": {
                     "title": "Node-Backup wieder anhängen",
@@ -3981,6 +3991,15 @@
                 }
               }
             },
+            "backups": {
+              "title": "Backups",
+              "page": {
+                "title": "Backups des Datenbank-Agent-Hosts",
+                "toast": {
+                  "downloadStarted": "Download gestartet."
+                }
+              }
+            },
             "configuration": {
               "title": "Konfiguration",
               "page": {
@@ -4499,6 +4518,9 @@
           },
           "form": {
             "backupConfigurationPlaceholder": "Vom Server erben",
+            "kind": "Backup-Art",
+            "kindDescription": "Server-Backups archivieren die Serverdateien. Datenbank-Backups erstellen Dumps der Datenbanken einer Server-Datenbankinstanz. Dies kann später nicht geändert werden.",
+            "kindLockedDescription": "Die Backup-Art wird beim Erstellen der Richtlinie festgelegt und kann nicht geändert werden.",
             "cron": "Zeitplan",
             "cronDescription": "Cron-Ausdruck (mit Sekunden), der bestimmt, wann Backups erstellt werden, in UTC.",
             "parallelism": "Parallelität",
@@ -4576,6 +4598,25 @@
                   },
                   "remove": {
                     "title": "Entfernen des Nodes bestätigen",
+                    "content": "Bist du sicher, dass du **{name}** aus **{policy}** entfernen möchtest?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Datenbank-Agent-Hosts",
+              "page": {
+                "title": "Datenbank-Agent-Hosts der System-Backup-Richtlinie",
+                "toast": {
+                  "added": "Datenbank-Agent-Host hinzugefügt.",
+                  "removed": "Datenbank-Agent-Host entfernt."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Datenbank-Agent-Host hinzufügen"
+                  },
+                  "remove": {
+                    "title": "Entfernen des Datenbank-Agent-Hosts bestätigen",
                     "content": "Bist du sicher, dass du **{name}** aus **{policy}** entfernen möchtest?"
                   }
                 }

@@ -1,9 +1,13 @@
 use crate::{
-    models::{InsertQueryBuilder, UpdateQueryBuilder, server_backup::retention::BackupRetention},
+    models::{
+        InsertQueryBuilder, UpdateQueryBuilder,
+        server_backup::{BackupDisk, ServerBackupKind, retention::BackupRetention},
+    },
     prelude::*,
 };
 use compact_str::ToCompactString;
 use garde::Validate;
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
@@ -22,6 +26,7 @@ pub struct SystemBackupPolicy {
     pub description: Option<compact_str::CompactString>,
 
     pub enabled: bool,
+    pub kind: ServerBackupKind,
     pub cron: croner::Cron,
     pub retention: BackupRetention,
     pub parallelism: i32,
@@ -72,6 +77,10 @@ impl BaseModel for SystemBackupPolicy {
                 compact_str::format_compact!("{prefix}enabled"),
             ),
             (
+                "system_backup_policies.kind",
+                compact_str::format_compact!("{prefix}kind"),
+            ),
+            (
                 "system_backup_policies.cron",
                 compact_str::format_compact!("{prefix}cron"),
             ),
@@ -111,6 +120,7 @@ impl BaseModel for SystemBackupPolicy {
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
+            kind: row.try_get(compact_str::format_compact!("{prefix}kind").as_str())?,
             cron: croner::Cron::from_str(&cron)
                 .map_err(|err| crate::database::DatabaseError::Any(anyhow::Error::new(err)))?,
             retention: serde_json::from_value(
@@ -128,10 +138,34 @@ impl BaseModel for SystemBackupPolicy {
 pub struct SystemBackupPolicyDueCandidate {
     pub server_uuid: uuid::Uuid,
     pub node_uuid: uuid::Uuid,
+    pub database_instance_uuid: Option<uuid::Uuid>,
+    pub database_agent_host_uuid: Option<uuid::Uuid>,
     pub last_attempt: Option<chrono::NaiveDateTime>,
-    /// The point from which the policy started covering this server, used as the cron anchor
-    /// when the server has no `last_attempt` yet.
+    /// The point from which the policy started covering this target, used as the cron anchor
+    /// when the target has no `last_attempt` yet.
     pub coverage_start: chrono::NaiveDateTime,
+}
+
+fn validate_backup_configuration(
+    kind: ServerBackupKind,
+    backup_configuration: &super::backup_configuration::BackupConfiguration,
+) -> Result<(), crate::database::DatabaseError> {
+    if kind == ServerBackupKind::DatabaseInstance
+        && matches!(
+            backup_configuration.backup_disk,
+            BackupDisk::Btrfs | BackupDisk::Zfs
+        )
+    {
+        return Err(anyhow::Error::new(
+            crate::response::DisplayError::new(
+                "database backups cannot be created on a btrfs or zfs backup configuration",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED),
+        )
+        .into());
+    }
+
+    Ok(())
 }
 
 impl SystemBackupPolicy {
@@ -234,6 +268,19 @@ impl SystemBackupPolicy {
         database: &crate::database::Database,
         limit: i64,
     ) -> Result<Vec<SystemBackupPolicyDueCandidate>, sqlx::Error> {
+        match self.kind {
+            ServerBackupKind::Server => self.due_server_candidates(database, limit).await,
+            ServerBackupKind::DatabaseInstance => {
+                self.due_database_instance_candidates(database, limit).await
+            }
+        }
+    }
+
+    async fn due_server_candidates(
+        &self,
+        database: &crate::database::Database,
+        limit: i64,
+    ) -> Result<Vec<SystemBackupPolicyDueCandidate>, sqlx::Error> {
         let rows = sqlx::query!(
             r#"
             SELECT
@@ -296,17 +343,102 @@ impl SystemBackupPolicy {
             .map(|row| SystemBackupPolicyDueCandidate {
                 server_uuid: row.server_uuid,
                 node_uuid: row.node_uuid,
+                database_instance_uuid: None,
+                database_agent_host_uuid: None,
                 last_attempt: row.last_attempt,
                 coverage_start: row.coverage_start,
             })
             .collect())
     }
 
-    /// (total_nodes, total_locations, total_servers, total_backups)
+    async fn due_database_instance_candidates(
+        &self,
+        database: &crate::database::Database,
+        limit: i64,
+    ) -> Result<Vec<SystemBackupPolicyDueCandidate>, sqlx::Error> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT
+                candidates.server_uuid AS server_uuid,
+                candidates.node_uuid AS node_uuid,
+                candidates.database_instance_uuid AS database_instance_uuid,
+                candidates.database_agent_host_uuid AS database_agent_host_uuid,
+                candidates.last_attempt AS "last_attempt?",
+                candidates.coverage_start AS "coverage_start!"
+            FROM (
+                SELECT
+                    servers.uuid AS server_uuid,
+                    servers.node_uuid AS node_uuid,
+                    server_database_instances.uuid AS database_instance_uuid,
+                    server_database_instances.database_agent_host_uuid AS database_agent_host_uuid,
+                    (
+                        SELECT MAX(server_backups.created)
+                        FROM server_backups
+                        WHERE
+                            server_backups.system_backup_policy_uuid = $1
+                            AND server_backups.database_instance_uuid = server_database_instances.uuid
+                    ) AS last_attempt,
+                    GREATEST(server_database_instances.created, coverage.attached) AS coverage_start
+                FROM server_database_instances
+                JOIN servers ON servers.uuid = server_database_instances.server_uuid
+                JOIN database_agent_hosts ON database_agent_hosts.uuid = server_database_instances.database_agent_host_uuid
+                LEFT JOIN LATERAL (
+                    SELECT MIN(scopes.created) AS attached
+                    FROM (
+                        SELECT system_backup_policy_database_agent_hosts.created
+                        FROM system_backup_policy_database_agent_hosts
+                        WHERE
+                            system_backup_policy_database_agent_hosts.system_backup_policy_uuid = $1
+                            AND system_backup_policy_database_agent_hosts.database_agent_host_uuid = server_database_instances.database_agent_host_uuid
+                        UNION ALL
+                        SELECT system_backup_policy_locations.created
+                        FROM system_backup_policy_locations
+                        JOIN location_database_agent_hosts ON location_database_agent_hosts.location_uuid = system_backup_policy_locations.location_uuid
+                        WHERE
+                            system_backup_policy_locations.system_backup_policy_uuid = $1
+                            AND location_database_agent_hosts.database_agent_host_uuid = server_database_instances.database_agent_host_uuid
+                        UNION ALL
+                        SELECT system_backup_policy_servers.created
+                        FROM system_backup_policy_servers
+                        WHERE
+                            system_backup_policy_servers.system_backup_policy_uuid = $1
+                            AND system_backup_policy_servers.server_uuid = servers.uuid
+                    ) AS scopes
+                ) AS coverage ON TRUE
+                WHERE
+                    servers.destination_node_uuid IS NULL
+                    AND servers.status IS NULL
+                    AND server_database_instances.status IS NULL
+                    AND NOT database_agent_hosts.maintenance_enabled
+                    AND coverage.attached IS NOT NULL
+            ) AS candidates
+            ORDER BY COALESCE(candidates.last_attempt, candidates.coverage_start) ASC
+            LIMIT $2
+            "#,
+            self.uuid,
+            limit,
+        )
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(rows
+            .into_iter()
+            .map(|row| SystemBackupPolicyDueCandidate {
+                server_uuid: row.server_uuid,
+                node_uuid: row.node_uuid,
+                database_instance_uuid: Some(row.database_instance_uuid),
+                database_agent_host_uuid: Some(row.database_agent_host_uuid),
+                last_attempt: row.last_attempt,
+                coverage_start: row.coverage_start,
+            })
+            .collect())
+    }
+
+    /// (total_nodes, total_database_agent_hosts, total_locations, total_servers, total_backups)
     async fn attachment_counts(
         &self,
         database: &crate::database::Database,
-    ) -> Result<(i64, i64, i64, i64), crate::database::DatabaseError> {
+    ) -> Result<(i64, i64, i64, i64, i64), crate::database::DatabaseError> {
         let row = sqlx::query!(
             r#"
             SELECT
@@ -315,6 +447,11 @@ impl SystemBackupPolicy {
                     FROM system_backup_policy_nodes
                     WHERE system_backup_policy_nodes.system_backup_policy_uuid = $1
                 ) AS "total_nodes!",
+                (
+                    SELECT COUNT(*)
+                    FROM system_backup_policy_database_agent_hosts
+                    WHERE system_backup_policy_database_agent_hosts.system_backup_policy_uuid = $1
+                ) AS "total_database_agent_hosts!",
                 (
                     SELECT COUNT(*)
                     FROM system_backup_policy_locations
@@ -340,6 +477,7 @@ impl SystemBackupPolicy {
 
         Ok((
             row.total_nodes,
+            row.total_database_agent_hosts,
             row.total_locations,
             row.total_servers,
             row.total_backups,
@@ -357,8 +495,13 @@ impl IntoAdminApiObject for SystemBackupPolicy {
         state: &crate::State,
         _args: Self::ExtraArgs<'a>,
     ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
-        let (total_nodes, total_locations, total_servers, total_backups) =
-            self.attachment_counts(&state.database).await?;
+        let (
+            total_nodes,
+            total_database_agent_hosts,
+            total_locations,
+            total_servers,
+            total_backups,
+        ) = self.attachment_counts(&state.database).await?;
 
         let api_object = AdminApiSystemBackupPolicy::init_hooks(&self, state).await?;
 
@@ -378,11 +521,13 @@ impl IntoAdminApiObject for SystemBackupPolicy {
                 name: self.name,
                 description: self.description,
                 enabled: self.enabled,
+                kind: self.kind,
                 cron: self.cron,
                 retention: self.retention,
                 parallelism: self.parallelism,
                 triggered: self.triggered.map(|dt| dt.and_utc()),
                 total_nodes,
+                total_database_agent_hosts,
                 total_locations,
                 total_servers,
                 total_backups,
@@ -437,6 +582,11 @@ impl ByUuid for SystemBackupPolicy {
     }
 }
 
+#[inline]
+fn default_kind() -> ServerBackupKind {
+    ServerBackupKind::Server
+}
+
 #[derive(ToSchema, Deserialize, Validate)]
 pub struct CreateSystemBackupPolicyOptions {
     #[garde(length(chars, min = 1, max = 255))]
@@ -449,6 +599,9 @@ pub struct CreateSystemBackupPolicyOptions {
     pub backup_configuration_uuid: Option<uuid::Uuid>,
     #[garde(skip)]
     pub enabled: bool,
+    #[garde(skip)]
+    #[serde(default = "default_kind")]
+    pub kind: ServerBackupKind,
     #[garde(skip)]
     #[schema(value_type = String, example = "0 0 0 * * *")]
     pub cron: croner::Cron,
@@ -480,14 +633,16 @@ impl CreatableModel for SystemBackupPolicy {
         options.validate()?;
 
         if let Some(backup_configuration_uuid) = options.backup_configuration_uuid {
-            super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
-                &state.database,
-                backup_configuration_uuid,
-            )
-            .await?
-            .ok_or(crate::database::InvalidRelationError(
-                "backup_configuration",
-            ))?;
+            let backup_configuration =
+                super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
+                    &state.database,
+                    backup_configuration_uuid,
+                )
+                .await?
+                .ok_or(crate::database::InvalidRelationError(
+                    "backup_configuration",
+                ))?;
+            validate_backup_configuration(options.kind, &backup_configuration)?;
         }
 
         let mut query_builder = InsertQueryBuilder::new("system_backup_policies");
@@ -502,6 +657,7 @@ impl CreatableModel for SystemBackupPolicy {
                 options.backup_configuration_uuid,
             )
             .set("enabled", options.enabled)
+            .set("kind", options.kind)
             .set("cron", options.cron.to_compact_string())
             .set("retention", serde_json::to_value(&options.retention)?)
             .set("parallelism", options.parallelism);
@@ -576,14 +732,16 @@ impl UpdatableModel for SystemBackupPolicy {
         options.validate()?;
 
         if let Some(Some(backup_configuration_uuid)) = options.backup_configuration_uuid {
-            super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
-                &state.database,
-                backup_configuration_uuid,
-            )
-            .await?
-            .ok_or(crate::database::InvalidRelationError(
-                "backup_configuration",
-            ))?;
+            let backup_configuration =
+                super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
+                    &state.database,
+                    backup_configuration_uuid,
+                )
+                .await?
+                .ok_or(crate::database::InvalidRelationError(
+                    "backup_configuration",
+                ))?;
+            validate_backup_configuration(self.kind, &backup_configuration)?;
         }
 
         let mut query_builder = UpdateQueryBuilder::new("system_backup_policies");
@@ -696,6 +854,7 @@ pub struct AdminApiSystemBackupPolicy {
     pub description: Option<compact_str::CompactString>,
 
     pub enabled: bool,
+    pub kind: ServerBackupKind,
     #[schema(value_type = String, example = "0 0 0 * * *")]
     pub cron: croner::Cron,
     pub retention: BackupRetention,
@@ -704,6 +863,7 @@ pub struct AdminApiSystemBackupPolicy {
     pub triggered: Option<chrono::DateTime<chrono::Utc>>,
 
     pub total_nodes: i64,
+    pub total_database_agent_hosts: i64,
     pub total_locations: i64,
     pub total_servers: i64,
     pub total_backups: i64,

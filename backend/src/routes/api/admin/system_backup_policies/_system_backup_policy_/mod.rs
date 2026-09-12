@@ -13,6 +13,7 @@ use shared::{
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod backups;
+mod database_agent_hosts;
 mod locations;
 mod nodes;
 mod servers;
@@ -260,6 +261,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
         .nest("/backups", backups::router(state))
+        .nest("/database-agent-hosts", database_agent_hosts::router(state))
         .nest("/locations", locations::router(state))
         .nest("/nodes", nodes::router(state))
         .nest("/servers", servers::router(state))

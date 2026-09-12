@@ -10,6 +10,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { databaseAgentType, databaseType } from '@/lib/schemas/generic.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
+import { serverBackupKind } from '@/lib/schemas/server/backups.ts';
 import { serverAutostartBehavior, serverStatus } from '@/lib/schemas/server/server.ts';
 import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 
@@ -109,6 +110,9 @@ export const adminServerBackupSchema = z.looseObject({
   uuid: z.string(),
   server: z.lazy(() => adminServerSchema).nullable(),
   systemBackupPolicyUuid: z.string().nullable(),
+  databaseInstanceUuid: z.string().nullable(),
+  databaseType: z.lazy(() => databaseAgentType).nullable(),
+  kind: serverBackupKind,
   name: z.string(),
   ignoredFiles: z.array(z.string()),
   isSuccessful: z.boolean(),

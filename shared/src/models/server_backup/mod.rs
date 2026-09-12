@@ -934,6 +934,49 @@ impl ServerBackup {
         })
     }
 
+    pub async fn by_database_agent_host_uuid_with_pagination(
+        database: &crate::database::Database,
+        database_agent_host_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let offset = (page - 1) * per_page;
+
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}, COUNT(*) OVER() AS total_count
+            FROM server_backups
+            JOIN server_database_instances ON server_database_instances.uuid = server_backups.database_instance_uuid
+            WHERE
+                server_database_instances.database_agent_host_uuid = $1
+                AND server_backups.deleted IS NULL
+                AND ($2 IS NULL OR server_backups.name ILIKE '%' || $2 || '%')
+            ORDER BY server_backups.created
+            LIMIT $3 OFFSET $4
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(database_agent_host_uuid)
+        .bind(search)
+        .bind(per_page)
+        .bind(offset)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(super::Pagination {
+            total: rows
+                .first()
+                .map_or(Ok(0), |row| row.try_get("total_count"))?,
+            per_page,
+            page,
+            data: rows
+                .into_iter()
+                .map(|row| Self::map(None, &row))
+                .try_collect_vec()?,
+        })
+    }
+
     pub async fn by_backup_configuration_uuid_with_pagination(
         database: &crate::database::Database,
         backup_configuration_uuid: uuid::Uuid,
@@ -1123,6 +1166,32 @@ impl ServerBackup {
         )
         .bind(system_backup_policy_uuid)
         .bind(node_uuid)
+        .fetch_one(database.read())
+        .await
+    }
+
+    /// Sibling of [`Self::count_system_inflight_by_system_backup_policy_uuid_node_uuid`] for
+    /// database instance policies, whose dumps load the database agent host rather than the node.
+    pub async fn count_system_inflight_by_system_backup_policy_uuid_database_agent_host_uuid(
+        database: &crate::database::Database,
+        system_backup_policy_uuid: uuid::Uuid,
+        database_agent_host_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM server_backups
+            JOIN server_database_instances ON server_database_instances.uuid = server_backups.database_instance_uuid
+            WHERE
+                server_backups.system_backup_policy_uuid = $1
+                AND server_database_instances.database_agent_host_uuid = $2
+                AND server_backups.completed IS NULL
+                AND server_backups.deleted IS NULL
+                AND server_backups.created >= NOW() - INTERVAL '1 day'
+            "#,
+        )
+        .bind(system_backup_policy_uuid)
+        .bind(database_agent_host_uuid)
         .fetch_one(database.read())
         .await
     }
@@ -2366,6 +2435,7 @@ pub enum FailedServerBackupScope {
     },
     BackupConfiguration(uuid::Uuid),
     SystemBackupPolicy(uuid::Uuid),
+    DatabaseAgentHost(uuid::Uuid),
 }
 
 impl FailedServerBackupScope {
@@ -2381,6 +2451,13 @@ impl FailedServerBackupScope {
             }
             Self::BackupConfiguration(_) => "server_backups.backup_configuration_uuid = $1",
             Self::SystemBackupPolicy(_) => "server_backups.system_backup_policy_uuid = $1",
+            Self::DatabaseAgentHost(_) => {
+                "server_backups.database_instance_uuid IN (
+                    SELECT server_database_instances.uuid
+                    FROM server_database_instances
+                    WHERE server_database_instances.database_agent_host_uuid = $1
+                )"
+            }
         }
     }
 
@@ -2392,7 +2469,8 @@ impl FailedServerBackupScope {
             | Self::DetachedNode(uuid)
             | Self::Server(uuid)
             | Self::BackupConfiguration(uuid)
-            | Self::SystemBackupPolicy(uuid) => (uuid, None),
+            | Self::SystemBackupPolicy(uuid)
+            | Self::DatabaseAgentHost(uuid) => (uuid, None),
             Self::PartiallyDetachedServer {
                 server_uuid,
                 node_uuid,

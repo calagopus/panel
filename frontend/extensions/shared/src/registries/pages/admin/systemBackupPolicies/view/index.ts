@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { SubNavigationRegistry } from '../../../../slices/subNavigation.ts';
 import { BackupsRegistry } from './backups.ts';
+import { DatabaseAgentHostsRegistry } from './databaseAgentHosts.ts';
 import { LocationsRegistry } from './locations.ts';
 import { NodesRegistry } from './nodes.ts';
 import { ServersRegistry } from './servers.ts';
@@ -11,6 +12,7 @@ export class ViewRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subNavigation.mergeFrom(other.subNavigation);
     this.backups.mergeFrom(other.backups);
+    this.databaseAgentHosts.mergeFrom(other.databaseAgentHosts);
     this.locations.mergeFrom(other.locations);
     this.nodes.mergeFrom(other.nodes);
     this.servers.mergeFrom(other.servers);
@@ -22,6 +24,7 @@ export class ViewRegistry implements Registry {
     systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>;
   }>();
   public backups: BackupsRegistry = new BackupsRegistry();
+  public databaseAgentHosts: DatabaseAgentHostsRegistry = new DatabaseAgentHostsRegistry();
   public locations: LocationsRegistry = new LocationsRegistry();
   public nodes: NodesRegistry = new NodesRegistry();
   public servers: ServersRegistry = new ServersRegistry();
@@ -37,6 +40,11 @@ export class ViewRegistry implements Registry {
 
   public enterBackups(callback: (registry: BackupsRegistry) => unknown): this {
     callback(this.backups);
+    return this;
+  }
+
+  public enterDatabaseAgentHosts(callback: (registry: DatabaseAgentHostsRegistry) => unknown): this {
+    callback(this.databaseAgentHosts);
     return this;
   }
 

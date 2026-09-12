@@ -16,6 +16,7 @@ mod detach;
 mod download;
 mod export;
 mod query;
+mod reassign;
 mod reattach;
 mod restore;
 
@@ -202,6 +203,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/export", export::router(state))
         .nest("/query", query::router(state))
         .nest("/restore", restore::router(state))
+        .nest("/reassign", reassign::router(state))
         .nest("/reattach", reattach::router(state))
         .nest("/detach", detach::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))

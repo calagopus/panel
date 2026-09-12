@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE server_backups\n            SET server_uuid = $2, node_uuid = $3, backup_group_uuid = $4\n            WHERE server_backups.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "52a903e9400b6b564990eaef8b98ee4b3bda90fa104c6f5865b4faff08b3ca50"
+}

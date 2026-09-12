@@ -66,6 +66,7 @@ const baseTranslations = defineTranslations({
         move: 'Move',
         transfer: 'Transfer',
         reattach: 'Reattach',
+        reassign: 'Reassign',
         detach: 'Detach',
         send: 'Send',
         reset: 'Reset',
@@ -266,6 +267,7 @@ const baseTranslations = defineTranslations({
         lines: 'Lines',
         databaseHost: 'Database Host',
         databaseAgentHost: 'Database Agent Host',
+        databaseInstance: 'Database Instance',
         timezone: 'Timezone',
         timezoneSystem: 'System',
         protocol: 'Protocol',
@@ -2931,6 +2933,7 @@ const baseTranslations = defineTranslations({
                   downloadStarted: 'Download started.',
                   detached: 'Backup detached successfully.',
                   reattached: 'Reattached backup to {name} successfully.',
+                  reassigned: 'Backup reassigned successfully.',
                   restoring: 'Restoring backup to {name}...',
                   exporting: 'Exporting backup to files of {name}...',
                   deletionStarted: 'Node backup deletion started.',
@@ -2943,6 +2946,14 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm Backup Detachment',
                     content:
                       'Are you sure you want to detach this backup from its server? It will not be deleted and can be reattached later.',
+                  },
+                  reassign: {
+                    title: 'Reassign Database Backup',
+                    description:
+                      'Move this backup to another {type} database instance. The instance can belong to a different server, as long as the backup is reachable from that server. Backups can only be assigned to an instance of the same database type.',
+                    instancePlaceholder: 'Select a database instance',
+                    serverFirst: 'Select a server first',
+                    noInstances: 'No matching database instances on this server',
                   },
                   reattach: {
                     title: 'Reattach Node Backup',
@@ -3989,6 +4000,15 @@ const baseTranslations = defineTranslations({
                 },
               },
             },
+            backups: {
+              title: 'Backups',
+              page: {
+                title: 'Database Agent Host Backups',
+                toast: {
+                  downloadStarted: 'Download started.',
+                },
+              },
+            },
             configuration: {
               title: 'Configuration',
               page: {
@@ -4529,6 +4549,10 @@ const baseTranslations = defineTranslations({
           },
           form: {
             backupConfigurationPlaceholder: 'Inherit from Server',
+            kind: 'Backup Kind',
+            kindDescription:
+              'Server backups archive the server files. Database backups dump the databases of a server database instance. This cannot be changed later.',
+            kindLockedDescription: 'The backup kind is chosen when the policy is created and cannot be changed.',
             cron: 'Schedule',
             cronDescription: 'Cron expression (with seconds) that determines when backups are taken, in UTC.',
             parallelism: 'Parallelism',
@@ -4609,6 +4633,25 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Node Removal',
+                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
+                  },
+                },
+              },
+            },
+            databaseAgentHosts: {
+              title: 'Database Agent Hosts',
+              page: {
+                title: 'System Backup Policy Database Agent Hosts',
+                toast: {
+                  added: 'Database agent host added.',
+                  removed: 'Database agent host removed.',
+                },
+                modal: {
+                  add: {
+                    title: 'Add Database Agent Host',
+                  },
+                  remove: {
+                    title: 'Confirm Database Agent Host Removal',
                     content: 'Are you sure you want to remove **{name}** from **{policy}**?',
                   },
                 },

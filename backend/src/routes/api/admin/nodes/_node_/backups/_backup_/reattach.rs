@@ -9,7 +9,7 @@ mod post {
         ApiError, GetState,
         models::{
             ByUuid, admin_activity::GetAdminActivityLogger, node::GetNode, server::Server,
-            user::GetPermissionManager,
+            server_backup::ServerBackupKind, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -28,6 +28,7 @@ mod post {
         (status = UNAUTHORIZED, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
         (status = BAD_REQUEST, body = ApiError),
+        (status = EXPECTATION_FAILED, body = ApiError),
     ), params(
         (
             "node" = uuid::Uuid,
@@ -49,6 +50,14 @@ mod post {
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("nodes.backups")?;
+
+        if backup.kind != ServerBackupKind::Server {
+            return ApiResponse::error(
+                "database backups follow their database instance and cannot be reattached",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED)
+            .ok();
+        }
 
         if backup.deleting.is_some() {
             return ApiResponse::error("backup is being deleted")
@@ -84,11 +93,21 @@ mod post {
                 .ok();
         }
 
+        let backup_group_uuid =
+            if backup.server.as_ref().map(|server| server.uuid) == Some(server.uuid) {
+                backup.backup_group_uuid
+            } else {
+                None
+            };
+
         sqlx::query!(
-            "UPDATE server_backups SET server_uuid = $2, node_uuid = $3 WHERE server_backups.uuid = $1",
+            "UPDATE server_backups
+            SET server_uuid = $2, node_uuid = $3, backup_group_uuid = $4
+            WHERE server_backups.uuid = $1",
             backup.uuid,
             server.uuid,
-            server.node.uuid
+            server.node.uuid,
+            backup_group_uuid
         )
         .execute(state.database.write())
         .await?;

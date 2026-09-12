@@ -18,9 +18,9 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteBackup from '@/api/server/backups/deleteBackup.ts';
 import downloadBackup from '@/api/server/backups/downloadBackup.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import BackupSourceLabel from '@/elements/data-display/BackupSourceLabel.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import { TableData, TableRow } from '@/elements/data-display/Table.tsx';
-import TableLink from '@/elements/data-display/TableLink.tsx';
 import HljsCode from '@/elements/editors/HljsCode.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -29,12 +29,7 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { getBackupSourceInstance } from '@/lib/domain/server.ts';
-import {
-  databaseAgentTypeLabelMapping,
-  serverBackupKindLabelMapping,
-  streamingArchiveFormatLabelMapping,
-} from '@/lib/enums.ts';
+import { serverBackupKindLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { bytesProgressString, bytesToString } from '@/lib/format/size.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
@@ -78,7 +73,6 @@ export default function BackupRow({
     'edit' | 'restore' | 'restoreDatabase' | 'export' | 'delete' | 'metadata' | null
   >(null);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
-  const sourceInstance = useMemo(() => getBackupSourceInstance(backup), [backup]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     downloadBackup(server.uuid, backup.uuid, archiveFormat)
@@ -299,39 +293,14 @@ export default function BackupRow({
 
             {columns.source && (
               <TableData>
-                {backup.kind === 'server' ? (
-                  <span className='text-sm text-(--mantine-color-dimmed)'>
-                    {t('pages.server.backups.modal.createBackup.sourceFiles', {})}
-                  </span>
-                ) : sourceInstance ? (
-                  <div className='flex flex-col'>
-                    {backup.databaseInstanceUuid && canReadDatabaseInstances ? (
-                      <TableLink
-                        className='w-max max-w-full truncate font-medium'
-                        to={`/server/${server.uuidShort}/databases/instances/${backup.databaseInstanceUuid}`}
-                      >
-                        {sourceInstance.name}
-                      </TableLink>
-                    ) : (
-                      <span className='font-medium'>
-                        {backup.databaseInstanceUuid
-                          ? sourceInstance.name
-                          : t('pages.server.backups.badge.sourceDeleted', { name: sourceInstance.name })}
-                      </span>
-                    )}
-                    <span className='text-xs text-(--mantine-color-dimmed)'>
-                      {backup.databaseType
-                        ? databaseAgentTypeLabelMapping[backup.databaseType]
-                        : serverBackupKindLabelMapping.database_instance()}
-                    </span>
-                  </div>
-                ) : (
-                  <span className='text-sm text-(--mantine-color-dimmed)'>
-                    {backup.databaseType
-                      ? databaseAgentTypeLabelMapping[backup.databaseType]
-                      : serverBackupKindLabelMapping.database_instance()}
-                  </span>
-                )}
+                <BackupSourceLabel
+                  backup={backup}
+                  to={
+                    backup.databaseInstanceUuid && canReadDatabaseInstances
+                      ? `/server/${server.uuidShort}/databases/instances/${backup.databaseInstanceUuid}`
+                      : undefined
+                  }
+                />
               </TableData>
             )}
 

@@ -106,7 +106,11 @@ export default function SystemBackupPolicyCreateOrUpdate({
     canRequest: canReadBackupConfigurations,
   });
 
-  const fields = useSystemBackupPolicyFormFields({ backupConfigurations, canReadBackupConfigurations });
+  const fields = useSystemBackupPolicyFormFields({
+    backupConfigurations,
+    canReadBackupConfigurations,
+    doUpdate: !!contextSystemBackupPolicy,
+  });
 
   return (
     <AdminContentContainer
