@@ -31,11 +31,31 @@ jobs:
           download_translations: true
           localization_branch_name: l10n_crowdin_translations
 
-          create_pull_request: true
-          pull_request_title: 'New Crowdin translations'
-          pull_request_body: 'New Crowdin pull request with translations'
-          pull_request_base_branch_name: 'main'
+          push_translations: false
+          create_pull_request: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Strip untranslated strings
+        run: |
+          changed=$(git diff --name-only -- frontend/public/translations shared/mails/variables | grep -v '/en\.json$' || true)
+          if [ -n "$changed" ]; then
+            python3 .github/scripts/strip_untranslated_translations.py $changed
+          else
+            echo "No downloaded translation files changed."
+          fi
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: l10n_crowdin_translations
+          base: main
+          title: 'New Crowdin translations'
+          body: 'New Crowdin pull request with translations'
+          commit-message: 'New Crowdin translations'
+          add-paths: |
+            frontend/public/translations/*.json
+            shared/mails/variables/*.json
