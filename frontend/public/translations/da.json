@@ -64,14 +64,6 @@
       "many": "{count} nodes",
       "other": "{count} nodes"
     },
-    "databaseAgentHost": {
-      "zero": "{count} Database Agent Hosts",
-      "one": "{count} Database Agent Host",
-      "two": "{count} Database Agent Hosts",
-      "few": "{count} Database Agent Hosts",
-      "many": "{count} Database Agent Hosts",
-      "other": "{count} Database Agent Hosts"
-    },
     "allocation": {
       "zero": "{count} node-allokeringer",
       "one": "{count} node-allokering",
@@ -174,7 +166,6 @@
         "cancel": "Annuller",
         "continue": "Fortsæt",
         "skip": "Spring over",
-        "okay": "Okay",
         "back": "Tilbage",
         "next": "Næste",
         "install": "Installer",
@@ -182,35 +173,33 @@
         "deselectAll": "Fravælg alle",
         "restore": "Gendan",
         "discard": "Kassér",
-        "download": "Download",
         "downloadAs": "Download som {format}",
         "export": "Eksportér",
         "exportAs": "Eksportér som {format}",
-        "recreate": "Genopret",
+        "recreate": "Genskab",
         "move": "Flyt",
         "transfer": "Overfør",
-        "reattach": "Tilknyt igen",
-        "detach": "Frakobl",
-        "send": "Send",
+        "reattach": "Monter igen",
+        "detach": "Frigør",
         "reset": "Nulstil",
         "view": "Vis",
-        "import": "Importér",
+        "import": "Importere",
         "details": "Detaljer",
-        "loadLogs": "Indlæs logs",
-        "sendTestEmail": "Send test-e-mail",
-        "setPrimary": "Sæt som primær",
-        "unsetPrimary": "Fjern som primær",
-        "leavePage": "Forlad siden",
-        "viewDocumentation": "Se dokumentation",
+        "loadLogs": "Indlæs Logs",
+        "sendTestEmail": "Send test e-mail",
+        "setPrimary": "Sæt Primær",
+        "unsetPrimary": "Fravælg Primær",
+        "leavePage": "Forlad Side",
+        "viewDocumentation": "Se Dokumentation",
         "undo": "Fortryd",
-        "clearUserFilter": "Ryd brugerfilter",
-        "deleteFailedBackups": "Delete {count} Failed"
+        "clearUserFilter": "Ryd Brugerfilter",
+        "deleteFailedBackups": "Slet {count} Mislykkedes"
       },
       "alert": {
         "error": "Fejl",
         "warning": "Advarsel",
         "success": "Succes",
-        "clockOffset": "Dit systemur er mere end 5 sekunder ude af sync med serveren. Det kan give problemer med passkey-login og tofaktorgodkendelse. Synkroniser dit ur, hvis der opstår problemer. Nuværende forskydning: {offset} sekund(er)."
+        "clockOffset": "Dit systems ur afviger mere end 5 sekunder fra serverens ur. Dette kan medføre problemer med godkendelse via adgangsnøgle og tofaktorautentificering. Synkroniser venligst dit ur, hvis der opstår problemer. Aktuel afvigelse: {offset} sekund(er)."
       },
       "divider": {
         "or": "ELLER"
@@ -222,33 +211,28 @@
         "jsonInput": {
           "enum": {
             "type": {
-              "string": "String",
-              "number": "Number",
-              "boolean": "Boolean",
-              "object": "Object",
-              "array": "Array",
-              "null": "Null"
+              "string": "Streng",
+              "null": "Nul"
             }
           },
           "textMode": "Tekst",
-          "jsonMode": "JSON",
           "invalidJson": "Ugyldig JSON"
         },
         "tagsInput": {
-          "copyAll": "Kopiér alle",
-          "pasteReplace": "Indsæt (erstat)"
+          "copyAll": "Kopier Alt",
+          "pasteReplace": "Indsæt (Erstat)"
         },
         "serverFileInput": {
           "notFound": "Der findes endnu ingen fil med dette navn.",
           "isDirectory": "Dette er en mappe, ikke en fil."
         },
         "ignoredFilesInput": {
-          "onePatternPerLine": "Ét mønster pr. linje.",
-          "countMatches": "Tæl matches",
-          "matches": "{count} matchede",
-          "noMatches": "Ingen matches",
+          "onePatternPerLine": "Et mønster pr. linje.",
+          "countMatches": "Antal Matcher",
+          "matches": "{count} matches",
+          "noMatches": "Ingen match",
           "exception": "Undtagelse",
-          "tooManyPatterns": "Matches tælles ikke automatisk ved mere end {max} mønstre."
+          "tooManyPatterns": "Matchning tælles ikke automatisk for mere end {max} mønstre."
         },
         "cronInput": {
           "segments": {
@@ -262,39 +246,38 @@
           "nextRun": "Næste kørsel er {timestamp}."
         },
         "backupRetention": {
-          "title": "Retention",
-          "disabled": "No retention rules",
-          "description": "Keep a successful backup when any rule selects it: the latest count, all backups within the recent number of days, or the newest backup in each daily, weekly, monthly or yearly period containing backups. Periods use UTC; weeks start on Monday. Missed periods do not consume the count. Leave a rule empty or set it to 0 to disable it. With all rules disabled, successful backups are kept.",
-          "sourcesDescription": "Retention is evaluated separately for server files and each database. Locked backups are protected. Retention does not schedule backups.",
-          "capacityDescription": "At the server backup limit, backups your rules no longer keep are removed to make room. Scheduled backups additionally evict the oldest unlocked backup; manual backups are refused instead.",
-          "failedDescription": "Unlocked failed backups are cleaned up after 24 hours, grouped or not.",
-          "count": "Keep latest",
-          "days": "Keep all within days",
-          "daily": "Keep daily",
-          "weekly": "Keep weekly",
-          "monthly": "Keep monthly",
-          "yearly": "Keep yearly",
-          "ruleSummary": "{rule}: {count}"
+          "title": "Opbevaring",
+          "disabled": "Ingen opbevaringsregler",
+          "description": "Behold en vellykket sikkerhedskopi, hvis en regel vælger den: den seneste (baseret på antal), alle sikkerhedskopier fra de seneste dage, eller den nyeste sikkerhedskopi i hver periode (daglig, ugentlig, månedlig eller årlig), der indeholder sikkerhedskopier. Perioder baseres på UTC; uger starter om mandagen. Perioder, hvor der ikke er foretaget sikkerhedskopiering, tæller ikke med i antallet. Lad en regel stå tom, eller sæt den til 0 for at deaktivere den. Hvis alle regler er deaktiveret, beholdes vellykkede sikkerhedskopier.",
+          "sourcesDescription": "Opbevaring evalueres separat for serverfiler og hver database. Låste sikkerhedskopier er beskyttet. Opbevaring planlægger ikke sikkerhedskopier.",
+          "capacityDescription": "Når grænsen for server-backups er nået, fjernes de backups, der ikke længere omfattes af dine regler, for at skabe plads. Ved planlagte backups slettes desuden den ældste ulåste backup, mens manuelle backups afvises.",
+          "failedDescription": "Oplåsning mislykket. Sikkerhedskopier renses op efter 24 timer, grupperet eller ej.",
+          "count": "Behold den nyeste",
+          "days": "Behold alle inden for dage",
+          "daily": "Behold dagligt",
+          "weekly": "Behold ugentligt",
+          "monthly": "Behold månedligt",
+          "yearly": "Behold årligt"
         }
       },
       "modal": {
         "duplicate": {
-          "title": "Duplikér {resource}"
+          "title": "Dupliker {resource}"
         },
         "delete": {
           "content": "Er du sikker på, at du vil slette **{name}**?"
         },
         "deleteFailedBackups": {
-          "title": "Confirm Failed Backup Deletion",
-          "content": "Are you sure you want to delete `{count}` failed backups? Locked backups and backups whose configuration is in maintenance are kept. Deletion runs in the background and may take a while to finish.",
+          "title": "Bekræft sletning af backup",
+          "content": "Er du sikker på, at du vil slette `{count}` mislykkede sikkerhedskopier? Låste sikkerhedskopier og sikkerhedskopier, hvis konfiguration er under vedligeholdelse, beholdes. Sletningen kører i baggrunden og kan tage et stykke tid at fuldføre.",
           "alert": {
-            "forceWarning": "Force deletion removes these backups even if their configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind."
+            "forceWarning": "Tvungen sletning fjerner disse sikkerhedskopier, selvom deres konfiguration mangler, eller fjernlageret ikke kan nås. Selve sikkerhedskopiere slettes muligvis ikke fuldstændigt, hvilket kan efterlade forældreløse data."
           }
         }
       },
       "toast": {
         "duplicated": "{resource} duplikeret.",
-        "failedBackupDeletionStarted": "Deleting {count} failed backups in the background."
+        "failedBackupDeletionStarted": "Sletter {count} mislykkede sikkerhedskopier i baggrunden."
       },
       "settingScope": {
         "account": "Synkronisér med konto",
@@ -326,16 +309,11 @@
         "newName": "Nyt navn",
         "description": "Beskrivelse",
         "author": "Forfatter",
-        "type": "Type",
         "password": "Adgangskode",
-        "host": "Host",
         "username": "Brugernavn",
         "usernameOrEmail": "Brugernavn/e-mail",
-        "server": "Server",
-        "url": "URL",
         "email": "E-mail",
         "path": "Sti",
-        "port": "Port",
         "provider": "Udbyder",
         "command": "Kommando",
         "fromAddress": "Afsenderadresse",
@@ -344,9 +322,6 @@
         "secretKey": "Secret key",
         "apiKey": "API-nøgle",
         "accessKey": "Access key",
-        "bucket": "Bucket",
-        "region": "Region",
-        "endpoint": "Endpoint",
         "publicUrl": "Offentlig URL",
         "firstName": "Fornavn",
         "lastName": "Efternavn",
@@ -362,7 +337,6 @@
         "sftpHost": "SFTP-host",
         "dockerImage": "Docker image",
         "memory": "Hukommelse",
-        "disk": "Disk",
         "serverName": "Servernavn",
         "startupCommand": "Opstartskommando",
         "archiveName": "Arkivnavn",
@@ -372,21 +346,15 @@
         "multiplexChannelsDescription": "Tilføj ekstra HTTP-forbindelser (og dermed også tråde) til overførsel af opdelte arkiver. Det samlede antal streams er 1 + multiplex-kanaler.",
         "deleteSourceBackups": "Slet kilde-backups",
         "deleteSourceBackupsDescription": "Sletter de overførte backups på kilde-noden, når overførslen er færdig.",
-        "node": "Node",
         "location": "Lokation",
         "primaryAllocation": "Primær allokering",
         "additionalAllocations": "Yderligere allokeringer",
         "externalId": "Eksternt ID",
-        "mount": "Mount",
-        "nest": "Nest",
         "lines": "Linjer",
         "databaseHost": "Databasehost",
-        "databaseAgentHost": "Database Agent Host",
         "timezone": "Tidszone",
-        "timezoneSystem": "System",
         "protocol": "Protokol",
         "powerAction": "Power-handling",
-        "destination": "Destination",
         "destinationDirectory": "Destinationsmappe",
         "directoryName": "Mappenavn",
         "symlinkName": "Symlink-navn",
@@ -403,7 +371,6 @@
         "filePath": "Filsti",
         "envVariable": "Miljøvariabel",
         "value": "Værdi",
-        "eggs": "Eggs",
         "ignoredFiles": "Ignorerede filer",
         "previewIgnoredFiles": "Forhåndsvis ignorerede filer",
         "yourControlPanelPassword": "Din adgangskode til kontrolpanelet",
@@ -421,10 +388,8 @@
           "empty": "Ingen elementer fundet. Det er næsten, som om de gemmer sig."
         },
         "columns": {
-          "id": "ID",
           "name": "Navn",
           "author": "Forfatter",
-          "type": "Type",
           "title": "Titel",
           "enabled": "Aktiveret",
           "description": "Beskrivelse",
@@ -435,34 +400,25 @@
           "updated": "Opdateret",
           "actor": "Aktør",
           "event": "Hændelse",
-          "ip": "IP",
           "when": "Hvornår",
           "command": "Kommando",
           "location": "Lokation",
-          "node": "Node",
           "owner": "Ejer",
           "added": "Tilføjet",
           "backupConfiguration": "Backup-konfiguration",
-          "status": "Status",
           "allocation": "Allokering",
           "notes": "Noter",
           "source": "Kilde",
           "target": "Mål",
-          "checksum": "Checksum",
           "files": "Filer",
-          "server": "Server",
           "address": "Adresse",
-          "eggs": "Eggs",
-          "template": "Skabelon",
-          "version": "Version",
-          "host": "Host"
+          "template": "Skabelon"
         }
       },
       "tabs": {
         "general": "Generelt"
       },
       "stat": {
-        "cpu": "CPU",
         "cpuLoad": "CPU-belastning",
         "memoryUsage": "Hukommelsesforbrug",
         "memoryLoad": "Hukommelsesbelastning",
@@ -480,8 +436,7 @@
         "disabled": "Deaktiveret",
         "successful": "Gennemført",
         "failed": "Mislykket",
-        "installed": "Installeret",
-        "systemBackup": "System"
+        "installed": "Installeret"
       },
       "label": {
         "noSubdirectories": "Ingen undermapper",
@@ -513,33 +468,24 @@
         },
         "serverState": {
           "unknown": "Ukendt",
-          "offline": "Offline",
           "running": "Kører",
           "starting": "Starter",
           "stopping": "Stopper"
         },
         "serverPowerAction": {
-          "start": "Start",
-          "stop": "Stop",
-          "restart": "Genstart",
-          "kill": "Kill"
+          "restart": "Genstart"
         },
         "serverBackupStatus": {
           "starting": "Starter",
           "finished": "Færdig",
           "failed": "Mislykket"
         },
-        "serverBackupKind": {
-          "server": "Server",
-          "databaseInstance": "Database"
-        },
         "serverFirewallRuleAction": {
           "allow": "Tillad",
           "deny": "Afvis"
         },
         "connectionStatus": {
-          "connected": "Forbundet",
-          "offline": "Offline"
+          "connected": "Forbundet"
         },
         "serverAutoStartBehavior": {
           "always": "Altid",
@@ -549,8 +495,7 @@
         "bulkActionServerAction": {
           "started": "Startet",
           "stopped": "Stoppet",
-          "restarted": "Genstartet",
-          "killed": "Killed"
+          "restarted": "Genstartet"
         },
         "compressionLevel": {
           "bestSpeed": "Bedste hastighed",
@@ -559,30 +504,15 @@
           "bestCompression": "Bedste komprimering"
         }
       },
-      "unit": {
-        "bytes": {
-          "bytes": "B",
-          "kibibytes": "KiB",
-          "mebibytes": "MiB",
-          "gibibytes": "GiB",
-          "tebibytes": "TiB",
-          "pebibytes": "PiB"
-        }
-      },
       "unlimited": "Ubegrænset",
       "readOnly": "Skrivebeskyttet",
-      "na": "N/A",
       "never": "Aldrig",
       "none": "Ingen",
       "unknown": "Ukendt",
       "yes": "Ja",
       "no": "Nej",
-      "web": "Web",
-      "api": "API",
       "default": "Standard",
       "custom": "Tilpasset",
-      "system": "System",
-      "schedule": "Schedule",
       "impersonatedBy": "Impersoneret af {username}"
     },
     "elements": {
@@ -592,7 +522,6 @@
       },
       "dragAndDrop": {
         "item": {
-          "labelled": "{label} (position {position})",
           "unlabelled": "element på position {position}"
         },
         "announcement": {
@@ -608,8 +537,7 @@
         "title": "Rutekonfiguration",
         "label": {
           "route": "Rute",
-          "divider": "Skillelinje",
-          "redirect": "Redirect"
+          "divider": "Skillelinje"
         },
         "empty": "Ingen ruter konfigureret. Tilføj ruter, skillelinjer eller redirects nedenfor.",
         "unnamed": "(unavngivet)",
@@ -649,8 +577,7 @@
           "estimating": "Beregner forventet sluttid...",
           "estimated": "Forventet sluttid: {time}"
         },
-        "calculating": "ETA: Beregner...",
-        "calculated": "ETA: {time}"
+        "calculating": "ETA: Beregner..."
       },
       "container": {
         "alert": {
@@ -666,7 +593,6 @@
           "openInPopup": "Åbn i popup",
           "openInNewTab": "Åbn i ny fane",
           "theme": "Tema",
-          "themeAuto": "Auto",
           "themeDark": "Mørkt",
           "themeLight": "Lyst",
           "resetDeviceOverrides": "Nulstil enhedens overrides ({count})"
@@ -682,8 +608,6 @@
         "trigger": "Hurtige handlinger...",
         "placeholder": "Søg efter handlinger og sider...",
         "category": {
-          "navigation": "Navigation",
-          "power": "Power",
           "account": "Konto",
           "servers": "Servere",
           "users": "Brugere",
@@ -921,11 +845,7 @@
             "description": "Vælg en stærk adgangskode. Denne konto får fuld administrativ adgang til alle servere og indstillinger."
           },
           "form": {
-            "usernamePlaceholder": "admin",
             "email": "E-mailadresse",
-            "emailPlaceholder": "admin@example.com",
-            "firstNamePlaceholder": "Alan",
-            "lastNamePlaceholder": "Turing",
             "passwordPlaceholder": "Indtast en stærk adgangskode",
             "confirmPasswordPlaceholder": "Indtast adgangskoden igen"
           },
@@ -937,7 +857,6 @@
           "title": "Log ind igen",
           "alert": "Du blev logget ud under opsætningen. Log ind igen for at fortsætte, hvor du slap.",
           "form": {
-            "usernamePlaceholder": "admin",
             "passwordPlaceholder": "Indtast en stærk adgangskode"
           },
           "button": {
@@ -952,7 +871,6 @@
             "locationFlag": "Lokationsflag",
             "locationFlagPlaceholder": "Det bedste land",
             "backupName": "Navn på backup-konfiguration",
-            "backupNamePlaceholder": "Unicorn Cloud",
             "backupDisk": "Backup-disk",
             "backupDiskPlaceholder": "Backup-disk"
           },
@@ -966,8 +884,7 @@
           "form": {
             "namePlaceholder": "Min server",
             "urlDescription": "Bruges til intern kommunikation med noden.",
-            "publicUrlDescription": "bruges til websocket/downloads",
-            "ip": "IP"
+            "publicUrlDescription": "bruges til websocket/downloads"
           },
           "error": {
             "noLocations": "Noget gik galt. Der blev ikke fundet nogen lokationer."
@@ -993,7 +910,6 @@
           "title": "Applikationsindstillinger",
           "form": {
             "applicationName": "Applikationsnavn",
-            "applicationNamePlaceholder": "Calagopus",
             "applicationUrl": "Applikations-URL",
             "registration": "Aktivér registrering",
             "registrationDescription": "Tillad nye brugere at oprette deres egen konto.",
@@ -1023,15 +939,12 @@
           }
         },
         "server": {
-          "title": "Server",
           "existingServer": "Der er allerede oprettet en server. Du kan ændre indstillingerne senere i admin-menuen.",
           "egg": {
-            "title": "Egg",
             "description": "Lad os få din første server op at køre. Hvilket egg vil du bruge?",
             "nestDescription": "For at bruge dette egg skal du oprette et nest. Nests er samlinger af eggs. Giv det et navn:"
           },
           "server": {
-            "title": "Server",
             "nestDescription": "For at bruge dette egg skal du oprette et nest. Nests er samlinger af eggs. Giv det et navn:"
           },
           "error": {
@@ -1052,12 +965,9 @@
               "subtitle": "Panelindstillinger og præferencer konfigureret"
             },
             "eggRepositories": {
-              "title": "Egg-repositories",
-              "subtitle": "{count} repositories"
+              "title": "Egg-repositories"
             },
-            "location": "Lokation",
-            "node": "Node",
-            "server": "Server"
+            "location": "Lokation"
           },
           "badge": {
             "skipped": "Sprunget over"
@@ -1164,7 +1074,6 @@
           "subtitle": "Indtast dine oplysninger for at oprette en konto",
           "form": {
             "usernamePlaceholder": "Dit brugernavn",
-            "emailPlaceholder": "you@example.com",
             "firstNamePlaceholder": "Dit fornavn",
             "lastNamePlaceholder": "Dit efternavn",
             "passwordPlaceholder": "Indtast en stærk adgangskode"
@@ -1176,9 +1085,6 @@
         "forgotPassword": {
           "title": "Glemt adgangskode",
           "subtitle": "Indtast din e-mail for at modtage en vejledning til at nulstille din adgangskode",
-          "form": {
-            "emailPlaceholder": "you@example.com"
-          },
           "button": {
             "request": "Anmod om nulstilling af adgangskode"
           },
@@ -1309,9 +1215,6 @@
             "groupActions": "Gruppehandlinger"
           },
           "noServers": "Der blev ikke fundet nogen servere. Skal du tilføje en?"
-        },
-        "admin": {
-          "title": "Admin"
         },
         "account": {
           "title": "Konto",
@@ -1453,14 +1356,10 @@
               }
             },
             "avatar": {
-              "title": "Avatar",
               "toast": {
                 "updated": "Avatar opdateret.",
                 "removed": "Avatar fjernet.",
                 "loadFailed": "Kunne ikke indlæse billedforhåndsvisningen. Sørg for, at filen er et gyldigt billede."
-              },
-              "form": {
-                "avatar": "Avatar"
               }
             }
           }
@@ -1468,11 +1367,6 @@
         "securityKeys": {
           "title": "Sikkerhedsnøgler",
           "subtitle": "{current} af maksimalt {max} sikkerhedsnøgler oprettet.",
-          "table": {
-            "columns": {
-              "credentialId": "Credential ID"
-            }
-          },
           "tooltip": {
             "secureContextRequired": "En sikker kontekst (HTTPS) er påkrævet for at bruge sikkerhedsnøgler.",
             "limitReached": "Du er begrænset til {max} sikkerhedsnøgler.",
@@ -1705,7 +1599,7 @@
           "subtitle": "{current} af maksimalt {max} API-nøgler oprettet.",
           "button": {
             "apiDocumentation": "API-dokumentation",
-            "copyUuid": "Copy UUID"
+            "copyUuid": "Kopiér UUID"
           },
           "tooltip": {
             "limitReached": "Du er begrænset til {max} API-nøgler."
@@ -1797,11 +1691,8 @@
       "admin": {
         "categories": {
           "infrastructure": "Infrastruktur",
-          "eggs": "Nests & Eggs",
           "databases": "Databaser",
-          "storage": "Storage",
-          "access": "Brugere & adgang",
-          "system": "System"
+          "access": "Brugere & adgang"
         },
         "home": {
           "title": "Forside",
@@ -1820,7 +1711,6 @@
                 },
                 "system": {
                   "memoryUsage": "Hukommelsesforbrug ({process} brugt af panelet)",
-                  "memoryValue": "{used} / {total} ({percent}%)",
                   "kernelVersion": "Kernel-version ({architecture})",
                   "containerType": "Containertype",
                   "databaseVersion": "Databaseversion ({size})",
@@ -1840,7 +1730,6 @@
                   "users": "Brugere",
                   "servers": "Servere",
                   "locations": "Lokationer",
-                  "nodes": "Nodes",
                   "nestEggs": "Nest-eggs",
                   "databaseHosts": "Databasehosts",
                   "backupConfigurations": "Backup-konfigurationer",
@@ -1869,8 +1758,6 @@
                   "recheckComplete": "Tjek fuldført."
                 },
                 "selectHistory": "Vælg en opdateringshistorik for at se den.",
-                "historyPanel": "Panel",
-                "historyExtension": "Extension: {name}",
                 "extensionsUpToDate": "Alle extensions er opdaterede.",
                 "extensionsOutdated": "Nogle extensions er forældede eller gav fejl under tjek for opdateringer.",
                 "noChangelog": "Ingen changelog",
@@ -1879,7 +1766,6 @@
                 "databaseAgentHostsUpToDate": "Alle database agent hosts ser ud til at være opdaterede. ({failed} kunne ikke tjekkes)",
                 "databaseAgentHostsOutdated": "Nogle database agent hosts er forældede. Den nyeste tilgængelige version er `{latest}`. ({outdated} forældede, {failed} kunne ikke tjekkes)",
                 "table": {
-                  "version": "Version",
                   "installed": "Installeret",
                   "packageName": "Pakkenavn",
                   "latestVersion": "Nyeste version",
@@ -1898,7 +1784,6 @@
                   "debugMode": "Debug-tilstand"
                 },
                 "appliedMigrations": "Anvendte migreringer ({percent}%)",
-                "migrationsValue": "{applied} / {total}",
                 "avgNtpOffset": "Gns. NTP-forskydning",
                 "noExtensions": "Ingen extensions fundet.",
                 "nodesSynced": "Alle nodes ser ud til at have et synkroniseret ur (inden for 5 sekunder af panelets ur). ({failed} kunne ikke tjekkes)",
@@ -1910,9 +1795,7 @@
                   "packageName": "Pakkenavn",
                   "applied": "Anvendt",
                   "total": "I alt",
-                  "id": "ID",
-                  "desync": "Ude af sync",
-                  "appliedValue": "{applied} ({percent}%)"
+                  "desync": "Ude af sync"
                 },
                 "button": {
                   "enableDebug": "Aktivér debug-tilstand",
@@ -1936,7 +1819,6 @@
                 "form": {
                   "icon": "Ikon",
                   "iconLight": "Ikon (lyst tema)",
-                  "banner": "Banner",
                   "bannerLight": "Banner (lyst tema)",
                   "sessionCookie": "Session-cookie",
                   "sessionDurationSeconds": "Sessionsvarighed (sekunder)",
@@ -1958,7 +1840,6 @@
                     "email": "E-mail"
                   },
                   "twoFactorRequirement": {
-                    "admins": "Admins",
                     "allUsers": "Alle brugere",
                     "none": "Ingen"
                   }
@@ -1985,16 +1866,11 @@
               }
             },
             "storage": {
-              "title": "Storage",
               "page": {
                 "title": "Storage-indstillinger",
-                "form": {
-                  "driver": "Driver"
-                },
                 "enum": {
                   "driver": {
-                    "filesystem": "Filsystem",
-                    "s3": "S3"
+                    "filesystem": "Filsystem"
                   }
                 },
                 "toast": {
@@ -2021,20 +1897,16 @@
               }
             },
             "mail": {
-              "title": "Mail",
               "page": {
                 "title": "E-mailindstillinger",
                 "enum": {
                   "provider": {
                     "none": "Ingen",
-                    "smtp": "SMTP",
                     "sendmail": "Sendmail-kommando",
                     "filesystem": "Filsystem"
                   },
                   "tlsMode": {
-                    "none": "Ingen",
-                    "startTls": "STARTTLS",
-                    "implicitTls": "Implicit TLS"
+                    "none": "Ingen"
                   }
                 },
                 "toast": {
@@ -2069,13 +1941,11 @@
                 },
                 "alert": {
                   "syntaxBefore": "Skabeloner bruger",
-                  "syntaxLink": "MiniJinja",
                   "syntaxMiddle": "som skabelonsyntaks. Variabler refereres med",
                   "syntaxAnd": "og kontrolstrukturer som",
                   "syntaxOr": "og",
                   "syntaxAfter": "understøttes."
                 },
-                "empty": "Vælg en skabelon i sidebaren for at redigere den.",
                 "loadingTemplate": "Indlæser skabelon...",
                 "form": {
                   "subject": "Emne"
@@ -2093,16 +1963,10 @@
               }
             },
             "captcha": {
-              "title": "Captcha",
               "page": {
                 "title": "Captcha-indstillinger",
                 "toast": {
                   "updated": "Captcha-indstillinger opdateret."
-                },
-                "recaptcha": {
-                  "form": {
-                    "v3": "V3"
-                  }
                 }
               }
             },
@@ -2136,7 +2000,6 @@
               }
             },
             "server": {
-              "title": "Server",
               "page": {
                 "title": "Serverindstillinger",
                 "form": {
@@ -2217,18 +2080,17 @@
               "page": {
                 "title": "Rate limit-indstillinger",
                 "form": {
-                  "hits": "Hits",
                   "hitsDescription": "Maksimalt antal tilladte requests pr. vindue.",
                   "windowSeconds": "Vindue",
                   "windowSecondsDescription": "Vinduets varighed i sekunder."
                 },
                 "exemptions": {
-                  "title": "Exemptions",
+                  "title": "Undtagelser",
                   "form": {
-                    "exemptIps": "Exempt IPs",
-                    "exemptIpsDescription": "IP addresses or CIDR ranges that skip the client and remote ratelimits. Login and per-server limits still apply.",
-                    "exemptApiKeys": "Exempt API Keys",
-                    "exemptApiKeysDescription": "UUIDs of API keys that skip the client ratelimit. Users can copy the UUID from the context menu of their API keys. Deleted keys are removed automatically."
+                    "exemptIps": "Undtagne IP-adresser",
+                    "exemptIpsDescription": "IP-adresser eller CIDR-områder, der omgår klient- og fjern-hastighedsbegrænsninger. Grænser for login og pr. server gælder stadig.",
+                    "exemptApiKeys": "Undtagne API-nøgler",
+                    "exemptApiKeysDescription": "UUID'er på API-nøgler, der omgår klient-hastighedsbegrænsningen. Brugere kan kopiere UUID'et fra kontekstmenuen på deres API-nøgler. Slettede nøgler fjernes automatisk."
                   }
                 },
                 "toast": {
@@ -2259,7 +2121,6 @@
                   "enabledEnd": "Aktiv til",
                   "locations": "Lokationer",
                   "locationsDescription": "Lad feltet være tomt for at gælde for alle lokationer.",
-                  "nodes": "Nodes",
                   "nodesDescription": "Lad feltet være tomt for at gælde for alle nodes.",
                   "backupConfigurations": "Backup-konfigurationer",
                   "backupConfigurationsDescription": "Lad feltet være tomt for at gælde for alle backup-konfigurationer.",
@@ -2273,7 +2134,6 @@
           },
           "enum": {
             "announcementType": {
-              "info": "Info",
               "success": "Succes",
               "warning": "Advarsel",
               "error": "Fejl"
@@ -2281,10 +2141,8 @@
           }
         },
         "assets": {
-          "title": "Assets",
           "button": {
             "newDirectory": "Ny mappe",
-            "upload": "Upload",
             "copyLink": "Kopiér link"
           },
           "quickAction": {
@@ -2316,7 +2174,6 @@
           }
         },
         "extensions": {
-          "title": "Extensions",
           "unknownExtension": "Ukendt extension",
           "alert": {
             "noExtensions": "Ingen extensions installeret.",
@@ -2378,7 +2235,6 @@
             "disabled": "Deaktiveret"
           },
           "card": {
-            "version": "Version",
             "authors": "Forfattere"
           },
           "section": {
@@ -2448,7 +2304,6 @@
             }
           },
           "tooltip": {
-            "admin": "Admin",
             "twoFactorEnabled": "2FA aktiveret",
             "twoFactorDisabled": "2FA deaktiveret"
           },
@@ -2469,7 +2324,6 @@
                   "impersonate": "Impersonér"
                 },
                 "form": {
-                  "admin": "Admin",
                   "adminDescription": "Admin-brugere har fuld og ubegrænset adgang til alt på panelet.",
                   "frozen": "Fastfrosset",
                   "frozenDescription": "Fastfrosne brugere kan ikke ændre deres kontooplysninger.",
@@ -2555,9 +2409,6 @@
           "tabs": {
             "general": {
               "page": {
-                "form": {
-                  "flag": "Flag"
-                },
                 "modal": {
                   "delete": {
                     "title": "Bekræft sletning af lokation"
@@ -2587,7 +2438,6 @@
               }
             },
             "databaseAgentHosts": {
-              "title": "Database Agent Hosts",
               "page": {
                 "title": "Lokationens Database Agent Hosts",
                 "toast": {
@@ -2606,7 +2456,6 @@
               }
             },
             "nodes": {
-              "title": "Nodes",
               "page": {
                 "title": "Lokationens nodes"
               }
@@ -2614,8 +2463,6 @@
           }
         },
         "nodes": {
-          "title": "Nodes",
-          "resourceName": "Node",
           "tabs": {
             "overview": {
               "title": "Oversigt",
@@ -2715,7 +2562,6 @@
                 },
                 "alert": {
                   "couldNotReach": "Kunne ikke nå noden: {error}",
-                  "integratedNode": "This node runs inside the panel. Its identity, panel URL and API bind settings are rewritten every time the panel starts, so changes to those are not kept. Everything else you change here is.",
                   "tokenWarning": "Konfigurationen nedenfor indeholder nodens token. Vis den kun, når det er nødvendigt.",
                   "portMismatch": "Nodens URL peger på port {connectPort}, men denne konfiguration får wings til at lytte på port {apiPort}. Medmindre en reverse proxy videresender port {connectPort} til wings, kan panelet ikke nå noden.",
                   "verifyBackend": "Backend til Wings",
@@ -2744,7 +2590,6 @@
                 },
                 "label": {
                   "memory": "Hukommelse",
-                  "disk": "Disk",
                   "cpuThreads": "{model} ({threads} tråde)",
                   "usedByWings": "{size} brugt af Wings",
                   "networkIn": "Ind: {in}",
@@ -2775,7 +2620,6 @@
                 },
                 "label": {
                   "memory": "Hukommelse",
-                  "disk": "Disk",
                   "memoryOverhead": "Hukommelses-overhead",
                   "servers": "Servere",
                   "noLimit": "Ingen node-grænse",
@@ -2786,7 +2630,6 @@
               }
             },
             "logs": {
-              "title": "Logs",
               "page": {
                 "title": "Node-logs",
                 "form": {
@@ -2857,7 +2700,6 @@
               }
             },
             "mounts": {
-              "title": "Mounts",
               "page": {
                 "title": "Node-mounts",
                 "toast": {
@@ -2895,7 +2737,6 @@
               }
             },
             "databaseAgentHosts": {
-              "title": "Database Agent Hosts",
               "page": {
                 "title": "Nodens Database Agent Hosts",
                 "toast": {
@@ -2914,7 +2755,6 @@
               }
             },
             "backups": {
-              "title": "Backups",
               "page": {
                 "title": "Node-backups",
                 "input": {
@@ -3022,9 +2862,7 @@
                   "noCertificate": "Denne node har **ikke rapporteret et certifikat**, så ingen peer kan åbne en forbindelse til den. Genstart nodens tunnel-daemon for at tilmelde den igen."
                 },
                 "form": {
-                  "host": "Host",
                   "hostDescription": "Det hostname eller den IP, andre nodes forbinder til denne på. Slås op på forbindelsestidspunktet.",
-                  "port": "Port",
                   "portDescription": "Den UDP-port, noden lytter på for andre nodes. Skal kunne nås fra dem."
                 },
                 "section": {
@@ -3032,7 +2870,6 @@
                 },
                 "state": {
                   "title": "Nodens tilstand",
-                  "daemon": "Daemon",
                   "connected": "Forbundet",
                   "disconnected": "Afbrudt",
                   "unknown": "Ukendt",
@@ -3055,19 +2892,14 @@
                     "frozenFlows": "{count} flows frosset"
                   },
                   "column": {
-                    "peer": "Peer",
                     "role": "Rolle",
                     "address": "Adresse",
                     "path": "Sti",
                     "loss": "Tab",
                     "transferred": "Overført",
-                    "streams": "Streams",
-                    "flows": "Flows",
-                    "drops": "Drops",
                     "connected": "Forbundet"
                   },
                   "hint": {
-                    "rttMtu": "RTT / MTU",
                     "packetsEvents": "pakker / congestion",
                     "inOut": "ind / ud",
                     "openTotal": "åbne / i alt",
@@ -3075,7 +2907,6 @@
                     "datagrams": "datagrammer"
                   },
                   "value": {
-                    "path": "{rtt} ms / {mtu}",
                     "tcpOpen": "{count} TCP åbne",
                     "linkUp": "Oppe",
                     "linkDown": "Nede"
@@ -3142,7 +2973,6 @@
         },
         "servers": {
           "title": "Servere",
-          "resourceName": "Server",
           "quickAction": {
             "viewClient": "Vis server i klientområdet",
             "transfer": "Overfør server",
@@ -3163,7 +2993,6 @@
                 "title": "Server fundet",
                 "name": "Navn",
                 "owner": "Ejer",
-                "node": "Node",
                 "viewServer": "Vis server"
               },
               "notFound": "Ingen server fundet med det eksterne ID."
@@ -3184,30 +3013,21 @@
                 "label": {
                   "user": "Bruger",
                   "createdAt": "Oprettet",
-                  "node": "Node",
                   "memoryLimit": "Hukommelsesgrænse",
                   "diskLimit": "Diskgrænse",
                   "sftpAddress": "SFTP-adresse",
                   "none": "Ingen",
-                  "egg": "Egg",
                   "autoKill": "Auto-kill",
                   "memory": "Hukommelse",
-                  "disk": "Disk",
-                  "swap": "Swap",
                   "allocations": "Allokeringer",
                   "databases": "Databaser",
                   "databaseAgents": "Agent-databaser",
-                  "backups": "Backups",
-                  "schedules": "Schedules",
                   "unlimited": "Ubegrænset",
-                  "autoKillSeconds": "{seconds}s",
-                  "autoKillDisabled": "Deaktiveret",
-                  "uuid": "UUID"
+                  "autoKillDisabled": "Deaktiveret"
                 },
                 "badge": {
                   "suspended": "Suspenderet",
-                  "transferring": "Overføres",
-                  "admin": "Admin"
+                  "transferring": "Overføres"
                 }
               }
             },
@@ -3237,12 +3057,10 @@
                   "descriptionPlaceholder": "Serverbeskrivelse",
                   "owner": "Ejer",
                   "ownerCreateHint": "Kan du ikke finde dem? Opret en ny bruger",
-                  "egg": "Egg",
                   "backupConfigurationPlaceholder": "Nedarv fra node/lokation",
                   "cpuLimit": "CPU-grænse (%)",
                   "cpuLimitDescription": "CPU-grænsen i %, som serveren må bruge.",
                   "cpuLimitTooltip": "1 tråd = 100%. 0 sætter ingen grænse.",
-                  "swap": "Swap",
                   "swapDescription": "Mængden af swap, denne server får.",
                   "swapTooltip": "-1 sætter ingen grænse.",
                   "memoryDescription": "Hukommelsesgrænsen for servercontaineren.",
@@ -3272,9 +3090,7 @@
                   "kvmPassthroughEnabledDescription": "Aktivér KVM-passthrough for serveren (giver adgang til /dev/kvm inde i containeren).",
                   "allocationsLimit": "Allokeringer",
                   "databasesLimit": "Databaser",
-                  "databaseAgentsLimit": "Agent-databaser",
-                  "backupsLimit": "Backups",
-                  "schedulesLimit": "Schedules"
+                  "databaseAgentsLimit": "Agent-databaser"
                 },
                 "modal": {
                   "confirmNoAllocation": {
@@ -3333,7 +3149,6 @@
               }
             },
             "mounts": {
-              "title": "Mounts",
               "page": {
                 "title": "Server-mounts",
                 "toast": {
@@ -3352,7 +3167,6 @@
               }
             },
             "backups": {
-              "title": "Backups",
               "page": {
                 "title": "Server-backups",
                 "input": {
@@ -3372,7 +3186,6 @@
               }
             },
             "logs": {
-              "title": "Logs",
               "page": {
                 "title": "Server-logs",
                 "form": {
@@ -3475,8 +3288,6 @@
           }
         },
         "nests": {
-          "title": "Nests",
-          "resourceName": "Nest",
           "tabs": {
             "general": {
               "page": {
@@ -3493,10 +3304,7 @@
               }
             },
             "eggs": {
-              "title": "Eggs",
               "page": {
-                "title": "Eggs",
-                "resourceName": "Egg",
                 "dropzone": {
                   "title": "Slip filer her for at importere dem som eggs",
                   "subtitle": "Slip for at starte importen"
@@ -3525,7 +3333,6 @@
                   },
                   "updateUrl": {
                     "title": "Opdater egg fra URL",
-                    "url": "URL",
                     "urlDescription": "Direkte link til et eksporteret egg i JSON- eller YAML-format."
                   },
                   "move": {
@@ -3560,10 +3367,8 @@
                         "stopType": "Stoptype",
                         "stopCommand": "Stopkommando",
                         "stopSignal": "Stopsignal",
-                        "parser": "Parser",
                         "createNewFile": "Opret ny fil",
                         "createNewFileDescription": "Hvis aktiveret, oprettes filen, hvis den ikke findes. Hvis deaktiveret, skal filen allerede findes, ellers mislykkes erstatningen.",
-                        "match": "Match",
                         "ifValue": "Hvis værdi",
                         "insertNew": "Indsæt ny",
                         "insertNewDescription": "Hvis aktiveret, og ingen eksisterende værdi matcher \"Match\"-feltet, indsættes værdien fra \"Erstat med\" i filen. Hvis deaktiveret, og der ikke findes et match, ændres filen ikke.",
@@ -3573,8 +3378,6 @@
                         "forceOutgoingIp": "Tving udgående IP",
                         "separatePort": "Adskil IP og port",
                         "separatePortDescription": "Adskiller den primære IP og port på konsolsiden i stedet for at samle dem med \":\".",
-                        "features": "Features",
-                        "featurePlaceholder": "Feature",
                         "fileDenylist": "Deny-liste for filer",
                         "dockerImages": "Docker images"
                       },
@@ -3650,7 +3453,6 @@
                     }
                   },
                   "mounts": {
-                    "title": "Mounts",
                     "page": {
                       "title": "Egg-mounts",
                       "toast": {
@@ -3726,9 +3528,6 @@
                     "assignToVariablePlaceholder": "f.eks. SERVER_PORT",
                     "assignToVariableDescription": "Valgfri miljøvariabel, der modtager den tildelte primære port."
                   },
-                  "divider": {
-                    "deployment": "Deployment"
-                  },
                   "additionalPorts": {
                     "title": "Yderligere porte",
                     "button": "Tilføj regel",
@@ -3779,8 +3578,7 @@
                   "credentials": "Repository-loginoplysninger",
                   "credentialType": "Type af loginoplysninger",
                   "password": "Adgangskode eller access token",
-                  "privateKey": "Privat nøgle",
-                  "passphrase": "Passphrase"
+                  "privateKey": "Privat nøgle"
                 },
                 "enum": {
                   "credentialType": {
@@ -3803,7 +3601,6 @@
               }
             },
             "eggs": {
-              "title": "Eggs",
               "page": {
                 "title": "Eggs i egg-repository",
                 "table": {
@@ -3884,8 +3681,6 @@
           }
         },
         "databaseAgentHosts": {
-          "title": "Database Agent Hosts",
-          "resourceName": "Database Agent Host",
           "tabs": {
             "general": {
               "page": {
@@ -4008,9 +3803,7 @@
                 },
                 "label": {
                   "createdAt": "Oprettet",
-                  "version": "Version",
                   "memory": "Hukommelse",
-                  "disk": "Disk",
                   "instances": "Instanser",
                   "kernelVersion": "Kernel-version",
                   "architecture": "Arkitektur",
@@ -4035,7 +3828,6 @@
                   "cpuThreads": "{model} ({threads} tråde)",
                   "memory": "Hukommelse",
                   "usedByAgent": "{size} brugt af agenten",
-                  "disk": "Disk",
                   "networkIn": "Ind: {in}",
                   "networkOut": "Ud: {out}"
                 },
@@ -4087,18 +3879,15 @@
                 "toast": {
                   "exported": "Database Agent-skabelon eksporteret."
                 },
-                "version": "Version {version}",
                 "form": {
                   "dockerImages": "Docker images",
                   "env": "Miljøvariabler",
-                  "volumes": "Volumes",
                   "socketPath": "Socket-sti",
                   "socketPathDescription": "Stien til unix-socket-filen inde i databasecontaineren. Skal matche det sted, hvor det konfigurerede image faktisk opretter sin socket.",
                   "imageUid": "Image-UID",
                   "imageGid": "Image-GID",
                   "memoryDescription": "Hukommelsesgrænsen for databasecontaineren.",
                   "memoryTooltip": "0 sætter ingen grænse.",
-                  "swap": "Swap",
                   "swapDescription": "Mængden af swap, denne database får.",
                   "swapTooltip": "-1 sætter ingen grænse.",
                   "diskDescription": "Databasens diskgrænse.",
@@ -4177,7 +3966,6 @@
                   "infoUrl": "Info-URL",
                   "basicAuth": "Basic auth",
                   "basicAuthDescription": "Bruger HTTP Basic Authentication til at sende client ID og secret. Ikke almindeligt længere.",
-                  "scopes": "Scopes",
                   "scopesDescription": "De OAuth2-scopes, der anmodes om. Sørg for at inkludere scopes til e-mail og profiloplysninger, når det er nødvendigt.",
                   "identifierPath": "Identifikator-sti",
                   "identifierPathDescription": "Stien, der bruges til at udtrække brugerens unikke identifikator fra svaret fra Info-URL'en (https://serdejsonpath.live).",
@@ -4209,14 +3997,8 @@
               }
             },
             "mappings": {
-              "title": "Mappings",
               "page": {
                 "title": "Mappings for OAuth-udbyder",
-                "table": {
-                  "columns": {
-                    "matcher": "Matcher"
-                  }
-                },
                 "enum": {
                   "mappingType": {
                     "role": "Rolle",
@@ -4249,10 +4031,8 @@
                   "mustNotMatch": "Matcheren må ikke matche:"
                 },
                 "form": {
-                  "matcher": "Matcher",
                   "matcherDescription": "Afgør, om denne mapping gælder for en bruger, der logger ind med denne udbyder.",
                   "matcherType": "Matcher-type",
-                  "scopes": "Scopes",
                   "scopesDescription": "OAuth-scopes, der alle skal være tildelt, for at denne matcher matcher.",
                   "path": "Feltsti",
                   "pathDescription": "Stien, der bruges til at udtrække det sammenlignede felt fra svaret fra Info-URL'en (https://serdejsonpath.live).",
@@ -4315,11 +4095,6 @@
         "backupConfigurations": {
           "title": "Backup-konfigurationer",
           "resourceName": "Backup-konfiguration",
-          "table": {
-            "columns": {
-              "disk": "Disk"
-            }
-          },
           "tabs": {
             "general": {
               "page": {
@@ -4353,12 +4128,10 @@
                 "restic": {
                   "title": "Restic-indstillinger",
                   "form": {
-                    "repository": "Repository",
                     "retryLockSeconds": "Sekunder mellem lock-forsøg",
                     "environmentVariables": "Miljøvariabler",
                     "cronSchedule": "Cron-schedule",
                     "cronScheduleDescription": "Format: sekund minut time dag måned ugedag.",
-                    "nodes": "Nodes",
                     "nodesPlaceholder": "Vælg nodes"
                   },
                   "pruneJobs": {
@@ -4373,8 +4146,6 @@
                   "title": "Proxmox Backup Server-indstillinger",
                   "form": {
                     "url": "Server-URL",
-                    "datastore": "Datastore",
-                    "namespace": "Namespace",
                     "tokenId": "Token-ID",
                     "tokenSecret": "Token secret",
                     "fingerprint": "TLS-certifikatfingeraftryk",
@@ -4421,7 +4192,6 @@
               }
             },
             "backups": {
-              "title": "Backups",
               "page": {
                 "title": "Backup-konfigurationens backups",
                 "toast": {
@@ -4436,7 +4206,6 @@
               }
             },
             "nodes": {
-              "title": "Nodes",
               "page": {
                 "title": "Backup-konfigurationens nodes"
               }
@@ -4455,15 +4224,8 @@
           "badge": {
             "runPending": "Kørsel afventer"
           },
-          "table": {
-            "columns": {
-              "cron": "Schedule",
-              "backups": "Backups"
-            }
-          },
           "form": {
             "backupConfigurationPlaceholder": "Nedarv fra server",
-            "cron": "Schedule",
             "cronDescription": "Cron-udtryk (med sekunder), der bestemmer, hvornår der tages backups, i UTC.",
             "parallelism": "Parallelitet",
             "parallelismDescription": "Maksimalt antal backups, denne politik kører samtidig på en enkelt node.",
@@ -4499,7 +4261,6 @@
               }
             },
             "backups": {
-              "title": "Backups",
               "page": {
                 "title": "Systembackup-politikkens backups",
                 "toast": {
@@ -4527,7 +4288,6 @@
               }
             },
             "nodes": {
-              "title": "Nodes",
               "page": {
                 "title": "Systembackup-politikkens nodes",
                 "toast": {
@@ -4567,8 +4327,6 @@
           }
         },
         "mounts": {
-          "title": "Mounts",
-          "resourceName": "Mount",
           "tabs": {
             "general": {
               "page": {
@@ -4586,7 +4344,6 @@
               }
             },
             "eggs": {
-              "title": "Eggs",
               "page": {
                 "title": "Mountets eggs",
                 "toast": {
@@ -4595,10 +4352,7 @@
                 },
                 "modal": {
                   "add": {
-                    "title": "Føj egg til mount",
-                    "form": {
-                      "egg": "Egg"
-                    }
+                    "title": "Føj egg til mount"
                   },
                   "remove": {
                     "title": "Bekræft fjernelse af egg fra mount",
@@ -4608,7 +4362,6 @@
               }
             },
             "nodes": {
-              "title": "Nodes",
               "page": {
                 "title": "Mountets nodes",
                 "toast": {
@@ -4777,7 +4530,6 @@
           },
           "details": {
             "address": "Adresse",
-            "port": "Port",
             "networkIn": "Netværk (ind)",
             "networkOut": "Netværk (ud)",
             "normalizeCpuLoad": "Normalisér CPU-belastning (skaleret til maks. 100%)"
@@ -4806,17 +4558,6 @@
             "list": "Liste",
             "tree": "Træ"
           },
-          "searchPreview": {
-            "expand": "Expand content preview for {file}",
-            "collapse": "Collapse content preview for {file}",
-            "lines": "Lines {start}-{end}",
-            "loading": "Loading preview...",
-            "empty": "Empty file",
-            "unavailable": "Preview unavailable",
-            "noContext": "Match found, preview unavailable",
-            "moreMatches": "More matches not shown",
-            "restricted": "Content permission required"
-          },
           "tree": {
             "empty": "Denne mappe er tom",
             "loadMore": "Indlæs flere",
@@ -4826,7 +4567,6 @@
             "hide": "Skjul filtræ",
             "searchPlaceholder": "Søg efter filer...",
             "noSearchResults": "Ingen matchende filer",
-            "upload": "Upload",
             "uploadFromComputer": "Upload fra computer",
             "uploadFromUrl": "Upload fra URL",
             "selectItem": "Vælg {name}",
@@ -4856,8 +4596,6 @@
           "button": {
             "new": "Ny",
             "connect": "Forbind",
-            "connectSftp": "via SFTP",
-            "connectVscode": "via VS Code",
             "openInNewWindow": "Åbn i nyt vindue",
             "rename": "Omdøb",
             "copy": "Kopiér",
@@ -4871,7 +4609,6 @@
             "exitBackup": "Forlad backup",
             "fileFromEditor": "Fil fra editor",
             "directory": "Mappe",
-            "symlink": "Symlink",
             "fileFromPull": "Fil fra URL",
             "fileFromUpload": "Fil fra upload",
             "directoryFromUpload": "Mappe fra upload",
@@ -4916,9 +4653,7 @@
             "query": "Søgning:",
             "excluded": "Ekskluderet:",
             "content": "Indhold:",
-            "size": "Størrelse:",
-            "min": "Min.:",
-            "max": "Maks.:"
+            "size": "Størrelse:"
           },
           "operations": {
             "compressing": "Komprimerer {files} fra {path}",
@@ -4996,7 +4731,6 @@
             "back": "{seconds} sekunder tilbage",
             "forward": "{seconds} sekunder frem",
             "play": "Afspil",
-            "pause": "Pause",
             "mute": "Slå lyd fra",
             "unmute": "Slå lyd til",
             "playbackRate": "Afspilningshastighed"
@@ -5015,7 +4749,6 @@
                 "compareToPrevious": "Sammenlign med forrige revision"
               },
               "diff": {
-                "original": "Revision",
                 "current": "Nuværende"
               }
             }
@@ -5047,9 +4780,6 @@
             },
             "createArchive": {
               "title": "Opret arkiv",
-              "form": {
-                "format": "Format"
-              },
               "createdAs": "Dette arkiv bliver oprettet som "
             },
             "createDirectory": {
@@ -5071,7 +4801,6 @@
               "title": "Løs kopieringskonflikter",
               "description": "Følgende {files} findes allerede på destinationen.",
               "source": "Kilde",
-              "destination": "Destination",
               "skip": "Spring over",
               "overwrite": "Overskriv",
               "rename": "Omdøb",
@@ -5108,7 +4837,6 @@
             "details": {
               "title": "Fildetaljer",
               "path": "Sti",
-              "mode": "Mode",
               "logicalSize": "Logisk størrelse",
               "physicalSize": "Fysisk størrelse",
               "mimeType": "MIME-type",
@@ -5135,7 +4863,6 @@
             },
             "massRename": {
               "title": "Omdøb filer",
-              "find": "Find",
               "findPlaceholder": "Tekst, der skal findes",
               "replacePlaceholder": "Erstatningstekst",
               "scope": "Anvend på",
@@ -5176,7 +4903,6 @@
               },
               "preview": {
                 "title": "Forhåndsvisning",
-                "original": "Original",
                 "unchanged": "Uændret",
                 "conflict": "Navnet er allerede i brug",
                 "duplicate": "Samme målnavn",
@@ -5207,14 +4933,12 @@
               "includeOversized": "Inkludér for store filer",
               "includeOversizedDescription": "Inkluderer filer, der matcher de andre filtre, men er for store til at søge i.",
               "fileSize": "Filstørrelse",
-              "minimum": "Minimum",
               "maximum": "Maksimum"
             },
             "pullFile": {
               "title": "Hent fil fra URL",
               "form": {
-                "fileUrl": "Fil-URL",
-                "query": "Query"
+                "fileUrl": "Fil-URL"
               },
               "createdAs": "Denne fil bliver oprettet som ",
               "pull": "Hent"
@@ -5263,7 +4987,6 @@
               "tableName": "Tabelnavn",
               "columnsList": "Kolonner",
               "columnName": "Kolonnenavn",
-              "nullable": "Nullable",
               "primaryKey": "Primærnøgle",
               "autoIncrement": "Auto increment"
             },
@@ -5275,8 +4998,7 @@
             "notFound": "Denne database findes ikke på instansen.",
             "tabs": {
               "rows": "Rækker",
-              "structure": "Struktur",
-              "query": "Query"
+              "structure": "Struktur"
             },
             "modal": {
               "deleteRows": {
@@ -5331,11 +5053,7 @@
               "noMatches": "Ingen tabeller matcher din søgning.",
               "noMatchesTruncated": "Ingen tabeller matcher din søgning. Kun de første {tables} tabeller blev indlæst, så resten kan ikke søges i.",
               "truncated": "Denne database har for mange tabeller til at blive indlæst. Kun de første {tables} vises.",
-              "tableBeyondLimit": "Denne tabel ligger uden for de første {tables} tabeller, som er alt, denne database kan indlæse.",
-              "rowEstimate": "~{rows}",
-              "badge": {
-                "view": "View"
-              }
+              "tableBeyondLimit": "Denne tabel ligger uden for de første {tables} tabeller, som er alt, denne database kan indlæse."
             },
             "rows": {
               "noTable": "Vælg en tabel for at gennemse dens rækker.",
@@ -5346,9 +5064,7 @@
               }
             },
             "filter": {
-              "add": "Filter",
               "column": "Kolonne",
-              "operator": "Operator",
               "value": "Værdi",
               "apply": "Anvend"
             },
@@ -5369,7 +5085,6 @@
             },
             "table": {
               "columns": {
-                "nullable": "Nullable",
                 "key": "Nøgle",
                 "default": "Standard",
                 "attributes": "Attributter"
@@ -5377,13 +5092,11 @@
             },
             "badge": {
               "primaryKey": "Primær",
-              "autoIncrement": "auto_increment",
               "generated": "Genereret",
               "binary": "Binær"
             },
             "query": {
               "placeholder": "Kør et statement for at se resultatet her.",
-              "statement": "Statement {index}",
               "form": {
                 "rowLimit": "Rækkegrænse",
                 "readOnlyDescription": "Afviser statements, der ændrer data eller struktur."
@@ -5395,7 +5108,6 @@
             },
             "cell": {
               "setNull": "Sæt til NULL",
-              "null": "NULL",
               "empty": "tom",
               "truncated": "Denne værdi var for stor til at blive indlæst i sin helhed og kan ikke redigeres.",
               "editorHint": "{enter} anvender værdien, {shiftEnter} indsætter en ny linje."
@@ -5413,9 +5125,7 @@
             "view": {
               "tabs": {
                 "databases": "Databaser",
-                "users": "Brugere",
-                "backups": "Backups",
-                "logs": "Logs"
+                "users": "Brugere"
               },
               "stats": {
                 "offline": "Instansen er offline"
@@ -5472,11 +5182,6 @@
                 "recreateDatabase": {
                   "title": "Bekræft genoprettelse af database",
                   "content": "Genoprettelse af en database sletter permanent alle data i databasen **{name}** og opretter en ny, tom database med samme navn og brugeradgang."
-                }
-              },
-              "table": {
-                "columns": {
-                  "database": "Database"
                 }
               },
               "toast": {
@@ -5569,7 +5274,6 @@
               }
             },
             "backups": {
-              "title": "Backups",
               "subtitle": "{current} af maksimalt {max} backups oprettet på denne server, delt med server-backups.",
               "badge": {
                 "restoring": "Gendanner backup"
@@ -5632,7 +5336,6 @@
               "credentials": {
                 "title": "Databaseloginoplysninger",
                 "form": {
-                  "database": "Database",
                   "databaseHint": "Den database, connection stringen nedenfor peger på.",
                   "jdbcConnectionString": "JDBC connection string"
                 }
@@ -5696,7 +5399,6 @@
           }
         },
         "schedules": {
-          "title": "Schedules",
           "subtitle": "{current} af maksimalt {max} schedules oprettet.",
           "dropzone": {
             "title": "Slip filer her for at importere dem som schedules",
@@ -5810,8 +5512,7 @@
             },
             "tabs": {
               "actions": "Handlinger",
-              "conditions": "Betingelser",
-              "triggers": "Triggers"
+              "conditions": "Betingelser"
             },
             "sections": {
               "actions": "Schedule-handlinger",
@@ -5833,8 +5534,6 @@
           },
           "form": {
             "scheduleName": "Schedule-navn",
-            "triggersList": "Triggers",
-            "triggerNumber": "Trigger {number}",
             "actionType": "Handlingstype",
             "conditionType": "Betingelsestype",
             "serverState": "Servertilstand",
@@ -5862,7 +5561,6 @@
               "empty": "Ingen betingelser tilføjet endnu.",
               "serverState": "Servertilstand er {state}",
               "uptime": "Oppetid {comparator} {value}",
-              "resourceUsage": "{metric} {comparator} {value}",
               "fileExists": "Filen {file} findes",
               "variableExists": "Variablen {variable} er sat",
               "equals": "Variablen {variable} er lig med {value}",
@@ -5935,7 +5633,6 @@
             "scheduleCompletion": {
               "title": "Schedule fuldført",
               "form": {
-                "schedule": "Schedule",
                 "completionStatus": "Fuldførelsesstatus"
               },
               "card": {
@@ -5958,7 +5655,6 @@
               }
             },
             "crash": {
-              "title": "Crash",
               "card": {
                 "content": "Når serveren crasher."
               }
@@ -5972,7 +5668,6 @@
             "sourceDatabaseInstance": "Kun fra managed database: {uuid}",
             "sourceDatabaseInstanceAny": "Kun fra managed database: Enhver",
             "backupSelector": {
-              "compact": "Backup {backup}",
               "compactLatest": "Den nyeste backup",
               "compactOldest": "Den ældste backup"
             }
@@ -5987,14 +5682,11 @@
               "orphanBranch": "Der er et \"Else\"-, \"Else If\"- eller \"End If\"-step uden et matchende \"If\" før det."
             },
             "groups": {
-              "server": "Server",
-              "backups": "Backups",
               "files": "Filer",
               "startup": "Opstartsindstillinger",
               "advanced": "Avanceret logik"
             },
             "sleep": {
-              "title": "Sleep",
               "description": "Vent et bestemt stykke tid, før den næste handling fortsætter.",
               "form": {
                 "duration": "Varighed (millisekunder)"
@@ -6004,42 +5696,36 @@
               }
             },
             "ensure": {
-              "title": "Ensure",
               "description": "Stop schedulet her, medmindre en betingelse er sand.",
               "renderer": {
                 "compact": "Sikr, at en betingelse matcher"
               }
             },
             "if": {
-              "title": "If",
               "description": "Kør kun de følgende steps, når en betingelse er sand, indtil Else/End If. Et matchende End If tilføjes automatisk.",
               "renderer": {
                 "compact": "Hvis en betingelse matcher"
               }
             },
             "elseIf": {
-              "title": "Else If",
               "description": "Kør de følgende steps, når ingen tidligere gren kørte, og en betingelse er sand.",
               "renderer": {
                 "compact": "Ellers hvis en betingelse matcher"
               }
             },
             "else": {
-              "title": "Else",
               "description": "Kør de følgende steps, når ingen tidligere gren i If-blokken kørte.",
               "renderer": {
                 "compact": "Ellers"
               }
             },
             "endIf": {
-              "title": "End If",
               "description": "Afslut den aktuelle If-blok.",
               "renderer": {
                 "compact": "Slut på If-blokken"
               }
             },
             "exit": {
-              "title": "Exit",
               "description": "Stop schedulet her, og markér kørslen som vellykket eller mislykket.",
               "form": {
                 "successful": "Markér kørslen som vellykket"
@@ -6059,7 +5745,6 @@
               }
             },
             "format": {
-              "title": "Format",
               "description": "Byg en tekstværdi ud fra variabler, og gem den i en variabel.",
               "form": {
                 "formatString": "Formatstreng",
@@ -6072,12 +5757,6 @@
             "matchRegex": {
               "title": "Match regex",
               "description": "Udtræk dele af en tekstværdi med et regulært udtryk.",
-              "form": {
-                "input": "Input",
-                "regex": "Regex",
-                "outputs": "Outputs",
-                "outputNumber": "Output {number}"
-              },
               "renderer": {
                 "compact": "Match {input} med regex {regex}"
               }
@@ -6092,8 +5771,7 @@
                 "compact": "Vent {timeout} på en konsollinje, der indeholder {contains}",
                 "detail": {
                   "lineContains": "Linjen skal indeholde: {contains}",
-                  "caseInsensitive": "Ignorér store/små bogstaver: {value}",
-                  "timeout": "Timeout: {timeout}"
+                  "caseInsensitive": "Ignorér store/små bogstaver: {value}"
                 }
               }
             },
@@ -6311,9 +5989,7 @@
               "renderer": {
                 "compact": "Komprimér {files} i {root} til {name}",
                 "detail": {
-                  "output": "Output: {name}",
                   "root": "Rod: {root}",
-                  "format": "Format: {format}",
                   "files": "Filer: {files}"
                 }
               }
@@ -6342,7 +6018,6 @@
               "renderer": {
                 "compact": "Hent {url} til {root}",
                 "detail": {
-                  "url": "URL: {url}",
                   "root": "Rod: {root}",
                   "fileName": "Filnavn: {fileName}",
                   "useHeader": "Brug filnavnet fra svaret: {value}"
@@ -6374,10 +6049,7 @@
               "title": "Opdater Docker image",
               "description": "Ændr det Docker image, serveren kører i.",
               "renderer": {
-                "compact": "Sæt til {image}",
-                "detail": {
-                  "image": "Image: {image}"
-                }
+                "compact": "Sæt til {image}"
               }
             },
             "httpRequest": {
@@ -6385,10 +6057,8 @@
               "description": "Send en HTTP-request, f.eks. til en webhook.",
               "form": {
                 "method": "Metode",
-                "headers": "Headers",
                 "headerName": "Header-navn",
                 "headerValue": "Header-værdi",
-                "body": "Body",
                 "timeout": "Timeout (millisekunder)",
                 "ignoreErrorStatus": "Ignorér fejl-statuskoder",
                 "outputStatusInto": "Output statuskode til",
@@ -6397,10 +6067,6 @@
               "renderer": {
                 "compact": "Send {method} til {url}",
                 "detail": {
-                  "request": "Request: {method} {url}",
-                  "headers": "Headers: {headers}",
-                  "body": "Body: {body}",
-                  "timeout": "Timeout: {timeout}",
                   "outputStatusInto": "Statuskode til: {variable}",
                   "outputBodyInto": "Response body til: {variable}",
                   "ignoreErrorStatus": "Ignorér fejl-statuskoder: {value}"
@@ -6451,7 +6117,6 @@
           }
         },
         "backups": {
-          "title": "Backups",
           "subtitle": "{current} af maksimalt {max} backups oprettet.",
           "subtitleWithDatabase": "{current} af maksimalt {max} backups oprettet ({server} server, {database} database).",
           "tooltip": {
@@ -6526,9 +6191,6 @@
           "badge": {
             "allLocked": "Alle låst"
           },
-          "form": {
-            "noRetentionDescription": "With no retention set, this group is just a label and never deletes successful backups automatically."
-          },
           "modal": {
             "createGroup": {
               "title": "Opret backup-gruppe"
@@ -6562,12 +6224,6 @@
           "tooltip": {
             "limitReached": "Denne server er begrænset til {max} allokeringer."
           },
-          "table": {
-            "columns": {
-              "hostname": "Hostname",
-              "port": "Port"
-            }
-          },
           "toast": {
             "created": "Allokering oprettet.",
             "updated": "Allokering opdateret.",
@@ -6583,7 +6239,6 @@
           }
         },
         "firewall": {
-          "title": "Firewall",
           "subtitle": "Reglerne tjekkes fra top til bund. Den første, der matcher, afgør.",
           "empty": {
             "title": "Ingen firewall-regler",
@@ -6600,12 +6255,10 @@
           },
           "rule": {
             "anySource": "enhver kilde",
-            "anyProtocol": "TCP & UDP",
             "allAllocations": "alle allokeringer",
             "sourceFile": "filen {file}",
             "summary": "{protocols} fra {sources} til {ports}",
             "moreSources": "+{count} flere",
-            "position": "#{position}",
             "badge": {
               "shadowed": "Matcher aldrig"
             },
@@ -6628,7 +6281,6 @@
             "action": "Handling",
             "protocols": "Protokoller",
             "protocolsDescription": "Lad feltet være tomt for at matche både TCP og UDP.",
-            "anyProtocol": "TCP & UDP",
             "sources": "Kilder",
             "sourcesDescription": "IP-adresser eller netværk som 10.0.0.0/8. Et netværk skal have sine host-bits sat til nul. Lad feltet være tomt for at matche enhver kilde.",
             "sourceFile": "Kildefil",
@@ -6727,12 +6379,9 @@
             "bypassesFirewall": "Private forbindelser går ikke gennem denne servers firewall-regler: forbindelsen i sig selv er adgangstilladelsen. Hver forbindelse virker kun i én retning, så en server, denne når, kan ikke nå tilbage, medmindre det gives særskilt."
           },
           "form": {
-            "name": "Hostname",
             "nameDescription": "Små bogstaver, cifre og bindestreger, op til 63 tegn. En server kan ikke nå to servere med samme hostname.",
             "namePlaceholder": "Lad feltet være tomt for at udlede et fra servernavnet",
-            "port": "Port",
             "protocols": "Protokoller",
-            "server": "Server",
             "serverDescription": "Kun servere, der allerede er på det private netværk, vises."
           },
           "toast": {
@@ -6805,7 +6454,6 @@
           "predefinedStartupCommands": "Foruddefinerede opstartskommandoer"
         },
         "mounts": {
-          "title": "Mounts",
           "table": {
             "columns": {
               "mounted": "Mountet"
@@ -6837,7 +6485,6 @@
           "debugInformation": {
             "title": "Debug-oplysninger",
             "form": {
-              "nodeName": "Node (UUID)",
               "locationName": "Lokation (UUID)",
               "serverUuid": "Server-UUID"
             }
