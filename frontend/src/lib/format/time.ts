@@ -13,6 +13,27 @@ function getRelativeTimeFormatter(): Intl.RelativeTimeFormat {
   return relativeTimeFormatter;
 }
 
+export function formatNanoseconds(nanoseconds: number, decimals = 2): string {
+  const [value, unit]: [number, string] =
+    nanoseconds < 1_000
+      ? [nanoseconds, 'nanosecond']
+      : nanoseconds < 1_000_000
+        ? [nanoseconds / 1_000, 'microsecond']
+        : nanoseconds < 1_000_000_000
+          ? [nanoseconds / 1_000_000, 'millisecond']
+          : [nanoseconds / 1_000_000_000, 'second'];
+
+  const fractionDigits = unit === 'nanosecond' ? 0 : decimals;
+
+  return new Intl.NumberFormat(getTranslations().language, {
+    style: 'unit',
+    unit,
+    unitDisplay: 'short',
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
+}
+
 export function formatMilliseconds(uptime: number, short = true, withSeconds = true) {
   const uptimeSeconds = Math.floor(uptime / 1000);
 

@@ -2,6 +2,11 @@ import { z } from 'zod';
 import { axiosInstance } from '@/api/axios.ts';
 import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 
+const cacheBucketSchema = z.object({
+  calls: z.number(),
+  averageLatencyNs: z.number(),
+});
+
 const adminSystemOverviewSchema = z.object({
   version: z.string(),
   containerType: z.string(),
@@ -23,8 +28,12 @@ const adminSystemOverviewSchema = z.object({
     totalCalls: z.number(),
     totalHits: z.number(),
     totalMisses: z.number(),
-    averageCallLatencyNs: z.number(),
+    averageHitLatencyNs: z.number(),
+    averageMissLatencyNs: z.number(),
     maxCallLatencyNs: z.number(),
+    localHits: cacheBucketSchema,
+    remoteHits: cacheBucketSchema,
+    coalescedWaits: cacheBucketSchema,
   }),
   database: z.object({
     version: z.string(),

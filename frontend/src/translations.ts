@@ -1757,7 +1757,17 @@ const baseTranslations = defineTranslations({
                   cacheCalls: 'Cache Calls',
                   cacheHits: 'Cache Hits ({percent}%)',
                   cacheMisses: 'Cache Misses ({percent}%)',
-                  avgCachedCallLatency: 'Avg. Cached Call Latency',
+                  cacheAverageLatency: 'avg. {latency}',
+                  slowestCachedCall: 'Slowest Cached Call',
+                  cacheBreakdown: {
+                    title: 'Call Breakdown',
+                    calls: 'Calls',
+                    averageLatency: 'Avg. Latency',
+                    localHits: 'Memory hit',
+                    remoteHits: 'Redis hit',
+                    coalescedWaits: 'Waited on another call',
+                    misses: 'Computed',
+                  },
                 },
                 containerType: {
                   none: 'None detected',

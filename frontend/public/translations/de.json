@@ -1830,7 +1830,17 @@
                   "cacheCalls": "Cache-Aufrufe",
                   "cacheHits": "Cache-Treffer ({percent}%)",
                   "cacheMisses": "Cache-Fehlversuche ({percent}%)",
-                  "avgCachedCallLatency": "Durchschnittliche Cache-Aufruflatenz"
+                  "cacheAverageLatency": "\u00d8 {latency}",
+                  "slowestCachedCall": "Langsamster Cache-Aufruf",
+                  "cacheBreakdown": {
+                    "title": "Aufrufaufschl\u00fcsselung",
+                    "calls": "Aufrufe",
+                    "averageLatency": "\u00d8 Latenz",
+                    "localHits": "Treffer im Arbeitsspeicher",
+                    "remoteHits": "Treffer in Redis",
+                    "coalescedWaits": "Auf anderen Aufruf gewartet",
+                    "misses": "Berechnet"
+                  }
                 },
                 "containerType": {
                   "none": "Keine erkannt",

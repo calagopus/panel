@@ -18,6 +18,7 @@ export default function StatCard({
   className,
   copyOnClick,
   popover,
+  popoverIcon = faCog,
   limit,
   details,
   progress,
@@ -31,6 +32,7 @@ export default function StatCard({
   className?: string;
   copyOnClick?: boolean;
   popover?: ReactNode;
+  popoverIcon?: IconDefinition;
   limit?: string | null;
   details?: string | null;
   progress?: number | null;
@@ -54,7 +56,7 @@ export default function StatCard({
               <Popover position='bottom' withArrow shadow='md'>
                 <Popover.Target>
                   <Button variant='transparent' size='compact-xs'>
-                    <FontAwesomeIcon size='lg' icon={faCog} />
+                    <FontAwesomeIcon size='lg' icon={popoverIcon} />
                   </Button>
                 </Popover.Target>
                 <Popover.Dropdown>{popover}</Popover.Dropdown>

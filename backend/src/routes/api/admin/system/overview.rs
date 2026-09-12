@@ -5,6 +5,7 @@ mod get {
     use serde::Serialize;
     use shared::{
         GetState,
+        cache::CacheBucketStats,
         models::user::GetPermissionManager,
         response::{ApiResponse, ApiResponseResult},
     };
@@ -29,13 +30,36 @@ mod get {
     }
 
     #[derive(ToSchema, Serialize)]
+    struct ResponseCacheBucket {
+        calls: u64,
+        average_latency_ns: u64,
+    }
+
+    impl From<CacheBucketStats> for ResponseCacheBucket {
+        fn from(stats: CacheBucketStats) -> Self {
+            Self {
+                calls: stats.calls,
+                average_latency_ns: stats.average_latency_ns(),
+            }
+        }
+    }
+
+    #[derive(ToSchema, Serialize)]
     struct ResponseCache {
         version: compact_str::CompactString,
         total_calls: u64,
         total_hits: u64,
         total_misses: u64,
-        average_call_latency_ns: u64,
+        average_hit_latency_ns: u64,
+        average_miss_latency_ns: u64,
         max_call_latency_ns: u64,
+
+        #[schema(inline)]
+        local_hits: ResponseCacheBucket,
+        #[schema(inline)]
+        remote_hits: ResponseCacheBucket,
+        #[schema(inline)]
+        coalesced_waits: ResponseCacheBucket,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -90,6 +114,8 @@ mod get {
         }
 
         let cpu = &sys.cpus()[0];
+        let cache_stats = state.cache.stats();
+        let cache_hits = cache_stats.hits();
 
         ApiResponse::new_serialized(Response {
             version: &state.version,
@@ -113,11 +139,15 @@ mod get {
                     .version()
                     .await
                     .unwrap_or_else(|_| "unknown".into()),
-                total_calls: state.cache.cache_calls(),
-                total_hits: state.cache.cache_calls() - state.cache.cache_misses(),
-                total_misses: state.cache.cache_misses(),
-                average_call_latency_ns: state.cache.cache_latency_ns_average(),
-                max_call_latency_ns: state.cache.cache_latency_ns_max(),
+                total_calls: cache_stats.total_calls(),
+                total_hits: cache_hits.calls,
+                total_misses: cache_stats.misses.calls,
+                average_hit_latency_ns: cache_hits.average_latency_ns(),
+                average_miss_latency_ns: cache_stats.misses.average_latency_ns(),
+                max_call_latency_ns: cache_stats.max_latency_ns,
+                local_hits: cache_stats.local_hits.into(),
+                remote_hits: cache_stats.remote_hits.into(),
+                coalesced_waits: cache_stats.coalesced_waits.into(),
             },
             database: ResponseDatabase {
                 version: state

@@ -4,6 +4,7 @@ import {
   faBan,
   faChartBar,
   faCheck,
+  faCircleInfo,
   faCircleQuestion,
   faComputer,
   faCrow,
@@ -19,6 +20,7 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Fragment } from 'react';
 import getBackupStats from '@/api/admin/stats/getBackupStats.ts';
 import getGeneralStats from '@/api/admin/stats/getGeneralStats.ts';
 import getOverview, { AdminSystemOverview } from '@/api/admin/system/getOverview.ts';
@@ -29,6 +31,7 @@ import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { bytesToString } from '@/lib/format/size.ts';
+import { formatNanoseconds } from '@/lib/format/time.ts';
 import { percentString } from '@/lib/format/usage.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
@@ -97,6 +100,33 @@ export default function AdminOverview() {
           <ResourceView resource={systemOverview}>
             {(overview) => {
               const container = containerTypeMeta(overview.containerType);
+              const breakdown = [
+                {
+                  label: t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.localHits', {}),
+                  bucket: overview.cache.localHits,
+                },
+                {
+                  label: t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.remoteHits', {}),
+                  bucket: overview.cache.remoteHits,
+                },
+                {
+                  label: t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.coalescedWaits', {}),
+                  bucket: overview.cache.coalescedWaits,
+                },
+                {
+                  label: t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.misses', {}),
+                  bucket: {
+                    calls: overview.cache.totalMisses,
+                    averageLatencyNs: overview.cache.averageMissLatencyNs,
+                  },
+                },
+              ];
+              const averageLatency = (calls: number, latencyNs: number) =>
+                calls === 0
+                  ? null
+                  : t('pages.admin.home.tabs.overview.page.system.cacheAverageLatency', {
+                      latency: formatNanoseconds(latencyNs),
+                    });
 
               return (
                 <>
@@ -152,22 +182,51 @@ export default function AdminOverview() {
                     <StatCard
                       value={overview.cache.totalCalls.toString()}
                       label={t('pages.admin.home.tabs.overview.page.system.cacheCalls', {})}
+                      popoverIcon={faCircleInfo}
+                      popover={
+                        <div className='grid grid-cols-[1fr_auto_auto] gap-x-4'>
+                          <Text size='sm' fw={700}>
+                            {t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.title', {})}
+                          </Text>
+                          <Text size='sm' fw={700} ta='right'>
+                            {t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.calls', {})}
+                          </Text>
+                          <Text size='sm' fw={700} ta='right'>
+                            {t('pages.admin.home.tabs.overview.page.system.cacheBreakdown.averageLatency', {})}
+                          </Text>
+                          {breakdown.map((row) => (
+                            <Fragment key={row.label}>
+                              <Text size='sm' c='dimmed'>
+                                {row.label}
+                              </Text>
+                              <Text size='sm' ta='right'>
+                                {row.bucket.calls.toString()}
+                              </Text>
+                              <Text size='sm' ta='right'>
+                                {row.bucket.calls === 0 ? '' : formatNanoseconds(row.bucket.averageLatencyNs)}
+                              </Text>
+                            </Fragment>
+                          ))}
+                        </div>
+                      }
                     />
                     <StatCard
                       value={overview.cache.totalHits.toString()}
                       label={t('pages.admin.home.tabs.overview.page.system.cacheHits', {
                         percent: percentString(overview.cache.totalHits, overview.cache.totalCalls),
                       })}
+                      details={averageLatency(overview.cache.totalHits, overview.cache.averageHitLatencyNs)}
                     />
                     <StatCard
                       value={overview.cache.totalMisses.toString()}
                       label={t('pages.admin.home.tabs.overview.page.system.cacheMisses', {
                         percent: percentString(overview.cache.totalMisses, overview.cache.totalCalls),
                       })}
+                      details={averageLatency(overview.cache.totalMisses, overview.cache.averageMissLatencyNs)}
                     />
                     <StatCard
-                      value={`${(overview.cache.averageCallLatencyNs / 1_000 / 1_000).toFixed(2)} ms`}
-                      label={t('pages.admin.home.tabs.overview.page.system.avgCachedCallLatency', {})}
+                      value={formatNanoseconds(overview.cache.maxCallLatencyNs)}
+                      label={t('pages.admin.home.tabs.overview.page.system.slowestCachedCall', {})}
                     />
                   </div>
                 </>

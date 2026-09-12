@@ -14,7 +14,7 @@ use std::{
     future::Future,
     sync::{
         Arc,
-        atomic::{AtomicU64, Ordering},
+        atomic::{AtomicU8, AtomicU64, Ordering},
     },
     time::{Duration, Instant},
 };
@@ -83,6 +83,74 @@ impl moka::Expiry<compact_str::CompactString, DataEntry> for DataExpiry {
     }
 }
 
+const OUTCOME_COALESCED: u8 = 0;
+const OUTCOME_REMOTE_HIT: u8 = 1;
+const OUTCOME_MISS: u8 = 2;
+
+#[derive(Default)]
+struct CacheBucket {
+    calls: AtomicU64,
+    latency_ns_total: AtomicU64,
+}
+
+impl CacheBucket {
+    fn record(&self, latency_ns: u64) {
+        self.calls.fetch_add(1, Ordering::Relaxed);
+        self.latency_ns_total
+            .fetch_add(latency_ns, Ordering::Relaxed);
+    }
+
+    fn stats(&self) -> CacheBucketStats {
+        CacheBucketStats {
+            calls: self.calls.load(Ordering::Relaxed),
+            latency_ns_total: self.latency_ns_total.load(Ordering::Relaxed),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct CacheBucketStats {
+    pub calls: u64,
+    pub latency_ns_total: u64,
+}
+
+impl CacheBucketStats {
+    #[inline]
+    pub fn average_latency_ns(&self) -> u64 {
+        self.latency_ns_total.checked_div(self.calls).unwrap_or(0)
+    }
+
+    fn merge(&self, other: &Self) -> Self {
+        Self {
+            calls: self.calls + other.calls,
+            latency_ns_total: self.latency_ns_total + other.latency_ns_total,
+        }
+    }
+}
+
+pub struct CacheStats {
+    pub local_hits: CacheBucketStats,
+    pub remote_hits: CacheBucketStats,
+    pub coalesced_waits: CacheBucketStats,
+    pub misses: CacheBucketStats,
+    pub max_latency_ns: u64,
+}
+
+impl CacheStats {
+    #[inline]
+    pub fn total_calls(&self) -> u64 {
+        self.local_hits.calls
+            + self.remote_hits.calls
+            + self.coalesced_waits.calls
+            + self.misses.calls
+    }
+
+    #[inline]
+    pub fn hits(&self) -> CacheBucketStats {
+        self.local_hits.merge(&self.remote_hits)
+    }
+}
+
 pub struct Cache {
     client: Option<Arc<Client>>,
     use_internal_cache: bool,
@@ -93,10 +161,11 @@ pub struct Cache {
     local_ratelimits: moka::future::Cache<compact_str::CompactString, (u64, u64)>,
     local_resolutions: moka::future::Cache<compact_str::CompactString, Resolution>,
 
-    cache_calls: AtomicU64,
-    cache_latency_ns_total: AtomicU64,
+    cache_local_hits: CacheBucket,
+    cache_remote_hits: CacheBucket,
+    cache_coalesced_waits: CacheBucket,
+    cache_misses: CacheBucket,
     cache_latency_ns_max: AtomicU64,
-    cache_misses: AtomicU64,
 }
 
 async fn connect_client(label: &str, url: &str) -> Client {
@@ -174,10 +243,11 @@ impl Cache {
             local_locks_task,
             local_ratelimits,
             local_resolutions,
-            cache_calls: AtomicU64::new(0),
-            cache_latency_ns_total: AtomicU64::new(0),
+            cache_local_hits: CacheBucket::default(),
+            cache_remote_hits: CacheBucket::default(),
+            cache_coalesced_waits: CacheBucket::default(),
+            cache_misses: CacheBucket::default(),
             cache_latency_ns_max: AtomicU64::new(0),
-            cache_misses: AtomicU64::new(0),
         });
 
         let version = instance
@@ -440,82 +510,100 @@ impl Cache {
             Duration::from_millis(50)
         };
 
-        let client_opt = self.client.clone();
-
-        self.cache_calls.fetch_add(1, Ordering::Relaxed);
         let start_time = Instant::now();
+
+        if let Some(entry) = self.local.get(key).await {
+            let value = rmp_serde::from_slice::<T>(&entry.data);
+            self.record_call(&self.cache_local_hits, start_time.elapsed());
+
+            return Ok(value?);
+        }
+
+        let client_opt = self.client.clone();
+        let outcome = AtomicU8::new(OUTCOME_COALESCED);
 
         let entry = self
             .local
-            .try_get_with(key.to_compact_string(), async move {
-                if let Some(client) = &client_opt {
-                    tracing::debug!("checking redis cache");
-                    let cached_value: Option<BulkString> = client
-                        .get(key)
-                        .await
-                        .map_err(|err| {
-                            tracing::error!("redis get error: {:?}", err);
-                            err
-                        })
-                        .ok()
-                        .flatten();
+            .try_get_with(key.to_compact_string(), {
+                let outcome = &outcome;
 
-                    if let Some(value) = cached_value {
-                        tracing::debug!("found in redis cache");
-                        return Ok(DataEntry {
-                            data: Arc::new(value.to_vec()),
-                            intended_ttl: effective_moka_ttl,
-                        });
+                async move {
+                    if let Some(client) = &client_opt {
+                        tracing::debug!("checking redis cache");
+                        let cached_value: Option<BulkString> = client
+                            .get(key)
+                            .await
+                            .map_err(|err| {
+                                tracing::error!("redis get error: {:?}", err);
+                                err
+                            })
+                            .ok()
+                            .flatten();
+
+                        if let Some(value) = cached_value {
+                            tracing::debug!("found in redis cache");
+                            outcome.store(OUTCOME_REMOTE_HIT, Ordering::Relaxed);
+
+                            return Ok(DataEntry {
+                                data: Arc::new(value.to_vec()),
+                                intended_ttl: effective_moka_ttl,
+                            });
+                        }
                     }
+
+                    outcome.store(OUTCOME_MISS, Ordering::Relaxed);
+
+                    tracing::debug!("executing compute");
+                    let result = fn_compute().await.map_err(|e| e.into())?;
+                    tracing::debug!("executed compute");
+
+                    let serialized = rmp_serde::to_vec(&result)?;
+                    let serialized_arc = Arc::new(serialized);
+
+                    if let Some(client) = &client_opt {
+                        let _ = client
+                            .set_with_options(
+                                key,
+                                BulkStringRef(&serialized_arc),
+                                None,
+                                SetExpiration::Ex(ttl),
+                            )
+                            .await;
+                    }
+
+                    Ok::<_, anyhow::Error>(DataEntry {
+                        data: serialized_arc,
+                        intended_ttl: effective_moka_ttl,
+                    })
                 }
-
-                self.cache_misses.fetch_add(1, Ordering::Relaxed);
-
-                tracing::debug!("executing compute");
-                let result = fn_compute().await.map_err(|e| e.into())?;
-                tracing::debug!("executed compute");
-
-                let serialized = rmp_serde::to_vec(&result)?;
-                let serialized_arc = Arc::new(serialized);
-
-                if let Some(client) = &client_opt {
-                    let _ = client
-                        .set_with_options(
-                            key,
-                            BulkStringRef(&serialized_arc),
-                            None,
-                            SetExpiration::Ex(ttl),
-                        )
-                        .await;
-                }
-
-                Ok::<_, anyhow::Error>(DataEntry {
-                    data: serialized_arc,
-                    intended_ttl: effective_moka_ttl,
-                })
             })
             .await;
 
-        let elapsed_ns = start_time.elapsed().as_nanos() as u64;
-        self.cache_latency_ns_total
-            .fetch_add(elapsed_ns, Ordering::Relaxed);
+        let value = match entry {
+            Ok(internal_entry) => {
+                rmp_serde::from_slice::<T>(&internal_entry.data).map_err(anyhow::Error::new)
+            }
+            Err(arc_error) => Err(anyhow::Error::new(SharedComputeError(arc_error))),
+        };
 
-        let _ = self.cache_latency_ns_max.fetch_update(
-            Ordering::Relaxed,
-            Ordering::Relaxed,
-            |current_max| {
-                if elapsed_ns > current_max {
-                    Some(elapsed_ns)
-                } else {
-                    Some(current_max)
-                }
+        self.record_call(
+            match outcome.load(Ordering::Relaxed) {
+                OUTCOME_REMOTE_HIT => &self.cache_remote_hits,
+                OUTCOME_MISS => &self.cache_misses,
+                _ => &self.cache_coalesced_waits,
             },
+            start_time.elapsed(),
         );
 
-        match entry {
-            Ok(internal_entry) => Ok(rmp_serde::from_slice::<T>(&internal_entry.data)?),
-            Err(arc_error) => Err(anyhow::Error::new(SharedComputeError(arc_error))),
-        }
+        value
+    }
+
+    fn record_call(&self, bucket: &CacheBucket, elapsed: Duration) {
+        let latency_ns = elapsed.as_nanos() as u64;
+
+        bucket.record(latency_ns);
+        self.cache_latency_ns_max
+            .fetch_max(latency_ns, Ordering::Relaxed);
     }
 
     pub async fn get<T: DeserializeOwned>(&self, key: &str) -> Result<Option<T>, anyhow::Error> {
@@ -695,28 +783,14 @@ impl Cache {
         Ok(())
     }
 
-    #[inline]
-    pub fn cache_calls(&self) -> u64 {
-        self.cache_calls.load(Ordering::Relaxed)
-    }
-
-    #[inline]
-    pub fn cache_misses(&self) -> u64 {
-        self.cache_misses.load(Ordering::Relaxed)
-    }
-
-    #[inline]
-    pub fn cache_latency_ns_average(&self) -> u64 {
-        let calls = self.cache_calls();
-        self.cache_latency_ns_total
-            .load(Ordering::Relaxed)
-            .checked_div(calls)
-            .unwrap_or(0)
-    }
-
-    #[inline]
-    pub fn cache_latency_ns_max(&self) -> u64 {
-        self.cache_latency_ns_max.load(Ordering::Relaxed)
+    pub fn stats(&self) -> CacheStats {
+        CacheStats {
+            local_hits: self.cache_local_hits.stats(),
+            remote_hits: self.cache_remote_hits.stats(),
+            coalesced_waits: self.cache_coalesced_waits.stats(),
+            misses: self.cache_misses.stats(),
+            max_latency_ns: self.cache_latency_ns_max.load(Ordering::Relaxed),
+        }
     }
 }
 
@@ -804,10 +878,11 @@ mod tests {
             local_locks_task: tokio::spawn(async {}),
             local_ratelimits: moka::future::Cache::builder().max_capacity(16).build(),
             local_resolutions: moka::future::Cache::builder().max_capacity(16).build(),
-            cache_calls: AtomicU64::new(0),
-            cache_latency_ns_total: AtomicU64::new(0),
+            cache_local_hits: CacheBucket::default(),
+            cache_remote_hits: CacheBucket::default(),
+            cache_coalesced_waits: CacheBucket::default(),
+            cache_misses: CacheBucket::default(),
             cache_latency_ns_max: AtomicU64::new(0),
-            cache_misses: AtomicU64::new(0),
         }
     }
 
@@ -837,6 +912,77 @@ mod tests {
         cache.ratelimit("test", 2, 60, "client").await.unwrap_err();
         assert!(cache.ratelimit_reached("test", 2, "client").await);
         assert!(!cache.ratelimit_reached("test", 2, "other").await);
+    }
+
+    #[tokio::test]
+    async fn cached_calls_are_bucketed_by_outcome() {
+        let cache = memory_only();
+
+        cache
+            .cached("key", 10, || async {
+                tokio::time::sleep(Duration::from_millis(10)).await;
+                Ok::<u8, anyhow::Error>(1)
+            })
+            .await
+            .unwrap();
+        cache
+            .cached("key", 10, || async { Ok::<u8, anyhow::Error>(2) })
+            .await
+            .unwrap();
+
+        let stats = cache.stats();
+
+        assert_eq!(stats.total_calls(), 2);
+        assert_eq!(stats.misses.calls, 1);
+        assert_eq!(stats.local_hits.calls, 1);
+        assert_eq!(stats.remote_hits.calls, 0);
+        assert_eq!(stats.coalesced_waits.calls, 0);
+
+        assert!(stats.misses.average_latency_ns() >= Duration::from_millis(10).as_nanos() as u64);
+        assert!(
+            stats.local_hits.average_latency_ns() < Duration::from_millis(10).as_nanos() as u64
+        );
+        assert_eq!(stats.max_latency_ns, stats.misses.average_latency_ns());
+    }
+
+    #[tokio::test]
+    async fn coalesced_waits_are_not_counted_as_hits() {
+        let cache = Arc::new(memory_only());
+        let (release, released) = tokio::sync::oneshot::channel::<()>();
+
+        let first = tokio::spawn({
+            let cache = Arc::clone(&cache);
+            async move {
+                cache
+                    .cached("key", 10, || async {
+                        released.await.unwrap();
+                        Ok::<u8, anyhow::Error>(1)
+                    })
+                    .await
+            }
+        });
+        tokio::time::sleep(Duration::from_millis(20)).await;
+
+        let second = tokio::spawn({
+            let cache = Arc::clone(&cache);
+            async move {
+                cache
+                    .cached("key", 10, || async { Ok::<u8, anyhow::Error>(2) })
+                    .await
+            }
+        });
+        tokio::time::sleep(Duration::from_millis(20)).await;
+        release.send(()).unwrap();
+
+        first.await.unwrap().unwrap();
+        second.await.unwrap().unwrap();
+
+        let stats = cache.stats();
+
+        assert_eq!(stats.misses.calls, 1);
+        assert_eq!(stats.coalesced_waits.calls, 1);
+        assert_eq!(stats.hits().calls, 0);
+        assert!(stats.coalesced_waits.average_latency_ns() > 0);
     }
 
     #[tokio::test]
