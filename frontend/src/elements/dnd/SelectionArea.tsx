@@ -226,7 +226,7 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>> {
     const container = this.containerRef.current!;
     const containerRect = container.getBoundingClientRect();
 
-    this.clearSelectionPreview();
+    this.clearSelectionPreview(!!this.props.deferSelection);
     this.cachedItems.clear();
     this.pendingSelectables.clear();
     this.currentlySelected = [];
@@ -372,7 +372,7 @@ class SelectionArea<T> extends Component<SelectionAreaProps<T>> {
       this.props.onSelected?.(this.currentlySelected);
     }
 
-    this.clearSelectionPreview(!committed);
+    this.clearSelectionPreview(!!this.props.deferSelection && !committed);
     this.cachedItems.clear();
     this.pendingSelectables.clear();
 
