@@ -1,22 +1,9 @@
 #!/usr/bin/env python3
-"""Strip strings from Crowdin-downloaded translation files that are still
-identical to the source string.
-
-When a Crowdin JSON export contains a key with no approved translation, it
-fills the value with the source-language text instead of omitting it. Left
-in place, these look like real translations even though nobody translated
-them, and they never fall back to the app's actual source language. This
-script removes any leaf value that's byte-for-byte equal to the source value
-at the same path, then prunes any object left empty by that removal.
-
-Usage:
-    strip_untranslated_translations.py <translation-file.json> [...]
-
-Each file is compared against the "en.json" source file in the same
-directory and rewritten in place if any strings were removed. Files are
-expected to already be relative to (or resolvable from) the current working
-directory, e.g. as produced by `git diff --name-only`.
-"""
+# Removes strings from Crowdin-downloaded translation files that Crowdin
+# filled in with the source-language text because no translation exists yet.
+#
+# Usage: strip_untranslated_translations.py <translation-file.json> [...]
+# Each file is compared against "en.json" in the same directory.
 
 from __future__ import annotations
 
@@ -39,10 +26,6 @@ def dump_json(path: Path, data: dict) -> None:
 
 
 def strip_untranslated(source: dict, target: dict) -> tuple[dict, int]:
-    """Recursively drop leaves in `target` identical to `source`, then prune
-    objects left empty. Returns the pruned dict and the number of strings
-    removed.
-    """
     removed = 0
     result: dict = {}
 
@@ -55,7 +38,6 @@ def strip_untranslated(source: dict, target: dict) -> tuple[dict, int]:
             if pruned:
                 result[key] = pruned
         elif isinstance(target_value, dict):
-            # No matching source subtree to compare against; keep as-is.
             result[key] = target_value
         elif target_value == source_value:
             removed += 1
@@ -83,10 +65,15 @@ def process_file(target_path: Path) -> None:
     target_data = load_json(target_path)
 
     pruned, removed = strip_untranslated(source_data, target_data)
+    if not removed:
+        return
 
-    if removed:
+    if pruned:
         dump_json(target_path, pruned)
         print(f"{target_path}: stripped {removed} untranslated string(s)")
+    else:
+        target_path.unlink()
+        print(f"{target_path}: stripped {removed} untranslated string(s), no translations left, deleted")
 
 
 def main(argv: list[str]) -> int:
