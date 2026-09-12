@@ -44,12 +44,14 @@ try {
 
   for (const key in baseMapping) {
     if (!(key in translationMapping)) {
+      if (!isVerbose) {
+        continue;
+      }
+
       console.log(`Missing translation key: ${key}`);
 
-      if (isVerbose) {
-        console.log('  Expected:', JSON.stringify(baseMapping[key], null, 2));
-        console.log('  Found:     <missing>');
-      }
+      console.log('  Expected:', JSON.stringify(baseMapping[key], null, 2));
+      console.log('  Found:     <missing>');
     } else {
       const baseVars = extractVariables(baseMapping[key]);
       const transVars = extractVariables(translationMapping[key]);
