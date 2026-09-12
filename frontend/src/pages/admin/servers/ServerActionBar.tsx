@@ -215,22 +215,26 @@ export default function ServerActionBar({
       </ConfirmationModal>
 
       <ActionBar opened={selectedServers.size > 0}>
-        {ACTIONS.map(({ action, icon, color, permission, label }) => (
-          <AdminCan key={action} action={permission}>
-            <Tooltip label={`${t(label, {})} (${tItem('server', selectedServers.size)})`}>
-              <Button
-                color={color}
-                onClick={() => start(action)}
-                loading={loading === action}
-                disabled={loading !== null && loading !== action}
-                aria-label={t(label, {})}
-                px='sm'
-              >
-                <FontAwesomeIcon icon={icon} />
-              </Button>
-            </Tooltip>
-          </AdminCan>
-        ))}
+        {ACTIONS.map(({ action, icon, color, permission, label }) => {
+          const applicable = targets(action).length;
+
+          return (
+            <AdminCan key={action} action={permission}>
+              <Tooltip label={`${t(label, {})} (${tItem('server', applicable)})`}>
+                <Button
+                  color={color}
+                  onClick={() => start(action)}
+                  loading={loading === action}
+                  disabled={(loading !== null && loading !== action) || applicable === 0}
+                  aria-label={t(label, {})}
+                  px='sm'
+                >
+                  <FontAwesomeIcon icon={icon} />
+                </Button>
+              </Tooltip>
+            </AdminCan>
+          );
+        })}
       </ActionBar>
     </>
   );
