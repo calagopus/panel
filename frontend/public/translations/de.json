@@ -6716,6 +6716,10 @@
         "firewall": {
           "title": "Firewall",
           "subtitle": "Regeln werden von oben nach unten geprüft, die erste zutreffende Regel entscheidet.",
+          "dropzone": {
+            "title": "Dateien hier ablegen, um sie als Firewall-Regeln zu importieren",
+            "subtitle": "Loslassen, um den Import zu starten"
+          },
           "empty": {
             "title": "Keine Firewall-Regeln",
             "description": "Jede Verbindung zu den Allocations dieses Servers ist erlaubt. Füge eine Regel hinzu, um den Zugriff einzuschränken.",
@@ -6774,12 +6778,20 @@
             "tooManyPorts": "Eine Regel kann höchstens {max} Ports abdecken."
           },
           "toast": {
-            "saved": "Firewall-Regeln gespeichert."
+            "saved": "Firewall-Regeln gespeichert.",
+            "exported": "Firewall-Regeln exportiert.",
+            "imported": "Firewall-Regeln importiert. Prüfe sie und speichere, um sie anzuwenden.",
+            "importCancelled": "Import abgebrochen, deine ungespeicherten Regeln wurden beibehalten.",
+            "parseFailed": "Fehler beim Parsen dieser Firewall-Regeldatei: {error}"
           },
           "modal": {
             "unsavedChanges": {
               "title": "Ungespeicherte Änderungen",
               "content": "Du hast ungespeicherte Firewall-Regeln. Wenn du die Seite jetzt verlässt, gehen sie verloren."
+            },
+            "importReplace": {
+              "title": "Ungespeicherte Regeln ersetzen",
+              "content": "Du hast ungespeicherte Firewall-Regeln. Beim Import wird jede Regel durch die aus der Datei ersetzt und deine ungespeicherten Änderungen gehen verloren."
             },
             "createRule": {
               "title": "Firewall-Regel erstellen"

@@ -1,6 +1,6 @@
-import { faBan, faExclamationTriangle, faPlus, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faExclamationTriangle, faPlus, faShieldHalved, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getFirewall from '@/api/server/firewall/getFirewall.ts';
@@ -11,18 +11,22 @@ import ServerContentContainer from '@/elements/containers/ServerContentContainer
 import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
 import { DndContainer, DndItem, SortableItem } from '@/elements/dnd/DragAndDrop.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
+import ImportOverlay from '@/elements/ImportOverlay.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Paper from '@/elements/layout/Paper.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import ResourceExportMenu from '@/elements/ResourceExportMenu.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
+import { downloadResourceFile, ResourceExportFormat } from '@/lib/download/export.ts';
 import { restrictToVerticalAxis } from '@/lib/dragAndDrop.ts';
 import { formatPortRanges } from '@/lib/network/ip.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { serverFirewallRuleSchema } from '@/lib/schemas/server/firewall.ts';
+import { serverFirewallEditSchema, serverFirewallRuleSchema } from '@/lib/schemas/server/firewall.ts';
+import { useResourceImport } from '@/plugins/import/useResourceImport.tsx';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -79,6 +83,7 @@ export default function ServerFirewall() {
   const server = useServerStore((state) => state.server);
   const canUpdate = useServerCan('firewall.update');
   const maxRuleCount = useGlobalStore((state) => state.settings.server.maxFirewallRuleCount);
+  const maxSourceCount = useGlobalStore((state) => state.settings.server.maxFirewallRuleSourceCount);
 
   const firewall = useResource({
     queryKey: queryKeys.server(server.uuid).firewall.all(),
@@ -91,7 +96,8 @@ export default function ServerFirewall() {
   const [editing, setEditing] = useState<DndRule | null>(null);
   const [deleting, setDeleting] = useState<DndRule | null>(null);
   const [creating, setCreating] = useState(false);
-
+  const [confirmingImport, setConfirmingImport] = useState(false);
+  const pendingImport = useRef<{ rules: Rule[]; resolve: () => void; reject: (error: unknown) => void } | null>(null);
   const blocker = useBlocker(dirty);
 
   useEffect(() => {
@@ -146,6 +152,58 @@ export default function ServerFirewall() {
     return Array.from(new Set(orderedRules.flatMap((rule) => rule.ports ?? []))).filter((port) => !allocated.has(port));
   }, [orderedRules, firewall.data]);
 
+  const doExport = (format: ResourceExportFormat) => {
+    downloadResourceFile(serverFirewallEditSchema, { rules: orderedRules }, `firewall-${server.uuid}`, format);
+
+    addToast(t('pages.server.firewall.toast.exported', {}), 'success');
+  };
+
+  const applyImportedRules = (imported: Rule[]) =>
+    replace(imported.map((rule) => ({ id: `rule-imported-${crypto.randomUUID()}`, rule })));
+
+  const resolvePendingImport = (apply: boolean) => {
+    const pending = pendingImport.current;
+
+    pendingImport.current = null;
+    setConfirmingImport(false);
+
+    if (!pending) return;
+
+    if (apply) {
+      applyImportedRules(pending.rules);
+      pending.resolve();
+    } else {
+      pending.reject(new Error(t('pages.server.firewall.toast.importCancelled', {})));
+    }
+  };
+
+  const { isDragging, openFilePicker, fileInput } = useResourceImport({
+    schema: serverFirewallEditSchema,
+    create: async (data) => {
+      if (data.rules.length > maxRuleCount) {
+        throw new Error(t('pages.server.firewall.tooltip.limitReached', { max: maxRuleCount }));
+      }
+      if (data.rules.some((rule) => rule.sources.length > maxSourceCount)) {
+        throw new Error(t('pages.server.firewall.form.tooManySources', { max: maxSourceCount }));
+      }
+
+      if (!dirty) {
+        applyImportedRules(data.rules);
+        return;
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        pendingImport.current?.reject(new Error(t('pages.server.firewall.toast.importCancelled', {})));
+
+        pendingImport.current = { rules: data.rules, resolve, reject };
+        setConfirmingImport(true);
+      });
+    },
+    formatParseError: (error) => t('pages.server.firewall.toast.parseFailed', { error }),
+    importedMessage: t('pages.server.firewall.toast.imported', {}),
+    enabled: canUpdate,
+  });
+
   return (
     <ResourceView resource={firewall}>
       {(data) => (
@@ -154,11 +212,25 @@ export default function ServerFirewall() {
           subtitle={t('pages.server.firewall.subtitle', {})}
           registry={window.extensionContext.extensionRegistry.pages.server.network.firewall.container}
           contentRight={
-            <ServerCan action='firewall.update'>
-              <Button loading={saving} disabled={!dirty} onClick={doSave}>
-                {t('common.button.save', {})}
-              </Button>
-            </ServerCan>
+            <>
+              <ResourceExportMenu
+                disabled={rules.length === 0}
+                menuProps={{ position: 'bottom-start', offset: 4 }}
+                onExport={doExport}
+              />
+
+              <ServerCan action='firewall.update'>
+                <Button variant='default' onClick={openFilePicker}>
+                  <FontAwesomeIcon icon={faUpload} className='mr-2' />
+                  {t('common.button.import', {})}
+                </Button>
+                <Button loading={saving} disabled={!dirty} onClick={doSave}>
+                  {t('common.button.save', {})}
+                </Button>
+
+                {fileInput}
+              </ServerCan>
+            </>
           }
         >
           <FirewallRuleModal
@@ -185,6 +257,16 @@ export default function ServerFirewall() {
           </ConfirmationModal>
 
           <ConfirmationModal
+            opened={confirmingImport}
+            onClose={() => resolvePendingImport(false)}
+            title={t('pages.server.firewall.modal.importReplace.title', {})}
+            confirm={t('common.button.import', {})}
+            onConfirmed={() => resolvePendingImport(true)}
+          >
+            {t('pages.server.firewall.modal.importReplace.content', {}).md()}
+          </ConfirmationModal>
+
+          <ConfirmationModal
             title={t('pages.server.firewall.modal.unsavedChanges.title', {})}
             opened={blocker.state === 'blocked'}
             onClose={() => blocker.reset()}
@@ -193,6 +275,12 @@ export default function ServerFirewall() {
           >
             {t('pages.server.firewall.modal.unsavedChanges.content', {}).md()}
           </ConfirmationModal>
+
+          <ImportOverlay
+            visible={isDragging}
+            title={t('pages.server.firewall.dropzone.title', {})}
+            subtitle={t('pages.server.firewall.dropzone.subtitle', {})}
+          />
 
           <NetworkSubNavigation />
 

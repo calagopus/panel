@@ -6814,6 +6814,10 @@ const baseTranslations = defineTranslations({
         firewall: {
           title: 'Firewall',
           subtitle: 'Rules are checked from top to bottom, the first one that matches decides.',
+          dropzone: {
+            title: 'Drop some files here to import as Firewall Rules',
+            subtitle: 'Release to start importing',
+          },
           empty: {
             title: 'No Firewall Rules',
             description:
@@ -6882,11 +6886,20 @@ const baseTranslations = defineTranslations({
           },
           toast: {
             saved: 'Firewall rules saved.',
+            exported: 'Firewall rules exported.',
+            imported: 'Firewall rules imported. Review them and save to apply them.',
+            importCancelled: 'Import cancelled, your unsaved rules were kept.',
+            parseFailed: 'Failed to parse that firewall rule file: {error}',
           },
           modal: {
             unsavedChanges: {
               title: 'Unsaved Changes',
               content: 'You have unsaved firewall rules. Leaving this page now discards them.',
+            },
+            importReplace: {
+              title: 'Replace Unsaved Rules',
+              content:
+                'You have unsaved firewall rules. Importing replaces every rule with the ones from the file, and your unsaved changes are lost.',
             },
             createRule: {
               title: 'Create Firewall Rule',

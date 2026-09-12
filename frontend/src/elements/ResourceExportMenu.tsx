@@ -1,5 +1,6 @@
 import { faChevronDown, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { MenuProps } from '@mantine/core';
 import Button from '@/elements/buttons/Button.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import type { ResourceExportFormat } from '@/lib/download/export.ts';
@@ -7,15 +8,22 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ResourceExportMenuProps {
   loading?: boolean;
+  disabled?: boolean;
+  menuProps?: MenuProps;
   onExport: (format: ResourceExportFormat) => void;
 }
 
-export default function ResourceExportMenu({ loading, onExport }: ResourceExportMenuProps) {
+export default function ResourceExportMenu({
+  loading,
+  disabled,
+  menuProps = { position: 'top', offset: 40 },
+  onExport,
+}: ResourceExportMenuProps) {
   const { t } = useTranslations();
 
   return (
     <ContextMenu
-      menuProps={{ position: 'top', offset: 40 }}
+      menuProps={menuProps}
       items={[
         {
           type: 'action',
@@ -41,6 +49,7 @@ export default function ResourceExportMenu({ loading, onExport }: ResourceExport
             openMenu(rect.left, rect.bottom);
           }}
           loading={loading}
+          disabled={disabled}
           variant='outline'
           rightSection={<FontAwesomeIcon icon={faChevronDown} />}
         >
