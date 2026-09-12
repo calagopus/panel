@@ -9,6 +9,7 @@ on:
       - 'frontend/public/translations/en.json'
       - 'shared/mails/variables/en.json'
       - '.github/workflows/crowdin.yml'
+      - '.github/scripts/strip_untranslated_translations.py'
       - 'crowdin.yml'
   schedule:
     - cron: '0 9 * * 1'
