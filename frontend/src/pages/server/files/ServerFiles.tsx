@@ -464,6 +464,7 @@ function ServerFilesComponent() {
   const doOpenModal = useFileManagerStore((state) => state.doOpenModal);
   const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
   const resetEntries = useFileManagerStore((state) => state.resetEntries);
+  const [, setSearchParams] = useSearchParams();
   const [view, setView] = useState<FileManagerView>(getStoredFileManagerView);
   const [fileTreeVisible, setFileTreeVisible] = useState(() => getStoredFileTreeVisibility(serverUuid));
   const [treeInitialDirectory, setTreeInitialDirectory] = useState(browsingDirectory);
@@ -478,6 +479,7 @@ function ServerFilesComponent() {
 
   const applyView = (value: FileManagerView) => {
     if (value === 'tree') setTreeInitialDirectory(browsingDirectory);
+    else setSearchParams({ directory: browsingDirectory });
     localStorage.setItem(FILE_MANAGER_VIEW_STORAGE_KEY, value);
     setView(value);
   };
