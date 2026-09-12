@@ -180,6 +180,7 @@
         "move": "Flyt",
         "transfer": "Overfør",
         "reattach": "Monter igen",
+        "reassign": "Omtildel",
         "detach": "Frigør",
         "reset": "Nulstil",
         "view": "Vis",
@@ -352,6 +353,7 @@
         "externalId": "Eksternt ID",
         "lines": "Linjer",
         "databaseHost": "Databasehost",
+        "databaseInstance": "Databaseinstans",
         "timezone": "Tidszone",
         "protocol": "Protokol",
         "powerAction": "Power-handling",
@@ -495,7 +497,11 @@
         "bulkActionServerAction": {
           "started": "Startet",
           "stopped": "Stoppet",
-          "restarted": "Genstartet"
+          "restarted": "Genstartet",
+          "suspended": "Suspenderet",
+          "unsuspended": "Genaktiveret",
+          "clearedState": "Ryddet for tilstand",
+          "deleted": "Slettet"
         },
         "compressionLevel": {
           "bestSpeed": "Bedste hastighed",
@@ -1717,8 +1723,7 @@
                   "cacheVersion": "Cache-version",
                   "cacheCalls": "Cache-kald",
                   "cacheHits": "Cache-hits ({percent}%)",
-                  "cacheMisses": "Cache-misses ({percent}%)",
-                  "avgCachedCallLatency": "Gns. latenstid for cachede kald"
+                  "cacheMisses": "Cache-misses ({percent}%)"
                 },
                 "containerType": {
                   "none": "Ingen registreret",
@@ -1865,6 +1870,36 @@
                 }
               }
             },
+            "metadata": {
+              "page": {
+                "title": "Metadata-indstillinger",
+                "form": {
+                  "description": "Beskrivelse",
+                  "descriptionDescription": "Vises under titlen i søgeresultater og link-forhåndsvisninger.",
+                  "ogImage": "Forhåndsvisningsbillede",
+                  "ogImageDescription": "Vises i link-forhåndsvisninger. Skal være PNG eller JPEG, ikke SVG.",
+                  "themeColor": "Temafarve",
+                  "themeColorDescription": "Farver browserens brugerflade på mobil og i link-forhåndsvisninger.",
+                  "indexable": "Tillad indeksering i søgemaskiner",
+                  "twitterCard": "Twitter Card-type"
+                },
+                "enum": {
+                  "twitterCard": {
+                    "summary": "Opsummering",
+                    "summaryLargeImage": "Opsummering med stort billede"
+                  }
+                },
+                "placeholder": {
+                  "description": "Administrer dine spilservere og tjenester med {name}."
+                },
+                "button": {
+                  "autofill": "Udfyld automatisk"
+                },
+                "toast": {
+                  "updated": "Metadata-indstillinger opdateret."
+                }
+              }
+            },
             "storage": {
               "page": {
                 "title": "Storage-indstillinger",
@@ -1936,6 +1971,7 @@
                 "title": "Indstillinger for e-mailskabeloner",
                 "sidebar": {
                   "templates": "Skabeloner",
+                  "globalVariables": "Globale variabler",
                   "loading": "Indlæser...",
                   "availableVariables": "Tilgængelige variabler"
                 },
@@ -1944,7 +1980,43 @@
                   "syntaxMiddle": "som skabelonsyntaks. Variabler refereres med",
                   "syntaxAnd": "og kontrolstrukturer som",
                   "syntaxOr": "og",
-                  "syntaxAfter": "understøttes."
+                  "syntaxAfter": "understøttes.",
+                  "variablesBefore": "Tekstfragmenter refereres med",
+                  "variablesAfter": "og oversættes pr. sprog i sektionen Variabler, så en skabelon kun behøver ét layout til alle de sprog, en bruger kan vælge."
+                },
+                "variables": {
+                  "title": "Variabler",
+                  "description": "Tekstfragmenter, som denne skabelon refererer til som",
+                  "globalDescription": "Tekstfragmenter, som alle skabeloner kan referere til som",
+                  "descriptionAfter": "Fragmenter er MiniJinja-snippets med adgang til de samme variabler som skabelonen. Et tomt felt bruger den standardværdi, der vises i det; sprog uden en værdi falder tilbage til den engelske værdi og derefter til den indbyggede oversættelse.",
+                  "custom": "Tilpasset",
+                  "add": "Tilføj variabel",
+                  "loading": "Indlæser...",
+                  "empty": "Ingen variabler defineret.",
+                  "error": {
+                    "valueRequired": "Tilpassede variabler skal have en engelsk værdi."
+                  },
+                  "toast": {
+                    "saved": "E-mailvariabel gemt.",
+                    "created": "E-mailvariabel oprettet.",
+                    "reset": "E-mailvariabel nulstillet til standard.",
+                    "deleted": "E-mailvariabel slettet."
+                  },
+                  "modal": {
+                    "create": {
+                      "title": "Opret variabel",
+                      "nameDescription": "Små bogstaver, tal og understregninger, og navnet skal starte med et bogstav.",
+                      "valueDescription": "Den engelske værdi. Oversættelser kan tilføjes, når variablen er oprettet."
+                    },
+                    "reset": {
+                      "title": "Nulstil til standard",
+                      "content": "Dette kasserer dine tilpassede værdier for **{name}** på alle sprog og gendanner de indbyggede standardværdier. Dette kan ikke fortrydes."
+                    },
+                    "delete": {
+                      "title": "Slet variabel",
+                      "content": "Dette sletter den tilpassede variabel **{name}** på alle sprog. Skabeloner, der refererer til den, viser intet i stedet. Dette kan ikke fortrydes."
+                    }
+                  }
                 },
                 "loadingTemplate": "Indlæser skabelon...",
                 "form": {
@@ -2562,6 +2634,7 @@
                 },
                 "alert": {
                   "couldNotReach": "Kunne ikke nå noden: {error}",
+                  "integratedNode": "Denne node kører inde i panelet. Dens identitet, panel-URL og API-bind-indstillinger overskrives, hver gang panelet starter, så ændringer i dem bevares ikke. Alt andet, du ændrer her, bevares.",
                   "tokenWarning": "Konfigurationen nedenfor indeholder nodens token. Vis den kun, når det er nødvendigt.",
                   "portMismatch": "Nodens URL peger på port {connectPort}, men denne konfiguration får wings til at lytte på port {apiPort}. Medmindre en reverse proxy videresender port {connectPort} til wings, kan panelet ikke nå noden.",
                   "verifyBackend": "Backend til Wings",
@@ -2767,6 +2840,7 @@
                   "downloadStarted": "Download startet.",
                   "detached": "Backup frakoblet.",
                   "reattached": "Backup tilknyttet {name} igen.",
+                  "reassigned": "Backuppen er omtildelt.",
                   "restoring": "Gendanner backup til {name}...",
                   "exporting": "Eksporterer backup til filerne på {name}...",
                   "deletionStarted": "Sletning af node-backup startet."
@@ -2778,6 +2852,13 @@
                   "detach": {
                     "title": "Bekræft frakobling af backup",
                     "content": "Er du sikker på, at du vil frakoble denne backup fra dens server? Den bliver ikke slettet og kan tilknyttes igen senere."
+                  },
+                  "reassign": {
+                    "title": "Omtildel database-backup",
+                    "description": "Flyt denne backup til en anden {type}-databaseinstans. Instansen kan tilhøre en anden server, så længe backuppen kan nås fra den server. Backups kan kun tildeles en instans af samme databasetype.",
+                    "instancePlaceholder": "Vælg en databaseinstans",
+                    "serverFirst": "Vælg først en server",
+                    "noInstances": "Ingen matchende databaseinstanser på denne server"
                   },
                   "reattach": {
                     "title": "Tilknyt node-backup igen",
@@ -2980,6 +3061,21 @@
             "unsuspend": "Ophæv suspendering af server",
             "clearState": "Ryd servertilstand",
             "delete": "Slet server"
+          },
+          "bulkActions": {
+            "verb": {
+              "suspend": "suspendere",
+              "unsuspend": "ophæve suspenderingen af",
+              "clearState": "rydde tilstanden for",
+              "delete": "slette"
+            },
+            "modal": {
+              "title": "Bekræft gruppehandling",
+              "content": "Er du sikker på, at du vil {action} **{servers}**?",
+              "deleteContent": "Er du sikker på, at du vil slette **{servers}** og alt på dem permanent? Dette kan ikke fortrydes."
+            },
+            "successWithSkipped": "{servers} blev {action}. {skippedServers} blev sprunget over.",
+            "nothingToDo": "Alle valgte servere er allerede i den tilstand."
           },
           "externalIdLookup": {
             "button": "Find via eksternt ID",
@@ -3740,6 +3836,14 @@
                 }
               }
             },
+            "backups": {
+              "page": {
+                "title": "Backups for Database Agent Host",
+                "toast": {
+                  "downloadStarted": "Download startet."
+                }
+              }
+            },
             "configuration": {
               "title": "Konfiguration",
               "page": {
@@ -4226,6 +4330,9 @@
           },
           "form": {
             "backupConfigurationPlaceholder": "Nedarv fra server",
+            "kind": "Backup-type",
+            "kindDescription": "Serverbackups arkiverer serverens filer. Database-backups dumper databaserne i en databaseinstans på en server. Dette kan ikke ændres senere.",
+            "kindLockedDescription": "Backup-typen vælges, når politikken oprettes, og kan ikke ændres.",
             "cronDescription": "Cron-udtryk (med sekunder), der bestemmer, hvornår der tages backups, i UTC.",
             "parallelism": "Parallelitet",
             "parallelismDescription": "Maksimalt antal backups, denne politik kører samtidig på en enkelt node.",
@@ -4300,6 +4407,24 @@
                   },
                   "remove": {
                     "title": "Bekræft fjernelse af node",
+                    "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "page": {
+                "title": "Systembackup-politikkens Database Agent Hosts",
+                "toast": {
+                  "added": "Database Agent Host tilføjet.",
+                  "removed": "Database Agent Host fjernet."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Tilføj Database Agent Host"
+                  },
+                  "remove": {
+                    "title": "Bekræft fjernelse af Database Agent Host",
                     "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
                   }
                 }
@@ -4558,6 +4683,17 @@
             "list": "Liste",
             "tree": "Træ"
           },
+          "searchPreview": {
+            "expand": "Udvid forhåndsvisning af indhold for {file}",
+            "collapse": "Skjul forhåndsvisning af indhold for {file}",
+            "lines": "Linje {start}-{end}",
+            "loading": "Indlæser forhåndsvisning...",
+            "empty": "Tom fil",
+            "unavailable": "Forhåndsvisning utilgængelig",
+            "noContext": "Match fundet, forhåndsvisning utilgængelig",
+            "moreMatches": "Flere match vises ikke",
+            "restricted": "Kræver rettighed til at se indhold"
+          },
           "tree": {
             "empty": "Denne mappe er tom",
             "loadMore": "Indlæs flere",
@@ -4575,9 +4711,17 @@
             "noEditorAvailable": "Der er ingen editor til denne filtype.",
             "editorTabsLabel": "Åbne filer",
             "closeEditorTab": "Luk {name}",
+            "closeOtherTabs": "Luk andre",
+            "closeTabsToRight": "Luk til højre",
+            "closeSavedTabs": "Luk gemte",
+            "closeAllTabs": "Luk alle",
+            "revealInTree": "Vis i træet",
+            "revealNotFound": "Kunne ikke finde {path} i filtræet.",
             "unsavedTab": "{name} har ugemte ændringer",
             "dropToSplit": "Slip for at åbne i et nyt editor-panel",
-            "resizeEditorPanes": "Tilpas størrelsen på editor-paneler"
+            "resizeEditorPanes": "Tilpas størrelsen på editor-paneler",
+            "selectPane": "Vælg editor-panel",
+            "editorPane": "Editor-panel {number}"
           },
           "titleEditorViewing": "Viser {file}",
           "titleEditorPlaying": "Afspiller {file}",
@@ -4613,11 +4757,19 @@
             "fileFromUpload": "Fil fra upload",
             "directoryFromUpload": "Mappe fra upload",
             "viewDiff": "Vis diff",
+            "openInEditor": "Åbn i editor",
+            "editorActions": "Editor-handlinger",
             "loadDisk": "Indlæs version fra disk",
             "keepEditor": "Behold editorens version"
           },
           "quickAction": {
             "newFile": "Ny fil",
+            "keepFileOpen": "Hold filen åben",
+            "copyFilePath": "Kopiér sti til aktiv fil",
+            "searchTree": "Søg i træet",
+            "refreshTree": "Genindlæs træet",
+            "switchToList": "Skift til listevisning",
+            "switchToTree": "Skift til trævisning",
             "newDirectory": "Ny mappe",
             "pullFile": "Hent fil fra URL",
             "uploadFiles": "Upload filer",
@@ -4649,11 +4801,17 @@
           },
           "searchBanner": {
             "resultsTitle": "Søgeresultater ({files} fundet)",
+            "emptyTitle": "Ingen filer matchede",
             "root": "Rod:",
             "query": "Søgning:",
+            "included": "Inkluderet:",
             "excluded": "Ekskluderet:",
             "content": "Indhold:",
-            "size": "Størrelse:"
+            "caseSensitive": "Forskel på store og små bogstaver",
+            "maxSearchSize": "Filer over {size} springes over",
+            "oversizedIncluded": "Filer over {size} vises uden at blive gennemsøgt",
+            "size": "Størrelse:",
+            "edit": "Rediger søgning"
           },
           "operations": {
             "compressing": "Komprimerer {files} fra {path}",
@@ -4679,6 +4837,8 @@
             "editorLineOverflow": "Ombryd lange linjer",
             "editorFontSize": "Skriftstørrelse i editoren",
             "editorEngine": "Editor-engine",
+            "editorPreviewTabs": "Åbn filer fra træet i forhåndsvisningsfaner",
+            "editorPreviewTabsDescription": "Rediger eller dobbeltklik på en fane for at holde den åben.",
             "vscodeUriScheme": "VS Code URI-scheme",
             "imageViewerSmoothing": "Udglat billede (anti-aliasing)"
           },
@@ -4706,6 +4866,7 @@
             "fileRenamed": "Filen er omdøbt.",
             "fileCouldNotBeRenamed": "Filen kunne ikke omdøbes.",
             "closeDestinationBeforeRename": "Luk editor-fanen for destinationsfilen, før du omdøber.",
+            "closeDestinationBeforeCreate": "Luk editor-fanen for destinationsfilen, før du opretter denne fil.",
             "closeTabsBeforeBulkRename": "Luk de berørte editor-faner, før du omdøber overlappende stier.",
             "filesRenamed": "{files} omdøbt.",
             "renameUndone": "Omdøbning fortrudt.",
@@ -6190,6 +6351,9 @@
           },
           "badge": {
             "allLocked": "Alle låst"
+          },
+          "form": {
+            "noRetentionDescription": "Uden opbevaringsregler er denne gruppe blot en etiket og sletter aldrig gennemførte backups automatisk."
           },
           "modal": {
             "createGroup": {

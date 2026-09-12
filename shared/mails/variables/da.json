@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Konto oprettet",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi der er oprettet en konto til dig på <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Klik på knappen nedenfor for sikkert at vælge din adgangskode og få adgang til din konto:",
+    "button": "Vælg din adgangskode",
+    "note": "<strong>Bemærk:</strong> Af sikkerhedshensyn udløber dette link om <strong>20 minutter</strong>.",
+    "footer": "Hvis du ikke har anmodet om denne konto, kan du roligt ignorere denne e-mail."
+  },
+  "password_reset": {
+    "subject": "Nulstilling af adgangskode",
+    "greeting": "Hej <strong>{{ user.username }}</strong>,",
+    "intro": "Vi har modtaget en anmodning om at nulstille adgangskoden til din konto på <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Hvis det var dig, der anmodede om det, så klik på knappen nedenfor for at vælge en ny adgangskode:",
+    "button": "Nulstil adgangskode",
+    "note": "<strong>Bemærk:</strong> Dette link udløber om <strong>20 minutter</strong>.",
+    "footer": "Hvis du ikke har anmodet om at nulstille din adgangskode, kan du ignorere denne e-mail. Din adgangskode forbliver uændret, og din konto er sikker."
+  },
+  "email_verification": {
+    "subject": "Bekræft din e-mail",
+    "greeting": "Hej <strong>{{ user.username }}</strong>,",
+    "intro": "Bekræft, at <strong>{{ email }}</strong> tilhører dig, for at gøre opsætningen af din konto på <strong>{{ settings.app.name }}</strong> færdig.",
+    "button": "Bekræft e-mail",
+    "note": "<strong>Bemærk:</strong> Dette link udløber om <strong>24 timer</strong>.",
+    "footer": "Hvis du ikke har oprettet denne konto eller anmodet om denne ændring, kan du ignorere denne e-mail. Intet bliver ændret."
+  },
+  "two_factor_code": {
+    "subject": "Din login-kode",
+    "greeting": "Hej <strong>{{ user.username }}</strong>,",
+    "intro": "Brug koden nedenfor til at fuldføre dit login på <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Bemærk:</strong> Denne kode udløber om <strong>10 minutter</strong> og kan kun bruges én gang.",
+    "footer": "Hvis du ikke har forsøgt at logge ind, kender en anden måske din adgangskode. Vi anbefaler, at du ændrer den hurtigst muligt."
+  },
+  "session_created": {
+    "subject": "Ny session oprettet",
+    "greeting": "Hej <strong>{{ user.username }}</strong>,",
+    "intro": "Der er netop logget ind på din konto på <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "IP-adresse",
+    "device_label": "Enhed",
+    "button": "Gennemgå sessioner",
+    "note": "<strong>Bemærk:</strong> Hvis det var dig, behøver du ikke gøre noget. Du kan tilbagekalde enhver session, du ikke genkender, i dine kontoindstillinger.",
+    "footer": "Hvis det ikke var dig, der loggede ind, kender en anden måske din adgangskode. Vi anbefaler, at du ændrer den hurtigst muligt."
+  },
+  "connection_test": {
+    "subject": "Forbindelsestest",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi en administrator på <strong>{{ settings.app.name }}</strong> har anmodet om en testbesked for at kontrollere systemets indstillinger for udgående mail.",
+    "success": "🎉 Det lykkedes! E-mailforbindelsen virker.",
+    "footer": "Dette er en automatisk testbesked fra din applikation. Du behøver ikke gøre mere."
+  },
+  "added_to_server": {
+    "subject": "Tilføjet til server",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi du er blevet tilføjet som underbruger på <strong>{{ server.name }}</strong>.",
+    "instruction": "Klik på knappen nedenfor for at tilgå serveren:",
+    "button": "Gå til serveren"
+  },
+  "removed_from_server": {
+    "subject": "Fjernet fra server",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi du er blevet fjernet som underbruger fra <strong>{{ server.name }}</strong>.",
+    "footer": "Du behøver ikke gøre noget. Hvis du mener, at dette er en fejl, bedes du kontakte serverens administrator for at få flere oplysninger."
+  },
+  "server_installed": {
+    "subject": "Server installeret",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi din server, <strong>{{ server.name }}</strong>, er færdig med at installere.",
+    "instruction": "Klik på knappen nedenfor for at tilgå serveren:",
+    "button": "Gå til serveren"
+  },
+  "server_restored": {
+    "subject": "Server gendannet",
+    "greeting": "Hej,",
+    "intro": "Du modtager denne e-mail, fordi din server, <strong>{{ server.name }}</strong>, er færdig med at blive gendannet fra en backup.",
+    "instruction": "Klik på knappen nedenfor for at tilgå serveren:",
+    "button": "Gå til serveren"
+  }
+}

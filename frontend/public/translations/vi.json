@@ -1596,8 +1596,7 @@
                   "cacheVersion": "Phiên Bản Bộ Nhớ Đệm",
                   "cacheCalls": "Số Lần Gọi Bộ Nhớ Đệm",
                   "cacheHits": "Bộ Nhớ Đệm Trúng ({percent}%)",
-                  "cacheMisses": "Bộ Nhớ Đệm Hụt ({percent}%)",
-                  "avgCachedCallLatency": "Độ Trễ Trung Bình Cuộc Gọi Đệm"
+                  "cacheMisses": "Bộ Nhớ Đệm Hụt ({percent}%)"
                 },
                 "containerType": {
                   "none": "Không phát hiện",

@@ -1465,8 +1465,7 @@
                   "cacheVersion": "Version du cache",
                   "cacheCalls": "Appels au cache",
                   "cacheHits": "Succès du cache ({percent}%)",
-                  "cacheMisses": "Échecs du cache ({percent}%)",
-                  "avgCachedCallLatency": "Latence moyenne des appels en cache"
+                  "cacheMisses": "Échecs du cache ({percent}%)"
                 },
                 "containerType": {
                   "none": "Aucun détecté",
