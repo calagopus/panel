@@ -1904,8 +1904,6 @@
             "general": {
               "page": {
                 "tooltip": {
-                  "deploymentEnabled": "Wdrożenie włączone",
-                  "deploymentDisabled": "Wdrożenie wyłączone",
                   "allInOneNode": "Węzeł wszystko-w-jednym",
                   "errorWhileFetchingVersion": "Błąd podczas pobierania wersji",
                   "updateAvailable": "{version} (Dostępna aktualizacja)"

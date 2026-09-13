@@ -1553,8 +1553,7 @@
                   "cacheVersion": "快取版本",
                   "cacheCalls": "快取呼叫次數",
                   "cacheHits": "快取命中（{percent}%）",
-                  "cacheMisses": "快取未命中（{percent}%）",
-                  "avgCachedCallLatency": "平均快取呼叫延遲"
+                  "cacheMisses": "快取未命中（{percent}%）"
                 },
                 "containerType": {
                   "none": "未偵測到",
@@ -2305,8 +2304,6 @@
             "general": {
               "page": {
                 "tooltip": {
-                  "deploymentEnabled": "部署已啟用",
-                  "deploymentDisabled": "部署已停用",
                   "allInOneNode": "All-in-One 節點",
                   "errorWhileFetchingVersion": "取得版本時發生錯誤",
                   "updateAvailable": "{version}（有可用更新）",

@@ -1465,8 +1465,7 @@
                   "cacheVersion": "Version du cache",
                   "cacheCalls": "Appels au cache",
                   "cacheHits": "Succès du cache ({percent}%)",
-                  "cacheMisses": "Échecs du cache ({percent}%)",
-                  "avgCachedCallLatency": "Latence moyenne des appels en cache"
+                  "cacheMisses": "Échecs du cache ({percent}%)"
                 },
                 "containerType": {
                   "none": "Aucun détecté",
@@ -2113,8 +2112,6 @@
             "general": {
               "page": {
                 "tooltip": {
-                  "deploymentEnabled": "Déploiement activé",
-                  "deploymentDisabled": "Déploiement désactivé",
                   "allInOneNode": "Nœud tout-en-un",
                   "errorWhileFetchingVersion": "Erreur lors de la récupération de la version",
                   "updateAvailable": "{version} (Mise à jour disponible)",
