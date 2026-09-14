@@ -1,5 +1,124 @@
 {
   "items": {
+    "byte": {
+      "zero": "{count} バイト",
+      "one": "{count} バイト",
+      "two": "{count} バイト",
+      "few": "{count} バイト",
+      "many": "{count} バイト",
+      "other": "{count} バイト"
+    },
+    "user": {
+      "zero": "{count} ユーザー",
+      "one": "{count} ユーザー",
+      "two": "{count} ユーザー",
+      "few": "{count} ユーザー",
+      "many": "{count} ユーザー",
+      "other": "{count} ユーザー"
+    },
+    "file": {
+      "zero": "{count} ファイル",
+      "one": "{count} ファイル",
+      "two": "{count} ファイル",
+      "few": "{count} ファイル",
+      "many": "{count} ファイル",
+      "other": "{count} ファイル"
+    },
+    "directory": {
+      "zero": "{count} ディレクトリ",
+      "one": "{count} ディレクトリ",
+      "two": "{count} ディレクトリ",
+      "few": "{count} ディレクトリ",
+      "many": "{count} ディレクトリ",
+      "other": "{count} ディレクトリ"
+    },
+    "server": {
+      "zero": "{count} サーバー",
+      "one": "{count} サーバー",
+      "two": "{count} サーバー",
+      "few": "{count} サーバー",
+      "many": "{count} サーバー",
+      "other": "{count} サーバー"
+    },
+    "sshKey": {
+      "zero": "{count} 個のSSHキー",
+      "one": "{count} 個のSSHキー",
+      "two": "{count} 個のSSHキー",
+      "few": "{count} 個のSSHキー",
+      "many": "{count} 個のSSHキー",
+      "other": "{count} 個のSSHキー"
+    },
+    "asset": {
+      "zero": "{count} アセット",
+      "one": "{count} アセット",
+      "two": "{count} アセット",
+      "few": "{count} アセット",
+      "many": "{count} アセット",
+      "other": "{count} アセット"
+    },
+    "node": {
+      "zero": "{count} ノード",
+      "one": "{count} ノード",
+      "two": "{count} ノード",
+      "few": "{count} ノード",
+      "many": "{count} ノード",
+      "other": "{count} ノード"
+    },
+    "databaseAgentHost": {
+      "zero": "{count} データベースエージェントホスト",
+      "one": "{count} データベースエージェントホスト",
+      "two": "{count} データベースエージェントホスト",
+      "few": "{count} データベースエージェントホスト",
+      "many": "{count} データベースエージェントホスト",
+      "other": "{count} データベースエージェントホスト"
+    },
+    "allocation": {
+      "zero": "{count} 個のノード割り当て",
+      "one": "{count} 個のノード割り当て",
+      "two": "{count} 個のノード割り当て",
+      "few": "{count} 個のノード割り当て",
+      "many": "{count} 個のノード割り当て",
+      "other": "{count} 個のノード割り当て"
+    },
+    "egg": {
+      "zero": "{count} Egg",
+      "two": "{count} Egg",
+      "few": "{count} Egg",
+      "many": "{count} Egg",
+      "other": "{count} Egg"
+    },
+    "instance": {
+      "zero": "{count} インスタンス",
+      "one": "{count} インスタンス",
+      "two": "{count} インスタンス",
+      "few": "{count} インスタンス",
+      "many": "{count} インスタンス",
+      "other": "{count} インスタンス"
+    },
+    "shortcut": {
+      "zero": "{count} ショートカット",
+      "one": "{count} ショートカット",
+      "two": "{count} ショートカット",
+      "few": "{count} ショートカット",
+      "many": "{count} ショートカット",
+      "other": "{count} ショートカット"
+    },
+    "line": {
+      "zero": "{count} 行",
+      "one": "{count} 行",
+      "two": "{count} 行",
+      "few": "{count} 行",
+      "many": "{count} 行",
+      "other": "{count} 行"
+    },
+    "header": {
+      "zero": "{count} ヘッダー",
+      "one": "{count} ヘッダー",
+      "two": "{count} ヘッダー",
+      "few": "{count} ヘッダー",
+      "many": "{count} ヘッダー",
+      "other": "{count} ヘッダー"
+    },
     "backup": {
       "zero": "{count} バックアップ",
       "one": "{count} バックアップ",
@@ -7,6 +126,30 @@
       "few": "{count} バックアップ",
       "many": "{count} バックアップ",
       "other": "{count} バックアップ"
+    },
+    "row": {
+      "zero": "{count} 行",
+      "one": "{count} 行",
+      "two": "{count} 行",
+      "few": "{count} 行",
+      "many": "{count} 行",
+      "other": "{count} 行"
+    },
+    "change": {
+      "zero": "{count} 件の変更",
+      "one": "{count} 件の変更",
+      "two": "{count} 件の変更",
+      "few": "{count} 件の変更",
+      "many": "{count} 件の変更",
+      "other": "{count} 件の変更"
+    },
+    "session": {
+      "zero": "{count} セッション",
+      "one": "{count} セッション",
+      "two": "{count} セッション",
+      "few": "{count} セッション",
+      "many": "{count} セッション",
+      "other": "{count} セッション"
     }
   },
   "translations": {
@@ -14,7 +157,9 @@
       "button": {
         "create": "作成",
         "add": "追加",
+        "addDefaultPort": ":{port} を追加",
         "save": "保存",
+        "saveAndStay": "保存してこのページに留まる",
         "edit": "編集",
         "duplicate": "複製",
         "delete": "削除",
@@ -28,6 +173,7 @@
         "cancel": "キャンセル",
         "continue": "続ける",
         "skip": "スキップ",
+        "okay": "Ok",
         "back": "戻る",
         "install": "インストール",
         "selectAll": "全て選択",
