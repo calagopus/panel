@@ -15,7 +15,12 @@ export default function ServerStats() {
   const server = useServerStore((state) => state.server);
   const stats = useServerStore((state) => state.stats);
 
-  const networkPrevious = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
+  const networkPrevious = useRef<{
+    tx: number;
+    rx: number;
+    uptime: number;
+    timestamp: number;
+  } | null>(null);
   const wasOffline = useRef(false);
 
   const cpu = useStreamChart({
@@ -39,12 +44,12 @@ export default function ServerStats() {
 
   useEffect(() => {
     if (offline) {
+      networkPrevious.current = null;
       if (!wasOffline.current) {
         wasOffline.current = true;
         cpu.push(0);
         memory.push(0);
         network.push([0, 0]);
-        networkPrevious.current = { tx: 0, rx: 0 };
       }
       return;
     }
@@ -52,13 +57,32 @@ export default function ServerStats() {
     wasOffline.current = false;
     cpu.push(stats.cpuAbsolute);
     memory.push(stats.memoryBytes);
-    network.push([
-      networkPrevious.current.tx < 0 ? 0 : Math.max(0, stats.network.txBytes - networkPrevious.current.tx),
-      networkPrevious.current.rx < 0 ? 0 : Math.max(0, stats.network.rxBytes - networkPrevious.current.rx),
-    ]);
+    const now = performance.now();
+    const previous = networkPrevious.current;
+    const elapsedSeconds = previous ? (now - previous.timestamp) / 1000 : 0;
+    const canCalculateRate =
+      previous &&
+      elapsedSeconds > 0 &&
+      stats.uptime >= previous.uptime &&
+      stats.network.txBytes >= previous.tx &&
+      stats.network.rxBytes >= previous.rx;
 
-    networkPrevious.current = { tx: stats.network.txBytes, rx: stats.network.rxBytes };
-  }, [stats]);
+    network.push(
+      canCalculateRate
+        ? [
+            (stats.network.txBytes - previous.tx) / elapsedSeconds,
+            (stats.network.rxBytes - previous.rx) / elapsedSeconds,
+          ]
+        : [0, 0],
+    );
+
+    networkPrevious.current = {
+      tx: stats.network.txBytes,
+      rx: stats.network.rxBytes,
+      uptime: stats.uptime,
+      timestamp: now,
+    };
+  }, [stats, offline, cpu.push, memory.push, network.push]);
 
   const overlayIcon = <FontAwesomeIcon icon={faPowerOff} className='text-2xl' />;
   const overlayLabel = offline ? t('pages.server.console.stats.offline', {}) : undefined;
