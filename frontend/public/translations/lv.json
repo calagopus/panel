@@ -55,6 +55,202 @@
       "few": "{count} Olas",
       "many": "{count} Olas",
       "other": "{count} Olas"
+    },
+    "backup": {
+      "few": "{count} Datu dublējumi",
+      "many": "{count} Datu dublējumi",
+      "other": "{count} Datu dublējumi"
+    },
+    "row": {
+      "zero": "{count} Rindas",
+      "one": "{count} Rinda",
+      "two": "{count} Rindas",
+      "few": "{count} Rindas",
+      "many": "{count} Rindas",
+      "other": "{count} Rindas"
+    },
+    "change": {
+      "zero": "{count} Izmaiņas",
+      "one": "{count} Izmaiņa",
+      "two": "{count} Izmaiņas",
+      "few": "{count} Izmaiņas",
+      "many": "{count} Izmaiņas",
+      "other": "{count} Izmaiņas"
+    },
+    "session": {
+      "zero": "{count} Sesijas",
+      "one": "{count} Sesija",
+      "two": "{count} Sesijas",
+      "few": "{count} Sesijas",
+      "many": "{count} Sesijas",
+      "other": "{count} Sesijas"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Izveidot",
+        "add": "Pievienot",
+        "addDefaultPort": "Pievienot :{port}",
+        "save": "Saglabāt",
+        "saveAndStay": "Saglabāt un palikt",
+        "edit": "Rediģēt",
+        "duplicate": "Dublicēt",
+        "delete": "Dzēst",
+        "remove": "Noņemt",
+        "enable": "Iespējot",
+        "disable": "Atspējot",
+        "disableTwoFactor": "Atspējot divpakāpju autentifikāciju",
+        "verify": "Pārbaudīt",
+        "update": "Atjaunināt",
+        "close": "Aizvērt",
+        "cancel": "Atcelt",
+        "continue": "Turpināt",
+        "skip": "Izlaist",
+        "okay": "Labi",
+        "back": "Atpakaļ",
+        "next": "Tālāk",
+        "install": "Instalēt",
+        "selectAll": "Atlasīt visu",
+        "deselectAll": "Atcelt visu atlasi",
+        "restore": "Restaurēt",
+        "discard": "Atmest",
+        "download": "Lejupielādēt",
+        "downloadAs": "Lejupielādēt kā {format}",
+        "export": "Eksportēt",
+        "exportAs": "Eksportēt kā {format}",
+        "recreate": "Pārtaisīt",
+        "move": "Pārvietot",
+        "transfer": "pārvietot",
+        "reattach": "Pievienot no jauna",
+        "reassign": "Pārcelt",
+        "detach": "Atvienot",
+        "send": "Sūtīt",
+        "reset": "Atiestatīt",
+        "view": "Skatīt",
+        "import": "Importēt",
+        "details": "Detaļas",
+        "loadLogs": "Ielādēt žurnālus",
+        "sendTestEmail": "Nosūtīt testa e-pastu",
+        "setPrimary": "Iestatīt kā galveno",
+        "unsetPrimary": "Noņemt galveno",
+        "leavePage": "Aizvērt lapu",
+        "viewDocumentation": "Skatīt dokumentāciju",
+        "undo": "Atsaukt",
+        "clearUserFilter": "Dzēst lietotāja filtru"
+      },
+      "alert": {
+        "error": "Kļūda",
+        "warning": "Brīdinājums",
+        "success": "Veiksmīgi",
+        "clockOffset": "Jūsu sistēmas pulkstenis atpaliek vai steidzas vairāk nekā par 5 sekundēm attiecībā pret serveri. Tas var izraisīt problēmas ar piekļuves atslēgu (passkey) un divfaktoru autentifikāciju. Lūdzu, sinhronizējiet pulksteni, ja rodas problēmas. Pašreizējā nobīde: {offset} sekunde(-s)."
+      },
+      "divider": {
+        "or": "QR"
+      },
+      "input": {
+        "search": "Meklēt..."
+      },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "Virkne",
+              "number": "Numur",
+              "object": "Objekts",
+              "null": "Nulle"
+            }
+          },
+          "textMode": "Teksts",
+          "invalidJson": "Nederīgs JSON"
+        },
+        "tagsInput": {
+          "copyAll": "Kopēt visu",
+          "pasteReplace": "Ielīmēt (aizstāt)"
+        },
+        "serverFileInput": {
+          "notFound": "Fails ar šādu nosaukumu vēl nepastāv."
+        },
+        "ignoredFilesInput": {
+          "countMatches": "Saskaitīt atbilstības",
+          "matches": "{count} Sakrita",
+          "noMatches": "Nav atbilstību",
+          "exception": "Izņēmums"
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Sekunde",
+            "minute": "Minūte",
+            "hour": "Stunda",
+            "day": "Diena"
+          }
+        }
+      },
+      "form": {
+        "externalId": "Ārējais ID",
+        "lines": "Rindas",
+        "timezone": "Laika zona",
+        "timezoneSystem": "Sistēma",
+        "protocol": "Protokols",
+        "destination": "Galamērķis",
+        "locked": "Slēgts",
+        "value": "Vērtība",
+        "source": "Avots",
+        "target": "Mērķis",
+        "replaceWith": "Aizvietot ar"
+      },
+      "table": {
+        "columns": {
+          "name": "Vārds",
+          "author": "Autors",
+          "type": "Veids",
+          "title": "Virsraksts",
+          "enabled": "Iespējots",
+          "description": "Apraksts",
+          "username": "Lietotājvārds",
+          "size": "Izmērs",
+          "lastUsed": "Pēdējoreiz izmantots",
+          "created": "Izveidots",
+          "updated": "Atjaunots",
+          "event": "Notikums",
+          "when": "Kad",
+          "command": "Komanda",
+          "location": "Lokācija",
+          "owner": "Īpašnieks",
+          "added": "Pievienots",
+          "status": "Statuss",
+          "allocation": "Piešķīrums",
+          "notes": "Piezīmes",
+          "source": "Avots",
+          "target": "Mērķis",
+          "checksum": "Kontrolsumma",
+          "files": "Faili",
+          "server": "Serveris",
+          "address": "Adrese",
+          "version": "Versija"
+        }
+      },
+      "stat": {
+        "network": "Tīkls",
+        "inbound": "Ienākošie",
+        "outbound": "Izejošie",
+        "uptime": "Darbības laiks",
+        "resources": "Resursi"
+      },
+      "badge": {
+        "active": "Aktīvs",
+        "inactive": "Neaktīvs",
+        "enabled": "Iespējots",
+        "disabled": "Atspējots",
+        "successful": "Veiksmīgi",
+        "failed": "Neizdevās",
+        "installed": "Instalēts",
+        "systemBackup": "Sistēma"
+      },
+      "label": {
+        "page": "Lapa {page}",
+        "ignored": "Ignorētie"
+      }
     }
   }
 }
