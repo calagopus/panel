@@ -53,7 +53,7 @@ export default function TerminalHeader({
   const [consoleFontSize, setConsoleFontSize] = useUserSetting(CONSOLE_FONT_SIZE_KEY, consoleFontSizeSchema, 14);
 
   return (
-    <div className='flex flex-row justify-between items-center mb-2 text-xs'>
+    <div className='flex flex-col gap-2 md:flex-row md:justify-between md:items-center mb-2 text-xs'>
       <div className='flex flex-row items-center'>
         <ExtensionSlot
           components={

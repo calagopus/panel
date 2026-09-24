@@ -5817,7 +5817,10 @@
             },
             "cell": {
               "setNull": "Set to NULL",
+              "picker": "Pick a value",
               "null": "NULL",
+              "true": "TRUE",
+              "false": "FALSE",
               "empty": "empty",
               "truncated": "This value was too large to load in full and cannot be edited.",
               "editorHint": "{enter} applies the value, {shiftEnter} inserts a new line."
