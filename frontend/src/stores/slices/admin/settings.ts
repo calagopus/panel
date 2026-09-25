@@ -160,6 +160,10 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       hits: 0,
       windowSeconds: 0,
     },
+    remoteEnroll: {
+      hits: 0,
+      windowSeconds: 0,
+    },
     exemptIps: [],
     exemptApiKeys: [],
   },

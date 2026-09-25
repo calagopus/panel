@@ -17,7 +17,9 @@ use std::{
 };
 use utoipa::ToSchema;
 
+mod enrollment;
 mod events;
+pub use enrollment::NodeEnrollment;
 pub use events::NodeEvent;
 
 pub type GetNode = crate::extract::ConsumingExtension<Node>;
@@ -678,22 +680,47 @@ impl Node {
         &self,
         state: &crate::State,
     ) -> Result<(String, String), anyhow::Error> {
+        self.replace_token(state, None)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("node {} no longer exists", self.uuid))
+    }
+
+    /// Rotates the token only while the node still has `expected_token_id`, so a token
+    /// handed out once (e.g. through an enrollment code) cannot be claimed twice.
+    pub async fn reset_token_if_unchanged(
+        &self,
+        state: &crate::State,
+        expected_token_id: &str,
+    ) -> Result<Option<(String, String)>, anyhow::Error> {
+        self.replace_token(state, Some(expected_token_id)).await
+    }
+
+    async fn replace_token(
+        &self,
+        state: &crate::State,
+        expected_token_id: Option<&str>,
+    ) -> Result<Option<(String, String)>, anyhow::Error> {
         let (token_id, token) = Self::generate_token();
         let (token, encrypted_token) =
             EncryptedString::from_plaintext_with_input(token, &state.database).await?;
 
-        sqlx::query(
+        let result = sqlx::query(
             r#"
             UPDATE nodes
             SET token_id = $2, token = $3
-            WHERE nodes.uuid = $1
+            WHERE nodes.uuid = $1 AND ($4::text IS NULL OR nodes.token_id = $4)
             "#,
         )
         .bind(self.uuid)
         .bind(&token_id)
         .bind(encrypted_token)
+        .bind(expected_token_id)
         .execute(state.database.write())
         .await?;
+
+        if result.rows_affected() == 0 {
+            return Ok(None);
+        }
 
         Self::invalidate_cached(&state.database, self.uuid).await;
 
@@ -706,7 +733,7 @@ impl Node {
             },
         );
 
-        Ok((token_id, token))
+        Ok(Some((token_id, token)))
     }
 
     #[inline]

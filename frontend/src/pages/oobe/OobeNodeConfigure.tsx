@@ -24,6 +24,7 @@ import {
   isNodeAIO,
 } from '@/lib/domain/node.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import NodePairingSection from '@/pages/admin/nodes/configuration/NodePairingSection.tsx';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -38,6 +39,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isVerified, setIsVerified] = useState(false);
+  const [verifyAfterPairing, setVerifyAfterPairing] = useState(false);
 
   const node = data.nodes[0] ?? null;
   const { data: nodeToken } = useResource({
@@ -112,6 +114,13 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
     setLoading(false);
   };
 
+  useEffect(() => {
+    if (!verifyAfterPairing || !nodeToken) return;
+
+    setVerifyAfterPairing(false);
+    verifyNode();
+  }, [verifyAfterPairing, nodeToken]);
+
   return (
     <Stack gap='lg'>
       <Title order={2}>{t('pages.oobe.nodeConfiguration.title', {})}</Title>
@@ -131,6 +140,8 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
             }).md()}
           </Alert>
         )}
+
+        {node && !isNodeAIO(node) && <NodePairingSection node={node} onConnected={() => setVerifyAfterPairing(true)} />}
 
         {node && nodeConfiguration && command && (
           <div className='flex flex-col min-w-0'>

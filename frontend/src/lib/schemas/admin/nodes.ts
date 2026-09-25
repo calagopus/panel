@@ -40,6 +40,27 @@ export const adminNodeTokenSchema = z.object({
   token: z.string(),
 });
 
+export const adminNodeSetupProbeSchema = z.object({
+  version: z.string(),
+  container: z.boolean(),
+  architecture: z.string(),
+  cpuCount: z.number(),
+  memoryBytes: z.number(),
+  diskBytes: z.number(),
+  ips: z.array(z.string()),
+  apiPort: z.number(),
+  sftpPort: z.number(),
+  docker: z.object({
+    available: z.boolean(),
+    version: z.string().nullable(),
+  }),
+});
+
+export const adminNodeEnrollmentSchema = z.object({
+  code: z.string(),
+  expires: z.coerce.date(),
+});
+
 export const adminNodeAllocatedCapacitySchema = z.object({
   servers: z.number(),
   cpu: z.number(),
@@ -134,6 +155,7 @@ export const adminNodeTransfersSchema = z.record(z.string(), adminNodeTransferPr
 export type AdminNode = z.infer<typeof adminNodeSchema>;
 export type AdminNodeAllocatedCapacity = z.infer<typeof adminNodeAllocatedCapacitySchema>;
 export type AdminNodeToken = z.infer<typeof adminNodeTokenSchema>;
+export type AdminNodeSetupProbe = z.infer<typeof adminNodeSetupProbeSchema>;
 export type AdminNodeAllocation = z.infer<typeof adminNodeAllocationSchema>;
 export type AdminNodeAllocationFilter = z.infer<typeof adminNodeAllocationFilterSchema>;
 export type AdminNodeAllocationSelector = z.infer<typeof adminNodeAllocationSelectorSchema>;

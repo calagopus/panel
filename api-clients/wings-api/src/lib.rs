@@ -11,6 +11,7 @@ use utoipa::ToSchema;
 
 pub mod client;
 mod extra;
+pub mod setup;
 pub mod tunnel;
 
 use client::{AsyncRequestReader, AsyncResponseReader};
@@ -635,6 +636,8 @@ pub enum SystemBackupsDdupBakCompressionFormat {
     Gzip,
     #[serde(rename = "brotli")]
     Brotli,
+    #[serde(rename = "zstd")]
+    Zstd,
 }
 
 pub type SystemPath = compact_str::CompactString;

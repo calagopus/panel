@@ -13,6 +13,7 @@ use utoipa_axum::router::OpenApiRouter;
 
 mod activity;
 mod backups;
+mod enroll;
 mod schedule;
 pub mod servers;
 mod sftp;
@@ -95,5 +96,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/schedule", schedule::router(state))
         .nest("/tunnel", tunnel::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))
+        .nest("/enroll", enroll::router(state))
         .with_state(state.clone())
 }

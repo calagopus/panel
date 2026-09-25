@@ -89,6 +89,7 @@ use utoipa::ToSchema;
 
 pub mod client;
 mod extra;
+pub mod setup;
 pub mod tunnel;
 
 use client::{AsyncRequestReader, AsyncResponseReader};

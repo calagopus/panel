@@ -2822,6 +2822,53 @@ const baseTranslations = defineTranslations({
         nodes: {
           title: 'Nodes',
           resourceName: 'Node',
+          pairing: {
+            mode: {
+              pair: 'Pair a Waiting Node',
+              manual: 'Set Up Manually',
+            },
+            title: 'Pair with Wings',
+            description:
+              'Start wings without a configuration file and it waits to be paired. The pairing code is printed in its logs (`journalctl -u wings` or `docker compose logs wings`).',
+            form: {
+              address: 'Node Address',
+              addressDescription: 'The address the panel uses to reach wings, including the port.',
+              pairingCode: 'Pairing Code',
+              pairingCodeDescription: 'Printed in the wings logs while it waits to be paired.',
+              panelUrl: 'Panel URL',
+              panelUrlDescription: 'Optional override, e.g. the closest region.',
+            },
+            section: {
+              allocations: 'Allocations',
+              advanced: 'Advanced',
+            },
+            probe: {
+              title: 'Wings {version} is waiting to be paired',
+              resources: '{cores} CPU cores, {memory} memory, {disk} disk ({architecture})',
+              dockerAvailable: 'Docker {version} is reachable.',
+              dockerUnavailable: 'Docker is not reachable. Wings will not be able to start servers until it is.',
+              container:
+                'Wings runs in a container, so it cannot see the host network interfaces. Enter the allocation IP yourself.',
+            },
+            enrollment: {
+              description: 'Run this on the node. The code works once and expires after 30 minutes.',
+            },
+            button: {
+              connect: 'Connect',
+              change: 'Change',
+              pair: 'Pair',
+              createAndPair: 'Create & Pair',
+              generateCommand: 'Generate Enrollment Command',
+            },
+            status: {
+              waiting: 'Waiting for wings to connect...',
+              connected: 'Wings {version} is connected.',
+              timeout: 'Wings has not come online yet. Check its logs on the node.',
+            },
+            toast: {
+              pairFailed: 'The node was created, but pairing failed: {error}',
+            },
+          },
           tabs: {
             overview: {
               title: 'Overview',

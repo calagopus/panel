@@ -19,7 +19,9 @@ mod config;
 mod database_agent_hosts;
 mod database_hosts;
 mod duplicate;
+mod enrollment;
 mod mounts;
+mod pair;
 mod reset_token;
 mod servers;
 mod system;
@@ -242,6 +244,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
         .nest("/reset-token", reset_token::router(state))
+        .nest("/enrollment", enrollment::router(state))
+        .nest("/pair", pair::router(state))
         .nest("/token", token::router(state))
         .nest("/tunnel", tunnel::router(state))
         .nest("/allocations", allocations::router(state))

@@ -25,6 +25,7 @@ export const ratelimitEndpoints: RatelimitEndpoint[] = [
   { label: 'client/servers/files/pull/query', key: 'clientServersFilesPullQuery' },
   { label: 'remote', key: 'remote' },
   { label: 'remote/sftp/auth', key: 'remoteSftpAuth' },
+  { label: 'remote/enroll', key: 'remoteEnroll' },
 ];
 
 export const ratelimitsEmptyFormValues: RatelimitsFormValues = {

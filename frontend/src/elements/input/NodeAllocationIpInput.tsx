@@ -13,9 +13,10 @@ const ANY_ADDRESSES = ['0.0.0.0', '::'];
 
 type Props = Omit<AutocompleteProps, 'data'> & {
   nodeUuid?: string;
+  suggestedIps?: string[];
 };
 
-function NodeAllocationIpInput({ nodeUuid, ...rest }: Props) {
+function NodeAllocationIpInput({ nodeUuid, suggestedIps, ...rest }: Props) {
   const { t } = useTranslations();
   const canReadNode = useAdminCan('nodes.read');
   const canReadAllocations = useAdminCan('nodes.allocations');
@@ -47,12 +48,15 @@ function NodeAllocationIpInput({ nodeUuid, ...rest }: Props) {
 
     const groups: ComboboxItemGroup<string>[] = [
       { group: t('common.elements.nodeAllocationIpInput.anyAddress', {}), items: ANY_ADDRESSES },
-      { group: t('common.elements.nodeAllocationIpInput.nodeInterfaces', {}), items: unseen(systemIps) },
+      {
+        group: t('common.elements.nodeAllocationIpInput.nodeInterfaces', {}),
+        items: unseen([...(suggestedIps ?? []), ...(systemIps ?? [])]),
+      },
       { group: t('common.elements.nodeAllocationIpInput.inUse', {}), items: unseen(allocationIps) },
     ];
 
     return groups.filter((group) => group.items.length > 0);
-  }, [systemIps, allocationIps, t]);
+  }, [suggestedIps, systemIps, allocationIps, t]);
 
   return (
     <Autocomplete

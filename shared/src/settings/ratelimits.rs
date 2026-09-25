@@ -33,6 +33,7 @@ pub struct AppSettingsRatelimits {
 
     pub remote: RatelimitConfiguration,
     pub remote_sftp_auth: RatelimitConfiguration,
+    pub remote_enroll: RatelimitConfiguration,
 
     #[schema(value_type = Vec<String>)]
     pub exempt_ips: Vec<sqlx::types::ipnetwork::IpNetwork>,
@@ -83,6 +84,7 @@ impl SettingsSerializeExt for AppSettingsRatelimits {
             )?
             .write_serde_setting("remote", &self.remote)?
             .write_serde_setting("remote_sftp_auth", &self.remote_sftp_auth)?
+            .write_serde_setting("remote_enroll", &self.remote_enroll)?
             .write_serde_setting("exempt_ips", &self.exempt_ips)?
             .write_serde_setting("exempt_api_keys", &self.exempt_api_keys)?)
     }
@@ -187,6 +189,12 @@ impl SettingsDeserializeExt for AppSettingsRatelimitsDeserializer {
                     hits: 60,
                     window_seconds: 30,
                 }),
+            remote_enroll: deserializer.read_serde_setting("remote_enroll").unwrap_or(
+                RatelimitConfiguration {
+                    hits: 10,
+                    window_seconds: 60,
+                },
+            ),
             exempt_ips: deserializer
                 .read_serde_setting("exempt_ips")
                 .unwrap_or_default(),

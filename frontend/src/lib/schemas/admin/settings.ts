@@ -231,6 +231,7 @@ export const adminSettingsRatelimitsSchema = z.object({
   clientServersFilesPullQuery: adminSettingsRatelimitConfigurationSchema,
   remote: adminSettingsRatelimitConfigurationSchema,
   remoteSftpAuth: adminSettingsRatelimitConfigurationSchema,
+  remoteEnroll: adminSettingsRatelimitConfigurationSchema,
   exemptIps: z.array(z.ipv4().or(z.ipv6()).or(z.cidrv4()).or(z.cidrv6())).max(256),
   exemptApiKeys: z.array(z.uuid()).max(256),
 });

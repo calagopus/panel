@@ -26,3 +26,6 @@ tokio-util = { workspace = true }
 futures-util = { workspace = true }
 garde = { workspace = true }
 tokio-tungstenite = { workspace = true }
+hmac = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }

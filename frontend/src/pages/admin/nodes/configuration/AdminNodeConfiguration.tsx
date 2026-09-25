@@ -31,6 +31,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import NodeInitialSetupSection from './NodeInitialSetupSection.tsx';
 import NodeLiveConfigurationSection from './NodeLiveConfigurationSection.tsx';
+import NodePairingSection from './NodePairingSection.tsx';
 import { VerifyResult } from './VerifyStatusAlert.tsx';
 
 export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof adminNodeSchema> }) {
@@ -38,9 +39,11 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
   const { addToast } = useToast();
   const canReadToken = useAdminCan('nodes.read-token');
   const canUpdate = useAdminCan('nodes.update');
+  const canResetToken = useAdminCan('nodes.reset-token');
 
   const isAIO = isNodeAIO(node);
   const showInitialSetup = canReadToken && !isAIO;
+  const showPairing = canResetToken && !isAIO;
 
   const [remote, setRemote] = useState(window.location.origin);
   const [apiPort, setApiPort] = useState(() => getNodeDefaultApiPort(node));
@@ -151,6 +154,12 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       registry={window.extensionContext.extensionRegistry.pages.admin.nodes.view.configuration.subContainer}
       registryProps={{ node }}
     >
+      {showPairing && (
+        <div className='mb-6'>
+          <NodePairingSection node={node} />
+        </div>
+      )}
+
       {showInitialSetup && !revealed ? (
         <Stack>
           <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>

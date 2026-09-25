@@ -2913,6 +2913,51 @@
         "nodes": {
           "title": "Nodes",
           "resourceName": "Node",
+          "pairing": {
+            "mode": {
+              "pair": "Wartenden Node koppeln",
+              "manual": "Manuell einrichten"
+            },
+            "title": "Mit Wings koppeln",
+            "description": "Starte Wings ohne Konfigurationsdatei, dann wartet es auf die Kopplung. Der Kopplungscode steht in den Logs (`journalctl -u wings` oder `docker compose logs wings`).",
+            "form": {
+              "address": "Node-Adresse",
+              "addressDescription": "Die Adresse, über die das Panel Wings erreicht, inklusive Port.",
+              "pairingCode": "Kopplungscode",
+              "pairingCodeDescription": "Steht in den Wings-Logs, solange es auf die Kopplung wartet.",
+              "panelUrl": "Panel-URL",
+              "panelUrlDescription": "Optionale Überschreibung, z. B. die nächste Region."
+            },
+            "section": {
+              "allocations": "Allokationen",
+              "advanced": "Erweitert"
+            },
+            "probe": {
+              "title": "Wings {version} wartet auf die Kopplung",
+              "resources": "{cores} CPU-Kerne, {memory} Arbeitsspeicher, {disk} Speicherplatz ({architecture})",
+              "dockerAvailable": "Docker {version} ist erreichbar.",
+              "dockerUnavailable": "Docker ist nicht erreichbar. Wings kann erst Server starten, wenn es erreichbar ist.",
+              "container": "Wings läuft in einem Container und sieht die Netzwerkschnittstellen des Hosts nicht. Gib die Allokations-IP selbst ein."
+            },
+            "enrollment": {
+              "description": "Führe diesen Befehl auf dem Node aus. Der Code funktioniert einmal und läuft nach 30 Minuten ab."
+            },
+            "button": {
+              "connect": "Verbinden",
+              "change": "Ändern",
+              "pair": "Koppeln",
+              "createAndPair": "Erstellen & koppeln",
+              "generateCommand": "Registrierungsbefehl erzeugen"
+            },
+            "status": {
+              "waiting": "Warte auf die Verbindung von Wings...",
+              "connected": "Wings {version} ist verbunden.",
+              "timeout": "Wings ist noch nicht online. Prüfe die Logs auf dem Node."
+            },
+            "toast": {
+              "pairFailed": "Der Node wurde erstellt, aber die Kopplung ist fehlgeschlagen: {error}"
+            }
+          },
           "tabs": {
             "overview": {
               "title": "Übersicht",

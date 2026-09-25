@@ -4,6 +4,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 mod _node_;
 mod capacities;
 mod config;
+mod probe;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -149,6 +150,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/{node}", _node_::router(state))
         .nest("/capacities", capacities::router(state))
         .nest("/config", config::router(state))
+        .nest("/probe", probe::router(state))
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .with_state(state.clone())

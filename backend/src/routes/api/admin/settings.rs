@@ -260,6 +260,8 @@ mod put {
         remote: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
         remote_sftp_auth: Option<shared::settings::ratelimits::RatelimitConfiguration>,
+        #[garde(dive)]
+        remote_enroll: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(length(max = 256))]
         #[schema(value_type = Option<Vec<String>>)]
         exempt_ips: Option<Vec<sqlx::types::ipnetwork::IpNetwork>>,
@@ -620,6 +622,9 @@ mod put {
             }
             if let Some(remote_sftp_auth) = ratelimits.remote_sftp_auth {
                 settings.ratelimits.remote_sftp_auth = remote_sftp_auth;
+            }
+            if let Some(remote_enroll) = ratelimits.remote_enroll {
+                settings.ratelimits.remote_enroll = remote_enroll;
             }
             if let Some(exempt_ips) = ratelimits.exempt_ips {
                 settings.ratelimits.exempt_ips = exempt_ips;

@@ -126,6 +126,9 @@ export const getNodeConfigurationCommand = ({ node, token, remote, apiPort, sftp
   return `calagopus-wings configure --join-data ${btoa(yaml)}`;
 };
 
+export const getNodeEnrollmentCommand = (panelUrl: string, code: string) =>
+  `calagopus-wings configure --panel-url ${panelUrl} --enroll ${code}`;
+
 export const getNodeUrl = (node: z.infer<typeof adminNodeSchema>, path: string = '') => {
   const url = new URL(`${node.publicUrl ?? node.url}${path}`);
   url.pathname = url.pathname.replace(/\/{2,}/g, '/');
