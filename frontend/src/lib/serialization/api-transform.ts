@@ -250,6 +250,18 @@ export function parsePaginationFromApi<T extends z.ZodTypeAny>(
 
 // camelCase to snake_case, skips undefined fields
 function applyReverseTransform(schema: AnySchema, data: unknown): unknown {
+  const { type: outerType } = def<{ type: string }>(schema);
+
+  // .partial() wraps fields in optional, look through it for a preprocess
+  if (outerType === 'optional') return applyReverseTransform(def<{ innerType: AnySchema }>(schema).innerType, data);
+
+  // z.preprocess is a pipe out of a transform, run it so the api gets the validated value ('' -> null)
+  if (outerType === 'pipe') {
+    const { in: input, out } = def<{ in: AnySchema; out: AnySchema }>(schema);
+    const inputDef = def<{ type: string; transform: (value: unknown) => unknown }>(input);
+    if (inputDef.type === 'transform') return applyReverseTransform(out, inputDef.transform(data));
+  }
+
   const inner = unwrap(schema);
   const { type } = def<{ type: string }>(inner);
 
