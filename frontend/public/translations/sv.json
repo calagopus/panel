@@ -663,7 +663,6 @@
           "tooltip": {
             "removeFromGroup": "Ta bort från gruppen",
             "addToGroup": "Lägg till i grupp",
-            "addServerToGroup": "Lägg till server i grupp",
             "groupActions": "Gruppadministrering",
             "noGroups": "Inga grupper tillgängliga att lägga till server i",
             "noGroup": "Denna server är inte i någon grupp"
@@ -696,11 +695,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Lägg till server till {group}",
-                    "noServers": "Alla servrar finns redan i den här gruppen.",
-                    "toast": {
-                      "added": "Servern har lagts till i gruppen."
-                    }
+                    "noServers": "Alla servrar finns redan i den här gruppen."
                   }
                 },
                 "noGroups": "Inga grupper kunde hittas, dags att skapa en?"

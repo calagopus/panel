@@ -1221,7 +1221,6 @@
           "tooltip": {
             "removeFromGroup": "從群組移除",
             "addToGroup": "加入群組",
-            "addServerToGroup": "將伺服器加入群組",
             "groupActions": "群組動作",
             "noGroups": "沒有可加入伺服器的群組",
             "noGroup": "此伺服器不在任何群組中",
@@ -1255,11 +1254,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "將伺服器加入 {group}",
-                    "noServers": "所有伺服器都已在此群組中。",
-                    "toast": {
-                      "added": "已將伺服器加入群組。"
-                    }
+                    "noServers": "所有伺服器都已在此群組中。"
                   },
                   "removeServerFromGroup": {
                     "title": "確認移除伺服器",

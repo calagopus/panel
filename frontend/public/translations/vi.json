@@ -1346,7 +1346,6 @@
           "tooltip": {
             "removeFromGroup": "Xóa khỏi nhóm",
             "addToGroup": "Thêm vào Nhóm",
-            "addServerToGroup": "Thêm Máy Chủ vào Nhóm",
             "groupActions": "Hành động Nhóm",
             "noGroups": "Không có nhóm nào khả dụng để thêm máy chủ vào",
             "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào",
@@ -1380,11 +1379,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Thêm Máy Chủ vào {group}",
-                    "noServers": "Không có máy chủ nào khả dụng để thêm vào nhóm này.",
-                    "toast": {
-                      "added": "Máy chủ đã được thêm vào nhóm."
-                    }
+                    "noServers": "Không có máy chủ nào khả dụng để thêm vào nhóm này."
                   },
                   "removeServerFromGroup": {
                     "title": "Xác Nhận Xóa Máy Chủ",

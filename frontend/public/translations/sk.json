@@ -799,7 +799,6 @@
           "tooltip": {
             "removeFromGroup": "Odstrániť zo skupiny",
             "addToGroup": "Pridať do skupiny",
-            "addServerToGroup": "Pridať server do skupiny",
             "groupActions": "Skupinové akcie",
             "noGroups": "Nie sú dostupné žiadne skupiny na pridanie servera",
             "noGroup": "Tento server nie je v žiadnej skupine"
@@ -832,11 +831,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Pridať server do {group}",
-                    "noServers": "Všetky servery sú už v tejto skupine.",
-                    "toast": {
-                      "added": "Server bol pridaný do skupiny."
-                    }
+                    "noServers": "Všetky servery sú už v tejto skupine."
                   },
                   "removeServerFromGroup": {
                     "title": "Potvrdiť odstránenie servera",

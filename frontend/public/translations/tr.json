@@ -655,7 +655,6 @@
           "tooltip": {
             "removeFromGroup": "Gruptan Kaldır",
             "addToGroup": "Gruba Ekle",
-            "addServerToGroup": "Sunucuyu Gruba Ekle",
             "groupActions": "Grup Eylemleri",
             "noGroups": "Sunucu eklenecek grup bulunmuyor",
             "noGroup": "Bu sunucu herhangi bir grupta değil"
@@ -688,11 +687,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Sunucuyu {group} Grubuna Ekle",
-                    "noServers": "Tüm sunucular zaten bu grupta.",
-                    "toast": {
-                      "added": "Sunucu gruba eklendi."
-                    }
+                    "noServers": "Tüm sunucular zaten bu grupta."
                   }
                 },
                 "noGroups": "Hiç grup bulunamadı, bir tane oluşturmaya ne dersiniz?"

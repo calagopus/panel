@@ -904,7 +904,6 @@
           "tooltip": {
             "removeFromGroup": "Usuń z grupy",
             "addToGroup": "Dodaj do grupy",
-            "addServerToGroup": "Dodaj serwer do grupy",
             "groupActions": "Działania grupowe",
             "noGroups": "Brak dostępnych grup do dodania serwera",
             "noGroup": "Ten serwer nie jest w żadnej grupie",
@@ -938,11 +937,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Dodaj serwer do {group}",
-                    "noServers": "Wszystkie serwery są już w tej grupie.",
-                    "toast": {
-                      "added": "Dodano serwer do grupy."
-                    }
+                    "noServers": "Wszystkie serwery są już w tej grupie."
                   },
                   "removeServerFromGroup": {
                     "title": "Potwierdź usunięcie serwera",

@@ -1129,7 +1129,6 @@
           "tooltip": {
             "removeFromGroup": "Fjern fra gruppe",
             "addToGroup": "Føj til gruppe",
-            "addServerToGroup": "Føj server til gruppe",
             "groupActions": "Gruppehandlinger",
             "noGroups": "Der er ingen grupper, serveren kan føjes til",
             "noGroup": "Denne server er ikke i nogen gruppe",
@@ -1163,11 +1162,7 @@
                     }
                   },
                   "addServerToGroup": {
-                    "title": "Føj server til {group}",
-                    "noServers": "Alle servere er allerede i denne gruppe.",
-                    "toast": {
-                      "added": "Server føjet til gruppen."
-                    }
+                    "noServers": "Alle servere er allerede i denne gruppe."
                   },
                   "removeServerFromGroup": {
                     "title": "Bekræft fjernelse af server",
