@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Tài khoản đã được tạo",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì một tài khoản đã được tạo cho bạn trên <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Vui lòng nhấp vào nút bên dưới để thiết lập mật khẩu một cách an toàn và truy cập vào tài khoản của bạn:",
+    "button": "Đặt Mật khẩu của Bạn",
+    "note": "<strong>Lưu ý:</strong> Vì lý do bảo mật, liên kết này sẽ hết hạn sau <strong>20 phút</strong>.",
+    "footer": "Nếu bạn không yêu cầu tạo tài khoản này, bạn có thể yên tâm bỏ qua email này."
+  },
+  "password_reset": {
+    "subject": "Đặt lại mật khẩu",
+    "greeting": "Xin chào <strong>{{ user.username }}</strong>,",
+    "intro": "Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn trên <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Nếu bạn đã gửi yêu cầu này, vui lòng nhấp vào nút bên dưới để chọn mật khẩu mới:",
+    "button": "Đặt Lại Mật khẩu",
+    "note": "<strong>Lưu ý:</strong> Liên kết này sẽ hết hạn sau <strong>20 phút</strong>.",
+    "footer": "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này. Mật khẩu của bạn sẽ không thay đổi và tài khoản của bạn vẫn được bảo mật."
+  },
+  "email_verification": {
+    "subject": "Xác minh email của bạn",
+    "greeting": "Xin chào <strong>{{ user.username }}</strong>,",
+    "intro": "Vui lòng xác nhận rằng <strong>{{ email }}</strong> thuộc về bạn để hoàn tất việc thiết lập tài khoản trên <strong>{{ settings.app.name }}</strong>.",
+    "button": "Xác minh email",
+    "note": "<strong>Lưu ý:</strong> Liên kết này sẽ hết hạn sau <strong>24 giờ</strong>.",
+    "footer": "Nếu bạn không tạo tài khoản này hoặc không yêu cầu thay đổi này, vui lòng bỏ qua email này. Sẽ không có thay đổi nào được thực hiện."
+  },
+  "two_factor_code": {
+    "subject": "Mã đăng nhập của bạn",
+    "greeting": "Xin chào <strong>{{ user.username }}</strong>,",
+    "intro": "Sử dụng mã bên dưới để hoàn tất đăng nhập vào <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Lưu ý:</strong> Mã này sẽ hết hạn sau <strong>10 phút</strong> và chỉ có thể sử dụng một lần.",
+    "footer": "Nếu bạn không thực hiện thao tác đăng nhập, có thể ai đó đã biết mật khẩu của bạn. Chúng tôi khuyên bạn nên đổi mật khẩu càng sớm càng tốt."
+  },
+  "session_created": {
+    "subject": "Phiên làm việc mới đã được tạo",
+    "greeting": "Xin chào <strong>{{ user.username }}</strong>,",
+    "intro": "Tài khoản của bạn vừa được đăng nhập trên <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "Địa chỉ IP",
+    "device_label": "Thiết bị",
+    "button": "Kiểm tra các phiên đăng nhập",
+    "note": "<strong>Lưu ý:</strong> Nếu đây là bạn thì không cần thực hiện thêm thao tác nào. Bạn có thể thu hồi bất kỳ phiên đăng nhập nào mà mình không nhận ra từ phần cài đặt tài khoản.",
+    "footer": "Nếu bạn không thực hiện thao tác đăng nhập, có thể ai đó đã biết mật khẩu của bạn. Chúng tôi khuyên bạn nên đổi mật khẩu càng sớm càng tốt."
+  },
+  "connection_test": {
+    "subject": "Kiểm tra kết nối",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì quản trị viên của <strong>{{ settings.app.name }}</strong> đã yêu cầu gửi một tin nhắn thử nghiệm để xác minh cài đặt gửi thư đi của hệ thống.",
+    "success": "🎉 Thành công! Kết nối email đã hoạt động.",
+    "footer": "Đây là tin nhắn kiểm tra tự động từ ứng dụng của bạn. Không cần thực hiện thêm thao tác nào."
+  },
+  "added_to_server": {
+    "subject": "Đã thêm vào máy chủ",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì bạn đã được thêm làm người dùng phụ trên <strong>{{ server.name }}</strong>.",
+    "instruction": "Nhấn vào nút bên dưới để truy cập máy chủ:",
+    "button": "Máy chủ truy cập"
+  },
+  "removed_from_server": {
+    "subject": "Đã bị xóa khỏi máy chủ",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì bạn đã được thêm làm người dùng phụ trên <strong>{{ server.name }}</strong>.",
+    "footer": "Bạn không cần thực hiện bất kỳ thao tác nào. Nếu bạn cho rằng đây là một sự nhầm lẫn, vui lòng liên hệ với quản trị viên máy chủ để biết thêm thông tin."
+  },
+  "server_installed": {
+    "subject": "Máy chủ đã được cài đặt",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì máy chủ <strong>{{ server.name }}</strong> của bạn đã hoàn tất quá trình cài đặt.",
+    "instruction": "Nhấn vào nút bên dưới để truy cập máy chủ:",
+    "button": "Truy cập máy chủ"
+  },
+  "server_restored": {
+    "subject": "Đã khôi phục máy chủ",
+    "greeting": "Xin chào,",
+    "intro": "Bạn nhận được email này vì máy chủ <strong>{{ server.name }}</strong> của bạn đã hoàn tất quá trình cài đặt.",
+    "instruction": "Nhấn vào nút bên dưới để truy cập máy chủ:",
+    "button": "Truy cập máy chủ"
+  }
+}

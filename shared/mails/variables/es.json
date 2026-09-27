@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Cuenta creada",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque se ha creado una cuenta para ti en <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Haz clic en el botón de abajo para establecer tu contraseña de forma segura y acceder a tu cuenta:",
+    "button": "Establece tu contraseña",
+    "note": "<strong>Nota:</strong> Por motivos de seguridad, este enlace caducará en <strong>20 minutos</strong>.",
+    "footer": "Si no solicitaste esta cuenta, puedes ignorar este correo electrónico de forma segura."
+  },
+  "password_reset": {
+    "subject": "Restablecer contraseña",
+    "greeting": "Hola <strong>{{ user.username }}</strong>,",
+    "intro": "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Si has realizado esta solicitud, haz clic en el botón de abajo para elegir una nueva contraseña:",
+    "button": "Restablecer contraseña",
+    "note": "<strong>Nota:</strong> Este enlace expirará en <strong>20 minutos</strong>.",
+    "footer": "Si no solicitaste restablecer la contraseña, ignora este correo electrónico. Tu contraseña permanecerá sin cambios y tu cuenta es segura."
+  },
+  "email_verification": {
+    "subject": "Verifica tu correo electrónico",
+    "greeting": "Hola <strong>{{ user.username }}</strong>,",
+    "intro": "Por favor, confirma que <strong>{{ email }}</strong> te pertenece para terminar de configurar tu cuenta en <strong>{{ settings.app.name }}</strong>.",
+    "button": "Verificar la dirección",
+    "note": "<strong>Nota:</strong> Este enlace caducará en <strong>24 horas</strong>.",
+    "footer": "Si no creaste esta cuenta ni solicitaste este cambio, ignora este correo electrónico. No se realizará ningún cambio."
+  },
+  "two_factor_code": {
+    "subject": "Tu código de acceso",
+    "greeting": "Hola <strong>{{ user.username }}</strong>,",
+    "intro": "Usa el siguiente código para terminar de iniciar sesión en <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Nota:</strong> Este código expirará en <strong>10 minutos</strong> y es de un único uso.",
+    "footer": "Si no has intentado iniciar sesión, es posible que alguien más conozca tu contraseña. Te recomendamos que la cambies lo antes posible."
+  },
+  "session_created": {
+    "subject": "Nueva sesión iniciada",
+    "greeting": "Hola <strong>{{ user.username }}</strong>,",
+    "intro": "Tu cuenta acaba de iniciar sesión en <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "Dirección IP",
+    "device_label": "Dispositivo",
+    "button": "Revisar sesiones",
+    "note": "<strong>Nota:</strong> Si fuiste tú, no es necesario realizar ninguna acción. Puedes revocar cualquier sesión que no reconozcas desde la configuración de tu cuenta.",
+    "footer": "Si no iniciaste sesión, es posible que otra persona conozca tu contraseña. Te recomendamos cambiarla lo antes posible."
+  },
+  "connection_test": {
+    "subject": "Prueba de conexión",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque un administrador de <strong>{{ settings.app.name }}</strong> ha solicitado un mensaje de prueba para verificar la configuración del correo saliente del sistema.",
+    "success": "🎉 ¡Éxito! La conexión de correo electrónico funciona correctamente.",
+    "footer": "Este es un mensaje de prueba automatizado de tu aplicación. No se requiere ninguna acción adicional."
+  },
+  "added_to_server": {
+    "subject": "Añadido al servidor",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque has sido añadido como subusuario en <strong>{{ server.name }}</strong>.",
+    "instruction": "Haz clic en el siguiente botón para acceder al servidor:",
+    "button": "Acceder al servidor"
+  },
+  "removed_from_server": {
+    "subject": "Eliminado del servidor",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque has sido eliminado como subusuario de <strong>{{ server.name }}</strong>.",
+    "footer": "No es necesario que realices ninguna acción. Si crees que esto ha sido un error, ponte en contacto con el administrador del servidor para obtener más información."
+  },
+  "server_installed": {
+    "subject": "Servidor instalado",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque tu servidor, <strong>{{ server.name }}</strong>, ha terminado de instalarse.",
+    "instruction": "Haz clic en el siguiente botón para acceder al servidor:",
+    "button": "Acceder al servidor"
+  },
+  "server_restored": {
+    "subject": "Servidor restaurado",
+    "greeting": "Hola,",
+    "intro": "Recibes este correo electrónico porque tu servidor, <strong>{{ server.name }}</strong>, ha terminado de restaurarse desde una copia de seguridad.",
+    "instruction": "Haz clic en el siguiente botón para acceder al servidor:",
+    "button": "Acceder al servidor"
+  }
+}

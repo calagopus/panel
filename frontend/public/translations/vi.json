@@ -143,6 +143,65 @@
       "few": "{count} phiên",
       "many": "{count} phiên",
       "other": "{count} phiên"
+    },
+    "serverAllocation": {
+      "zero": "{count} Phân Bổ",
+      "one": "{count} Phân Bổ",
+      "two": "{count} Phân Bổ",
+      "few": "{count} Phân Bổ",
+      "many": "{count} Phân Bổ",
+      "other": "{count} Phân Bổ"
+    },
+    "databaseInstance": {
+      "zero": "{count} Cơ Sở Dữ Liệu Được Quản Lý",
+      "one": "{count} Cơ Sở Dữ Liệu Được Quản Lý",
+      "two": "{count} Cơ Sở Dữ Liệu Được Quản Lý",
+      "few": "{count} Cơ Sở Dữ Liệu Được Quản Lý",
+      "many": "{count} Cơ Sở Dữ Liệu Được Quản Lý",
+      "other": "{count} Cơ Sở Dữ Liệu Được Quản Lý"
+    },
+    "schedule": {
+      "zero": "{count} đã lên lịch",
+      "one": "{count} đã lên lịch",
+      "two": "{count} đã lên lịch",
+      "few": "{count} đã lên lịch",
+      "many": "{count} đã lên lịch",
+      "other": "{count} đã lên lịch"
+    },
+    "subuser": {
+      "zero": "{count} Người Dùng",
+      "one": "{count} Người Dùng",
+      "two": "{count} Người Dùng",
+      "few": "{count} Người Dùng",
+      "many": "{count} Người Dùng",
+      "other": "{count} Người Dùng"
+    },
+    "mount": {
+      "one": "{count} Mounts"
+    },
+    "apiKey": {
+      "zero": "{count} Khóa API",
+      "one": "{count} Khóa API",
+      "two": "{count} Khóa API",
+      "few": "{count} Khóa API",
+      "many": "{count} Khóa API",
+      "other": "{count} Khóa API"
+    },
+    "oauthLink": {
+      "zero": "{count} Tài khoản được liên kết",
+      "one": "{count} Tài khoản được liên kết",
+      "two": "{count} Tài khoản được liên kết",
+      "few": "{count} Tài khoản được liên kết",
+      "many": "{count} Tài khoản được liên kết",
+      "other": "{count} Tài khoản được liên kết"
+    },
+    "commandSnippet": {
+      "zero": "{count} Đoạn lệnh",
+      "one": "{count} Đoạn lệnh",
+      "two": "{count} Đoạn lệnh",
+      "few": "{count} Đoạn lệnh",
+      "many": "{count} Đoạn lệnh",
+      "other": "{count} Đoạn lệnh"
     }
   },
   "translations": {
@@ -160,6 +219,7 @@
         "enable": "Kích hoạt",
         "disable": "Vô hiệu hóa",
         "disableTwoFactor": "Tắt Xác thực Hai Lớp",
+        "verify": "Xác minh",
         "update": "Cập nhật",
         "close": "Đóng",
         "cancel": "Hủy",
@@ -181,6 +241,7 @@
         "move": "Di chuyển",
         "transfer": "Chuyển",
         "reattach": "Gắn lại",
+        "reassign": "Phân công lại",
         "detach": "Tháo",
         "send": "Gửi",
         "reset": "Đặt lại",
@@ -193,13 +254,16 @@
         "unsetPrimary": "Bỏ Chính",
         "leavePage": "Rời Khỏi Trang",
         "viewDocumentation": "Xem Tài Liệu",
-        "undo": "Hoàn tác"
+        "undo": "Hoàn tác",
+        "clearUserFilter": "Xóa Bộ Lọc Người Dùng",
+        "deleteFailedBackups": "Xóa {count} mục thất bại"
       },
       "alert": {
         "error": "Lỗi",
         "warning": "Cảnh báo",
         "success": "Thành công",
-        "clockOffset": "Đồng hồ hệ thống của bạn không được đồng bộ với máy chủ hơn 5 giây. Điều này có thể gây ra sự cố với xác thực passkey và xác thực hai lớp. Vui lòng đồng bộ đồng hồ của bạn nếu có sự cố xảy ra. Độ lệch hiện tại: {offset} giây."
+        "clockOffset": "Đồng hồ hệ thống của bạn không được đồng bộ với máy chủ hơn 5 giây. Điều này có thể gây ra sự cố với xác thực passkey và xác thực hai lớp. Vui lòng đồng bộ đồng hồ của bạn nếu có sự cố xảy ra. Độ lệch hiện tại: {offset} giây.",
+        "passwordAuthUnavailable": "Mật khẩu của bạn sẽ không hoạt động với kết nối này. Thay vào đó, hãy sử dụng khóa SSH; bạn có thể thêm khóa tại trang SSH Keys trong tài khoản của mình."
       },
       "divider": {
         "or": "HOẶC"
@@ -224,6 +288,15 @@
           "copyAll": "Sao chép tất cả",
           "pasteReplace": "Dán (Thay thế)"
         },
+        "serverFileInput": {
+          "notFound": "Chưa có tệp nào mang tên này.",
+          "isDirectory": "Đây là một thư mục, không phải là một tệp tin."
+        },
+        "nodeAllocationIpInput": {
+          "anyAddress": "Tất cả địa chỉ",
+          "nodeInterfaces": "Giao diện Node",
+          "inUse": "Đang dùng"
+        },
         "ignoredFilesInput": {
           "onePatternPerLine": "Mỗi dòng một pattern.",
           "countMatches": "Đếm số khớp",
@@ -231,6 +304,54 @@
           "noMatches": "Không có kết quả khớp",
           "exception": "Ngoại lệ",
           "tooManyPatterns": "Không tự động đếm số khớp khi có hơn {max} pattern."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Giây",
+            "minute": "Phút",
+            "hour": "Giờ",
+            "day": "Ngày",
+            "month": "Tháng",
+            "weekday": "Ngày trong tuần"
+          },
+          "nextRun": "Lần chạy tiếp theo là {timestamp}."
+        },
+        "backupRetention": {
+          "title": "Duy trì",
+          "disabled": "Không có quy tắc lưu giữ",
+          "description": "Hệ thống sẽ giữ lại bản sao lưu thành công nếu thỏa mãn bất kỳ quy tắc nào sau đây: giữ theo số lượng bản sao lưu gần nhất; giữ tất cả các bản sao lưu trong một khoảng thời gian gần đây hoặc giữ bản sao lưu mới nhất trong mỗi chu kỳ có phát sinh bản sao lưu. Các chu kỳ được tính theo giờ UTC; tuần bắt đầu vào thứ Hai. Các chu kỳ bị bỏ lỡ sẽ không tính vào giới hạn số lượng. Để vô hiệu hóa quy tắc, hãy để trống hoặc đặt giá trị là 0. Nếu tất cả các quy tắc đều bị vô hiệu hóa, các bản sao lưu thành công sẽ được giữ lại.",
+          "sourcesDescription": "Thời gian lưu giữ được đánh giá riêng cho các tệp tin máy chủ và từng cơ sở dữ liệu. Các bản sao lưu bị khóa sẽ được bảo vệ. Cơ chế lưu giữ không thực hiện việc lên lịch sao lưu.",
+          "capacityDescription": "Khi đạt đến giới hạn sao lưu của máy chủ, các bản sao lưu không còn tuân theo quy tắc lưu giữ sẽ bị xóa để giải phóng dung lượng. Đối với các bản sao lưu theo lịch trình, hệ thống sẽ loại bỏ bản sao lưu cũ nhất chưa bị khóa; trong khi đó, các yêu cầu sao lưu thủ công sẽ bị từ chối.",
+          "failedDescription": "Các bản sao lưu thất bại không bị khóa sẽ được dọn dẹp sau 24 giờ, bất kể chúng có được nhóm lại hay không.",
+          "count": "Giữ lại bản mới nhất",
+          "days": "Hoàn tất mọi việc trong vòng vài ngày.",
+          "daily": "Số ngày giữ lại",
+          "weekly": "Giữ lại hàng tuần",
+          "monthly": "Lưu giữ hàng tháng",
+          "yearly": "Lưu giữ hàng năm",
+          "ruleSummary": "{rule} {count}",
+          "status": {
+            "rule": {
+              "count": "Mới nhất",
+              "days": "Gần đây",
+              "daily": "Hàng ngày",
+              "weekly": "Hàng tuần",
+              "monthly": "Hàng tháng",
+              "yearly": "Hàng năm"
+            },
+            "locked": "Khóa",
+            "indefinite": "Được lưu giữ vô thời hạn",
+            "expired": "Đang chờ xóa",
+            "failed": "Dọn dẹp",
+            "keptBy": "Tuân thủ: {rules}.",
+            "forecastDescription": "Thời gian xóa là ước tính dựa trên lịch trình sao lưu.",
+            "lockedDescription": "Các bản sao lưu bị khóa sẽ không bao giờ bị xóa theo chính sách lưu giữ.",
+            "indefiniteDescription": "Không có quy tắc lưu giữ.",
+            "expiredDescription": "Không còn quy tắc nào duy trì bản sao lưu này nữa. Nó sẽ bị loại bỏ trong đợt xử lý lưu giữ tiếp theo.",
+            "failedDescription": "Các bản sao lưu thất bại sẽ bị xóa sau 24 giờ.",
+            "expires": "Đã xóa {timestamp}",
+            "expiresUnknown": "Không có dự báo xóa"
+          }
         }
       },
       "modal": {
@@ -239,10 +360,34 @@
         },
         "delete": {
           "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
+        },
+        "deleteFailedBackups": {
+          "title": "Xác nhận xóa bản sao lưu thất bại",
+          "content": "Bạn có chắc chắn muốn xóa `{count}` bản sao lưu bị lỗi không? Các bản sao lưu bị khóa và các bản sao lưu có cấu hình đang trong quá trình bảo trì sẽ được giữ lại. Quá trình xóa chạy ngầm và có thể mất một lúc để hoàn tất.",
+          "alert": {
+            "forceWarning": "Tính năng xóa cưỡng bức sẽ loại bỏ bản sao lưu ngay cả khi tệp cấu hình bị thiếu hoặc không thể kết nối với bộ lưu trữ từ xa. Tuy nhiên, bản thân các tệp sao lưu có thể không được dọn dẹp hoàn toàn, dẫn đến việc còn sót lại dữ liệu dư thừa."
+          }
         }
       },
       "toast": {
-        "duplicated": "Đã nhân bản {resource}."
+        "duplicated": "Đã nhân bản {resource}.",
+        "failedBackupDeletionStarted": "Đang xóa {count} bản sao lưu bị lỗi trong nền."
+      },
+      "settingScope": {
+        "account": "Đồng bộ với tài khoản",
+        "device": "Chỉ trên thiết bị này",
+        "useAccountValue": "Sử dụng giá trị tài khoản",
+        "saveToAccount": "Lưu giá trị vào tài khoản",
+        "stateAccount": "Tài khoản",
+        "stateDevice": "Trên thiết bị này",
+        "tooltip": {
+          "account": "Cài đặt này được đồng bộ hóa với tài khoản của bạn.",
+          "device": "Cài đặt này chỉ bị ghi đè trên thiết bị này."
+        },
+        "toast": {
+          "saved": "Cài đặt đã được lưu vào tài khoản của bạn.",
+          "saveFailed": "Không thể lưu cài đặt này vào tài khoản của bạn."
+        }
       },
       "tooltip": {
         "resetToDefault": "Đặt lại về mặc định",
@@ -309,6 +454,7 @@
         "lines": "Số Dòng",
         "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
         "databaseAgentHost": "Máy Chủ Agent Cơ Sở Dữ Liệu",
+        "databaseInstance": "Instance cơ sở dữ liệu",
         "timezone": "Múi Giờ",
         "timezoneSystem": "Hệ Thống",
         "protocol": "Giao Thức",
@@ -342,6 +488,7 @@
         "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác."
       },
       "table": {
+        "selectRow": "Chọn hàng",
         "pagination": {
           "results": "Hiển thị {start} đến {end} của {total} kết quả.",
           "empty": "Chúng tôi đã tìm kiếm rất nhiều nhưng xui xẻo là không tìm thấy kết quả nào cả."
@@ -381,6 +528,27 @@
           "host": "Máy chủ"
         }
       },
+      "bulkActions": {
+        "success": "Đã thành công {action} {items}.",
+        "partial": "Đã thành công {action} {successfulItems}. {failedItems} failed.",
+        "successWithSkipped": "Đã thành công {action} {items}. {skippedItems} đã bỏ qua.",
+        "nothingToDo": "Không có gì trong phần được chọn có thể bị thay đổi bởi hành động đó.",
+        "verb": {
+          "deleted": "đã bị xóa",
+          "removed": "đã loại bỏ",
+          "locked": "đã khóa",
+          "unlocked": "đã mở khóa",
+          "moved": "đã di chuyển",
+          "enabled": "đã bật",
+          "disabled": "đã tắt",
+          "attached": "đã gắn vào",
+          "detached": "đã tháo ra",
+          "started": "đã bắt đầu",
+          "stopped": "đã dừng",
+          "restarted": "đã khởi động lại",
+          "killed": "đã buộc dừng"
+        }
+      },
       "tabs": {
         "general": "Tổng Quan"
       },
@@ -410,7 +578,35 @@
         "page": "Trang {page}",
         "emptyDirectory": "Thư mục này trống",
         "ignored": "Đã bỏ qua",
+        "partiallyIgnored": "Bị phớt lờ một phần",
         "showingFirstEntries": "Hiển thị {count} mục đầu tiên"
+      },
+      "databaseAgentHost": {
+        "deployment": {
+          "available": "Triển Khai Đã Bật",
+          "nearlyFull": "Gần đầy",
+          "full": "Không có giới hạn",
+          "disabled": "Không Cho Phép Triển Khai",
+          "maintenance": "Hiện đang bảo trì",
+          "typesDisabled": "Không có loại nào được kích hoạt",
+          "memoryUsage": "Bộ nhớ: {used} / {limit}",
+          "memoryUsageUnlimited": "Bộ nhớ: {used} đã dùng, host không giới hạn",
+          "diskUsage": "Ổ đĩa: {used} / {limit}",
+          "diskUsageUnlimited": "Bộ nhớ: {used} đã dùng, host không giới hạn"
+        }
+      },
+      "node": {
+        "deployment": {
+          "available": "Cho Phép Triển Khai",
+          "nearlyFull": "Gần đầy",
+          "full": "Không có giới hạn",
+          "disabled": "Triển Khai Đã Tắt",
+          "maintenance": "Hiện đang bảo trì",
+          "memoryUsage": "Bộ nhớ: {used} / {limit}",
+          "memoryUsageUnlimited": "Bộ nhớ: {used} đã dùng, node không giới hạn",
+          "diskUsage": "Ổ đĩa: {used} / {limit}",
+          "diskUsageUnlimited": "Bộ nhớ: {used} đã dùng, node không giới hạn"
+        }
       },
       "server": {
         "noAllocation": "Không có địa chỉ ip.",
@@ -420,7 +616,8 @@
           "nodeMaintenance": "Node đang bảo trì",
           "restoringBackup": "Khôi phục Backup",
           "installing": "Đang cài đặt",
-          "installFailed": "Lỗi cài đặt máy chủ"
+          "installFailed": "Lỗi cài đặt máy chủ",
+          "backupRestoreFailed": "Khôi phục sao lưu thất bại"
         }
       },
       "enum": {
@@ -450,6 +647,14 @@
           "finished": "Đã hoàn thành",
           "failed": "Thất bại"
         },
+        "serverBackupKind": {
+          "server": "Máy Chủ",
+          "databaseInstance": "Cơ sở dữ liệu"
+        },
+        "serverFirewallRuleAction": {
+          "allow": "Cho phép",
+          "deny": "Từ chối"
+        },
         "connectionStatus": {
           "connected": "Đã kết nối",
           "offline": "Ngoại tuyến"
@@ -463,7 +668,11 @@
           "started": "Đã bắt đầu",
           "stopped": "Đã dừng",
           "restarted": "Đã khởi động lại",
-          "killed": "Đã buộc dừng"
+          "killed": "Đã buộc dừng",
+          "suspended": "Bị tạm đình chỉ",
+          "unsuspended": "Gỡ Đình Chỉ",
+          "clearedState": "Đã xóa trạng thái của",
+          "deleted": "Đã xóa"
         },
         "compressionLevel": {
           "bestSpeed": "Tốc độ nhanh nhất",
@@ -486,6 +695,12 @@
       "impersonatedBy": "Mạo danh bởi {username}"
     },
     "elements": {
+      "lockedConfigPaths": {
+        "notice": "Các cài đặt này chỉ có thể được thay đổi trong tệp cấu hình trên chính máy đó. Bảng điều khiển sẽ bỏ qua mọi chỉnh sửa đối với chúng:",
+        "toast": {
+          "ignored": "Cấu hình đã được áp dụng, ngoại trừ các cài đặt sau – vốn chỉ có thể thay đổi trong tệp cấu hình trên chính máy đó: {paths}"
+        }
+      },
       "chartLegend": {
         "hide": "Ẩn {series}",
         "show": "Hiện {series}"
@@ -568,7 +783,9 @@
           "theme": "Giao diện",
           "themeAuto": "Tự động",
           "themeDark": "Tối",
-          "themeLight": "Sáng"
+          "themeLight": "Sáng",
+          "redactAddresses": "Ẩn các địa chỉ",
+          "resetDeviceOverrides": "Đặt lại các tùy chọn ghi đè thiết bị ({count})"
         },
         "modal": {
           "logout": {
@@ -770,18 +987,37 @@
         "reselect": "Chọn lại tệp để tiếp tục",
         "badge": {
           "uploading": "Đang tải lên",
+          "uploadingPercent": "Đang Tải Lên: {percent}%",
           "waiting": "Đang chờ",
-          "paused": "Đã tạm dừng"
+          "paused": "Đã tạm dừng",
+          "incomplete": "Chưa hoàn thành"
         },
         "rateLimited": "Tải lên của bạn đã bị giới hạn tốc độ. Đang chờ...",
         "cancelAllUploads": "Hủy tất cả lượt tải lên",
         "modal": {
           "cancelAllUploads": {
             "content": "Bạn có chắc chắn muốn hủy tất cả các lượt tải lên đang hoạt động không? Các tệp đang tải lên dở dang sẽ bị hủy bỏ."
+          },
+          "uploadConflict": {
+            "title": "Giải quyết xung đột tải lên",
+            "description": "Các {items} sau đây đã tồn tại trong `{directory}`.",
+            "alsoUploading": "{files} không có xung đột sẽ được tải lên trong mọi trường hợp.",
+            "source": "Đã chọn",
+            "selectedFolder": "Chứa {files}.",
+            "destination": "Đã có",
+            "skip": "Bỏ qua",
+            "overwrite": "Ghi đè",
+            "merge": "Hợp nhất",
+            "mergeHint": "Các tệp hiện có trùng tên với một trong số các {files} sẽ bị ghi đè.",
+            "rename": "Đổi tên",
+            "skipAll": "Bỏ qua tất cả",
+            "overwriteAll": "Ghi đè tất cả",
+            "confirm": "Tải lên {files}"
           }
         },
         "toast": {
           "uploading": "Đang tải lên {files}...",
+          "conflictCheckFailed": "Không thể kiểm tra các tệp hiện có; vẫn tiến hành tải lên.",
           "failed": "Tải lên thất bại: {error}",
           "cancelledFile": "Đã hủy `{file}`.",
           "cancelledFolder": "Đã hủy tải lên `{folder}` ({files}).",
@@ -789,6 +1025,8 @@
           "cancelledAll": "Tất cả các tải lên đã bị hủy.",
           "completedServer": "Đã tải xong {files} lên `{server}`.",
           "completedAssets": "Hoàn thành tải lên {files} vào admin assets.",
+          "progressServer": "Đã tải lên {files} tới `{server}`...",
+          "progressAssets": "Đang tải {files} lên tài nguyên quản trị...",
           "showFiles": "Hiển thị tệp"
         }
       }
@@ -966,7 +1204,9 @@
           "error": {
             "usernameRequired": "Vui lòng nhập tên người dùng của bạn.",
             "registrationDisabled": "Không tìm thấy tài khoản phù hợp và đăng ký hiện đang bị tắt.",
-            "userAlreadyExists": "Một tài khoản với tên người dùng hoặc email này đã tồn tại."
+            "userAlreadyExists": "Một tài khoản với tên người dùng hoặc email này đã tồn tại.",
+            "securityKeyRequired": "Tài khoản này yêu cầu xác thực hai yếu tố; hãy đăng nhập bằng khóa bảo mật thay thế.",
+            "passwordLoginDisabled": "Tính năng đăng nhập bằng mật khẩu đã bị tắt trên bảng này; thay vào đó, hãy sử dụng một trong các tùy chọn dưới đây."
           },
           "passkey": {
             "error": {
@@ -986,6 +1226,7 @@
             "username": {
               "title": "Đăng nhập",
               "subtitle": "Nhập tên người dùng hoặc địa chỉ email của bạn để tiếp tục",
+              "subtitleProviderOnly": "Chọn nhà cung cấp để tiếp tục",
               "form": {
                 "usernameOrEmailPlaceholder": "Tên người dùng hoặc địa chỉ email của bạn"
               },
@@ -1029,8 +1270,13 @@
               }
             },
             "email": {
+              "subtitle": "Chúng tôi có thể gửi email cho bạn mã dùng một lần để hoàn tất việc đăng nhập.",
+              "enterCode": "Nhập mã 6 chữ số đã được gửi đến địa chỉ email của bạn",
               "button": {
-                "sendCode": "Gửi mã"
+                "useEmail": "Gửi mã cho tôi qua email",
+                "sendCode": "Gửi mã",
+                "resend": "Gửi lại mã",
+                "resendIn": "Gửi lại mã ({seconds}s)"
               }
             },
             "totpRecovery": {
@@ -1066,6 +1312,14 @@
             "request": "Yêu cầu Đặt Lại Mật khẩu"
           },
           "success": "Một email đã được gửi đến bạn với hướng dẫn về cách đặt lại mật khẩu."
+        },
+        "verifyEmail": {
+          "title": "Xác minh email",
+          "success": "Địa chỉ email **{email}** của bạn đã được xác minh.",
+          "failed": "Liên kết xác minh này không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu một liên kết mới và thử lại.",
+          "button": {
+            "continue": "Tiếp tục"
+          }
         },
         "resetPassword": {
           "title": "Đặt Lại Mật khẩu",
@@ -1140,6 +1394,21 @@
                     }
                   }
                 },
+                "drag": {
+                  "blocked": {
+                    "alreadyInGroup": {
+                      "title": "Đã ở trong nhóm này rồi",
+                      "description": "Máy chủ này đã là một phần của {group}."
+                    },
+                    "groupFull": {
+                      "title": "Nhóm đã đầy",
+                      "description": "Một nhóm không thể sở hữu quá {max} máy chủ."
+                    }
+                  },
+                  "toast": {
+                    "moved": "Máy chủ đã được chuyển sang {group}."
+                  }
+                },
                 "noGroups": "Chà có vẻ không có nhóm nào hãy thử tạo một nhóm mới?"
               }
             },
@@ -1180,6 +1449,14 @@
               "title": "Yêu cầu Xác thực Hai Lớp",
               "description": "Để cải thiện bảo mật tài khoản của bạn, chúng tôi yêu cầu bạn kích hoạt xác thực hai lớp. Vui lòng thiết lập xác thực hai lớp để tiếp tục sử dụng tài khoản của bạn."
             },
+            "verifyEmail": {
+              "title": "Yêu cầu xác minh email",
+              "description": "Vui lòng xác thực **{email}** để tiếp tục sử dụng bảng điều khiển. Hãy kiểm tra hộp thư đến để lấy liên kết xác thực.",
+              "sent": "Email xác minh đã được gửi đến {email}.",
+              "button": {
+                "resend": "Gửi Lại Email Xác Nhận"
+              }
+            },
             "frozen": {
               "title": "Tài Khoản Bị Đóng Băng",
               "description": "Tài khoản của bạn đã bị đóng băng. Bạn không thể thực hiện thay đổi tài khoản cho đến khi được mở đóng băng. Vui lòng liên hệ quản trị viên để biết thêm thông tin."
@@ -1188,17 +1465,30 @@
           "containers": {
             "password": {
               "title": "Mật khẩu",
+              "button": {
+                "logOutOthers": "Đăng xuất tất cả"
+              },
               "toast": {
                 "updated": "Mật khẩu đã được cập nhật."
               },
               "form": {
                 "newPassword": "Mật khẩu mới",
                 "confirmNewPassword": "Xác nhận mật khẩu mới"
+              },
+              "modal": {
+                "logOutOtherSessions": {
+                  "title": "Đăng xuất khỏi các phiên khác",
+                  "content": "Mật khẩu của bạn đã được cập nhật. Bạn có muốn đăng xuất khỏi tất cả các phiên làm việc, ngoại trừ phiên hiện tại không? Mọi thiết bị khác đang đăng nhập vào tài khoản của bạn sẽ phải đăng nhập lại.",
+                  "toast": {
+                    "deleted": "{sessions} đã được xóa."
+                  }
+                }
               }
             },
             "email": {
               "toast": {
-                "updated": "Email đã được cập nhật thành công."
+                "updated": "Email đã được cập nhật thành công.",
+                "pending": "Liên kết xác nhận đã được gửi đến {email}. Địa chỉ của bạn sẽ thay đổi sau khi bạn mở liên kết đó."
               },
               "form": {
                 "newEmail": "Email Mới"
@@ -1226,14 +1516,68 @@
                 }
               },
               "button": {
-                "setupTwoFactor": "Thiết lập Xác thực Hai Lớp"
+                "setupTwoFactor": "Thiết lập Xác thực Hai Lớp",
+                "enableEmail": "Bật tính năng email",
+                "disableEmail": "Vô hiệu hóa email",
+                "securityKeys": "Khóa Bảo Mật"
               },
-              "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}"
+              "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}",
+              "none": "Tài khoản của bạn chưa được thiết lập xác thực hai yếu tố.",
+              "requirementMet": "Tài khoản của bạn đáp ứng yêu cầu về xác thực hai yếu tố.",
+              "requirementUnmet": "Tài khoản của bạn chưa đáp ứng yêu cầu xác thực hai yếu tố.",
+              "method": {
+                "totp": "Ứng dụng xác thực",
+                "securityKey": "Khóa bảo mật"
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "Đã tắt thành công xác thực hai yếu tố qua email."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Bật xác thực hai yếu tố qua email",
+                  "description": "Một mã dùng một lần sẽ được gửi đến **{email}** mỗi khi bạn đăng nhập. Bất kỳ ai có quyền truy cập vào hộp thư đó đều có thể đăng nhập dưới tên bạn."
+                },
+                "disable": {
+                  "title": "Tắt xác thực hai yếu tố qua email",
+                  "description": "Tắt xác thực hai lớp sẽ làm cho tài khoản của bạn kém an toàn hơn."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Đăng nhập bằng mật khẩu",
+              "enabled": "Bạn có thể đăng nhập bằng mật khẩu của mình.",
+              "disabled": "Tính năng đăng nhập bằng mật khẩu đã bị tắt. Chỉ khóa bảo mật của bạn mới có thể dùng để đăng nhập.",
+              "toast": {
+                "updated": "Mật khẩu đăng nhập đã được cập nhật thành công."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Hãy thêm khóa bảo mật trước khi tắt tính năng đăng nhập bằng mật khẩu."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Tắt đăng nhập bằng mật khẩu",
+                  "description": "Mật khẩu của bạn sẽ không còn dùng để đăng nhập vào bất kỳ đâu được nữa, kể cả SFTP. Chỉ các khóa bảo mật của bạn mới hoạt động, vì vậy hãy đảm bảo bạn có thể sử dụng khóa bảo mật trước khi tiếp tục."
+                },
+                "enable": {
+                  "title": "Bật đăng nhập bằng mật khẩu",
+                  "description": "Mật khẩu của bạn sẽ cho phép bạn đăng nhập lại."
+                }
+              }
             },
             "account": {
               "title": "Chi tiết Tài khoản",
               "toast": {
                 "updated": "Chi tiết tài khoản đã được cập nhật thành công."
+              }
+            },
+            "preferences": {
+              "title": "Tùy chọn",
+              "form": {
+                "toastPosition": "Vị trí thông báo",
+                "startOnGroupedServers": "Bắt đầu trên trang Nhóm Máy Chủ",
+                "redactAddresses": "Ẩn địa chỉ máy chủ (nỗ lực tối đa, dành cho chia sẻ màn hình)"
               }
             },
             "avatar": {
@@ -1295,6 +1639,9 @@
           "button": {
             "deleteOthers": "Đăng xuất tất cả"
           },
+          "tooltip": {
+            "noOtherSessions": "Không còn phiên đăng nhập nào khác để đăng xuất."
+          },
           "table": {
             "columns": {
               "thisDevice": "Thiết bị Này?"
@@ -1342,7 +1689,8 @@
           "general": {
             "title": "Chung",
             "undo": "Hoàn tác hành động cuối cùng",
-            "quickActions": "Mở các thao tác nhanh"
+            "quickActions": "Mở các thao tác nhanh",
+            "save": "Lưu biểu mẫu hiện tại"
           },
           "fileManager": {
             "title": "Trình Quản Lý Tệp",
@@ -1357,14 +1705,19 @@
             "moveDownSelection": "Di chuyển xuống lựa chọn",
             "renameFile": "Đổi tên tệp",
             "deselectAll": "Bỏ chọn tất cả tệp",
-            "deleteFiles": "Xóa các tệp đã chọn"
+            "deleteFiles": "Xóa các tệp đã chọn",
+            "closeEditorTab": "Đóng thẻ trình soạn thảo đang hoạt động",
+            "nextEditorTab": "Tab trình soạn thảo tiếp theo",
+            "previousEditorTab": "Thẻ trình soạn thảo trước đó"
           },
           "table": {
             "title": "Điều Hướng Bảng",
             "previousPage": "Trang trước",
             "nextPage": "Trang tiếp theo",
             "firstPage": "Trang đầu tiên",
-            "lastPage": "Trang cuối cùng"
+            "lastPage": "Trang cuối cùng",
+            "selectAll": "Chọn tất cả các hàng",
+            "deselectAll": "Chọn tất cả các hàng"
           },
           "console": {
             "title": "Bảng điều khiển Máy chủ",
@@ -1412,6 +1765,10 @@
                 "created": "{sshKeys} đã được tạo."
               }
             },
+            "deleteSshKeys": {
+              "title": "Xác Nhận Xóa Khóa SSH",
+              "content": "Bạn có chắc muốn xóa **{sshKeys}** khỏi tài khoản của bạn không?"
+            },
             "deleteSshKey": {
               "title": "Xác Nhận Xóa Khóa SSH",
               "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
@@ -1440,6 +1797,10 @@
                 "updated": "Đoạn lệnh đã được cập nhật."
               }
             },
+            "deleteCommandSnippets": {
+              "title": "Xác Nhận Xóa Đoạn Lệnh",
+              "content": "Bạn có chắc muốn xóa **{commandSnippets}** khỏi tài khoản của bạn không?"
+            },
             "deleteCommandSnippet": {
               "title": "Xác Nhận Xóa Đoạn Lệnh",
               "content": "Bạn có chắc muốn xóa **{name}** khỏi tài khoản của bạn không?",
@@ -1467,6 +1828,10 @@
             }
           },
           "modal": {
+            "deleteOAuthLinks": {
+              "title": "Xác Nhận Xóa Liên Kết OAuth",
+              "content": "Bạn có chắc muốn xóa **{oauthLinks}** khỏi tài khoản của bạn không?"
+            },
             "deleteOAuthLink": {
               "title": "Xác Nhận Xóa Liên Kết OAuth",
               "content": "Bạn có chắc muốn xóa kết nối **{provider}** khỏi tài khoản của bạn không?",
@@ -1480,7 +1845,8 @@
           "title": "Khóa API",
           "subtitle": "{current} trên {max} khóa API tối đa đã được tạo.",
           "button": {
-            "apiDocumentation": "Tài Liệu API"
+            "apiDocumentation": "Tài Liệu API",
+            "copyUuid": "Sao chép UUID"
           },
           "tooltip": {
             "limitReached": "Bạn được giới hạn ở {max} khóa API."
@@ -1491,6 +1857,10 @@
               "permissions": "Quyền Người Dùng / Máy Chủ / Admin",
               "expires": "Hết Hạn"
             }
+          },
+          "toast": {
+            "enabled": "Khóa API đã được kích hoạt.",
+            "disabled": "Khóa API đã bị vô hiệu hóa."
           },
           "modal": {
             "createApiKey": {
@@ -1511,6 +1881,10 @@
               "toast": {
                 "recreated": "Khóa API đã được tạo lại."
               }
+            },
+            "deleteApiKeys": {
+              "title": "Xác Nhận Xóa Khóa API",
+              "content": "Bạn có chắc muốn xóa **{apiKeys}** khỏi tài khoản của bạn không?"
             },
             "deleteApiKey": {
               "title": "Xác Nhận Xóa Khóa API",
@@ -1596,7 +1970,17 @@
                   "cacheVersion": "Phiên Bản Bộ Nhớ Đệm",
                   "cacheCalls": "Số Lần Gọi Bộ Nhớ Đệm",
                   "cacheHits": "Bộ Nhớ Đệm Trúng ({percent}%)",
-                  "cacheMisses": "Bộ Nhớ Đệm Hụt ({percent}%)"
+                  "cacheMisses": "Bộ Nhớ Đệm Hụt ({percent}%)",
+                  "cacheAverageLatency": "trung bình {latency}",
+                  "slowestCachedCall": "Cuộc gọi được lưu vào bộ nhớ đệm chậm nhất",
+                  "cacheBreakdown": {
+                    "title": "Phân tích chi tiết cuộc gọi",
+                    "calls": "Cuộc gọi",
+                    "localHits": "Bộ nhớ trúng",
+                    "remoteHits": "Redis trúng",
+                    "coalescedWaits": "Đang chờ một cuộc gọi khác",
+                    "misses": "Đã tính"
+                  }
                 },
                 "containerType": {
                   "none": "Không phát hiện",
@@ -1699,6 +2083,8 @@
               "page": {
                 "title": "Cài Đặt Ứng Dụng",
                 "form": {
+                  "additionalUrls": "Url Bổ Sung",
+                  "additionalUrlsDescription": "Các địa chỉ khác có thể dùng để truy cập vào bảng điều khiển: Các email liên quan đến đăng nhập, OAuth và dịch vụ tự phục vụ sẽ sử dụng chính URL mà yêu cầu được gửi đến; tất cả các chức năng còn lại đều sử dụng URL chính. Khóa bảo mật chỉ hoạt động với các URL thuộc phạm vi WebAuthn RP ID.",
                   "icon": "Biểu Tượng",
                   "iconLight": "Biểu Tượng (Chế Độ Sáng)",
                   "banner": "Biểu ngữ",
@@ -1706,11 +2092,23 @@
                   "sessionCookie": "Cookie Phiên",
                   "sessionDurationSeconds": "Thời Lượng Phiên (giây)",
                   "twoFactorRequirement": "Yêu Cầu Xác Thực Hai Lớp",
+                  "emailTwoFactorEnabled": "Xác thực hai yếu tố qua email",
+                  "emailTwoFactorEnabledDescription": "Cho phép người dùng nhận mã đăng nhập một lần qua email. Yêu cầu phải cấu hình dịch vụ truyền tải email.",
+                  "twoFactorAcceptedMethods": "Các phương thức xác thực hai yếu tố được chấp nhận",
+                  "twoFactorAcceptedMethodsDescription": "Những yếu tố xác thực nào được tính vào yêu cầu xác thực hai yếu tố? Tính năng xác thực qua email bị tắt theo mặc định: do quy trình đặt lại mật khẩu cũng sử dụng email, nên phương thức này không độc lập với mật khẩu.",
+                  "emailVerificationRequired": "Yêu cầu xác minh email",
+                  "emailVerificationRequiredDescription": "Người dùng mới phải xác nhận địa chỉ email trước khi có thể sử dụng bảng điều khiển. Yêu cầu phải cấu hình hệ thống truyền tải email.",
                   "telemetryEnabled": "Bật Đo Lường",
                   "telemetryEnabledDescription": "Cho phép Calagopus thu thập dữ liệu sử dụng ẩn danh và hạn chế để giúp cải thiện ứng dụng.",
-                  "registrationEnabled": "Bật Đăng Ký"
+                  "registrationEnabled": "Bật Đăng Ký",
+                  "passwordLoginEnabled": "Bật đăng nhập bằng mật khẩu",
+                  "passwordLoginEnabledDescription": "Cho phép người dùng đăng nhập bằng tên người dùng và mật khẩu. Việc tắt tính năng này sẽ khiến các nhà cung cấp OAuth và khóa bảo mật trở thành những phương thức truy cập duy nhất, đồng thời vô hiệu hóa việc đăng ký tài khoản cục bộ, đặt lại mật khẩu và xác thực mật khẩu qua SFTP."
                 },
                 "enum": {
+                  "twoFactorMethod": {
+                    "totp": "Ứng dụng xác thực (TOTP)",
+                    "securityKey": "Khóa bảo mật"
+                  },
                   "twoFactorRequirement": {
                     "admins": "Quản Trị Viên",
                     "allUsers": "Tất Cả Người Dùng",
@@ -1732,9 +2130,43 @@
                     "title": "Xác Nhận Bật Đăng Ký",
                     "content": "Bạn có chắc muốn bật đăng ký? Bật đăng ký cho phép bất kỳ ai tạo tài khoản trên bảng điều khiển này. Nếu bạn chưa cấu hình captcha, đây có thể là một sai lầm."
                   },
+                  "disablePasswordLogin": {
+                    "title": "Xác nhận tắt tính năng đăng nhập bằng mật khẩu",
+                    "content": "Bạn có chắc chắn muốn tắt tính năng đăng nhập bằng mật khẩu không? Mọi người sẽ cần sử dụng nhà cung cấp OAuth hoặc khóa bảo mật để đăng nhập; đồng thời, các tính năng đăng ký cục bộ, đặt lại mật khẩu và xác thực mật khẩu SFTP sẽ ngừng hoạt động. Hãy đảm bảo rằng bạn vẫn có thể đăng nhập được trước khi tiếp tục."
+                  },
                   "telemetryPreview": {
                     "title": "Xem Trước Đo Lường"
                   }
+                }
+              }
+            },
+            "metadata": {
+              "page": {
+                "title": "Cài đặt Metadata",
+                "form": {
+                  "description": "Mô tả",
+                  "descriptionDescription": "Hiển thị bên dưới tiêu đề trong kết quả tìm kiếm và bản xem trước liên kết.",
+                  "ogImage": "Xem trước hình ảnh",
+                  "ogImageDescription": "Hiển thị trong bản xem trước liên kết. Phải là định dạng PNG hoặc JPEG, không phải SVG.",
+                  "themeColor": "Màu chủ đề",
+                  "themeColorDescription": "Tạo màu cho giao diện trình duyệt trên thiết bị di động và các bản xem trước liên kết.",
+                  "indexable": "Cho phép công cụ tìm kiếm lập chỉ mục",
+                  "twitterCard": "Loại thẻ Twitter"
+                },
+                "enum": {
+                  "twitterCard": {
+                    "summary": "Tóm tắt",
+                    "summaryLargeImage": "Tóm tắt kèm hình ảnh lớn"
+                  }
+                },
+                "placeholder": {
+                  "description": "Quản lý các máy chủ trò chơi và dịch vụ của bạn với {name}."
+                },
+                "button": {
+                  "autofill": "Tự Động Điền"
+                },
+                "toast": {
+                  "updated": "Đã cập nhật cài đặt siêu dữ liệu."
                 }
               }
             },
@@ -1801,7 +2233,9 @@
                 "smtp": {
                   "form": {
                     "tlsMode": "Chế Độ TLS",
-                    "skipCertValidation": "Bỏ Qua Xác Thực Chứng Chỉ"
+                    "skipCertValidation": "Bỏ Qua Xác Thực Chứng Chỉ",
+                    "heloDomain": "Tên miền HELO/EHLO",
+                    "heloDomainDescription": "Tên miền được gửi trong lời chào HELO/EHLO. Một số nhà cung cấp, chẳng hạn như Google Workspace, từ chối giá trị mặc định này."
                   }
                 }
               }
@@ -1812,6 +2246,7 @@
                 "title": "Cài Đặt Mẫu Email",
                 "sidebar": {
                   "templates": "Mẫu",
+                  "globalVariables": "Biến Global",
                   "loading": "Đang tải...",
                   "availableVariables": "Biến Có Sẵn"
                 },
@@ -1820,7 +2255,43 @@
                   "syntaxMiddle": ". Các biến được tham chiếu bằng",
                   "syntaxAnd": "và các cấu trúc điều khiển như",
                   "syntaxOr": "và",
-                  "syntaxAfter": "được hỗ trợ."
+                  "syntaxAfter": "được hỗ trợ.",
+                  "variablesBefore": "Các đoạn văn bản được tham chiếu bằng",
+                  "variablesAfter": "và được dịch theo từng ngôn ngữ trong phần Biến nhờ đó một mẫu chỉ cần một bố cục duy nhất cho mọi ngôn ngữ mà người dùng có thể chọn."
+                },
+                "variables": {
+                  "title": "Biến",
+                  "description": "Các đoạn văn bản mà mẫu này tham chiếu đến như sau",
+                  "globalDescription": "Các đoạn văn bản mà mọi mẫu đều có thể tham chiếu tới",
+                  "descriptionAfter": "Fragment là các đoạn mã MiniJinja có quyền truy cập vào cùng các biến như mẫu. Một trường để trống sẽ sử dụng giá trị mặc định được hiển thị tại đó; đối với các ngôn ngữ không có giá trị cụ thể, hệ thống sẽ sử dụng giá trị tiếng Anh, sau đó là bản dịch tích hợp sẵn.",
+                  "custom": "Tùy Chỉnh",
+                  "add": "Thêm biến",
+                  "loading": "Đang tải...",
+                  "empty": "Chưa có biến nào được định nghĩa.",
+                  "error": {
+                    "valueRequired": "Các biến tùy chỉnh cần có giá trị bằng tiếng Anh."
+                  },
+                  "toast": {
+                    "saved": "Biến email đã được lưu.",
+                    "created": "Biến email đã được tạo.",
+                    "reset": "Biến email đã được đặt lại về mặc định.",
+                    "deleted": "Biến email đã được xóa."
+                  },
+                  "modal": {
+                    "create": {
+                      "title": "Tạo biến",
+                      "nameDescription": "Các chữ cái thường, chữ số và dấu gạch dưới, bắt đầu bằng một chữ cái.",
+                      "valueDescription": "Giá trị tiếng Anh. Các bản dịch có thể được thêm vào sau khi tạo biến."
+                    },
+                    "reset": {
+                      "title": "Đặt lại về mặc định",
+                      "content": "Điều này sẽ hủy bỏ mẫu tùy chỉnh cho **{name}** và khôi phục mặc định tích hợp. Hành động này không thể hoàn tác."
+                    },
+                    "delete": {
+                      "title": "Xóa biến",
+                      "content": "Thao tác này sẽ xóa biến tùy chỉnh **{name}** ở tất cả các ngôn ngữ. Các mẫu sử dụng biến này sẽ không hiển thị nội dung nào tại vị trí đó. Hành động này không thể hoàn tác."
+                    }
+                  }
                 },
                 "loadingTemplate": "Đang tải mẫu...",
                 "form": {
@@ -1879,6 +2350,10 @@
                 "form": {
                   "maxFileManagerViewSize": "Kích Thước Xem Tối Đa Trình Quản Lý Tệp",
                   "maxScheduleStepCount": "Số Bước Lịch Trình Tối Đa",
+                  "maxFirewallRuleCount": "Số lượng quy tắc tường lửa tối đa",
+                  "maxFirewallRuleSourceCount": "Số lượng nguồn quy tắc tường lửa tối đa",
+                  "maxTunnelConnectionCount": "Số lượng kết nối riêng tối đa trên mỗi máy chủ",
+                  "maxTunnelPortCount": "Số lượng cổng riêng tối đa trên mỗi máy chủ",
                   "maxFileManagerContentSearchSize": "Kích Thước Tìm Kiếm Nội Dung Tối Đa",
                   "maxFileManagerSearchResults": "Số Kết Quả Tìm Kiếm Tối Đa",
                   "maxSubuserCount": "Số Người Dùng Phụ Tối Đa",
@@ -1911,6 +2386,8 @@
                   "maxCommandSnippetCount": "Số Đoạn Lệnh Tối Đa",
                   "maxSecurityKeyCount": "Số Khóa Bảo Mật Tối Đa",
                   "maxSshKeyCount": "Số Khóa SSH Tối Đa",
+                  "maxSettingsCount": "Cài đặt được đồng bộ hóa tối đa",
+                  "maxSettingsValueBytes": "Kích thước tối đa của cài đặt được đồng bộ (byte)",
                   "allowChangingLanguage": "Cho Phép Thay Đổi Ngôn Ngữ",
                   "allowChangingLanguageDescription": "Nếu bật, người dùng sẽ có thể thay đổi tùy chọn ngôn ngữ."
                 },
@@ -1936,7 +2413,15 @@
                   "serverLogAdminActivity": "Ghi Nhật Ký Hoạt Động Admin Máy Chủ",
                   "serverLogAdminActivityDescription": "Bật hoặc tắt ghi nhật ký hoạt động admin trên các máy chủ mà admin không phải là chủ sở hữu hoặc người dùng phụ.",
                   "serverLogScheduleActivity": "Ghi Nhật Ký Hoạt Động Lịch Trình Máy Chủ",
-                  "serverLogScheduleActivityDescription": "Bật hoặc tắt ghi nhật ký hoạt động được thực hiện bởi lịch trình máy chủ."
+                  "serverLogScheduleActivityDescription": "Bật hoặc tắt ghi nhật ký hoạt động được thực hiện bởi lịch trình máy chủ.",
+                  "serverHideActivityIps": "Ẩn địa chỉ IP hoạt động của máy chủ",
+                  "serverHideActivityIpsDescription": "Ẩn địa chỉ IP trong nhật ký hoạt động của máy chủ, ngay cả với chủ sở hữu máy chủ. Người dùng vẫn luôn nhìn thấy địa chỉ IP gắn liền với hoạt động của chính họ."
+                },
+                "enum": {
+                  "serverHideActivityIps": {
+                    "allUsers": "Tất Cả Người Dùng",
+                    "none": "Trống"
+                  }
                 },
                 "toast": {
                   "updated": "Cài đặt hoạt động đã được cập nhật."
@@ -1952,6 +2437,15 @@
                   "hitsDescription": "Số lượng yêu cầu tối đa được phép mỗi cửa sổ.",
                   "windowSeconds": "Cửa Sổ",
                   "windowSecondsDescription": "Thời lượng cửa sổ tính bằng giây."
+                },
+                "exemptions": {
+                  "title": "Miễn trừ",
+                  "form": {
+                    "exemptIps": "Các địa chỉ IP được miễn trừ",
+                    "exemptIpsDescription": "Các địa chỉ IP hoặc dải CIDR bỏ qua ratelimit áp dụng cho máy khách và kết nối từ xa. Các giới hạn về đăng nhập và giới hạn theo từng máy chủ vẫn được áp dụng.",
+                    "exemptApiKeys": "Các khóa API được miễn trừ",
+                    "exemptApiKeysDescription": "Các UUID của khóa API được miễn trừ khỏi ratelimit phía máy khách. Người dùng có thể sao chép UUID từ menu ngữ cảnh của khóa API. Các khóa đã xóa sẽ tự động bị loại bỏ."
+                  }
                 },
                 "toast": {
                   "updated": "Cài đặt giới hạn tốc độ đã được cập nhật."
@@ -2015,6 +2509,7 @@
             "deleteSelection": "Xóa đã chọn"
           },
           "dropzone": {
+            "title": "Thả tệp hoặc thư mục vào đây để tải lên",
             "subtitle": "Thả để bắt đầu tải lên"
           },
           "toast": {
@@ -2049,6 +2544,14 @@
             "buildFailed": {
               "title": "Lần cuối biên dịch tiện ích mở rộng thất bại",
               "content": "Các tiện ích này sẽ không được biên dịch lại cho đến khi có sự thay đổi, hoặc cho đến khi bạn chủ động thực hiện lại quá trình biên dịch."
+            },
+            "pendingRestart": {
+              "title": "Một số tiện ích mở rộng đã được bật hoặc tắt",
+              "content": "Bảng điều khiển sẽ nhận diện sự thay đổi vào lần khởi động tiếp theo."
+            },
+            "versionMismatch": {
+              "title": "Bảng điều khiển đang phục vụ bản dựng cho một phiên bản khác",
+              "content": "Bảng điều khiển đang chạy là phiên bản {runningVersion}, nhưng các bản dựng tiện ích mở rộng lại nhắm đến phiên bản {targetVersion}. Các tiện ích mở rộng mà bạn cài đặt cần phải tương thích với {targetVersion}."
             }
           },
           "button": {
@@ -2069,7 +2572,10 @@
             "cancelling": "Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "noBackend": "Cần tiện ích backend để cấu hình tiện ích này.",
             "noConfigurationPage": "Tiện ích này không có trang cấu hình.",
-            "removeExtension": "Xóa tiện ích"
+            "extensionDisabled": "Tiện ích mở rộng này đã bị vô hiệu hóa; phần giao diện người dùng của nó không được tải.",
+            "removeExtension": "Xóa tiện ích",
+            "enableExtension": "Bật tiện ích mở rộng",
+            "disableExtension": "Tắt tiện ích mở rộng"
           },
           "phase": {
             "queued": "Đang trong hàng đợi…",
@@ -2087,7 +2593,9 @@
             "frontendMissing": "Thiếu frontend",
             "backendMissing": "Thiếu backend",
             "pendingBuild": "Đang chờ build",
-            "pendingRemoval": "Đang chờ xóa"
+            "pendingRemoval": "Đang chờ xóa",
+            "pendingRestart": "Đang chờ khởi động lại",
+            "disabled": "Đã tắt"
           },
           "card": {
             "version": "Phiên Bản",
@@ -2107,7 +2615,10 @@
             "buildFailed": "Build tiện ích mở rộng thất bại: {reason}",
             "cancelRequested": "Đã yêu cầu hủy. Quá trình build sẽ dừng lại ngay khi bước hiện tại kết thúc.",
             "added": "Tiện ích `{packageName}` đã được thêm thành công.",
-            "removed": "Tiện ích `{packageName}` đã được xóa thành công."
+            "removed": "Tiện ích `{packageName}` đã được xóa thành công.",
+            "enabled": "Tiện ích mở rộng `{packageName}` sẽ được kích hoạt lại sau khi bảng điều khiển khởi động lại.",
+            "disabled": "Tiện ích mở rộng `{packageName}` sẽ bị vô hiệu hóa sau khi bảng điều khiển khởi động lại.",
+            "restarting": "Bảng điều khiển đang khởi động lại."
           },
           "notFound": {
             "title": "Không Tìm Thấy Tiện Ích",
@@ -2173,6 +2684,7 @@
                 },
                 "button": {
                   "sendPasswordResetEmail": "Gửi Email Đặt Lại Mật Khẩu",
+                  "verifyEmail": "Đánh dấu email đã xác minh",
                   "impersonate": "Mạo Danh"
                 },
                 "form": {
@@ -2188,6 +2700,17 @@
                   "delete": {
                     "title": "Xác Nhận Xóa Người Dùng",
                     "content": "Bạn có chắc muốn xóa **{username}** không?"
+                  },
+                  "grantAdmin": {
+                    "title": "Xác nhận quyền truy cập admin",
+                    "content": "Bạn có chắc chắn muốn cấp quyền quản trị cho **{username}** không? Tài khoản này sẽ có toàn quyền truy cập không giới hạn vào mọi thứ trên bảng điều khiển."
+                  },
+                  "verifyEmail": {
+                    "title": "Đánh dấu email đã xác minh",
+                    "content": "Bạn có chắc chắn muốn đánh dấu **{email}** là đã xác minh mà không cần xác nhận không?",
+                    "toast": {
+                      "verified": "Email đã được đánh dấu là đã xác minh."
+                    }
                   },
                   "disableTwoFactor": {
                     "title": "Tắt Xác Thực Hai Lớp Người Dùng",
@@ -2408,6 +2931,7 @@
                 },
                 "alert": {
                   "couldNotReach": "Không thể kết nối với node: {error}",
+                  "integratedNode": "Node này chạy bên trong panel. Danh tính, URL của panel và các thiết lập liên kết API của nó sẽ được ghi đè mỗi khi panel khởi động, do đó các thay đổi đối với những thông tin này sẽ không được lưu lại. Mọi thay đổi khác mà bạn thực hiện tại đây đều sẽ được lưu giữ.",
                   "tokenWarning": "Cấu hình dưới đây chứa token của node. Chỉ hiển thị nó khi cần thiết.",
                   "portMismatch": "URL của node trỏ tới cổng {connectPort}, nhưng cấu hình này khiến wings lắng nghe trên cổng {apiPort}. Trừ khi reverse proxy chuyển tiếp cổng {connectPort} tới wings, panel sẽ không thể kết nối tới node.",
                   "verifyBackend": "Backend tới Wings",
@@ -2616,6 +3140,7 @@
                   "downloadStarted": "Tải xuống đã bắt đầu.",
                   "detached": "Sao lưu đã được tách thành công.",
                   "reattached": "Đã gắn lại sao lưu vào {name} thành công.",
+                  "reassigned": "Bản sao lưu đã được gán lại thành công.",
                   "restoring": "Đang khôi phục sao lưu vào {name}...",
                   "exporting": "Đang xuất bản sao lưu sang các tệp của {name}...",
                   "deletionStarted": "Đã bắt đầu xóa bản sao lưu trên node."
@@ -2627,6 +3152,13 @@
                   "detach": {
                     "title": "Xác Nhận Tách Sao Lưu",
                     "content": "Bạn có chắc muốn tách sao lưu này khỏi máy chủ? Nó sẽ không bị xóa và có thể được gắn lại sau."
+                  },
+                  "reassign": {
+                    "title": "Gán lại tác vụ sao lưu cơ sở dữ liệu",
+                    "description": "Di chuyển bản sao lưu này sang một instance cơ sở dữ liệu {type} khác. Instance này có thể nằm trên một máy chủ khác, miễn là máy chủ đó có thể truy cập được bản sao lưu. Các bản sao lưu chỉ có thể được gán cho một instance cùng loại cơ sở dữ liệu.",
+                    "instancePlaceholder": "Chọn một instance cơ sở dữ liệu",
+                    "serverFirst": "Hãy chọn máy chủ trước",
+                    "noInstances": "Không có phiên bản cơ sở dữ liệu nào khớp trên máy chủ này"
                   },
                   "reattach": {
                     "title": "Gắn Lại Sao Lưu Node",
@@ -2699,6 +3231,107 @@
                   }
                 }
               }
+            },
+            "tunnel": {
+              "title": "Mạng riêng",
+              "page": {
+                "title": "Mạng riêng Node",
+                "description": "Khi đó, các máy chủ trên nút này có thể kết nối riêng tư với máy chủ trên bất kỳ nút nào khác cũng thuộc mạng lưới. Dữ liệu được truyền giữa các nút thông qua một đường hầm mã hóa và hoàn toàn không đi qua mạng Internet công cộng.",
+                "alert": {
+                  "unreachable": "Không thể kết nối tới nút mạng, do đó không thể kiểm tra phần mạng thuộc về nút này.",
+                  "notSupported": "Nút này **không thể chạy mạng riêng**. Tính năng này hoặc đã bị tắt trong cấu hình nút, hoặc nút đang sử dụng Docker ở chế độ không cần quyền root– một cấu hình không được hỗ trợ.",
+                  "noCertificate": "Nút này **chưa báo cáo chứng chỉ**, do đó không có nút ngang hàng nào có thể thiết lập kết nối với nó. Hãy khởi động lại tiến trình nền đường hầm của nút để thực hiện lại quy trình đăng ký."
+                },
+                "form": {
+                  "hostDescription": "Tên máy chủ hoặc địa chỉ IP mà các nút khác sử dụng để kết nối tới nút này. Được phân giải tại thời điểm thiết lập kết nối.",
+                  "portDescription": "Cổng UDP mà nút sử dụng để lắng nghe các nút khác. Các nút khác phải có khả năng kết nối tới cổng này."
+                },
+                "section": {
+                  "settings": "Thiết lập mạng"
+                },
+                "state": {
+                  "title": "Tình trạng Node",
+                  "connected": "Đã kết nối",
+                  "disconnected": "Đã ngắt kết nối",
+                  "unknown": "Không xác định",
+                  "epoch": "Tình trạng phiên bản",
+                  "certificate": "Dấu Vân Tay Chứng Chỉ Tls",
+                  "noCertificate": "Chưa có báo cáo"
+                },
+                "metrics": {
+                  "title": "Các liên kết ngang hàng trực tiếp",
+                  "loading": "Đang yêu cầu nút cung cấp các chỉ số...",
+                  "unreachable": "Không thể kết nối tới nút, do đó các chỉ số thời gian thực không khả dụng.",
+                  "applied": "Đã áp dụng phiên bản trạng thái {epoch}, {snapshots}",
+                  "stat": {
+                    "peers": "Đã kết nối ngang hàng",
+                    "uptime": "Thời gian hoạt động của daemon",
+                    "controlLink": "Liên kết điều khiển",
+                    "frontends": "Các Frontend được liên kết",
+                    "flowsOpen": "{count} luồng đang mở",
+                    "localDrops": "Rớt gói tin tại cùng một nút",
+                    "frozenFlows": "{count} luồng bị đóng băng"
+                  },
+                  "column": {
+                    "peer": "Ngang hàng",
+                    "role": "Vai trò",
+                    "address": "Địa Chỉ",
+                    "path": "Đường Dẫn",
+                    "loss": "Tổn thất",
+                    "transferred": "Đã chuyển",
+                    "streams": "Nguồn trực tiếp",
+                    "flows": "Luồng",
+                    "drops": "Rơi",
+                    "connected": "Đã kết nối"
+                  },
+                  "hint": {
+                    "inOut": "vào / ra",
+                    "openTotal": "đã mở / tổng cộng",
+                    "udpOpenTotal": "UDP đã mở / tổng cộng",
+                    "datagrams": "gói dữ liệu"
+                  },
+                  "value": {
+                    "tcpOpen": "{count} luồng TCP đang mở"
+                  },
+                  "role": {
+                    "initiator": "Ngắt kết nối",
+                    "acceptor": "Đã chấp nhận"
+                  },
+                  "tooltip": {
+                    "roleInitiator": "Node này đã thiết lập kết nối bằng cách gọi đến nút ngang hàng tại địa chỉ host và cổng tương ứng.",
+                    "roleAcceptor": "Node này đã thiết lập kết nối bằng cách gọi đến nút ngang hàng tại địa chỉ host và cổng tương ứng."
+                  },
+                  "drop": {
+                    "sendBufferFull": "Bộ đệm gửi đã đầy",
+                    "unknownFlow": "Luồng không xác định",
+                    "fragTimeout": "Hết thời gian chờ phân mảnh",
+                    "fragLimit": "Giới hạn phân mảnh",
+                    "oversize": "Ngoại cỡ"
+                  }
+                },
+                "button": {
+                  "enable": "Bật",
+                  "disable": "Tắt",
+                  "rotate": "Xoay vòng danh tính"
+                },
+                "toast": {
+                  "connectionLost": "Mất kết nối với luồng thống kê node.",
+                  "enabled": "Node đã được thêm vào mạng riêng.",
+                  "updated": "Đã lưu cài đặt mạng riêng.",
+                  "disabled": "Node đã bị loại bỏ khỏi mạng riêng.",
+                  "rotated": "Danh tính node đã được xoay vòng."
+                },
+                "modal": {
+                  "disable": {
+                    "title": "Xác nhận xóa khỏi mạng riêng",
+                    "content": "Mọi kết nối đến và đi từ các máy chủ trên nút này đều bị ngắt, và các máy chủ đó sẽ mất địa chỉ riêng của mình."
+                  },
+                  "rotate": {
+                    "title": "Xác nhận luân chuyển danh tính",
+                    "content": "Các node ngang hàng sẽ ngắt kết nối với nút này ngay lập tức. Nó sẽ tự động gia nhập lại mạng với một chứng chỉ mới trong vòng một phút, và các kết nối sẽ tự động được thiết lập lại."
+                  }
+                }
+              }
             }
           },
           "modal": {
@@ -2729,6 +3362,27 @@
             "unsuspend": "Hủy Đình chỉ máy chủ",
             "clearState": "Dọn dẹp trạng thái máy chủ",
             "delete": "Xóa máy chủ"
+          },
+          "bulkActions": {
+            "verb": {
+              "suspend": "đình Chỉ",
+              "unsuspend": "gỡ Đình Chỉ",
+              "clearState": "đã xóa trạng thái của",
+              "delete": "xóa"
+            },
+            "modal": {
+              "title": "Xác nhận thao tác hàng loạt",
+              "content": "Bạn có chắc muốn **{action}** {servers} không**?",
+              "deleteContent": "Bạn có chắc chắn muốn xóa vĩnh viễn **{servers}** và mọi dữ liệu trên đó không? Thao tác này không thể hoàn tác.",
+              "form": {
+                "deleteBackups": "Bạn có muốn xóa các bản sao lưu của những máy chủ này không?"
+              },
+              "alert": {
+                "forceWarning": "Việc xóa bắt buộc sẽ loại bỏ các máy chủ này khỏi bảng điều khiển ngay cả khi không thể truy cập được các nút của chúng. Các tệp và cơ sở dữ liệu của chúng có thể không được dọn sạch hoàn toàn, để lại dữ liệu mồ côi."
+              }
+            },
+            "successWithSkipped": "Đã thành công {action} {servers}. {skippedServers} đã bỏ qua.",
+            "nothingToDo": "Mọi máy chủ được chọn đều đã ở trạng thái đó."
           },
           "externalIdLookup": {
             "button": "Tìm bằng ID Bên Ngoài",
@@ -2776,7 +3430,8 @@
                   "schedules": "Lịch trình",
                   "unlimited": "Không giới hạn",
                   "autoKillSeconds": "{seconds} giây",
-                  "autoKillDisabled": "Đã vô hiệu hóa"
+                  "autoKillDisabled": "Đã vô hiệu hóa",
+                  "labels": "Nhãn"
                 },
                 "badge": {
                   "suspended": "Bị tạm đình chỉ",
@@ -2810,6 +3465,7 @@
                   "externalIdPlaceholder": "Mã định danh bên ngoài tùy chọn",
                   "descriptionPlaceholder": "Mô tả máy chủ",
                   "owner": "Chủ Sở Hữu",
+                  "ownerCreateHint": "Không tìm thấy họ? Hãy Tạo người dùng mới",
                   "backupConfigurationPlaceholder": "Kế Thừa Từ Node/Vị Trí",
                   "cpuLimit": "Giới Hạn CPU (%)",
                   "cpuLimitDescription": "Giới hạn CPU tính theo % mà máy chủ có thể sử dụng.",
@@ -2833,6 +3489,8 @@
                   "predefinedDockerImagesPlaceholder": "Chưa chọn hình ảnh định nghĩa trước",
                   "startupCommandCustom": "Tùy Chỉnh",
                   "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước",
+                  "labels": "Nhãn Container",
+                  "labelsDescription": "Các nhãn Docker được gán cho container máy chủ có thể được đọc trong lệnh khởi động dưới dạng `server.labels.<key>` và sẽ có hiệu lực ở lần khởi động tiếp theo.",
                   "startOnCompletion": "Khởi Động Khi Hoàn Tất",
                   "startOnCompletionDescription": "Khởi động máy chủ sau khi cài đặt hoàn tất.",
                   "skipInstaller": "Bỏ Qua Cài Đặt",
@@ -3374,6 +4032,15 @@
                     "path": "Đường Dẫn"
                   }
                 },
+                "toast": {
+                  "installed": "{eggs} đã được cài đặt."
+                },
+                "modal": {
+                  "install": {
+                    "title": "Cài đặt {eggs}",
+                    "button": "Cài đặt {eggs}"
+                  }
+                },
                 "drawer": {
                   "noReadme": "Egg này không có tệp README."
                 }
@@ -3445,9 +4112,16 @@
               "page": {
                 "titleCreate": "Tạo Máy Chủ Agent Cơ Sở Dữ Liệu",
                 "titleUpdate": "Cập Nhật Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "tooltip": {
+                  "errorWhileFetchingVersion": "Lỗi khi lấy phiên bản",
+                  "updateAvailable": "{version} (Có Cập Nhật)"
+                },
                 "form": {
                   "typePublicHost": "Host Công Khai",
-                  "typePublicPort": "Cổng Công Khai"
+                  "typePublicPort": "Cổng Công Khai",
+                  "memoryDescription": "Tổng dung lượng bộ nhớ khả dụng cho các máy chủ trên node này.",
+                  "diskDescription": "Tổng dung lượng ổ đĩa khả dụng cho các máy chủ trên node này.",
+                  "unlimitedTooltip": "0 sẽ không đặt giới hạn."
                 },
                 "alert": {
                   "urlMissingPort": "Chưa chỉ định cổng. Panel sẽ kết nối tới máy chủ này qua cổng {port}. Mặc định agent cơ sở dữ liệu lắng nghe trên cổng {agentPort}, hãy thêm cổng vào URL trừ khi có reverse proxy trên cổng {port} chuyển tiếp tới agent."
@@ -3496,6 +4170,15 @@
                       "forceWarning": "Buộc xóa sẽ xóa phiên bản ngay cả khi không thể kết nối tới agent. Phiên bản và dữ liệu của nó trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
+                }
+              }
+            },
+            "backups": {
+              "title": "Sao lưu",
+              "page": {
+                "title": "Sao Lưu Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "toast": {
+                  "downloadStarted": "Tải xuống đã bắt đầu."
                 }
               }
             },
@@ -3741,7 +4424,12 @@
                   "nameFirstPathDescription": "Đường dẫn dùng để trích xuất tên từ phản hồi URL Thông Tin (https://serdejsonpath.live).",
                   "nameLastPath": "Đường Dẫn Họ",
                   "nameLastPathDescription": "Đường dẫn dùng để trích xuất họ từ phản hồi URL Thông Tin (https://serdejsonpath.live).",
+                  "avatarUrlTemplate": "Mẫu URL ảnh đại diện",
+                  "avatarOverwrite": "Ghi đè lên ảnh đại diện hiện có",
+                  "avatarOverwriteDescription": "Nhập lại ảnh đại diện mỗi khi đăng nhập, thay thế ảnh do người dùng tự thiết lập. Nếu tắt tính năng này, ảnh đại diện chỉ được nhập cho những người dùng chưa có ảnh.",
                   "loginOnly": "Chỉ Cho Phép Đăng Nhập",
+                  "loginBypassTwoFactor": "Bỏ Qua 2FA Khi Đăng Nhập",
+                  "loginBypassTwoFactorDescription": "Cho phép người dùng đăng nhập bằng nhà cung cấp này bỏ qua 2FA panel.",
                   "linkViewable": "Hiển Thị Liên Kết Cho Người Dùng",
                   "linkViewableDescription": "Cho phép người dùng xem kết nối và mã định danh trong giao diện client.",
                   "userManageable": "Người Dùng Quản Lý Liên Kết",
@@ -4007,6 +4695,9 @@
           },
           "form": {
             "backupConfigurationPlaceholder": "Kế thừa từ Server",
+            "kind": "Đĩa Sao Lưu",
+            "kindDescription": "Sao lưu máy chủ giúp lưu trữ các tệp tin của máy chủ. Sao lưu cơ sở dữ liệu thực hiện trích xuất dữ liệu từ các cơ sở dữ liệu thuộc một instance cơ sở dữ liệu trên máy chủ. Thiết lập này không thể thay đổi về sau.",
+            "kindLockedDescription": "Loại sao lưu được chọn khi tạo chính sách và không thể thay đổi.",
             "cron": "Lịch trình",
             "cronDescription": "Biểu thức Cron (bao gồm cả giây) xác định thời điểm thực hiện sao lưu, theo giờ UTC.",
             "parallelism": "Tính song song",
@@ -4083,6 +4774,25 @@
                   },
                   "remove": {
                     "title": "Xác nhận xóa Node",
+                    "content": "Bạn có chắc chắn muốn xóa **{name}** khỏi **{policy}** không?"
+                  }
+                }
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Máy Chủ Agent Cơ Sở Dữ Liệu",
+              "page": {
+                "title": "Các máy chủ chạy Agent Cơ Sở Dữ Liệu",
+                "toast": {
+                  "added": "Đã thêm Máy chủ Agent Cơ Sở Dữ Liệu.",
+                  "removed": "Đã xóa Máy chủ agent cơ sở dữ liệu."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Thêm Máy Chủ Agent Cơ Sở Dữ Liệu"
+                  },
+                  "remove": {
+                    "title": "Xác nhận Xóa Máy Chủ Agent Cơ Sở Dữ Liệu",
                     "content": "Bạn có chắc chắn muốn xóa **{name}** khỏi **{policy}** không?"
                   }
                 }
@@ -4268,11 +4978,16 @@
             "commandHistory": "Lịch Sử Lệnh",
             "decreaseFontSize": "Giảm Kích Thước Font",
             "increaseFontSize": "Tăng Kích Thước Font",
-            "copySelection": "Sao Chép vùng chọn"
+            "copySelection": "Sao Chép vùng chọn",
+            "popout": "Mở trong cửa sổ riêng"
           },
           "quickAction": {
             "search": "Tìm trong Console",
             "scrollToBottom": "Cuộn xuống cuối"
+          },
+          "popout": {
+            "windowTitle": "Bảng Điều Khiển",
+            "returnHint": "Bảng điều khiển này đang chạy trong cửa sổ riêng. Bạn có thể đóng nó bất cứ lúc nào."
           },
           "drawer": {
             "commandHistory": {
@@ -4331,6 +5046,53 @@
         },
         "files": {
           "title": "Tệp",
+          "editorNotFound": {
+            "title": "Không tìm thấy",
+            "content": "Không tìm thấy trình soạn thảo."
+          },
+          "view": {
+            "list": "Danh sách"
+          },
+          "searchPreview": {
+            "expand": "Mở rộng xem trước nội dung cho {file}",
+            "collapse": "Thu gọn bản xem trước nội dung của {file}",
+            "lines": "Dòng {start}-{end}",
+            "loading": "Đang tải bản xem trước...",
+            "empty": "Tệp trống",
+            "unavailable": "Xem trước không khả dụng",
+            "noContext": "Đã tìm thấy kết quả khớp, không có bản xem trước",
+            "restricted": "Cần có quyền truy cập nội dung"
+          },
+          "tree": {
+            "empty": "Thư mục này rỗng",
+            "loadMore": "Hiện thêm",
+            "retry": "Thử lại",
+            "reload": "Tải lại tập tin",
+            "show": "Hiển thị cây thư mục",
+            "hide": "Ẩn cây thư mục",
+            "searchPlaceholder": "Tìm kiếm tệp...",
+            "noSearchResults": "Không có tệp phù hợp",
+            "upload": "Tải Lên",
+            "uploadFromComputer": "Tải lên từ máy tính",
+            "uploadFromUrl": "Tải lên từ URL",
+            "selectItem": "Chọn {name}",
+            "deselectItem": "Bỏ chọn {name}",
+            "selectFileToOpen": "Chọn một tệp từ cây thư mục để mở nó.",
+            "noEditorAvailable": "Không có trình chỉnh sửa nào cho loại tệp này.",
+            "editorTabsLabel": "Mở tệp",
+            "closeEditorTab": "Đóng {name}",
+            "closeOtherTabs": "Đóng phần khác",
+            "closeTabsToRight": "Đóng tới bên phải",
+            "closeSavedTabs": "Đóng Đã lưu",
+            "closeAllTabs": "Đóng tất cả",
+            "revealInTree": "Hiển thị trong cây thư mục",
+            "revealNotFound": "Không tìm thấy {path} trong cây tệp.",
+            "unsavedTab": "{name} có các thay đổi chưa được lưu",
+            "dropToSplit": "Thả để mở trong một ngăn trình soạn thảo mới",
+            "resizeEditorPanes": "Thay đổi kích thước các khung soạn thảo",
+            "selectPane": "Chọn khung soạn thảo",
+            "editorPane": "Khung soạn thảo {number}"
+          },
           "titleEditorViewing": "Xem {file}",
           "titleEditorPlaying": "Đang phát {file}",
           "titleEditorEditing": "Chỉnh Sửa {file}",
@@ -4350,7 +5112,10 @@
             "connect": "Kết Nối",
             "connectSftp": "qua SFTP",
             "connectVscode": "qua VS Code",
-            "openInNewWindow": "Mở Trong Cửa Sổ Mới",
+            "open": "Mở",
+            "openInNewTab": "Mở trong tab mới",
+            "openInPopup": "Mở trong cửa sổ pop-up",
+            "openInVirtualWindow": "Mở trong cửa sổ ảo",
             "rename": "Đổi Tên",
             "copy": "Sao Chép",
             "fingerprint": "Dấu Vân Tay",
@@ -4367,17 +5132,26 @@
             "fileFromUpload": "Tệp Từ Tải Lên",
             "directoryFromUpload": "Thư Mục Từ Tải Lên",
             "viewDiff": "Xem khác biệt",
+            "openInEditor": "Mở trong Trình Soạn Thảo",
+            "editorActions": "Các thao tác của trình biên tập",
             "loadDisk": "Load Phiên Bản Ổ đĩa",
             "keepEditor": "Giữ bản Chỉnh sửa"
           },
           "quickAction": {
             "newFile": "Tệp Mới",
+            "keepFileOpen": "Giữ tệp mở",
+            "copyFilePath": "Sao chép đường dẫn tệp đang hoạt động",
+            "searchTree": "Cây tìm kiếm",
+            "refreshTree": "Làm mới cây",
+            "switchToList": "Chuyển sang hiển thị dạng danh sách",
+            "switchToTree": "Chuyển sang chế độ xem dạng cây",
             "newDirectory": "Thư Mục Mới",
             "pullFile": "Tải file từ URL",
             "uploadFiles": "Tải Tệp lên",
             "uploadDirectory": "Tải thư mục lên",
             "search": "Tìm kiếm tệp",
             "largestDirectories": "Phân tích kích thước thư mục",
+            "incompleteUploads": "Chuyển sang chế độ xem dạng cây",
             "parentDirectory": "Đi tới thư mục chính",
             "copyPath": "Sao chép đường dẫn hiện tại",
             "exitBackup": "Thoát chế độ duyệt sao lưu",
@@ -4403,10 +5177,24 @@
           },
           "searchBanner": {
             "resultsTitle": "Kết Quả Tìm Kiếm ({files} tìm thấy)",
+            "emptyTitle": "Không có tệp nào khớp",
             "query": "Truy Vấn:",
+            "included": "Bao Gồm:",
             "excluded": "Loại Trừ:",
             "content": "Nội Dung:",
-            "size": "Kích Thước:"
+            "caseSensitive": "Phân biệt chữ hoa/thường",
+            "maxSearchSize": "Các tệp có kích thước lớn hơn {size} sẽ bị bỏ qua",
+            "oversizedIncluded": "Các tệp có kích thước lớn hơn {size} được liệt kê mà không qua tìm kiếm",
+            "size": "Kích Thước:",
+            "edit": "Chỉnh sửa Tìm kiếm"
+          },
+          "upload": {
+            "by": "bởi {user}",
+            "banner": {
+              "title": "Các tệp tải lên chưa hoàn tất",
+              "content": "Một số tệp tải lên máy chủ này chưa hoàn tất và các phần tệp của chúng vẫn còn nằm trên đĩa.",
+              "review": "Xem lại các tệp đã tải lên"
+            }
           },
           "operations": {
             "compressing": "Đang Nén {files} từ {path}",
@@ -4415,11 +5203,14 @@
             "copying": "Đang Sao Chép {path} tới {destination}",
             "copyingMany": "Đang Sao Chép {files}",
             "receivingRemote": "Đang Nhận {files} Từ máy chủ điều khiển",
+            "receivingRemoteFrom": "Đang Nhận {files} Từ {server}",
             "sendingRemote": "Đang Gửi {files}  tới máy chủ điều khiển",
+            "sendingRemoteTo": "Gửi {files} tới {server}",
             "exportingBackup": "Đang xuất bản sao lưu tới {destination}",
             "cancelAllOperations": "Hủy tất cả hoạt động"
           },
           "dropzone": {
+            "title": "Thả tệp hoặc thư mục vào đây để tải lên",
             "subtitle": "Thả để bắt đầu tải lên"
           },
           "settings": {
@@ -4429,6 +5220,8 @@
             "editorLineOverflow": "Bao Ngoặc Dòng Tràn",
             "editorFontSize": "Cỡ Chữ Trình Biên Tập",
             "editorEngine": "Công cụ biên tập",
+            "editorPreviewTabs": "Xem trước tệp trong các thẻ dạng cây",
+            "editorPreviewTabsDescription": "Chỉnh sửa hoặc nhấp đúp vào thẻ để giữ cho thẻ đó luôn mở.",
             "vscodeUriScheme": "Lược Đồ URI VS Code",
             "imageViewerSmoothing": "Làm Mịn Hình Ảnh (Anti-Aliasing)"
           },
@@ -4449,10 +5242,15 @@
             "archiveCreationStarted": "Tạo kho lưu trữ đã bắt đầu.",
             "decompressionStarted": "Đã bắt đầu giải nén.",
             "fileCopyingStarted": "Sao chép tệp đã bắt đầu.",
+            "fileCopyingStartedMany": "Quá trình sao chép tệp tin sang {servers} đã bắt đầu.",
+            "fileCopyingStartedPartial": "Quá trình sao chép tệp sang {successfulServers} đã bắt đầu. {failedServers} thất bại:",
             "fileInfoRetrieved": "Thông tin tệp được truy xuất thành công.",
             "filePullingStarted": "Kéo tệp đã bắt đầu.",
             "fileRenamed": "Tệp đã được đổi tên.",
             "fileCouldNotBeRenamed": "Tệp không thể được đổi tên.",
+            "closeDestinationBeforeRename": "Hãy đóng thẻ trình soạn thảo của tệp đích trước khi đổi tên.",
+            "closeDestinationBeforeCreate": "Hãy đóng thẻ trình soạn thảo của tệp đích trước khi tạo tệp này.",
+            "closeTabsBeforeBulkRename": "Đóng các thẻ trình chỉnh sửa có liên quan trước khi đổi tên các đường dẫn bị trùng lặp.",
             "filesRenamed": "{files} đã được đổi tên.",
             "renameUndone": "Đã hoàn tác đổi tên.",
             "renameCouldNotBeUndone": "Permissions restored.",
@@ -4467,17 +5265,20 @@
           },
           "tooltip": {
             "settings": "Cài đặt",
+            "advancedSearch": "Tìm kiếm nâng cao",
             "fileHistory": "Lịch Sử Tệp",
             "revertToDisk": "Bỏ qua",
             "collabEditing": "{user} đang chỉnh sửa tệp này",
             "largestDirectories": "Phân tích kích thước thư mục",
             "dragToMove": "Kéo để di chuyển",
+            "virtual": "Mục này là ảo và không tồn tại trên đĩa",
             "back": "Lùi {seconds} giây",
             "forward": "Tiến {seconds} giây",
             "play": "Phát",
             "pause": "Tạm Dừng",
             "mute": "Tắt Tiếng",
-            "unmute": "Bật Tiếng"
+            "unmute": "Bật Tiếng",
+            "playbackRate": "Tốc độ phát lại"
           },
           "drawer": {
             "revisions": {
@@ -4558,7 +5359,12 @@
               "confirm": "Sao Chép {files} ở đây"
             },
             "copyRemote": {
-              "title": "Sao Chép Tệp Máy Chủ Điều Khiển"
+              "title": "Sao Chép Tệp Máy Chủ Điều Khiển",
+              "servers": "Máy chủ đích",
+              "addFromGroup": "Thêm máy chủ từ một nhóm",
+              "browsingOn": "Khi duyệt {server}, đường dẫn đã chọn sẽ được sử dụng trên mọi máy chủ đích.",
+              "noCreatePermission": "Bạn không có quyền tạo tệp trên {servers}.",
+              "createdAs": "Những tệp này sẽ được tạo trên {servers} điều khiển dưới "
             },
             "fileFingerprints": {
               "title": "Dấu Vân Tay Tệp",
@@ -4670,9 +5476,12 @@
               "advancedFilters": "Bộ Lọc Nâng Cao",
               "pathPatterns": "Mẫu Đường Dẫn",
               "include": "Bao Gồm",
+              "includePlaceholder": "v.d., *.js, src/**",
               "exclude": "Loại Trừ",
+              "excludePlaceholder": "v.d., node_modules/**",
               "fileContent": "Nội Dung Tệp",
               "searchText": "Văn Bản Tìm Kiếm",
+              "contentPlaceholder": "Văn bản cần tìm trong các tệp",
               "maxFileSize": "Kích Thước Tệp Tối Đa",
               "includeOversized": "Bao Gồm Tệp Quá Lớn",
               "includeOversizedDescription": "Bao gồm các tệp khớp với các bộ lọc khác nhưng quá lớn để tìm kiếm.",
@@ -4692,12 +5501,24 @@
             "sftpDetails": {
               "title": "Chi Tiết SFTP",
               "launch": "Khởi Chạy"
+            },
+            "incompleteUploads": {
+              "title": "Các tệp tải lên chưa hoàn tất",
+              "content": "Các {files} sau đây chưa hoàn tất quá trình tải lên. Phần dữ liệu đã tải lên vẫn nằm trên đĩa nhưng không thể sử dụng được cho đến khi quá trình tải lên hoàn tất.",
+              "hint": "Hãy tiếp tục quá trình từ bảng tải lên nếu bạn đã bắt đầu nó, hoặc xóa tệp tin chưa hoàn tất nếu bạn không còn cần đến nữa.",
+              "empty": "Mọi quá trình tải lên máy chủ này đã hoàn tất."
             }
           }
         },
         "databases": {
           "title": "Cơ Sở Dữ Liệu",
           "subtitle": "{current} của {max} cơ sở dữ liệu tối đa được tạo.",
+          "empty": {
+            "title": "Không có Cơ sở dữ liệu",
+            "description": "Máy chủ này không có cơ sở dữ liệu để lưu trữ dữ liệu. Hãy tạo một cơ sở dữ liệu để nhận địa chỉ, tên người dùng và mật khẩu dùng cho việc kết nối.",
+            "descriptionReadOnly": "Máy chủ này không có cơ sở dữ liệu để lưu trữ dữ liệu.",
+            "descriptionUnavailable": "Máy chủ này không có cơ sở dữ liệu để lưu trữ dữ liệu. Chưa có máy chủ cơ sở dữ liệu nào được cung cấp cho nó, vì vậy hiện tại chưa thể tạo cơ sở dữ liệu nào."
+          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} cơ sở dữ liệu."
           },
@@ -4707,7 +5528,8 @@
             }
           },
           "button": {
-            "rotatePassword": "Xoay Mật Khẩu"
+            "rotatePassword": "Xoay Mật Khẩu",
+            "createFirstDatabase": "Tạo Cơ Sở Dữ Liệu"
           },
           "form": {
             "databaseName": "Tên Cơ Sở Dữ Liệu"
@@ -4799,6 +5621,9 @@
               "title": "Bảng",
               "empty": "Phiên bản này chưa bảng nào.",
               "noMatches": "Không có bảng nào khớp với tìm kiếm của bạn.",
+              "noMatchesTruncated": "Không có bảng nào khớp với nội dung tìm kiếm của bạn. Chỉ {tables} bảng đầu tiên được tải, do đó không thể tìm kiếm trong các bảng còn lại.",
+              "truncated": "Cơ sở dữ liệu này có quá nhiều bảng để tải. Chỉ {tables} bảng đầu tiên được hiển thị.",
+              "tableBeyondLimit": "Bảng này nằm ngoài số lượng {tables} đầu tiên mà cơ sở dữ liệu này có thể tải.",
               "badge": {
                 "view": "Hiển thị"
               }
@@ -4861,14 +5686,22 @@
             "cell": {
               "setNull": "Set thành NULL",
               "empty": "rỗng",
+              "truncated": "Giá trị này quá lớn để tải toàn bộ và không thể chỉnh sửa được.",
               "editorHint": "{enter} áp dụng giá trị, {shiftEnter} chèn một dòng mới."
             }
           },
           "instance": {
             "title": "Cơ Sở Dữ Liệu Được Quản Lý",
             "updateAvailable": "Có Bản Cập Nhật",
+            "empty": {
+              "title": "Không có cơ sở dữ liệu được quản lý",
+              "description": "Máy chủ này không chạy cơ sở dữ liệu riêng. Hãy tạo một cơ sở dữ liệu được quản lý để có cơ sở dữ liệu với tài nguyên, người dùng và các bản sao lưu riêng.",
+              "descriptionReadOnly": "Máy chủ này không chạy cơ sở dữ liệu riêng.",
+              "descriptionUnavailable": "Máy chủ này không vận hành cơ sở dữ liệu riêng. Chưa có mẫu nào được cung cấp cho nó, vì vậy hiện chưa thể tạo ra mẫu nào."
+            },
             "button": {
-              "applyUpdate": "Áp dụng cập nhật"
+              "applyUpdate": "Áp dụng cập nhật",
+              "createFirstInstance": "Tạo Cơ Sở Dữ Liệu Được Quản Lý"
             },
             "tooltip": {
               "limitReached": "Máy chủ này bị giới hạn ở {max} cơ sở dữ liệu được quản lý."
@@ -4877,6 +5710,7 @@
               "tabs": {
                 "databases": "Cơ sở dữ liệu",
                 "users": "Người dùng",
+                "backups": "Sao lưu",
                 "logs": "Nhật ký"
               },
               "stats": {
@@ -5004,6 +5838,10 @@
                 "kill": "Cơ sở dữ liệu được quản lý đã bị buộc dừng."
               },
               "modal": {
+                "forceKillBulk": {
+                  "title": "Buộc Dừng Cơ Sở Dữ Liệu",
+                  "content": "Buộc dừng **{databaseInstances}** cơ sở dữ liệu có thể dẫn đến hỏng dữ liệu."
+                },
                 "forceKill": {
                   "title": "Buộc Dừng Cơ Sở Dữ Liệu",
                   "content": "Buộc dừng một cơ sở dữ liệu có thể dẫn đến hỏng dữ liệu."
@@ -5030,6 +5868,36 @@
                 }
               }
             },
+            "backups": {
+              "title": "Sao lưu",
+              "subtitle": "{current} trong số {max} bản sao lưu tối đa được tạo trên máy chủ này, dùng chung với các bản sao lưu của máy chủ.",
+              "badge": {
+                "restoring": "Khôi phục bản sao lưu"
+              },
+              "notification": {
+                "restoring": "Một bản sao lưu hiện đang được khôi phục vào cơ sở dữ liệu được quản lý này. Vui lòng chờ..."
+              },
+              "tooltip": {
+                "limitReached": "Máy chủ này bị giới hạn ở mức {max} bản sao lưu, được chia sẻ giữa các bản sao lưu máy chủ và cơ sở dữ liệu.",
+                "offline": "Cơ sở dữ liệu được quản lý phải đang chạy để thực hiện sao lưu.",
+                "restoring": "Một bản sao lưu hiện đang được khôi phục vào cơ sở dữ liệu được quản lý này."
+              },
+              "toast": {
+                "restoring": "Đang khôi phục bản sao lưu vào cơ sở dữ liệu được quản lý...",
+                "restoreCompleted": "Quá trình khôi phục bản sao lưu cơ sở dữ liệu đã hoàn tất thành công.",
+                "restoreFailed": "Quá trình khôi phục bản sao lưu cơ sở dữ liệu đã thất bại."
+              },
+              "toggle": {
+                "allEngineBackups": "Tất cả các bản sao lưu {engine} trên máy chủ này"
+              },
+              "modal": {
+                "restoreBackup": {
+                  "title": "Khôi phục bản sao lưu cơ sở dữ liệu",
+                  "content": "Thao tác này sẽ nhập **{backup}** vào **{name}**. Các bảng và bộ sưu tập hiện có trong bản sao lưu sẽ bị thay thế, đồng thời các thao tác điều khiển hệ thống sẽ bị chặn cho đến khi quá trình khôi phục hoàn tất.",
+                  "targetInstance": "Cơ sở dữ liệu được quản lý đích"
+                }
+              }
+            },
             "modal": {
               "createDatabaseInstance": {
                 "title": "Tạo Cơ Sở Dữ Liệu Được Quản Lý",
@@ -5052,6 +5920,13 @@
                 "content": "Thao tác này sẽ cập nhật **{name}** lên cấu hình mẫu mới nhất. Cơ sở dữ liệu sẽ được khởi động lại để áp dụng cấu hình mới.",
                 "toast": {
                   "applied": "Đã áp dụng bản cập nhật mẫu."
+                }
+              },
+              "deleteDatabaseInstances": {
+                "title": "Xác nhận xóa cơ sở dữ liệu được quản lý",
+                "content": "Việc xóa cơ sở dữ liệu được quản lý là hành động vĩnh viễn và không thể hoàn tác. Thao tác này sẽ xóa vĩnh viễn **{databaseInstances}** cùng toàn bộ dữ liệu bên trong.",
+                "alert": {
+                  "skipped": "{databaseInstances} sẽ bị bỏ qua. Không thể xóa các cơ sở dữ liệu được quản lý đang bị khóa."
                 }
               },
               "deleteDatabaseInstance": {
@@ -5118,6 +5993,13 @@
                 "recreated": "Cơ sở dữ liệu đã được tạo lại."
               }
             },
+            "deleteDatabases": {
+              "title": "Xác nhận xóa cơ sở dữ liệu",
+              "content": "Xóa cơ sở dữ liệu là một hành động vĩnh viễn, không thể hoàn tác. Điều này sẽ xóa vĩnh viễn cơ sở dữ liệu **{databases}** và loại bỏ tất cả các dữ liệu liên quan.",
+              "alert": {
+                "skipped": "{databases} sẽ bị bỏ qua. Không thể xóa các cơ sở dữ liệu được quản lý đang bị khóa."
+              }
+            },
             "deleteDatabase": {
               "title": "Xác Nhận Xóa Cơ Sở Dữ Liệu",
               "content": "Xóa cơ sở dữ liệu là một hành động vĩnh viễn, không thể hoàn tác. Điều này sẽ xóa vĩnh viễn cơ sở dữ liệu **{name}** và loại bỏ tất cả các dữ liệu liên quan.",
@@ -5133,6 +6015,11 @@
           "dropzone": {
             "title": "Thả một số tệp ở đây để Nhập chúng dưới dạng Lịch Trình",
             "subtitle": "Nhả để bắt đầu Nhập"
+          },
+          "empty": {
+            "title": "Không có lịch trình",
+            "description": "Không có tác vụ nào tự động chạy trên máy chủ này. Hãy thiết lập lịch trình để thực thi các lệnh, sao lưu và nhiều tác vụ khác theo thời gian định sẵn hoặc khi có sự kiện kích hoạt.",
+            "descriptionReadOnly": "Không có gì chạy tự động trên máy chủ này."
           },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} lịch trình."
@@ -5156,7 +6043,8 @@
             "addOutput": "Thêm Đầu Ra",
             "addFile": "Thêm Tệp",
             "addHeader": "Thêm tiêu đề",
-            "viewCalendar": "Xem Lịch"
+            "viewCalendar": "Xem Lịch",
+            "createFirstSchedule": "Tạo Lịch Trình"
           },
           "toast": {
             "imported": "Lịch trình đã được nhập.",
@@ -5213,6 +6101,10 @@
             "calendar": {
               "title": "Lịch các đợt chạy sắp tới",
               "truncatedWarning": "Một số đợt chạy sắp tới đã được lược bỏ để đảm bảo lịch trình luôn linh hoạt và phản hồi nhanh."
+            },
+            "deleteSchedules": {
+              "title": "Xác Nhận Xóa Lịch Trình",
+              "content": "Bạn có chắc muốn xóa **{schedules}** khỏi máy chủ này không?"
             },
             "deleteSchedule": {
               "title": "Xác Nhận Xóa Lịch Trình",
@@ -5274,7 +6166,10 @@
             "rootPath": "Đường Dẫn Root",
             "outputInto": "Đầu Ra Thành",
             "ignoreFailure": "Bỏ Qua Lỗi",
-            "runInForeground": "Chạy Ở Nền Trước"
+            "runInForeground": "Chạy Ở Nền Trước",
+            "sourceDatabaseInstance": "Chỉ xem xét các bản sao lưu từ",
+            "sourceDatabaseInstanceDescription": "Chỉ chọn các bản sao lưu cơ sở dữ liệu được tạo từ cơ sở dữ liệu được quản lý này. Để trống nếu muốn xem xét các bản sao lưu từ bất kỳ cơ sở dữ liệu được quản lý nào trên máy chủ này.",
+            "sourceDatabaseInstanceAny": "Bất kỳ cơ sở dữ liệu được quản lý nào"
           },
           "condition": {
             "variable": "Biến",
@@ -5287,6 +6182,7 @@
             "anyMustBeTrue": "Bất kỳ điều kiện nào phải đúng:",
             "mustNotBeTrue": "Điều kiện phải không đúng:",
             "renderer": {
+              "none": "Không có điều kiện - cái này luôn khớp.",
               "empty": "Chưa có điều kiện nào được thêm vào.",
               "serverState": "Trạng thái máy chủ là {state}",
               "uptime": "Thời gian hoạt động {comparator} `{value}",
@@ -5351,6 +6247,15 @@
                 "content": "Khi Sao Lưu Đạt Tới Trạng Thái `{status}`."
               }
             },
+            "databaseBackupStatus": {
+              "title": "Trạng thái sao lưu cơ sở dữ liệu",
+              "form": {
+                "backupStatus": "Trạng Thái Sao Lưu"
+              },
+              "card": {
+                "content": "Khi Sao lưu Cơ sở dữ liệu đạt trạng thái `{status}`."
+              }
+            },
             "scheduleCompletion": {
               "title": "Hoàn Thành Lịch Trình",
               "form": {
@@ -5387,7 +6292,14 @@
             "noActionSelected": "Chọn loại hành động để cấu hình",
             "noActionDetails": "Chi tiết hành động không khả dụng",
             "ignoreFailure": "Bỏ Qua Lỗi: {value}",
-            "foreground": "Nền Trước: {value}"
+            "foreground": "Nền Trước: {value}",
+            "sourceDatabaseInstance": "Chỉ từ Cơ sở dữ liệu được quản lý: {uuid}",
+            "sourceDatabaseInstanceAny": "Chỉ từ cơ sở dữ liệu được quản lý: Bất kỳ",
+            "backupSelector": {
+              "compact": "Sao lưu {backup}",
+              "compactLatest": "Bản sao lưu mới nhất",
+              "compactOldest": "Bản sao lưu cũ nhất"
+            }
           },
           "steps": {
             "empty": {
@@ -5539,7 +6451,22 @@
                   "backupName": "Tên Sao Lưu: {name}",
                   "backupNameAuto": "Tên Sao Lưu: Tự động tạo",
                   "outputInto": "Sao lưu UUID vào: {variable}",
-                  "ignoredFiles": "Tệp Bị Bỏ Qua: {files}"
+                  "ignoredFiles": "Tệp Bị Bỏ Qua: {files}",
+                  "backupGroup": "Nhóm sao lưu: {uuid}"
+                }
+              }
+            },
+            "createDatabaseBackup": {
+              "title": "Tạo bản sao lưu cơ sở dữ liệu",
+              "description": "Tạo bản sao lưu của cơ sở dữ liệu được quản lý.",
+              "form": {
+                "databaseInstance": "Cơ sở dữ liệu được quản lý"
+              },
+              "renderer": {
+                "compact": "Tạo bản sao lưu cơ sở dữ liệu {name}",
+                "compactAuto": "Tạo bản sao lưu cơ sở dữ liệu với tên được tạo tự động",
+                "detail": {
+                  "databaseInstance": "Cơ sở dữ liệu được quản lý: {uuid}"
                 }
               }
             },
@@ -5576,7 +6503,8 @@
               "title": "Xóa bản sao lưu",
               "description": "Xóa bản sao lưu được chọn bởi bộ chọn bản sao lưu.",
               "form": {
-                "backupSelector": "Bản Sao Lưu cần xóa"
+                "backupSelector": "Bản Sao Lưu cần xóa",
+                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu đã chọn, bao gồm cả các tệp của nó trên nút. Nếu bản sao lưu đã chọn đang bị khóa, bước này sẽ thất bại."
               }
             },
             "moveBackup": {
@@ -5591,6 +6519,38 @@
                   "targetGroup": "Nhóm mục tiêu: {uuid}",
                   "targetGroupNone": "Nhóm mục tiêu: Không có (không được nhóm)"
                 }
+              }
+            },
+            "restoreDatabaseBackup": {
+              "title": "Khôi phục bản sao lưu cơ sở dữ liệu",
+              "description": "Khôi phục bản sao lưu cơ sở dữ liệu vào một cơ sở dữ liệu được quản lý.",
+              "form": {
+                "backupSelector": "Sao lưu cơ sở dữ liệu để khôi phục",
+                "targetDatabaseInstance": "Khôi phục vào",
+                "targetDatabaseInstanceDescription": "Cơ sở dữ liệu được quản lý mà bản sao lưu sẽ được nhập vào. Hãy để trống nếu muốn khôi phục vào chính cơ sở dữ liệu đã tạo ra bản sao lưu đó.",
+                "targetDatabaseInstanceSource": "Cơ sở dữ liệu mà bản sao lưu được tạo ra từ đó",
+                "warning": "Quá trình khôi phục sẽ ghi đè lên nội dung của cơ sở dữ liệu đích. Lịch trình không chờ quá trình nhập dữ liệu hoàn tất, do đó các bước tiếp theo có thể được thực hiện ngay cả khi quá trình này vẫn đang diễn ra. Nếu cơ sở dữ liệu gốc đã bị xóa, bước này sẽ thất bại trừ khi bạn chọn một cơ sở dữ liệu đích tại đây."
+              },
+              "renderer": {
+                "detail": {
+                  "targetDatabaseInstance": "Khôi phục vào: {uuid}",
+                  "targetDatabaseInstanceSource": "Khôi phục vào: Cơ sở dữ liệu mà bản sao lưu được tạo ra"
+                }
+              }
+            },
+            "deleteDatabaseBackup": {
+              "title": "Xóa bản sao lưu cơ sở dữ liệu",
+              "description": "Xóa bản sao lưu cơ sở dữ liệu được chọn bởi công cụ chọn bản sao lưu.",
+              "form": {
+                "backupSelector": "Sao lưu cơ sở dữ liệu cần xóa",
+                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu cơ sở dữ liệu đã chọn, bao gồm cả tệp dump của nó trên node. Chỉ các bản sao lưu cơ sở dữ liệu mới được tính đến, không bao gồm bản sao lưu tệp tin. Nếu bản sao lưu được chọn đang bị khóa, bước này sẽ thất bại."
+              }
+            },
+            "moveDatabaseBackup": {
+              "title": "Di chuyển bản sao lưu cơ sở dữ liệu",
+              "description": "Di chuyển bản sao lưu cơ sở dữ liệu được chọn bởi bộ chọn bản sao lưu vào một nhóm sao lưu.",
+              "form": {
+                "backupSelector": "Chuyển cơ sở dữ liệu sao lưu được chọn bằng cách chọn bản sao lưu vào một bản sao lưu nhóm"
               }
             },
             "createDirectory": {
@@ -5687,6 +6647,21 @@
                 }
               }
             },
+            "pullFile": {
+              "title": "Kéo Tệp",
+              "description": "Tải tệp từ URL vào một thư mục.",
+              "form": {
+                "useHeader": "Sử dụng tên tệp phản hồi",
+                "useHeaderDescription": "Đặt tên tệp theo tiêu đề Content-Disposition khi không có tên tệp nào được chỉ định."
+              },
+              "renderer": {
+                "compact": "Kéo {url} vào {root}",
+                "detail": {
+                  "fileName": "Tên tệp: {fileName}",
+                  "useHeader": "Sử dụng tên tệp phản hồi: {value}"
+                }
+              }
+            },
             "updateStartupVariable": {
               "title": "Cập Nhật Biến Khởi Động",
               "description": "Thay đổi giá trị của một biến khởi động.",
@@ -5749,6 +6724,14 @@
         "subusers": {
           "title": "Người dùng phụ",
           "subtitle": "{current} trên {max} người dùng phụ tối đa đã được tạo.",
+          "empty": {
+            "title": "Không có người dùng phụ",
+            "description": "Chưa có ai khác được cấp quyền truy cập vào máy chủ này. Hãy thêm người dùng phụ để chia sẻ quyền truy cập, với các quyền hạn do bạn tùy chọn.",
+            "descriptionReadOnly": "Không ai khác được cấp quyền truy cập vào máy chủ này."
+          },
+          "button": {
+            "createFirstSubuser": "Tạo Người Dùng Phụ"
+          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} người dùng phụ."
           },
@@ -5768,7 +6751,8 @@
               "form": {
                 "emailPlaceholder": "Nhập email mà người dùng phụ này nên được lưu.",
                 "permissions": "Quyền",
-                "ignoredFilesDescription": "Các tệp và thư mục khớp với các mẫu này sẽ bị ẩn khỏi người dùng phụ này. Sử dụng mẫu glob kiểu gitignore (vd: `*.env`, `secrets/`). Đặt `!` trước mẫu để bỏ ẩn đường dẫn mà mẫu rộng hơn sẽ loại trừ."
+                "ignoredFilesDescription": "Các tệp và thư mục khớp với các mẫu này sẽ bị ẩn khỏi người dùng phụ này. Sử dụng mẫu glob kiểu gitignore (vd: `*.env`, `secrets/`). Đặt `!` trước mẫu để bỏ ẩn đường dẫn mà mẫu rộng hơn sẽ loại trừ.",
+                "ignoredFilesInherited": "Các đường dẫn bị ẩn khỏi bạn luôn được áp dụng đè lên những đường dẫn này và không thể bị chuyển nhượng."
               }
             },
             "updateSubuser": {
@@ -5776,6 +6760,10 @@
               "toast": {
                 "updated": "Người dùng phụ đã được cập nhật."
               }
+            },
+            "removeSubusers": {
+              "title": "Xác Nhận Xóa Người Dùng Phụ",
+              "content": "Bạn có chắc muốn xóa **{subusers}** khỏi máy chủ này không?"
             },
             "removeSubuser": {
               "title": "Xác Nhận Xóa Người Dùng Phụ",
@@ -5789,23 +6777,36 @@
         "backups": {
           "title": "Sao Lưu",
           "subtitle": "{current} của {max} sao lưu tối đa đã được tạo.",
+          "subtitleWithDatabase": "Đã tạo {current} trong số {max} bản sao lưu tối đa (máy chủ {server}, cơ sở dữ liệu {database}).",
+          "empty": {
+            "title": "Không có sao lưu",
+            "description": "Không có dữ liệu nào trên máy chủ này có thể được khôi phục nếu xảy ra sự cố. Hãy tạo bản sao lưu để giữ lại một bản sao mà bạn có thể khôi phục lại sau này.",
+            "descriptionReadOnly": "Không có gì trên máy chủ này có thể được khôi phục nếu xảy ra sự cố."
+          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} sao lưu."
           },
           "table": {
             "columns": {
+              "kind": "Loại",
+              "retention": "Duy trì",
               "locked": "Khóa?"
             }
           },
           "badge": {
             "deleting": "Đang xóa…",
-            "deleteFailed": "Xóa thất bại"
+            "deleteFailed": "Xóa thất bại",
+            "sourceDeleted": "{name} (đã được xóa)"
           },
           "button": {
             "browse": "Duyệt",
             "exportToFiles": "Xuất ra Tệp",
             "createBackup": "Tạo Sao Lưu",
-            "createGroup": "Tạo Nhóm Sao Lưu"
+            "createGroup": "Tạo Nhóm Sao Lưu",
+            "moveToGroup": "Chuyển tới Nhóm",
+            "removeFromGroup": "Xóa khỏi nhóm",
+            "lock": "Khoá",
+            "unlock": "Mở khoá"
           },
           "toast": {
             "downloadStarted": "Tải xuống đã bắt đầu.",
@@ -5816,6 +6817,10 @@
             "createBackup": {
               "title": "Tạo Sao Lưu",
               "noGroup": "Không có nhóm",
+              "source": "Nguồn",
+              "sourceFiles": "Tệp tin máy chủ",
+              "sourceDatabase": "Cơ Sở Dữ Liệu Được Quản Lý",
+              "sourceInstance": "Cơ Sở Dữ Liệu Được Quản Lý",
               "toast": {
                 "created": "Sao lưu đã được tạo."
               }
@@ -5831,6 +6836,13 @@
             },
             "exportBackup": {
               "title": "Xuất Sao Lưu Sang Tệp"
+            },
+            "deleteBackups": {
+              "title": "Xác Nhận Xóa Sao Lưu",
+              "content": "Bạn có chắc muốn xóa **{backups}** khỏi máy chủ này không?",
+              "alert": {
+                "skipped": "Các bản sao lưu {backups} sẽ bị bỏ qua. Không thể xóa các bản sao lưu bị khóa, các bản sao lưu chưa hoàn tất và các bản sao lưu đang trong quá trình bị xóa."
+              }
             },
             "deleteBackup": {
               "title": "Xác Nhận Xóa Sao Lưu",
@@ -5854,6 +6866,9 @@
           },
           "badge": {
             "allLocked": "Tất cả đã khóa"
+          },
+          "form": {
+            "noRetentionDescription": "Khi không thiết lập chính sách giữ lại, nhóm này chỉ đóng vai trò là một nhãn phân loại và không bao giờ tự động xóa các bản sao lưu."
           },
           "modal": {
             "createGroup": {
@@ -5882,6 +6897,9 @@
         "network": {
           "title": "Mạng",
           "subtitle": "{current} của {max} phân bổ tối đa được gán.",
+          "allocations": {
+            "title": "Phân bổ"
+          },
           "tooltip": {
             "limitReached": "Máy chủ này được giới hạn ở {max} phân bổ."
           },
@@ -5899,9 +6917,223 @@
             "unsetPrimary": "Phân bổ được bỏ chính."
           },
           "modal": {
+            "removeAllocations": {
+              "title": "Xác Nhận Xóa Phân Bổ",
+              "content": "Bạn có chắc muốn xóa **{allocations}** khỏi máy chủ này không?",
+              "alert": {
+                "skipped": "{allocations} sẽ bị bỏ qua. Không thể xóa phân bổ chính."
+              }
+            },
             "removeAllocation": {
               "title": "Xác Nhận Xóa Phân Bổ",
               "content": "Bạn có chắc muốn xóa **{allocation}** khỏi máy chủ này không?"
+            }
+          }
+        },
+        "firewall": {
+          "title": "Tường lửa",
+          "subtitle": "Các quy tắc được kiểm tra từ trên xuống dưới; quy tắc đầu tiên khớp với điều kiện sẽ là quy tắc quyết định.",
+          "dropzone": {
+            "title": "Thả các tệp vào đây để nhập dưới dạng Quy tắc Tường lửa",
+            "subtitle": "Thả ra để bắt đầu nhập"
+          },
+          "empty": {
+            "title": "Không có quy tắc tường lửa",
+            "description": "Mọi kết nối tới các tài nguyên được cấp phát của máy chủ này đều được cho phép. Hãy thêm quy tắc để bắt đầu hạn chế đối tượng có thể truy cập vào đó.",
+            "descriptionReadOnly": "Mọi kết nối tới các phân bổ của máy chủ này đều được cho phép."
+          },
+          "button": {
+            "createFirstRule": "Tạo quy tắc",
+            "addRule": "Thêm Quy Tắc",
+            "addDenyAll": "Từ chối mọi thứ khác"
+          },
+          "tooltip": {
+            "limitReached": "Máy chủ này bị giới hạn ở mức {max} quy tắc tường lửa."
+          },
+          "rule": {
+            "anySource": "bất kỳ nguồn nào",
+            "allAllocations": "tất cả phân bổ",
+            "sourceFile": "tệp: {file}",
+            "summary": "{protocols} từ {sources} đến {ports}",
+            "moreSources": "thêm +{count}",
+            "badge": {
+              "shadowed": "Không bao giờ khớp"
+            },
+            "aria": {
+              "reorder": "Thay đổi thứ tự quy tắc tường lửa {position}",
+              "actions": "Các hành động của quy tắc tường lửa {position}"
+            }
+          },
+          "alert": {
+            "fallthrough": "Lưu lượng không khớp với bất kỳ quy tắc nào trong số này sẽ được **cho phép**. Hãy thêm một quy tắc từ chối ở cuối danh sách để áp dụng cho mọi trường hợp, qua đó biến nó thành tường lửa có cơ chế mặc định là từ chối.",
+            "notEnforced": "Node này sẽ không thực thi các quy tắc tường lửa. Các quy tắc vẫn được lưu lại nhưng không có tác dụng, và **máy chủ này có thể từ chối khởi động khi có bất kỳ quy tắc nào được cấu hình.**",
+            "unallocatedPorts": "Các quy tắc này tham chiếu đến các cổng không được cấp phát cho máy chủ này: **{ports}**. Node sẽ bỏ qua chúng cho đến khi có các cấp phát tương ứng.",
+            "limitations": "Các quy tắc áp dụng cho lưu lượng truy cập đến máy chủ này từ bên ngoài, bao gồm cả lưu lượng qua các cổng đã được công bố và lưu lượng trực tiếp đến địa chỉ container. Các kết nối do chính node đó khởi tạo sẽ không bị lọc.",
+            "shadowed": "Quy tắc tại vị trí {position} không bao giờ khớp được, vì một quy tắc đứng trước đó đã bao hàm toàn bộ phạm vi hoạt động của nó.",
+            "shadowedMany": "Các quy tắc tại {positions} sẽ không bao giờ khớp được, vì các quy tắc trước đó đã bao hàm mọi trường hợp mà chúng xử lý.",
+            "unknownEnforcement": "Không thể kết nối tới nút này, do đó không rõ liệu nó có đang áp dụng các quy tắc tường lửa hay không.",
+            "unsaved": "Bạn có các thay đổi chưa được lưu. Không có gì được áp dụng cho đến khi bạn lưu lại."
+          },
+          "form": {
+            "action": "Hành động",
+            "protocols": "Giao Thức",
+            "protocolsDescription": "Để trống để khớp với cả TCP và UDP.",
+            "sources": "Nguồn",
+            "sourcesDescription": "Các địa chỉ IP hoặc mạng, chẳng hạn như 10.0.0.0/8. Đối với mạng, các bit host phải được đặt về giá trị 0. Để trống để khớp với bất kỳ nguồn nào.",
+            "sourceFile": "Tệp Nguồn",
+            "sourceFileDescription": "Đường dẫn đến tệp tin trong thư mục máy chủ, trong đó mỗi dòng chứa một địa chỉ IP hoặc mạng; các dòng bắt đầu bằng dấu # sẽ bị bỏ qua. Các mục trong tệp này được bổ sung vào các nguồn đã nêu ở trên, và nút mạng sẽ tự động cập nhật các thay đổi của tệp tin.",
+            "portsDescription": "Các cổng cấp phát mà quy tắc này áp dụng, dưới dạng Port đơn hoặc dải cổng ví dụ: 25565-25570. Để trống để áp dụng cho mọi cổng được cấp phát của máy chủ.",
+            "preview": "Xem Trước",
+            "sourcesCount": "Đã sử dụng {count}/{max}",
+            "invalidSource": "{source} không phải là địa chỉ IP hoặc mạng hợp lệ.",
+            "tooManySources": "Một quy tắc có thể có tối đa {max} nguồn.",
+            "invalidPort": "{port} không phải là cổng hoặc dải cổng hợp lệ.",
+            "tooManyPorts": "Một quy tắc có thể bao gồm tối đa {max} cổng."
+          },
+          "toast": {
+            "saved": "Các quy tắc tường lửa đã được lưu.",
+            "exported": "Các quy tắc tường lửa đã được xuất.",
+            "imported": "Các quy tắc tường lửa đã được nhập. Hãy xem lại và lưu lại để áp dụng chúng.",
+            "importCancelled": "Việc nhập đã bị hủy; các quy tắc chưa được lưu của bạn vẫn được giữ lại.",
+            "parseFailed": "Không thể phân tích cú pháp tệp quy tắc tường lửa đó: {error}"
+          },
+          "modal": {
+            "unsavedChanges": {
+              "content": "Bạn có các quy tắc tường lửa chưa được lưu. Rời khỏi trang này ngay bây giờ sẽ làm mất các quy tắc đó."
+            },
+            "importReplace": {
+              "title": "Thay thế các quy tắc chưa được lưu",
+              "content": "Bạn có các quy tắc tường lửa chưa được lưu. Việc nhập dữ liệu sẽ thay thế toàn bộ quy tắc hiện tại bằng các quy tắc từ tệp tin, và những thay đổi chưa được lưu của bạn sẽ bị mất."
+            },
+            "createRule": {
+              "title": "Tạo quy tắc tường lửa"
+            },
+            "editRule": {
+              "title": "Chỉnh sửa quy tắc tường lửa"
+            },
+            "removeRule": {
+              "title": "Xác nhận xóa quy tắc",
+              "content": "Bạn có chắc chắn muốn xóa quy tắc tường lửa này không?"
+            }
+          }
+        },
+        "tunnel": {
+          "subtitle": "Kết nối trực tiếp với các máy chủ khác mà không cần đi qua mạng Internet công cộng.",
+          "empty": {
+            "title": "Không nằm trong mạng riêng",
+            "description": "Hãy tham gia để cấp cho máy chủ này một địa chỉ riêng mà các máy chủ khác có thể dùng để kết nối tới nó.",
+            "descriptionReadOnly": "Máy chủ này không có địa chỉ riêng, do đó không có máy chủ nào khác có thể kết nối với nó qua mạng nội bộ."
+          },
+          "ports": {
+            "empty": "Hiện chưa có cổng nào được cung cấp, vì vậy không thể truy cập được gì trên máy chủ này."
+          },
+          "outgoing": {
+            "empty": "Máy chủ này chưa thể kết nối với bất kỳ máy chủ nào khác. Hãy kết nối một máy chủ để bắt đầu xây dựng đồ thị."
+          },
+          "button": {
+            "join": "Tham gia mạng riêng",
+            "leave": "Rời khỏi mạng riêng",
+            "connect": "Kết nối máy chủ",
+            "addPort": "Thêm Port",
+            "editPorts": "Các Port được cung cấp"
+          },
+          "action": {
+            "rename": "Thay đổi tên máy chủ",
+            "editPorts": "Chỉnh sửa các cổng được cung cấp",
+            "removeOutgoing": "Ngừng truy cập máy chủ này",
+            "removeIncoming": "Ngăn chặn máy chủ này kết nối với chúng tôi",
+            "grantOutgoing": "Hãy để máy chủ này tiếp cận nó",
+            "grantIncoming": "Cho phép truy cập vào máy chủ này"
+          },
+          "canvas": {
+            "hint": "Nhấp vào một kết nối để bật hoặc tắt hướng đó. Kéo để di chuyển, giữ phím Ctrl và cuộn chuột để phóng to/thu nhỏ, hoặc chụm ngón tay trên màn hình cảm ứng.",
+            "legend": {
+              "outbound": "Chiều đi",
+              "inbound": "Chiều vào"
+            },
+            "edge": {
+              "outboundActive": "Máy chủ này kết nối tới {server}. Nhấp để dừng nó.",
+              "outboundInactive": "Máy chủ này không thể kết nối với {server}. Hãy nhấp để cho phép kết nối.",
+              "inboundActive": "Máy chủ này kết nối tới {server}. Nhấp để dừng nó.",
+              "inboundInactive": "Máy chủ này không thể kết nối với {server}. Hãy nhấp để cho phép kết nối."
+            },
+            "zoomIn": "Phóng to",
+            "zoomOut": "Thu nhỏ",
+            "fit": "Tập trung lại"
+          },
+          "node": {
+            "actions": "Hành động máy chủ",
+            "noPorts": "Không cung cấp cổng kết nối nào, do đó không thể truy cập vào bất kỳ thành phần nào trên đó.",
+            "noPortsSelf": "Không cung cấp cổng kết nối nào, do đó không thể truy cập vào bất kỳ thành phần nào trên đó.",
+            "inboundOnly": "Kết nối được tới máy chủ này. Không thể truy cập bất cứ thứ gì trên đó từ đây.",
+            "caption": {
+              "self": "Connect to this server. Không thể truy cập bất cứ điều gì từ đây",
+              "peer": "Máy chủ này truy cập nó tại"
+            }
+          },
+          "tooltip": {
+            "nodeNotOnNetwork": "Nút mà máy chủ này đang chạy không nằm trong mạng riêng.",
+            "connectionLimitReached": "Máy chủ này được giới hạn ở {max} kết nối ra ngoài."
+          },
+          "alert": {
+            "nodeNotOnNetwork": "Nút mà máy chủ này đang chạy **không nằm trong mạng riêng**, do đó nó không thể tham gia. Hãy yêu cầu quản trị viên kích hoạt tính năng này cho nút đó.",
+            "nodeLeftNetwork": "Node mà máy chủ này đang chạy đã bị **ngắt khỏi mạng nội bộ**, do đó tất cả các kết nối của nó đều không hoạt động. Hãy yêu cầu quản trị viên kết nối lại nút này vào mạng.",
+            "bypassesFirewall": "Các kết nối riêng tư không đi qua các quy tắc tường lửa của máy chủ này: bản thân kết nối đó chính là quyền truy cập. Mỗi kết nối chỉ hoạt động theo một chiều, do đó máy chủ được máy chủ này kết nối tới sẽ không thể kết nối ngược lại trừ khi quyền đó được cấp riêng."
+          },
+          "form": {
+            "name": "Tên Máy Chủ",
+            "nameDescription": "Các chữ cái viết thường, chữ số và dấu gạch ngang, tối đa 63 ký tự. Một máy chủ không thể kết nối tới hai máy chủ có cùng tên máy chủ.",
+            "namePlaceholder": "Để trống để lấy giá trị từ tên máy chủ",
+            "protocols": "Giao Thức",
+            "server": "Máy Chủ",
+            "serverDescription": "Chỉ các máy chủ đã nằm trong mạng riêng mới được liệt kê."
+          },
+          "toast": {
+            "joined": "Đã tham gia mạng riêng.",
+            "left": "Rời khỏi mạng riêng.",
+            "renamed": "Tên máy chủ đã được thay đổi.",
+            "portsSaved": "Các cổng được cung cấp đã được lưu lại.",
+            "connected": "Máy chủ đã được kết nối.",
+            "disconnected": "Kết nối đã bị xóa."
+          },
+          "modal": {
+            "join": {
+              "title": "Đã tham gia mạng riêng",
+              "description": "Hãy chọn tên máy chủ mà các máy chủ khác sẽ dùng để kết nối với máy chủ này. Các máy chủ khác có thể sử dụng cùng tên máy chủ, miễn là không có máy chủ nào kết nối với cả hai. Bạn có thể thay đổi tên này sau."
+            },
+            "rename": {
+              "title": "Thay đổi tên máy chủ",
+              "warning": "Các máy chủ được kết nối sẽ cập nhật tên máy chủ mới trong vòng một phút mà không bị ngắt kết nối. Mọi kết nối vẫn sử dụng tên cũ sẽ không còn phân giải được nữa, vì vậy bạn cũng cần cập nhật tại đó — hoặc sử dụng **{alias}.tunnel**."
+            },
+            "ports": {
+              "title": "Các Port được cung cấp",
+              "description": "Các cổng có thể kết nối với máy chủ; không giới hạn ở mức phân bổ của bạn.",
+              "fromAllocations": "Thêm từ các phần được cấp phát của máy chủ này",
+              "count": "Đã sử dụng {count}/{max}",
+              "duplicate": "Cùng một cổng được liệt kê nhiều hơn một lần."
+            },
+            "connect": {
+              "title": "Kết nối máy chủ",
+              "empty": "Không có máy chủ nào khả dụng. Máy chủ cần phải nằm trong mạng riêng thì mới có thể kết nối được.",
+              "outbound": "Máy chủ này kết nối tới {server}",
+              "inbound": "{server} kết nối tới máy chủ này",
+              "alreadyOn": "Đã được kết nối theo hướng này.",
+              "collision": "Máy chủ này sử dụng cổng {port} cho các tác vụ riêng của nó, do đó nó không bao giờ có thể kết nối tới {server} thông qua cổng này.",
+              "collisionReverse": "{server} sử dụng cổng {port} cho các tác vụ của riêng nó, do đó nó không bao giờ có thể kết nối tới máy chủ này thông qua cổng đó.",
+              "noPermission": "Bạn không được phép cấp quyền này từ {server}.",
+              "noPermissionTo": "Bạn không được phép kết nối tới {server}.",
+              "offersNothing": "{server} hiện chưa cung cấp cổng nào, vì vậy sẽ không có gì để kết nối tới.",
+              "youOfferNothing": "Máy chủ này chưa cung cấp cổng nào, vì vậy sẽ không có gì để nó kết nối tới.",
+              "addPortTo": "Ưu đãi trên {server}",
+              "offersNothingAlert": "**{server}** không mở cổng nào cả. Việc kết nối sẽ cung cấp cho bạn một tên máy chủ phân giải được địa chỉ nhưng lại từ chối mọi kết nối. Ai đó có quyền truy cập vào {server} cần phải mở một cổng trước đã."
+            },
+            "disconnect": {
+              "title": "Xác nhận xóa kết nối",
+              "content": "Bạn có chắc chắn muốn ngăn máy chủ này kết nối tới **{server}** không?",
+              "contentIncoming": "Bạn có chắc chắn muốn ngăn **{server}** kết nối tới máy chủ này không?"
+            },
+            "leave": {
+              "content": "Máy chủ này bị mất địa chỉ riêng, các cổng đã được cấp và mọi kết nối theo cả hai chiều. Việc kết nối lại sẽ gán một địa chỉ mới."
             }
           }
         },
@@ -5941,6 +7173,13 @@
               "content": "Bạn có muốn gắn **{name}** vào `{target}` không?",
               "toast": {
                 "attached": "{name} đã được gắn vào máy chủ của bạn."
+              }
+            },
+            "detachMounts": {
+              "title": "Tháo rời các giá đỡ",
+              "content": "Bạn có muốn ngắt kết nối **{mounts}** khỏi máy chủ này không?",
+              "alert": {
+                "skipped": "{mounts} sẽ bị bỏ qua. Các điểm gắn không được kết nối thì không thể tháo rời."
               }
             },
             "detachMount": {
@@ -5998,6 +7237,7 @@
             "modal": {
               "title": "Xác Nhận Cài Đặt Lại Máy Chủ",
               "button": "Cài đặt lại",
+              "startOnCompletion": "Khởi động máy chủ sau khi quá trình cài đặt lại hoàn tất",
               "toast": {
                 "reinstalling": "Đang cài đặt lại máy chủ..."
               }

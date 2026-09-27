@@ -143,6 +143,78 @@
       "few": "{count} 項變更",
       "many": "{count} 項變更",
       "other": "{count} 項變更"
+    },
+    "session": {
+      "zero": "{count} 個會話",
+      "one": "{count} 個會話",
+      "two": "{count} 個會話",
+      "few": "{count} 個會話",
+      "many": "{count} 個會話",
+      "other": "{count} 個會話"
+    },
+    "serverAllocation": {
+      "zero": "{count} 個分配",
+      "one": "{count} 個分配",
+      "two": "{count} 個分配",
+      "few": "{count} 個分配",
+      "many": "{count} 個分配",
+      "other": "{count} 個分配"
+    },
+    "database": {
+      "zero": "{count} 個資料庫",
+      "one": "{count} 個資料庫",
+      "two": "{count} 個資料庫",
+      "few": "{count} 個資料庫",
+      "many": "{count} 個資料庫",
+      "other": "{count} 個資料庫"
+    },
+    "databaseInstance": {
+      "zero": "{count} 個託管資料庫",
+      "one": "{count} 個託管資料庫",
+      "two": "{count} 個託管資料庫",
+      "few": "{count} 個託管資料庫",
+      "many": "{count} 個託管資料庫",
+      "other": "{count} 個託管資料庫"
+    },
+    "schedule": {
+      "zero": "{count} 筆排程",
+      "one": "{count} 筆排程",
+      "two": "{count} 筆排程",
+      "few": "{count} 筆排程",
+      "many": "{count} 筆排程",
+      "other": "{count} 筆排程"
+    },
+    "subuser": {
+      "zero": "{count} 個子用戶",
+      "one": "{count} 個子用戶",
+      "two": "{count} 個子用戶",
+      "few": "{count} 個子用戶",
+      "many": "{count} 個子用戶",
+      "other": "{count} 個子用戶"
+    },
+    "apiKey": {
+      "zero": "{count} 個 API 金鑰",
+      "one": "{count} 個 API 金鑰",
+      "two": "{count} 個 API 金鑰",
+      "few": "{count} 個 API 金鑰",
+      "many": "{count} 個 API 金鑰",
+      "other": "{count} 個 API 金鑰"
+    },
+    "oauthLink": {
+      "zero": "{count} 個連結的帳號",
+      "one": "{count} 個連結的帳號",
+      "two": "{count} 個連結的帳號",
+      "few": "{count} 個連結的帳號",
+      "many": "{count} 個連結的帳號",
+      "other": "{count} 個連結的帳號"
+    },
+    "commandSnippet": {
+      "zero": "{count} 個指令片段",
+      "one": "{count} 個指令片段",
+      "two": "{count} 個指令片段",
+      "few": "{count} 個指令片段",
+      "many": "{count} 個指令片段",
+      "other": "{count} 個指令片段"
     }
   },
   "translations": {
@@ -159,6 +231,8 @@
         "remove": "移除",
         "enable": "啟用",
         "disable": "停用",
+        "disableTwoFactor": "停用雙重驗證",
+        "verify": "驗證",
         "update": "更新",
         "close": "關閉",
         "cancel": "取消",
@@ -180,6 +254,7 @@
         "move": "移動",
         "transfer": "轉移",
         "reattach": "重新附加",
+        "reassign": "重新分配",
         "detach": "卸離",
         "send": "傳送",
         "reset": "重設",
@@ -192,13 +267,16 @@
         "unsetPrimary": "取消主要",
         "leavePage": "離開頁面",
         "viewDocumentation": "檢視文件",
-        "undo": "還原"
+        "undo": "還原",
+        "clearUserFilter": "清除使用者篩選",
+        "deleteFailedBackups": "刪除 {count} 失敗"
       },
       "alert": {
         "error": "錯誤",
         "warning": "警告",
         "success": "成功",
-        "clockOffset": "你的系統時鐘與伺服器相差超過 5 秒。這可能會造成通行密鑰驗證與雙因素驗證問題。若發生問題，請同步你的時鐘。目前偏移：{offset} 秒。"
+        "clockOffset": "你的系統時鐘與伺服器相差超過 5 秒。這可能會造成通行密鑰驗證與雙因素驗證問題。若發生問題，請同步你的時鐘。目前偏移：{offset} 秒。",
+        "passwordAuthUnavailable": "您的密碼無法用於此連線。請改用 SSH 金鑰，您可以在帳戶的「SSH 金鑰」頁面中新增金鑰。"
       },
       "divider": {
         "or": "或"
@@ -225,6 +303,15 @@
           "copyAll": "複製全部",
           "pasteReplace": "貼上（取代）"
         },
+        "serverFileInput": {
+          "notFound": "目前尚不存在同名檔案。",
+          "isDirectory": "這是一個目錄，不是檔案。"
+        },
+        "nodeAllocationIpInput": {
+          "anyAddress": "所有地址",
+          "nodeInterfaces": "節點介面",
+          "inUse": "使用中"
+        },
         "ignoredFilesInput": {
           "onePatternPerLine": "每行一個模式。",
           "countMatches": "計算相符數量",
@@ -232,15 +319,80 @@
           "noMatches": "沒有相符項目",
           "exception": "例外",
           "tooManyPatterns": "超過 {max} 個模式時不會自動計算相符數量。"
+        },
+        "cronInput": {
+          "segments": {
+            "second": "秒",
+            "minute": "分",
+            "hour": "小時",
+            "day": "日",
+            "month": "月",
+            "weekday": "週"
+          },
+          "nextRun": "下次運行時間為 {timestamp}。"
+        },
+        "backupRetention": {
+          "title": "保留",
+          "disabled": "無保留規則",
+          "description": "當任何規則選取成功備份時，請保留該備份：保留最新計數、最近指定天數內的所有備份，或保留每日、每週、每月或每年包含備份的每個週期內的最新備份。週期採用 UTC 時間；每週從星期一開始。錯過週期不會減少計數。將規則留空或設定為 0 可停用該規則。停用所有規則後，仍會保留成功備份。",
+          "sourcesDescription": "伺服器文件和每個資料庫的保留策略是分別評估的。鎖定的備份受到保護。保留策略不會安排備份。",
+          "capacityDescription": "當伺服器備份達到上限時，系統會刪除規則不再保留的備份以騰出空間。計劃備份也會額外刪除最早的未鎖定備份；手動備份則會被拒絕。",
+          "failedDescription": "未鎖定的失敗備份會在 24 小時後清理，無論是否分組。",
+          "count": "保持最新",
+          "status": {
+            "rule": {
+              "count": "最新的",
+              "days": "最近的",
+              "daily": "每日",
+              "weekly": "每週",
+              "monthly": "每月",
+              "yearly": "每年"
+            },
+            "locked": "已鎖定",
+            "indefinite": "永久保存",
+            "expired": "待移除",
+            "failed": "清理",
+            "forecastDescription": "刪除時間是根據備份計畫估算的。",
+            "lockedDescription": "鎖定備份永遠不會被保留機制刪除。",
+            "indefiniteDescription": "不適用任何保留規則。",
+            "expiredDescription": "此備份不再保留，將進入下一次保留週期。",
+            "failedDescription": "失敗的備份將在 24 小時後刪除。",
+            "expires": "{timestamp} 已刪除"
+          }
         }
       },
       "modal": {
         "duplicate": {
           "title": "複製 {resource}"
+        },
+        "delete": {
+          "content": "確定要刪除 **{name}** 嗎？"
+        },
+        "deleteFailedBackups": {
+          "content": "您確定要刪除 `{count}` 個失敗的備份嗎？已鎖定的備份和設定正在維護中的備份將被保留。刪除操作在背景運行，可能需要一些時間才能完成。",
+          "alert": {
+            "forceWarning": "強制刪除操作會移除這些備份，即使它們的配置資訊缺失或遠端儲存無法存取。備份檔案本身可能無法完全清理，從而留下孤立資料。"
+          }
         }
       },
       "toast": {
-        "duplicated": "{resource} 已複製。"
+        "duplicated": "{resource} 已複製。",
+        "failedBackupDeletionStarted": "正在背景刪除 {count} 個失敗的備份。"
+      },
+      "settingScope": {
+        "account": "與帳戶同步",
+        "device": "僅此設備",
+        "useAccountValue": "使用帳戶值",
+        "stateAccount": "帳號",
+        "stateDevice": "此裝置",
+        "tooltip": {
+          "account": "此設定與您的帳戶同步。",
+          "device": "此設定僅在該裝置上生效。"
+        },
+        "toast": {
+          "saved": "設定已儲存到您的帳戶。",
+          "saveFailed": "未能將此設定儲存到您的帳戶。"
+        }
       },
       "tooltip": {
         "resetToDefault": "重設為預設值",
@@ -380,6 +532,10 @@
       "tabs": {
         "general": "一般"
       },
+      "stat": {
+        "uptime": "運行時間",
+        "resources": "資源"
+      },
       "badge": {
         "active": "作用中",
         "inactive": "未作用",
@@ -395,7 +551,15 @@
         "page": "第 {page} 頁",
         "emptyDirectory": "此目錄是空的",
         "ignored": "已忽略",
+        "partiallyIgnored": "部分忽略",
         "showingFirstEntries": "顯示前 {count} 筆項目"
+      },
+      "databaseAgentHost": {
+        "deployment": {
+          "available": "部署已啟用",
+          "full": "無空間",
+          "disabled": "已停用部署"
+        }
       },
       "server": {
         "noAllocation": "無分配",
@@ -4313,7 +4477,6 @@
             "connect": "連線",
             "connectSftp": "透過 SFTP",
             "connectVscode": "透過 VS Code",
-            "openInNewWindow": "在新視窗中開啟",
             "rename": "重新命名",
             "copy": "複製",
             "fingerprint": "指紋",

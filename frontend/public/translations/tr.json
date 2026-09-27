@@ -1108,7 +1108,6 @@
           },
           "button": {
             "new": "Yeni",
-            "openInNewWindow": "Yeni Pencerede Aç",
             "rename": "Yeniden Adlandır",
             "copy": "Kopyala",
             "fingerprint": "Parmak İzi",

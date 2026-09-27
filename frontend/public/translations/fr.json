@@ -3439,7 +3439,6 @@
           "button": {
             "new": "Nouveau",
             "connect": "Connecter",
-            "openInNewWindow": "Ouvrir dans une nouvelle fenêtre",
             "rename": "Renommer",
             "copy": "Copier",
             "fingerprint": "Empreinte",

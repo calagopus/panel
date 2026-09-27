@@ -3193,7 +3193,6 @@
             "connect": "Pripojiť",
             "connectSftp": "cez SFTP",
             "connectVscode": "cez VS Code",
-            "openInNewWindow": "Otvoriť v novom okne",
             "rename": "Premenovať",
             "copy": "Kopírovať",
             "fingerprint": "Odtlačok prsta",

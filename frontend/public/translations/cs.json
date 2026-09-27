@@ -1,0 +1,206 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} bajtů",
+      "one": "{count} bajt",
+      "two": "{count} bajty",
+      "few": "{count} bajty",
+      "many": "{count} bajtu",
+      "other": "{count} bajtů"
+    },
+    "user": {
+      "zero": "{count} uživatelů",
+      "one": "{count} uživatel",
+      "two": "{count} uživatelé",
+      "few": "{count} uživatelé",
+      "many": "{count} uživatele",
+      "other": "{count} uživatelů"
+    },
+    "file": {
+      "zero": "{count} souborů",
+      "one": "{count} soubor",
+      "two": "{count} soubory",
+      "few": "{count} soubory",
+      "many": "{count} souboru",
+      "other": "{count} souborů"
+    },
+    "directory": {
+      "zero": "{count} adresářů",
+      "one": "{count} adresář",
+      "two": "{count} adresáře",
+      "few": "{count} adresáře",
+      "many": "{count} adresáře",
+      "other": "{count} adresářů"
+    },
+    "server": {
+      "zero": "{count} serverů",
+      "one": "{count} server",
+      "two": "{count} servery",
+      "few": "{count} servery",
+      "many": "{count} serveru",
+      "other": "{count} serverů"
+    },
+    "sshKey": {
+      "zero": "{count} klíčů SSH",
+      "one": "{count} klíč SSH",
+      "two": "{count} klíče SSH",
+      "few": "{count} klíče SSH",
+      "many": "{count} klíče SSH",
+      "other": "{count} klíčů SSH"
+    },
+    "asset": {
+      "zero": "{count} souborů administrace",
+      "one": "{count} soubor administrace",
+      "two": "{count} soubory administrace",
+      "few": "{count} soubory administrace",
+      "many": "{count} souboru administrace",
+      "other": "{count} souborů administrace"
+    },
+    "node": {
+      "zero": "{count} uzlů",
+      "one": "{count} uzel",
+      "two": "{count} uzly",
+      "few": "{count} uzly",
+      "many": "{count} uzlu",
+      "other": "{count} uzlů"
+    },
+    "databaseAgentHost": {
+      "zero": "{count} hostitelů databázových agentů",
+      "one": "{count} hostitel databázového agenta"
+    },
+    "row": {
+      "many": "{count} řádku",
+      "other": "{count} řádků"
+    },
+    "change": {
+      "zero": "{count} změn",
+      "one": "{count} změna",
+      "two": "{count} změny",
+      "few": "{count} změny",
+      "many": "{count} změny",
+      "other": "{count} změn"
+    },
+    "session": {
+      "zero": "{count} relací",
+      "one": "{count} relace",
+      "two": "{count} relace",
+      "few": "{count} relace",
+      "many": "{count} relace",
+      "other": "{count} relací"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Vytvořit",
+        "add": "Přidat",
+        "addDefaultPort": "Přidat :{port}",
+        "save": "Uložit",
+        "saveAndStay": "Uložit a zůstat",
+        "edit": "Upravit",
+        "duplicate": "Duplikovat",
+        "delete": "Smazat",
+        "remove": "Odebrat",
+        "enable": "Povolit",
+        "disable": "Zakázat",
+        "disableTwoFactor": "Vypnout dvoufázové ověřování",
+        "verify": "Ověřit",
+        "update": "Aktualizovat",
+        "close": "Zavřít",
+        "cancel": "Zrušit",
+        "continue": "Pokračovat",
+        "skip": "Přeskočit",
+        "okay": "Rozumím",
+        "back": "Zpět",
+        "next": "Další",
+        "install": "Nainstalovat",
+        "selectAll": "Vybrat vše",
+        "deselectAll": "Zrušit výběr",
+        "restore": "Obnovit",
+        "discard": "Zahodit",
+        "download": "Stáhnout",
+        "downloadAs": "Stáhnout jako {format}",
+        "export": "Exportovat",
+        "exportAs": "Exportovat jako {format}",
+        "recreate": "Znovu vytvořit",
+        "move": "Přesunout",
+        "transfer": "Převést",
+        "reattach": "Znovu připojit",
+        "reassign": "Přeřadit",
+        "detach": "Odpojit"
+      },
+      "elements": {
+        "backupRetention": {
+          "sourcesDescription": "Pravidla uchovávání se vyhodnocují samostatně pro soubory serveru a pro každou databázi. Uzamčené zálohy jsou chráněny. Tato pravidla neurčují, kdy se zálohy vytvářejí.",
+          "capacityDescription": "Při dosažení limitu záloh serveru se místo uvolní smazáním záloh, které již pravidla nevyžadují uchovávat. Při plánovaném zálohování se v případě potřeby smaže i nejstarší neuzamčená záloha; ruční zálohování se v takovém případě odmítne.",
+          "failedDescription": "Neúspěšné neuzamčené zálohy se mažou po 24 hodinách bez ohledu na to, zda patří do skupiny.",
+          "count": "Počet nejnovějších záloh",
+          "days": "Uchovat všechny zálohy (počet dnů)",
+          "daily": "Počet denních záloh",
+          "weekly": "Počet týdenních záloh",
+          "monthly": "Počet měsíčních záloh",
+          "yearly": "Počet ročních záloh"
+        }
+      },
+      "modal": {
+        "duplicate": {
+          "title": "Duplikovat: {resource}"
+        },
+        "delete": {
+          "content": "Opravdu chcete smazat **{name}**?"
+        },
+        "deleteFailedBackups": {
+          "title": "Potvrzení smazání neúspěšných záloh",
+          "content": "Opravdu chcete smazat neúspěšné zálohy v počtu `{count}`? Uzamčené zálohy a zálohy, jejichž konfigurace je v režimu údržby, budou zachovány. Mazání probíhá na pozadí a může chvíli trvat.",
+          "alert": {
+            "forceWarning": "Vynucené smazání odstraní tyto zálohy i v případě, že jejich konfigurace chybí nebo vzdálené úložiště není dostupné. Samotné soubory záloh se nemusí podařit zcela smazat a na úložišti mohou zůstat osiřelá data."
+          }
+        }
+      },
+      "toast": {
+        "duplicated": "Duplikování dokončeno: {resource}.",
+        "failedBackupDeletionStarted": "Na pozadí probíhá mazání neúspěšných záloh v počtu {count}."
+      },
+      "settingScope": {
+        "account": "Synchronizovat s účtem",
+        "device": "Pouze toto zařízení",
+        "useAccountValue": "Použít hodnotu z účtu",
+        "saveToAccount": "Uložit tuto hodnotu do mého účtu",
+        "stateAccount": "Účet",
+        "stateDevice": "Toto zařízení",
+        "tooltip": {
+          "account": "Toto nastavení se synchronizuje s vaším účtem.",
+          "device": "Toto nastavení je změněno pouze v tomto zařízení."
+        },
+        "toast": {
+          "saved": "Nastavení bylo uloženo do vašeho účtu.",
+          "saveFailed": "Nastavení se nepodařilo uložit do vašeho účtu."
+        }
+      },
+      "tooltip": {
+        "resetToDefault": "Obnovit výchozí hodnotu",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "remove": "Odebrat",
+        "primary": "Primární",
+        "backupOnDifferentNode": "Tato záloha je na jiném uzlu než server. Přes klientské API ji nelze zobrazit."
+      },
+      "form": {
+        "force": "Chcete vynutit smazání?",
+        "name": "Název",
+        "newName": "Nový název",
+        "description": "Popis",
+        "author": "Autor",
+        "type": "Typ",
+        "password": "Heslo",
+        "host": "Hostitel",
+        "username": "Uživatelské jméno",
+        "usernameOrEmail": "Uživatelské jméno nebo e-mail",
+        "email": "E-mail",
+        "path": "Cesta",
+        "provider": "Poskytovatel",
+        "command": "Příkaz"
+      }
+    }
+  }
+}

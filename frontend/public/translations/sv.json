@@ -1125,7 +1125,6 @@
           },
           "button": {
             "new": "Ny",
-            "openInNewWindow": "Öppna i nytt fönster",
             "rename": "Döp om",
             "copy": "Kopiera",
             "fingerprint": "Fingeravtryck",

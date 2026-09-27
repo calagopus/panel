@@ -1106,7 +1106,6 @@
           },
           "button": {
             "new": "جديد",
-            "openInNewWindow": "فتح في نافذة جديدة",
             "rename": "إعادة التسمية",
             "copy": "نسخ",
             "fingerprint": "البصمة",
