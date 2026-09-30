@@ -62,6 +62,7 @@ function AdminContentContainer(props: Props) {
           search={search}
           setSearch={setSearch}
           contentRight={contentRight}
+          hoistToNavbar={!fullscreen}
         />
         <ExtensionSlot
           components={registry?.prependedContentComponents ?? []}

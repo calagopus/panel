@@ -19,6 +19,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import copyFile from '@/api/server/files/copyFile.ts';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
+import { useNavbarPageHeader } from '@/elements/containers/useNavbarPageHeader.ts';
 import Card from '@/elements/data-display/Card.tsx';
 import Table, { TableData, TableHeaderProps, TableRow } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
@@ -475,6 +476,10 @@ function ServerFilesComponent() {
   const setSearchInfo = useFileManagerStore((state) => state.setSearchInfo);
   const [, setSearchParams] = useSearchParams();
   const [view, setView] = useState<FileManagerView>(getStoredFileManagerView);
+  const viewTitle = t(view === 'tree' ? 'pages.server.files.view.tree' : 'pages.server.files.view.list', {});
+  const titleHoisted = useNavbarPageHeader({ title: viewTitle });
+  const desktop = usePageBreakpoint('lg');
+  const settingsBesideTitle = !titleHoisted || desktop;
   const [fileTreeVisible, setFileTreeVisible] = useState(() => getStoredFileTreeVisibility(serverUuid));
   const [treeInitialDirectory, setTreeInitialDirectory] = useState(browsingDirectory);
   const [treeDirty, setTreeDirty] = useState(false);
@@ -548,14 +553,15 @@ function ServerFilesComponent() {
       <FileActionBar />
 
       <Group justify='space-between' align='center' mb='md'>
-        <Group>
-          <Title order={1}>
-            {t(view === 'tree' ? 'pages.server.files.view.tree' : 'pages.server.files.view.list', {})}
-          </Title>
-          <FileSettings />
-        </Group>
+        {settingsBesideTitle && (
+          <Group>
+            <Title order={1}>{viewTitle}</Title>
+            <FileSettings />
+          </Group>
+        )}
 
         <Group>
+          {!settingsBesideTitle && <FileSettings />}
           {view === 'tree' && (
             <Tooltip label={t('pages.server.files.tooltip.advancedSearch', {})}>
               <ActionIcon

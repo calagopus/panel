@@ -1,6 +1,6 @@
-import { faCancel, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faCancel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Group, Text, Title, TitleOrder } from '@mantine/core';
+import { Text, TitleOrder } from '@mantine/core';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useShallow } from 'zustand/react/shallow';
@@ -11,7 +11,6 @@ import Button from '@/elements/buttons/Button.tsx';
 import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
 import Notification from '@/elements/feedback/Notification.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
-import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { bytesProgressString } from '@/lib/format/size.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -23,6 +22,7 @@ import { AdminCan, ServerCan } from '../Can.tsx';
 import ExtensionSlot from '../ExtensionSlot.tsx';
 import EstimatedTimeArrival from '../time/EstimatedTimeArrival.tsx';
 import ContentContainer from './ContentContainer.tsx';
+import ContentContainerHeader from './ContentContainerHeader.tsx';
 
 export interface Props {
   title: string;
@@ -254,49 +254,16 @@ function ServerContentContainer(props: Props) {
       <div className={`${fullscreen || id ? 'mb-4' : 'px-4 lg:px-6 mb-4 lg:mt-6 mt-2'}`}>
         <ExtensionSlot components={registry?.prependedComponents ?? []} name='prepended' props={modifiedProps} />
 
-        {hideTitleComponent ? null : setSearch ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>
-              <TextInput
-                placeholder={t('common.input.search', {})}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                leftSection={<FontAwesomeIcon icon={faSearch} />}
-                w={250}
-              />
-              {contentRight}
-            </Group>
-          </Group>
-        ) : contentRight ? (
-          <Group justify='space-between' mb='md'>
-            <div>
-              <Title order={titleOrder}>{title}</Title>
-              {subtitle ? (
-                <Text size='xs' c='dimmed'>
-                  {subtitle}
-                </Text>
-              ) : null}
-            </div>
-            <Group>{contentRight}</Group>
-          </Group>
-        ) : (
-          <div className='mb-4'>
-            <Title order={titleOrder}>{title}</Title>
-            {subtitle ? (
-              <Text size='xs' c='dimmed'>
-                {subtitle}
-              </Text>
-            ) : null}
-          </div>
-        )}
+        <ContentContainerHeader
+          title={title}
+          subtitle={subtitle}
+          hideTitleComponent={hideTitleComponent}
+          titleOrder={titleOrder}
+          search={search}
+          setSearch={setSearch}
+          contentRight={contentRight}
+          hoistToNavbar={!fullscreen}
+        />
         <ExtensionSlot
           components={registry?.prependedContentComponents ?? []}
           name='prepended-content'
