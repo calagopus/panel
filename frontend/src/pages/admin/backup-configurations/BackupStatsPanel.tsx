@@ -12,7 +12,7 @@ export default function BackupStatsPanel({ stats }: { stats: z.infer<typeof back
   const { t } = useTranslations();
 
   return (
-    <div className='flex flex-col 2xl:flex-row gap-4'>
+    <div className='grid md:grid-cols-2 xl:grid-cols-4 gap-4'>
       {PERIODS.map((period) => {
         const periodLabel = t(`pages.admin.backupConfigurations.tabs.stats.page.periodLabel.${period}`, {});
         const periodStats = stats[period];
@@ -21,7 +21,7 @@ export default function BackupStatsPanel({ stats }: { stats: z.infer<typeof back
           <TitleCard
             key={period}
             title={t(`pages.admin.backupConfigurations.tabs.stats.page.period.${period}`, {})}
-            className='flex-1 min-w-0'
+            className='min-w-0'
           >
             <div className='flex flex-col gap-4'>
               <Card>

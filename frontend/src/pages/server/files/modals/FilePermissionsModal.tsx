@@ -221,7 +221,7 @@ export default function FilePermissionsModal({ file, ...props }: Props) {
         </div>
       </Card>
 
-      <div className='mt-4 grid grid-cols-3 gap-4'>
+      <div className='mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <PermissionGroup
           title={t('pages.server.files.modal.filePermissions.owner', {})}
           category='owner'

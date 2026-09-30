@@ -102,7 +102,7 @@ export default function SystemStatistics({ wsPath, labels }: { wsPath: string; l
     <>
       <div className='mt-4'>
         <TitleCard title={labels.resourcesCard} icon={<FontAwesomeIcon icon={faUserLarge} />}>
-          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
             <Card>
               <div className='flex flex-col md:flex-row gap-4 md:items-center'>
                 <div className='flex justify-center md:flex-1'>

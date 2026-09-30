@@ -62,7 +62,7 @@ export default function DismissibleAnnouncementAlert({ announcement }: { announc
       key={announcement.uuid}
       title={announcement.titleTranslations[language] ?? announcement.title}
       color={announcementTypeColorMapping[announcement.type]}
-      className='mt-2 mx-6'
+      className='mt-2 mx-4 lg:mx-6'
       withCloseButton={canShowDismissButton(announcement)}
       onClose={handleDismiss}
     >

@@ -76,7 +76,7 @@ export function StepCardBody({ step, label, isActive, editable, dragHandleProps,
             </ActionIcon>
           )}
 
-          <ThemeIcon size='lg' color={isActive ? 'blue' : 'gray'} className='shrink-0'>
+          <ThemeIcon size='lg' color={isActive ? 'blue' : 'gray'} className='shrink-0 max-sm:hidden!'>
             {isActive ? (
               <AnimatedHourglass />
             ) : (

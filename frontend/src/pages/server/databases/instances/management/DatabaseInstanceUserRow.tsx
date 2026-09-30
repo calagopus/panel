@@ -143,7 +143,9 @@ export default function DatabaseInstanceUserRow({
               <Group gap='xs'>
                 {grantedDatabases.map(({ database, permission }) => (
                   <Tooltip key={database.uuid} label={serverDatabaseInstanceUserPermissionLabelMapping[permission]()}>
-                    <Badge color={permission === 'read_write' ? 'blue' : 'gray'}>{database.name}</Badge>
+                    <Badge className='w-max!' color={permission === 'read_write' ? 'blue' : 'gray'}>
+                      {database.name}
+                    </Badge>
                   </Tooltip>
                 ))}
               </Group>

@@ -262,21 +262,7 @@ export default function Table({
                 <TableHeader key={`column-${index}`} {...(typeof column === 'object' ? column : { name: column })} />
               ))}
             </TableHead>
-            <MantineTable.Tbody>
-              {error ? (
-                <MantineTable.Tr>
-                  <MantineTable.Td colSpan={columns.length}>
-                    <ErrorItems error={error} />
-                  </MantineTable.Td>
-                </MantineTable.Tr>
-              ) : pagination?.total === 0 && !loading ? (
-                <MantineTable.Tr>
-                  <MantineTable.Td colSpan={columns.length}>{empty ?? <NoItems />}</MantineTable.Td>
-                </MantineTable.Tr>
-              ) : (
-                children
-              )}
-            </MantineTable.Tbody>
+            <MantineTable.Tbody>{!error && !(pagination?.total === 0 && !loading) && children}</MantineTable.Tbody>
           </MantineTable>
 
           {loading && (
@@ -286,6 +272,14 @@ export default function Table({
           )}
         </div>
       </MantineTable.ScrollContainer>
+
+      {error ? (
+        <div className='p-2.5'>
+          <ErrorItems error={error} />
+        </div>
+      ) : (
+        pagination?.total === 0 && !loading && <div className='p-2.5'>{empty ?? <NoItems />}</div>
+      )}
 
       {!error && pagination && onPageSelect && <Pagination data={pagination} m='xs' onPageSelect={onPageSelect} />}
     </div>

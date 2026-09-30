@@ -249,41 +249,39 @@ export default function ServerCreate() {
               title={t('pages.admin.servers.tabs.general.page.card.allocations', {})}
               icon={<FontAwesomeIcon icon={faNetworkWired} />}
             >
-              <Stack>
-                <Group grow>
-                  <Select
-                    label={t('common.form.primaryAllocation', {})}
-                    disabled={!selectedNodeUuid}
-                    data={availablePrimaryAllocations.items
-                      .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
-                      .map((alloc) => ({
-                        label: formatAllocation(alloc),
-                        value: alloc.uuid,
-                      }))}
-                    searchable
-                    searchValue={availablePrimaryAllocations.search}
-                    onSearchChange={availablePrimaryAllocations.setSearch}
-                    allowDeselect
-                    key={form.key('allocationUuid')}
-                    {...form.getInputProps('allocationUuid')}
-                  />
-                  <MultiSelect
-                    label={t('common.form.additionalAllocations', {})}
-                    disabled={!selectedNodeUuid}
-                    data={availableAllocations.items
-                      .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
-                      .map((alloc) => ({
-                        label: formatAllocation(alloc),
-                        value: alloc.uuid,
-                      }))}
-                    searchable
-                    searchValue={availableAllocations.search}
-                    onSearchChange={availableAllocations.setSearch}
-                    key={form.key('allocationUuids')}
-                    {...form.getInputProps('allocationUuids')}
-                  />
-                </Group>
-              </Stack>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <Select
+                  label={t('common.form.primaryAllocation', {})}
+                  disabled={!selectedNodeUuid}
+                  data={availablePrimaryAllocations.items
+                    .filter((alloc) => !form.getValues().allocationUuids.includes(alloc.uuid))
+                    .map((alloc) => ({
+                      label: formatAllocation(alloc),
+                      value: alloc.uuid,
+                    }))}
+                  searchable
+                  searchValue={availablePrimaryAllocations.search}
+                  onSearchChange={availablePrimaryAllocations.setSearch}
+                  allowDeselect
+                  key={form.key('allocationUuid')}
+                  {...form.getInputProps('allocationUuid')}
+                />
+                <MultiSelect
+                  label={t('common.form.additionalAllocations', {})}
+                  disabled={!selectedNodeUuid}
+                  data={availableAllocations.items
+                    .filter((alloc) => alloc.uuid !== form.getValues().allocationUuid)
+                    .map((alloc) => ({
+                      label: formatAllocation(alloc),
+                      value: alloc.uuid,
+                    }))}
+                  searchable
+                  searchValue={availableAllocations.search}
+                  onSearchChange={availableAllocations.setSearch}
+                  key={form.key('allocationUuids')}
+                  {...form.getInputProps('allocationUuids')}
+                />
+              </div>
             </TitleCard>
 
             <TitleCard

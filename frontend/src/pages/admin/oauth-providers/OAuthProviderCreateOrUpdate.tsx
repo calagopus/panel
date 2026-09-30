@@ -133,7 +133,9 @@ export default function OAuthProviderCreateOrUpdate({
           {contextOAuthProvider ? (
             <div className='flex flex-col items-center md:items-end gap-1'>
               {[settings.app.url, ...settings.app.additionalUrls].map((url) => (
-                <Code key={url}>{`${url.replace(/\/+$/, '')}/api/auth/oauth/${contextOAuthProvider.uuid}`}</Code>
+                <Code key={url} className='break-all'>
+                  {`${url.replace(/\/+$/, '')}/api/auth/oauth/${contextOAuthProvider.uuid}`}
+                </Code>
               ))}
             </div>
           ) : (

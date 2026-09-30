@@ -240,7 +240,7 @@ export default function EmailTemplatesContainer() {
         </Text>
       </Alert>
 
-      <div className='mt-4 flex flex-col md:flex-row gap-4'>
+      <div className='mt-4 flex flex-col md:flex-row md:flex-wrap lg:flex-nowrap gap-4'>
         {sidebar}
 
         {selectedIdentifier === null ? (
@@ -327,8 +327,8 @@ export default function EmailTemplatesContainer() {
               ) : null}
             </Paper>
 
-            <div className='shrink-0 md:w-[26rem] w-full md:relative'>
-              <EmailVariablesSection templateIdentifier={selectedIdentifier} className='md:absolute md:inset-0' />
+            <div className='shrink-0 lg:w-[26rem] w-full lg:relative'>
+              <EmailVariablesSection templateIdentifier={selectedIdentifier} className='lg:absolute lg:inset-0' />
             </div>
           </>
         )}

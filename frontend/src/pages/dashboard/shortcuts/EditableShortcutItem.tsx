@@ -122,8 +122,10 @@ export default function EditableShortcutItem({
     <Flex
       align='center'
       justify='space-between'
+      wrap='wrap'
       gap='sm'
       px='xs'
+      py={6}
       mih={48}
       style={{ borderBottom: hideBorder ? 'none' : '1px solid var(--mantine-color-default-border)' }}
     >
@@ -138,7 +140,7 @@ export default function EditableShortcutItem({
         )}
       </Group>
 
-      <Flex align='center' gap={6} wrap='nowrap' style={{ flexShrink: 0 }}>
+      <Flex align='center' gap={6} wrap='nowrap' ml='auto' style={{ flexShrink: 0 }}>
         <Flex align='center' justify='flex-end' gap={6} wrap='nowrap' style={{ minWidth: 104 }}>
           {recording ? (
             <Text size='xs' c='yellow' fw={500} className='whitespace-nowrap'>

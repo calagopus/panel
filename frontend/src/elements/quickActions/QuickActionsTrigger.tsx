@@ -49,10 +49,7 @@ export default function QuickActionsTrigger() {
       leftSection={<FontAwesomeIcon icon={faMagnifyingGlass} size='sm' />}
       rightSection={hint ? <Kbd size='xs'>{hint}</Kbd> : undefined}
       onClick={() => setOpen(true)}
-      styles={{
-        inner: { justifyContent: 'space-between' },
-        label: { color: 'var(--mantine-color-dimmed)' },
-      }}
+      styles={{ label: { width: '100%', color: 'var(--mantine-color-dimmed)' } }}
     >
       {t('elements.quickActions.trigger', {})}
     </Button>

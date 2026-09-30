@@ -16,7 +16,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import classNames from 'classnames';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
@@ -40,6 +40,8 @@ import { useWindows } from '@/providers/WindowProvider.tsx';
 import RouterRoutes from '@/RouterRoutes.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
+
+const CloseMobileMenuContext = createContext<(() => void) | null>(null);
 
 type SidebarProps = {
   children: ReactNode;
@@ -73,16 +75,18 @@ function Sidebar({ children, header, footer }: SidebarProps) {
         opened={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         withCloseButton={false}
-        maw='16rem'
+        size='16rem'
         styles={{ body: { height: '100%' } }}
       >
         <CloseButton size='xl' className='absolute! right-4 z-10' onClick={() => setIsMobileMenuOpen(false)} />
 
-        <div id='sidebar-content' className='h-full flex flex-col'>
-          {header && <div className='shrink-0'>{header}</div>}
-          <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
-          {footer && <div className='shrink-0 pt-2'>{footer}</div>}
-        </div>
+        <CloseMobileMenuContext.Provider value={() => setIsMobileMenuOpen(false)}>
+          <div id='sidebar-content' className='h-full flex flex-col'>
+            {header && <div className='shrink-0'>{header}</div>}
+            <div className='flex flex-col flex-1 overflow-y-auto min-h-0'>{children}</div>
+            {footer && <div className='shrink-0 pt-2'>{footer}</div>}
+          </div>
+        </CloseMobileMenuContext.Provider>
       </Drawer>
 
       <Card
@@ -113,6 +117,7 @@ type LinkProps = {
 function Link({ to, end, icon, name, title = name, className, activeMatches }: LinkProps) {
   const { t } = useTranslations();
   const { addWindow } = useWindows();
+  const closeMobileMenu = useContext(CloseMobileMenuContext);
   const { pathname } = useLocation();
   const isLight = useComputedColorScheme('dark') === 'light';
   const extraActive = activeMatches?.some((pattern) => matchPath({ path: pattern, end: false }, pathname)) ?? false;
@@ -125,13 +130,15 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
         type: 'action' as const,
         icon: faWindowRestore,
         label: t('elements.sidebar.button.openInVirtualWindow', {}),
-        onClick: () =>
+        onClick: () => {
+          closeMobileMenu?.();
           addWindow(
             title || 'Window',
             <MemoryRouter initialEntries={[to]}>
               <RouterRoutes isNormal={false} />
             </MemoryRouter>,
-          ),
+          );
+        },
         color: 'gray',
       },
       {
@@ -154,7 +161,7 @@ function Link({ to, end, icon, name, title = name, className, activeMatches }: L
         color: 'gray',
       },
     ],
-    [t, addWindow, title, to],
+    [t, addWindow, closeMobileMenu, title, to],
   );
 
   return (

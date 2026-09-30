@@ -32,7 +32,7 @@ function Container({ children, isNormal }: LayoutProps) {
     >
       <div>
         {impersonating && (
-          <Alert icon={<FontAwesomeIcon icon={faUserCheck} />} color='yellow' className='mt-2 mx-6'>
+          <Alert icon={<FontAwesomeIcon icon={faUserCheck} />} color='yellow' className='mt-2 mx-4 lg:mx-6'>
             {t('elements.container.alert.impersonating', {})}
           </Alert>
         )}
@@ -43,7 +43,7 @@ function Container({ children, isNormal }: LayoutProps) {
 
         {children}
       </div>
-      <div className='my-2 ml-auto mr-12 flex flex-col items-end'>
+      <div className='my-2 ml-auto mr-4 lg:mr-6 flex flex-col items-end'>
         {serverName && (
           <span className='text-xs text-(--mantine-color-dimmed)'>
             {t('elements.container.connectedTo', { name: serverName })}

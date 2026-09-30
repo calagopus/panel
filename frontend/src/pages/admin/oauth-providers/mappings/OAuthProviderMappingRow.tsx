@@ -97,7 +97,7 @@ export default function OAuthProviderMappingRow({
             </TableData>
 
             <TableData>
-              <Badge color={mapping.mapping.type === 'role' ? 'blue' : 'grape'}>
+              <Badge className='w-max!' color={mapping.mapping.type === 'role' ? 'blue' : 'grape'}>
                 {mapping.mapping.type === 'role'
                   ? t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.role', {})
                   : t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {})}

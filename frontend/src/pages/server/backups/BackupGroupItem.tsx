@@ -99,7 +99,7 @@ export default function BackupGroupItem({
         dragHandleProps={dragHandleProps}
         header={
           <>
-            <span className='font-medium min-w-0 flex-1 text-left'>
+            <span className='font-medium min-w-0 text-left'>
               <ScrollingText>{group.name}</ScrollingText>
             </span>
             <Badge variant='light' color='gray'>

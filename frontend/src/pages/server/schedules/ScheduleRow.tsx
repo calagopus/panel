@@ -191,7 +191,7 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
             </TableData>
 
             <TableData>
-              <Badge color={schedule.enabled ? 'green' : 'red'}>
+              <Badge className='w-max!' color={schedule.enabled ? 'green' : 'red'}>
                 {schedule.enabled ? t('common.badge.active', {}) : t('common.badge.inactive', {})}
               </Badge>
             </TableData>

@@ -39,7 +39,7 @@ export default function VariableContainer({
   return (
     <TitleCard title={title} icon={<FontAwesomeIcon icon={faCog} />}>
       <div className='flex flex-row w-full justify-between items-start'>
-        <div className='w-full'>
+        <div className='w-full min-w-0'>
           {variable.rules.includes('boolean') ||
           (variable.rules.includes('string') &&
             (variable.rules.includes('in:1,0') ||
@@ -125,7 +125,7 @@ export default function VariableContainer({
               }
             />
           )}
-          <div className='text-(--mantine-color-dimmed) text-sm mt-4'>{description?.md()}</div>
+          <div className='text-(--mantine-color-dimmed) text-sm mt-4 wrap-break-word'>{description?.md()}</div>
         </div>
         {!variable.isEditable ? <Badge className='min-w-fit ml-4'>{t('common.readOnly', {})}</Badge> : null}
       </div>

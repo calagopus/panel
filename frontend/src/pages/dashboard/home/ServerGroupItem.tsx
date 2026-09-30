@@ -301,64 +301,54 @@ export default function ServerGroupItem({
         <div
           id='server-group-item-header'
           className={classNames(
-            'flex flex-row items-end sm:items-center gap-3 px-3 bg-(--mantine-color-dark-7) light:bg-(--mantine-color-gray-0)! justify-between',
+            'flex flex-col sm:flex-row sm:items-center sm:gap-3 px-3 bg-(--mantine-color-dark-7) light:bg-(--mantine-color-gray-0)! justify-between',
             isExpanded && 'border-b border-(--mantine-color-default-border)',
           )}
         >
-          <div className='flex flex-col min-w-0 my-3 sm:my-0'>
-            <div className='flex flex-row'>
-              {dragHandleProps && (
-                <ActionIcon
-                  size='md'
-                  variant='subtle'
-                  color='gray'
-                  style={{ cursor: 'grab', flexShrink: 0 }}
-                  className='text-gray-400! light:text-gray-500!'
-                  {...dragHandleProps}
-                >
-                  <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
-                </ActionIcon>
-              )}
-
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className='flex items-center gap-2.5 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity'
+          <div className='flex flex-row min-w-0 pt-2.5 sm:pt-0'>
+            {dragHandleProps && (
+              <ActionIcon
+                size='md'
+                variant='subtle'
+                color='gray'
+                style={{ cursor: 'grab', flexShrink: 0 }}
+                className='text-gray-400! light:text-gray-500!'
+                {...dragHandleProps}
               >
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  className={classNames(
-                    isExpanded ? 'rotate-90' : 'rotate-0',
-                    'transition duration-200 w-3 h-3 text-(--mantine-color-dimmed) shrink-0',
-                  )}
-                />
-                <span className='font-medium flex-1 min-w-0 text-left'>
-                  <ScrollingText>{serverGroup.name}</ScrollingText>
-                </span>
-                <Badge variant={isDark ? 'light' : 'filled'} color='gray'>
-                  {tItem('server', serverCount)}
-                </Badge>
-              </button>
-            </div>
-            <TextInput
-              placeholder={t('common.input.search', {})}
-              size='xs'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              leftSection={<FontAwesomeIcon icon={faSearch} />}
-              className='w-full max-w-48 mt-1 sm:hidden'
-            />
+                <FontAwesomeIcon icon={faGripVertical} style={{ fontSize: 16 }} />
+              </ActionIcon>
+            )}
+
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className='flex items-center gap-2.5 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity'
+            >
+              <FontAwesomeIcon
+                icon={faChevronRight}
+                className={classNames(
+                  isExpanded ? 'rotate-90' : 'rotate-0',
+                  'transition duration-200 w-3 h-3 text-(--mantine-color-dimmed) shrink-0',
+                )}
+              />
+              <span className='font-medium flex-1 min-w-0 text-left'>
+                <ScrollingText>{serverGroup.name}</ScrollingText>
+              </span>
+              <Badge variant={isDark ? 'light' : 'filled'} color='gray'>
+                {tItem('server', serverCount)}
+              </Badge>
+            </button>
           </div>
 
-          <div className='flex flex-col sm:flex-row items-center gap-1 mb-1.5 sm:mb-0 py-2.5 shrink-0 justify-end'>
+          <div className='flex flex-row items-center gap-1 py-2.5 shrink-0 justify-end'>
             <TextInput
               placeholder={t('common.input.search', {})}
               size='xs'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               leftSection={<FontAwesomeIcon icon={faSearch} />}
-              className='min-w-32 hidden sm:block'
+              className='min-w-32 max-sm:flex-1 max-sm:max-w-48 max-sm:mr-auto'
             />
-            <div className='flex flex-row items-center gap-1 w-full justify-end'>
+            <div className='flex flex-row items-center gap-1 justify-end'>
               {onServersSelectionChange && isExpanded && (
                 <Checkbox
                   size='xs'

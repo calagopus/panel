@@ -247,7 +247,7 @@ function MultiKeyValueInput({
       <Stack gap={0}>
         {label && <Input.Label required={withAsterisk}>{label}</Input.Label>}
         {description && <Input.Description mb={4}>{description}</Input.Description>}
-        <div className='grid grid-cols-6 gap-2'>
+        <div className='grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] gap-2'>
           <TextInput
             ref={keyInputRef}
             value={newKey}
@@ -255,7 +255,6 @@ function MultiKeyValueInput({
             onKeyDown={handleKeyDown}
             placeholder={placeholderKey}
             size='xs'
-            className='col-span-2'
           />
           <TextInput
             ref={valueInputRef}
@@ -264,7 +263,6 @@ function MultiKeyValueInput({
             onKeyDown={handleKeyDown}
             placeholder={placeholderValue}
             size='xs'
-            className='col-span-3'
           />
           <Button onClick={handleAdd} size='xs' disabled={!newKey.trim() || !newValue.trim()}>
             {t('common.button.add', {})}

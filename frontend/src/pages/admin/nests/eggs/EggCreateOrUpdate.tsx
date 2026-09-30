@@ -299,7 +299,7 @@ export default function EggCreateOrUpdate({
             title={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.card.startupConfiguration', {})}
             icon={<FontAwesomeIcon icon={faPlay} size='sm' />}
           >
-            <Group grow align='top'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <TagsInput
                 withAsterisk
                 label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.startupDone', {})}
@@ -316,7 +316,7 @@ export default function EggCreateOrUpdate({
                   type: 'checkbox',
                 })}
               />
-            </Group>
+            </div>
           </TitleCard>
 
           <EggStopConfigEditor form={form} />
@@ -344,7 +344,7 @@ export default function EggCreateOrUpdate({
             />
           </Group>
 
-          <Group grow align='top'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <TagsInput
               label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.features', {})}
               placeholder={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.featurePlaceholder', {})}
@@ -356,7 +356,7 @@ export default function EggCreateOrUpdate({
               key={form.key('fileDenylist')}
               {...form.getInputProps('fileDenylist')}
             />
-          </Group>
+          </div>
 
           <MultiKeyValueInput
             label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.form.dockerImages', {})}

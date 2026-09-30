@@ -663,7 +663,7 @@ export default function FileTreeWorkspace({
         <div
           ref={workspaceRef}
           data-file-manager-workspace
-          className='absolute inset-x-0 top-0 max-w-none overflow-x-auto overflow-y-hidden'
+          className='absolute inset-x-0 top-0 max-w-none overflow-x-auto overflow-y-hidden bg-(--mantine-color-body)'
         >
           <div
             data-file-manager-workspace-grid
