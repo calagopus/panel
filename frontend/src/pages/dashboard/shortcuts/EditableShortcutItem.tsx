@@ -120,16 +120,17 @@ export default function EditableShortcutItem({
 
   return (
     <Flex
-      align='center'
+      direction={{ base: 'column', sm: 'row' }}
+      align={{ base: 'flex-start', sm: 'center' }}
       justify='space-between'
       wrap='wrap'
-      gap='sm'
+      gap={{ base: 6, sm: 'sm' }}
       px='xs'
       py={6}
       mih={48}
       style={{ borderBottom: hideBorder ? 'none' : '1px solid var(--mantine-color-default-border)' }}
     >
-      <Group gap={6} wrap='nowrap' className='min-w-0'>
+      <Group gap={6} wrap='nowrap' maw='100%' className='min-w-0'>
         <Text size='sm' style={{ minWidth: 0, flex: 1 }}>
           <ScrollingText>{shortcutDescription(definition)}</ScrollingText>
         </Text>
@@ -140,8 +141,14 @@ export default function EditableShortcutItem({
         )}
       </Group>
 
-      <Flex align='center' gap={6} wrap='nowrap' ml='auto' style={{ flexShrink: 0 }}>
-        <Flex align='center' justify='flex-end' gap={6} wrap='nowrap' style={{ minWidth: 104 }}>
+      <Flex align='center' gap={6} wrap='nowrap' ml={{ base: 0, sm: 'auto' }} style={{ flexShrink: 0 }}>
+        <Flex
+          align='center'
+          justify={{ base: 'flex-start', sm: 'flex-end' }}
+          gap={6}
+          wrap='nowrap'
+          style={{ minWidth: 104 }}
+        >
           {recording ? (
             <Text size='xs' c='yellow' fw={500} className='whitespace-nowrap'>
               {t('pages.account.shortcuts.label.recording', {})}
