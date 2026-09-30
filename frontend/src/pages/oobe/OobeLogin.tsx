@@ -85,6 +85,7 @@ export default function OobeLogin({ onNext }: OobeComponentProps) {
             <TextInput
               label={t('common.form.username', {})}
               placeholder={t('pages.oobe.login.form.usernamePlaceholder', {})}
+              autoComplete='username'
               leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
               required
               {...form.getInputProps('username')}
@@ -92,6 +93,7 @@ export default function OobeLogin({ onNext }: OobeComponentProps) {
             <PasswordInput
               label={t('common.form.password', {})}
               placeholder={t('pages.oobe.login.form.passwordPlaceholder', {})}
+              autoComplete='current-password'
               leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
               required
               {...form.getInputProps('password')}

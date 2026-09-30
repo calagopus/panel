@@ -8,6 +8,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverDatabaseInstanceDatabaseSchema,
@@ -62,7 +63,12 @@ export default function DatabaseInstanceUserCreateModal({ instance, databases, .
           {t('pages.server.databases.instance.users.modal.createUser.content', {}).md()}
         </Text>
 
-        <TextInput withAsterisk label={t('common.form.username', {})} {...form.getInputProps('username')} />
+        <TextInput
+          withAsterisk
+          label={t('common.form.username', {})}
+          {...ignorePasswordManagerProps}
+          {...form.getInputProps('username')}
+        />
 
         {hasDatabases && (
           <DatabaseInstanceUserDatabasesInput

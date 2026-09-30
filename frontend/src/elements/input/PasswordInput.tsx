@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PasswordInput as MantinePasswordInput, PasswordInputProps } from '@mantine/core';
 import { forwardRef } from 'react';
 import { makeComponentHookable } from 'shared';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 
 const VisibilityToggleIcon = ({ reveal }: { reveal: boolean }) =>
   reveal ? (
@@ -19,6 +20,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ classN
       value={value ?? undefined}
       placeholder={typeof rest.label === 'string' ? rest.label : undefined}
       visibilityToggleIcon={VisibilityToggleIcon}
+      {...(rest.autoComplete ? undefined : { ...ignorePasswordManagerProps, autoComplete: 'new-password' })}
       {...rest}
     />
   );

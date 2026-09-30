@@ -16,6 +16,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import Captcha, { useCaptcha } from '@/elements/captcha/Captcha.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
@@ -283,94 +284,89 @@ export default function Login() {
               </Text>
             </div>
             <Card>
-              <Stack>
-                {(settings.app.passwordLoginEnabled || webauthnEnabled) && (
-                  <>
-                    <div className='flex flex-col gap-1'>
-                      <TextInput
-                        label={t('common.form.usernameOrEmail', {})}
-                        placeholder={t('pages.auth.login.step.username.form.usernameOrEmailPlaceholder', {})}
-                        autoComplete='username'
-                        onKeyDown={(e) => e.key === 'Enter' && doSubmitUsername()}
-                        leftSection={<FontAwesomeIcon icon={faUser} />}
-                        size='md'
-                        autoFocus
-                        {...usernameForm.getInputProps('username')}
-                      />
-                      {settings.app.passwordLoginEnabled && (
-                        <NavLink className='text-neutral-400' to='/auth/forgot-password'>
-                          {t('pages.auth.login.step.username.link.forgotPassword', {})}
-                        </NavLink>
+              <form onSubmit={usernameForm.onSubmit(() => doSubmitUsername())}>
+                <Stack>
+                  {(settings.app.passwordLoginEnabled || webauthnEnabled) && (
+                    <>
+                      <div className='flex flex-col gap-1'>
+                        <TextInput
+                          label={t('common.form.usernameOrEmail', {})}
+                          placeholder={t('pages.auth.login.step.username.form.usernameOrEmailPlaceholder', {})}
+                          autoComplete='username'
+                          leftSection={<FontAwesomeIcon icon={faUser} />}
+                          size='md'
+                          autoFocus
+                          {...usernameForm.getInputProps('username')}
+                        />
+                        {settings.app.passwordLoginEnabled && (
+                          <NavLink className='text-neutral-400' to='/auth/forgot-password'>
+                            {t('pages.auth.login.step.username.link.forgotPassword', {})}
+                          </NavLink>
+                        )}
+                      </div>
+                      <Button type='submit' disabled={!usernameForm.isValid()} loading={loading} size='md' fullWidth>
+                        {t('common.button.continue', {})}
+                      </Button>
+
+                      {(oAuthProviders.length > 0 ||
+                        (webauthnEnabled && settings.webauthn?.allowDiscoverable !== false)) && (
+                        <Divider label={t('common.divider.or', {})} labelPosition='center' />
                       )}
-                    </div>
+                    </>
+                  )}
+
+                  {webauthnEnabled && settings.webauthn?.allowDiscoverable !== false && (
                     <Button
-                      onClick={doSubmitUsername}
-                      disabled={!usernameForm.isValid()}
+                      variant='light'
+                      onClick={doDiscoverablePasskeyAuth}
                       loading={loading}
+                      leftSection={<FontAwesomeIcon icon={faFingerprint} />}
                       size='md'
                       fullWidth
                     >
-                      {t('common.button.continue', {})}
+                      {t('pages.auth.login.step.username.button.passkeyLogin', {})}
                     </Button>
+                  )}
 
-                    {(oAuthProviders.length > 0 ||
-                      (webauthnEnabled && settings.webauthn?.allowDiscoverable !== false)) && (
-                      <Divider label={t('common.divider.or', {})} labelPosition='center' />
-                    )}
-                  </>
-                )}
-
-                {webauthnEnabled && settings.webauthn?.allowDiscoverable !== false && (
-                  <Button
-                    variant='light'
-                    onClick={doDiscoverablePasskeyAuth}
-                    loading={loading}
-                    leftSection={<FontAwesomeIcon icon={faFingerprint} />}
-                    size='md'
-                    fullWidth
-                  >
-                    {t('pages.auth.login.step.username.button.passkeyLogin', {})}
-                  </Button>
-                )}
-
-                {oAuthProviders.length > 3 ? (
-                  <Button
-                    variant='light'
-                    disabled={!oAuthProviders.length}
-                    onClick={() => navigate('/auth/login/oauth')}
-                    size='md'
-                    fullWidth
-                  >
-                    {t('pages.auth.login.step.username.button.oauthLogin', {})}
-                  </Button>
-                ) : (
-                  oAuthProviders.length > 0 && (
-                    <>
-                      {oAuthProviders.map((oAuthProvider) => (
-                        <Button
-                          key={oAuthProvider.uuid}
-                          leftSection={<FontAwesomeIcon icon={faFingerprint} />}
-                          size='md'
-                          fullWidth
-                          onClick={() => {
-                            window.location.href = `/api/auth/oauth/redirect/${oAuthProvider.uuid}`;
-                          }}
-                        >
-                          {t('pages.auth.button.loginWith', {
-                            name: oAuthProvider.name,
-                          })}
-                        </Button>
-                      ))}
-                    </>
-                  )
-                )}
-                {settings.app.registrationEnabled && settings.app.passwordLoginEnabled && (
-                  <NavLink to='/auth/register' className='text-neutral-400 flex gap-1 items-center'>
-                    {t('pages.auth.login.step.username.link.notRegistered', {})}{' '}
-                    <p>{t('pages.auth.login.step.username.link.createAccount', {})}</p>
-                  </NavLink>
-                )}
-              </Stack>
+                  {oAuthProviders.length > 3 ? (
+                    <Button
+                      variant='light'
+                      disabled={!oAuthProviders.length}
+                      onClick={() => navigate('/auth/login/oauth')}
+                      size='md'
+                      fullWidth
+                    >
+                      {t('pages.auth.login.step.username.button.oauthLogin', {})}
+                    </Button>
+                  ) : (
+                    oAuthProviders.length > 0 && (
+                      <>
+                        {oAuthProviders.map((oAuthProvider) => (
+                          <Button
+                            key={oAuthProvider.uuid}
+                            leftSection={<FontAwesomeIcon icon={faFingerprint} />}
+                            size='md'
+                            fullWidth
+                            onClick={() => {
+                              window.location.href = `/api/auth/oauth/redirect/${oAuthProvider.uuid}`;
+                            }}
+                          >
+                            {t('pages.auth.button.loginWith', {
+                              name: oAuthProvider.name,
+                            })}
+                          </Button>
+                        ))}
+                      </>
+                    )
+                  )}
+                  {settings.app.registrationEnabled && settings.app.passwordLoginEnabled && (
+                    <NavLink to='/auth/register' className='text-neutral-400 flex gap-1 items-center'>
+                      {t('pages.auth.login.step.username.link.notRegistered', {})}{' '}
+                      <p>{t('pages.auth.login.step.username.link.createAccount', {})}</p>
+                    </NavLink>
+                  )}
+                </Stack>
+              </form>
             </Card>
           </>
         ) : step === 'passkey' ? (
@@ -419,36 +415,44 @@ export default function Login() {
               </Text>
             </div>
             <Card>
-              <Stack>
-                <PasswordInput
-                  label={t('common.form.password', {})}
-                  placeholder={t('pages.auth.login.step.password.form.passwordPlaceholder', {})}
-                  autoComplete='current-password'
-                  onKeyDown={(e) => e.key === 'Enter' && doSubmitPassword()}
-                  leftSection={<FontAwesomeIcon icon={faLock} />}
-                  size='md'
-                  autoFocus
-                  {...passwordForm.getInputProps('password')}
-                />
-                <Button
-                  onClick={doSubmitPassword}
-                  disabled={!passwordForm.isValid() || !captcha.isValid}
-                  loading={loading}
-                  size='md'
-                  fullWidth
-                >
-                  {t('pages.auth.login.step.password.button.signIn', {})}
-                </Button>
+              <form
+                onSubmit={passwordForm.onSubmit(() => {
+                  if (captcha.isValid) {
+                    doSubmitPassword();
+                  }
+                })}
+              >
+                <Stack>
+                  <HiddenUsernameInput username={usernameForm.values.username} />
+                  <PasswordInput
+                    label={t('common.form.password', {})}
+                    placeholder={t('pages.auth.login.step.password.form.passwordPlaceholder', {})}
+                    autoComplete='current-password'
+                    leftSection={<FontAwesomeIcon icon={faLock} />}
+                    size='md'
+                    autoFocus
+                    {...passwordForm.getInputProps('password')}
+                  />
+                  <Button
+                    type='submit'
+                    disabled={!passwordForm.isValid() || !captcha.isValid}
+                    loading={loading}
+                    size='md'
+                    fullWidth
+                  >
+                    {t('pages.auth.login.step.password.button.signIn', {})}
+                  </Button>
 
-                <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                  <Divider label={t('common.divider.or', {})} labelPosition='center' />
 
-                <Button variant='light' onClick={() => navigate('/auth/forgot-password')} size='md' fullWidth>
-                  {t('pages.auth.login.step.password.button.forgotPassword', {})}
-                </Button>
-                <Button variant='light' onClick={() => setStep('username')} size='md' fullWidth>
-                  {t('common.button.back', {})}
-                </Button>
-              </Stack>
+                  <Button variant='light' onClick={() => navigate('/auth/forgot-password')} size='md' fullWidth>
+                    {t('pages.auth.login.step.password.button.forgotPassword', {})}
+                  </Button>
+                  <Button variant='light' onClick={() => setStep('username')} size='md' fullWidth>
+                    {t('common.button.back', {})}
+                  </Button>
+                </Stack>
+              </form>
             </Card>
           </>
         ) : null}

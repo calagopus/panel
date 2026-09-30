@@ -9,6 +9,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { sshKeyProviderLabelMapping } from '@/lib/enums.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -66,6 +67,7 @@ export default function SshKeyImportModal({ ...props }: ModalProps) {
             withAsterisk
             label={t('common.form.username', {})}
             className='col-span-2'
+            {...ignorePasswordManagerProps}
             {...form.getInputProps('username')}
           />
         </div>

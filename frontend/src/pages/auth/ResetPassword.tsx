@@ -80,29 +80,37 @@ export default function ResetPassword() {
           <Text className='text-neutral-400!'>{t('pages.auth.resetPassword.subtitle', {})}</Text>
         </div>
         <Card>
-          <Stack>
-            <PasswordInput
-              label={t('common.form.password', {})}
-              placeholder={t('pages.auth.resetPassword.form.passwordPlaceholder', {})}
-              autoComplete='new-password'
-              leftSection={<FontAwesomeIcon icon={faLock} />}
-              size='md'
-              autoFocus
-              {...form.getInputProps('password')}
-            />
-            <PasswordInput
-              label={t('common.form.confirmPassword', {})}
-              placeholder={t('pages.auth.resetPassword.form.confirmPasswordPlaceholder', {})}
-              autoComplete='new-password'
-              leftSection={<FontAwesomeIcon icon={faLock} />}
-              size='md'
-              {...form.getInputProps('confirmPassword')}
-            />
+          <form
+            onSubmit={form.onSubmit(() => {
+              if (token) {
+                submit();
+              }
+            })}
+          >
+            <Stack>
+              <PasswordInput
+                label={t('common.form.password', {})}
+                placeholder={t('pages.auth.resetPassword.form.passwordPlaceholder', {})}
+                autoComplete='new-password'
+                leftSection={<FontAwesomeIcon icon={faLock} />}
+                size='md'
+                autoFocus
+                {...form.getInputProps('password')}
+              />
+              <PasswordInput
+                label={t('common.form.confirmPassword', {})}
+                placeholder={t('pages.auth.resetPassword.form.confirmPasswordPlaceholder', {})}
+                autoComplete='new-password'
+                leftSection={<FontAwesomeIcon icon={faLock} />}
+                size='md'
+                {...form.getInputProps('confirmPassword')}
+              />
 
-            <Button onClick={submit} loading={loading} disabled={!token || !form.isValid()} size='md' fullWidth>
-              {t('pages.auth.resetPassword.button.reset', {})}
-            </Button>
-          </Stack>
+              <Button type='submit' loading={loading} disabled={!token || !form.isValid()} size='md' fullWidth>
+                {t('pages.auth.resetPassword.button.reset', {})}
+              </Button>
+            </Stack>
+          </form>
         </Card>
       </Stack>
     </AuthWrapper>

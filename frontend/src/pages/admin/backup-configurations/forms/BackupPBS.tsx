@@ -1,6 +1,7 @@
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminBackupConfigurationPbsSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupProviderSection from './BackupProviderSection.tsx';
@@ -35,7 +36,7 @@ export default function BackupPBS({
       name: 'tokenId',
       label: t('pages.admin.backupConfigurations.tabs.general.page.pbs.form.tokenId', {}),
       required: true,
-      props: { placeholder: 'root@pam!mytoken' },
+      props: { placeholder: 'root@pam!mytoken', ...ignorePasswordManagerProps },
     },
     {
       type: 'password',

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminSettingsEmailSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import type { DiscriminatedVariant } from '../DiscriminatedSettingsForm.tsx';
@@ -58,7 +59,7 @@ export function useEmailModeVariants(): Partial<Record<MailMode, DiscriminatedVa
           label: t('pages.admin.settings.tabs.mail.page.smtp.form.heloDomain', {}),
           description: t('pages.admin.settings.tabs.mail.page.smtp.form.heloDomainDescription', {}),
         },
-        { type: 'text', name: 'username', label: t('common.form.username', {}) },
+        { type: 'text', name: 'username', label: t('common.form.username', {}), props: ignorePasswordManagerProps },
         { type: 'password', name: 'password', label: t('common.form.password', {}) },
         ...fromFields,
       ],

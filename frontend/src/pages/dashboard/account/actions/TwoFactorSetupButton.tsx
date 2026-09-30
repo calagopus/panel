@@ -13,6 +13,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -132,6 +133,7 @@ export default function TwoFactorSetupButton() {
           )}
 
           <Stack>
+            <HiddenUsernameInput username={user?.username ?? ''} />
             <Text>{t('pages.account.account.containers.twoFactor.modal.setupTwoFactor.description', {})}</Text>
             {!token ? (
               <Spinner.Centered />

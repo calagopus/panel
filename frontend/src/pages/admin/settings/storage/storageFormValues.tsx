@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import type { DiscriminatedVariant } from '../DiscriminatedSettingsForm.tsx';
@@ -47,7 +48,13 @@ export function useStorageDriverVariants(): Partial<Record<StorageDriver, Discri
         </Alert>
       ),
       fields: [
-        { type: 'text', name: 'accessKey', label: t('common.form.accessKey', {}), required: true },
+        {
+          type: 'text',
+          name: 'accessKey',
+          label: t('common.form.accessKey', {}),
+          required: true,
+          props: ignorePasswordManagerProps,
+        },
         { type: 'password', name: 'secretKey', label: t('common.form.secretKey', {}), required: true },
         { type: 'text', name: 'bucket', label: t('common.form.bucket', {}), required: true },
         { type: 'text', name: 'region', label: t('common.form.region', {}), required: true },

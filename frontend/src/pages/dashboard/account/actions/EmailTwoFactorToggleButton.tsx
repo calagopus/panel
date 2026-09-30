@@ -8,6 +8,7 @@ import disableEmailTwoFactor from '@/api/me/account/disableEmailTwoFactor.ts';
 import enableEmailTwoFactor from '@/api/me/account/enableEmailTwoFactor.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -113,6 +114,7 @@ export default function EmailTwoFactorToggleButton() {
           onSubmit={enabled ? doDisable : doEnable}
         >
           <Stack>
+            <HiddenUsernameInput username={user?.username ?? ''} />
             <Text>
               {enabled
                 ? t('pages.account.account.containers.emailTwoFactor.modal.disable.description', {}).md()

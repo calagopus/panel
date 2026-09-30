@@ -83,6 +83,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <TextInput
                 label={t('common.form.firstName', {})}
                 placeholder={t('pages.oobe.register.form.firstNamePlaceholder', {})}
+                autoComplete='given-name'
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 className='flex-1'
                 {...form.getInputProps('nameFirst')}
@@ -90,6 +91,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <TextInput
                 label={t('common.form.lastName', {})}
                 placeholder={t('pages.oobe.register.form.lastNamePlaceholder', {})}
+                autoComplete='family-name'
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 className='flex-1'
                 {...form.getInputProps('nameLast')}
@@ -100,6 +102,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <TextInput
                 label={t('common.form.username', {})}
                 placeholder={t('pages.oobe.register.form.usernamePlaceholder', {})}
+                autoComplete='username'
                 leftSection={<FontAwesomeIcon icon={faUser} size='sm' />}
                 required
                 className='flex-1'
@@ -108,6 +111,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <TextInput
                 label={t('pages.oobe.register.form.email', {})}
                 placeholder={t('pages.oobe.register.form.emailPlaceholder', {})}
+                autoComplete='email'
                 leftSection={<FontAwesomeIcon icon={faEnvelope} size='sm' />}
                 type='email'
                 required
@@ -120,6 +124,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <PasswordInput
                 label={t('common.form.password', {})}
                 placeholder={t('pages.oobe.register.form.passwordPlaceholder', {})}
+                autoComplete='new-password'
                 leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
                 required
                 className='flex-1'
@@ -128,6 +133,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
               <PasswordInput
                 label={t('common.form.confirmPassword', {})}
                 placeholder={t('pages.oobe.register.form.confirmPasswordPlaceholder', {})}
+                autoComplete='new-password'
                 leftSection={<FontAwesomeIcon icon={faLock} size='sm' />}
                 required
                 className='flex-1'

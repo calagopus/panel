@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import updatePasswordLogin from '@/api/me/account/updatePasswordLogin.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -73,6 +74,7 @@ export default function PasswordLoginToggleButton() {
         onSubmit={doToggle}
       >
         <Stack>
+          <HiddenUsernameInput username={user?.username ?? ''} />
           <Text>
             {disabled
               ? t('pages.account.account.containers.passwordLogin.modal.enable.description', {}).md()

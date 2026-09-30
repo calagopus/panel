@@ -7,6 +7,7 @@ import createSecurityKey from '@/api/me/security-keys/createSecurityKey.ts';
 import deleteSecurityKey from '@/api/me/security-keys/deleteSecurityKey.ts';
 import postSecurityKeyChallenge from '@/api/me/security-keys/postSecurityKeyChallenge.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -14,6 +15,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { withTwoFactorMethod } from '@/lib/auth/twoFactor.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSecurityKeyCreateSchema } from '@/lib/schemas/user/securityKeys.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
@@ -108,7 +110,13 @@ export default function SecurityKeyCreateModal({ ...props }: ModalProps) {
       onSubmit={handleSubmit}
     >
       <Stack>
-        <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
+        <HiddenUsernameInput username={user?.username ?? ''} />
+        <TextInput
+          withAsterisk
+          label={t('common.form.name', {})}
+          {...ignorePasswordManagerProps}
+          {...form.getInputProps('name')}
+        />
 
         {settings.webauthn?.allowDiscoverable !== false && (
           <Switch

@@ -2,6 +2,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import { compressionTypeLabelMapping } from '@/lib/enums.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminBackupConfigurationS3Schema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupProviderSection from './BackupProviderSection.tsx';
@@ -12,7 +13,13 @@ export default function BackupS3({ form, onRemove }: { form: UseFormReturnType<S
   const { t } = useTranslations();
 
   const fields: FieldDef<S3FormValues>[] = [
-    { type: 'text', name: 'accessKey', label: t('common.form.accessKey', {}), required: true },
+    {
+      type: 'text',
+      name: 'accessKey',
+      label: t('common.form.accessKey', {}),
+      required: true,
+      props: ignorePasswordManagerProps,
+    },
     {
       type: 'password',
       name: 'secretKey',

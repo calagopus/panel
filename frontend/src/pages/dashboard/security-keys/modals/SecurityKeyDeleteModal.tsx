@@ -4,6 +4,7 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import deleteSecurityKey from '@/api/me/security-keys/deleteSecurityKey.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -67,6 +68,7 @@ export default function SecurityKeyDeleteModal({ securityKey, total, ...props }:
       onSubmit={handleSubmit}
     >
       <Stack>
+        <HiddenUsernameInput username={user?.username ?? ''} />
         <Text>
           {t('pages.account.securityKeys.modal.deleteSecurityKey.content', {
             key: securityKey.name,

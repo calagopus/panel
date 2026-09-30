@@ -10,6 +10,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { serverVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -100,6 +101,7 @@ export default function VariableContainer({
             <TextInput
               withAsterisk={variable.rules.includes('required')}
               id={variable.envVariable}
+              {...ignorePasswordManagerProps}
               placeholder={variable.defaultValue ?? ''}
               value={value}
               onChange={(e) => setValue(e.target.value)}

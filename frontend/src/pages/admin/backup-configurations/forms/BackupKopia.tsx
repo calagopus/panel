@@ -2,6 +2,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import { type FieldDef, FormEngine } from '@/elements/form-engine/index.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminBackupConfigurationKopiaSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupProviderSection from './BackupProviderSection.tsx';
@@ -32,7 +33,13 @@ export default function BackupKopia({
       description: t('pages.admin.backupConfigurations.tabs.general.page.kopia.form.fingerprintDescription', {}),
       props: { placeholder: '48537cce...398d40f7' },
     },
-    { type: 'text', name: 'username', label: t('common.form.username', {}), required: true },
+    {
+      type: 'text',
+      name: 'username',
+      label: t('common.form.username', {}),
+      required: true,
+      props: ignorePasswordManagerProps,
+    },
     { type: 'password', name: 'password', label: t('common.form.password', {}), required: true },
   ];
 

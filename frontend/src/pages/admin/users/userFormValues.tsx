@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { type FieldDef } from '@/elements/form-engine/index.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
@@ -56,13 +57,19 @@ export function useUserFormFields({
   const { t } = useTranslations();
 
   return [
-    { type: 'text', name: 'username', label: t('common.table.columns.username', {}), required: true },
+    {
+      type: 'text',
+      name: 'username',
+      label: t('common.table.columns.username', {}),
+      required: true,
+      props: ignorePasswordManagerProps,
+    },
     {
       type: 'text',
       name: 'email',
       label: t('common.form.email', {}),
       required: true,
-      props: { type: 'email', disabled: !isRootAdmin && editingOtherUser },
+      props: { type: 'email', disabled: !isRootAdmin && editingOtherUser, ...ignorePasswordManagerProps },
     },
     { type: 'text', name: 'nameFirst', label: t('common.form.firstName', {}) },
     { type: 'text', name: 'nameLast', label: t('common.form.lastName', {}) },

@@ -12,6 +12,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import Avatar from '@/elements/data-display/Avatar.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PinInput from '@/elements/input/PinInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Center from '@/elements/layout/Center.tsx';
@@ -152,191 +153,201 @@ export default function LoginCheckpoint() {
         )}
       </div>
 
-      <Stack className='w-full'>
-        {step === 'totp' ? (
-          <>
-            <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
-            <Card>
-              <Stack>
-                <div className='flex items-center gap-2'>
-                  <Avatar
-                    size={56}
-                    src={twoFactorInformation?.user.avatar}
-                    name={twoFactorInformation?.user.username}
-                  />
-                  <span className='text-neutral-400'>
-                    {t('pages.auth.login.step.totp.welcomeBack', {
-                      username: twoFactorInformation?.user.username ?? '',
-                    })}
-                  </span>
-                </div>
-                <Text className=' text-neutral-400!'>{t('pages.auth.login.step.totp.enterCode', {})}</Text>
-                <Center>
-                  <PinInput
-                    length={6}
-                    placeholder='0'
-                    size='md'
-                    type='number'
-                    oneTimeCode
-                    autoFocus
-                    {...form.getInputProps('code')}
-                  />
-                </Center>
-                <Button onClick={doSubmit} loading={loading} disabled={!form.isValid()} size='md' fullWidth>
-                  {t('pages.auth.login.step.totp.button.verify', {})}
-                </Button>
-                <Divider label={t('common.divider.or', {})} labelPosition='center' />
-                {hasEmail && (
-                  <Button
-                    variant='light'
-                    onClick={() => {
-                      form.reset();
-                      setStep('email');
-                    }}
-                    size='md'
-                    fullWidth
-                  >
-                    {t('pages.auth.login.step.email.button.useEmail', {})}
-                  </Button>
-                )}
-                <Button
-                  variant='light'
-                  onClick={() => {
-                    form.reset();
-                    setStep('totp-recovery');
-                  }}
-                  size='md'
-                  fullWidth
-                >
-                  {t('pages.auth.login.step.totp.button.useRecoveryCode', {})}
-                </Button>
-              </Stack>
-            </Card>
-          </>
-        ) : step === 'totp-recovery' ? (
-          <>
-            <div>
+      <form
+        className='w-full'
+        onSubmit={form.onSubmit(() => {
+          if (step !== 'email' || codeSent) {
+            doSubmit();
+          }
+        })}
+      >
+        <HiddenUsernameInput username={twoFactorInformation?.user.username ?? ''} />
+        <Stack>
+          {step === 'totp' ? (
+            <>
               <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
-              <Text className='text-neutral-400!'>{t('pages.auth.login.step.totpRecovery.subtitle', {})}</Text>
-            </div>
-            <Card>
-              <Stack>
-                <TextInput
-                  label={t('pages.auth.login.step.totpRecovery.form.label', {})}
-                  placeholder={t('pages.auth.login.step.totpRecovery.form.placeholder', {})}
-                  onKeyDown={(e) => e.key === 'Enter' && doSubmit()}
-                  leftSection={<FontAwesomeIcon icon={faKey} />}
-                  size='md'
-                  autoFocus
-                  {...form.getInputProps('code')}
-                />
-                <Button onClick={doSubmit} loading={loading} disabled={!form.isValid()} size='md' fullWidth>
-                  {t('pages.auth.login.step.totp.button.verify', {})}
-                </Button>
-                <Divider label={t('common.divider.or', {})} labelPosition='center' />
-                <Button
-                  variant='light'
-                  onClick={() => {
-                    form.reset();
-                    setStep(hasTotp ? 'totp' : 'email');
-                  }}
-                  size='md'
-                  fullWidth
-                >
-                  {hasTotp
-                    ? t('pages.auth.login.step.totp.button.useTotp', {})
-                    : t('pages.auth.login.step.email.button.useEmail', {})}
-                </Button>
-              </Stack>
-            </Card>
-          </>
-        ) : step === 'email' ? (
-          <>
-            <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
-            <Card>
-              <Stack>
-                <div className='flex items-center gap-2'>
-                  <Avatar
-                    size={56}
-                    src={twoFactorInformation?.user.avatar}
-                    name={twoFactorInformation?.user.username}
-                  />
-                  <span className='text-neutral-400'>
-                    {t('pages.auth.login.step.totp.welcomeBack', {
-                      username: twoFactorInformation?.user.username ?? '',
-                    })}
-                  </span>
-                </div>
-                {codeSent ? (
-                  <>
-                    <Text className='text-neutral-400!'>{t('pages.auth.login.step.email.enterCode', {})}</Text>
-                    <Center>
-                      <PinInput
-                        length={6}
-                        placeholder='0'
-                        size='md'
-                        type='number'
-                        oneTimeCode
-                        autoFocus
-                        {...form.getInputProps('code')}
-                      />
-                    </Center>
-                    <Button onClick={doSubmit} loading={loading} disabled={!form.isValid()} size='md' fullWidth>
-                      {t('pages.auth.login.step.totp.button.verify', {})}
-                    </Button>
+              <Card>
+                <Stack>
+                  <div className='flex items-center gap-2'>
+                    <Avatar
+                      size={56}
+                      src={twoFactorInformation?.user.avatar}
+                      name={twoFactorInformation?.user.username}
+                    />
+                    <span className='text-neutral-400'>
+                      {t('pages.auth.login.step.totp.welcomeBack', {
+                        username: twoFactorInformation?.user.username ?? '',
+                      })}
+                    </span>
+                  </div>
+                  <Text className=' text-neutral-400!'>{t('pages.auth.login.step.totp.enterCode', {})}</Text>
+                  <Center>
+                    <PinInput
+                      length={6}
+                      placeholder='0'
+                      size='md'
+                      type='number'
+                      oneTimeCode
+                      autoFocus
+                      {...form.getInputProps('code')}
+                    />
+                  </Center>
+                  <Button type='submit' loading={loading} disabled={!form.isValid()} size='md' fullWidth>
+                    {t('pages.auth.login.step.totp.button.verify', {})}
+                  </Button>
+                  <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                  {hasEmail && (
                     <Button
-                      variant='subtle'
-                      onClick={doSendCode}
-                      loading={sendingCode}
-                      disabled={resendCooldown > 0}
+                      variant='light'
+                      onClick={() => {
+                        form.reset();
+                        setStep('email');
+                      }}
                       size='md'
                       fullWidth
                     >
-                      {resendCooldown > 0
-                        ? t('pages.auth.login.step.email.button.resendIn', {
-                            seconds: String(resendCooldown),
-                          })
-                        : t('pages.auth.login.step.email.button.resend', {})}
+                      {t('pages.auth.login.step.email.button.useEmail', {})}
                     </Button>
-                  </>
-                ) : (
-                  <>
-                    <Text className='text-neutral-400!'>{t('pages.auth.login.step.email.subtitle', {})}</Text>
-                    <Button onClick={doSendCode} loading={sendingCode} size='md' fullWidth>
-                      {t('pages.auth.login.step.email.button.sendCode', {})}
-                    </Button>
-                  </>
-                )}
-                <Divider label={t('common.divider.or', {})} labelPosition='center' />
-                {hasTotp && (
+                  )}
                   <Button
                     variant='light'
                     onClick={() => {
                       form.reset();
-                      setStep('totp');
+                      setStep('totp-recovery');
                     }}
                     size='md'
                     fullWidth
                   >
-                    {t('pages.auth.login.step.totp.button.useTotp', {})}
+                    {t('pages.auth.login.step.totp.button.useRecoveryCode', {})}
                   </Button>
-                )}
-                <Button
-                  variant='light'
-                  onClick={() => {
-                    form.reset();
-                    setStep('totp-recovery');
-                  }}
-                  size='md'
-                  fullWidth
-                >
-                  {t('pages.auth.login.step.totp.button.useRecoveryCode', {})}
-                </Button>
-              </Stack>
-            </Card>
-          </>
-        ) : null}
-      </Stack>
+                </Stack>
+              </Card>
+            </>
+          ) : step === 'totp-recovery' ? (
+            <>
+              <div>
+                <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
+                <Text className='text-neutral-400!'>{t('pages.auth.login.step.totpRecovery.subtitle', {})}</Text>
+              </div>
+              <Card>
+                <Stack>
+                  <TextInput
+                    label={t('pages.auth.login.step.totpRecovery.form.label', {})}
+                    placeholder={t('pages.auth.login.step.totpRecovery.form.placeholder', {})}
+                    autoComplete='off'
+                    leftSection={<FontAwesomeIcon icon={faKey} />}
+                    size='md'
+                    autoFocus
+                    {...form.getInputProps('code')}
+                  />
+                  <Button type='submit' loading={loading} disabled={!form.isValid()} size='md' fullWidth>
+                    {t('pages.auth.login.step.totp.button.verify', {})}
+                  </Button>
+                  <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                  <Button
+                    variant='light'
+                    onClick={() => {
+                      form.reset();
+                      setStep(hasTotp ? 'totp' : 'email');
+                    }}
+                    size='md'
+                    fullWidth
+                  >
+                    {hasTotp
+                      ? t('pages.auth.login.step.totp.button.useTotp', {})
+                      : t('pages.auth.login.step.email.button.useEmail', {})}
+                  </Button>
+                </Stack>
+              </Card>
+            </>
+          ) : step === 'email' ? (
+            <>
+              <Title order={2}>{t('pages.auth.login.step.totp.title', {})}</Title>
+              <Card>
+                <Stack>
+                  <div className='flex items-center gap-2'>
+                    <Avatar
+                      size={56}
+                      src={twoFactorInformation?.user.avatar}
+                      name={twoFactorInformation?.user.username}
+                    />
+                    <span className='text-neutral-400'>
+                      {t('pages.auth.login.step.totp.welcomeBack', {
+                        username: twoFactorInformation?.user.username ?? '',
+                      })}
+                    </span>
+                  </div>
+                  {codeSent ? (
+                    <>
+                      <Text className='text-neutral-400!'>{t('pages.auth.login.step.email.enterCode', {})}</Text>
+                      <Center>
+                        <PinInput
+                          length={6}
+                          placeholder='0'
+                          size='md'
+                          type='number'
+                          oneTimeCode
+                          autoFocus
+                          {...form.getInputProps('code')}
+                        />
+                      </Center>
+                      <Button type='submit' loading={loading} disabled={!form.isValid()} size='md' fullWidth>
+                        {t('pages.auth.login.step.totp.button.verify', {})}
+                      </Button>
+                      <Button
+                        variant='subtle'
+                        onClick={doSendCode}
+                        loading={sendingCode}
+                        disabled={resendCooldown > 0}
+                        size='md'
+                        fullWidth
+                      >
+                        {resendCooldown > 0
+                          ? t('pages.auth.login.step.email.button.resendIn', {
+                              seconds: String(resendCooldown),
+                            })
+                          : t('pages.auth.login.step.email.button.resend', {})}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Text className='text-neutral-400!'>{t('pages.auth.login.step.email.subtitle', {})}</Text>
+                      <Button onClick={doSendCode} loading={sendingCode} size='md' fullWidth>
+                        {t('pages.auth.login.step.email.button.sendCode', {})}
+                      </Button>
+                    </>
+                  )}
+                  <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                  {hasTotp && (
+                    <Button
+                      variant='light'
+                      onClick={() => {
+                        form.reset();
+                        setStep('totp');
+                      }}
+                      size='md'
+                      fullWidth
+                    >
+                      {t('pages.auth.login.step.totp.button.useTotp', {})}
+                    </Button>
+                  )}
+                  <Button
+                    variant='light'
+                    onClick={() => {
+                      form.reset();
+                      setStep('totp-recovery');
+                    }}
+                    size='md'
+                    fullWidth
+                  >
+                    {t('pages.auth.login.step.totp.button.useRecoveryCode', {})}
+                  </Button>
+                </Stack>
+              </Card>
+            </>
+          ) : null}
+        </Stack>
+      </form>
     </AuthWrapper>
   );
 }

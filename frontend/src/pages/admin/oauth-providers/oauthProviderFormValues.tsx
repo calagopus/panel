@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { type FieldDef } from '@/elements/form-engine/index.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -74,6 +75,7 @@ export function useOAuthProviderFormFields(): {
       name: 'clientId',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.clientId', {}),
       required: true,
+      props: ignorePasswordManagerProps,
     },
     {
       type: 'password',

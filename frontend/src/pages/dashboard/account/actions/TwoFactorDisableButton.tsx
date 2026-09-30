@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import disableTwoFactor from '@/api/me/account/disableTwoFactor.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -78,6 +79,7 @@ export default function TwoFactorDisableButton() {
         onSubmit={doDisable}
       >
         <Stack>
+          <HiddenUsernameInput username={user?.username ?? ''} />
           <Text>{t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.description', {}).md()}</Text>
 
           <TextInput

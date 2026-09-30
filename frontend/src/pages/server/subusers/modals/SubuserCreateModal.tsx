@@ -12,6 +12,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { appendInheritedIgnoredFiles } from '@/lib/domain/subusers.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserCreateSchema } from '@/lib/schemas/server/subusers.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
@@ -77,6 +78,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
           withAsterisk
           label={t('common.form.email', {})}
           placeholder={t('pages.server.subusers.modal.createSubuser.form.emailPlaceholder', {})}
+          {...ignorePasswordManagerProps}
           {...form.getInputProps('email')}
         />
 

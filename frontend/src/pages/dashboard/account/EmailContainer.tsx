@@ -10,6 +10,7 @@ import updateEmail from '@/api/me/account/updateEmail.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -87,6 +88,7 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
       className={classNames('h-full order-20', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
+        <HiddenUsernameInput username={user?.username ?? ''} />
         <Stack h='100%'>
           <TextInput
             withAsterisk

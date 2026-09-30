@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
+import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminSettingsCaptchaProviderSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import type { DiscriminatedVariant } from '../DiscriminatedSettingsForm.tsx';
@@ -17,7 +18,13 @@ export function useCaptchaProviderVariants(): Partial<
   const { t } = useTranslations();
 
   const siteAndSecret: FieldDef<CaptchaFormValues>[] = [
-    { type: 'text', name: 'siteKey', label: t('common.form.siteKey', {}), required: true },
+    {
+      type: 'text',
+      name: 'siteKey',
+      label: t('common.form.siteKey', {}),
+      required: true,
+      props: ignorePasswordManagerProps,
+    },
     { type: 'password', name: 'secretKey', label: t('common.form.secretKey', {}), required: true },
   ];
 
@@ -73,7 +80,13 @@ export function useCaptchaProviderVariants(): Partial<
       formId: 'admin.settings.captcha.friendlyCaptcha',
       defaults: { siteKey: '', apiKey: '' },
       fields: [
-        { type: 'text', name: 'siteKey', label: t('common.form.siteKey', {}), required: true },
+        {
+          type: 'text',
+          name: 'siteKey',
+          label: t('common.form.siteKey', {}),
+          required: true,
+          props: ignorePasswordManagerProps,
+        },
         { type: 'password', name: 'apiKey', label: t('common.form.apiKey', {}), required: true },
       ],
     },

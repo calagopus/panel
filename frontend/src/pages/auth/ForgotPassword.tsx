@@ -99,34 +99,41 @@ export default function ForgotPassword() {
         </div>
 
         <Card>
-          <Stack>
-            <TextInput
-              label={t('common.form.email', {})}
-              placeholder={t('pages.auth.forgotPassword.form.emailPlaceholder', {})}
-              autoComplete='email'
-              onKeyDown={(e) => e.key === 'Enter' && form.isValid() && captcha.isValid && !requested && submit()}
-              leftSection={<FontAwesomeIcon icon={faEnvelope} />}
-              size='md'
-              autoFocus
-              {...form.getInputProps('email')}
-            />
+          <form
+            onSubmit={form.onSubmit(() => {
+              if (captcha.isValid && !requested) {
+                submit();
+              }
+            })}
+          >
+            <Stack>
+              <TextInput
+                label={t('common.form.email', {})}
+                placeholder={t('pages.auth.forgotPassword.form.emailPlaceholder', {})}
+                autoComplete='email'
+                leftSection={<FontAwesomeIcon icon={faEnvelope} />}
+                size='md'
+                autoFocus
+                {...form.getInputProps('email')}
+              />
 
-            <Button
-              onClick={submit}
-              loading={loading}
-              disabled={requested || !form.isValid() || !captcha.isValid}
-              size='md'
-              fullWidth
-            >
-              {t('pages.auth.forgotPassword.button.request', {})}
-            </Button>
+              <Button
+                type='submit'
+                loading={loading}
+                disabled={requested || !form.isValid() || !captcha.isValid}
+                size='md'
+                fullWidth
+              >
+                {t('pages.auth.forgotPassword.button.request', {})}
+              </Button>
 
-            <Divider label={t('common.divider.or', {})} labelPosition='center' />
+              <Divider label={t('common.divider.or', {})} labelPosition='center' />
 
-            <Button variant='light' onClick={() => navigate('/auth/login')} size='md' fullWidth>
-              {t('pages.auth.button.login', {})}
-            </Button>
-          </Stack>
+              <Button variant='light' onClick={() => navigate('/auth/login')} size='md' fullWidth>
+                {t('pages.auth.button.login', {})}
+              </Button>
+            </Stack>
+          </form>
         </Card>
         <Captcha {...captcha.props} />
       </Stack>
