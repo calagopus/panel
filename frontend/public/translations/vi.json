@@ -179,6 +179,14 @@
     "mount": {
       "one": "{count} Mounts"
     },
+    "device": {
+      "zero": "{count} Thiết bị",
+      "one": "{count} Thiết bị",
+      "two": "{count} Thiết bị",
+      "few": "{count} Thiết bị",
+      "many": "{count} Thiết bị",
+      "other": "{count} Thiết bị"
+    },
     "apiKey": {
       "zero": "{count} Khóa API",
       "one": "{count} Khóa API",
@@ -409,6 +417,7 @@
         "username": "Tên người dùng",
         "usernameOrEmail": "Tên người dùng/Email",
         "server": "Máy chủ",
+        "servers": "Máy chủ",
         "path": "Đường dẫn",
         "port": "Cổng",
         "provider": "Nhà cung cấp",
@@ -451,6 +460,7 @@
         "additionalAllocations": "Phân Bổ Bổ Sung",
         "externalId": "ID Bên Ngoài",
         "mount": "Điểm Gắn",
+        "device": "Thiết bị",
         "lines": "Số Dòng",
         "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
         "databaseAgentHost": "Máy Chủ Agent Cơ Sở Dữ Liệu",

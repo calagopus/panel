@@ -200,6 +200,14 @@
       "many": "{count} montajes",
       "other": "{count} montajes"
     },
+    "device": {
+      "zero": "{count} dispositivos",
+      "one": "{count} dispositivo",
+      "two": "{count} dispositivos",
+      "few": "{count} dispositivos",
+      "many": "{count} dispositivos",
+      "other": "{count} dispositivos"
+    },
     "apiKey": {
       "zero": "{count} claves API",
       "one": "{count} clave API",
@@ -428,6 +436,7 @@
         "username": "Usuario",
         "usernameOrEmail": "Nombre de usuario/correo electrónico",
         "server": "Servidor",
+        "servers": "Servidores",
         "email": "Correo",
         "path": "Ruta",
         "port": "Puerto",
@@ -473,6 +482,7 @@
         "additionalAllocations": "Asignaciones adicionales",
         "externalId": "ID externo",
         "mount": "Montaje",
+        "device": "Dispositivo",
         "nest": "Nido",
         "lines": "Líneas",
         "databaseHost": "Host de la base de datos",
@@ -747,6 +757,7 @@
           "redirect": "Redirección"
         },
         "empty": "No hay rutas configuradas. Añade rutas, separadores o redirecciones a continuación.",
+        "missingRoutes": "Las siguientes páginas faltan en la configuración de esta ruta y no estarán disponibles para los usuarios: {routes}.",
         "unnamed": "(sin nombre)",
         "dividerPlaceholder": "Etiqueta del separador (opcional)",
         "redirectNamePlaceholder": "Nombre de la redirección",
@@ -1054,7 +1065,7 @@
     "pages": {
       "oobe": {
         "welcome": {
-          "title": "Bienvenido a Calagopus",
+          "title": "Te damos la bienvenida a Calagopus",
           "subtitle": "¡Vamos a poner en marcha tu sistema de gestión de servidores de juego!",
           "wizardIntro": "Este asistente de configuración te guiará por:",
           "steps": {
@@ -1281,7 +1292,7 @@
             },
             "totp": {
               "title": "Autenticación en dos factores",
-              "welcomeBack": "¡Bienvenido de nuevo, {username}!",
+              "welcomeBack": "¡Te damos la bienvenida de nuevo, {username}!",
               "enterCode": "Introduce el código de 6 dígitos de tu app de autenticación",
               "button": {
                 "verify": "Verificar código",
@@ -1362,6 +1373,7 @@
           "tooltip": {
             "removeFromGroup": "Quitar del grupo",
             "addToGroup": "Añadir al grupo",
+            "addServerToGroup": "Añadir servidores al grupo",
             "groupActions": "Acciones del grupo",
             "noGroups": "No hay grupos disponibles a los que añadir el servidor",
             "noGroup": "Este servidor no está en ningún grupo",
@@ -1395,7 +1407,11 @@
                     }
                   },
                   "addServerToGroup": {
-                    "noServers": "Todos los servidores ya están en este grupo."
+                    "title": "Añadir servidores a {group}",
+                    "noServers": "Todos los servidores ya están en este grupo.",
+                    "toast": {
+                      "added": "{servers} añadido al grupo."
+                    }
                   },
                   "removeServerFromGroup": {
                     "title": "Confirmar la eliminación del servidor",
@@ -1959,6 +1975,9 @@
         },
         "home": {
           "title": "Inicio",
+          "alert": {
+            "newPanelVersion": "¡Hay una nueva versión disponible para el panel! Actualmente estás usando la versión {current} y la última versión disponible es {latest}. Te recomendamos considerar la posibilidad de actualizar. [Haz clic aquí]({upgradeUrl}) para consultar las instrucciones de actualización."
+          },
           "tabs": {
             "overview": {
               "title": "Resumen",
@@ -2034,8 +2053,8 @@
                 "noChangelog": "No hay registro de cambios",
                 "nodesUpToDate": "Parece que todos los nodos están actualizados. ({failed} no se pudieron comprobar)",
                 "nodesOutdated": "Algunos nodos están desactualizados; la última versión disponible es {latest}. ({outdated} desactualizados, {failed} no se pudieron comprobar)",
-                "databaseAgentHostsUpToDate": "Parece que todos los hosts de agentes de base de datos están actualizados. ({failed} no se pudieron comprobar)",
-                "databaseAgentHostsOutdated": "Algunos hosts de agentes de base de datos están desactualizados; la última versión disponible es {latest}. ({outdated} desactualizados, {failed} no se pudieron comprobar)",
+                "databaseAgentHostsUpToDate": "Parece que todos los hosts de agentes de bases de datos están actualizados. ({failed} no se pudieron comprobar)",
+                "databaseAgentHostsOutdated": "Algunos hosts de agentes de bases de datos están desactualizados; la última versión disponible es {latest}. ({outdated} desactualizados, {failed} no se pudieron comprobar)",
                 "table": {
                   "version": "Versión",
                   "installed": "Instalado",
@@ -2316,6 +2335,18 @@
                 "title": "Configuración de Captcha",
                 "toast": {
                   "updated": "Configuración de Captcha actualizada."
+                },
+                "cap": {
+                  "form": {
+                    "apiUrl": "URL de la instancia",
+                    "apiUrlDescription": "URL pública de tu instancia de Cap Standalone, sin la clave del sitio."
+                  }
+                },
+                "recaptcha": {
+                  "form": {
+                    "threshold": "Umbral de puntuación",
+                    "thresholdDescription": "Puntuación mínima necesaria para superar la verificación, de 0 a 1. Los valores más altos son más estrictos. Valor predeterminado: 0,5."
+                  }
                 }
               }
             },
@@ -2796,15 +2827,15 @@
               "page": {
                 "title": "Hosts de bases de datos de la ubicación",
                 "toast": {
-                  "created": "Ubicación del host de base de datos creada.",
-                  "deleted": "Ubicación del host de base de datos eliminada."
+                  "created": "Ubicación del host de bases de datos creada.",
+                  "deleted": "Ubicación del host de bases de datos eliminada."
                 },
                 "modal": {
                   "create": {
-                    "title": "Crear ubicación de host de base de datos"
+                    "title": "Crear ubicación de host de bases de datos"
                   },
                   "delete": {
-                    "title": "Confirmar la eliminación de la ubicación del host de base de datos",
+                    "title": "Confirmar la eliminación de la ubicación del host de bases de datos",
                     "content": "¿Quieres eliminar el host de base de datos **{name}** de la ubicación **{location}**?"
                   }
                 }
@@ -2815,15 +2846,15 @@
               "page": {
                 "title": "Hosts de agentes de bases de datos de la ubicación",
                 "toast": {
-                  "created": "Host de agente de base de datos de la ubicación creado.",
-                  "deleted": "Host de agente de base de datos de la ubicación eliminado."
+                  "created": "Host de agente de bases de datos de la ubicación creado.",
+                  "deleted": "Host de agente de bases de datos de la ubicación eliminado."
                 },
                 "modal": {
                   "create": {
-                    "title": "Crear host de agente de base de datos de la ubicación"
+                    "title": "Crear host de agente de bases de datos de la ubicación"
                   },
                   "delete": {
-                    "title": "Confirmar eliminación del host de agente de base de datos de la ubicación",
+                    "title": "Confirmar eliminación del host de agente de bases de datos de la ubicación",
                     "content": "¿Quieres eliminar el host de agente de base de datos {name} de la ubicación {location}?"
                   }
                 }
@@ -2840,6 +2871,51 @@
         "nodes": {
           "title": "Nodos",
           "resourceName": "Nodo",
+          "pairing": {
+            "mode": {
+              "pair": "Emparejar un nodo en espera",
+              "manual": "Configurar manualmente"
+            },
+            "title": "Emparejar con Wings",
+            "description": "Inicia Wings sin un archivo de configuración y espera a ser emparejado. El código de emparejamiento se muestra en sus registros (`journalctl -u wings` o `docker compose logs wings`).",
+            "form": {
+              "address": "Dirección del nodo",
+              "addressDescription": "La dirección que utiliza el panel para acceder a Wings, incluyendo el puerto.",
+              "pairingCode": "Código de emparejamiento",
+              "pairingCodeDescription": "Se muestra en los registros de Wings mientras espera a ser emparejado.",
+              "panelUrl": "URL del panel",
+              "panelUrlDescription": "Sobrescritura opcional, p. ej., la región más cercana."
+            },
+            "section": {
+              "allocations": "Asignaciones",
+              "advanced": "Avanzado"
+            },
+            "probe": {
+              "title": "Wings {version} está esperando a ser emparejado",
+              "resources": "{cores} núcleos de CPU, {memory} memoria, {disk} disco ({architecture})",
+              "dockerAvailable": "Docker {version} es accesible.",
+              "dockerUnavailable": "Docker no se encuentra accesible. Wings no podrá iniciar servidores hasta que lo esté.",
+              "container": "Wings se ejecuta en un contenedor, por lo que no puede ver las interfaces de red del host. Introduce manualmente la IP de asignación."
+            },
+            "enrollment": {
+              "description": "Ejecuta esto en el nodo. El código funciona una sola vez y caduca después de 30 minutos."
+            },
+            "button": {
+              "connect": "Conectar",
+              "change": "Cambiar",
+              "pair": "Emparejar",
+              "createAndPair": "Crear y emparejar",
+              "generateCommand": "Generar comando de registro"
+            },
+            "status": {
+              "waiting": "Esperando a que Wings se conecte...",
+              "connected": "Wings {version} está conectado.",
+              "timeout": "Wings no se encuentra en línea aún. Revisa los registros en el nodo."
+            },
+            "toast": {
+              "pairFailed": "El nodo se ha creado, pero el emparejamiento ha fallado: {error}"
+            }
+          },
           "tabs": {
             "overview": {
               "title": "Resumen",
@@ -3097,40 +3173,59 @@
                 }
               }
             },
-            "databaseHosts": {
-              "title": "Hosts de base de datos",
+            "devices": {
+              "title": "Dispositivos",
               "page": {
-                "title": "Hosts de base de datos del nodo",
+                "title": "Dispositivos del nodo",
                 "toast": {
-                  "created": "Host de base de datos del nodo creado.",
-                  "deleted": "Host de base de datos del nodo eliminado."
+                  "added": "Se ha añadido el dispositivo del nodo.",
+                  "removed": "Se ha eliminado el dispositivo del nodo."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Añadir dispositivo al nodo"
+                  },
+                  "remove": {
+                    "title": "Confirmar eliminación del dispositivo del nodo",
+                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                  }
+                }
+              }
+            },
+            "databaseHosts": {
+              "title": "Hosts de bases de datos",
+              "page": {
+                "title": "Hosts de bases de datos del nodo",
+                "toast": {
+                  "created": "Host de bases de datos del nodo creado.",
+                  "deleted": "Host de bases de datos del nodo eliminado."
                 },
                 "modal": {
                   "create": {
-                    "title": "Crear host de base de datos del nodo "
+                    "title": "Crear host de bases de datos del nodo "
                   },
                   "delete": {
-                    "title": "Confirmar la eliminación del host de base de datos del nodo",
-                    "content": "¿Quieres eliminar el host de base de datos **{name}** de **{node}**?"
+                    "title": "Confirmar la eliminación del host de bases de datos del nodo",
+                    "content": "¿Quieres eliminar el host de bases de datos **{name}** de **{node}**?"
                   }
                 }
               }
             },
             "databaseAgentHosts": {
-              "title": "Hosts de agentes de base de datos",
+              "title": "Hosts de agentes de bases de datos",
               "page": {
                 "title": "Hosts de agentes de bases de datos del nodo",
                 "toast": {
-                  "created": "Host de agente de base de datos del nodo creado.",
-                  "deleted": "Host de agente de base de datos del nodo eliminado."
+                  "created": "Host de agente de bases de datos del nodo creado.",
+                  "deleted": "Host de agente de bases de datos del nodo eliminado."
                 },
                 "modal": {
                   "create": {
-                    "title": "Crear host de agente de base de datos del nodo"
+                    "title": "Crear host de agente de bases de datos del nodo"
                   },
                   "delete": {
-                    "title": "Confirmar eliminación del host de agente de base de datos del nodo",
-                    "content": "¿Quieres eliminar el host de agente de base de datos {name} del nodo {node}?"
+                    "title": "Confirmar eliminación del host de agente de bases de datos del nodo",
+                    "content": "¿Quieres eliminar el host de agente de bases de datos {name} del nodo {node}?"
                   }
                 }
               }
@@ -3598,6 +3693,25 @@
                 }
               }
             },
+            "devices": {
+              "title": "Dispositivos",
+              "page": {
+                "title": "Dispositivos del servidor",
+                "toast": {
+                  "added": "Se ha añadido el dispositivo del servidor.",
+                  "deleted": "Se ha eliminado el dispositivo del servidor."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Añadir dispositivo al servidor"
+                  },
+                  "remove": {
+                    "title": "Confirmar eliminación del dispositivo del servidor",
+                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "Copias de seguridad",
               "page": {
@@ -3912,6 +4026,25 @@
                       }
                     }
                   },
+                  "devices": {
+                    "title": "Dispositivos",
+                    "page": {
+                      "title": "Dispositivos del huevo",
+                      "toast": {
+                        "added": "Se ha añadido el dispositivo al huevo.",
+                        "deleted": "Se ha eliminado el dispositivo del huevo."
+                      },
+                      "modal": {
+                        "add": {
+                          "title": "Añadir dispositivo al huevo"
+                        },
+                        "delete": {
+                          "title": "Confirmar eliminación del dispositivo del huevo",
+                          "content": "¿Quieres eliminar el dispositivo **{device}** de **{egg}**?"
+                        }
+                      }
+                    }
+                  },
                   "servers": {
                     "title": "Servidores",
                     "page": {
@@ -3924,7 +4057,7 @@
           }
         },
         "eggConfigurations": {
-          "title": "Configuraciones del huevo",
+          "title": "Configuraciones de huevos",
           "resourceName": "Configuración del huevo",
           "table": {
             "columns": {
@@ -4072,13 +4205,13 @@
           }
         },
         "databaseHosts": {
-          "title": "Hosts de base de datos",
-          "resourceName": "Host de base de datos",
+          "title": "Hosts de bases de datos",
+          "resourceName": "Host de bases de datos",
           "tabs": {
             "general": {
               "page": {
-                "titleCreate": "Crear host de base de datos",
-                "titleUpdate": "Actualizar host de base de datos",
+                "titleCreate": "Crear host de bases de datos",
+                "titleUpdate": "Actualizar host de bases de datos",
                 "form": {
                   "publicHost": "Host público",
                   "publicPort": "Puerto público",
@@ -4100,7 +4233,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirmar eliminación del host de base de datos",
+                    "title": "Confirmar eliminación del host de bases de datos",
                     "alert": {
                       "forceWarning": "La eliminación forzada elimina todas las bases de datos de este host. Es posible que las bases de datos del propio host no se limpien por completo, dejando datos huérfanos."
                     }
@@ -4111,7 +4244,7 @@
             "databases": {
               "title": "Bases de datos",
               "page": {
-                "title": "Base de datos de host de base de datos",
+                "title": "Bases de datos de host de base de datos",
                 "modal": {
                   "delete": {
                     "title": "Confirmar eliminación de la base de datos",
@@ -4604,6 +4737,10 @@
                 "modal": {
                   "delete": {
                     "title": "Confirmar eliminación de la configuración de copia de seguridad"
+                  },
+                  "removeProvider": {
+                    "title": "Confirmar eliminación de la configuración del proveedor",
+                    "content": "Esto eliminará la configuración de **{provider}** al guardar. Las copias de seguridad existentes que dependan de estas opciones de configuración dejarán de funcionar."
                   }
                 },
                 "s3": {
@@ -4916,6 +5053,76 @@
               "title": "Servidores",
               "page": {
                 "title": "Servidores de montaje"
+              }
+            }
+          }
+        },
+        "devices": {
+          "title": "Dispositivos",
+          "resourceName": "Dispositivo",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Crear dispositivo",
+                "titleUpdate": "Actualizar dispositivo",
+                "alert": "Los dispositivos son una función potente y potencialmente peligrosa. Un uso inadecuado puede provocar la pérdida de datos o vulnerabilidades de seguridad (incluidos escapes del contenedor). Asegúrate de comprender las implicaciones de usar dispositivos antes de crearlos o actualizarlos.",
+                "form": {
+                  "userAttachable": "Conectable por el usuario",
+                  "permissions": "Permisos",
+                  "permissionsDescription": "Acceso al dispositivo: r para lectura, w para escritura y m para crear dispositivos de nodo."
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirmar eliminación del dispositivo"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "title": "Huevos",
+              "page": {
+                "title": "Dispositivos del huevo",
+                "toast": {
+                  "added": "Se ha añadido el dispositivo al huevo.",
+                  "removed": "Se ha eliminado el dispositivo del huevo."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Añadir dispositivo al huevo",
+                    "form": {
+                      "egg": "Huevo"
+                    }
+                  },
+                  "remove": {
+                    "title": "Confirmar eliminación del dispositivo del huevo",
+                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "title": "Nodos",
+              "page": {
+                "title": "Dispositivos del nodo",
+                "toast": {
+                  "added": "Se ha añadido el dispositivo al nodo.",
+                  "removed": "Se ha eliminado el dispositivo del nodo."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Añadir dispositivo al nodo"
+                  },
+                  "remove": {
+                    "title": "Confirmar eliminación del dispositivo del nodo",
+                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Servidores",
+              "page": {
+                "title": "Dispositivos del servidor"
               }
             }
           }
@@ -6516,7 +6723,7 @@
                 "backupName": "Nombre de la copia de seguridad",
                 "truncateDirectory": "Elimina todos los archivos antes de restaurar",
                 "restoreStartup": "Restaura la configuración de inicio",
-                "warning": "Restaurar detiene el servidor y sobrescribe sus archivos. La programación espera hasta que la restauración haya finalizado antes de continuar. Evita combinar este paso con activadores de encendido o del estado del servidor que puedan volver a activar la programación."
+                "warning": "La restauración detiene el servidor y sobrescribe sus archivos. La programación espera hasta que finalice la restauración antes de continuar. Evita combinar este paso con activadores de encendido o del estado del servidor que puedan volver a activar la programación."
               },
               "renderer": {
                 "detail": {
@@ -7229,6 +7436,41 @@
               "content": "¿Quieres desmontar **{name}** de `{target}`?",
               "toast": {
                 "detached": "{name} se ha eliminado de tu servidor."
+              }
+            }
+          }
+        },
+        "devices": {
+          "title": "Dispositivos",
+          "table": {
+            "columns": {
+              "attached": "Conectado"
+            }
+          },
+          "button": {
+            "attach": "Conectar",
+            "detach": "Desconectar"
+          },
+          "modal": {
+            "attachDevice": {
+              "title": "Conectar dispositivo",
+              "content": "¿Quieres conectar **{name}** a `{target}`?",
+              "toast": {
+                "attached": "Se ha conectado {name} a tu servidor."
+              }
+            },
+            "detachDevices": {
+              "title": "Desconectar dispositivos",
+              "content": "¿Quieres desconectar **{devices}** de este servidor?",
+              "alert": {
+                "skipped": "{devices} se omitirán. Los dispositivos que no están conectados no se pueden desconectar."
+              }
+            },
+            "detachDevice": {
+              "title": "Desconectar dispositivo",
+              "content": "¿Quieres desconectar **{name}** de `{target}`?",
+              "toast": {
+                "detached": "{name} ha sido eliminado de tu servidor."
               }
             }
           }
