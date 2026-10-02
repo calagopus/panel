@@ -171,6 +171,9 @@
         "serverFileInput": {
           "notFound": "Fails ar šādu nosaukumu vēl nepastāv."
         },
+        "nodeAllocationIpInput": {
+          "anyAddress": "Visas adreses"
+        },
         "ignoredFilesInput": {
           "countMatches": "Saskaitīt atbilstības",
           "matches": "{count} Sakrita",
@@ -182,7 +185,9 @@
             "second": "Sekunde",
             "minute": "Minūte",
             "hour": "Stunda",
-            "day": "Diena"
+            "day": "Diena",
+            "month": "Mēnesis",
+            "weekday": "Darba diena"
           }
         }
       },
