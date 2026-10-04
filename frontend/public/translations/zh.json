@@ -340,14 +340,6 @@
           "failedDescription": "未鎖定的失敗備份會在 24 小時後清理，無論是否分組。",
           "count": "保持最新",
           "status": {
-            "rule": {
-              "count": "最新的",
-              "days": "最近的",
-              "daily": "每日",
-              "weekly": "每週",
-              "monthly": "每月",
-              "yearly": "每年"
-            },
             "locked": "已鎖定",
             "indefinite": "永久保存",
             "expired": "待移除",
@@ -1713,12 +1705,6 @@
                   "cacheCalls": "快取呼叫次數",
                   "cacheHits": "快取命中（{percent}%）",
                   "cacheMisses": "快取未命中（{percent}%）"
-                },
-                "containerType": {
-                  "none": "未偵測到",
-                  "official": "官方",
-                  "officialAio": "官方 AIO",
-                  "officialHeavy": "官方 Heavy"
                 },
                 "stats": {
                   "users": "使用者",

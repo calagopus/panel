@@ -1310,9 +1310,6 @@
                   "databaseVersion": "Wersja bazy danych ({size})",
                   "cacheVersion": "Wersja cache"
                 },
-                "containerType": {
-                  "none": "Nie wykryto"
-                },
                 "stats": {
                   "users": "Użytkownicy",
                   "servers": "Serwery",

@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Konts izveidots",
+    "greeting": "Sveiki,",
+    "intro": "Jūs saņemat šo e-pastu, jo jums tika izveidots konts vietnē <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Lūdzu, noklikšķiniet uz zemāk esošās pogas, lai droši iestatītu paroli un piekļūtu savam kontam:",
+    "button": "Iestatiet savu paroli",
+    "note": "<strong>Piezīme:</strong> Drošības apsvērumu dēļ šī saite nebūs derīga pēc <strong>20 minūtēm</strong>.",
+    "footer": "Ja jūs neesat pieprasījis šo kontu, varat droši ignorēt šo e-pastu."
+  },
+  "password_reset": {
+    "subject": "Paroles atjaunošana",
+    "greeting": "Sveiki <strong>{{ user.username }}</strong>,",
+    "intro": "Mēs saņēmām pieprasījumu atiestatīt jūsu konta paroli <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Ja jūs veicāt šo pieprasījumu, lūdzu, noklikšķiniet uz zemāk esošās pogas, lai izvēlētos jaunu paroli:",
+    "button": "Atiestatīt paroli",
+    "note": "<strong>Piezīme:</strong> Saite nebūs derīga pēc <strong>20 minūtēm</strong>.",
+    "footer": "Ja neesat pieprasījis paroles atiestatīšanu, lūdzu, ignorējiet šo e-pastu. Jūsu parole paliks nemainīga, un jūsu konts ir drošībā."
+  },
+  "email_verification": {
+    "subject": "Apstipriniet savu e-pasta adresi",
+    "greeting": "Sveiki <strong>{{ user.username }}</strong>,",
+    "intro": "Lūdzu, apstipriniet, ka <strong>{{ email }}</strong> pieder jums, lai pabeigtu konta izveidi vietnē <strong>{{ settings.app.name }}</strong>.",
+    "button": "Apstiprināt e-pastu",
+    "note": "<strong>Piezīme:</strong> Saite nebūs derīga pēc <strong>24 stundām</strong>.",
+    "footer": "Ja jūs neesat izveidojis šo kontu vai lūdzis veikt šīs izmaiņas, lūdzu, ignorējiet šo e-pastu. Nekas netiks mainīts."
+  },
+  "two_factor_code": {
+    "subject": "Jūsu pieteikšanās kods",
+    "greeting": "Sveiki <strong>{{ user.username }}</strong>,",
+    "intro": "Izmantojiet tālāk norādīto kodu, lai pabeigtu pieteikšanos platformā <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Piezīme:</strong> Šis kods vairs nedarbosies pēc <strong>10 minūtēm</strong>, un to var izmantot tikai vienu reizi.",
+    "footer": "Ja nemēģinājāt pieteikties, iespējams, kāds cits zina jūsu paroli. Iesakām to pēc iespējas ātrāk nomainīt."
+  },
+  "session_created": {
+    "subject": "Jauna sesija izveidota",
+    "greeting": "Sveiki <strong>{{ user.username }}</strong>,",
+    "intro": "Jūsu kontā tikko tika veikta pieteikšanās <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "IP adrese",
+    "device_label": "Ierīce",
+    "button": "Pārskatīt sesijas",
+    "note": "<strong>Piezīme:</strong> Ja tas bijāt jūs, nekāda rīcība nav nepieciešama. Jūs varat anulēt jebkuru sesiju, kuru neatpazīstat, savos konta iestatījumos.",
+    "footer": "Ja nemēģinājāt pieteikties, iespējams, kāds cits zina jūsu paroli. Iesakām to pēc iespējas ātrāk nomainīt."
+  },
+  "connection_test": {
+    "subject": "Savienojuma pārbaude",
+    "greeting": "Sveicināts,",
+    "intro": "Jūs saņemat šo e-pastu, jo <strong>{{ settings.app.name }}</strong> administrators pieprasīja nosūtīt testa ziņojumu, lai pārbaudītu sistēmas izejošā pasta iestatījumus.",
+    "success": "🎉Izdevās! E-pasta savienojums darbojas.",
+    "footer": "Šis ir automatizēts testa ziņojums no jūsu lietotnes. Nekāda turpmāka rīcība nav nepieciešama."
+  },
+  "added_to_server": {
+    "subject": "Pievienots serverim",
+    "greeting": "Sveicināts,",
+    "intro": "Jūs saņemat šo e-pastu, jo esat pievienots kā apakšlietotājs zem <strong>{{ server.name }}</strong>.",
+    "instruction": "Noklikšķiniet uz zemāk esošās pogas, lai piekļūtu serverim:",
+    "button": "Piekļūt serverim"
+  },
+  "removed_from_server": {
+    "subject": "Noņemt no servera",
+    "greeting": "Sveicināts,",
+    "intro": "Jūs saņemat šo e-pastu, jo esat noņemts kā apakšlietotājs no <strong>{{ server.name }}</strong>.",
+    "footer": "No jūsu puses nav nepieciešama nekāda rīcība. Ja uzskatāt, ka tā ir kļūda, lūdzu, sazinieties ar servera administratoru, lai saņemtu sīkāku informāciju."
+  },
+  "server_installed": {
+    "subject": "Serveris Uzstādīts",
+    "greeting": "Sveicināts,",
+    "intro": "Jūs saņemat šo e-pastu, jo jūsu servera <strong>{{ server.name }}</strong> instalēšana ir pabeigta.",
+    "instruction": "Noklikšķiniet uz zemāk esošās pogas, lai piekļūtu serverim:",
+    "button": "Piekļūt serverim"
+  },
+  "server_restored": {
+    "subject": "Serveris atjaunots",
+    "greeting": "Sveiki,",
+    "intro": "Jūs saņemat šo e-pastu, jo jūsu servera <strong>{{ server.name }}</strong> atjaunošana no rezerves kopijas ir pabeigta.",
+    "instruction": "Noklikšķiniet uz zemāk esošās pogas, lai piekļūtu serverim:",
+    "button": "Piekļūt serverim"
+  }
+}

@@ -1239,12 +1239,6 @@
                   "cacheHits": "Zásahy cache ({percent} %)",
                   "cacheMisses": "Minutia cache ({percent} %)"
                 },
-                "containerType": {
-                  "none": "Žiadne zistené",
-                  "official": "Oficiálne",
-                  "officialAio": "Oficiálne AIO",
-                  "officialHeavy": "Oficiálne Heavy"
-                },
                 "stats": {
                   "users": "Používatelia",
                   "servers": "Servery",

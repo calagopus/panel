@@ -1300,12 +1300,7 @@
               "twoFactorLastUsed": "Sidst brugt: {timestamp}",
               "none": "Der er ikke sat nogen anden faktor op på din konto endnu.",
               "requirementMet": "Din konto opfylder kravet om tofaktor.",
-              "requirementUnmet": "Din konto opfylder endnu ikke kravet om tofaktor.",
-              "method": {
-                "totp": "Authenticator-app",
-                "securityKey": "Sikkerhedsnøgle",
-                "email": "E-mail"
-              }
+              "requirementUnmet": "Din konto opfylder endnu ikke kravet om tofaktor."
             },
             "emailTwoFactor": {
               "toast": {
@@ -1719,12 +1714,6 @@
                   "cacheCalls": "Cache-kald",
                   "cacheHits": "Cache-hits ({percent}%)",
                   "cacheMisses": "Cache-misses ({percent}%)"
-                },
-                "containerType": {
-                  "none": "Ingen registreret",
-                  "official": "Officiel",
-                  "officialAio": "Officiel AIO",
-                  "officialHeavy": "Officiel Heavy"
                 },
                 "stats": {
                   "users": "Brugere",

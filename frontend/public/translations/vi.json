@@ -179,6 +179,14 @@
     "mount": {
       "one": "{count} Mounts"
     },
+    "device": {
+      "zero": "{count} Thiết bị",
+      "one": "{count} Thiết bị",
+      "two": "{count} Thiết bị",
+      "few": "{count} Thiết bị",
+      "many": "{count} Thiết bị",
+      "other": "{count} Thiết bị"
+    },
     "apiKey": {
       "zero": "{count} Khóa API",
       "one": "{count} Khóa API",
@@ -331,14 +339,6 @@
           "yearly": "Lưu giữ hàng năm",
           "ruleSummary": "{rule} {count}",
           "status": {
-            "rule": {
-              "count": "Mới nhất",
-              "days": "Gần đây",
-              "daily": "Hàng ngày",
-              "weekly": "Hàng tuần",
-              "monthly": "Hàng tháng",
-              "yearly": "Hàng năm"
-            },
             "locked": "Khóa",
             "indefinite": "Được lưu giữ vô thời hạn",
             "expired": "Đang chờ xóa",
@@ -409,6 +409,7 @@
         "username": "Tên người dùng",
         "usernameOrEmail": "Tên người dùng/Email",
         "server": "Máy chủ",
+        "servers": "Máy chủ",
         "path": "Đường dẫn",
         "port": "Cổng",
         "provider": "Nhà cung cấp",
@@ -451,6 +452,7 @@
         "additionalAllocations": "Phân Bổ Bổ Sung",
         "externalId": "ID Bên Ngoài",
         "mount": "Điểm Gắn",
+        "device": "Thiết bị",
         "lines": "Số Dòng",
         "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
         "databaseAgentHost": "Máy Chủ Agent Cơ Sở Dữ Liệu",
@@ -1519,11 +1521,7 @@
               "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}",
               "none": "Tài khoản của bạn chưa được thiết lập xác thực hai yếu tố.",
               "requirementMet": "Tài khoản của bạn đáp ứng yêu cầu về xác thực hai yếu tố.",
-              "requirementUnmet": "Tài khoản của bạn chưa đáp ứng yêu cầu xác thực hai yếu tố.",
-              "method": {
-                "totp": "Ứng dụng xác thực",
-                "securityKey": "Khóa bảo mật"
-              }
+              "requirementUnmet": "Tài khoản của bạn chưa đáp ứng yêu cầu xác thực hai yếu tố."
             },
             "emailTwoFactor": {
               "toast": {
@@ -1976,12 +1974,6 @@
                     "coalescedWaits": "Đang chờ một cuộc gọi khác",
                     "misses": "Đã tính"
                   }
-                },
-                "containerType": {
-                  "none": "Không phát hiện",
-                  "official": "Chính Thức",
-                  "officialAio": "Chính Thức AIO",
-                  "officialHeavy": "Chính Thức Heavy"
                 },
                 "stats": {
                   "users": "Người Dùng",

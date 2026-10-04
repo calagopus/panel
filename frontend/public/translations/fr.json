@@ -1462,12 +1462,6 @@
                   "cacheHits": "Succès du cache ({percent}%)",
                   "cacheMisses": "Échecs du cache ({percent}%)"
                 },
-                "containerType": {
-                  "none": "Aucun détecté",
-                  "official": "Officiel",
-                  "officialAio": "Officiel AIO",
-                  "officialHeavy": "Officiel Heavy"
-                },
                 "stats": {
                   "users": "Utilisateurs",
                   "servers": "Serveurs",
