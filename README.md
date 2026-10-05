@@ -1,5 +1,7 @@
 <div align="center">
 
+[![Deploy to Railyard](https://app.railyard.run/deploy/badge)](https://app.railyard.run/deploy?repo=https://github.com/calagopus/panel)
+
 ![Calagopus Logo](https://calagopus.com/fulllogo.svg)
 
 # Calagopus Panel
