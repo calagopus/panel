@@ -124,6 +124,7 @@ export default function ServerUpdate({ contextServer }: { contextServer: AdminSe
       selectedNestUuid,
       setSelectedNestUuid,
       eggImages,
+      nodeUuid: contextServer.node.uuid,
     });
 
   return (

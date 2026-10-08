@@ -180,6 +180,8 @@ pub struct Server {
     pub memory_overhead: i64,
     pub swap: i64,
     pub disk: i64,
+    pub bandwidth_upload: i64,
+    pub bandwidth_download: i64,
     pub io_weight: Option<i16>,
     pub cpu: i32,
     pub pinned_cpus: Vec<i16>,
@@ -276,6 +278,14 @@ impl BaseModel for Server {
             ),
             ("servers.swap", compact_str::format_compact!("{prefix}swap")),
             ("servers.disk", compact_str::format_compact!("{prefix}disk")),
+            (
+                "servers.bandwidth_upload",
+                compact_str::format_compact!("{prefix}bandwidth_upload"),
+            ),
+            (
+                "servers.bandwidth_download",
+                compact_str::format_compact!("{prefix}bandwidth_download"),
+            ),
             (
                 "servers.io_weight",
                 compact_str::format_compact!("{prefix}io_weight"),
@@ -401,6 +411,10 @@ impl BaseModel for Server {
                 .try_get(compact_str::format_compact!("{prefix}memory_overhead").as_str())?,
             swap: row.try_get(compact_str::format_compact!("{prefix}swap").as_str())?,
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
+            bandwidth_upload: row
+                .try_get(compact_str::format_compact!("{prefix}bandwidth_upload").as_str())?,
+            bandwidth_download: row
+                .try_get(compact_str::format_compact!("{prefix}bandwidth_download").as_str())?,
             io_weight: row.try_get(compact_str::format_compact!("{prefix}io_weight").as_str())?,
             cpu: row.try_get(compact_str::format_compact!("{prefix}cpu").as_str())?,
             pinned_cpus: row
@@ -2086,6 +2100,10 @@ impl Server {
                     },
                 },
                 build: wings_api::ServerConfigurationBuild {
+                    bandwidth: wings_api::BandwidthLimits {
+                        upload: self.bandwidth_upload as u64,
+                        download: self.bandwidth_download as u64,
+                    },
                     memory_limit: self.memory,
                     overhead_memory: self.memory_overhead,
                     swap: self.swap,
@@ -2242,6 +2260,10 @@ impl super::IntoAdminApiObject for Server {
                     swap: self.swap,
                     disk: self.disk,
                     io_weight: self.io_weight,
+                    bandwidth: Some(ApiServerBandwidth {
+                        upload: self.bandwidth_upload as u64,
+                        download: self.bandwidth_download as u64,
+                    }),
                 },
                 pinned_cpus: self.pinned_cpus,
                 feature_limits,
@@ -2337,6 +2359,10 @@ impl super::IntoApiObject for Server {
                     memory: self.memory,
                     swap: self.swap,
                     disk: self.disk,
+                    bandwidth: ApiServerBandwidth {
+                        upload: self.bandwidth_upload as u64,
+                        download: self.bandwidth_download as u64,
+                    },
                 },
                 feature_limits,
                 startup: self.startup,
@@ -2497,6 +2523,14 @@ impl CreatableModel for Server {
             .await?
             .ok_or(crate::database::InvalidRelationError("node"))?;
 
+        if options
+            .limits
+            .bandwidth
+            .is_some_and(|limits| limits.upload != 0 || limits.download != 0)
+        {
+            node.ensure_bandwidth_ready(&state.database).await?;
+        }
+
         super::user::User::by_uuid_optional(&state.database, options.owner_uuid)
             .await?
             .ok_or(crate::database::InvalidRelationError("owner"))?;
@@ -2551,6 +2585,14 @@ impl CreatableModel for Server {
                 )
                 .set("memory", options.limits.memory)
                 .set("memory_overhead", options.limits.memory_overhead)
+                .set(
+                    "bandwidth_upload",
+                    options.limits.bandwidth.unwrap_or_default().upload as i64,
+                )
+                .set(
+                    "bandwidth_download",
+                    options.limits.bandwidth.unwrap_or_default().download as i64,
+                )
                 .set("swap", options.limits.swap)
                 .set("disk", options.limits.disk)
                 .set("io_weight", options.limits.io_weight)
@@ -2873,6 +2915,18 @@ impl UpdatableModel for Server {
         self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
+        if options
+            .limits
+            .and_then(|limits| limits.bandwidth)
+            .is_some_and(|limits| limits.upload != 0 || limits.download != 0)
+        {
+            self.node
+                .fetch_cached(&state.database)
+                .await?
+                .ensure_bandwidth_ready(&state.database)
+                .await?;
+        }
+
         query_builder
             .set("owner_uuid", options.owner_uuid.as_ref())
             .set("egg_uuid", options.egg_uuid.as_ref())
@@ -2927,6 +2981,12 @@ impl UpdatableModel for Server {
                 .set("swap", Some(limits.swap))
                 .set("disk", Some(limits.disk))
                 .set("io_weight", Some(limits.io_weight));
+
+            if let Some(bandwidth) = limits.bandwidth {
+                query_builder
+                    .set("bandwidth_upload", Some(bandwidth.upload as i64))
+                    .set("bandwidth_download", Some(bandwidth.download as i64));
+            }
         }
 
         if let Some(feature_limits) = &options.feature_limits {
@@ -2969,6 +3029,10 @@ impl UpdatableModel for Server {
             self.swap = limits.swap;
             self.disk = limits.disk;
             self.io_weight = limits.io_weight;
+            if let Some(bandwidth) = limits.bandwidth {
+                self.bandwidth_upload = bandwidth.upload as i64;
+                self.bandwidth_download = bandwidth.download as i64;
+            }
         }
         if let Some(pinned_cpus) = options.pinned_cpus {
             self.pinned_cpus = pinned_cpus;
@@ -3141,6 +3205,26 @@ pub struct RemoteApiServer {
     process_configuration: super::nest_egg::ProcessConfiguration,
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy, Default)]
+pub struct ApiServerBandwidth {
+    pub upload: u64,
+    pub download: u64,
+}
+
+fn validate_bandwidth(value: &Option<ApiServerBandwidth>, _context: &()) -> garde::Result {
+    if let Some(limits) = value {
+        for rate in [limits.upload, limits.download] {
+            if rate != 0 && !(8..=100_000_000_000).contains(&rate) {
+                return Err(garde::Error::new(
+                    "bandwidth must be zero or between 8 and 100000000000 bits/s",
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone, Copy)]
 pub struct AdminApiServerLimits {
     #[garde(range(min = 0))]
@@ -3161,6 +3245,9 @@ pub struct AdminApiServerLimits {
     #[garde(range(min = 0, max = 1000))]
     #[schema(minimum = 0, maximum = 1000)]
     pub io_weight: Option<i16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[garde(custom(validate_bandwidth))]
+    pub bandwidth: Option<ApiServerBandwidth>,
 }
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone, Copy)]
@@ -3177,6 +3264,8 @@ pub struct ApiServerLimits {
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
     pub disk: i64,
+    #[garde(skip)]
+    pub bandwidth: ApiServerBandwidth,
 }
 
 #[schema_extension_derive::extendible]

@@ -115,7 +115,7 @@ export interface NumberTagsFieldDef<T extends Record<string, unknown>> extends B
 
 export interface SizeFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'size';
-  mode: 'b' | 'mb';
+  mode: 'b' | 'mb' | 'bps';
   min: number;
 }
 

@@ -82,6 +82,24 @@ pub enum BackupAdapter {
     Kopia,
 }
 
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct BandwidthLimits {
+        #[schema(inline)]
+        pub upload: u64,
+        #[schema(inline)]
+        pub download: u64,
+    }
+}
+
+nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct BandwidthStatus {
+        #[schema(inline)]
+        pub ready: bool,
+        #[schema(inline)]
+        pub reason: Option<compact_str::CompactString>,
+    }
+}
+
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
 pub enum CompressionLevel {
     #[serde(rename = "best_speed")]
@@ -576,6 +594,8 @@ nestify::nest! {
             pub threads: Option<compact_str::CompactString>,
             #[schema(inline)]
             pub oom_disabled: bool,
+            #[schema(inline)]
+            pub bandwidth: BandwidthLimits,
         },
 
         #[schema(inline)]
@@ -2772,6 +2792,8 @@ pub mod system {
                 pub os: compact_str::CompactString,
                 #[schema(inline)]
                 pub version: compact_str::CompactString,
+                #[schema(inline)]
+                pub bandwidth: BandwidthStatus,
             }
         }
 

@@ -18,6 +18,7 @@ export const serverLimitsSchema = z.object({
   memory: z.number().min(0),
   swap: z.number().min(-1),
   disk: z.number().min(0),
+  bandwidth: z.object({ upload: z.number().min(0), download: z.number().min(0) }).default({ upload: 0, download: 0 }),
 });
 
 export const serverEggSchema = z.looseObject({

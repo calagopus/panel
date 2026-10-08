@@ -831,6 +831,52 @@ impl Node {
         Some(NodeAllowedSources::from_config(&config))
     }
 
+    pub async fn bandwidth_status(
+        &self,
+        database: &crate::database::Database,
+    ) -> wings_api::BandwidthStatus {
+        let status = tokio::time::timeout(std::time::Duration::from_secs(3), async {
+            Ok::<_, anyhow::Error>(
+                self.api_client(database)
+                    .await?
+                    .get_system()
+                    .await?
+                    .bandwidth,
+            )
+        })
+        .await;
+
+        match status {
+            Ok(Ok(status)) => status,
+            Ok(Err(err)) => wings_api::BandwidthStatus {
+                ready: false,
+                reason: Some(compact_str::format_compact!("unable to check wings: {err}")),
+            },
+            Err(_) => wings_api::BandwidthStatus {
+                ready: false,
+                reason: Some("timed out checking wings".into()),
+            },
+        }
+    }
+
+    pub async fn ensure_bandwidth_ready(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<(), anyhow::Error> {
+        let status = self.bandwidth_status(database).await;
+        if status.ready {
+            return Ok(());
+        }
+
+        Err(crate::response::DisplayError::new(
+            status
+                .reason
+                .unwrap_or_else(|| "node does not support bandwidth limits".into()),
+        )
+        .with_status(axum::http::StatusCode::CONFLICT)
+        .into())
+    }
+
     /// What the node reports about its mesh daemon, `None` when it could not be reached in
     /// time. Not cached: the panel shows it live on the node page.
     pub async fn fetch_tunnel_status(

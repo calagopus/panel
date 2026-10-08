@@ -70,6 +70,42 @@ export function bytesProgressString(processed: number, total: number): string {
  * amount of bytes. Unlike closestUnit, this prefers a clean value in a smaller
  * unit over a messy value in a larger unit.
  */
+export const RATE_UNITS = Object.freeze(['Kbps', 'Mbps', 'Gbps'] as const);
+
+export type RateUnit = (typeof RATE_UNITS)[number];
+
+export function mapRateUnitToLocale(unit: RateUnit): string {
+  const unitToLocaleMapping: Record<RateUnit, string> = {
+    Kbps: getTranslations().t('common.unit.rate.kilobits', {}),
+    Mbps: getTranslations().t('common.unit.rate.megabits', {}),
+    Gbps: getTranslations().t('common.unit.rate.gigabits', {}),
+  };
+
+  return unitToLocaleMapping[unit];
+}
+
+export function rateUnitFactor(unit: RateUnit): number {
+  return 1000 ** (RATE_UNITS.indexOf(unit) + 1);
+}
+
+export function bestRateUnit(bits: number): RateUnit {
+  for (let i = RATE_UNITS.length - 1; i > 0; i--) {
+    const unit = RATE_UNITS[i];
+    if (bits >= rateUnitFactor(unit)) {
+      return unit;
+    }
+  }
+
+  return bits > 0 ? 'Kbps' : 'Mbps';
+}
+
+export function bitsPerSecondOfLimitToString(bits: number, limit: number): string {
+  const unit = bestRateUnit(limit);
+  const factor = rateUnitFactor(unit);
+
+  return `${Number((bits / factor).toFixed(1))} / ${Number((limit / factor).toFixed(2))} ${mapRateUnitToLocale(unit)}`;
+}
+
 export function bestUnit(bytes: number, units: readonly Unit[] = UNITS): Unit {
   if (!bytes || bytes < 1) return units[0];
 

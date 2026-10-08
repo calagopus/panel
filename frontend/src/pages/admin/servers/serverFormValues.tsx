@@ -1,17 +1,20 @@
 import { UseFormReturnType } from '@mantine/form';
 import { useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
+import getNodeBandwidth from '@/api/admin/nodes/getNodeBandwidth.ts';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import { getTimezoneOptions } from '@/lib/format/timezones.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { AdminServer, AdminServerCreate, AdminServerUpdate } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import OwnerCreateField from './OwnerCreateField.tsx';
@@ -39,6 +42,7 @@ const baseServerFormValues = {
     swap: 0,
     disk: 10240,
     ioWeight: null,
+    bandwidth: { upload: 0, download: 0 },
   },
   pinnedCpus: [],
   startup: '',
@@ -185,8 +189,13 @@ function buildFeatureLimitsFields<T extends Record<string, unknown>>(t: TFunc): 
 
 function buildResourceLimitsFields<T extends Record<string, unknown>>(
   t: TFunc,
-  { swapAdvanced }: { swapAdvanced?: boolean } = {},
+  { swapAdvanced, bandwidth }: { swapAdvanced?: boolean; bandwidth?: { ready: boolean; reason: string | null } } = {},
 ): FieldDef<T>[] {
+  const bandwidthDescription =
+    !bandwidth || bandwidth.ready
+      ? t('pages.admin.servers.tabs.general.page.form.bandwidth.description', {})
+      : (bandwidth.reason ?? t('pages.admin.servers.tabs.general.page.form.bandwidth.unavailable', {}));
+
   return [
     {
       type: 'number',
@@ -255,6 +264,22 @@ function buildResourceLimitsFields<T extends Record<string, unknown>>(
       placeholder: '0',
       allowReordering: false,
       advanced: true,
+    },
+    {
+      type: 'size',
+      name: 'limits.bandwidth.upload',
+      label: t('pages.admin.servers.tabs.general.page.form.bandwidth.upload', {}),
+      description: bandwidthDescription,
+      mode: 'bps',
+      min: 0,
+    },
+    {
+      type: 'size',
+      name: 'limits.bandwidth.download',
+      label: t('pages.admin.servers.tabs.general.page.form.bandwidth.download', {}),
+      description: bandwidthDescription,
+      mode: 'bps',
+      min: 0,
     },
   ];
 }
@@ -614,6 +639,7 @@ export interface ServerFormFieldsOptions<T extends ServerEggAssignmentFormValues
   selectedNestUuid: string | null;
   setSelectedNestUuid: (uuid: string | null) => void;
   eggImages: Record<string, string>;
+  nodeUuid: string;
 }
 
 export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opts: ServerFormFieldsOptions<T>) {
@@ -634,13 +660,21 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
     selectedNestUuid,
     setSelectedNestUuid,
     eggImages,
+    nodeUuid,
   } = opts;
+
+  const { data: bandwidth } = useResource({
+    queryKey: queryKeys.admin.nodes.bandwidth(nodeUuid),
+    queryFn: () => getNodeBandwidth(nodeUuid),
+    enabled: !!nodeUuid,
+    silent: true,
+  });
 
   const basicInfoFields = useMemo(() => buildBasicInfoFields<T>(t), [t]);
   const featureLimitsFields = useMemo(() => buildFeatureLimitsFields<T>(t), [t]);
   const resourceLimitsFields = useMemo(
-    () => buildResourceLimitsFields<T>(t, { swapAdvanced: mode === 'create' }),
-    [t, mode],
+    () => buildResourceLimitsFields<T>(t, { swapAdvanced: mode === 'create', bandwidth }),
+    [t, mode, bandwidth],
   );
 
   const serverAssignmentFields = useMemo(

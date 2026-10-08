@@ -184,6 +184,7 @@ export default function ServerCreate() {
       selectedNestUuid,
       setSelectedNestUuid,
       eggImages,
+      nodeUuid: selectedNodeUuid,
     });
 
   return (

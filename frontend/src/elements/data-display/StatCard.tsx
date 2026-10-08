@@ -54,8 +54,9 @@ export default function StatCard({
           </ThemeIcon>
         )}
         <div className={classNames('flex flex-col w-full min-w-0', icon && 'ml-4')}>
-          <div className='w-full flex justify-between'>
-            <span className='text-sm text-left text-(--mantine-color-dimmed) font-bold'>{label}</span>
+          <div className='w-full flex justify-between items-baseline gap-2'>
+            <span className='text-sm text-left text-(--mantine-color-dimmed) font-bold shrink-0'>{label}</span>
+            {details && <span className='text-xs text-(--mantine-color-dimmed) truncate'>{details}</span>}
             {popover && (
               <Popover position='bottom' withArrow shadow='md'>
                 <Popover.Target>
@@ -74,14 +75,12 @@ export default function StatCard({
             {copyOnClick ? (
               <ScrollingText>
                 <CopyOnClick content={value} className='text-left block'>
-                  {displayValue} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}{' '}
-                  {details && <span className='text-sm text-(--mantine-color-dimmed)'>({details})</span>}
+                  {displayValue} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}
                 </CopyOnClick>
               </ScrollingText>
             ) : (
               <ScrollingText>
-                {displayValue} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}{' '}
-                {details && <span className='text-sm text-(--mantine-color-dimmed)'>({details})</span>}
+                {displayValue} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}
               </ScrollingText>
             )}
           </span>

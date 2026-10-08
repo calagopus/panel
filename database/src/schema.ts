@@ -1088,6 +1088,8 @@ export const serversTable = pgTable(
     memory_overhead: bigint({ mode: 'number' }).default(0).notNull(),
     swap: bigint({ mode: 'number' }).notNull(),
     disk: bigint({ mode: 'number' }).notNull(),
+    bandwidth_upload: bigint({ mode: 'number' }).default(0).notNull(),
+    bandwidth_download: bigint({ mode: 'number' }).default(0).notNull(),
     io_weight: smallint(),
     cpu: integer().notNull(),
     pinned_cpus: smallint().array().notNull(),

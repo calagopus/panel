@@ -14,6 +14,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod allocations;
 mod backups;
+mod bandwidth;
 mod capacity;
 mod config;
 mod database_agent_hosts;
@@ -252,6 +253,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/allocations", allocations::router(state))
         .nest("/system", system::router(state))
         .nest("/capacity", capacity::router(state))
+        .nest("/bandwidth", bandwidth::router(state))
         .nest("/servers", servers::router(state))
         .nest("/mounts", mounts::router(state))
         .nest("/devices", devices::router(state))

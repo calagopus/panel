@@ -23,6 +23,7 @@ export const adminServerLimitsSchema = z.object({
   swap: z.number().min(-1),
   disk: z.number().min(0),
   ioWeight: z.preprocess(nullableNumber, z.number().min(0).max(1000).nullable()),
+  bandwidth: z.object({ upload: z.number().min(0), download: z.number().min(0) }).optional(),
 });
 
 export const adminServerFeatureLimitsSchema = z.looseObject({

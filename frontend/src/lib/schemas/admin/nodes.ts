@@ -170,3 +170,8 @@ export type AdminNodeDevice = z.infer<typeof adminNodeDeviceSchema>;
 export type AdminNodeDatabaseHost = z.infer<typeof adminNodeDatabaseHostSchema>;
 export type AdminNodeDatabaseAgentHost = z.infer<typeof adminNodeDatabaseAgentHostSchema>;
 export type AdminNodeServerBackup = z.infer<typeof adminNodeServerBackupSchema>;
+
+export const adminNodeBandwidthSchema = z.object({
+  ready: z.boolean(),
+  reason: z.string().nullable(),
+});
