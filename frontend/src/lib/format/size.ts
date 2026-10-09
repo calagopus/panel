@@ -99,11 +99,10 @@ export function bestRateUnit(bits: number): RateUnit {
   return bits > 0 ? 'Kbps' : 'Mbps';
 }
 
-export function bitsPerSecondOfLimitToString(bits: number, limit: number): string {
-  const unit = bestRateUnit(limit);
-  const factor = rateUnitFactor(unit);
+export function bitsPerSecondToString(bits: number): string {
+  const unit = bits > 0 ? bestRateUnit(bits) : RATE_UNITS[0];
 
-  return `${Number((bits / factor).toFixed(1))} / ${Number((limit / factor).toFixed(2))} ${mapRateUnitToLocale(unit)}`;
+  return `${Number((bits / rateUnitFactor(unit)).toFixed(2))} ${mapRateUnitToLocale(unit)}`;
 }
 
 export function bestUnit(bytes: number, units: readonly Unit[] = UNITS): Unit {

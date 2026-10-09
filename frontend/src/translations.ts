@@ -5421,6 +5421,7 @@ const baseTranslations = defineTranslations({
             port: 'Port',
             networkIn: 'Network (In)',
             networkOut: 'Network (Out)',
+            networkDetails: '{total} total · {packets} pps',
             normalizeCpuLoad: 'Normalize CPU Load (shifted to max 100%)',
           },
           power: {

@@ -5383,6 +5383,7 @@
             "port": "Port",
             "networkIn": "Netzwerk (Eingehend)",
             "networkOut": "Netzwerk (Ausgehend)",
+            "networkDetails": "{total} gesamt · {packets} Pakete/s",
             "normalizeCpuLoad": "Normalisiere CPU-Last (skaliert auf max. 100%)"
           },
           "power": {

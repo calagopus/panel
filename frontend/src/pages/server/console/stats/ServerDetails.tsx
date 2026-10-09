@@ -14,7 +14,7 @@ import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import UserSettingScopeMenu from '@/elements/UserSettingScopeMenu.tsx';
 import { formatAllocation } from '@/lib/domain/server.ts';
-import { bitsPerSecondOfLimitToString, bytesToString, mbToBytes } from '@/lib/format/size.ts';
+import { bitsPerSecondToString, bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { formatMilliseconds } from '@/lib/format/time.ts';
 import { useUserSetting } from '@/lib/userSettings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -185,16 +185,22 @@ export default function ServerDetails() {
         value={
           state === 'offline' && server.status !== 'installing'
             ? t('common.enum.serverState.offline', {})
-            : bytesToString(stats?.network.rxBytes || 0)
+            : bitsPerSecondToString(networkSpeeds.rxBytesSpeed * 8)
+        }
+        limit={
+          server.limits.bandwidth.download !== 0
+            ? bitsPerSecondToString(server.limits.bandwidth.download)
+            : t('common.unlimited', {})
         }
         progress={state === 'offline' && server.status !== 'installing' ? null : networkSpeeds.rxBytesSpeed * 8}
         total={server.limits.bandwidth.download}
         details={
           state === 'offline' && server.status !== 'installing'
             ? null
-            : server.limits.bandwidth.download !== 0
-              ? `${bitsPerSecondOfLimitToString(networkSpeeds.rxBytesSpeed * 8, server.limits.bandwidth.download)}, ${Math.round(networkSpeeds.rxPacketsSpeed)} pps`
-              : `${bytesToString(Math.round(networkSpeeds.rxBytesSpeed), undefined, true)}/s, ${Math.round(networkSpeeds.rxPacketsSpeed)} pps`
+            : t('pages.server.console.details.networkDetails', {
+                total: bytesToString(stats?.network.rxBytes || 0),
+                packets: Math.round(networkSpeeds.rxPacketsSpeed),
+              })
         }
       />
       <StatCard
@@ -204,16 +210,22 @@ export default function ServerDetails() {
         value={
           state === 'offline' && server.status !== 'installing'
             ? t('common.enum.serverState.offline', {})
-            : bytesToString(stats?.network.txBytes || 0)
+            : bitsPerSecondToString(networkSpeeds.txBytesSpeed * 8)
+        }
+        limit={
+          server.limits.bandwidth.upload !== 0
+            ? bitsPerSecondToString(server.limits.bandwidth.upload)
+            : t('common.unlimited', {})
         }
         progress={state === 'offline' && server.status !== 'installing' ? null : networkSpeeds.txBytesSpeed * 8}
         total={server.limits.bandwidth.upload}
         details={
           state === 'offline' && server.status !== 'installing'
             ? null
-            : server.limits.bandwidth.upload !== 0
-              ? `${bitsPerSecondOfLimitToString(networkSpeeds.txBytesSpeed * 8, server.limits.bandwidth.upload)}, ${Math.round(networkSpeeds.txPacketsSpeed)} pps`
-              : `${bytesToString(Math.round(networkSpeeds.txBytesSpeed), undefined, true)}/s, ${Math.round(networkSpeeds.txPacketsSpeed)} pps`
+            : t('pages.server.console.details.networkDetails', {
+                total: bytesToString(stats?.network.txBytes || 0),
+                packets: Math.round(networkSpeeds.txPacketsSpeed),
+              })
         }
       />
       <ExtensionSlot

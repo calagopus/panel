@@ -6,8 +6,8 @@ import ChartLegend from '@/elements/charts/ChartLegend.tsx';
 import ChartSyncGroup from '@/elements/charts/ChartSyncGroup.tsx';
 import StreamChart from '@/elements/charts/StreamChart.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
-import { formatBytes, formatBytesRate, formatPercent, useStreamChart } from '@/lib/chart.ts';
-import { mbToBytes } from '@/lib/format/size.ts';
+import { formatBytes, formatPercent, useStreamChart } from '@/lib/chart.ts';
+import { bitsPerSecondToString, mbToBytes } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -39,8 +39,8 @@ export default function ServerStats() {
   });
   const network = useStreamChart({
     series: useMemo(() => [t('common.stat.outbound', {}), t('common.stat.inbound', {})], [t]),
-    format: formatBytesRate,
-    scale: 'binary',
+    format: bitsPerSecondToString,
+    min: 1000,
   });
 
   const offline = !stats?.state || (stats.state === 'offline' && server.status !== 'installing');
@@ -73,8 +73,8 @@ export default function ServerStats() {
     network.push(
       canCalculateRate
         ? [
-            (stats.network.txBytes - previous.tx) / elapsedSeconds,
-            (stats.network.rxBytes - previous.rx) / elapsedSeconds,
+            ((stats.network.txBytes - previous.tx) * 8) / elapsedSeconds,
+            ((stats.network.rxBytes - previous.rx) * 8) / elapsedSeconds,
           ]
         : [0, 0],
     );
