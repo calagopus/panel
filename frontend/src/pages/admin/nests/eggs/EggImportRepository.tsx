@@ -1,7 +1,7 @@
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
-import { Ref, useEffect, useState } from 'react';
+import { Ref, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
@@ -150,6 +150,7 @@ export default function EggImportRepository({
           <Select
             className='w-64 sm:w-80'
             placeholder={t('pages.admin.nests.tabs.eggs.page.importRepository.selectPlaceholder', {})}
+            autoComplete='off'
             data={eggRepositories.items.map((repo) => ({
               label: repo.name,
               value: repo.uuid,
@@ -157,6 +158,7 @@ export default function EggImportRepository({
             value={selectedRepositoryUuid}
             onChange={handleRepositoryChange}
             searchable
+            clearable
             searchValue={eggRepositories.search}
             onSearchChange={eggRepositories.setSearch}
             loading={eggRepositories.loading}
