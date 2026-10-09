@@ -94,6 +94,8 @@ nestify::nest! {
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct BandwidthStatus {
         #[schema(inline)]
+        pub enabled: bool,
+        #[schema(inline)]
         pub ready: bool,
         #[schema(inline)]
         pub reason: Option<compact_str::CompactString>,
@@ -3281,6 +3283,12 @@ pub mod system_config {
                     },
 
                     #[schema(inline)]
+                    pub bandwidth: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerBandwidth {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                    },
+
+                    #[schema(inline)]
                     pub domainname: compact_str::CompactString,
                     #[schema(inline)]
                     pub registries: IndexMap<compact_str::CompactString, serde_json::Value>,
@@ -3353,6 +3361,14 @@ pub mod system_config {
                         pub cooldown: u64,
                         #[schema(inline)]
                         pub max_concurrent: u64,
+                    },
+
+                    #[schema(inline)]
+                    pub lxcfs: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200DockerLxcfs {
+                        #[schema(inline)]
+                        pub enabled: bool,
+                        #[schema(inline)]
+                        pub directory: SystemPath,
                     },
 
                     #[schema(inline)]

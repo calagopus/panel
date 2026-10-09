@@ -3650,6 +3650,7 @@ const baseTranslations = defineTranslations({
                     download: 'Download Limit',
                     description: '0 will not set a limit.',
                     unavailable: 'The node does not support bandwidth limits.',
+                    disabled: 'Bandwidth limits are disabled in the node configuration.',
                   },
                   pinnedCpus: 'Pinned CPUs',
                   pinnedCpusDescription: 'The CPU cores this server is pinned to.',

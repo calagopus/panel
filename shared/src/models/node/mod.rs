@@ -849,10 +849,12 @@ impl Node {
         match status {
             Ok(Ok(status)) => status,
             Ok(Err(err)) => wings_api::BandwidthStatus {
+                enabled: false,
                 ready: false,
                 reason: Some(compact_str::format_compact!("unable to check wings: {err}")),
             },
             Err(_) => wings_api::BandwidthStatus {
+                enabled: false,
                 ready: false,
                 reason: Some("timed out checking wings".into()),
             },
@@ -864,17 +866,21 @@ impl Node {
         database: &crate::database::Database,
     ) -> Result<(), anyhow::Error> {
         let status = self.bandwidth_status(database).await;
-        if status.ready {
+        if status.enabled && status.ready {
             return Ok(());
         }
 
-        Err(crate::response::DisplayError::new(
+        let reason = if status.ready {
+            "bandwidth limits are disabled on this node".into()
+        } else {
             status
                 .reason
-                .unwrap_or_else(|| "node does not support bandwidth limits".into()),
-        )
-        .with_status(axum::http::StatusCode::CONFLICT)
-        .into())
+                .unwrap_or_else(|| "node does not support bandwidth limits".into())
+        };
+
+        Err(crate::response::DisplayError::new(reason)
+            .with_status(axum::http::StatusCode::CONFLICT)
+            .into())
     }
 
     /// What the node reports about its mesh daemon, `None` when it could not be reached in

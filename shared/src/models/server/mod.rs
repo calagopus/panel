@@ -2918,7 +2918,11 @@ impl UpdatableModel for Server {
         if options
             .limits
             .and_then(|limits| limits.bandwidth)
-            .is_some_and(|limits| limits.upload != 0 || limits.download != 0)
+            .is_some_and(|limits| {
+                (limits.upload != 0 || limits.download != 0)
+                    && (limits.upload as i64 != self.bandwidth_upload
+                        || limits.download as i64 != self.bandwidth_download)
+            })
         {
             self.node
                 .fetch_cached(&state.database)

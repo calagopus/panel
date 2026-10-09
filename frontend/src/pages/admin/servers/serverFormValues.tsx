@@ -189,12 +189,17 @@ function buildFeatureLimitsFields<T extends Record<string, unknown>>(t: TFunc): 
 
 function buildResourceLimitsFields<T extends Record<string, unknown>>(
   t: TFunc,
-  { swapAdvanced, bandwidth }: { swapAdvanced?: boolean; bandwidth?: { ready: boolean; reason: string | null } } = {},
+  {
+    swapAdvanced,
+    bandwidth,
+  }: { swapAdvanced?: boolean; bandwidth?: { enabled: boolean; ready: boolean; reason: string | null } } = {},
 ): FieldDef<T>[] {
   const bandwidthDescription =
-    !bandwidth || bandwidth.ready
+    !bandwidth || (bandwidth.enabled && bandwidth.ready)
       ? t('pages.admin.servers.tabs.general.page.form.bandwidth.description', {})
-      : (bandwidth.reason ?? t('pages.admin.servers.tabs.general.page.form.bandwidth.unavailable', {}));
+      : bandwidth.ready
+        ? t('pages.admin.servers.tabs.general.page.form.bandwidth.disabled', {})
+        : (bandwidth.reason ?? t('pages.admin.servers.tabs.general.page.form.bandwidth.unavailable', {}));
 
   return [
     {
