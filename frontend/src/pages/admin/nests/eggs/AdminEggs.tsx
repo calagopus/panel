@@ -1,4 +1,4 @@
-import { faChevronDown, faLink, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faDownload, faLink, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChangeEvent, Ref, useRef, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
@@ -27,6 +27,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 import EggActionBar from './EggActionBar.tsx';
 import EggCreateOrUpdate from './EggCreateOrUpdate.tsx';
+import EggImportRepository from './EggImportRepository.tsx';
 import EggRow from './EggRow.tsx';
 import EggImportUrlModal from './modals/EggImportUrlModal.tsx';
 
@@ -36,6 +37,7 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
   const { t } = useTranslations();
 
   const canCreate = useAdminCan('eggs.create');
+  const canReadRepositories = useAdminCan('egg-repositories.read');
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importUrlOpen, setImportUrlOpen] = useState(false);
@@ -129,6 +131,17 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
                 onClick: () => setImportUrlOpen(true),
                 color: 'gray',
               },
+              ...(canReadRepositories
+                ? [
+                    {
+                      type: 'action' as const,
+                      icon: faDownload,
+                      label: t('pages.admin.nests.tabs.eggs.page.button.fromEggRepositories', {}),
+                      onClick: () => navigate(`/admin/nests/${contextNest.uuid}/eggs/repository`),
+                      color: 'gray' as const,
+                    },
+                  ]
+                : []),
             ]}
           >
             {({ openMenu }) => (
@@ -210,10 +223,11 @@ export default function AdminEggs({ contextNest }: { contextNest: z.infer<typeof
   return (
     <Routes>
       <Route path='/' element={<EggsContainer contextNest={contextNest} />} />
-      <Route path='/:eggId/*' element={<EggView contextNest={contextNest} />} />
       <Route element={<AdminPermissionGuard permission='eggs.create' />}>
         <Route path='/new' element={<EggCreateOrUpdate contextNest={contextNest} />} />
+        <Route path='/repository' element={<EggImportRepository contextNest={contextNest} />} />
       </Route>
+      <Route path='/:eggId/*' element={<EggView contextNest={contextNest} />} />
     </Routes>
   );
 }

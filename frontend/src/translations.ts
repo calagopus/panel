@@ -3923,6 +3923,17 @@ const baseTranslations = defineTranslations({
                   fromFile: 'from File',
                   fromUrl: 'from URL',
                   fromRepository: 'from Repository',
+                  fromEggRepositories: 'from Egg Repositories',
+                },
+                importRepository: {
+                  title: 'Import Eggs from Repository',
+                  subtitle: 'Select an egg repository and choose eggs to import into this nest.',
+                  selectRepository: 'Egg Repository',
+                  selectPlaceholder: 'Select an egg repository...',
+                  noRepositories: 'No egg repositories found. Please configure an egg repository first.',
+                  goToRepositories: 'Go to Egg Repositories',
+                  importButton: 'Import {count} Egg(s)',
+                  importThisEgg: 'Import Egg',
                 },
                 toast: {
                   imported: 'Egg imported.',
