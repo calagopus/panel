@@ -1,0 +1,55 @@
+{
+  "account_created": {
+    "subject": "Účet vytvořen",
+    "greeting": "Dobrý den,",
+    "intro": "Obdrželi jste tento e-mail, protože pro vás byl vytvořen účet na <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Klikněte na tlačítko níže pro bezpečné nastavení hesla a přístup k účtu:",
+    "button": "Nastavte své heslo",
+    "note": "<strong>Poznámka:</strong> Z bezpečnostních důvodů vyprší platnost tohoto odkazu za <strong>20 minut</strong>.",
+    "footer": "Pokud jste o tento účet nepožádali, můžete bezpečně ignorovat tento e-mail."
+  },
+  "password_reset": {
+    "subject": "Obnovit heslo",
+    "greeting": "Dobrý den <strong>{{ user.username }}</strong>",
+    "intro": "Obdrželi jsme žádost o obnovení hesla k vašemu účtu na <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Pokud jste tuto žádost podali, klikněte na tlačítko níže a vyberte si nové heslo:",
+    "button": "Obnovit heslo",
+    "note": "<strong>Poznámka:</strong> Tento odkaz vyprší za <strong>20 minut</strong>.",
+    "footer": "Pokud jste nepožádali o obnovení hesla, ignorujte prosím tento e-mail. Vaše heslo zůstane nezměněno a váš účet v bezpečí."
+  },
+  "email_verification": {
+    "subject": "Ověřte svůj E-mail",
+    "greeting": "Dobrý den <strong>{{ user.username }}</strong>",
+    "intro": "Potvrďte, že <strong>{{ email }}</strong> patří k vám, abyste dokončili nastavení účtu na <strong>{{ settings.app.name }}</strong>.",
+    "button": "Ověřte email",
+    "note": "<strong>Poznámka:</strong> Tento odkaz vyprší za <strong>24 minut</strong>.",
+    "footer": "Pokud jste nevytvořili tento účet nebo nepožádali o tuto změnu, ignorujte prosím tento e-mail a nic se nezmění."
+  },
+  "two_factor_code": {
+    "subject": "Váš přihlašovací kód",
+    "greeting": "Dobrý den <strong>{{ user.username }}</strong>",
+    "intro": "Pomocí níže uvedeného kódu můžete dokončit přihlášení do <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Poznámka:</strong> Tento kód vyprší za <strong>10 minut</strong> a může být použit pouze jednou.",
+    "footer": "Pokud jste se nepokusili přihlásit, někdo jiný může znát vaše heslo. Doporučujeme ho co nejdříve změnit."
+  },
+  "session_created": {
+    "subject": "Nová relace byla vytvořena",
+    "greeting": "Dobrý den <strong>{{ user.username }}</strong>",
+    "intro": "Váš účet byl právě přihlášený na <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "IP adresa",
+    "device_label": "Zařízení",
+    "button": "Ohodnotit relaci",
+    "note": "<strong>Poznámka:</strong> Pokud jste to byli vy, není potřebná žádná akce. Můžete zrušit jakoukoliv relaci, kterou nepoznáváte v nastavení účtu.",
+    "footer": "Pokud jste se nepokusili přihlásit, někdo jiný může znát vaše heslo. Doporučujeme ho co nejdříve změnit."
+  },
+  "connection_test": {
+    "subject": "Test připojení",
+    "greeting": "Dobrý den,",
+    "intro": "Obdrželi jste tento e-mail, protože správce v <strong>{{ settings.app.name }}</strong> požádal o testovací zprávu k ověření nastavení odchozích e-mailů systému.",
+    "success": "🎉 Úspěch! Připojení e-mailu funguje.",
+    "footer": "Toto je automatizovaná testovací zpráva z vaší aplikace. Další akce není nutná."
+  },
+  "added_to_server": {
+    "subject": "Přidáno na server"
+  }
+}
