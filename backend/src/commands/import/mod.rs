@@ -248,6 +248,11 @@ fn decrypt_laravel_value(
     struct LaravelEncrypted {
         iv: compact_str::CompactString,
         value: compact_str::CompactString,
+        // Laravel >= 9.x defaults to AES-256-GCM, whose payload carries an
+        // authentication tag. Pterodactyl 1.x predates that and stores CBC
+        // payloads without a tag, so the field is optional and its PRESENCE
+        // selects the cipher rather than any configuration guess.
+        tag: Option<compact_str::CompactString>,
     }
 
     let payload: LaravelEncrypted = serde_json::from_slice(&decoded)?;
@@ -268,9 +273,33 @@ fn decrypt_laravel_value(
         ));
     };
 
-    let decrypted = cbc::Decryptor::<aes::Aes256>::new(key.into(), iv.into())
-        .decrypt_padded::<Pkcs7>(&mut value)
-        .map_err(|err| anyhow::anyhow!("AES-256-CBC decryption failed: {err}"))?;
+    let decrypted = if let Some(tag) = &payload.tag {
+        let decoded_tag = BASE64_ENGINE.decode(tag)?;
+        // AES-GCM tags are 16 bytes; Laravel stores the tag separately from
+        // the ciphertext, while the aes-gcm crate expects it appended. The
+        // length check keeps a malformed payload failing loudly here.
+        if decoded_tag.len() != 16 {
+            return Err(anyhow::anyhow!(
+                "GCM tag must be 16 bytes, got {}",
+                decoded_tag.len()
+            ));
+        }
+        value.extend_from_slice(&decoded_tag);
+        // AES-256-GCM (Laravel >= 9 default cipher).
+        use aes_gcm::{Aes256Gcm, KeyInit, aead::Aead, aead::Nonce};
+        let cipher = Aes256Gcm::new(key.into());
+        let nonce = Nonce::<Aes256Gcm>::from_slice(&decoded_iv);
+        cipher
+            .decrypt(nonce, value.as_slice())
+            .map_err(|err| anyhow::anyhow!("AES-256-GCM decryption failed: {err}"))?
+            .to_vec()
+    } else {
+        // AES-256-CBC (Pterodactyl 1.x and older Laravel).
+        cbc::Decryptor::<aes::Aes256>::new(key.into(), iv.into())
+            .decrypt_padded::<Pkcs7>(&mut value)
+            .map_err(|err| anyhow::anyhow!("AES-256-CBC decryption failed: {err}"))?
+            .to_vec()
+    };
 
     let result = compact_str::CompactString::from_utf8(decrypted)?;
 
