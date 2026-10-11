@@ -75,7 +75,6 @@ export default function OwnerCreateModal({ opened, onClose, initialSearch, onCre
   const fields = useUserFormFields({
     isRootAdmin,
     editingOtherUser: false,
-    isUpdate: false,
     languages,
     roles,
     canReadRoles,

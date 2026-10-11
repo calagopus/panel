@@ -40,7 +40,6 @@ export const userToFormValues = (user: z.infer<typeof adminFullUserSchema>): Par
 interface UserFormFieldsOptions {
   isRootAdmin: boolean;
   editingOtherUser: boolean;
-  isUpdate: boolean;
   languages: string[];
   roles: ReturnType<typeof useSearchableResource<z.infer<typeof roleSchema>>>;
   canReadRoles: boolean;
@@ -49,7 +48,6 @@ interface UserFormFieldsOptions {
 export function useUserFormFields({
   isRootAdmin,
   editingOtherUser,
-  isUpdate,
   languages,
   roles,
   canReadRoles,
@@ -107,7 +105,10 @@ export function useUserFormFields({
       type: 'password',
       name: 'password',
       label: t('common.form.password', {}),
-      props: { withAsterisk: !isUpdate, disabled: !isRootAdmin && editingOtherUser },
+      // The backend treats the password as optional on create (no password =
+      // sign-in via password-reset email or OAuth), so the field must not
+      // present itself as required with an asterisk (#248).
+      props: { disabled: !isRootAdmin && editingOtherUser },
     },
     {
       type: 'switch',

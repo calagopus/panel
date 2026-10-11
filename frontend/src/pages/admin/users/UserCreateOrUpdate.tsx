@@ -133,7 +133,6 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   const fields = useUserFormFields({
     isRootAdmin,
     editingOtherUser,
-    isUpdate: !!contextUser,
     languages,
     roles,
     canReadRoles,
