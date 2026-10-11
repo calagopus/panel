@@ -24,21 +24,23 @@ fn cbc_payload_shape_has_no_tag() {
     type Aes256CbcEnc = cbc::Encryptor<aes::Aes256>;
     type Aes256CbcDec = cbc::Decryptor<aes::Aes256>;
 
-    let mut buf = [0u8; 64];
+    let mut enc_buf = [0u8; 64];
     let ct = Aes256CbcEnc::new((&KEY).into(), &IV.into())
-        .encrypt_padded_b2b::<Pkcs7>(PLAINTEXT.as_bytes(), &mut buf)
-        .unwrap();
+        .encrypt_padded_b2b::<Pkcs7>(PLAINTEXT.as_bytes(), &mut enc_buf)
+        .unwrap()
+        .to_vec();
 
     let payload = serde_json::json!({
         "iv": b64(&IV),
-        "value": b64(ct),
+        "value": b64(&ct),
         "mac": "irrelevant",
     });
     assert!(payload.get("tag").is_none(), "CBC payload must have no tag");
 
     // And decrypt back through the same crate the importer uses.
+    let mut dec_buf = [0u8; 64];
     let pt = Aes256CbcDec::new((&KEY).into(), &IV.into())
-        .decrypt_padded_b2b::<Pkcs7>(ct, &mut buf)
+        .decrypt_padded_b2b::<Pkcs7>(&ct, &mut dec_buf)
         .unwrap();
     assert_eq!(pt, PLAINTEXT.as_bytes());
 }
