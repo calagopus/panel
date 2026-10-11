@@ -287,6 +287,12 @@ fn decrypt_laravel_value(
         value.extend_from_slice(&decoded_tag);
         // AES-256-GCM (Laravel >= 9 default cipher).
         use aes_gcm::{Aes256Gcm, KeyInit, aead::Aead, aead::Nonce};
+        if decoded_iv.len() != 12 {
+            return Err(anyhow::anyhow!(
+                "GCM IV must be 12 bytes, got {}",
+                decoded_iv.len()
+            ));
+        }
         let cipher = Aes256Gcm::new(key.into());
         let nonce = Nonce::<Aes256Gcm>::from_slice(&decoded_iv);
         cipher

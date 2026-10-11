@@ -13,6 +13,8 @@ const KEY: [u8; 32] = [
     26, 27, 28, 29, 30, 31,
 ];
 const IV: [u8; 16] = [0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+// GCM standard nonce is 12 bytes (that's what Laravel generates); CBC IV is 16.
+const GCM_NONCE: [u8; 12] = [0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const PLAINTEXT: &str = "secret-password";
 
 fn b64(data: &[u8]) -> String {
@@ -51,12 +53,12 @@ fn gcm_payload_shape_and_round_trip() {
     use aes_gcm::{Aes256Gcm, KeyInit};
 
     let cipher = Aes256Gcm::new((&KEY).into());
-    let nonce = Nonce::<Aes256Gcm>::from_slice(&IV);
+    let nonce = Nonce::<Aes256Gcm>::from_slice(&GCM_NONCE);
     let ct_with_tag = cipher.encrypt(nonce, PLAINTEXT.as_bytes()).unwrap();
     let (ct, tag) = ct_with_tag.split_at(ct_with_tag.len() - 16);
 
     let payload = serde_json::json!({
-        "iv": b64(&IV),
+        "iv": b64(&GCM_NONCE),
         "value": b64(ct),
         "tag": b64(tag),
         "mac": "irrelevant",
