@@ -5,8 +5,7 @@
 //! separate authentication tag. These tests pin both payload SHAPES and the
 //! GCM round trip through the same primitives the importer uses.
 
-use aes::cipher::{BlockEncrypt, KeyInit, generic_array::GenericArray};
-use aes_gcm::aead::Aead;
+use aes::cipher::{block_padding::Pkcs7, BlockModeDecrypt, BlockModeEncrypt, KeyIvInit};
 use base64::Engine;
 
 const KEY: [u8; 32] = [
@@ -22,44 +21,35 @@ fn b64(data: &[u8]) -> String {
 
 #[test]
 fn cbc_payload_shape_has_no_tag() {
-    // PKCS7 pad: plaintext is 15 bytes -> pad 1
-    let mut buf = PLAINTEXT.as_bytes().to_vec();
-    let pad = 16 - buf.len() % 16;
-    buf.extend(std::iter::repeat(pad as u8).take(pad));
+    type Aes256CbcEnc = cbc::Encryptor<aes::Aes256>;
+    type Aes256CbcDec = cbc::Decryptor<aes::Aes256>;
 
-    let mut cipher = cbc::Encryptor::<aes::Aes256>::new((&KEY).into(), &IV.into());
-    let mut ct = vec![0u8; buf.len()];
-    for (chunk, out) in buf.chunks(16).zip(ct.chunks_mut(16)) {
-        cipher.encrypt_block_b2b(
-            GenericArray::from_slice(chunk),
-            GenericArray::from_mut_slice(out),
-        );
-    }
+    let mut buf = [0u8; 64];
+    let ct = Aes256CbcEnc::new((&KEY).into(), &IV.into())
+        .encrypt_padded_b2b::<Pkcs7>(PLAINTEXT.as_bytes(), &mut buf)
+        .unwrap();
 
     let payload = serde_json::json!({
         "iv": b64(&IV),
-        "value": b64(&ct),
+        "value": b64(ct),
         "mac": "irrelevant",
     });
     assert!(payload.get("tag").is_none(), "CBC payload must have no tag");
 
     // And decrypt back through the same crate the importer uses.
-    let mut dec = vec![0u8; ct.len()];
-    let mut d = cbc::Decryptor::<aes::Aes256>::new((&KEY).into(), &IV.into());
-    for (chunk, out) in ct.chunks(16).zip(dec.chunks_mut(16)) {
-        d.decrypt_block_b2b(
-            GenericArray::from_slice(chunk),
-            GenericArray::from_mut_slice(out),
-        );
-    }
-    let unpadded_len = dec.len() - *dec.last().unwrap() as usize;
-    assert_eq!(&dec[..unpadded_len], PLAINTEXT.as_bytes());
+    let pt = Aes256CbcDec::new((&KEY).into(), &IV.into())
+        .decrypt_padded_b2b::<Pkcs7>(ct, &mut buf)
+        .unwrap();
+    assert_eq!(pt, PLAINTEXT.as_bytes());
 }
 
 #[test]
 fn gcm_payload_shape_and_round_trip() {
-    let cipher = aes_gcm::Aes256Gcm::new((&KEY).into());
-    let nonce = aes_gcm::aead::Nonce::<aes_gcm::Aes256Gcm>::from_slice(&IV);
+    use aes_gcm::aead::{Aead, Nonce};
+    use aes_gcm::{Aes256Gcm, KeyInit};
+
+    let cipher = Aes256Gcm::new((&KEY).into());
+    let nonce = Nonce::<Aes256Gcm>::from_slice(&IV);
     let ct_with_tag = cipher.encrypt(nonce, PLAINTEXT.as_bytes()).unwrap();
     let (ct, tag) = ct_with_tag.split_at(ct_with_tag.len() - 16);
 
@@ -71,7 +61,7 @@ fn gcm_payload_shape_and_round_trip() {
     });
     assert!(payload.get("tag").is_some(), "GCM payload must carry a tag");
 
-    // Round trip through the same primitives the importer uses: tag is
+    // Round trip through the same primitives the importer uses: the tag is
     // appended back onto the ciphertext before decrypting.
     let mut value = base64::engine::general_purpose::STANDARD
         .decode(payload["value"].as_str().unwrap())
