@@ -1,4 +1,6 @@
+import { join } from 'pathe';
 import picomatch from 'picomatch';
+import type { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
 
 /**
  * A subuser ignore list with the matching rules wings applies, mirrored from
@@ -78,8 +80,11 @@ function compileGlob(line: string): Glob | null {
     actual = `${actual}/*`;
   }
 
+  // Gitignore treats parentheses and pipes as literal characters.
+  actual = actual.replace(/\\.|[()|]/g, (part) => (part.length === 1 ? `\\${part}` : part));
+
   try {
-    return { matches: picomatch(actual, { dot: true }), negated, dirOnly };
+    return { matches: picomatch(actual, { dot: true, noext: true }), negated, dirOnly };
   } catch {
     return null;
   }
@@ -121,7 +126,7 @@ export function compileIgnoreList(lines: string[]): IgnoreList | null {
 
     const negated = trimmed.startsWith('!') ? '!' : '';
     const body = negated ? trimmed.slice(1) : trimmed;
-    if (body.length === 0) continue;
+    if (body.length === 0 || /^\/+$/.test(body)) continue;
 
     const glob = compileGlob(trimmed);
     if (!glob) return null;
@@ -185,4 +190,42 @@ export function compileIgnoreList(lines: string[]): IgnoreList | null {
     },
     isIgnored: (path, isDir) => excluded(normalize(path), isDir),
   };
+}
+
+export async function countIgnoreMatches(
+  pattern: string,
+  limit: number,
+  loadDirectory: (path: string, page: number) => Promise<DirectoryResponse>,
+  signal?: AbortSignal,
+): Promise<number> {
+  pattern = pattern.trim();
+  if (!pattern || pattern.startsWith('#') || pattern.startsWith('!') || limit <= 0) return 0;
+
+  const list = compileIgnoreList([pattern]);
+  if (!list) throw new Error('Invalid ignore pattern');
+
+  const directories = ['/'];
+  let count = 0;
+
+  for (let index = 0; index < directories.length; index++) {
+    for (let page = 1; ; page++) {
+      signal?.throwIfAborted();
+      const { entries } = await loadDirectory(directories[index], page);
+      signal?.throwIfAborted();
+
+      for (const entry of entries.data) {
+        const path = join(directories[index], entry.name);
+        if (list.isIgnored(path, entry.directory)) {
+          count++;
+          if (count >= limit) return count;
+        }
+
+        if (entry.directory && !entry.symlink) directories.push(path);
+      }
+
+      if (page * entries.perPage >= entries.total) break;
+    }
+  }
+
+  return count;
 }

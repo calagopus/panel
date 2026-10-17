@@ -1,10 +1,10 @@
 import { faBan, faCheck, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Input, Text } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { ReactNode, RefObject, useEffect, useMemo, useRef, useState } from 'react';
-import searchFiles from '@/api/server/files/searchFiles.ts';
+import loadDirectory from '@/api/server/files/loadDirectory.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import IgnoredFilesBrowser from '@/elements/files/IgnoredFilesBrowser.tsx';
@@ -12,6 +12,7 @@ import Switch from '@/elements/input/Switch.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
+import { countIgnoreMatches } from '@/lib/files/ignoreList.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,26 +37,26 @@ function unanchoredExceptions(patterns: string[]): string[] {
   ];
 }
 
-function includeGlobs(pattern: string): string[] {
-  const base = pattern.replace(/\/+$/, '') || pattern;
-  return [pattern, `${base}/**`];
-}
-
 function MatchIndicator({ serverUuid, pattern, enabled }: { serverUuid: string; pattern: string; enabled: boolean }) {
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
   const maxResults = useGlobalStore((state) => state.settings.server.maxFileManagerSearchResults);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.server(serverUuid).files.ignoreMatches(pattern),
-    queryFn: async () => {
-      const { entries } = await searchFiles(serverUuid, {
-        root: '/',
-        pathFilter: { include: includeGlobs(pattern), exclude: [], caseInsensitive: false },
-        sizeFilter: null,
-        contentFilter: null,
-      });
-      return entries;
-    },
+  const { data, isFetching, isError } = useQuery({
+    queryKey: queryKeys.server(serverUuid).files.ignoreMatches(pattern, maxResults),
+    queryFn: ({ signal }) =>
+      countIgnoreMatches(
+        pattern,
+        maxResults,
+        (path, page) =>
+          queryClient.fetchQuery({
+            queryKey: queryKeys.server(serverUuid).files.ignoreMatchDirectory(path, page),
+            queryFn: () => loadDirectory(serverUuid, path, page, 'name_asc'),
+            staleTime: 60_000,
+            retry: false,
+          }),
+        signal,
+      ),
     enabled,
     staleTime: 60_000,
     retry: false,
@@ -65,21 +66,29 @@ function MatchIndicator({ serverUuid, pattern, enabled }: { serverUuid: string; 
     return <Spinner size={10} />;
   }
 
-  if (!data) {
+  if (isError) {
+    return (
+      <Text size='xs' c='yellow'>
+        {t('common.alert.error', {})}
+      </Text>
+    );
+  }
+
+  if (data === undefined) {
     return null;
   }
 
   return (
     <>
       <FontAwesomeIcon
-        icon={data.length === 0 ? faTriangleExclamation : faCheck}
-        className={data.length === 0 ? 'text-(--mantine-color-yellow-filled)' : 'text-(--mantine-color-green-filled)'}
+        icon={data === 0 ? faTriangleExclamation : faCheck}
+        className={data === 0 ? 'text-(--mantine-color-yellow-filled)' : 'text-(--mantine-color-green-filled)'}
       />
       <Text size='xs' c='dimmed' truncate>
-        {data.length === 0
+        {data === 0
           ? t('common.elements.ignoredFilesInput.noMatches', {})
           : t('common.elements.ignoredFilesInput.matches', {
-              count: data.length >= maxResults ? `${maxResults}+` : data.length,
+              count: data >= maxResults ? `${maxResults}+` : data,
             })}
       </Text>
     </>
@@ -113,7 +122,7 @@ function MatchGutter({
 
           return (
             <div key={index} className='flex items-center gap-1.5 px-2 overflow-hidden' style={{ height: LINE_HEIGHT }}>
-              {!pattern || !settled ? null : pattern.startsWith('!') ? (
+              {!pattern || pattern.startsWith('#') || !settled ? null : pattern.startsWith('!') ? (
                 <>
                   <FontAwesomeIcon icon={faBan} className='text-(--mantine-color-dimmed)' />
                   <Text size='xs' c='dimmed' truncate>
