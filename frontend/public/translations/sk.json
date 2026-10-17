@@ -3318,7 +3318,6 @@
             },
             "deleteFile": {
               "title": "Odstrániť súbor",
-              "singleFileWarning": "Po odstránení už nebudete môcť obnoviť obsah {file}.",
               "multipleFilesWarning": "Po odstránení už nebudete môcť obnoviť obsah nasledujúcich súborov."
             },
             "createFile": {

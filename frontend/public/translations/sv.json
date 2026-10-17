@@ -1213,7 +1213,6 @@
             },
             "deleteFile": {
               "title": "Ta bort fil",
-              "singleFileWarning": "Du kommer inte att kunna återställa innehållet i {file} efter borttagning.",
               "multipleFilesWarning": "Du kommer inte att kunna återställa innehållet i följande filer efter borttagning."
             },
             "createFile": {

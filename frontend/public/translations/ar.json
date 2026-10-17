@@ -1197,7 +1197,6 @@
             },
             "deleteFile": {
               "title": "حذف الملف",
-              "singleFileWarning": "لن تتمكن من استعادة محتويات {file} بمجرد حذفها.",
               "multipleFilesWarning": "لن تتمكن من استعادة محتويات الملفات التالية بمجرد حذفها."
             },
             "createFile": {

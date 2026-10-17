@@ -4052,8 +4052,7 @@
                 "titleUpdate": "Actualizar configuración del huevo",
                 "form": {
                   "order": "Orden",
-                  "eggsPlaceholder": "Seleccionar huevos",
-                  "eggsEmpty": "No hay huevos configurados. Crea un nido y un huevo antes de crear una configuración de huevo."
+                  "eggsPlaceholder": "Seleccionar huevos"
                 },
                 "enum": {
                   "deploymentType": {
@@ -4633,7 +4632,6 @@
                   "scopes": "Ámbitos (scopes)",
                   "scopesDescription": "Ámbitos (scopes) OAuth que deben haber sido coincididos para que esta coincidencia se cumpla.",
                   "path": "Ruta del campo",
-                  "pathDescription": "La ruta utilizada para extraer el campo que se va a comparar de la respuesta de la URL de información (https://serdejsonpath.live).",
                   "equals": "Igual a",
                   "contains": "Contiene",
                   "startsWith": "Empieza por",
@@ -5607,7 +5605,6 @@
             },
             "deleteFile": {
               "title": "Eliminar archivo",
-              "singleFileWarning": "No podrás recuperar el contenido de {file} una vez eliminado.",
               "multipleFilesWarning": "No podrás recuperar el contenido de los siguientes archivos una vez eliminados."
             },
             "createFile": {

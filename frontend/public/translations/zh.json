@@ -3360,8 +3360,7 @@
                 "titleUpdate": "更新 Egg 設定",
                 "form": {
                   "order": "順序",
-                  "eggsPlaceholder": "選取 Egg",
-                  "eggsEmpty": "尚未設定任何 Egg。請先建立 Nest 與 Egg,再建立 Egg 設定。"
+                  "eggsPlaceholder": "選取 Egg"
                 },
                 "enum": {
                   "deploymentType": {
@@ -3907,7 +3906,6 @@
                   "scopes": "範圍",
                   "scopesDescription": "此對應套用所需的 OAuth 範圍。",
                   "path": "欄位路徑",
-                  "pathDescription": "用於從資訊 URL 回應中擷取比對欄位的路徑(https://serdejsonpath.live)。",
                   "equals": "等於",
                   "contains": "包含",
                   "startsWith": "開頭為",
@@ -4672,7 +4670,6 @@
             },
             "deleteFile": {
               "title": "刪除檔案",
-              "singleFileWarning": "刪除後將無法復原 {file} 的內容。",
               "multipleFilesWarning": "刪除後將無法復原以下檔案的內容。"
             },
             "createFile": {

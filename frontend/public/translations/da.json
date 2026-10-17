@@ -143,6 +143,69 @@
       "few": "{count} sessioner",
       "many": "{count} sessioner",
       "other": "{count} sessioner"
+    },
+    "serverAllocation": {
+      "zero": "{count} Allokeringer",
+      "one": "{count} Allokering",
+      "two": "{count} Allokeringer",
+      "few": "{count} Allokeringer",
+      "many": "{count} Allokeringer",
+      "other": "{count} Allokeringer"
+    },
+    "database": {
+      "zero": "{count} Databaser",
+      "two": "{count} Databaser",
+      "few": "{count} Databaser",
+      "many": "{count} Databaser",
+      "other": "{count} Databaser"
+    },
+    "databaseInstance": {
+      "zero": "{count} Administrerede Databaser",
+      "one": "{count} Administreret Database",
+      "two": "{count} Administrerede Databaser",
+      "few": "{count} Administrerede Databaser",
+      "many": "{count} Administrerede Databaser",
+      "other": "{count} Administrerede Databaser"
+    },
+    "schedule": {
+      "zero": "{count} Tidsplaner",
+      "one": "{count} Tidsplan",
+      "two": "{count} Tidsplaner",
+      "few": "{count} Tidsplaner",
+      "many": "{count} Tidsplaner",
+      "other": "{count} Tidsplaner"
+    },
+    "subuser": {
+      "zero": "{count} Underbrugere",
+      "one": "{count} Underbruger",
+      "two": "{count} Underbrugere",
+      "few": "{count} Underbrugere",
+      "many": "{count} Underbrugere",
+      "other": "{count} Underbrugere"
+    },
+    "mount": {
+      "zero": "{count} Monteringer",
+      "one": "{count} Montering",
+      "two": "{count} Monteringer",
+      "few": "{count} Monteringer",
+      "many": "{count} Monteringer",
+      "other": "{count} Monteringer"
+    },
+    "device": {
+      "zero": "{count} Enheder",
+      "one": "{count} Enhed",
+      "two": "{count} Enheder",
+      "few": "{count} Enheder",
+      "many": "{count} Enheder",
+      "other": "{count} Enheder"
+    },
+    "apiKey": {
+      "zero": "{count} API-nøgler",
+      "one": "{count} API-nøgle",
+      "two": "{count} API-nøgler",
+      "few": "{count} API-nøgler",
+      "many": "{count} API-nøgler",
+      "other": "{count} API-nøgler"
     }
   },
   "translations": {
@@ -200,7 +263,8 @@
         "error": "Fejl",
         "warning": "Advarsel",
         "success": "Succes",
-        "clockOffset": "Dit systems ur afviger mere end 5 sekunder fra serverens ur. Dette kan medføre problemer med godkendelse via adgangsnøgle og tofaktorautentificering. Synkroniser venligst dit ur, hvis der opstår problemer. Aktuel afvigelse: {offset} sekund(er)."
+        "clockOffset": "Dit systems ur afviger mere end 5 sekunder fra serverens ur. Dette kan medføre problemer med godkendelse via adgangsnøgle og tofaktorautentificering. Synkroniser venligst dit ur, hvis der opstår problemer. Aktuel afvigelse: {offset} sekund(er).",
+        "passwordAuthUnavailable": "Din adgangskode vil ikke virke for denne forbindelse. Brug i stedet en SSH-nøgle, du kan tilføje en på SSH-nøgler-siden på din konto."
       },
       "divider": {
         "or": "ELLER"
@@ -227,13 +291,18 @@
           "notFound": "Der findes endnu ingen fil med dette navn.",
           "isDirectory": "Dette er en mappe, ikke en fil."
         },
+        "nodeAllocationIpInput": {
+          "anyAddress": "Alle adresser",
+          "inUse": "I Brug"
+        },
         "ignoredFilesInput": {
           "onePatternPerLine": "Et mønster pr. linje.",
           "countMatches": "Antal Matcher",
           "matches": "{count} matches",
           "noMatches": "Ingen match",
           "exception": "Undtagelse",
-          "tooManyPatterns": "Matchning tælles ikke automatisk for mere end {max} mønstre."
+          "tooManyPatterns": "Matchning tælles ikke automatisk for mere end {max} mønstre.",
+          "unanchoredException": "`{pattern}` matcher i alle dybder, brug `{anchored}` for kun at matche det i rodmappen."
         },
         "cronInput": {
           "segments": {
@@ -258,7 +327,11 @@
           "daily": "Behold dagligt",
           "weekly": "Behold ugentligt",
           "monthly": "Behold månedligt",
-          "yearly": "Behold årligt"
+          "yearly": "Behold årligt",
+          "status": {
+            "locked": "Låst",
+            "indefinite": "Beholdt i uendelig tid"
+          }
         }
       },
       "modal": {
@@ -417,6 +490,14 @@
           "template": "Skabelon"
         }
       },
+      "bulkActions": {
+        "verb": {
+          "started": "startet",
+          "stopped": "stoppet",
+          "restarted": "genstartet",
+          "killed": "dræbt"
+        }
+      },
       "tabs": {
         "general": "Generelt"
       },
@@ -429,7 +510,8 @@
         "inbound": "Indgående",
         "outbound": "Udgående",
         "uptime": "Oppetid",
-        "resources": "Ressourcer"
+        "resources": "Ressourcer",
+        "limit": "Grænse {limit}"
       },
       "badge": {
         "active": "Aktiv",
@@ -445,7 +527,27 @@
         "page": "Side {page}",
         "emptyDirectory": "Denne mappe er tom",
         "ignored": "Ignoreret",
+        "partiallyIgnored": "Delvist ignoreret",
         "showingFirstEntries": "Viser de første {count} poster"
+      },
+      "databaseAgentHost": {
+        "deployment": {
+          "nearlyFull": "Næsten Fuld",
+          "full": "Ingen Kapacitet",
+          "maintenance": "Under Vedligeholdelse",
+          "typesDisabled": "Ingen Typer Aktiverede",
+          "memoryUsage": "Hukommelse: {used} / {limit}",
+          "memoryUsageUnlimited": "Hukommelse: {used} brugt, ingen værts-begrænsning",
+          "diskUsageUnlimited": "Disk: {used} brugt, ingen værts-begrænsning"
+        }
+      },
+      "node": {
+        "deployment": {
+          "nearlyFull": "Næsten Fuld",
+          "full": "Ingen Kapacitet",
+          "maintenance": "Under Vedligeholdelse",
+          "memoryUsage": "Hukommelse: {used} / {limit}"
+        }
       },
       "server": {
         "noAllocation": "Ingen allokering",
@@ -456,7 +558,8 @@
           "restoringBackup": "Gendanner backup",
           "installing": "Installerer",
           "installFailed": "Installation mislykkedes",
-          "backupRestoreFailed": "Gendannelse af backup mislykkedes"
+          "backupRestoreFailed": "Gendannelse af backup mislykkedes",
+          "resourcesUnavailable": "Ressourceforbrug Ikke Tilgængeligt"
         }
       },
       "enum": {
@@ -481,6 +584,14 @@
           "starting": "Starter",
           "finished": "Færdig",
           "failed": "Mislykket"
+        },
+        "backupRetentionRule": {
+          "count": "Seneste",
+          "days": "Nyligt",
+          "daily": "Dagligt",
+          "weekly": "Ugentligt",
+          "monthly": "Månedligt",
+          "yearly": "Årligt"
         },
         "serverFirewallRuleAction": {
           "allow": "Tillad",
@@ -522,6 +633,12 @@
       "impersonatedBy": "Impersoneret af {username}"
     },
     "elements": {
+      "lockedConfigPaths": {
+        "notice": "Disse indstillinger kan kun ændres i konfigurationsfilen på selve maskinen. Panelet ignorerer ændringer til dem:",
+        "toast": {
+          "ignored": "Konfiguration anvendt, med undtagelse af disse indstillinger, som kun kan ændres i konfigurationsfilen på selve maskinen: {paths}"
+        }
+      },
       "chartLegend": {
         "hide": "Skjul {series}",
         "show": "Vis {series}"
@@ -546,6 +663,7 @@
           "divider": "Skillelinje"
         },
         "empty": "Ingen ruter konfigureret. Tilføj ruter, skillelinjer eller redirects nedenfor.",
+        "missingRoutes": "Følgende sider mangler i denne rutekonfiguration og vil være utilgængelige for brugere: {routes}.",
         "unnamed": "(unavngivet)",
         "dividerPlaceholder": "Tekst til skillelinje (valgfri)",
         "redirectNamePlaceholder": "Navn på redirect",
@@ -601,6 +719,7 @@
           "theme": "Tema",
           "themeDark": "Mørkt",
           "themeLight": "Lyst",
+          "redactAddresses": "Skjul Adresser",
           "resetDeviceOverrides": "Nulstil enhedens overrides ({count})"
         },
         "modal": {
@@ -802,14 +921,23 @@
         "reselect": "Vælg filen igen for at genoptage",
         "badge": {
           "uploading": "Uploader",
+          "uploadingPercent": "Uploader {percent}%",
           "waiting": "Venter",
-          "paused": "Pauset"
+          "paused": "Pauset",
+          "incomplete": "Ikke fuldført"
         },
         "rateLimited": "Din upload er blevet rate limited. Venter...",
         "cancelAllUploads": "Annuller alle uploads",
         "modal": {
           "cancelAllUploads": {
             "content": "Er du sikker på, at du vil annullere alle aktive uploads? Delvist uploadede filer bliver kasseret."
+          },
+          "uploadConflict": {
+            "title": "Løs Uploadkonflikter",
+            "description": "Følgende {items} findes allerede i `{directory}`.",
+            "alsoUploading": "{files} uden konflikter vil uploades alligevel.",
+            "source": "Valgt",
+            "selectedFolder": "Indeholder {files}."
           }
         },
         "toast": {
@@ -3574,8 +3702,7 @@
                 "titleUpdate": "Opdater egg-konfiguration",
                 "form": {
                   "order": "Rækkefølge",
-                  "eggsPlaceholder": "Vælg eggs",
-                  "eggsEmpty": "Der er ingen eggs konfigureret. Opret et nest og et egg, før du opretter en egg-konfiguration."
+                  "eggsPlaceholder": "Vælg eggs"
                 },
                 "enum": {
                   "deploymentType": {
@@ -4121,7 +4248,6 @@
                   "matcherType": "Matcher-type",
                   "scopesDescription": "OAuth-scopes, der alle skal være tildelt, for at denne matcher matcher.",
                   "path": "Feltsti",
-                  "pathDescription": "Stien, der bruges til at udtrække det sammenlignede felt fra svaret fra Info-URL'en (https://serdejsonpath.live).",
                   "equals": "Er lig med",
                   "contains": "Indeholder",
                   "startsWith": "Starter med",
@@ -4970,7 +5096,6 @@
             },
             "deleteFile": {
               "title": "Slet fil",
-              "singleFileWarning": "Du kan ikke gendanne indholdet af {file}, når den er slettet.",
               "multipleFilesWarning": "Du kan ikke gendanne indholdet af følgende filer, når de er slettet."
             },
             "createFile": {

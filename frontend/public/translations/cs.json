@@ -66,9 +66,72 @@
     },
     "databaseAgentHost": {
       "zero": "{count} hostitelů databázových agentů",
-      "one": "{count} hostitel databázového agenta"
+      "one": "{count} hostitel databázového agenta",
+      "two": "{count} hostitelů databázových agentů",
+      "few": "{count} hostitelů databázových agentů",
+      "many": "{count} hostitelů databázových agentů",
+      "other": "{count} hostitelů databázových agentů"
+    },
+    "allocation": {
+      "zero": "{count} Alokace uzlů",
+      "one": "{count} Alokace uzlů",
+      "two": "{count} Alokace uzlů",
+      "few": "{count} Alokace uzlů",
+      "many": "{count} Alokace uzlů",
+      "other": "{count} Alokace uzlů"
+    },
+    "egg": {
+      "zero": "{count} Vejce",
+      "one": "{count} Vejce",
+      "two": "{count} Vejce",
+      "few": "{count} Vejce",
+      "many": "{count} Vejce",
+      "other": "{count} Vejce"
+    },
+    "instance": {
+      "zero": "{count} Instance",
+      "two": "{count} Instance",
+      "few": "{count} Instance",
+      "many": "{count} Instance",
+      "other": "{count} Instance"
+    },
+    "shortcut": {
+      "zero": "{count} Zkratky",
+      "one": "{count} Zkratka",
+      "two": "{count} Zkratky",
+      "few": "{count} Zkratky",
+      "many": "{count} Zkratky",
+      "other": "{count} Zkratky"
+    },
+    "line": {
+      "zero": "{count} Řádků",
+      "one": "{count} Řádek",
+      "two": "{count} Řádků",
+      "few": "{count} Řádků",
+      "many": "{count} Řádků",
+      "other": "{count} Řádků"
+    },
+    "header": {
+      "zero": "{count} Záhlaví",
+      "one": "{count} Záhlaví",
+      "two": "{count} Záhlaví",
+      "few": "{count} Záhlaví",
+      "many": "{count} Záhlaví",
+      "other": "{count} Záhlaví"
+    },
+    "backup": {
+      "zero": "{count} Zálohy",
+      "one": "{count} Záloha",
+      "two": "{count} Zálohy",
+      "few": "{count} Zálohy",
+      "many": "{count} Zálohy",
+      "other": "{count} Zálohy"
     },
     "row": {
+      "zero": "{count} řádků",
+      "one": "{count} Řádek",
+      "two": "{count} řádků",
+      "few": "{count} řádků",
       "many": "{count} řádku",
       "other": "{count} řádků"
     },
@@ -87,6 +150,14 @@
       "few": "{count} relace",
       "many": "{count} relace",
       "other": "{count} relací"
+    },
+    "serverAllocation": {
+      "zero": "{count} alokací",
+      "one": "{count} Alokace",
+      "two": "{count} Alokace"
+    },
+    "oauthLink": {
+      "other": "{count} Propojené účty"
     }
   },
   "translations": {

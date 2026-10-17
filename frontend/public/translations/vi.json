@@ -3904,8 +3904,7 @@
                 "titleUpdate": "Cập Nhật Cấu Hình Egg",
                 "form": {
                   "order": "Thứ Tự",
-                  "eggsPlaceholder": "Chọn Egg",
-                  "eggsEmpty": "Chưa cấu hình egg nào. Hãy tạo một nest và egg trước khi tạo cấu hình egg."
+                  "eggsPlaceholder": "Chọn Egg"
                 },
                 "enum": {
                   "deploymentType": {
@@ -4479,7 +4478,6 @@
                   "scopes": "Phạm Vi",
                   "scopesDescription": "Phạm vi OAuth cần thiết để ánh xạ này áp dụng.",
                   "path": "Đường dẫn trường dữ liệu",
-                  "pathDescription": "Đường dẫn dùng để trích xuất email từ phản hồi URL Thông Tin (https://serdejsonpath.live).",
                   "equals": "Bằng",
                   "startsWith": "Bắt đầu với",
                   "endsWith": "Kết thúc với",
@@ -5365,7 +5363,6 @@
             },
             "deleteFile": {
               "title": "Xóa Tệp",
-              "singleFileWarning": "Bạn sẽ không thể khôi phục nội dung của {file} sau khi xóa.",
               "multipleFilesWarning": "Bạn sẽ không thể khôi phục nội dung của các tệp sau đây sau khi xóa."
             },
             "createFile": {

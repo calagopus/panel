@@ -3559,7 +3559,6 @@
             },
             "deleteFile": {
               "title": "Supprimer fichier",
-              "singleFileWarning": "Vous ne pourrez plus récupérer le contenu de {file} une fois supprimé.",
               "multipleFilesWarning": "Vous ne serez plus en mesure de récupérer le contenu des fichiers suivants une fois supprimés."
             },
             "createFile": {

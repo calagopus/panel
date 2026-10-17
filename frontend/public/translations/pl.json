@@ -3004,7 +3004,6 @@
             },
             "deleteFile": {
               "title": "Usuń Plik",
-              "singleFileWarning": "Nie będziesz w stanie odzyskać zawartości {file} po usunięciu.",
               "multipleFilesWarning": "Nie będziesz w stanie odzyskać zawartości następujących plików po usunięciu."
             },
             "createFile": {

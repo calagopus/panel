@@ -1196,7 +1196,6 @@
             },
             "deleteFile": {
               "title": "Dosyayı Sil",
-              "singleFileWarning": "{file} içeriğini sildikten sonra geri kurtaramazsınız.",
               "multipleFilesWarning": "Aşağıdaki dosyaların içeriğini sildikten sonra geri kurtaramazsınız."
             },
             "createFile": {
