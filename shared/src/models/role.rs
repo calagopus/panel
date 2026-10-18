@@ -96,6 +96,22 @@ impl BaseModel for Role {
 }
 
 impl Role {
+    async fn user_uuids(
+        &self,
+        database: &crate::database::Database,
+    ) -> Result<Vec<uuid::Uuid>, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT users.uuid
+            FROM users
+            WHERE users.role_uuid = $1
+            "#,
+        )
+        .bind(self.uuid)
+        .fetch_all(database.read())
+        .await
+    }
+
     pub async fn all_with_pagination(
         database: &crate::database::Database,
         page: i64,
@@ -295,6 +311,46 @@ impl UpdatableModel for Role {
         &UPDATE_LISTENERS
     }
 
+    async fn update(
+        &mut self,
+        state: &crate::State,
+        options: Self::UpdateOptions,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let access_changed = options
+            .admin_permissions
+            .as_ref()
+            .is_some_and(|permissions| permissions != self.admin_permissions.as_ref())
+            || options
+                .server_permissions
+                .as_ref()
+                .is_some_and(|permissions| permissions != self.server_permissions.as_ref());
+
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .update_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        if access_changed {
+            match self.user_uuids(&state.database).await {
+                Ok(user_uuids) => {
+                    super::node::Node::deauthorize_users_everywhere(&state.database, user_uuids);
+                }
+                Err(err) => {
+                    tracing::error!(role = %self.uuid, "failed to deauthorize role users in wings: {:?}", err);
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     async fn update_with_transaction(
         &mut self,
         state: &crate::State,
@@ -352,6 +408,30 @@ impl DeletableModel for Role {
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &DELETE_LISTENERS
+    }
+
+    async fn delete(
+        &self,
+        state: &crate::State,
+        options: Self::DeleteOptions,
+    ) -> Result<(), anyhow::Error> {
+        let user_uuids = self.user_uuids(&state.database).await?;
+
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .delete_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        super::node::Node::deauthorize_users_everywhere(&state.database, user_uuids);
+
+        Ok(())
     }
 
     async fn delete_with_transaction(

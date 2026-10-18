@@ -2,7 +2,7 @@ use clap::{Args, FromArgMatches};
 use colored::Colorize;
 use compact_str::ToCompactString;
 use dialoguer::{Input, Password, theme::ColorfulTheme};
-use shared::models::ByUuid;
+use shared::models::{ByUuid, node::Node};
 use std::io::IsTerminal;
 
 #[derive(Args)]
@@ -79,6 +79,7 @@ impl shared::extensions::commands::CliCommand<ResetPasswordArgs> for ResetPasswo
 
                 user.update_password(&state.database, Some(&password))
                     .await?;
+                Node::deauthorize_users_everywhere(&state.database, vec![user.uuid]).await?;
 
                 eprintln!(
                     "password has been reset for the user {}",

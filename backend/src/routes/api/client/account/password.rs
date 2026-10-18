@@ -8,6 +8,7 @@ mod put {
     use shared::{
         ApiError, GetState,
         models::{
+            node::Node,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
         },
@@ -64,6 +65,7 @@ mod put {
 
         user.update_password(&state.database, Some(&data.new_password))
             .await?;
+        Node::deauthorize_users_everywhere(&state.database, vec![user.uuid]);
 
         activity_logger
             .log("account:password-changed", serde_json::json!({}))

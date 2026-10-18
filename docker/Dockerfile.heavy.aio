@@ -2,7 +2,7 @@ ARG WINGS_SOURCE=release
 
 FROM node:24-slim AS node_source
 
-FROM ghcr.io/calagopus/wings:latest AS wings-release-image
+FROM ghcr.io/calagopus/wings:1.1.6 AS wings-release-image
 FROM alpine AS wings-release
 COPY --from=wings-release-image /usr/bin/calagopus-wings /wings/calagopus-wings
 

@@ -1048,6 +1048,39 @@ impl UpdatableModel for User {
         &UPDATE_LISTENERS
     }
 
+    async fn update(
+        &mut self,
+        state: &crate::State,
+        options: Self::UpdateOptions,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let access_changed = options.password.is_some()
+            || options
+                .suspended
+                .is_some_and(|suspended| suspended != self.suspended)
+            || options.admin.is_some_and(|admin| admin != self.admin)
+            || options
+                .role_uuid
+                .is_some_and(|role_uuid| role_uuid != self.role.as_ref().map(|role| role.uuid));
+
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .update_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        if access_changed {
+            super::node::Node::deauthorize_users_everywhere(&state.database, vec![self.uuid]);
+        }
+
+        Ok(())
+    }
+
     async fn update_with_transaction(
         &mut self,
         state: &crate::State,
@@ -1185,6 +1218,8 @@ impl DeletableModel for User {
         self.delete_with_transaction(state, options, &mut transaction)
             .await?;
         transaction.commit().await?;
+
+        super::node::Node::deauthorize_users_everywhere(&state.database, vec![self.uuid]);
 
         state.storage.remove(self.avatar.as_deref()).await?;
 

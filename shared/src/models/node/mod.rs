@@ -6,6 +6,7 @@ use crate::{
     prelude::*,
 };
 use compact_str::ToCompactString;
+use futures_util::StreamExt;
 use garde::Validate;
 use rand::{RngExt, distr::SampleString};
 use serde::{Deserialize, Serialize};
@@ -717,6 +718,133 @@ impl Node {
             .extend(path.trim_start_matches('/').split('/'));
 
         Ok(url)
+    }
+
+    pub async fn deauthorize_users(
+        &self,
+        database: &crate::database::Database,
+        users: &[uuid::Uuid],
+        servers: &[uuid::Uuid],
+    ) {
+        const DEAUTHORIZE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
+
+        if users.is_empty() {
+            return;
+        }
+
+        let result = async {
+            let server_uuids = super::server::Server::all_uuids_by_node_uuid(database, self.uuid)
+                .await?;
+            if server_uuids.is_empty() {
+                return Ok(());
+            }
+
+            let api_client = self.api_client(database).await?;
+
+            let jtis = users
+                .iter()
+                .map(|user| user.to_compact_string())
+                .collect::<Vec<_>>();
+            let mut known_server = false;
+            for &server in &server_uuids {
+                let denied = tokio::time::timeout(
+                    DEAUTHORIZE_TIMEOUT,
+                    api_client.post_servers_server_ws_deny(
+                        server,
+                        &wings_api::servers_server_ws_deny::post::RequestBody {
+                            jtis: jtis.clone(),
+                        },
+                    ),
+                )
+                .await;
+
+                match denied {
+                    Ok(Err(wings_api::client::ApiHttpError::Http(
+                        reqwest::StatusCode::NOT_FOUND,
+                        _,
+                    ))) => continue,
+                    Ok(Ok(_)) => {}
+                    Ok(Err(err)) => {
+                        tracing::error!(node = %self.uuid, "failed to deny user tokens in wings: {:?}", err);
+                    }
+                    Err(err) => {
+                        tracing::error!(node = %self.uuid, "failed to deny user tokens in wings: {:?}", err);
+                    }
+                }
+
+                known_server = true;
+                break;
+            }
+
+            if !known_server {
+                return Ok(());
+            }
+
+            for &user in users {
+                let deauthorized = async {
+                    tokio::time::timeout(
+                        DEAUTHORIZE_TIMEOUT,
+                        api_client.post_deauthorize_user(
+                            &wings_api::deauthorize_user::post::RequestBody {
+                                servers: servers.to_vec(),
+                                user,
+                            },
+                        ),
+                    )
+                    .await??;
+
+                    Ok::<_, anyhow::Error>(())
+                }
+                .await;
+
+                if let Err(err) = deauthorized {
+                    tracing::error!(node = %self.uuid, user = %user, "failed to deauthorize user in wings: {:?}", err);
+                }
+            }
+
+            Ok::<_, anyhow::Error>(())
+        }
+        .await;
+
+        if let Err(err) = result {
+            tracing::error!(node = %self.uuid, "failed to deauthorize users in wings: {:?}", err);
+        }
+    }
+
+    pub fn deauthorize_users_everywhere(
+        database: &Arc<crate::database::Database>,
+        users: Vec<uuid::Uuid>,
+    ) -> tokio::task::JoinHandle<()> {
+        let database = database.clone();
+
+        tokio::spawn(async move {
+            if users.is_empty() {
+                return;
+            }
+
+            let mut nodes = Vec::new();
+            let mut node_page = 1;
+            loop {
+                match Self::all_with_pagination(&database, node_page, 50, None).await {
+                    Ok(page) if page.data.is_empty() => break,
+                    Ok(page) => nodes.extend(page.data),
+                    Err(err) => {
+                        tracing::error!("failed to list nodes to deauthorize users: {:?}", err);
+                        break;
+                    }
+                }
+
+                node_page += 1;
+            }
+
+            let mut futures = Vec::with_capacity(nodes.len());
+            for node in &nodes {
+                futures.push(node.deauthorize_users(&database, &users, &[]));
+            }
+
+            let mut results_stream = futures_util::stream::iter(futures).buffer_unordered(10);
+            while results_stream.next().await.is_some() {}
+        })
     }
 
     #[inline]

@@ -8,6 +8,7 @@ mod delete {
         ApiError, GetState,
         models::{
             DeletableModel,
+            node::Node,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
             user_ssh_key::UserSshKey,
@@ -50,6 +51,7 @@ mod delete {
         };
 
         ssh_key.delete(&state, ()).await?;
+        Node::deauthorize_users_everywhere(&state.database, vec![user.uuid]);
 
         activity_logger
             .log(

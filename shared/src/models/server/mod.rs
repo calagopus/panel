@@ -684,6 +684,28 @@ impl Server {
         })
     }
 
+    pub async fn all_uuids_by_node_uuid(
+        database: &crate::database::Database,
+        node_uuid: uuid::Uuid,
+    ) -> Result<Vec<uuid::Uuid>, crate::database::DatabaseError> {
+        let rows = sqlx::query(
+            r#"
+            SELECT servers.uuid
+            FROM servers
+            WHERE servers.node_uuid = $1
+            ORDER BY servers.created
+            "#,
+        )
+        .bind(node_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(rows
+            .into_iter()
+            .map(|row| row.get::<uuid::Uuid, _>("uuid"))
+            .collect())
+    }
+
     pub async fn all_uuids_by_node_uuid_user_uuid(
         database: &crate::database::Database,
         node_uuid: uuid::Uuid,
@@ -2420,6 +2442,49 @@ impl UpdatableModel for Server {
             LazyLock::new(|| Arc::new(ModelHandlerList::default()));
 
         &UPDATE_LISTENERS
+    }
+
+    async fn update(
+        &mut self,
+        state: &crate::State,
+        options: Self::UpdateOptions,
+    ) -> Result<(), crate::database::DatabaseError> {
+        let previous_owner = options
+            .owner_uuid
+            .is_some_and(|owner_uuid| owner_uuid != self.owner.uuid)
+            .then_some(self.owner.uuid);
+
+        let mut transaction = state.database.write().begin().await?;
+
+        if let Err(err) = self
+            .update_with_transaction(state, options, &mut transaction)
+            .await
+        {
+            transaction.rollback().await?;
+            return Err(err);
+        }
+
+        transaction.commit().await?;
+
+        if let Some(previous_owner) = previous_owner {
+            let database = state.database.clone();
+            let server_uuid = self.uuid;
+            let node = self.node.clone();
+
+            tokio::spawn(async move {
+                match node.fetch_cached(&database).await {
+                    Ok(node) => {
+                        node.deauthorize_users(&database, &[previous_owner], &[server_uuid])
+                            .await;
+                    }
+                    Err(err) => {
+                        tracing::error!(server = %server_uuid, "failed to deauthorize previous owner in wings: {:?}", err);
+                    }
+                }
+            });
+        }
+
+        Ok(())
     }
 
     async fn update_with_transaction(

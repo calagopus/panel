@@ -130,19 +130,22 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
+          rustflags: ""
           target: ${{ matrix.target }}
           cache-key: ${{ matrix.target }}
 
       - name: Install cross
         if: contains(matrix.target, 'linux')
-        run: cargo install cross --git https://github.com/cross-rs/cross
+        env:
+          CARGO_BUILD_WARNINGS: allow
+        run: cargo install cross --git https://github.com/cross-rs/cross --rev 8c1a8aa4b661711f4b7b6ac07c2e8929ce2f7d27 --locked
 
       - name: Extract wings binary
         if: contains(matrix.target, 'linux')
         run: |
           mkdir -p bins/all-in-one/bins
-          docker pull --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:latest
-          cid=$(docker create --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:latest)
+          docker pull --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:1.1.6
+          cid=$(docker create --platform ${{ matrix.wings_platform }} ghcr.io/calagopus/wings:1.1.6)
           docker cp "$cid:/usr/bin/calagopus-wings" bins/all-in-one/bins/wings-release-bin
           docker rm "$cid"
           chmod +x bins/all-in-one/bins/wings-release-bin
@@ -213,6 +216,7 @@ jobs:
         with:
           name: ${{ steps.release_info.outputs.version }}
           draft: true
+          make_latest: false
           prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
           files: |
@@ -296,13 +300,8 @@ jobs:
           VERSION="${VERSION#release-}"
           STABLE="${{ matrix.stable_tag }}"
 
+          # 1.1.x is a maintenance branch, moving tags belong to the newest release line
           SUFFIXES=("${VERSION}${{ matrix.version_suffix }}")
-          if [[ "$VERSION" == *-* ]]; then
-            SUFFIXES+=("${STABLE}-pre")
-          else
-            SUFFIXES+=("$STABLE")
-            SUFFIXES+=("${STABLE}-pre")
-          fi
 
           IMAGE_TAGS=""
           for t in "${SUFFIXES[@]}"; do
@@ -448,13 +447,8 @@ jobs:
           RAW_TAG="${{ github.ref_name }}"
           VERSION="${RAW_TAG#release-}"
 
+          # 1.1.x is a maintenance branch, moving tags belong to the newest release line
           SUFFIXES=("${VERSION}-${{ matrix.variant }}")
-          if [[ "$VERSION" == *-* ]]; then
-            SUFFIXES+=("${{ matrix.variant }}-pre")
-          else
-            SUFFIXES+=("${{ matrix.variant }}")
-            SUFFIXES+=("${{ matrix.variant }}-pre")
-          fi
 
           GHCR_TAGS=""
           DOCKERHUB_TAGS=""

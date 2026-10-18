@@ -8,8 +8,8 @@ mod post {
     use shared::{
         ApiError, GetState,
         models::{
-            CreatableModel, user_activity::UserActivity, user_password_reset::UserPasswordReset,
-            user_session::UserSession,
+            CreatableModel, node::Node, user_activity::UserActivity,
+            user_password_reset::UserPasswordReset, user_session::UserSession,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -98,6 +98,7 @@ mod post {
             .user
             .update_password(&state.database, Some(&data.new_password))
             .await?;
+        Node::deauthorize_users_everywhere(&state.database, vec![token.user.uuid]);
 
         UserSession::delete_by_user_uuid_except(&state.database, token.user.uuid, None).await?;
 

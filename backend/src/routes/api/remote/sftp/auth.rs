@@ -94,6 +94,13 @@ mod post {
                 }
             }
         };
+
+        if user.suspended {
+            return ApiResponse::error("account is suspended")
+                .with_status(StatusCode::EXPECTATION_FAILED)
+                .ok();
+        }
+
         let server = match Server::by_user_identifier(&state.database, &user, server).await? {
             Some(server) => server,
             None => {
