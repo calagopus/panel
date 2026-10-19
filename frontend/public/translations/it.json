@@ -255,8 +255,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Visualizzazione da {start} a {end} di {total} risultati.",
-          "empty": "Nessun elemento trovato, è come se si stessero nascondendo."
+          "results": "Visualizzazione da {start} a {end} di {total} risultati."
         },
         "columns": {
           "name": "Nome",
@@ -435,8 +434,7 @@
                       "deleted": "Gruppo di server eliminato."
                     }
                   }
-                },
-                "noGroups": "Nessun gruppo trovato, è ora di crearne uno?"
+                }
               }
             },
             "allServers": {
@@ -455,8 +453,7 @@
                 }
               }
             }
-          },
-          "noServers": "Nessun server trovato, è ora di aggiungerne uno?"
+          }
         },
         "account": {
           "alert": {

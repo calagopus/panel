@@ -459,8 +459,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Viser {start} til {end} af {total} resultater.",
-          "empty": "Ingen elementer fundet. Det er næsten, som om de gemmer sig."
+          "results": "Viser {start} til {end} af {total} resultater."
         },
         "columns": {
           "name": "Navn",
@@ -1314,8 +1313,7 @@
                   "toast": {
                     "moved": "Server flyttet til {group}."
                   }
-                },
-                "noGroups": "Der blev ikke fundet nogen grupper. Skal du oprette en?"
+                }
               }
             },
             "allServers": {
@@ -1342,8 +1340,7 @@
             "success": "{servers} blev {action}.",
             "partial": "{successfulServers} blev {action}. {failedServers} mislykkedes.",
             "groupActions": "Gruppehandlinger"
-          },
-          "noServers": "Der blev ikke fundet nogen servere. Skal du tilføje en?"
+          }
         },
         "account": {
           "title": "Konto",
@@ -2084,7 +2081,6 @@
                 "sidebar": {
                   "templates": "Skabeloner",
                   "globalVariables": "Globale variabler",
-                  "loading": "Indlæser...",
                   "availableVariables": "Tilgængelige variabler"
                 },
                 "alert": {
@@ -2103,7 +2099,6 @@
                   "descriptionAfter": "Fragmenter er MiniJinja-snippets med adgang til de samme variabler som skabelonen. Et tomt felt bruger den standardværdi, der vises i det; sprog uden en værdi falder tilbage til den engelske værdi og derefter til den indbyggede oversættelse.",
                   "custom": "Tilpasset",
                   "add": "Tilføj variabel",
-                  "loading": "Indlæser...",
                   "empty": "Ingen variabler defineret.",
                   "error": {
                     "valueRequired": "Tilpassede variabler skal have en engelsk værdi."
@@ -2130,7 +2125,6 @@
                     }
                   }
                 },
-                "loadingTemplate": "Indlæser skabelon...",
                 "form": {
                   "subject": "Emne"
                 },
@@ -2360,7 +2354,6 @@
         "extensions": {
           "unknownExtension": "Ukendt extension",
           "alert": {
-            "noExtensions": "Ingen extensions installeret.",
             "heavyImageMissing": "Du ser ikke ud til at bruge det heavy-image, der kræves for at installere extensions. Se [her]({docsUrl}), hvordan du skifter til det.",
             "supervisorUnreachable": {
               "title": "Extension-supervisoren svarer ikke",
@@ -3070,7 +3063,6 @@
                 },
                 "metrics": {
                   "title": "Live peer-links",
-                  "loading": "Spørger noden om dens metrics...",
                   "unreachable": "Noden kunne ikke nås, så live-metrics er ikke tilgængelige.",
                   "applied": "Tilstandsversion {epoch}, {snapshots} anvendt",
                   "stat": {
@@ -5785,10 +5777,6 @@
               "actions": "Schedule-handlinger",
               "preConditions": "Forudsætninger for schedule",
               "triggers": "Schedule-triggers"
-            },
-            "alert": {
-              "noActions": "Ingen handlinger konfigureret for dette schedule",
-              "noTriggers": "Ingen triggers konfigureret for dette schedule"
             }
           },
           "step": {
@@ -6720,7 +6708,6 @@
               "content": "Du har ugemte ændringer i dine opstartsvariabler. Er du sikker på, at du vil forlade siden? Dine ændringer går tabt, hvis du forlader den."
             }
           },
-          "noVariables": "Ingen opstartsvariabler fundet for denne server.",
           "predefinedStartupCommands": "Foruddefinerede opstartskommandoer"
         },
         "mounts": {

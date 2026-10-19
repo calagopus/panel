@@ -516,8 +516,7 @@
       "table": {
         "selectRow": "Seleccionar fila",
         "pagination": {
-          "results": "Mostrando {start} a {end} de {total} resultados.",
-          "empty": "No se encontró ningún elemento; casi parece que se están escondiendo."
+          "results": "Mostrando {start} a {end} de {total} resultados."
         },
         "columns": {
           "name": "Nombre",
@@ -1427,8 +1426,7 @@
                   "toast": {
                     "moved": "Servidor movido a {group}."
                   }
-                },
-                "noGroups": "No se encontraron grupos; ¿hora de crear uno?"
+                }
               }
             },
             "allServers": {
@@ -1455,8 +1453,7 @@
             "success": "Se {action} correctamente {servers}.",
             "partial": "Se {action} correctamente {successfulServers}. Fallaron {failedServers}.",
             "groupActions": "Acciones del grupo"
-          },
-          "noServers": "No se encontraron servidores; ¿hora de añadir uno?"
+          }
         },
         "admin": {
           "title": "Administración"
@@ -2250,7 +2247,6 @@
                 "sidebar": {
                   "templates": "Plantillas",
                   "globalVariables": "Variables globales",
-                  "loading": "Cargando...",
                   "availableVariables": "Variables disponibles"
                 },
                 "alert": {
@@ -2268,7 +2264,6 @@
                   "descriptionAfter": "Los fragmentos son fragmentos de MiniJinja que tienen acceso a las mismas variables que la plantilla. Un campo vacío utiliza el valor predeterminado que se muestra en él; los idiomas sin un valor asignado recurren al valor en inglés y, después, a la traducción integrada.",
                   "custom": "Personalizado",
                   "add": "Añadir variable",
-                  "loading": "Cargando...",
                   "empty": "No hay variables definidas.",
                   "error": {
                     "valueRequired": "Las variables personalizadas necesitan un valor en inglés."
@@ -2295,7 +2290,6 @@
                     }
                   }
                 },
-                "loadingTemplate": "Cargando plantilla...",
                 "form": {
                   "subject": "Asunto"
                 },
@@ -2551,7 +2545,6 @@
           "title": "Extensiones",
           "unknownExtension": "Extensión desconocida",
           "alert": {
-            "noExtensions": "No hay extensiones instaladas.",
             "heavyImageMissing": "Parece que no estás utilizando la imagen Heavy necesaria para instalar extensiones. Consulta [aquí]({docsUrl}) cómo cambiar a ella.",
             "supervisorUnreachable": {
               "title": "El supervisor de la extensión no responde",
@@ -3347,7 +3340,6 @@
                 },
                 "metrics": {
                   "title": "Conexiones activas entre pares",
-                  "loading": "Solicitando métricas al nodo...",
                   "unreachable": "No se ha podido alcanzar al nodo, por lo que las métricas en vivo no están disponibles.",
                   "applied": "Versión de estado {epoch}, {snapshots} aplicadas",
                   "stat": {
@@ -6366,10 +6358,6 @@
               "actions": "Acciones de la tarea programada",
               "preConditions": "Precondiciones de la tarea programada",
               "triggers": "Disparadores de la tarea programada"
-            },
-            "alert": {
-              "noActions": "No hay acciones configuradas para esta tarea programada",
-              "noTriggers": "No hay disparadores configurados para esta tarea programada"
             }
           },
           "step": {
@@ -7380,7 +7368,6 @@
               "content": "Tienes cambios sin guardar en tus variables de arranque. ¿Seguro que quieres salir de esta página? Si sales, se perderán tus cambios."
             }
           },
-          "noVariables": "No se encontraron variables de arranque para este servidor.",
           "predefinedStartupCommands": "Comandos de inicio predefinidos"
         },
         "mounts": {

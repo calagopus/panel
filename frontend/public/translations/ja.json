@@ -199,6 +199,14 @@
       "many": "{count} マウント",
       "other": "{count} マウント"
     },
+    "device": {
+      "zero": "{count} デバイス",
+      "one": "{count} デバイス",
+      "two": "{count} デバイス",
+      "few": "{count} デバイス",
+      "many": "{count} デバイス",
+      "other": "{count} デバイス"
+    },
     "apiKey": {
       "zero": "{count} APIキー",
       "one": "{count} APIキー",
@@ -270,6 +278,7 @@
         "details": "詳細",
         "loadLogs": "ログを読み込む",
         "sendTestEmail": "テストメール送信",
+        "test": "テスト",
         "setPrimary": "プライマリに設定",
         "unsetPrimary": "プライマリを解除",
         "leavePage": "ページを離れる",
@@ -314,7 +323,12 @@
           "isDirectory": "これはディレクトリであり、ファイルではありません。"
         },
         "nodeAllocationIpInput": {
+          "anyAddress": "すべてのアドレス",
+          "nodeInterfaces": "ノードのネットワークインターフェース",
           "inUse": "使用中"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "1行に1パターンずつ入力してください。"
         },
         "cronInput": {
           "segments": {

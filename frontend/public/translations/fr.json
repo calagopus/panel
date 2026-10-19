@@ -312,8 +312,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Affiche {start} à {end} de {total} résultats.",
-          "empty": "Pas d'éléments trouvés, c'est comme s'ils se cachaient."
+          "results": "Affiche {start} à {end} de {total} résultats."
         },
         "columns": {
           "id": "Identifiant",
@@ -1045,8 +1044,7 @@
                   "toast": {
                     "moved": "Serveur déplacé vers {group}."
                   }
-                },
-                "noGroups": "Pas de groupes trouvés, créez-en un."
+                }
               }
             },
             "allServers": {
@@ -1073,8 +1071,7 @@
             "success": "{action} {servers} avec succès.",
             "partial": "{action} {successfulServers} avec succès. {failedServers} ont échoué.",
             "groupActions": "Actions de groupe"
-          },
-          "noServers": "Pas de serveurs trouvés, est-il temps d'en ajouter un ?"
+          }
         },
         "admin": {
           "title": "Administrateur"
@@ -1665,7 +1662,6 @@
                 "title": "Paramètres des modèles d'e-mail",
                 "sidebar": {
                   "templates": "Modèles",
-                  "loading": "Chargement...",
                   "availableVariables": "Variables disponibles"
                 },
                 "alert": {
@@ -1675,7 +1671,6 @@
                   "syntaxOr": "et",
                   "syntaxAfter": "sont prises en charge."
                 },
-                "loadingTemplate": "Chargement du modèle...",
                 "form": {
                   "subject": "Objet"
                 },
@@ -1872,7 +1867,6 @@
         "extensions": {
           "unknownExtension": "Extension inconnue",
           "alert": {
-            "noExtensions": "Aucune extension installée.",
             "heavyImageMissing": "Il semble que vous n'utilisiez pas l'image heavy requise pour installer des extensions, consultez [ici]({docsUrl}) comment basculer dessus."
           },
           "button": {
@@ -3823,10 +3817,6 @@
               "actions": "Actions de la planification",
               "preConditions": "Pré-conditions de la planification",
               "triggers": "Déclencheurs de la planification"
-            },
-            "alert": {
-              "noActions": "Aucune action configurée pour cette planification",
-              "noTriggers": "Aucun déclencheur configuré pour cette planification"
             }
           },
           "form": {
@@ -4258,8 +4248,7 @@
               "title": "Changements non sauvegardés",
               "content": "Vous avez des changements non sauvegardés dans vos variables de démarrage. Êtes-vous sûr de vouloir quitter cette page ? Si vous quittez, vos changements seront perdus."
             }
-          },
-          "noVariables": "Aucune variable de démarrage trouvée pour ce serveur."
+          }
         },
         "mounts": {
           "title": "Montages",

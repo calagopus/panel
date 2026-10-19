@@ -231,8 +231,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Zobrazuje sa {start} až {end} z {total} výsledkov.",
-          "empty": "Nenašli sa žiadne položky."
+          "results": "Zobrazuje sa {start} až {end} z {total} výsledkov."
         },
         "columns": {
           "name": "Názov",
@@ -840,8 +839,7 @@
                       "removed": "Server bol odstránený zo skupiny."
                     }
                   }
-                },
-                "noGroups": "Nenašli sa žiadne skupiny, je čas na vytvorenie?"
+                }
               }
             },
             "allServers": {
@@ -868,8 +866,7 @@
             "success": "Akcia {action} bola úspešne vykonaná pre {servers}.",
             "partial": "{successfulServers}: akcia {action} prebehla úspešne. {failedServers}: zlyhalo.",
             "groupActions": "Skupinové akcie"
-          },
-          "noServers": "Nenašli sa žiadne servery, je čas na pridanie?"
+          }
         },
         "account": {
           "title": "Účet",
@@ -1443,7 +1440,6 @@
                 "title": "Nastavenia e-mailových šablón",
                 "sidebar": {
                   "templates": "Šablóny",
-                  "loading": "Načítava sa...",
                   "availableVariables": "Dostupné premenné"
                 },
                 "alert": {
@@ -1453,7 +1449,6 @@
                   "syntaxOr": "a",
                   "syntaxAfter": "sú podporované."
                 },
-                "loadingTemplate": "Načítava sa šablóna...",
                 "form": {
                   "subject": "Predmet"
                 },
@@ -1655,7 +1650,6 @@
           "title": "Rozšírenia",
           "unknownExtension": "Neznáme rozšírenie",
           "alert": {
-            "noExtensions": "Nie sú nainštalované žiadne rozšírenia.",
             "heavyImageMissing": "Zdá sa, že nepoužívate heavy obraz Docker potrebný na inštaláciu rozšírení. Postup prepnutia nájdete [tu]({docsUrl})."
           },
           "button": {
@@ -3587,10 +3581,6 @@
               "actions": "Akcie plánu",
               "preConditions": "Predbežné podmienky plánu",
               "triggers": "Spúšťače plánu"
-            },
-            "alert": {
-              "noActions": "Pre tento plán nie sú nakonfigurované žiadne akcie",
-              "noTriggers": "Pre tento plán nie sú nakonfigurované žiadne spúšťače"
             }
           },
           "form": {
@@ -4004,8 +3994,7 @@
               "title": "Neuložené zmeny",
               "content": "Máte neuložené zmeny spúšťacích premenných. Naozaj chcete opustiť túto stránku? Ak odídete, vaše zmeny sa stratia."
             }
-          },
-          "noVariables": "Pre tento server sa nenašli žiadne spúšťacie premenné."
+          }
         },
         "mounts": {
           "title": "Mounty",

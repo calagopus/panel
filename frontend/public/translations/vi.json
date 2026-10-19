@@ -492,8 +492,7 @@
       "table": {
         "selectRow": "Chọn hàng",
         "pagination": {
-          "results": "Hiển thị {start} đến {end} của {total} kết quả.",
-          "empty": "Chúng tôi đã tìm kiếm rất nhiều nhưng xui xẻo là không tìm thấy kết quả nào cả."
+          "results": "Hiển thị {start} đến {end} của {total} kết quả."
         },
         "columns": {
           "name": "Tên",
@@ -1405,8 +1404,7 @@
                   "toast": {
                     "moved": "Máy chủ đã được chuyển sang {group}."
                   }
-                },
-                "noGroups": "Chà có vẻ không có nhóm nào hãy thử tạo một nhóm mới?"
+                }
               }
             },
             "allServers": {
@@ -1433,8 +1431,7 @@
             "success": "Đã thành công {action} {servers}.",
             "partial": "Đã thành công {action} {successfulServers}. {failedServers} failed.",
             "groupActions": "Hành động Nhóm"
-          },
-          "noServers": "Không tìm thấy máy chủ nào, đến lúc thêm một cái?"
+          }
         },
         "admin": {
           "title": "Quản trị viên"
@@ -2234,7 +2231,6 @@
                 "sidebar": {
                   "templates": "Mẫu",
                   "globalVariables": "Biến Global",
-                  "loading": "Đang tải...",
                   "availableVariables": "Biến Có Sẵn"
                 },
                 "alert": {
@@ -2253,7 +2249,6 @@
                   "descriptionAfter": "Fragment là các đoạn mã MiniJinja có quyền truy cập vào cùng các biến như mẫu. Một trường để trống sẽ sử dụng giá trị mặc định được hiển thị tại đó; đối với các ngôn ngữ không có giá trị cụ thể, hệ thống sẽ sử dụng giá trị tiếng Anh, sau đó là bản dịch tích hợp sẵn.",
                   "custom": "Tùy Chỉnh",
                   "add": "Thêm biến",
-                  "loading": "Đang tải...",
                   "empty": "Chưa có biến nào được định nghĩa.",
                   "error": {
                     "valueRequired": "Các biến tùy chỉnh cần có giá trị bằng tiếng Anh."
@@ -2280,7 +2275,6 @@
                     }
                   }
                 },
-                "loadingTemplate": "Đang tải mẫu...",
                 "form": {
                   "subject": "Chủ Đề"
                 },
@@ -2522,7 +2516,6 @@
           "title": "Tiện Ích Mở Rộng",
           "unknownExtension": "Tiện Ích Không Xác Định",
           "alert": {
-            "noExtensions": "Chưa cài đặt tiện ích mở rộng nào.",
             "heavyImageMissing": "Bạn dường như không sử dụng hình ảnh heavy cần thiết để cài đặt tiện ích mở rộng, xem [tại đây]({docsUrl}) để biết cách chuyển đổi.",
             "supervisorUnreachable": {
               "title": "Không thể kết nối với trình quản lý tiện ích",
@@ -3247,7 +3240,6 @@
                 },
                 "metrics": {
                   "title": "Các liên kết ngang hàng trực tiếp",
-                  "loading": "Đang yêu cầu nút cung cấp các chỉ số...",
                   "unreachable": "Không thể kết nối tới nút, do đó các chỉ số thời gian thực không khả dụng.",
                   "applied": "Đã áp dụng phiên bản trạng thái {epoch}, {snapshots}",
                   "stat": {
@@ -6125,10 +6117,6 @@
               "actions": "Hành Động Lịch Trình",
               "preConditions": "Điều Kiện Trước Lịch Trình",
               "triggers": "Trình Kích Hoạt Lịch Trình"
-            },
-            "alert": {
-              "noActions": "Không có hành động nào được cấu hình cho lịch trình này",
-              "noTriggers": "Không có trình kích hoạt nào được cấu hình cho lịch trình này"
             }
           },
           "step": {
@@ -7137,7 +7125,6 @@
               "content": "Bạn có thay đổi chưa lưu đối với các biến khởi động. Bạn có chắc muốn rời khỏi trang này không? Nếu bạn rời khỏi, các thay đổi sẽ bị mất."
             }
           },
-          "noVariables": "Không tìm thấy biến khởi động cho máy chủ này.",
           "predefinedStartupCommands": "Lệnh Khởi Động Được Định Nghĩa Trước"
         },
         "mounts": {

@@ -72,8 +72,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Se afișează de la {start} la {end} din {total} rezultate.",
-          "empty": "Nu s-au găsit elemente, este aproape ca și cum s-ar ascunde."
+          "results": "Se afișează de la {start} la {end} din {total} rezultate."
         },
         "columns": {
           "name": "Nume",
@@ -251,8 +250,7 @@
                       "deleted": "Grup de servere șters."
                     }
                   }
-                },
-                "noGroups": "Nu s-au găsit grupuri, este timpul să creezi unul?"
+                }
               }
             },
             "allServers": {
@@ -271,8 +269,7 @@
                 }
               }
             }
-          },
-          "noServers": "Nu s-au găsit servere, este timpul să adaugi unul?"
+          }
         },
         "account": {
           "title": "Cont",

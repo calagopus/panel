@@ -137,8 +137,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Показано с {start} по {end} из {total} результатов.",
-          "empty": "Ничего не найдено, как будто они прячутся."
+          "results": "Показано с {start} по {end} из {total} результатов."
         },
         "columns": {
           "name": "Имя",
@@ -678,8 +677,7 @@
                   "addServerToGroup": {
                     "noServers": "Все серверы уже в этой группе."
                   }
-                },
-                "noGroups": "Группы не найдены, время создать одну?"
+                }
               }
             },
             "allServers": {
@@ -706,8 +704,7 @@
             "success": "Успешно {action} {servers}.",
             "partial": "Успешно {action} {successfulServers}. {failedServers} не удалось.",
             "groupActions": "Действия с группой"
-          },
-          "noServers": "Серверы не найдены, время добавить один?"
+          }
         },
         "admin": {
           "title": "Администрирование"
@@ -1398,10 +1395,6 @@
               "actions": "Действия расписания",
               "preConditions": "Предусловия расписания",
               "triggers": "Триггеры расписания"
-            },
-            "alert": {
-              "noActions": "Для этого расписания не настроены действия",
-              "noTriggers": "Для этого расписания не настроены триггеры"
             }
           },
           "form": {

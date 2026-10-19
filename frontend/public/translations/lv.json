@@ -56,6 +56,14 @@
       "many": "{count} Olas",
       "other": "{count} Olas"
     },
+    "line": {
+      "zero": "{count} Līnijas",
+      "one": "{count} Līnija",
+      "two": "{count} Līnijas",
+      "few": "{count} Līnijas",
+      "many": "{count} Līnijas",
+      "other": "{count} Līnijas"
+    },
     "backup": {
       "few": "{count} Datu dublējumi",
       "many": "{count} Datu dublējumi",
@@ -189,10 +197,18 @@
             "month": "Mēnesis",
             "weekday": "Darba diena"
           }
+        },
+        "backupRetention": {
+          "status": {
+            "locked": "Slēgts",
+            "failed": "Tīrīšana"
+          }
         }
       },
       "form": {
+        "location": "Lokācija",
         "externalId": "Ārējais ID",
+        "device": "Ierīce",
         "lines": "Rindas",
         "timezone": "Laika zona",
         "timezoneSystem": "Sistēma",
@@ -205,6 +221,7 @@
         "replaceWith": "Aizvietot ar"
       },
       "table": {
+        "selectRow": "Atlasīt rindu",
         "columns": {
           "name": "Vārds",
           "author": "Autors",
@@ -233,6 +250,19 @@
           "server": "Serveris",
           "address": "Adrese",
           "version": "Versija"
+        }
+      },
+      "bulkActions": {
+        "verb": {
+          "deleted": "dzēst",
+          "removed": "noņemt",
+          "locked": "slēgts",
+          "unlocked": "atslēgts",
+          "moved": "pārvietot",
+          "enabled": "iespējot",
+          "disabled": "atspējot",
+          "attached": "pievienot",
+          "detached": "atvienot"
         }
       },
       "stat": {

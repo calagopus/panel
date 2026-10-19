@@ -174,8 +174,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Visar {start} till {end} av {total} resultat.",
-          "empty": "Inga objekt kunde hittas, det är nästan som om de döljer sig."
+          "results": "Visar {start} till {end} av {total} resultat."
         },
         "columns": {
           "name": "Namn",
@@ -697,8 +696,7 @@
                   "addServerToGroup": {
                     "noServers": "Alla servrar finns redan i den här gruppen."
                   }
-                },
-                "noGroups": "Inga grupper kunde hittas, dags att skapa en?"
+                }
               }
             },
             "allServers": {
@@ -725,8 +723,7 @@
             "success": "Lyckades {action} {servers}.",
             "partial": "Lyckades {action} {successfulServers}. {failedServers} misslyckades.",
             "groupActions": "Gruppåtgärder"
-          },
-          "noServers": "Inga servrar kunde hittas, dags att lägga till en?"
+          }
         },
         "account": {
           "title": "Konto",
@@ -1415,10 +1412,6 @@
               "actions": "Schemaåtgärder",
               "preConditions": "Schema Pre-Conditions",
               "triggers": "Schema Utlösare"
-            },
-            "alert": {
-              "noActions": "Inga åtgärder konfigurerade för detta schema",
-              "noTriggers": "Inga utlösare konfigurerade för detta schema"
             }
           },
           "form": {
@@ -1805,8 +1798,7 @@
               "title": "Osparade ändringar",
               "content": "Du har osparade ändringar i dina startvariabler. Är du säker på att du vill lämna den här sidan? Om du lämnar sidan kommer dina ändringar att gå förlorade."
             }
-          },
-          "noVariables": "Inga startvariabler hittades för den här servern."
+          }
         },
         "mounts": {
           "table": {

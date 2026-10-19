@@ -304,8 +304,7 @@
       },
       "table": {
         "pagination": {
-          "results": "Wyświetlono {start} do {end} z {total} wyników.",
-          "empty": "Nie można nic znaleźć. Zupełnie, jakby wyniki się chowały."
+          "results": "Wyświetlono {start} do {end} z {total} wyników."
         },
         "columns": {
           "name": "Nazwa",
@@ -946,8 +945,7 @@
                       "removed": "Serwer usunięty z grupy."
                     }
                   }
-                },
-                "noGroups": "Nie znaleziono żadnych grup. Czas na utworzenie jednej?"
+                }
               }
             },
             "allServers": {
@@ -1490,7 +1488,6 @@
               "page": {
                 "sidebar": {
                   "templates": "Szablony",
-                  "loading": "Wczytywanie...",
                   "availableVariables": "Dostępne zmienne"
                 },
                 "alert": {
@@ -1500,7 +1497,6 @@
                   "syntaxOr": "oraz",
                   "syntaxAfter": "są wspierane."
                 },
-                "loadingTemplate": "Ładowanie szablonu...",
                 "form": {
                   "subject": "Temat"
                 },
@@ -1660,7 +1656,6 @@
           "title": "Rozszerzenia",
           "unknownExtension": "Nieznane rozszerzenie",
           "alert": {
-            "noExtensions": "Brak zainstalowanych rozszerzeń.",
             "heavyImageMissing": "Wygląda na to, że nie używasz ciężkiego obrazu wymaganego do zainstalowania rozszerzeń, przejdź [tutaj]({docsUrl}), żeby zobaczyć, jak na niego przełączyć."
           },
           "button": {
@@ -3627,7 +3622,6 @@
               "content": "Masz niezapisane zmiany zmiennych startowych. Czy na pewno chcesz opuścić tę stronę? Jeśli wyjdziesz, zmiany zostaną utracone."
             }
           },
-          "noVariables": "Nie znaleziono zmiennych startowych dla tego serwera.",
           "predefinedStartupCommands": "Predefiniowane polecenia startowe"
         },
         "settings": {

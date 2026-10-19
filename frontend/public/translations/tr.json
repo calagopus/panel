@@ -150,8 +150,7 @@
       },
       "table": {
         "pagination": {
-          "results": "{total} sonuçtan {start} ile {end} arası gösteriliyor.",
-          "empty": "Hiçbir öğe bulunamadı, sanki saklanıyorlar."
+          "results": "{total} sonuçtan {start} ile {end} arası gösteriliyor."
         },
         "columns": {
           "name": "İsim",
@@ -689,8 +688,7 @@
                   "addServerToGroup": {
                     "noServers": "Tüm sunucular zaten bu grupta."
                   }
-                },
-                "noGroups": "Hiç grup bulunamadı, bir tane oluşturmaya ne dersiniz?"
+                }
               }
             },
             "allServers": {
@@ -717,8 +715,7 @@
             "success": "{servers} üzerinde {action} işlemi başarıyla tamamlandı.",
             "partial": "{successfulServers} üzerinde {action} başarılı. {failedServers} başarısız.",
             "groupActions": "Grup Eylemleri"
-          },
-          "noServers": "Hiç sunucu bulunamadı, bir tane eklemeye ne dersiniz?"
+          }
         },
         "admin": {
           "title": "Yönetici"
@@ -1405,10 +1402,6 @@
               "actions": "Zamanlayıcı Eylemleri",
               "preConditions": "Zamanlayıcı Ön Koşulları",
               "triggers": "Zamanlayıcı Tetikleyicileri"
-            },
-            "alert": {
-              "noActions": "Bu zamanlayıcı için yapılandırılmış eylem yok",
-              "noTriggers": "Bu zamanlayıcı için yapılandırılmış tetikleyici yok"
             }
           },
           "form": {
@@ -1800,8 +1793,7 @@
             "startupCommandUpdated": "Başlangıç komutu güncellendi.",
             "dockerImageUpdated": "Docker imajı güncellendi.",
             "variablesUpdated": "Değişkenler güncellendi."
-          },
-          "noVariables": "Bu sunucu için başlangıç değişkeni bulunamadı."
+          }
         },
         "mounts": {
           "title": "Bağlama Noktaları (Mounts)",

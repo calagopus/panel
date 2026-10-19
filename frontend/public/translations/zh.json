@@ -482,8 +482,7 @@
       },
       "table": {
         "pagination": {
-          "results": "顯示第 {start} 至 {end} 筆，共 {total} 筆結果。",
-          "empty": "找不到任何項目，它們好像躲起來了。"
+          "results": "顯示第 {start} 至 {end} 筆，共 {total} 筆結果。"
         },
         "columns": {
           "name": "名稱",
@@ -1255,8 +1254,7 @@
                       "removed": "已從群組移除伺服器。"
                     }
                   }
-                },
-                "noGroups": "找不到任何群組，要建立一個嗎？"
+                }
               }
             },
             "allServers": {
@@ -1283,8 +1281,7 @@
             "success": "已成功{action} {servers}。",
             "partial": "已成功{action} {successfulServers}。{failedServers} 失敗。",
             "groupActions": "群組動作"
-          },
-          "noServers": "找不到任何伺服器，要新增一台嗎？"
+          }
         },
         "admin": {
           "title": "管理"
@@ -1916,7 +1913,6 @@
                 "title": "電子郵件範本設定",
                 "sidebar": {
                   "templates": "範本",
-                  "loading": "載入中...",
                   "availableVariables": "可用變數"
                 },
                 "alert": {
@@ -1926,7 +1922,6 @@
                   "syntaxOr": "和",
                   "syntaxAfter": "等控制結構。"
                 },
-                "loadingTemplate": "正在載入範本...",
                 "form": {
                   "subject": "主旨"
                 },
@@ -2147,7 +2142,6 @@
           "title": "擴充功能",
           "unknownExtension": "未知的擴充功能",
           "alert": {
-            "noExtensions": "尚未安裝任何擴充功能。",
             "heavyImageMissing": "你似乎未使用安裝擴充功能所需的 heavy 映像檔，請參閱[此處]({docsUrl})了解如何切換。",
             "supervisorUnreachable": {
               "title": "擴充功能監控服務無回應",
@@ -5313,10 +5307,6 @@
               "actions": "排程動作",
               "preConditions": "排程前置條件",
               "triggers": "排程觸發器"
-            },
-            "alert": {
-              "noActions": "此排程未設定任何動作",
-              "noTriggers": "此排程未設定任何觸發器"
             }
           },
           "step": {
@@ -5990,7 +5980,6 @@
               "content": "你的啟動變數有未儲存的變更。你確定要離開此頁面嗎？若離開，變更將會遺失。"
             }
           },
-          "noVariables": "找不到此伺服器的啟動變數。",
           "predefinedStartupCommands": "預先定義的啟動指令"
         },
         "mounts": {
