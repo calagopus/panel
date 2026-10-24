@@ -86,26 +86,26 @@
       "two": "{count} huevos",
       "few": "{count} huevos",
       "many": "{count} huevos",
-      "other": "{count} huevos"
+      "other": "{count} Huevos"
     },
     "instance": {
-      "zero": "{count} instancias",
-      "one": "{count} instancia",
-      "two": "{count} instancias",
-      "few": "{count} instancias",
-      "many": "{count} instancias",
-      "other": "{count} instancias"
+      "zero": "{count} Instancias",
+      "one": "{count} Instancia",
+      "two": "{count} Instancias",
+      "few": "{count} Instancias",
+      "many": "{count} Instancias",
+      "other": "{count} Instancias"
     },
     "shortcut": {
       "zero": "{count} atajos",
-      "one": "{count} atajo",
-      "two": "{count} atajos",
-      "few": "{count} atajos",
-      "many": "{count} atajos",
-      "other": "{count} atajos"
+      "one": "{count} Atajo",
+      "two": "{count} Atajos",
+      "few": "{count} Atajos",
+      "many": "{count} Atajos",
+      "other": "{count} Atajos"
     },
     "line": {
-      "zero": "{count} líneas",
+      "zero": "{count} Líneas",
       "one": "{count} línea",
       "two": "{count} líneas",
       "few": "{count} líneas",
@@ -238,6 +238,7 @@
       "button": {
         "create": "Crear",
         "add": "Añadir",
+        "retry": "Reintentar",
         "addDefaultPort": "Añadir :{port}",
         "save": "Guardar",
         "saveAndStay": "Guardar y permanecer",
@@ -250,7 +251,9 @@
         "disableTwoFactor": "Deshabilitar dos factores",
         "verify": "Verificar",
         "update": "Actualizar",
+        "upgrade": "Mejorar",
         "close": "Cerrar",
+        "copy": "Copiar",
         "cancel": "Cancelar",
         "continue": "Continuar",
         "skip": "Omitir",
@@ -279,6 +282,7 @@
         "details": "Detalles",
         "loadLogs": "Cargar registros",
         "sendTestEmail": "Enviar correo de prueba",
+        "test": "Probar",
         "setPrimary": "Establecer como principal",
         "unsetPrimary": "Quitar principal",
         "leavePage": "Salir de la página",
@@ -332,7 +336,10 @@
           "matches": "{count} coincidencias",
           "noMatches": "No hay coincidencias",
           "exception": "Excepción",
-          "tooManyPatterns": "Las coincidencias no se cuentan automáticamente cuando hay más de {max} patrones."
+          "invalid": "Patrón inválido",
+          "unavailable": "Cuenta no disponible",
+          "tooManyPatterns": "Las coincidencias no se cuentan automáticamente cuando hay más de {max} patrones.",
+          "unanchoredException": "`{pattern}` coincide en cualquier profundidad, usa `{anchored}` para coincidir sólo en el directorio raíz."
         },
         "cronInput": {
           "segments": {
@@ -344,6 +351,29 @@
             "weekday": "Día de la semana"
           },
           "nextRun": "La próxima ejecución es {timestamp}."
+        },
+        "iconInput": {
+          "defaultIcon": "Icono predeterminado",
+          "searchPlaceholder": "Buscar iconos…",
+          "noResults": "Ningún icono coincide con tu búsqueda.",
+          "moreResults": "Usando las primeras {count} coincidencias, refina tu búsqueda para ver más.",
+          "button": {
+            "reset": "Utilizar icono predeterminado"
+          }
+        },
+        "trashRetention": {
+          "days": "días"
+        },
+        "trashSettings": {
+          "custom": "Usar ajustes personalizados para la papelera de este servidor",
+          "default": "Panel por defecto: {summary}",
+          "summary": {
+            "disabled": "Desactivado",
+            "withThreshold": "{retention}, borrado con {threshold}% de uso de disco"
+          },
+          "retention": "Retención",
+          "retentionDescription": "Cuánto tiempo permanecen los archivos borrados en la papelera. Establecer en 0 para desactivar la papelera.",
+          "usageThreshold": "Limpiar al llegar a cierto Uso de Disco"
         },
         "backupRetention": {
           "title": "Retención",
@@ -420,6 +450,7 @@
       "form": {
         "force": "¿Quieres ejecutar la eliminación forzadamente?",
         "name": "Nombre",
+        "icon": "Icono",
         "newName": "Nuevo nombre",
         "description": "Descripción",
         "author": "Autor",
@@ -516,7 +547,13 @@
       "table": {
         "selectRow": "Seleccionar fila",
         "pagination": {
-          "results": "Mostrando {start} a {end} de {total} resultados."
+          "results": "Mostrando {start} a {end} de {total} resultados.",
+          "perPage": "{count} / página",
+          "perPageLabel": "Resultados por página"
+        },
+        "empty": {
+          "title": "No se encontraron elementos",
+          "description": "Prueba una búsqueda diferente o vuelve a intentarlo una vez que se haya añadido algo."
         },
         "columns": {
           "name": "Nombre",
@@ -582,7 +619,8 @@
         "inbound": "Entrada",
         "outbound": "Salida",
         "uptime": "Tiempo activo",
-        "resources": "Recursos"
+        "resources": "Recursos",
+        "limit": "Límite: {limit}"
       },
       "badge": {
         "active": "Activo",
@@ -592,7 +630,9 @@
         "successful": "Correcto",
         "failed": "Fallido",
         "installed": "Instalado",
-        "systemBackup": "Sistema"
+        "updateAvailable": "Actualización disponible",
+        "systemBackup": "Sistema",
+        "restarting": "Reiniciando"
       },
       "label": {
         "noSubdirectories": "No hay subdirectorios",
@@ -627,6 +667,12 @@
           "memoryUsageUnlimited": "Memoria: {used} usado, sin límite de nodo",
           "diskUsage": "Disco: {used} / {limit}",
           "diskUsageUnlimited": "Disco: {used} usado, sin límite de nodo"
+        },
+        "allowedSources": {
+          "checking": "Comprobando Nodo",
+          "notAllowed": "No permitido en el nodo",
+          "mountNotAllowed": "El nodo `allowed_mounts` no cubre la fuente de este mount, así que las wings lo omiten al iniciar el servidor.",
+          "deviceNotAllowed": "El nodo `allowed_devices` no cubre la fuente de este dispositivo (o sus permisos no son válidos), así que las wings lo saltan al iniciar el servidor."
         }
       },
       "server": {
@@ -638,7 +684,8 @@
           "restoringBackup": "Restaurando copia de seguridad",
           "installing": "Instalando",
           "installFailed": "Instalación fallida",
-          "backupRestoreFailed": "Fallo al restaurar la copia de seguridad"
+          "backupRestoreFailed": "Fallo al restaurar la copia de seguridad",
+          "resourcesUnavailable": "Uso de recursos no disponible"
         }
       },
       "enum": {
@@ -667,6 +714,12 @@
           "starting": "Iniciando",
           "finished": "Finalizado",
           "failed": "Fallido"
+        },
+        "backupRetentionRule": {
+          "count": "Último",
+          "days": "Reciente",
+          "daily": "Diariamente",
+          "weekly": "Semanalmente"
         },
         "serverBackupKind": {
           "server": "Servidor",
@@ -1993,6 +2046,15 @@
                     "misses": "Calculado"
                   }
                 },
+                "enum": {
+                  "containerType": {
+                    "none": "Ninguno detectado",
+                    "official": "Oficial",
+                    "officialAio": "AIO oficial",
+                    "officialHeavy": "Oficial Heavy",
+                    "officialHeavyAio": "Heavy AIO Oficial"
+                  }
+                },
                 "stats": {
                   "users": "Usuarios",
                   "servers": "Servidores",
@@ -2030,7 +2092,12 @@
                 "extensionsOutdated": "Algunas extensiones están desactualizadas o tuvieron errores al buscar actualizaciones.",
                 "noChangelog": "No hay registro de cambios",
                 "nodesUpToDate": "Parece que todos los nodos están actualizados. ({failed} no se pudieron comprobar)",
+                "nodesOutdatedSummary": "Algunos nodos están desactualizados. ({outdated} desactualizados, {failed} no pudo comprobar)",
                 "databaseAgentHostsUpToDate": "Parece que todos los hosts de agentes de bases de datos están actualizados. ({failed} no se pudieron comprobar)",
+                "databaseAgentHostsOutdatedSummary": "Algunos hosts de agentes de base de datos están desactualizados. ({outdated} desactualizado, {failed} no pudo comprobar)",
+                "badge": {
+                  "latestVersion": "Última versión: {version}"
+                },
                 "table": {
                   "version": "Versión",
                   "installed": "Instalado",
@@ -2101,6 +2168,11 @@
                   "registrationEnabled": "Habilitar registro",
                   "passwordLoginEnabled": "Habilitar inicio de sesión con contraseña",
                   "passwordLoginEnabledDescription": "Permite a los usuarios iniciar sesión con un nombre de usuario y una contraseña. Si desactivas esta opción, los proveedores de OAuth y las claves de seguridad serán las únicas formas de iniciar sesión, y también se desactivarán el registro de cuentas locales, los restablecimientos de contraseña y la autenticación mediante contraseña en SFTP."
+                },
+                "section": {
+                  "authentication": "Autenticación",
+                  "sessions": "Sesiones",
+                  "telemetry": "Telemetría"
                 },
                 "enum": {
                   "twoFactorMethod": {
@@ -2219,6 +2291,9 @@
                 },
                 "toast": {
                   "updated": "Configuración de correo electrónico actualizada."
+                },
+                "tooltip": {
+                  "noProvider": "Guardar un proveedor de correo antes de enviar un correo electrónico de prueba."
                 },
                 "modal": {
                   "sendTestEmail": {
@@ -2376,8 +2451,19 @@
                   "allowAcknowledgingInstallationFailureDescription": "Si está activado, los usuarios podrán confirmar los fallos de instalación de los servidores que se encuentren en el estado \"Instalación fallida\", lo que les permitirá intentar iniciar el servidor en lugar de tener que esperar a un administrador. Si está desactivado, solo los administradores podrán confirmar los fallos de instalación.",
                   "allowViewingTransferProgress": "Permitir ver progreso de transferencia",
                   "allowViewingTransferProgressDescription": "Si está activado, los usuarios con permisos de lectura de la consola también podrán ver los registros del progreso de la transferencia mediante la conexión WebSocket. Si está desactivado, los registros del progreso de la transferencia solo estarán disponibles para los administradores.",
+                  "trashRetention": "Retención de basura",
+                  "trashRetentionDescription": "Cuánto tiempo permanecen los archivos borrados en la papelera del servidor antes de que se eliminen permanentemente. Establecer en 0 para desactivar la papelera. Los archivos en el recuento de basura hacia el límite de disco del servidor. Cada servidor puede usar sus propias configuraciones de basura en su lugar.",
+                  "trashUsageThreshold": "Limpiar al llegar a cierto Uso de Disco",
                   "containerPrelude": "Preámbulo del contenedor",
                   "containerPreludeDescription": "El preámbulo de la terminal utilizado para algunos mensajes relacionados con el estado en la consola del servidor."
+                },
+                "section": {
+                  "fileManager": "Gestor de archivos",
+                  "limits": "Límites",
+                  "networking": "Redes",
+                  "databaseInstances": "Instancias de base de datos",
+                  "lifecycle": "Consola y ciclo de vida",
+                  "trash": "Papelera"
                 },
                 "toast": {
                   "updated": "Configuración del servidor actualizada.\n"
@@ -2397,7 +2483,13 @@
                   "maxSettingsCount": "Máximo de ajustes sincronizados",
                   "maxSettingsValueBytes": "Tamaño máximo de la configuración sincronizada (bytes)",
                   "allowChangingLanguage": "Permitir el cambio de idioma",
-                  "allowChangingLanguageDescription": "Si está activado, los usuarios podrán cambiar sus preferencias de idioma."
+                  "allowChangingLanguageDescription": "Si está activado, los usuarios podrán cambiar sus preferencias de idioma.",
+                  "allowChangingAvatar": "Permitir cambiar Avatar",
+                  "allowChangingAvatarDescription": "Si está activado, los usuarios podrán subir y eliminar su avatar."
+                },
+                "section": {
+                  "limits": "Límites",
+                  "permissions": "Permisos"
                 },
                 "routeOrder": {
                   "title": "Orden de ruta de cliente"
@@ -2459,6 +2551,12 @@
                 "toast": {
                   "updated": "Configuración de límites de tasa actualizada."
                 }
+              }
+            },
+            "updates": {
+              "title": "Actualizaciones",
+              "page": {
+                "title": "Actualizar Ajustes"
               }
             }
           }
@@ -2540,6 +2638,11 @@
           }
         },
         "extensions": {
+          "empty": {
+            "title": "No hay extensiones instaladas",
+            "description": "Este panel se ejecuta sin ninguna extensión. Suelta un archivo de extensión en esta página para instalar uno.",
+            "descriptionDisabled": "Este panel se ejecuta sin ninguna extensión. La administración de extensiones ha sido desactivada, por lo que no se puede instalar ninguna."
+          },
           "title": "Extensiones",
           "unknownExtension": "Extensión desconocida",
           "alert": {
@@ -2550,7 +2653,12 @@
             },
             "buildFailed": {
               "title": "La última compilación de la extensión ha fallado",
-              "content": "Estas extensiones no se volverán a compilar hasta que cambien o vuelvas a intentar la compilación explícitamente."
+              "content": "Estas extensiones no se volverán a compilar hasta que cambien o vuelvas a intentar la compilación explícitamente.",
+              "failedExtensions": "La compilación falló en {extensions}. Actualízalas o eliminalas, luego reintenta la compilación."
+            },
+            "startFailed": {
+              "title": "Algunas extensiones no pudieron iniciarse",
+              "content": "Se bloquearon mientras iniciaban, o sus rutas o comandos CLI entran en conflicto con el panel o con otra extensión, por lo que no se están ejecutando. Actualiza o elimina, luego reinicia el panel."
             },
             "pendingRestart": {
               "title": "Algunas extensiones fueron habilitadas o desactivadas",
@@ -2600,9 +2708,12 @@
             "frontendMissing": "Falta la interfaz",
             "backendMissing": "Falta el backend",
             "pendingBuild": "Compilación pendiente",
+            "buildFailed": "Error al compilar",
+            "startFailed": "Error al iniciar",
             "pendingRemoval": "Eliminación pendiente",
             "pendingRestart": "Reinicio pendiente",
-            "disabled": "Deshabilitado"
+            "disabled": "Deshabilitado",
+            "processing": "Procesando"
           },
           "card": {
             "version": "Versión",
@@ -2911,7 +3022,8 @@
                   "unavailable": "No disponible"
                 },
                 "badge": {
-                  "updateAvailable": "Actualización disponible"
+                  "updateAvailable": "Actualización disponible",
+                  "latestVersionUnknown": "Última versión Desconocida"
                 }
               }
             },
@@ -2921,6 +3033,7 @@
                   "allInOneNode": "Nodo todo en uno",
                   "errorWhileFetchingVersion": "Error al obtener la versión",
                   "updateAvailable": "{version} (actualización disponible)",
+                  "latestVersionUnknown": "{version} (última versión desconocida)",
                   "useWingsProxyUrl": "Usar la URL del proxy de Wings"
                 },
                 "form": {
@@ -3051,7 +3164,9 @@
                   "noLimit": "Sin límite de nodo",
                   "free": "{size} libre",
                   "overhead": "+ {size} sobrecarga reservada",
-                  "cores": "{cores} núcleos asignados"
+                  "cores": "{cores} núcleos asignados",
+                  "other": "Otros ({servers})",
+                  "suspended": "Suspendido"
                 }
               }
             },
@@ -4045,6 +4160,16 @@
                   "eggsPlaceholder": "Seleccionar huevos"
                 },
                 "enum": {
+                  "matcherType": {
+                    "not": "NOT (no debe coincidir)",
+                    "nodes": "Nodos",
+                    "locations": "Ubicaciones"
+                  },
+                  "featureState": {
+                    "inherit": "Heredar",
+                    "enabled": "Habilitado",
+                    "disabled": "Deshabilitado"
+                  },
                   "deploymentType": {
                     "random": "Aleatorio",
                     "range": "Rango de puertos",
@@ -4092,6 +4217,16 @@
                     "removeRule": "Eliminar regla de despliegue"
                   }
                 },
+                "features": {
+                  "title": "Configuración de Feature",
+                  "description": "A diferencia de otras secciones, cada característica heredada mantiene el valor de las configuraciones de orden inferior. Características que nadie establece permanecen activadas.",
+                  "form": {
+                    "firewall": "Cortafuegos",
+                    "firewallDescription": "Permite a los usuarios administrar reglas de cortafuegos para sus servidores. Desactivar mantiene las reglas existentes pero deja de aplicarlas.",
+                    "privateNetwork": "Red privada",
+                    "privateNetworkDescription": "Permite que los servidores se unan a la red privada y se conecten a otros servidores. Desactivar los elimina de la red hasta que esté habilitado de nuevo."
+                  }
+                },
                 "startup": {
                   "title": "Configuración de inicio",
                   "form": {
@@ -4106,6 +4241,45 @@
                 }
               }
             }
+          }
+        },
+        "eggLibrary": {
+          "title": "Librería de huevos",
+          "tabs": {
+            "installed": {
+              "title": "Instalado",
+              "page": {
+                "title": "Huevos instalados",
+                "empty": {
+                  "title": "Aún no hay huevos instalados",
+                  "description": "Los huevos instalados desde los repositorios o importados manualmente se muestran aquí. Navega por los huevos disponibles para instalar el primero.",
+                  "button": "Explorar Huevos Disponibles"
+                },
+                "toast": {
+                  "updated": "{egg} actualizado desde su repositorio."
+                }
+              }
+            },
+            "available": {
+              "title": "Disponible",
+              "page": {
+                "title": "Huevos disponibles",
+                "empty": {
+                  "title": "No hay huevos disponibles",
+                  "description": "Añade un repositorio de huevos y se sincroniza automáticamente, los huevos que puedes instalar aparecen aquí.",
+                  "button": "Ir a los repositorios de Huevos"
+                }
+              }
+            }
+          },
+          "card": {
+            "repository": "Repositorio",
+            "author": "Autor",
+            "installedIn": "Instalado en"
+          },
+          "button": {
+            "open": "Abrir",
+            "readme": "LEEME"
           }
         },
         "eggRepositories": {
@@ -4127,7 +4301,9 @@
                   "credentialType": "Tipo de credencial",
                   "password": "Contraseña o token de acceso",
                   "privateKey": "Clave privada",
-                  "passphrase": "Frase de contraseña"
+                  "passphrase": "Frase de contraseña",
+                  "autoSync": "Sincronización automática",
+                  "autoSyncDescription": "Volver a sincronizar este repositorio una vez al día para que aparezcan los huevos nuevos y actualizados sin presionar Sincronizar."
                 },
                 "enum": {
                   "credentialType": {
@@ -4142,6 +4318,9 @@
                 "toast": {
                   "synced": "Repositorio de huevos sincronizado, se han encontrado {eggs}."
                 },
+                "alert": {
+                  "credentialsCleared": "Cambiando el esquema, host o puerto del repositorio borra sus credenciales almacenadas. Introdúzcalas de nuevo abajo si el nuevo host las necesita."
+                },
                 "modal": {
                   "delete": {
                     "title": "Confirmar eliminación del repositorio de huevos"
@@ -4155,16 +4334,29 @@
                 "title": "Huevos de repositorio de huevos",
                 "table": {
                   "columns": {
-                    "path": "Ruta"
+                    "path": "Ruta",
+                    "repository": "Repositorio",
+                    "installedIn": "Instalado en"
                   }
                 },
                 "toast": {
-                  "installed": "{eggs} instalado."
+                  "installed": "{eggs} instalado.",
+                  "alreadyInstalled": "Este huevo ya estaba instalado en {nest}, se utilizó el huevo existente."
                 },
                 "modal": {
                   "install": {
                     "title": "Instalar {eggs}",
                     "button": "Instalar {eggs}"
+                  },
+                  "catalog": {
+                    "title": "Instalar Huevo desde Repository",
+                    "searchPlaceholder": "Buscar huevos en cada repositorio...",
+                    "selected": "Seleccionado: **{egg}**",
+                    "moreResults": "Mostrando {shown} de huevos {total}, sigue escribiendo para reducirlo.",
+                    "installingInto": "El huevo se instalará en **{nest}**.",
+                    "noEggs": "Aún no hay huevos disponibles. Añada un repositorio de huevos bajo los repositorio de Egg Repositories, se sincroniza automáticamente.",
+                    "button": "Instalar",
+                    "buttonSelect": "Instalar & Seleccionar"
                   }
                 },
                 "drawer": {
@@ -4197,6 +4389,9 @@
                 },
                 "button": {
                   "testConnection": "Verificar conexión"
+                },
+                "tooltip": {
+                  "errorWhileFetchingVersion": "Error al obtener la versión"
                 },
                 "toast": {
                   "tested": "Prueba completada correctamente."
@@ -4240,7 +4435,8 @@
                 "titleUpdate": "Actualizar host de agente de bases de datos",
                 "tooltip": {
                   "errorWhileFetchingVersion": "Error al obtener la versión",
-                  "updateAvailable": "{version} (actualización disponible)"
+                  "updateAvailable": "{version} (actualización disponible)",
+                  "latestVersionUnknown": "{version} (última versión desconocida)"
                 },
                 "form": {
                   "typePublicHost": "Host público",
@@ -5384,6 +5580,7 @@
             "permissionsSelection": "Cambiar permisos",
             "fingerprintSelection": "Mostrar huella del archivo",
             "deleteSelection": "Eliminar selección",
+            "openTrash": "Abrir la Papelera",
             "saveFile": "Guardar archivo",
             "createFile": "Crear archivo"
           },
@@ -5439,6 +5636,8 @@
             "editorEngine": "Motor del editor",
             "editorPreviewTabs": "Previsualizar archivos en pestañas de árbol",
             "editorPreviewTabsDescription": "Edita o haz doble clic en una pestaña para mantenerla abierta.",
+            "alwaysOverwrite": "Sobrescribir siempre los archivos existentes",
+            "alwaysOverwriteDescription": "Omitir la ventana de conflicto al subir, copiar o pegar.",
             "vscodeUriScheme": "Esquema URI de VS Code",
             "imageViewerSmoothing": "Suavizar imagen (antialiasing)"
           },
@@ -5456,6 +5655,10 @@
             "moveCouldNotBeUndone": "No se pudo deshacer el traslado.",
             "downloadStarted": "Descarga iniciada.",
             "filesDeleted": "Los archivos se han eliminado.",
+            "filesTrashed": "{files} movidos a la papelera.",
+            "filesTrashedPartiallyDeleted": "{files} movidos a la papelera, {deleted} eliminados permanentemente.",
+            "trashUndone": "{files} restaurado de la papelera.",
+            "trashCouldNotBeUndone": "No se pudieron restaurar los archivos de la papelera.",
             "archiveCreationStarted": "Se ha iniciado la creación del archivo.",
             "decompressionStarted": "La extracción del archivo ha comenzado.",
             "fileCopyingStarted": "Se ha iniciado la copia del archivo.",
@@ -5514,6 +5717,49 @@
                 "original": "Revisión",
                 "current": "Actual"
               }
+            }
+          },
+          "trash": {
+            "title": "Papelera",
+            "subtitle": "Los archivos eliminados se guardan para {retention} antes de que se eliminen permanentemente.",
+            "table": {
+              "columns": {
+                "originalLocation": "Ubicación original",
+                "deletedAt": "Eliminado"
+              }
+            },
+            "empty": {
+              "title": "La papelera está vacía"
+            },
+            "modal": {
+              "deleteEntries": {
+                "title": "Eliminar permanentemente"
+              },
+              "deleteEntry": {
+                "title": "Eliminar permanentemente"
+              },
+              "emptyTrash": {
+                "title": "Vaciar Papelera",
+                "content": "¿Está seguro que desea eliminar permanentemente todo de la papelera? Esto no se puede deshacer."
+              },
+              "restoreTo": {
+                "title": "Restaurar en directorio",
+                "destination": "Directorio de destino",
+                "restoredAs": "Este archivo será restaurado como "
+              },
+              "restoreConflict": {
+                "title": "Resolver conflictos de la restauración",
+                "description": "Algo ya existe donde los siguientes {files} van a ser restaurados.",
+                "confirm": "Restaurar {files}"
+              }
+            },
+            "toast": {
+              "restored": "{entries} restaurados.",
+              "nothingRestored": "No se pudo restaurar nada.",
+              "restoreUndone": "{files} fueron movidos nuevamente a la papelera.",
+              "restoreCouldNotBeUndone": "No se pudo deshacer la restauración.",
+              "deleted": "{entries} eliminados permanentemente.",
+              "emptied": "Se ha vaciado la papelera."
             }
           },
           "modal": {
@@ -5595,7 +5841,9 @@
             },
             "deleteFile": {
               "title": "Eliminar archivo",
-              "multipleFilesWarning": "No podrás recuperar el contenido de los siguientes archivos una vez eliminados."
+              "singleFileWarning": "No podrás recuperar el contenido de **{file}** una vez eliminado.",
+              "multipleFilesWarning": "No podrás recuperar el contenido de los siguientes archivos una vez eliminados.",
+              "trashTitle": "Mover a la papelera"
             },
             "createFile": {
               "title": "Crear archivo"
@@ -5682,7 +5930,10 @@
             },
             "largestDirectories": {
               "title": "Directorios más grandes",
-              "empty": "No se han encontrado directorios."
+              "empty": "No se han encontrado directorios.",
+              "files": "Archivos en esta carpeta",
+              "inaccessible": "Inaccesible",
+              "openFolder": "Abrir carpeta"
             },
             "searchFiles": {
               "title": "Buscar archivos",
@@ -5929,6 +6180,7 @@
                 "logs": "Registros"
               },
               "stats": {
+                "connecting": "Conectando...",
                 "offline": "La instancia está desconectada"
               }
             },
@@ -6341,6 +6593,13 @@
             }
           },
           "view": {
+            "empty": {
+              "triggers": {
+                "title": "No hay Triggers",
+                "description": "Esta tarea programada nunca comienza por sí sola y solo se ejecuta cuando se inicia a mano. Edítalo para añadir un disparador.",
+                "descriptionReadOnly": "Esta tarea programada nunca comienza por sí sola y sólo se ejecuta cuando se inicia a mano."
+              }
+            },
             "badge": {
               "running": "En ejecución"
             },
@@ -6511,13 +6770,20 @@
             }
           },
           "steps": {
+            "tooltip": {
+              "limitReached": "Esta tarea programada está limitada a {max} pasos."
+            },
             "empty": {
+              "descriptionReadOnly": "Esta tarea programada no hace nada cuando se ejecuta.",
               "title": "No hay pasos configurados",
               "description": "Esta tarea programada aún no tiene pasos. Añade algunas acciones para empezar."
             },
             "warning": {
               "unclosedIf": "A un bloque \"If\" le falta su correspondiente \"End If\". Todos los pasos restantes se ejecutarán como parte del bloque.",
-              "orphanBranch": "Hay un paso \"Else\", \"Else If\" o \"End If\" sin un \"If\" correspondiente anterior."
+              "orphanBranch": "Hay un paso \"Else\", \"Else If\" o \"End If\" sin un \"If\" correspondiente anterior.",
+              "variable": {
+                "never": "La variable \"{variable}\" nunca está establecida por este programa, por lo que no se resolverá."
+              }
             },
             "groups": {
               "server": "Servidor",
