@@ -4816,7 +4816,6 @@
             "revealInTree": "Vis i træet",
             "revealNotFound": "Kunne ikke finde {path} i filtræet.",
             "unsavedTab": "{name} har ugemte ændringer",
-            "dropToSplit": "Slip for at åbne i et nyt editor-panel",
             "resizeEditorPanes": "Tilpas størrelsen på editor-paneler",
             "selectPane": "Vælg editor-panel",
             "editorPane": "Editor-panel {number}"

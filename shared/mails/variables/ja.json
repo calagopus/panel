@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "アカウントが作成されました",
+    "greeting": "こんにちは、",
+    "intro": "<strong>{{ settings.app.name }}</strong> でアカウントが作成されたため、このメールをお送りしています。",
+    "instruction": "下のボタンをクリックして安全にパスワードを設定し、アカウントにアクセスしてください:",
+    "button": "パスワードを設定",
+    "note": "<strong>注意:</strong> セキュリティ上の理由から、このリンクの有効期限は <strong>20分</strong> です。",
+    "footer": "アカウントの作成を依頼していない場合は、このメールを無視していただいて構いません。"
+  },
+  "password_reset": {
+    "subject": "パスワードのリセット",
+    "greeting": "<strong>{{ user.username }}</strong> さん、こんにちは、",
+    "intro": "<strong>{{ settings.app.name }}</strong> のアカウントのパスワードをリセットするリクエストを受け付けました。",
+    "instruction": "ご自身でリクエストした場合は、下のボタンをクリックして新しいパスワードを設定してください:",
+    "button": "パスワードをリセット",
+    "note": "<strong>注意:</strong> このリンクの有効期限は <strong>20分</strong> です。",
+    "footer": "パスワードのリセットを依頼していない場合は、このメールを無視してください。パスワードは変更されず、アカウントは安全な状態に保たれます。"
+  },
+  "email_verification": {
+    "subject": "メールアドレスの確認",
+    "greeting": "<strong>{{ user.username }}</strong> さん、こんにちは、",
+    "intro": "<strong>{{ settings.app.name }}</strong> でのアカウント設定を完了するため、<strong>{{ email }}</strong> がご自身のメールアドレスであることを確認してください。",
+    "button": "メールアドレスを確認",
+    "note": "<strong>注意:</strong> このリンクの有効期限は <strong>24時間</strong> です。",
+    "footer": "このアカウントの作成や変更を依頼していない場合は、このメールを無視してください。変更は行われません。"
+  },
+  "two_factor_code": {
+    "subject": "ログインコード",
+    "greeting": "<strong>{{ user.username }}</strong> さん、こんにちは、",
+    "intro": "以下のコードを使用して、<strong>{{ settings.app.name }}</strong> へのログインを完了してください。",
+    "note": "<strong>注意:</strong> このコードの有効期限は <strong>10分</strong> で、一度だけ使用できます。",
+    "footer": "ログインを試みていない場合、第三者にパスワードを知られている可能性があります。できるだけ早くパスワードを変更することをおすすめします。"
+  },
+  "session_created": {
+    "subject": "新しいセッションが作成されました",
+    "greeting": "<strong>{{ user.username }}</strong> さん、こんにちは、",
+    "intro": "<strong>{{ settings.app.name }}</strong> で、お使いのアカウントへのログインがありました。",
+    "ip_label": "IPアドレス",
+    "device_label": "デバイス",
+    "button": "セッションを確認",
+    "note": "<strong>注意:</strong> ご自身によるログインであれば、対応は不要です。心当たりのないセッションは、アカウント設定から取り消せます。",
+    "footer": "ご自身によるログインでない場合、第三者にパスワードを知られている可能性があります。できるだけ早くパスワードを変更することをおすすめします。"
+  },
+  "connection_test": {
+    "subject": "接続テスト",
+    "greeting": "こんにちは、",
+    "intro": "<strong>{{ settings.app.name }}</strong> の管理者がメール送信設定を確認するためにテストメッセージをリクエストしたため、このメールをお送りしています。",
+    "success": "🎉 成功しました！メール接続は正常に動作しています。",
+    "footer": "これはアプリケーションから自動送信されたテストメッセージです。追加の対応は不要です。"
+  },
+  "added_to_server": {
+    "subject": "サーバーに追加されました",
+    "greeting": "こんにちは、",
+    "intro": "<strong>{{ server.name }}</strong> のサブユーザーに追加されたため、このメールをお送りしています。",
+    "instruction": "下のボタンをクリックしてサーバーにアクセスしてください:",
+    "button": "サーバーにアクセス"
+  },
+  "removed_from_server": {
+    "subject": "サーバーから削除されました",
+    "greeting": "こんにちは、",
+    "intro": "<strong>{{ server.name }}</strong> のサブユーザーから削除されたため、このメールをお送りしています。",
+    "footer": "ご自身での対応は不要です。誤りと思われる場合は、詳細についてサーバー管理者にお問い合わせください。"
+  },
+  "server_installed": {
+    "subject": "サーバーのインストールが完了しました",
+    "greeting": "こんにちは、",
+    "intro": "サーバー <strong>{{ server.name }}</strong> のインストールが完了したため、このメールをお送りしています。",
+    "instruction": "下のボタンをクリックしてサーバーにアクセスしてください:",
+    "button": "サーバーにアクセス"
+  },
+  "server_restored": {
+    "subject": "サーバーの復元が完了しました",
+    "greeting": "こんにちは、",
+    "intro": "サーバー <strong>{{ server.name }}</strong> のバックアップからの復元が完了したため、このメールをお送りしています。",
+    "instruction": "下のボタンをクリックしてサーバーにアクセスしてください:",
+    "button": "サーバーにアクセス"
+  }
+}

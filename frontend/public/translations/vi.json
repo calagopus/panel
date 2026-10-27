@@ -1,7 +1,7 @@
 {
   "items": {
     "byte": {
-      "other": "{count} Egg"
+      "other": "{count} Byte"
     },
     "user": {
       "zero": "{count} Người Dùng",
@@ -217,6 +217,7 @@
       "button": {
         "create": "Tạo",
         "add": "Thêm",
+        "retry": "Thử lại",
         "addDefaultPort": "Thêm :{port}",
         "save": "Lưu",
         "saveAndStay": "Lưu &Ở lại",
@@ -229,7 +230,9 @@
         "disableTwoFactor": "Tắt Xác thực Hai Lớp",
         "verify": "Xác minh",
         "update": "Cập nhật",
+        "upgrade": "Nâng cấp",
         "close": "Đóng",
+        "copy": "Sao Chép",
         "cancel": "Hủy",
         "continue": "Tiếp tục",
         "skip": "Bỏ qua",
@@ -258,6 +261,7 @@
         "details": "Chi Tiết",
         "loadLogs": "Tải Nhật Ký",
         "sendTestEmail": "Gửi Email Thử",
+        "test": "Thử",
         "setPrimary": "Đặt làm Chính",
         "unsetPrimary": "Bỏ Chính",
         "leavePage": "Rời Khỏi Trang",
@@ -311,7 +315,10 @@
           "matches": "{count} khớp",
           "noMatches": "Không có kết quả khớp",
           "exception": "Ngoại lệ",
-          "tooManyPatterns": "Không tự động đếm số khớp khi có hơn {max} pattern."
+          "invalid": "Thành phần không hợp lệ",
+          "unavailable": "Số liệu không khả dụng",
+          "tooManyPatterns": "Không tự động đếm số khớp khi có hơn {max} pattern.",
+          "unanchoredException": "{pattern}` khớp ở bất kỳ độ sâu nào, hãy sử dụng `{anchored}` để chỉ khớp trong thư mục gốc."
         },
         "cronInput": {
           "segments": {
@@ -323,6 +330,30 @@
             "weekday": "Ngày trong tuần"
           },
           "nextRun": "Lần chạy tiếp theo là {timestamp}."
+        },
+        "iconInput": {
+          "defaultIcon": "Biểu tượng mặc định",
+          "searchPlaceholder": "Tìm kiếm biểu tượng…",
+          "noResults": "Không có biểu tượng nào khớp với tìm kiếm của bạn.",
+          "moreResults": "Hiển thị {count} kết quả phù hợp đầu tiên, hãy tinh chỉnh tìm kiếm của bạn để xem thêm.",
+          "button": {
+            "reset": "Sử dụng biểu tượng mặc định"
+          }
+        },
+        "trashRetention": {
+          "days": "ngày"
+        },
+        "trashSettings": {
+          "custom": "Sử dụng cài đặt thùng rác tùy chỉnh cho máy chủ này",
+          "default": "Panel mặc định: {summary}",
+          "summary": {
+            "disabled": "Đã vô hiệu hóa",
+            "withThreshold": "{retention}, đã được xóa khi đạt mức sử dụng đĩa {threshold}%"
+          },
+          "retention": "Giữ lại",
+          "retentionDescription": "Thời gian các tệp đã xóa lưu trữ trong thùng rác. Đặt thành 0 để tắt thùng rác.",
+          "usageThreshold": "Xóa dữ liệu sử dụng ổ đĩa",
+          "usageThresholdDescription": "Xóa các mục thùng rác cũ nhất khi mức sử dụng ổ đĩa đạt đến tỷ lệ phần trăm giới hạn này. Đặt thành 0 để chỉ xóa thùng rác khi thao tác ghi vượt quá giới hạn."
         },
         "backupRetention": {
           "title": "Duy trì",
@@ -358,6 +389,10 @@
         "duplicate": {
           "title": "Nhân bản {resource}"
         },
+        "unsavedChanges": {
+          "title": "Các thay đổi chưa được lưu",
+          "content": "Bạn có những thay đổi chưa được lưu. Bạn có chắc chắn muốn rời khỏi trang này không? Nếu bạn rời đi, những thay đổi của bạn sẽ bị mất."
+        },
         "delete": {
           "content": "Bạn có chắc chắn muốn xóa **{name}** không?"
         },
@@ -371,7 +406,8 @@
       },
       "toast": {
         "duplicated": "Đã nhân bản {resource}.",
-        "failedBackupDeletionStarted": "Đang xóa {count} bản sao lưu bị lỗi trong nền."
+        "failedBackupDeletionStarted": "Đang xóa {count} bản sao lưu bị lỗi trong nền.",
+        "requestBlockedByExtension": "Yêu cầu này đã bị chặn bởi một tiện ích mở rộng."
       },
       "settingScope": {
         "account": "Đồng bộ với tài khoản",
@@ -400,6 +436,7 @@
       "form": {
         "force": "Bạn có muốn buộc thực hiện việc xóa này không?",
         "name": "Tên",
+        "icon": "Biểu Tượng",
         "newName": "Tên mới",
         "description": "Mô tả",
         "author": "Tác giả",
@@ -437,7 +474,7 @@
         "sftpHost": "Máy chủ SFTP",
         "dockerImage": "Hình Ảnh Docker",
         "memory": "Bộ nhớ (MB)",
-        "disk": "Ông đĩa (MB)",
+        "disk": "Ổ đĩa",
         "serverName": "Tên Máy Chủ",
         "startupCommand": "Lệnh Khởi Động",
         "archiveName": "Tên Kho Lưu Trữ",
@@ -453,6 +490,7 @@
         "externalId": "ID Bên Ngoài",
         "mount": "Điểm Gắn",
         "device": "Thiết bị",
+        "nestCreateHint": "Không tìm thấy cái nào? Hãy Tạo một nest mới",
         "lines": "Số Dòng",
         "databaseHost": "Máy Chủ Cơ Sở Dữ Liệu",
         "databaseAgentHost": "Máy Chủ Agent Cơ Sở Dữ Liệu",
@@ -487,12 +525,28 @@
         "target": "Đích",
         "replaceWith": "Thay thế bằng",
         "caseInsensitive": "Không phân biệt chữ hoa/thường",
-        "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác."
+        "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác.",
+        "rule": {
+          "invalidCharacters": "Chứa các ký tự không được phép sử dụng ở đây.",
+          "username": "Chỉ từ 3 đến 15 ký tự, bao gồm chữ cái, chữ số và dấu gạch dưới.",
+          "databaseName": "Tối đa 31 ký tự, chỉ bao gồm chữ cái, chữ số và dấu gạch dưới.",
+          "databaseInstanceIdentifier": "Từ 2 đến 23 ký tự, chỉ bao gồm chữ cái và chữ số.",
+          "captchaSiteKey": "Chỉ chấp nhận chữ cái, chữ số, dấu gạch ngang và dấu gạch dưới.",
+          "variableName": "Bắt đầu bằng một chữ cái thường, sau đó là tối đa 63 chữ cái thường, chữ số hoặc dấu gạch dưới.",
+          "hexColor": "Mã màu hex như #1c7ed6.",
+          "devicePermissions": "Bất kỳ sự kết hợp nào của r (đọc), w (ghi) và m (mknod)."
+        }
       },
       "table": {
         "selectRow": "Chọn hàng",
         "pagination": {
-          "results": "Hiển thị {start} đến {end} của {total} kết quả."
+          "results": "Hiển thị {start} đến {end} của {total} kết quả.",
+          "perPage": "{count} / trang",
+          "perPageLabel": "Kết quả mỗi trang"
+        },
+        "empty": {
+          "title": "Không tìm thấy mục nào",
+          "description": "Hãy thử tìm kiếm bằng công cụ khác, hoặc quay lại kiểm tra sau khi có nội dung mới được thêm vào."
         },
         "columns": {
           "name": "Tên",
@@ -562,7 +616,8 @@
         "inbound": "Băng thông vào",
         "outbound": "Băng thông ra",
         "uptime": "Thời gian hoạt động",
-        "resources": "Tài nguyên"
+        "resources": "Tài nguyên",
+        "limit": "Giới hạn: {limit}"
       },
       "badge": {
         "active": "Đang hoạt động",
@@ -572,7 +627,9 @@
         "successful": "Thành công",
         "failed": "Thất bại",
         "installed": "Đã cài đặt",
-        "systemBackup": "Hệ thống"
+        "updateAvailable": "Có Bản Cập Nhật",
+        "systemBackup": "Hệ thống",
+        "restarting": "Đang khởi động lại"
       },
       "label": {
         "noSubdirectories": "Không có thư mục con",
@@ -607,6 +664,12 @@
           "memoryUsageUnlimited": "Bộ nhớ: {used} đã dùng, node không giới hạn",
           "diskUsage": "Ổ đĩa: {used} / {limit}",
           "diskUsageUnlimited": "Bộ nhớ: {used} đã dùng, node không giới hạn"
+        },
+        "allowedSources": {
+          "checking": "Đang kiểm tra Node",
+          "notAllowed": "Không được phép trên Node",
+          "mountNotAllowed": "Thuộc tính `allowed_mounts` của node không bao gồm nguồn của mount này, vì vậy wings sẽ bỏ qua nó khi khởi động máy chủ.",
+          "deviceNotAllowed": "Thuộc tính `allowed_devices` của node không bao gồm nguồn của thiết bị này (hoặc quyền truy cập của nó không hợp lệ), vì vậy wings sẽ bỏ qua nó khi khởi động máy chủ."
         }
       },
       "server": {
@@ -618,7 +681,8 @@
           "restoringBackup": "Khôi phục Backup",
           "installing": "Đang cài đặt",
           "installFailed": "Lỗi cài đặt máy chủ",
-          "backupRestoreFailed": "Khôi phục sao lưu thất bại"
+          "backupRestoreFailed": "Khôi phục sao lưu thất bại",
+          "resourcesUnavailable": "Thông tin sử dụng tài nguyên không khả dụng"
         }
       },
       "enum": {
@@ -648,6 +712,14 @@
           "finished": "Đã hoàn thành",
           "failed": "Thất bại"
         },
+        "backupRetentionRule": {
+          "count": "Mới nhất",
+          "days": "Gần đây",
+          "daily": "Hàng ngày",
+          "weekly": "Hàng tuần",
+          "monthly": "Hàng tháng",
+          "yearly": "Hàng năm"
+        },
         "serverBackupKind": {
           "server": "Máy Chủ",
           "databaseInstance": "Cơ sở dữ liệu"
@@ -658,6 +730,7 @@
         },
         "connectionStatus": {
           "connected": "Đã kết nối",
+          "connecting": "Đang kết nối...",
           "offline": "Ngoại tuyến"
         },
         "serverAutoStartBehavior": {
@@ -738,8 +811,15 @@
           "addRedirect": "Thêm Chuyển Hướng"
         }
       },
+      "assetReloadNotice": {
+        "title": "Đang cập nhật lên phiên bản mới nhất",
+        "button": {
+          "reloadNow": "Tải lại ngay"
+        }
+      },
       "errorBoundary": {
         "message": "Đã có lỗi xảy ra ở trang này hãy thử tải lại trang",
+        "refresh": "Tải lại trang",
         "hideDetails": "Ẩn",
         "showDetails": "Chi tiết",
         "errorMessage": "Lỗi:",
@@ -835,6 +915,11 @@
       },
       "serverSelect": {
         "showOtherUsersServers": "Hiển thị máy chủ của người dùng khác"
+      },
+      "allocationBar": {
+        "total": {
+          "custom": "Tùy Chỉnh"
+        }
       },
       "can": {
         "tooltip": {
@@ -1142,13 +1227,16 @@
           "description": "Các kho Egg của bạn.",
           "repositories": {
             "pterodactylGame": {
-              "description": "Eggs cho game như Minecraft, Terraria, và còn nhiều hơn nữa."
+              "description": "Eggs cho game như Minecraft, Terraria, và còn nhiều hơn nữa.",
+              "nest": "Game"
             },
             "pterodactylApplication": {
-              "description": "Eggs cho ứng dụng như Grafana, Meilisearch, và various databases."
+              "description": "Eggs cho ứng dụng như Grafana, Meilisearch, và various databases.",
+              "nest": "Ứng dụng"
             },
             "pterodactylGeneral": {
-              "description": "Eggs cho các runtime ứng dụng chung như Node JS, Java, và Rust."
+              "description": "Eggs cho các runtime ứng dụng chung như Node JS, Java, và Rust.",
+              "nest": "Chung"
             }
           }
         },
@@ -1343,10 +1431,14 @@
       },
       "account": {
         "home": {
+          "empty": {
+            "title": "Không có máy chủ"
+          },
           "title": "Máy Chủ",
           "tooltip": {
             "removeFromGroup": "Xóa khỏi nhóm",
             "addToGroup": "Thêm vào Nhóm",
+            "addServerToGroup": "Thêm Máy Chủ vào Nhóm",
             "groupActions": "Hành động Nhóm",
             "noGroups": "Không có nhóm nào khả dụng để thêm máy chủ vào",
             "noGroup": "Máy chủ này không thuộc bất kỳ nhóm nào",
@@ -1380,7 +1472,11 @@
                     }
                   },
                   "addServerToGroup": {
-                    "noServers": "Không có máy chủ nào khả dụng để thêm vào nhóm này."
+                    "title": "Thêm Máy Chủ vào {group}",
+                    "noServers": "Không có máy chủ nào khả dụng để thêm vào nhóm này.",
+                    "toast": {
+                      "added": "{servers} đã được thêm vào nhóm."
+                    }
                   },
                   "removeServerFromGroup": {
                     "title": "Xác Nhận Xóa Máy Chủ",
@@ -1518,7 +1614,13 @@
               "twoFactorLastUsed": "Lần sử dụng cuối: {timestamp}",
               "none": "Tài khoản của bạn chưa được thiết lập xác thực hai yếu tố.",
               "requirementMet": "Tài khoản của bạn đáp ứng yêu cầu về xác thực hai yếu tố.",
-              "requirementUnmet": "Tài khoản của bạn chưa đáp ứng yêu cầu xác thực hai yếu tố."
+              "requirementUnmet": "Tài khoản của bạn chưa đáp ứng yêu cầu xác thực hai yếu tố.",
+              "enum": {
+                "twoFactorMethod": {
+                  "totp": "Ứng dụng xác thực",
+                  "securityKey": "Khóa bảo mật"
+                }
+              }
             },
             "emailTwoFactor": {
               "toast": {
@@ -1865,6 +1967,12 @@
                 "updated": "Khóa API đã được cập nhật."
               }
             },
+            "duplicateApiKey": {
+              "title": "Nhân bản API Key",
+              "toast": {
+                "duplicated": "Khóa API đã được nhân bản."
+              }
+            },
             "recreateApiKey": {
               "title": "Tạo Lại Khóa API",
               "content": "Tạo lại khóa API sẽ tạo khóa mới và vô hiệu hóa khóa cũ. Bạn có chắc muốn tạo lại khóa API **{name}** không?",
@@ -1966,10 +2074,20 @@
                   "cacheBreakdown": {
                     "title": "Phân tích chi tiết cuộc gọi",
                     "calls": "Cuộc gọi",
+                    "averageLatency": "Độ trễ trung bình",
                     "localHits": "Bộ nhớ trúng",
                     "remoteHits": "Redis trúng",
                     "coalescedWaits": "Đang chờ một cuộc gọi khác",
                     "misses": "Đã tính"
+                  }
+                },
+                "enum": {
+                  "containerType": {
+                    "none": "Không phát hiện",
+                    "official": "Chính Thức",
+                    "officialAio": "Chính Thức AIO",
+                    "officialHeavy": "Chính Thức Heavy",
+                    "officialHeavyAio": "Chính Thức Heavy AIO"
                   }
                 },
                 "stats": {
@@ -2012,6 +2130,9 @@
                 "noChangelog": "Không có nhật ký thay đổi",
                 "nodesUpToDate": "Có vẻ tất cả các node đều đã cập nhật. ({failed} kiểm tra thất bại)",
                 "databaseAgentHostsUpToDate": "Dường như tất cả các máy chủ agent cơ sở dữ liệu đều đã được cập nhật. ({failed} lỗi khi kiểm tra)",
+                "badge": {
+                  "latestVersion": "Phiên Bản Mới Nhất {version}"
+                },
                 "table": {
                   "version": "Phiên Bản",
                   "installed": "Đã Cài Đặt",
@@ -2085,6 +2206,13 @@
                   "registrationEnabled": "Bật Đăng Ký",
                   "passwordLoginEnabled": "Bật đăng nhập bằng mật khẩu",
                   "passwordLoginEnabledDescription": "Cho phép người dùng đăng nhập bằng tên người dùng và mật khẩu. Việc tắt tính năng này sẽ khiến các nhà cung cấp OAuth và khóa bảo mật trở thành những phương thức truy cập duy nhất, đồng thời vô hiệu hóa việc đăng ký tài khoản cục bộ, đặt lại mật khẩu và xác thực mật khẩu qua SFTP."
+                },
+                "section": {
+                  "general": "Tổng Quan",
+                  "branding": "Thương hiệu",
+                  "authentication": "Xác thực",
+                  "sessions": "Phiên Làm Việc",
+                  "telemetry": "Chuẩn đoán từ xa"
                 },
                 "enum": {
                   "twoFactorMethod": {
@@ -2204,6 +2332,9 @@
                 "toast": {
                   "updated": "Cài đặt email đã được cập nhật."
                 },
+                "tooltip": {
+                  "noProvider": "Hãy lưu lại nhà cung cấp email bạn đã chọn trước khi gửi email thử nghiệm."
+                },
                 "modal": {
                   "sendTestEmail": {
                     "title": "Gửi Email Thử",
@@ -2293,6 +2424,18 @@
                 "title": "Cài Đặt Captcha",
                 "toast": {
                   "updated": "Cài đặt captcha đã được cập nhật."
+                },
+                "cap": {
+                  "form": {
+                    "apiUrl": "Địa chỉ Instance",
+                    "apiUrlDescription": "URL công khai của phiên bản Cap Standalone của bạn, không bao gồm khóa trang web."
+                  }
+                },
+                "recaptcha": {
+                  "form": {
+                    "threshold": "Ngưỡng điểm",
+                    "thresholdDescription": "Điểm tối thiểu cần đạt để vượt qua quá trình xác minh, từ 0 đến 1. Giá trị càng cao thì yêu cầu càng khắt khe hơn. Mặc định: 0,5."
+                  }
                 }
               }
             },
@@ -2350,6 +2493,13 @@
                   "containerPrelude": "Lời Mở Đầu Container",
                   "containerPreludeDescription": "Lời mở đầu terminal được sử dụng cho một số thông báo liên quan đến trạng thái trong bảng điều khiển máy chủ."
                 },
+                "section": {
+                  "fileManager": "Trình Quản Lý Tệp",
+                  "limits": "Hạn mức",
+                  "networking": "Mạng",
+                  "databaseInstances": "Instance cơ sở dữ liệu",
+                  "trash": "Thùng rác"
+                },
                 "toast": {
                   "updated": "Cài đặt máy chủ đã được cập nhật."
                 }
@@ -2369,6 +2519,10 @@
                   "maxSettingsValueBytes": "Kích thước tối đa của cài đặt được đồng bộ (byte)",
                   "allowChangingLanguage": "Cho Phép Thay Đổi Ngôn Ngữ",
                   "allowChangingLanguageDescription": "Nếu bật, người dùng sẽ có thể thay đổi tùy chọn ngôn ngữ."
+                },
+                "section": {
+                  "limits": "Hạn mức",
+                  "permissions": "Quyền"
                 },
                 "routeOrder": {
                   "title": "Thứ Tự Tuyến Đường Client"
@@ -2429,6 +2583,12 @@
                 "toast": {
                   "updated": "Cài đặt giới hạn tốc độ đã được cập nhật."
                 }
+              }
+            },
+            "updates": {
+              "title": "Cập Nhật",
+              "page": {
+                "title": "Cập nhật phần cài đặt"
               }
             }
           }
@@ -2571,9 +2731,12 @@
             "frontendMissing": "Thiếu frontend",
             "backendMissing": "Thiếu backend",
             "pendingBuild": "Đang chờ build",
+            "buildFailed": "Dựng không thành công",
+            "startFailed": "Thất bại khi khởi động",
             "pendingRemoval": "Đang chờ xóa",
             "pendingRestart": "Đang chờ khởi động lại",
-            "disabled": "Đã tắt"
+            "disabled": "Đã tắt",
+            "processing": "Đang xử lý"
           },
           "card": {
             "version": "Phiên Bản",
@@ -2812,6 +2975,21 @@
         },
         "nodes": {
           "title": "Node",
+          "pairing": {
+            "form": {
+              "address": "Đia chỉ node",
+              "pairingCode": "Mã ghép nối"
+            },
+            "section": {
+              "allocations": "Phân bổ",
+              "advanced": "Nâng cao"
+            },
+            "button": {
+              "connect": "Kết Nối",
+              "change": "Thay đổi",
+              "pair": "Ghép nối"
+            }
+          },
           "tabs": {
             "overview": {
               "title": "Tổng Quan",
@@ -2975,7 +3153,8 @@
                   "noLimit": "Không giới hạn node",
                   "free": "{size} trống",
                   "overhead": "+ {size} phí tổn dự trữ",
-                  "cores": "{cores} nhân đã phân bổ"
+                  "cores": "{cores} nhân đã phân bổ",
+                  "suspended": "Đã bị khóa"
                 }
               }
             },
@@ -3065,6 +3244,9 @@
                   }
                 }
               }
+            },
+            "devices": {
+              "title": "Thiết bị"
             },
             "databaseHosts": {
               "title": "Máy chủ cơ sở dữ liệu",
@@ -3214,15 +3396,15 @@
               "title": "Mạng riêng",
               "page": {
                 "title": "Mạng riêng Node",
-                "description": "Khi đó, các máy chủ trên nút này có thể kết nối riêng tư với máy chủ trên bất kỳ nút nào khác cũng thuộc mạng lưới. Dữ liệu được truyền giữa các nút thông qua một đường hầm mã hóa và hoàn toàn không đi qua mạng Internet công cộng.",
+                "description": "Khi đó, các máy chủ trên node này có thể kết nối riêng tư với máy chủ trên bất kỳ node nào khác cũng thuộc mạng lưới. Dữ liệu được truyền giữa các node thông qua một đường hầm mã hóa và hoàn toàn không đi qua mạng Internet công cộng.",
                 "alert": {
-                  "unreachable": "Không thể kết nối tới nút mạng, do đó không thể kiểm tra phần mạng thuộc về nút này.",
-                  "notSupported": "Nút này **không thể chạy mạng riêng**. Tính năng này hoặc đã bị tắt trong cấu hình nút, hoặc nút đang sử dụng Docker ở chế độ không cần quyền root– một cấu hình không được hỗ trợ.",
-                  "noCertificate": "Nút này **chưa báo cáo chứng chỉ**, do đó không có nút ngang hàng nào có thể thiết lập kết nối với nó. Hãy khởi động lại tiến trình nền đường hầm của nút để thực hiện lại quy trình đăng ký."
+                  "unreachable": "Không thể kết nối tới node mạng, do đó không thể kiểm tra phần mạng thuộc về node này.",
+                  "notSupported": "Node này **không thể chạy mạng riêng**. Tính năng này hoặc đã bị tắt trong cấu hình node, hoặc node đang sử dụng Docker ở chế độ không cần quyền root– một cấu hình không được hỗ trợ.",
+                  "noCertificate": "Node này **chưa báo cáo chứng chỉ**, do đó không có node ngang hàng nào có thể thiết lập kết nối với nó. Hãy khởi động lại tiến trình nền đường hầm của node để thực hiện lại quy trình đăng ký."
                 },
                 "form": {
-                  "hostDescription": "Tên máy chủ hoặc địa chỉ IP mà các nút khác sử dụng để kết nối tới nút này. Được phân giải tại thời điểm thiết lập kết nối.",
-                  "portDescription": "Cổng UDP mà nút sử dụng để lắng nghe các nút khác. Các nút khác phải có khả năng kết nối tới cổng này."
+                  "hostDescription": "Tên máy chủ hoặc địa chỉ IP mà các node khác sử dụng để kết nối tới node này. Được phân giải tại thời điểm thiết lập kết nối.",
+                  "portDescription": "Cổng UDP mà node sử dụng để lắng nghe các node khác. Các node khác phải có khả năng kết nối tới cổng này."
                 },
                 "section": {
                   "settings": "Thiết lập mạng"
@@ -3238,7 +3420,7 @@
                 },
                 "metrics": {
                   "title": "Các liên kết ngang hàng trực tiếp",
-                  "unreachable": "Không thể kết nối tới nút, do đó các chỉ số thời gian thực không khả dụng.",
+                  "unreachable": "Không thể kết nối tới node, do đó các chỉ số thời gian thực không khả dụng.",
                   "applied": "Đã áp dụng phiên bản trạng thái {epoch}, {snapshots}",
                   "stat": {
                     "peers": "Đã kết nối ngang hàng",
@@ -3246,7 +3428,7 @@
                     "controlLink": "Liên kết điều khiển",
                     "frontends": "Các Frontend được liên kết",
                     "flowsOpen": "{count} luồng đang mở",
-                    "localDrops": "Rớt gói tin tại cùng một nút",
+                    "localDrops": "Rớt gói tin tại cùng một node",
                     "frozenFlows": "{count} luồng bị đóng băng"
                   },
                   "column": {
@@ -3275,8 +3457,8 @@
                     "acceptor": "Đã chấp nhận"
                   },
                   "tooltip": {
-                    "roleInitiator": "Node này đã thiết lập kết nối bằng cách gọi đến nút ngang hàng tại địa chỉ host và cổng tương ứng.",
-                    "roleAcceptor": "Node này đã thiết lập kết nối bằng cách gọi đến nút ngang hàng tại địa chỉ host và cổng tương ứng."
+                    "roleInitiator": "Node này đã thiết lập kết nối bằng cách gọi đến node ngang hàng tại địa chỉ host và cổng tương ứng.",
+                    "roleAcceptor": "Node này đã thiết lập kết nối bằng cách gọi đến node ngang hàng tại địa chỉ host và cổng tương ứng."
                   },
                   "drop": {
                     "sendBufferFull": "Bộ đệm gửi đã đầy",
@@ -3301,11 +3483,11 @@
                 "modal": {
                   "disable": {
                     "title": "Xác nhận xóa khỏi mạng riêng",
-                    "content": "Mọi kết nối đến và đi từ các máy chủ trên nút này đều bị ngắt, và các máy chủ đó sẽ mất địa chỉ riêng của mình."
+                    "content": "Mọi kết nối đến và đi từ các máy chủ trên node này đều bị ngắt, và các máy chủ đó sẽ mất địa chỉ riêng của mình."
                   },
                   "rotate": {
                     "title": "Xác nhận luân chuyển danh tính",
-                    "content": "Các node ngang hàng sẽ ngắt kết nối với nút này ngay lập tức. Nó sẽ tự động gia nhập lại mạng với một chứng chỉ mới trong vòng một phút, và các kết nối sẽ tự động được thiết lập lại."
+                    "content": "Các node ngang hàng sẽ ngắt kết nối với node này ngay lập tức. Nó sẽ tự động gia nhập lại mạng với một chứng chỉ mới trong vòng một phút, và các kết nối sẽ tự động được thiết lập lại."
                   }
                 }
               }
@@ -3325,6 +3507,11 @@
               },
               "error": {
                 "invalidYaml": "YAML không hợp lệ: {error}"
+              }
+            },
+            "upgrade": {
+              "form": {
+                "version": "Phiên bản"
               }
             }
           }
@@ -3355,7 +3542,7 @@
                 "deleteBackups": "Bạn có muốn xóa các bản sao lưu của những máy chủ này không?"
               },
               "alert": {
-                "forceWarning": "Việc xóa bắt buộc sẽ loại bỏ các máy chủ này khỏi bảng điều khiển ngay cả khi không thể truy cập được các nút của chúng. Các tệp và cơ sở dữ liệu của chúng có thể không được dọn sạch hoàn toàn, để lại dữ liệu mồ côi."
+                "forceWarning": "Việc xóa bắt buộc sẽ loại bỏ các máy chủ này khỏi bảng điều khiển ngay cả khi không thể truy cập được các node của chúng. Các tệp và cơ sở dữ liệu của chúng có thể không được dọn sạch hoàn toàn, để lại dữ liệu mồ côi."
               }
             },
             "successWithSkipped": "Đã thành công {action} {servers}. {skippedServers} đã bỏ qua.",
@@ -3408,6 +3595,7 @@
                   "unlimited": "Không giới hạn",
                   "autoKillSeconds": "{seconds} giây",
                   "autoKillDisabled": "Đã vô hiệu hóa",
+                  "trash": "Thùng rác",
                   "labels": "Nhãn"
                 },
                 "badge": {
@@ -3437,6 +3625,11 @@
                 "badge": {
                   "serverSuspended": "Máy Chủ Bị Đình Chỉ"
                 },
+                "empty": {
+                  "noEggs": {
+                    "button": "Cài đặt Từ Kho Lưu Trữ"
+                  }
+                },
                 "form": {
                   "serverNamePlaceholder": "Máy Chủ Game Của Tôi",
                   "externalIdPlaceholder": "Mã định danh bên ngoài tùy chọn",
@@ -3459,6 +3652,11 @@
                   "ioWeight": "Trọng Số IO",
                   "ioWeightDescription": "Trọng số IO tương đối của container máy chủ so với các container khác.",
                   "ioWeightTooltip": "0-1000. Có thể không hoạt động trên tất cả hệ thống.",
+                  "bandwidth": {
+                    "upload": "Giới hạn tải lên",
+                    "download": "Giới hạn tải xuống",
+                    "description": "0 sẽ không đặt giới hạn."
+                  },
                   "pinnedCpus": "CPU Được Ghim",
                   "pinnedCpusDescription": "Các nhân CPU mà máy chủ này được ghim vào.",
                   "pinnedCpusTooltip": "Theo chỉ mục, ví dụ: 0, 1, 2. Để trống để cho phép tất cả các lõi.",
@@ -3557,6 +3755,21 @@
                 }
               }
             },
+            "devices": {
+              "title": "Thiết bị",
+              "page": {
+                "toast": {
+                  "added": "Thiết bị máy chủ đã được thêm.",
+                  "deleted": "Thiết bị máy chủ đã được xóa."
+                },
+                "modal": {
+                  "remove": {
+                    "title": "Xác Nhận Xóa Thiết bị Máy Chủ",
+                    "content": "Bạn có chắc muốn xóa thiết bị **{device}** khỏi **{name}** không?"
+                  }
+                }
+              }
+            },
             "backups": {
               "title": "Sao Lưu",
               "page": {
@@ -3596,6 +3809,12 @@
               "title": "Quản Lý",
               "page": {
                 "title": "Quản Lý Máy Chủ",
+                "trash": {
+                  "title": "Thùng rác",
+                  "toast": {
+                    "updated": "Cài đặt thùng rác máy chủ đã được cập nhật."
+                  }
+                },
                 "transfer": {
                   "title": "Chuyển",
                   "content": "Chuyển máy chủ này và dữ liệu của nó sang node khác trong hệ thống.",
@@ -3818,6 +4037,9 @@
                   "variables": {
                     "title": "Biến",
                     "page": {
+                      "empty": {
+                        "title": "Không có mục cho sẵn"
+                      },
                       "title": "Biến Egg",
                       "aria": {
                         "reorder": "Sắp xếp lại biến"
@@ -3868,6 +4090,12 @@
                       }
                     }
                   },
+                  "devices": {
+                    "title": "Thiết bị",
+                    "page": {
+                      "title": "Thiết bị egg"
+                    }
+                  },
                   "servers": {
                     "title": "Máy Chủ",
                     "page": {
@@ -3894,9 +4122,33 @@
                 "titleUpdate": "Cập Nhật Cấu Hình Egg",
                 "form": {
                   "order": "Thứ Tự",
-                  "eggsPlaceholder": "Chọn Egg"
+                  "eggsPlaceholder": "Chọn Egg",
+                  "nodesPlaceholder": "Chọn node",
+                  "locationsPlaceholder": "Chọn vị trí",
+                  "matcherType": "Khớp với Loại"
+                },
+                "matcher": {
+                  "anyMustMatch": "Bất kì điểm chung đều phải cùng:",
+                  "mustNotMatch": "Tất cả điểm chung không cùng cùng:"
+                },
+                "button": {
+                  "addMatcher": "Thêm Điểm chung"
                 },
                 "enum": {
+                  "matcherType": {
+                    "never": "Không bao giờ (Không áp dụng)",
+                    "all": "Tất cả (Luôn áp dụng)",
+                    "and": "VÀ (Tất cả phải khớp)",
+                    "or": "HOẶC (Bất kỳ phải khớp)",
+                    "not": "KHÔNG (Phải không khớp)",
+                    "nests": "Nest",
+                    "locations": "Vị Trí"
+                  },
+                  "featureState": {
+                    "inherit": "Thừa kế",
+                    "enabled": "Đã bật",
+                    "disabled": "Đã tắt"
+                  },
                   "deploymentType": {
                     "random": "Ngẫu Nhiên",
                     "range": "Phạm Vi Cổng",
@@ -3944,6 +4196,13 @@
                     "removeRule": "Xóa quy tắc triển khai"
                   }
                 },
+                "features": {
+                  "title": "Cấu Hình Tính Năng",
+                  "form": {
+                    "firewall": "Tường lửa",
+                    "privateNetwork": "Mạng riêng"
+                  }
+                },
                 "startup": {
                   "title": "Cấu Hình Khởi Động",
                   "form": {
@@ -3958,6 +4217,38 @@
                 }
               }
             }
+          }
+        },
+        "eggLibrary": {
+          "title": "Thư viện Egg",
+          "tabs": {
+            "installed": {
+              "title": "Đã Cài Đặt",
+              "page": {
+                "title": "Egg Đã Cài Đặt"
+              }
+            },
+            "available": {
+              "title": "Khả dụng",
+              "page": {
+                "title": "Egg Khả dụng",
+                "empty": {
+                  "title": "Không có egg khả dụng",
+                  "button": "Tới Kho Lưu Trữ Egg"
+                }
+              }
+            }
+          },
+          "card": {
+            "repository": "Kho Lưu Trữ",
+            "author": "Tác giả",
+            "installedIn": "Đã Cài Đặt vào"
+          },
+          "badge": {
+            "manual": "Thủ công"
+          },
+          "button": {
+            "open": "Mở"
           }
         },
         "eggRepositories": {
@@ -3978,7 +4269,9 @@
                   "credentialType": "Loại Thông Tin",
                   "password": "Mật khẩu và Token Access",
                   "privateKey": "Khóa bí mật",
-                  "passphrase": "Mã truy cập"
+                  "passphrase": "Mã truy cập",
+                  "defaultNest": "Nest mặc định",
+                  "autoSync": "Tự động đồng bộ"
                 },
                 "enum": {
                   "credentialType": {
@@ -4005,7 +4298,9 @@
                 "title": "Egg Kho Lưu Trữ",
                 "table": {
                   "columns": {
-                    "path": "Đường Dẫn"
+                    "path": "Đường Dẫn",
+                    "repository": "Kho Lưu Trữ",
+                    "installedIn": "Đã Cài Đặt vào"
                   }
                 },
                 "toast": {
@@ -4015,6 +4310,12 @@
                   "install": {
                     "title": "Cài đặt {eggs}",
                     "button": "Cài đặt {eggs}"
+                  },
+                  "catalog": {
+                    "title": "Cài đặt Từ Kho Lưu Trữ",
+                    "selected": "Chọn {egg}**",
+                    "button": "Cài Đặt",
+                    "buttonSelect": "Cài đặt và Chọn"
                   }
                 },
                 "drawer": {
@@ -4048,6 +4349,9 @@
                 "button": {
                   "testConnection": "Kiểm Tra Kết Nối"
                 },
+                "tooltip": {
+                  "errorWhileFetchingVersion": "Lỗi khi lấy phiên bản"
+                },
                 "toast": {
                   "tested": "Kiểm tra hoàn thành thành công."
                 },
@@ -4058,6 +4362,33 @@
                       "forceWarning": "Buộc xóa sẽ xóa tất cả cơ sở dữ liệu trên máy chủ này. Các cơ sở dữ liệu trên chính máy chủ có thể không được dọn dẹp hoàn toàn, để lại dữ liệu mồ côi."
                     }
                   }
+                }
+              }
+            },
+            "overview": {
+              "title": "Tổng Quan",
+              "page": {
+                "title": "Tổng Quan Máy Chủ Agent Cơ Sở Dữ Liệu",
+                "status": {
+                  "deploymentEnabled": "Cho Phép Triển Khai",
+                  "deploymentDisabled": "Không Cho Phép Triển Khai",
+                  "maintenanceEnabled": "Bảo trì đã được kích hoạt",
+                  "maintenanceDisabled": "Không Bảo Trì"
+                },
+                "card": {
+                  "hostDetails": "Chi Tiết Máy Chủ",
+                  "systemInfo": "Thông Tin Hệ Thống"
+                },
+                "label": {
+                  "address": "Địa Chỉ",
+                  "publicAddress": "Địa chỉ công khai",
+                  "createdAt": "Đã tạo",
+                  "version": "Phiên bản",
+                  "unavailable": "Không khả dụng",
+                  "databases": "Cơ sở dữ liệu",
+                  "totalSize": "Tổng kích thước",
+                  "share": "Chia sẻ",
+                  "other": "Khác ({databases})"
                 }
               }
             },
@@ -4230,7 +4561,8 @@
                   "unavailable": "Không khả dụng",
                   "noLimit": "Không giới hạn máy chủ",
                   "free": "{size} còn trống",
-                  "cores": "Đã phân bổ {cores} lõi"
+                  "cores": "Đã phân bổ {cores} lõi",
+                  "other": "Khác ({instances})"
                 },
                 "badge": {
                   "updateAvailable": "Có Bản Cập Nhật"
@@ -4277,6 +4609,11 @@
               },
               "error": {
                 "invalidYaml": "YAML không hợp lệ: {error}"
+              }
+            },
+            "upgrade": {
+              "form": {
+                "version": "Phiên bản"
               }
             }
           }
@@ -4385,6 +4722,7 @@
                   "authUrl": "URL Xác Thực",
                   "tokenUrl": "URL Token",
                   "infoUrl": "URL Thông Tin",
+                  "infoUrls": "Url Bổ Sung",
                   "basicAuth": "Xác Thực Cơ Bản",
                   "basicAuthDescription": "Sử dụng Xác Thực HTTP Cơ Bản để truyền client id và secret, không còn phổ biến.",
                   "scopes": "Phạm Vi",
@@ -4858,6 +5196,63 @@
             }
           }
         },
+        "devices": {
+          "title": "Thiết bị",
+          "resourceName": "Thiết bị",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Tạo Thiết bị",
+                "titleUpdate": "Cập nhật Thiết bị",
+                "alert": "Thiết là tính năng mạnh mẽ và có thể nguy hiểm. Sử dụng không đúng có thể dẫn đến mất dữ liệu hoặc lỗ hổng bảo mật (bao gồm thoát container). Hãy đảm bảo bạn hiểu hệ quả trước khi tạo hoặc cập nhật.",
+                "form": {
+                  "permissions": "Quyền"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Xác Nhận Xóa Thiết bị"
+                  }
+                }
+              }
+            },
+            "eggs": {
+              "page": {
+                "title": "Thiết bị Egg",
+                "toast": {
+                  "added": "Thiết bị egg đã được thêm.",
+                  "removed": "Thiết bị egg đã được xóa."
+                },
+                "modal": {
+                  "remove": {
+                    "title": "Xác Nhận Xóa Thiết bị Egg",
+                    "content": "Bạn có chắc muốn xóa thiết bị **{device}** khỏi **{name}** không?"
+                  }
+                }
+              }
+            },
+            "nodes": {
+              "page": {
+                "title": "Device Node",
+                "toast": {
+                  "added": "Thiết bị egg đã được thêm.",
+                  "removed": "Thiết bị egg đã được xóa."
+                },
+                "modal": {
+                  "add": {
+                    "title": "Thêm thiết bị vào node"
+                  },
+                  "remove": {
+                    "title": "Xác Nhận Xóa Thiết bị Node",
+                    "content": "Bạn có chắc muốn xóa thiết bị **{device}** khỏi **{name}** không?"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Máy chủ"
+            }
+          }
+        },
         "roles": {
           "title": "Vai Trò",
           "resourceName": "Vai Trò",
@@ -4931,8 +5326,8 @@
           "notification": {
             "suspended": "Máy chủ của bạn hiện đang bị đình chỉ. Không có hành động nào có thể được thực hiện cho đến khi đình chỉ được gỡ bỏ.",
             "suspendedAdmin": "Máy chủ này hiện đang bị đình chỉ. Vì bạn là quản trị viên, bạn vẫn có thể truy cập máy chủ nhưng hành động bị hạn chế.",
-            "nodeMaintenance": "Máy chủ của bạn đang trên một nút đang được bảo trì.",
-            "transferring": "Máy chủ của bạn hiện đang được chuyển sang nút khác.",
+            "nodeMaintenance": "Máy chủ của bạn đang trên một node đang được bảo trì.",
+            "transferring": "Máy chủ của bạn hiện đang được chuyển sang node khác.",
             "restoringBackup": "Máy chủ của bạn hiện đang khôi phục từ bản sao lưu. Vui lòng chờ...",
             "installing": "Máy chủ của bạn hiện đang được cài đặt. Vui lòng chờ...",
             "pendingRestart": "Máy chủ của bạn có các thay đổi đang chờ yêu cầu khởi động lại. Vui lòng khởi động lại máy chủ để áp dụng các thay đổi này."
@@ -4954,7 +5349,8 @@
             "decreaseFontSize": "Giảm Kích Thước Font",
             "increaseFontSize": "Tăng Kích Thước Font",
             "copySelection": "Sao Chép vùng chọn",
-            "popout": "Mở trong cửa sổ riêng"
+            "popout": "Mở trong cửa sổ riêng",
+            "commandPrefix": "Tiền tố lệnh"
           },
           "quickAction": {
             "search": "Tìm trong Console",
@@ -5014,12 +5410,16 @@
             }
           },
           "stats": {
-            "offline": "Máy chủ đang ngoại tuyến."
+            "offline": "Máy chủ đang ngoại tuyến.",
+            "connecting": "Đang kết nối..."
           },
           "socketConnected": "Đã Kết Nối ({ping}ms ping)",
           "socketDisconnected": "Ngắt Kết Nối"
         },
         "files": {
+          "empty": {
+            "title": "Thư mục rỗng"
+          },
           "title": "Tệp",
           "editorNotFound": {
             "title": "Không tìm thấy",
@@ -5063,7 +5463,6 @@
             "revealInTree": "Hiển thị trong cây thư mục",
             "revealNotFound": "Không tìm thấy {path} trong cây tệp.",
             "unsavedTab": "{name} có các thay đổi chưa được lưu",
-            "dropToSplit": "Thả để mở trong một ngăn trình soạn thảo mới",
             "resizeEditorPanes": "Thay đổi kích thước các khung soạn thảo",
             "selectPane": "Chọn khung soạn thảo",
             "editorPane": "Khung soạn thảo {number}"
@@ -5098,6 +5497,12 @@
             "extract": "Giải nén",
             "archive": "Nén",
             "more": "Thêm",
+            "moveToTrash": "Chuyển vào Thư mục Rác",
+            "deletePermanently": "Xóa vĩnh viễn",
+            "trash": "Thùng rác",
+            "emptyTrash": "Làm rỗng thùng rác",
+            "backToFiles": "Quay lại tệp",
+            "restoreTo": "Khôi phục vào...",
             "remoteCopy": "Sao Chép Máy Chủ Điều Khiển",
             "search": "Tìm Kiếm",
             "exitBackup": "Thoát Sao Lưu",
@@ -5143,6 +5548,7 @@
             "permissionsSelection": "Thay đổi quyền",
             "fingerprintSelection": "Hiển thị Dấu Vân Tay Tệp",
             "deleteSelection": "Xóa đã chọn",
+            "openTrash": "Mở Thùng rác",
             "saveFile": "Lưu tệp",
             "createFile": "Tạo Tệp"
           },
@@ -5271,6 +5677,30 @@
               "diff": {
                 "original": "Phiên Bản",
                 "current": "Hiện Tại"
+              }
+            }
+          },
+          "trash": {
+            "title": "Thùng rác",
+            "table": {
+              "columns": {
+                "originalLocation": "Vị Trí Ban Đầu",
+                "deletedAt": "Đã xóa"
+              }
+            },
+            "empty": {
+              "title": "Thùng rác trống"
+            },
+            "modal": {
+              "emptyTrash": {
+                "title": "Làm rỗng thùng rác",
+                "content": "Bạn có chắc chắn muốn xóa vĩnh viễn **** và mọi dữ liệu trên đó không? Thao tác này không thể hoàn tác."
+              },
+              "restoreTo": {
+                "destination": "Thư mục đích"
+              },
+              "restoreConflict": {
+                "confirm": "Khôi phục {files}"
               }
             }
           },
@@ -5442,7 +5872,8 @@
             },
             "largestDirectories": {
               "title": "Thư Mục Lớn Nhất",
-              "empty": "Không tìm thấy thư mục."
+              "empty": "Không tìm thấy thư mục.",
+              "openFolder": "Mở thư mục"
             },
             "searchFiles": {
               "title": "Tìm Kiếm Tệp",
@@ -5688,6 +6119,7 @@
                 "logs": "Nhật ký"
               },
               "stats": {
+                "connecting": "Đang kết nối...",
                 "offline": "Instance đã ngoại tuyến"
               }
             },
@@ -6100,6 +6532,11 @@
             }
           },
           "view": {
+            "empty": {
+              "triggers": {
+                "title": "Không có trigger"
+              }
+            },
             "badge": {
               "running": "Đang Chạy"
             },
@@ -6474,7 +6911,7 @@
               "description": "Xóa bản sao lưu được chọn bởi bộ chọn bản sao lưu.",
               "form": {
                 "backupSelector": "Bản Sao Lưu cần xóa",
-                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu đã chọn, bao gồm cả các tệp của nó trên nút. Nếu bản sao lưu đã chọn đang bị khóa, bước này sẽ thất bại."
+                "warning": "Thao tác này xóa vĩnh viễn bản sao lưu đã chọn, bao gồm cả các tệp của nó trên node. Nếu bản sao lưu đã chọn đang bị khóa, bước này sẽ thất bại."
               }
             },
             "moveBackup": {
@@ -6565,7 +7002,8 @@
               "title": "Xóa Tệp",
               "description": "Xóa các tệp hoặc thư mục.",
               "form": {
-                "filesToDelete": "Tệp Để Xóa"
+                "filesToDelete": "Tệp Để Xóa",
+                "trash": "Chuyển vào Thư mục Rác"
               },
               "renderer": {
                 "compact": "Xóa {files}",
@@ -6941,7 +7379,7 @@
             "limitations": "Các quy tắc áp dụng cho lưu lượng truy cập đến máy chủ này từ bên ngoài, bao gồm cả lưu lượng qua các cổng đã được công bố và lưu lượng trực tiếp đến địa chỉ container. Các kết nối do chính node đó khởi tạo sẽ không bị lọc.",
             "shadowed": "Quy tắc tại vị trí {position} không bao giờ khớp được, vì một quy tắc đứng trước đó đã bao hàm toàn bộ phạm vi hoạt động của nó.",
             "shadowedMany": "Các quy tắc tại {positions} sẽ không bao giờ khớp được, vì các quy tắc trước đó đã bao hàm mọi trường hợp mà chúng xử lý.",
-            "unknownEnforcement": "Không thể kết nối tới nút này, do đó không rõ liệu nó có đang áp dụng các quy tắc tường lửa hay không.",
+            "unknownEnforcement": "Không thể kết nối tới node này, do đó không rõ liệu nó có đang áp dụng các quy tắc tường lửa hay không.",
             "unsaved": "Bạn có các thay đổi chưa được lưu. Không có gì được áp dụng cho đến khi bạn lưu lại."
           },
           "form": {
@@ -6951,7 +7389,7 @@
             "sources": "Nguồn",
             "sourcesDescription": "Các địa chỉ IP hoặc mạng, chẳng hạn như 10.0.0.0/8. Đối với mạng, các bit host phải được đặt về giá trị 0. Để trống để khớp với bất kỳ nguồn nào.",
             "sourceFile": "Tệp Nguồn",
-            "sourceFileDescription": "Đường dẫn đến tệp tin trong thư mục máy chủ, trong đó mỗi dòng chứa một địa chỉ IP hoặc mạng; các dòng bắt đầu bằng dấu # sẽ bị bỏ qua. Các mục trong tệp này được bổ sung vào các nguồn đã nêu ở trên, và nút mạng sẽ tự động cập nhật các thay đổi của tệp tin.",
+            "sourceFileDescription": "Đường dẫn đến tệp tin trong thư mục máy chủ, trong đó mỗi dòng chứa một địa chỉ IP hoặc mạng; các dòng bắt đầu bằng dấu # sẽ bị bỏ qua. Các mục trong tệp này được bổ sung vào các nguồn đã nêu ở trên, và node mạng sẽ tự động cập nhật các thay đổi của tệp tin.",
             "portsDescription": "Các cổng cấp phát mà quy tắc này áp dụng, dưới dạng Port đơn hoặc dải cổng ví dụ: 25565-25570. Để trống để áp dụng cho mọi cổng được cấp phát của máy chủ.",
             "preview": "Xem Trước",
             "sourcesCount": "Đã sử dụng {count}/{max}",
@@ -7042,12 +7480,12 @@
             }
           },
           "tooltip": {
-            "nodeNotOnNetwork": "Nút mà máy chủ này đang chạy không nằm trong mạng riêng.",
+            "nodeNotOnNetwork": "Node mà máy chủ này đang chạy không nằm trong mạng riêng.",
             "connectionLimitReached": "Máy chủ này được giới hạn ở {max} kết nối ra ngoài."
           },
           "alert": {
-            "nodeNotOnNetwork": "Nút mà máy chủ này đang chạy **không nằm trong mạng riêng**, do đó nó không thể tham gia. Hãy yêu cầu quản trị viên kích hoạt tính năng này cho nút đó.",
-            "nodeLeftNetwork": "Node mà máy chủ này đang chạy đã bị **ngắt khỏi mạng nội bộ**, do đó tất cả các kết nối của nó đều không hoạt động. Hãy yêu cầu quản trị viên kết nối lại nút này vào mạng.",
+            "nodeNotOnNetwork": "Node mà máy chủ này đang chạy **không nằm trong mạng riêng**, do đó nó không thể tham gia. Hãy yêu cầu quản trị viên kích hoạt tính năng này cho node đó.",
+            "nodeLeftNetwork": "Node mà máy chủ này đang chạy đã bị **ngắt khỏi mạng nội bộ**, do đó tất cả các kết nối của nó đều không hoạt động. Hãy yêu cầu quản trị viên kết nối lại node này vào mạng.",
             "bypassesFirewall": "Các kết nối riêng tư không đi qua các quy tắc tường lửa của máy chủ này: bản thân kết nối đó chính là quyền truy cập. Mỗi kết nối chỉ hoạt động theo một chiều, do đó máy chủ được máy chủ này kết nối tới sẽ không thể kết nối ngược lại trừ khi quyền đó được cấp riêng."
           },
           "form": {
@@ -7160,6 +7598,38 @@
             }
           }
         },
+        "devices": {
+          "title": "Thiết bị",
+          "table": {
+            "columns": {
+              "attached": "Đã gắn vào"
+            }
+          },
+          "button": {
+            "attach": "Gắn",
+            "detach": "Tháo"
+          },
+          "modal": {
+            "attachDevice": {
+              "content": "Bạn có muốn gắn **{name}** vào `{target}` không?",
+              "toast": {
+                "attached": "{name} đã được gắn vào máy chủ của bạn."
+              }
+            },
+            "detachDevices": {
+              "content": "Bạn có muốn ngắt kết nối **{devices}** khỏi máy chủ này không?",
+              "alert": {
+                "skipped": "{devices} sẽ bị bỏ qua. Các điểm gắn không được kết nối thì không thể tháo rời."
+              }
+            },
+            "detachDevice": {
+              "content": "Bạn có muốn tháo **{name}** từ `{target}` không?",
+              "toast": {
+                "detached": "{name} đã được xóa khỏi máy chủ của bạn."
+              }
+            }
+          }
+        },
         "settings": {
           "title": "Cài đặt",
           "debugInformation": {
@@ -7188,6 +7658,12 @@
             },
             "toast": {
               "updated": "Tự động dừng máy chủ đã được cập nhật."
+            }
+          },
+          "trash": {
+            "title": "Thùng rác",
+            "toast": {
+              "updated": "Cài đặt máy chủ đã được cập nhật."
             }
           },
           "autostart": {
