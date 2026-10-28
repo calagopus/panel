@@ -12,6 +12,7 @@ import { useResource } from '@/plugins/resource/useResource.ts';
 interface UseDatabaseAgentHostDeploymentResult {
   state: DatabaseAgentHostDeploymentState;
   usage: ReturnType<typeof getDatabaseAgentHostDeploymentUsage> | null;
+  instances: number | null;
   loading: boolean;
 }
 
@@ -30,6 +31,7 @@ export function useDatabaseAgentHostDeployment(
   return {
     state,
     usage: allocated ? getDatabaseAgentHostDeploymentUsage(databaseAgentHost, allocated) : null,
+    instances: data === undefined ? null : (allocated?.instances ?? 0),
     loading: loading && data === undefined && state === 'available',
   };
 }

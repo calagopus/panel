@@ -7,3 +7,10 @@ export const adminRoleUpdateSchema = z.lazy(() =>
     created: true,
   }),
 );
+
+export const adminRoleCountsSchema = z.record(
+  z.string(),
+  z.object({
+    roleUsers: z.number(),
+  }),
+);

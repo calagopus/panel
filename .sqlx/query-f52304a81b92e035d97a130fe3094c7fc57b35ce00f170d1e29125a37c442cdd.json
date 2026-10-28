@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        servers.egg_uuid,\n                        COUNT(*) AS \"nest_egg_servers!\"\n                    FROM servers\n                    GROUP BY servers.egg_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "egg_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "servers",
+            "name": "egg_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "nest_egg_servers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "f52304a81b92e035d97a130fe3094c7fc57b35ce00f170d1e29125a37c442cdd"
+}

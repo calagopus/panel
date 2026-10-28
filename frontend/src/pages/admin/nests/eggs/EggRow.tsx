@@ -1,12 +1,16 @@
 import { forwardRef } from 'react';
 import { z } from 'zod';
+import getEggCounts from '@/api/admin/eggs/getEggCounts.ts';
 import { TableData, TableRow, TableSelectionCell } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 
 interface EggRowProps {
   nest: z.infer<typeof adminNestSchema>;
@@ -20,6 +24,12 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
   { nest, egg, isSelected = false, onSelectionChange, contextMenuProps },
   ref,
 ) {
+  const { data: counts, loading: countsLoading } = useResource({
+    queryKey: queryKeys.admin.eggs.counts(),
+    queryFn: getEggCounts,
+    silent: true,
+  });
+
   return (
     <TableRow
       bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
@@ -54,6 +64,8 @@ const EggRow = forwardRef<HTMLTableRowElement, EggRowProps>(function EggRow(
       <TableData>{egg.author}</TableData>
 
       <TableData>{egg.description}</TableData>
+
+      <TableData>{counts ? (counts[egg.uuid]?.nestEggServers ?? 0) : countsLoading && <Spinner size={16} />}</TableData>
 
       <TableData>
         <FormattedTimestamp timestamp={egg.created} />

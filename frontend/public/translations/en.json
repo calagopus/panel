@@ -617,6 +617,10 @@
           "server": "Server",
           "address": "Address",
           "eggs": "Eggs",
+          "nodes": "Nodes",
+          "servers": "Servers",
+          "users": "Users",
+          "databases": "Databases",
           "template": "Template",
           "version": "Version",
           "host": "Host"

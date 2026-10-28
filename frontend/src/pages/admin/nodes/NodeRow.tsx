@@ -34,7 +34,12 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
 ) {
   const { t } = useTranslations();
   const { version, unavailable, loading, upgradeAvailability } = useNodeVersion(node, { upgradeStatus });
-  const { state: deploymentState, usage: deploymentUsage, loading: deploymentLoading } = useNodeDeployment(node);
+  const {
+    state: deploymentState,
+    usage: deploymentUsage,
+    servers: deploymentServers,
+    loading: deploymentLoading,
+  } = useNodeDeployment(node);
 
   return (
     <TableRow
@@ -152,6 +157,8 @@ const NodeRow = forwardRef<HTMLTableRowElement, NodeRowProps>(function NodeRow(
           </Code>
         </TableLink>
       </TableData>
+
+      <TableData>{deploymentServers}</TableData>
 
       <TableData>
         <FormattedTimestamp timestamp={node.created} />

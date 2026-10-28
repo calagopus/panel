@@ -104,3 +104,10 @@ export const adminEggRepositoryCatalogEggSchema = z.object({
   egg: adminEggEggRepositoryEggSchema,
   installedEggs: z.array(adminEggRepositoryEggInstalledEggSchema),
 });
+
+export const adminEggRepositoryCountsSchema = z.record(
+  z.string(),
+  z.object({
+    eggRepositoryEggs: z.number(),
+  }),
+);

@@ -9,6 +9,14 @@ export const adminNestSchema = z.looseObject({
   created: z.coerce.date(),
 });
 
+export const adminNestCountsSchema = z.record(
+  z.string(),
+  z.object({
+    nestEggs: z.number(),
+    nestServers: z.number(),
+  }),
+);
+
 export const adminNestUpdateSchema = z.lazy(() =>
   adminNestSchema.omit({
     uuid: true,

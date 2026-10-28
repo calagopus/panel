@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _nest_;
+mod counts;
 mod eggs;
 
 mod get {
@@ -138,6 +139,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .nest("/{nest}", _nest_::router(state))
+        .nest("/counts", counts::router(state))
         .nest("/eggs", eggs::router(state))
         .with_state(state.clone())
 }

@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        nest_eggs.nest_uuid,\n                        COUNT(*) AS \"nest_eggs!\",\n                        COALESCE(SUM(egg_servers.servers), 0)::int8 AS \"nest_servers!\"\n                    FROM nest_eggs\n                    LEFT JOIN (\n                        SELECT servers.egg_uuid, COUNT(*) AS servers\n                        FROM servers\n                        GROUP BY servers.egg_uuid\n                    ) AS egg_servers ON egg_servers.egg_uuid = nest_eggs.uuid\n                    GROUP BY nest_eggs.nest_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "nest_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "nest_eggs",
+            "name": "nest_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "nest_eggs!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "nest_servers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "1b4267b36abd5a2050f5d832a6174c5a70c8b8db5796fb720d2a9155496c8f11"
+}

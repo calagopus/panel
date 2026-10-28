@@ -7,6 +7,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { adminUpgradeStatusSchema } from '@/lib/schemas/admin/system.ts';
+import { useDatabaseAgentHostDeployment } from '@/plugins/database-agent-hosts/useDatabaseAgentHostDeployment.ts';
 import DatabaseAgentHostDeploymentBadge from './DatabaseAgentHostDeploymentBadge.tsx';
 import DatabaseAgentHostHealthIcon from './DatabaseAgentHostHealthIcon.tsx';
 
@@ -23,6 +24,8 @@ const DatabaseAgentHostRow = forwardRef<HTMLTableRowElement, DatabaseAgentHostRo
   { databaseAgentHost, upgradeStatus, isSelected = false, onSelectionChange, contextMenuProps, nameSection },
   ref,
 ) {
+  const { instances } = useDatabaseAgentHostDeployment(databaseAgentHost);
+
   return (
     <TableRow
       bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
@@ -62,6 +65,8 @@ const DatabaseAgentHostRow = forwardRef<HTMLTableRowElement, DatabaseAgentHostRo
           {nameSection}
         </span>
       </TableData>
+
+      <TableData>{instances}</TableData>
 
       <TableData>
         <FormattedTimestamp timestamp={databaseAgentHost.created} />

@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        server_databases.database_host_uuid,\n                        COUNT(*) AS \"database_host_server_databases!\"\n                    FROM server_databases\n                    GROUP BY server_databases.database_host_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "database_host_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_databases",
+            "name": "database_host_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "database_host_server_databases!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "1517e1b25242a121bdd0c4a83cc92405836e277d81572626e7b165ca6996f57c"
+}

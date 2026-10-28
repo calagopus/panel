@@ -113,3 +113,10 @@ export const adminEggVariableUpdateSchema = z.lazy(() =>
 );
 
 export const processConfigurationConfigParser = z.enum(['file', 'yaml', 'properties', 'ini', 'json', 'xml', 'toml']);
+
+export const adminEggCountsSchema = z.record(
+  z.string(),
+  z.object({
+    nestEggServers: z.number(),
+  }),
+);

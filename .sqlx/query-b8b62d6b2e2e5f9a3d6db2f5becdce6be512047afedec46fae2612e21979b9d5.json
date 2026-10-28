@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        egg_repository_eggs.egg_repository_uuid,\n                        COUNT(*) AS \"egg_repository_eggs!\"\n                    FROM egg_repository_eggs\n                    GROUP BY egg_repository_eggs.egg_repository_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "egg_repository_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "egg_repository_eggs",
+            "name": "egg_repository_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "egg_repository_eggs!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "b8b62d6b2e2e5f9a3d6db2f5becdce6be512047afedec46fae2612e21979b9d5"
+}

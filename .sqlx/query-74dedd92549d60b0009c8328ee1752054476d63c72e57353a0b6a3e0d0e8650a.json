@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        nodes.location_uuid,\n                        COUNT(*) AS \"location_nodes!\",\n                        COALESCE(SUM(node_servers.servers), 0)::int8 AS \"location_servers!\"\n                    FROM nodes\n                    LEFT JOIN (\n                        SELECT servers.node_uuid, COUNT(*) AS servers\n                        FROM servers\n                        GROUP BY servers.node_uuid\n                    ) AS node_servers ON node_servers.node_uuid = nodes.uuid\n                    GROUP BY nodes.location_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "location_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "nodes",
+            "name": "location_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "location_nodes!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "location_servers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "74dedd92549d60b0009c8328ee1752054476d63c72e57353a0b6a3e0d0e8650a"
+}

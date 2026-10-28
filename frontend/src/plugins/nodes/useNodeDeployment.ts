@@ -7,6 +7,7 @@ import { useResource } from '@/plugins/resource/useResource.ts';
 interface UseNodeDeploymentResult {
   state: NodeDeploymentState;
   usage: ReturnType<typeof getNodeDeploymentUsage> | null;
+  servers: number | null;
   loading: boolean;
 }
 
@@ -23,6 +24,7 @@ export function useNodeDeployment(node: AdminNode): UseNodeDeploymentResult {
   return {
     state,
     usage: allocated ? getNodeDeploymentUsage(node, allocated) : null,
+    servers: data === undefined ? null : (allocated?.servers ?? 0),
     loading: loading && data === undefined && state === 'available',
   };
 }

@@ -13,6 +13,14 @@ export const adminLocationSchema = z.looseObject({
   created: z.string(),
 });
 
+export const adminLocationCountsSchema = z.record(
+  z.string(),
+  z.object({
+    locationNodes: z.number(),
+    locationServers: z.number(),
+  }),
+);
+
 export const adminLocationUpdateSchema = z.lazy(() =>
   adminLocationSchema
     .omit({

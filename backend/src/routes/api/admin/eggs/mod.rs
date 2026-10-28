@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod counts;
+
 mod get {
     use axum::{extract::Query, http::StatusCode};
     use serde::{Deserialize, Serialize};
@@ -98,5 +100,6 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/counts", counts::router(state))
         .with_state(state.clone())
 }

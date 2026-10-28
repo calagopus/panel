@@ -15,6 +15,7 @@ const admin = {
     all: () => ['admin', 'roles'] as const,
     detail: (uuid: string) => ['admin', 'roles', { uuid }] as const,
     users: (roleUuid: string) => ['admin', 'roles', roleUuid, 'users'] as const,
+    counts: () => ['admin', 'roles', 'counts'] as const,
   },
 
   nodes: {
@@ -64,6 +65,7 @@ const admin = {
     all: () => ['admin', 'nests'] as const,
     detail: (uuid: string) => ['admin', 'nests', { uuid }] as const,
     eggs: (nestUuid: string) => ['admin', 'nests', nestUuid, 'eggs'] as const,
+    counts: () => ['admin', 'nests', 'counts'] as const,
   },
 
   eggs: {
@@ -71,6 +73,7 @@ const admin = {
     list: (nestUuid?: string | null) =>
       nestUuid ? (['admin', 'eggs', 'list', nestUuid] as const) : (['admin', 'eggs', 'list'] as const),
     grouped: () => ['admin', 'eggs', 'grouped'] as const,
+    counts: () => ['admin', 'eggs', 'counts'] as const,
     detail: (uuid: string) => ['admin', 'eggs', { uuid }] as const,
     servers: (eggUuid: string) => ['admin', 'eggs', eggUuid, 'servers'] as const,
   },
@@ -81,6 +84,7 @@ const admin = {
     databaseHosts: (locationUuid: string) => ['admin', 'locations', locationUuid, 'database-hosts'] as const,
     databaseAgentHosts: (locationUuid: string) => ['admin', 'locations', locationUuid, 'database-agent-hosts'] as const,
     nodes: (locationUuid: string) => ['admin', 'locations', locationUuid, 'nodes'] as const,
+    counts: () => ['admin', 'locations', 'counts'] as const,
   },
 
   mounts: {
@@ -118,6 +122,7 @@ const admin = {
   databaseHosts: {
     all: () => ['admin', 'database-hosts'] as const,
     detail: (uuid: string) => ['admin', 'database-hosts', { uuid }] as const,
+    counts: () => ['admin', 'database-hosts', 'counts'] as const,
     databases: (hostUuid: string) => ['admin', 'database-hosts', hostUuid, 'databases'] as const,
     databaseSizes: (hostUuid: string) => ['admin', 'database-hosts', hostUuid, 'databases', 'sizes'] as const,
     version: (hostUuid: string) => ['admin', 'database-hosts', hostUuid, 'version'] as const,
@@ -185,6 +190,7 @@ const admin = {
     detail: (uuid: string) => ['admin', 'egg-repositories', { uuid }] as const,
     eggs: (repoUuid: string) => ['admin', 'egg-repositories', repoUuid, 'eggs'] as const,
     eggsUnscoped: () => ['admin', 'egg-repositories', 'eggs'] as const,
+    counts: () => ['admin', 'egg-repositories', 'counts'] as const,
   },
 
   eggConfigurations: {

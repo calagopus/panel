@@ -81,6 +81,7 @@ export const databaseHostTableColumns = (): string[] => {
     t('common.table.columns.id', {}),
     t('common.table.columns.name', {}),
     t('common.table.columns.type', {}),
+    t('common.table.columns.databases', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -169,6 +170,7 @@ export const databaseAgentHostTableColumns = (): string[] => {
     '',
     t('common.table.columns.id', {}),
     t('common.table.columns.name', {}),
+    t('common.table.columns.databases', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -200,6 +202,8 @@ export const locationTableColumns = (): string[] => {
     t('common.table.columns.id', {}),
     t('common.table.columns.name', {}),
     t('common.table.columns.backupConfiguration', {}),
+    t('common.table.columns.nodes', {}),
+    t('common.table.columns.servers', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -211,6 +215,7 @@ export const eggRepositoryTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('common.table.columns.description', {}),
     t('pages.admin.eggRepositories.table.columns.gitRepository', {}),
+    t('common.table.columns.eggs', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -244,6 +249,8 @@ export const nestTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('common.table.columns.author', {}),
     t('common.table.columns.description', {}),
+    t('common.table.columns.eggs', {}),
+    t('common.table.columns.servers', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -255,6 +262,7 @@ export const eggTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('common.table.columns.author', {}),
     t('common.table.columns.description', {}),
+    t('common.table.columns.servers', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -301,6 +309,7 @@ export const nodeTableColumns = (): string[] => {
     t('common.table.columns.id', {}),
     t('common.table.columns.name', {}),
     t('common.table.columns.location', {}),
+    t('common.table.columns.servers', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -313,6 +322,7 @@ export const desyncNodeTableColumns = (): string[] => {
     t('pages.admin.home.tabs.health.page.table.desync', {}),
     t('common.table.columns.name', {}),
     t('common.table.columns.location', {}),
+    t('common.table.columns.servers', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -397,6 +407,7 @@ export const roleTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('pages.admin.roles.table.columns.serverPermissions', {}),
     t('pages.admin.roles.table.columns.adminPermissions', {}),
+    t('common.table.columns.users', {}),
     t('common.table.columns.created', {}),
   ];
 };

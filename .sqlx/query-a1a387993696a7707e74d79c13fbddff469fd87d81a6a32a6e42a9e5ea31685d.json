@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        users.role_uuid AS \"role_uuid!\",\n                        COUNT(*) AS \"role_users!\"\n                    FROM users\n                    WHERE users.role_uuid IS NOT NULL\n                    GROUP BY users.role_uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "role_uuid!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "role_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "role_users!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      null
+    ]
+  },
+  "hash": "a1a387993696a7707e74d79c13fbddff469fd87d81a6a32a6e42a9e5ea31685d"
+}

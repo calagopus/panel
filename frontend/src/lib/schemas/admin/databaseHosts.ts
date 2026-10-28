@@ -84,3 +84,10 @@ export const adminDatabaseHostDatabaseSizeSchema = z.object({
   }),
   size: z.number(),
 });
+
+export const adminDatabaseHostCountsSchema = z.record(
+  z.string(),
+  z.object({
+    databaseHostServerDatabases: z.number(),
+  }),
+);
