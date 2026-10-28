@@ -6635,7 +6635,6 @@
             "rootPath": "Ruta raíz",
             "outputInto": "Guardar salida en",
             "ignoreFailure": "Ignorar fallo",
-            "runInForeground": "Ejecutar en primer plano",
             "sourceDatabaseInstance": "Considerar solo copias de seguridad de",
             "sourceDatabaseInstanceDescription": "Selecciona únicamente copias de seguridad de la base de datos que se hayan realizado desde esta base de datos administrada. Déjalo vacío para considerar copias de seguridad de cualquier base de datos administrada de este servidor.",
             "sourceDatabaseInstanceAny": "Cualquier base de datos gestionada"
@@ -6759,7 +6758,6 @@
             "noActionSelected": "Selecciona un tipo de acción para configurar",
             "noActionDetails": "Detalles de la acción no disponibles",
             "ignoreFailure": "Ignorar fallo: {value}",
-            "foreground": "Primer plano: {value}",
             "sourceDatabaseInstance": "Solo desde la base de datos administrada: {uuid}",
             "sourceDatabaseInstanceAny": "Solo desde la base de datos administrada: Cualquiera",
             "backupSelector": {

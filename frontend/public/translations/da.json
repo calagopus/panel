@@ -5793,7 +5793,6 @@
             "rootPath": "Rodsti",
             "outputInto": "Output til",
             "ignoreFailure": "Ignorér fejl",
-            "runInForeground": "Kør i forgrunden",
             "sourceDatabaseInstance": "Overvej kun backups fra",
             "sourceDatabaseInstanceDescription": "Vælg kun database-backups, der er taget fra denne managed database. Lad feltet være tomt for at overveje backups fra enhver managed database på denne server.",
             "sourceDatabaseInstanceAny": "Enhver managed database"
@@ -5916,7 +5915,6 @@
             "noActionSelected": "Vælg en handlingstype for at konfigurere",
             "noActionDetails": "Handlingsdetaljer ikke tilgængelige",
             "ignoreFailure": "Ignorér fejl: {value}",
-            "foreground": "Forgrund: {value}",
             "sourceDatabaseInstance": "Kun fra managed database: {uuid}",
             "sourceDatabaseInstanceAny": "Kun fra managed database: Enhver",
             "backupSelector": {

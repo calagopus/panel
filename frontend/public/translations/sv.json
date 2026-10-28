@@ -1424,8 +1424,7 @@
             "comparator": "Komparator",
             "rootPath": "Rotväg",
             "outputInto": "Utgång i",
-            "ignoreFailure": "Ignorera misslyckande",
-            "runInForeground": "Kör i förgrunden"
+            "ignoreFailure": "Ignorera misslyckande"
           },
           "condition": {
             "variable": "Variabel",
@@ -1484,8 +1483,7 @@
           "renderer": {
             "noActionSelected": "Välj en åtgärdstyp att konfigurera",
             "noActionDetails": "Åtgärdsinformation inte tillgänglig",
-            "ignoreFailure": "Ignorera fel: {value}",
-            "foreground": "Förgrund: {value}"
+            "ignoreFailure": "Ignorera fel: {value}"
           },
           "steps": {
             "empty": {

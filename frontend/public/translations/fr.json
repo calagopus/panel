@@ -3828,8 +3828,7 @@
             "comparator": "Comparateur",
             "rootPath": "Chemin racine",
             "outputInto": "Sortir dans",
-            "ignoreFailure": "Ignorer l'échec",
-            "runInForeground": "Exécuter au premier plan"
+            "ignoreFailure": "Ignorer l'échec"
           },
           "condition": {
             "equals": "Égale à",
@@ -3893,8 +3892,7 @@
           "renderer": {
             "noActionSelected": "Sélectionnez un type d'action à configurer",
             "noActionDetails": "Détails de l'action non disponibles",
-            "ignoreFailure": "Ignorer l'échec : {value}",
-            "foreground": "Premier plan : {value}"
+            "ignoreFailure": "Ignorer l'échec : {value}"
           },
           "steps": {
             "empty": {

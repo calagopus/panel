@@ -6573,7 +6573,6 @@
             "rootPath": "Đường Dẫn Root",
             "outputInto": "Đầu Ra Thành",
             "ignoreFailure": "Bỏ Qua Lỗi",
-            "runInForeground": "Chạy Ở Nền Trước",
             "sourceDatabaseInstance": "Chỉ xem xét các bản sao lưu từ",
             "sourceDatabaseInstanceDescription": "Chỉ chọn các bản sao lưu cơ sở dữ liệu được tạo từ cơ sở dữ liệu được quản lý này. Để trống nếu muốn xem xét các bản sao lưu từ bất kỳ cơ sở dữ liệu được quản lý nào trên máy chủ này.",
             "sourceDatabaseInstanceAny": "Bất kỳ cơ sở dữ liệu được quản lý nào"
@@ -6699,7 +6698,6 @@
             "noActionSelected": "Chọn loại hành động để cấu hình",
             "noActionDetails": "Chi tiết hành động không khả dụng",
             "ignoreFailure": "Bỏ Qua Lỗi: {value}",
-            "foreground": "Nền Trước: {value}",
             "sourceDatabaseInstance": "Chỉ từ Cơ sở dữ liệu được quản lý: {uuid}",
             "sourceDatabaseInstanceAny": "Chỉ từ cơ sở dữ liệu được quản lý: Bất kỳ",
             "backupSelector": {

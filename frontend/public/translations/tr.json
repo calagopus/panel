@@ -1414,8 +1414,7 @@
             "comparator": "Karşılaştırıcı",
             "rootPath": "Kök Yol",
             "outputInto": "Çıktı konumu",
-            "ignoreFailure": "Hatayı Yoksay",
-            "runInForeground": "Ön Planda Çalıştır"
+            "ignoreFailure": "Hatayı Yoksay"
           },
           "condition": {
             "variable": "Değişken",
@@ -1479,8 +1478,7 @@
           "renderer": {
             "noActionSelected": "Yapılandırmak için bir eylem tipi seçin",
             "noActionDetails": "Eylem detayları mevcut değil",
-            "ignoreFailure": "Hatayı Yoksay: {value}",
-            "foreground": "Ön Plan: {value}"
+            "ignoreFailure": "Hatayı Yoksay: {value}"
           },
           "steps": {
             "empty": {
