@@ -1015,6 +1015,7 @@ const baseTranslations = defineTranslations({
         },
         toast: {
           uploading: 'Started uploading {files}...',
+          checkingConflicts: 'Checking {files} for existing files...',
           conflictCheckFailed: 'Could not check for existing files; uploading anyway.',
           failed: 'Upload failed: {error}',
           cancelledFile: 'Successfully cancelled upload of `{file}`.',

@@ -56,7 +56,7 @@ interface UploadGroup {
 
 export default function UploadsCard() {
   const { t, tItem } = useTranslations();
-  const { addToast, toastPosition } = useToast();
+  const { addToast, addProgressToast, dismissToast, toastPosition } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,6 +78,8 @@ export default function UploadsCard() {
     setUploadManagerExternals({
       queryClient,
       addToast,
+      addProgressToast,
+      dismissToast,
       onUploadsComplete: (destination, fileCount) => {
         const message =
           destination.type === 'server'
@@ -96,7 +98,7 @@ export default function UploadsCard() {
         ]);
       },
     });
-  }, [queryClient, addToast, navigate, t, tItem]);
+  }, [queryClient, addToast, addProgressToast, dismissToast, navigate, t, tItem]);
 
   const groups = useMemo(() => {
     const map = new Map<string, UploadGroup>();

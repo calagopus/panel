@@ -1168,6 +1168,7 @@
         },
         "toast": {
           "uploading": "Hochladen von {files} gestartet...",
+          "checkingConflicts": "{files} werden auf vorhandene Dateien geprüft...",
           "conflictCheckFailed": "Vorhandene Dateien konnten nicht geprüft werden; wird trotzdem hochgeladen.",
           "failed": "Upload fehlgeschlagen: {error}",
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
