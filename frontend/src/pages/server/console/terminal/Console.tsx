@@ -262,7 +262,13 @@ export default function Terminal({ popout = false }: { popout?: boolean }) {
           if (!command) return;
 
           commandHistory.recordCommand(command);
-          socketInstance?.send(SocketRequest.SEND_COMMAND, commandPrefix + command);
+          
+          for (const line of command.split(/\\n|\r?\n/)) {
+            const trimmedLine = line.trim();
+            if (trimmedLine) {
+              socketInstance?.send(SocketRequest.SEND_COMMAND, commandPrefix + trimmedLine);
+            }
+          }
           setInputValue('');
           inputValueRef.current = '';
         }
