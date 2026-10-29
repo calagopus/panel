@@ -1416,8 +1416,7 @@
             "comparator": "المقارن",
             "rootPath": "المسار الجذر",
             "outputInto": "الإخراج إلى",
-            "ignoreFailure": "تجاهل الفشل",
-            "runInForeground": "التشغيل في المقدمة"
+            "ignoreFailure": "تجاهل الفشل"
           },
           "condition": {
             "variable": "المتغير",
@@ -1481,8 +1480,7 @@
           "renderer": {
             "noActionSelected": "حدد نوع إجراء للتكوين",
             "noActionDetails": "تفاصيل الإجراء غير متوفرة",
-            "ignoreFailure": "تجاهل الفشل: {value}",
-            "foreground": "المقدمة: {value}"
+            "ignoreFailure": "تجاهل الفشل: {value}"
           },
           "steps": {
             "empty": {

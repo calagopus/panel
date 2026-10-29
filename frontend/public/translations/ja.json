@@ -6846,7 +6846,6 @@
             "rootPath": "ルートパス",
             "outputInto": "出力先変数",
             "ignoreFailure": "失敗を無視",
-            "runInForeground": "フォアグラウンドで実行",
             "sourceDatabaseInstance": "バックアップ対象インスタンスの限定",
             "sourceDatabaseInstanceDescription": "このマネージドデータベースから取得されたバックアップのみを対象とします。空にすると、このサーバー上の任意のマネージドデータベースのバックアップが対象になります。",
             "sourceDatabaseInstanceAny": "任意のマネージドデータベース"
@@ -6972,7 +6971,6 @@
             "noActionSelected": "設定するアクションの種類を選択してください",
             "noActionDetails": "アクションの詳細を利用できません",
             "ignoreFailure": "失敗を無視: {value}",
-            "foreground": "フォアグラウンド実行: {value}",
             "sourceDatabaseInstance": "指定マネージドデータベースのみ: {uuid}",
             "sourceDatabaseInstanceAny": "指定マネージドデータベースのみ: 任意",
             "backupSelector": {

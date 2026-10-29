@@ -5325,8 +5325,7 @@
             "comparator": "比較器",
             "rootPath": "根路徑",
             "outputInto": "輸出到",
-            "ignoreFailure": "忽略失敗",
-            "runInForeground": "在前景執行"
+            "ignoreFailure": "忽略失敗"
           },
           "condition": {
             "variable": "變數",
@@ -5437,8 +5436,7 @@
           "renderer": {
             "noActionSelected": "選取要設定的動作類型",
             "noActionDetails": "沒有可用的動作詳細資訊",
-            "ignoreFailure": "忽略失敗：{value}",
-            "foreground": "前景：{value}"
+            "ignoreFailure": "忽略失敗：{value}"
           },
           "steps": {
             "empty": {

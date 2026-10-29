@@ -3592,8 +3592,7 @@
             "comparator": "Porovnávač",
             "rootPath": "Koreňová cesta",
             "outputInto": "Výstup do",
-            "ignoreFailure": "Ignorovať zlyhanie",
-            "runInForeground": "Spustiť v popredí"
+            "ignoreFailure": "Ignorovať zlyhanie"
           },
           "condition": {
             "variable": "Premenná",
@@ -3658,8 +3657,7 @@
           "renderer": {
             "noActionSelected": "Vyberte typ akcie, ktorú chcete nakonfigurovať",
             "noActionDetails": "Podrobnosti o akcii nie sú k dispozícii",
-            "ignoreFailure": "Ignorovať zlyhanie: {value}",
-            "foreground": "Popredie: {value}"
+            "ignoreFailure": "Ignorovať zlyhanie: {value}"
           },
           "steps": {
             "empty": {

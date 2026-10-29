@@ -1407,8 +1407,7 @@
             "comparator": "Оператор сравнения",
             "rootPath": "Корневой путь",
             "outputInto": "Вывод в",
-            "ignoreFailure": "Игнорировать ошибки",
-            "runInForeground": "Выполнять на переднем плане"
+            "ignoreFailure": "Игнорировать ошибки"
           },
           "condition": {
             "variable": "Переменная",
@@ -1472,8 +1471,7 @@
           "renderer": {
             "noActionSelected": "Выберите тип действия для настройки",
             "noActionDetails": "Детали действия недоступны",
-            "ignoreFailure": "Игнорировать ошибки: {value}",
-            "foreground": "Передний план: {value}"
+            "ignoreFailure": "Игнорировать ошибки: {value}"
           },
           "steps": {
             "empty": {
