@@ -75,6 +75,8 @@ export class Extension {
   public cardConfigurationPage: React.FC | null = null;
   // This is the component added in your extension card in the admin extensions page
   public cardComponent: React.FC | null = null;
+  // This is the component added to the hover preview of your extension card, it is mounted every time the preview opens
+  public cardPreviewComponent: React.FC | null = null;
   // This overrides the icon element shown in your extension row in the admin extensions page
   public cardIcon: React.ReactNode = null;
 

@@ -2875,7 +2875,8 @@
           },
           "card": {
             "version": "Version",
-            "authors": "Autoren"
+            "authors": "Autoren",
+            "panelVersion": "Panel-Version"
           },
           "section": {
             "pendingExtensions": "Ausstehende Erweiterungen",

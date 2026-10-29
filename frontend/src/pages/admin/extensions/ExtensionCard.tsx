@@ -5,7 +5,7 @@ import { Extension } from 'shared';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
-import Card from '@/elements/data-display/Card.tsx';
+import PreviewCard from '@/elements/data-display/PreviewCard.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
@@ -64,117 +64,171 @@ export default function ExtensionCard({
     </Button>
   );
 
-  return (
-    <Card>
-      <div className='mb-3 flex items-start gap-3'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
-          {extension?.cardIcon ?? <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />}
-        </div>
-        <div className='min-w-0 flex-1'>
-          <h3 className='text-md font-medium leading-tight'>
-            <ScrollingText>{name}</ScrollingText>
-          </h3>
-          {packageName && (
-            <p className='mt-0.5 font-mono text-[11px] text-(--mantine-color-dimmed)'>
-              <ScrollingText>{packageName}</ScrollingText>
-            </p>
-          )}
-        </div>
+  const header = (
+    <div className='mb-3 flex items-start gap-3'>
+      <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
+        {extension?.cardIcon ?? <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />}
       </div>
+      <div className='min-w-0 flex-1'>
+        <h3 className='text-md font-medium leading-tight'>
+          <ScrollingText>{name}</ScrollingText>
+        </h3>
+        {packageName && (
+          <p className='mt-0.5 font-mono text-[11px] text-(--mantine-color-dimmed)'>
+            <ScrollingText>{packageName}</ScrollingText>
+          </p>
+        )}
+      </div>
+    </div>
+  );
 
-      {badges.length > 0 && (
-        <div className='mb-2.5 flex flex-wrap gap-1.5'>
-          {badges.map((badge) => (
-            <Badge key={badge.key} color={badge.color} variant='light' size='sm'>
-              {badge.label}
-            </Badge>
-          ))}
-        </div>
+  const badgeList = badges.length > 0 && (
+    <div className='mb-2.5 flex flex-wrap gap-1.5'>
+      {badges.map((badge) => (
+        <Badge key={badge.key} color={badge.color} variant='light' size='sm'>
+          {badge.label}
+        </Badge>
+      ))}
+    </div>
+  );
+
+  const version = backendExtension && (
+    <div className='mb-1.5 flex items-center justify-between'>
+      <span className='text-xs text-(--mantine-color-dimmed)'>{t('pages.admin.extensions.card.version', {})}</span>
+      <span className='font-mono text-xs text-(--mantine-color-text)'>{backendExtension.version}</span>
+    </div>
+  );
+
+  const authorsLabel = (
+    <span className='text-xs text-(--mantine-color-dimmed) shrink-0'>
+      {t('pages.admin.extensions.card.authors', {})}
+    </span>
+  );
+  const authors = backendExtension?.authors.join(', ') || t('common.unknown', {});
+
+  const cardComponent = extension?.cardComponent && (
+    <div>
+      <extension.cardComponent />
+    </div>
+  );
+
+  const actions = (
+    <div className='mt-auto flex items-center gap-2'>
+      <ConditionalTooltip
+        enabled={configureDisabled}
+        label={
+          !backendExtension
+            ? t('pages.admin.extensions.tooltip.noBackend', {})
+            : isDisabled
+              ? t('pages.admin.extensions.tooltip.extensionDisabled', {})
+              : t('pages.admin.extensions.tooltip.noConfigurationPage', {})
+        }
+        className='flex-1'
+      >
+        {configureDisabled || !extension ? (
+          configureButton
+        ) : (
+          <Link to={`/admin/extensions/${extension.packageName}`} className='block w-full'>
+            {configureButton}
+          </Link>
+        )}
+      </ConditionalTooltip>
+      {backendExtension && onToggle && (
+        <Tooltip
+          label={
+            isPendingDisabled
+              ? t('pages.admin.extensions.tooltip.enableExtension', {})
+              : t('pages.admin.extensions.tooltip.disableExtension', {})
+          }
+        >
+          <Switch
+            checked={!isPendingDisabled}
+            disabled={isRemoved || busy}
+            onChange={(e) => onToggle(e.target.checked)}
+          />
+        </Tooltip>
       )}
+      {backendExtension && onRemove && (
+        <Tooltip label={t('pages.admin.extensions.tooltip.removeExtension', {})}>
+          <ActionIcon
+            color='red'
+            variant='subtle'
+            size='input-md'
+            disabled={isRemoved}
+            loading={busy}
+            onClick={onRemove}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </ActionIcon>
+        </Tooltip>
+      )}
+    </div>
+  );
+
+  return (
+    <PreviewCard
+      preview={
+        <>
+          {header}
+          {badgeList}
+          {backendExtension && (
+            <div className='mb-3'>
+              {version}
+              <div className='mb-1.5 flex items-start justify-between gap-2 min-w-0'>
+                {authorsLabel}
+                <span className='text-right text-xs text-(--mantine-color-text) min-w-0'>{authors}</span>
+              </div>
+              <div className='flex items-center justify-between'>
+                <span className='text-xs text-(--mantine-color-dimmed)'>
+                  {t('pages.admin.extensions.card.panelVersion', {})}
+                </span>
+                <span className='font-mono text-xs text-(--mantine-color-text)'>
+                  {backendExtension.metadataToml.panelVersion}
+                </span>
+              </div>
+            </div>
+          )}
+          {backendExtension?.description && (
+            <p className='mb-3 text-xs leading-relaxed text-(--mantine-color-dimmed)'>{backendExtension.description}</p>
+          )}
+          {cardComponent}
+          {extension?.cardPreviewComponent && (
+            <div className='mb-3'>
+              <extension.cardPreviewComponent />
+            </div>
+          )}
+          <Divider className='mb-3 mt-1' />
+          {actions}
+        </>
+      }
+    >
+      {header}
+      {badgeList}
 
       {backendExtension && (
-        <div className='mb-3 flex flex-col gap-1.5'>
-          <div className='flex items-center justify-between'>
-            <span className='text-xs text-(--mantine-color-dimmed)'>
-              {t('pages.admin.extensions.card.version', {})}
-            </span>
-            <span className='font-mono text-xs text-(--mantine-color-text)'>{backendExtension.version}</span>
-          </div>
+        <div className='mb-3'>
+          {version}
           <div className='flex items-center justify-between gap-2 min-w-0'>
-            <span className='text-xs text-(--mantine-color-dimmed) shrink-0'>
-              {t('pages.admin.extensions.card.authors', {})}
-            </span>
+            {authorsLabel}
             <span className='text-xs text-(--mantine-color-text) min-w-0'>
-              <ScrollingText>{backendExtension.authors.join(', ') || t('common.unknown', {})}</ScrollingText>
+              <ScrollingText>{authors}</ScrollingText>
             </span>
           </div>
         </div>
       )}
 
       {backendExtension?.description && (
-        <p className='flex-1 text-xs leading-relaxed text-(--mantine-color-dimmed)'>{backendExtension.description}</p>
+        <p className='flex-1 line-clamp-3 text-xs leading-relaxed text-(--mantine-color-dimmed)'>
+          {backendExtension.description}
+        </p>
       )}
 
-      {extension?.cardComponent && (
-        <div>
-          <Divider className='mt-3 mb-1' />
-
-          <extension.cardComponent />
-        </div>
-      )}
+      {cardComponent && <Divider className='mt-3 mb-1' />}
+      {cardComponent}
 
       <Divider className='mb-3 mt-1' />
 
-      <div className='mt-auto flex items-center gap-2'>
-        <ConditionalTooltip
-          enabled={configureDisabled}
-          label={
-            !backendExtension
-              ? t('pages.admin.extensions.tooltip.noBackend', {})
-              : isDisabled
-                ? t('pages.admin.extensions.tooltip.extensionDisabled', {})
-                : t('pages.admin.extensions.tooltip.noConfigurationPage', {})
-          }
-          className='flex-1'
-        >
-          {configureDisabled || !extension ? (
-            configureButton
-          ) : (
-            <Link to={`/admin/extensions/${extension.packageName}`} className='block w-full'>
-              {configureButton}
-            </Link>
-          )}
-        </ConditionalTooltip>
-        {backendExtension && onToggle && (
-          <Tooltip
-            label={
-              isPendingDisabled
-                ? t('pages.admin.extensions.tooltip.enableExtension', {})
-                : t('pages.admin.extensions.tooltip.disableExtension', {})
-            }
-          >
-            <Switch
-              checked={!isPendingDisabled}
-              disabled={isRemoved || busy}
-              onChange={(e) => onToggle(e.target.checked)}
-            />
-          </Tooltip>
-        )}
-        {backendExtension && onRemove && (
-          <Tooltip label={t('pages.admin.extensions.tooltip.removeExtension', {})}>
-            <ActionIcon
-              color='red'
-              variant='subtle'
-              size='input-md'
-              disabled={isRemoved}
-              loading={busy}
-              onClick={onRemove}
-            >
-              <FontAwesomeIcon icon={faTrash} />
-            </ActionIcon>
-          </Tooltip>
-        )}
-      </div>
-    </Card>
+      {actions}
+    </PreviewCard>
   );
 }

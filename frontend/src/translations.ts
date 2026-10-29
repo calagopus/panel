@@ -2808,6 +2808,7 @@ const baseTranslations = defineTranslations({
           card: {
             version: 'Version',
             authors: 'Authors',
+            panelVersion: 'Panel Version',
           },
           section: {
             pendingExtensions: 'Pending extensions',
