@@ -4507,6 +4507,8 @@ const baseTranslations = defineTranslations({
             repository: 'Repository',
             author: 'Author',
             installedIn: 'Installed in',
+            dockerImages: 'Docker Images',
+            features: 'Features',
           },
           badge: {
             manual: 'Manual',

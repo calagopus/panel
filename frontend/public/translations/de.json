@@ -4488,7 +4488,9 @@
           "card": {
             "repository": "Repository",
             "author": "Autor",
-            "installedIn": "Installiert in"
+            "installedIn": "Installiert in",
+            "dockerImages": "Docker-Images",
+            "features": "Features"
           },
           "badge": {
             "manual": "Manuell"

@@ -4533,7 +4533,9 @@
           "card": {
             "repository": "Repository",
             "author": "Author",
-            "installedIn": "Installed in"
+            "installedIn": "Installed in",
+            "dockerImages": "Docker Images",
+            "features": "Features"
           },
           "badge": {
             "manual": "Manual"
@@ -7066,6 +7068,8 @@
                 "time": "At",
                 "weekday": "On",
                 "dayOfMonth": "On day",
+                "weekInterval": "Every (weeks)",
+                "weekAnchor": "Aligned to the week of",
                 "advanced": "Edit as cron expression"
               },
               "frequency": {
@@ -7075,6 +7079,7 @@
                 "weekly": "Weekly",
                 "monthly": "Monthly"
               },
+              "everyWeeks": "every {weeks} weeks",
               "timezoneHint": "Times use the server timezone ({timezone}).",
               "card": {
                 "content": "On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}."
