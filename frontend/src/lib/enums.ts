@@ -1038,7 +1038,7 @@ export const scheduleTriggerDefaultMapping: Record<
   z.infer<typeof serverScheduleTriggerSchema>['type'],
   z.infer<typeof serverScheduleTriggerSchema>
 > = {
-  cron: { type: 'cron', schedule: '0 0 0 * * *' },
+  cron: { type: 'cron', schedule: '0 0 0 * * *', weekInterval: 1, weekAnchor: null },
   power_action: { type: 'power_action', action: 'start' },
   server_state: { type: 'server_state', state: 'running' },
   backup_status: { type: 'backup_status', status: 'starting' },

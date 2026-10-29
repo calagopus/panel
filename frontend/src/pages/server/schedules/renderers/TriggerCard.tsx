@@ -1,6 +1,4 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CronExpressionParser } from 'cron-parser';
-import cronstrue from 'cronstrue';
 import { z } from 'zod';
 import getSchedule from '@/api/server/schedules/getSchedule.ts';
 import Card from '@/elements/data-display/Card.tsx';
@@ -10,6 +8,7 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { describeCron, getCronOccurrence } from '@/lib/cron.ts';
 import {
   scheduleComparatorLabelMapping,
   scheduleResourceMetricLabelMapping,
@@ -23,12 +22,12 @@ import { useResource } from '@/plugins/resource/useResource.ts';
 import { getTranslations, useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-function cronTooltip(cron: string) {
+function cronTooltip(cron: string, weekInterval: number) {
   const { t, language } = getTranslations();
 
   let description: string;
   try {
-    description = cronstrue.toString(cron, { locale: language });
+    description = describeCron(cron, weekInterval, language);
   } catch {
     description = t('pages.server.schedules.triggers.cron.invalidCron', {});
   }
@@ -63,18 +62,20 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
           <Text component='div' className='mr-1!'>
             {tReact('pages.server.schedules.triggers.cron.card.content', {
               schedule: (
-                <Tooltip label={cronTooltip(trigger.schedule)} className='inline-block'>
+                <Tooltip label={cronTooltip(trigger.schedule, trigger.weekInterval)} className='inline-block'>
                   <Code>{trigger.schedule}</Code>
                 </Tooltip>
               ),
               timestamp: (
                 <FormattedTimestamp
-                  timestamp={CronExpressionParser.parse(trigger.schedule, {
-                    currentDate: date,
-                    tz: timezone,
-                  })
-                    .next()
-                    .toDate()}
+                  timestamp={getCronOccurrence(
+                    trigger.schedule,
+                    timezone,
+                    date,
+                    'next',
+                    trigger.weekInterval,
+                    trigger.weekAnchor,
+                  )}
                   autoUpdate={false}
                   precise
                   tooltipClassName='inline-block'
@@ -82,12 +83,14 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
               ),
               lastTimestamp: (
                 <FormattedTimestamp
-                  timestamp={CronExpressionParser.parse(trigger.schedule, {
-                    currentDate: date,
-                    tz: timezone,
-                  })
-                    .prev()
-                    .toDate()}
+                  timestamp={getCronOccurrence(
+                    trigger.schedule,
+                    timezone,
+                    date,
+                    'prev',
+                    trigger.weekInterval,
+                    trigger.weekAnchor,
+                  )}
                   autoUpdate={false}
                   precise
                   tooltipClassName='inline-block'

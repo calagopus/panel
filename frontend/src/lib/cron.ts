@@ -1,3 +1,7 @@
+import { CronDate, CronExpressionParser } from 'cron-parser';
+import cronstrue from 'cronstrue';
+import { getTranslations } from '@/providers/TranslationProvider.tsx';
+
 export const CRON_WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
 
 export type SimpleSchedule =
@@ -91,4 +95,65 @@ export function getLocalizedCronWeekdays(language: string): { value: (typeof CRO
       label: formatter.format(new Date(Date.UTC(2021, 7, 1 + day))),
     };
   });
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_WEEK_ANCHOR = '1970-01-05';
+const MAX_WEEK_SKIPS = 1000;
+
+function localDayNumber(date: CronDate): number {
+  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS;
+}
+
+function localStartOfDay(date: CronDate, offsetDays: number, timezone: string): number {
+  const start = new CronDate(date, timezone);
+  start.setStartOfDay();
+
+  const target = new CronDate(start.getTime() + offsetDays * DAY_MS + DAY_MS / 2, timezone);
+  target.setStartOfDay();
+
+  return target.getTime();
+}
+
+export function getCronOccurrence(
+  schedule: string,
+  timezone: string,
+  from: Date,
+  direction: 'next' | 'prev',
+  weekInterval = 1,
+  weekAnchor?: string | null,
+): Date {
+  const step = (currentDate: Date | number) => {
+    const expression = CronExpressionParser.parse(schedule, { currentDate, tz: timezone });
+    return direction === 'next' ? expression.next() : expression.prev();
+  };
+
+  let candidate = step(from);
+  if (weekInterval <= 1) return candidate.toDate();
+
+  const anchor = Date.parse(weekAnchor || DEFAULT_WEEK_ANCHOR) / DAY_MS;
+
+  for (let skips = 0; skips < MAX_WEEK_SKIPS; skips++) {
+    const day = localDayNumber(candidate);
+    const week = Math.floor((day - anchor) / 7);
+    const phase = ((week % weekInterval) + weekInterval) % weekInterval;
+    if (phase === 0) return candidate.toDate();
+
+    if (direction === 'next') {
+      const windowStart = localStartOfDay(candidate, anchor + (week + weekInterval - phase) * 7 - day, timezone);
+      candidate = step(windowStart - 1000);
+    } else {
+      const windowEnd = localStartOfDay(candidate, anchor + (week - phase + 1) * 7 - day, timezone);
+      candidate = step(windowEnd);
+    }
+  }
+
+  throw new Error('No cron occurrence found within the week interval');
+}
+
+export function describeCron(schedule: string, weekInterval: number, language: string): string {
+  const description = cronstrue.toString(schedule, { locale: language });
+  if (weekInterval <= 1) return description;
+
+  return `${description}, ${getTranslations().t('pages.server.schedules.triggers.cron.everyWeeks', { weeks: weekInterval })}`;
 }

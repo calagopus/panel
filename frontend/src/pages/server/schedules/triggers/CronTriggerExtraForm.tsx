@@ -1,6 +1,6 @@
-import cronstrue from 'cronstrue';
 import { useMemo, useState } from 'react';
 import { CrontabEditor } from '@/elements/input/CronInput.tsx';
+import DatePicker from '@/elements/input/DatePicker.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -12,6 +12,7 @@ import Popover from '@/elements/overlays/Popover.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import {
   CRON_WEEKDAYS,
+  describeCron,
   getLocalizedCronWeekdays,
   parseSimpleSchedule,
   SimpleSchedule,
@@ -39,10 +40,21 @@ export default function CronTriggerExtraForm({ form, index }: TriggerFormProps) 
 
   const setSchedule = (value: string) => form.setFieldValue(`triggers.${index}.schedule`, value);
   const setSimple = (value: SimpleSchedule) => setSchedule(simpleScheduleToCron(value));
+  const setWeekAnchor = (value: string | null) => form.setFieldValue(`triggers.${index}.weekAnchor`, value);
+
+  const setWeekInterval = (value: number) => {
+    const weekInterval = Math.min(Math.max(Math.floor(value) || 1, 1), 52);
+    form.setFieldValue(`triggers.${index}.weekInterval`, weekInterval);
+
+    if (weekInterval > 1 && !trigger.weekAnchor) {
+      setWeekAnchor(new Intl.DateTimeFormat('en-CA', { timeZone: server.timezone || 'UTC' }).format(new Date()));
+    }
+  };
 
   const handleFrequencyChange = (frequency: string) => {
     const hour = simple && 'hour' in simple ? simple.hour : 0;
     const minute = simple && 'minute' in simple ? simple.minute : 0;
+    if (frequency !== 'weekly') setWeekInterval(1);
 
     switch (frequency) {
       case 'everyMinutes':
@@ -73,7 +85,7 @@ export default function CronTriggerExtraForm({ form, index }: TriggerFormProps) 
   };
 
   const cronValid = isValidCronExpression(schedule);
-  const description = cronValid ? cronstrue.toString(schedule, { locale: language }) : null;
+  const description = cronValid ? describeCron(schedule, trigger.weekInterval, language) : null;
 
   const timeValue =
     simple && 'hour' in simple
@@ -165,6 +177,38 @@ export default function CronTriggerExtraForm({ form, index }: TriggerFormProps) 
               value={timeValue}
               onChange={(e) => handleTimeChange(e.currentTarget.value)}
             />
+          )}
+        </Group>
+      )}
+
+      {(advanced || simple!.frequency === 'weekly') && (
+        <Group align='end' gap='sm'>
+          <NumberInput
+            label={t('pages.server.schedules.triggers.cron.form.weekInterval', {})}
+            className='w-40'
+            min={1}
+            max={52}
+            value={trigger.weekInterval}
+            onChange={(value) => setWeekInterval(Number(value))}
+          />
+          {trigger.weekInterval > 1 && (
+            <Popover>
+              <Popover.Target>
+                <TextInput
+                  readOnly
+                  className='w-60'
+                  label={t('pages.server.schedules.triggers.cron.form.weekAnchor', {})}
+                  value={trigger.weekAnchor ?? ''}
+                />
+              </Popover.Target>
+              <Popover.Dropdown>
+                <DatePicker
+                  value={trigger.weekAnchor}
+                  defaultDate={trigger.weekAnchor ?? undefined}
+                  onChange={(value) => value && setWeekAnchor(value)}
+                />
+              </Popover.Dropdown>
+            </Popover>
           )}
         </Group>
       )}

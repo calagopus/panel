@@ -2708,6 +2708,8 @@ impl Validator<'_> {
             let triggers = match croner::Cron::from_str(&expression) {
                 Ok(cron) => vec![wings_api::ScheduleTrigger::Cron {
                     schedule: Box::new(cron),
+                    week_interval: 1,
+                    week_anchor: None,
                 }],
                 Err(err) => {
                     if self.problem(

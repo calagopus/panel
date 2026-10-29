@@ -688,6 +688,13 @@ pub enum ScheduleTrigger {
         #[garde(skip)]
         #[schema(value_type = String, example = "* * * * * *")]
         schedule: Box<croner::Cron>,
+        #[garde(range(min = 1, max = 52))]
+        #[schema(minimum = 1, maximum = 52)]
+        #[serde(default = "default_week_interval")]
+        week_interval: u32,
+        #[garde(skip)]
+        #[serde(default)]
+        week_anchor: Option<chrono::NaiveDate>,
     },
     PowerAction {
         #[garde(skip)]
@@ -734,6 +741,48 @@ pub enum ScheduleTrigger {
         output_into: Option<ScheduleVariable>,
     },
     Crash,
+}
+
+fn default_week_interval() -> u32 {
+    1
+}
+
+pub fn next_cron_occurrence<Tz: chrono::TimeZone>(
+    schedule: &croner::Cron,
+    week_interval: u32,
+    week_anchor: Option<chrono::NaiveDate>,
+    after: chrono::DateTime<Tz>,
+) -> Option<chrono::DateTime<Tz>> {
+    let mut candidate = schedule.find_next_occurrence(&after, false).ok()?;
+    if week_interval <= 1 {
+        return Some(candidate);
+    }
+
+    let interval = i64::from(week_interval);
+    let anchor = match week_anchor {
+        Some(anchor) => anchor,
+        None => chrono::NaiveDate::from_ymd_opt(1970, 1, 5)?,
+    };
+
+    loop {
+        let week = (candidate.date_naive() - anchor).num_days().div_euclid(7);
+        let phase = week.rem_euclid(interval);
+        if phase == 0 {
+            return Some(candidate);
+        }
+
+        let window_start = anchor.checked_add_signed(chrono::TimeDelta::try_weeks(
+            week.checked_add(interval - phase)?,
+        )?)?;
+        let timezone = candidate.timezone();
+        let window_start = (0..24).find_map(|hour| {
+            timezone
+                .from_local_datetime(&window_start.and_hms_opt(hour, 0, 0)?)
+                .earliest()
+        })?;
+
+        candidate = schedule.find_next_occurrence(&window_start, true).ok()?;
+    }
 }
 
 impl ScheduleTrigger {

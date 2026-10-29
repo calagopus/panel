@@ -2,8 +2,6 @@ import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { Schedule, ScheduleEventData, ScheduleViewLevel } from '@mantine/schedule';
-import { CronExpressionParser } from 'cron-parser';
-import cronstrue from 'cronstrue';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
@@ -12,6 +10,7 @@ import Alert from '@/elements/feedback/Alert.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { describeCron, getCronOccurrence } from '@/lib/cron.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -129,7 +128,7 @@ export default function ScheduleCalendarModal(props: ModalProps) {
 
         let description: string;
         try {
-          description = cronstrue.toString(trigger.schedule, { locale: language });
+          description = describeCron(trigger.schedule, trigger.weekInterval, language);
         } catch {
           description = t('pages.server.schedules.triggers.cron.invalidCron', {});
         }
@@ -143,7 +142,14 @@ export default function ScheduleCalendarModal(props: ModalProps) {
         while (occurrenceCount < MAX_OCCURRENCES_PER_TRIGGER) {
           let next: Date;
           try {
-            next = CronExpressionParser.parse(trigger.schedule, { currentDate: cursor, tz: timezone }).next().toDate();
+            next = getCronOccurrence(
+              trigger.schedule,
+              timezone,
+              cursor,
+              'next',
+              trigger.weekInterval,
+              trigger.weekAnchor,
+            );
           } catch {
             break;
           }

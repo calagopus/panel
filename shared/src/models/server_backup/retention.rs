@@ -187,13 +187,30 @@ impl BackupRetention {
 const FORECAST_STEP_LIMIT: usize = 10_000;
 
 #[derive(Clone)]
+pub struct CadenceCron {
+    pub schedule: croner::Cron,
+    pub week_interval: u32,
+    pub week_anchor: Option<chrono::NaiveDate>,
+}
+
+impl From<croner::Cron> for CadenceCron {
+    fn from(schedule: croner::Cron) -> Self {
+        Self {
+            schedule,
+            week_interval: 1,
+            week_anchor: None,
+        }
+    }
+}
+
+#[derive(Clone)]
 pub struct RetentionCadence {
-    crons: Vec<croner::Cron>,
+    crons: Vec<CadenceCron>,
     timezone: chrono_tz::Tz,
 }
 
 impl RetentionCadence {
-    pub fn new(crons: Vec<croner::Cron>, timezone: chrono_tz::Tz) -> Option<Self> {
+    pub fn new(crons: Vec<CadenceCron>, timezone: chrono_tz::Tz) -> Option<Self> {
         if crons.is_empty() {
             return None;
         }
@@ -206,7 +223,14 @@ impl RetentionCadence {
 
         self.crons
             .iter()
-            .filter_map(|cron| cron.find_next_occurrence(&after, false).ok())
+            .filter_map(|cron| {
+                wings_api::next_cron_occurrence(
+                    &cron.schedule,
+                    cron.week_interval,
+                    cron.week_anchor,
+                    after,
+                )
+            })
             .map(|time| time.naive_utc())
             .min()
     }
@@ -1129,7 +1153,7 @@ impl RetentionScopeConfig {
                 let cron: String = row.try_get("cron")?;
                 let cadences = croner::Cron::from_str(&cron)
                     .ok()
-                    .and_then(|cron| RetentionCadence::new(vec![cron], chrono_tz::UTC))
+                    .and_then(|cron| RetentionCadence::new(vec![cron.into()], chrono_tz::UTC))
                     .into_iter()
                     .flat_map(|cadence| {
                         [
@@ -1231,7 +1255,15 @@ impl RetentionScopeConfig {
             let triggers: Vec<wings_api::ScheduleTrigger> = serde_json::from_value(triggers)?;
 
             crons.extend(triggers.into_iter().filter_map(|trigger| match trigger {
-                wings_api::ScheduleTrigger::Cron { schedule } => Some(*schedule),
+                wings_api::ScheduleTrigger::Cron {
+                    schedule,
+                    week_interval,
+                    week_anchor,
+                } => Some(CadenceCron {
+                    schedule: *schedule,
+                    week_interval,
+                    week_anchor,
+                }),
                 _ => None,
             }));
         }
@@ -1431,7 +1463,7 @@ mod tests {
         RetentionCadence::new(
             crons
                 .iter()
-                .map(|cron| croner::Cron::from_str(cron).unwrap())
+                .map(|cron| croner::Cron::from_str(cron).unwrap().into())
                 .collect(),
             timezone,
         )

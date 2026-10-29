@@ -7131,6 +7131,8 @@ const baseTranslations = defineTranslations({
                 time: 'At',
                 weekday: 'On',
                 dayOfMonth: 'On day',
+                weekInterval: 'Every (weeks)',
+                weekAnchor: 'Aligned to the week of',
                 advanced: 'Edit as cron expression',
               },
               frequency: {
@@ -7140,6 +7142,7 @@ const baseTranslations = defineTranslations({
                 weekly: 'Weekly',
                 monthly: 'Monthly',
               },
+              everyWeeks: 'every {weeks} weeks',
               timezoneHint: 'Times use the server timezone ({timezone}).',
               card: {
                 content: 'On Cron Interval {schedule}, Next run is {timestamp} - Last run was {lastTimestamp}.',

@@ -34,6 +34,8 @@ export const serverScheduleComparator = z.enum([
 export const serverScheduleTriggerCronSchema = z.object({
   type: z.literal('cron'),
   schedule: z.string().refine(isValidCronExpression, { message: 'Invalid cron expression' }),
+  weekInterval: z.number().int().min(1).max(52).default(1),
+  weekAnchor: z.iso.date().nullable().default(null),
 });
 
 export const serverScheduleTriggerPowerActionSchema = z.object({
