@@ -2,7 +2,7 @@ import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { join } from 'pathe';
+import { join, resolve } from 'pathe';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -149,7 +149,7 @@ export default function FileCopyModal({ file, ...props }: Props) {
 
   const previewPath = readOnly
     ? join(form.getValues().destination, form.getValues().name)
-    : join(browsingDirectory, form.getValues().name || generateNewName());
+    : resolve(browsingDirectory, form.getValues().name || generateNewName());
 
   return (
     <FormModal

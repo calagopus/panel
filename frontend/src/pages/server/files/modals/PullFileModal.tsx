@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import classNames from 'classnames';
-import { join } from 'pathe';
+import { resolve } from 'pathe';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import pullFile from '@/api/server/files/pullFile.ts';
@@ -99,7 +99,7 @@ export default function PullFileModal({ ...props }: ModalProps) {
 
       <FilePathPreview
         label={t('pages.server.files.modal.pullFile.createdAs', {})}
-        path={join(browsingDirectory, form.values.name ?? '')}
+        path={resolve(browsingDirectory, form.values.name ?? '')}
       />
 
       <ModalFooter>

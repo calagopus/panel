@@ -1,7 +1,7 @@
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { join } from 'pathe';
+import { join, resolve } from 'pathe';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import createSymlink from '@/api/server/files/createSymlink.ts';
@@ -48,8 +48,8 @@ export default function SymlinkNameModal({ file, ...props }: Props) {
     }
   }, [props.opened, file?.name]);
 
-  const linkPath = join(browsingDirectory, form.values.link);
-  const targetPath = form.values.target.startsWith('/') ? form.values.target : join(linkPath, '..', form.values.target);
+  const linkPath = resolve(browsingDirectory, form.values.link);
+  const targetPath = resolve(linkPath, '..', form.values.target);
 
   return (
     <FormModal

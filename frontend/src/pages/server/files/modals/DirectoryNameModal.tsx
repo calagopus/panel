@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import { join } from 'pathe';
+import { resolve } from 'pathe';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 import createDirectory from '@/api/server/files/createDirectory.ts';
@@ -32,7 +32,7 @@ export default function DirectoryNameModal({ ...props }: ModalProps) {
     onSubmit: async (values) => {
       await createDirectory(server.uuid, browsingDirectory, values.name);
       invalidateFilemanager();
-      setSearchParams({ directory: join(browsingDirectory, values.name) });
+      setSearchParams({ directory: resolve(browsingDirectory, values.name) });
     },
   });
 
@@ -54,7 +54,7 @@ export default function DirectoryNameModal({ ...props }: ModalProps) {
 
       <FilePathPreview
         label={t('pages.server.files.modal.createDirectory.createdAs', {})}
-        path={join(browsingDirectory, form.values.name)}
+        path={resolve(browsingDirectory, form.values.name)}
       />
 
       <ModalFooter>

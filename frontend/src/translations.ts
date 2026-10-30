@@ -6213,7 +6213,8 @@ const baseTranslations = defineTranslations({
             },
             createSymlink: {
               title: 'Create Symlink',
-              targetDescription: 'Relative to the directory the symlink is created in.',
+              targetDescription:
+                'Relative to the directory the symlink is created in, or to the server root when starting with /.',
               createdAs: 'This symlink will be created as ',
               pointsTo: 'It will point to ',
             },

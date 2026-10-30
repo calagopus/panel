@@ -6124,7 +6124,7 @@
             },
             "createSymlink": {
               "title": "Symlink erstellen",
-              "targetDescription": "Relativ zu dem Verzeichnis, in dem der Symlink erstellt wird.",
+              "targetDescription": "Relativ zu dem Verzeichnis, in dem der Symlink erstellt wird, oder zum Server-Stammverzeichnis, wenn er mit / beginnt.",
               "createdAs": "Dieser Symlink wird erstellt als ",
               "pointsTo": "Er wird zeigen auf "
             },

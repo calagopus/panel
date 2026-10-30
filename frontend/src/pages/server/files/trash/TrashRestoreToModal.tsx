@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import { join } from 'pathe';
+import { resolve } from 'pathe';
 import { useState } from 'react';
 import { z } from 'zod';
 import restoreTrashEntries from '@/api/server/files/trash/restoreTrashEntries.ts';
@@ -46,7 +46,10 @@ export default function TrashRestoreToModal({ entries, onFinished, ...props }: P
     hydrate: () => ({ destination: '/', names: entries.map((entry) => entry.name) }),
     onClose: props.onClose,
     onSubmit: async (values) => {
-      const targets = entries.map((entry, i) => ({ entry, path: join(values.destination, values.names[i].trim()) }));
+      const targets = entries.map((entry, i) => ({
+        entry,
+        path: resolve('/', values.destination, values.names[i].trim()),
+      }));
       const { restored, conflicts } = await restoreTrashEntries({
         uuid: server.uuid,
         entries: targets.map(({ entry, path }) => ({ uuid: entry.uuid, path })),
@@ -106,7 +109,7 @@ export default function TrashRestoreToModal({ entries, onFinished, ...props }: P
                 />
                 <FilePathPreview
                   label={t('pages.server.files.trash.modal.restoreTo.restoredAs', {})}
-                  path={join(form.values.destination, form.values.names[i] ?? '')}
+                  path={resolve('/', form.values.destination, form.values.names[i] ?? '')}
                 />
               </div>
             ))}

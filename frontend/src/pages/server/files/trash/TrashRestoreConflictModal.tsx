@@ -1,7 +1,7 @@
 import { faFile, faFolder } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { basename, dirname, join } from 'pathe';
+import { basename, dirname, resolve } from 'pathe';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -136,7 +136,7 @@ export default function TrashRestoreConflictModal({ conflicts, onResolved, onUnd
       } else if (resolution === 'rename') {
         rename.push({
           entry: conflict.entry,
-          path: join(dirname(conflict.target), renames[conflict.entry.uuid].trim()),
+          path: resolve('/', dirname(conflict.target), renames[conflict.entry.uuid].trim()),
         });
       }
     }

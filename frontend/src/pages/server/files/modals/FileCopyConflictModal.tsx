@@ -109,9 +109,10 @@ export default function FileCopyConflictModal({ conflicts, loading, onResolve, .
       if (resolution === 'overwrite') {
         result.overwrite.push({ from: conflict.from, to: conflict.to, server: conflict.server?.uuid });
       } else if (resolution === 'rename') {
+        const name = renames[key].trim();
         result.rename.push({
           from: conflict.from,
-          to: join(dirname(conflict.to), renames[key].trim()),
+          to: name.startsWith('/') ? name : join(dirname(conflict.to), name),
           server: conflict.server?.uuid,
         });
       }

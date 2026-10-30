@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import { join } from 'pathe';
+import { resolve } from 'pathe';
 import { z } from 'zod';
 import compressFiles from '@/api/server/files/compressFiles.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -80,7 +80,7 @@ export default function ArchiveCreateModal({ files, ...props }: Props) {
 
         <FilePathPreview
           label={t('pages.server.files.modal.createArchive.createdAs', {})}
-          path={join(
+          path={resolve(
             browsingDirectory,
             form.values.name
               ? `${form.values.name}${archiveFormatLabelMapping[form.values.format as z.infer<typeof archiveFormat>]}`

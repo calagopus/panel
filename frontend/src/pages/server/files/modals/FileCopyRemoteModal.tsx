@@ -1,6 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { join } from 'pathe';
+import { join, resolve } from 'pathe';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -337,7 +337,9 @@ export default function FileCopyRemoteModal({ files, ...props }: Props) {
             servers: tItem('server', destinationServers.length),
           })}
           path={
-            isSingleFile ? join(form.values.destination, form.values.name || files[0].name) : form.values.destination
+            isSingleFile
+              ? resolve('/', form.values.destination, form.values.name || files[0].name)
+              : form.values.destination
           }
         />
 
