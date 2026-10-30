@@ -11,7 +11,7 @@ const usernameRule = ruleMessage((t) => t('common.form.rule.username', {}));
 export const usernameSchema = z
   .string()
   .min(3, usernameRule)
-  .max(15, usernameRule)
+  .max(48, usernameRule)
   .regex(/^[a-zA-Z0-9_]+$/, usernameRule);
 
 const databaseInstanceIdentifierRule = ruleMessage((t) => t('common.form.rule.databaseInstanceIdentifier', {}));

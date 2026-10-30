@@ -1098,8 +1098,8 @@ pub struct CreateUserOptions {
     #[schema(max_length = 255)]
     pub external_id: Option<compact_str::CompactString>,
 
-    #[garde(length(chars, min = 3, max = 15), pattern("^[a-zA-Z0-9_]+$"))]
-    #[schema(min_length = 3, max_length = 15)]
+    #[garde(length(chars, min = 3, max = 48), pattern("^[a-zA-Z0-9_]+$"))]
+    #[schema(min_length = 3, max_length = 48)]
     #[schema(pattern = "^[a-zA-Z0-9_]+$")]
     pub username: compact_str::CompactString,
     #[garde(email, length(max = 255))]
@@ -1227,8 +1227,8 @@ pub struct UpdateUserOptions {
     )]
     pub external_id: Option<Option<compact_str::CompactString>>,
 
-    #[garde(length(chars, min = 3, max = 15), pattern("^[a-zA-Z0-9_]+$"))]
-    #[schema(min_length = 3, max_length = 15)]
+    #[garde(length(chars, min = 3, max = 48), pattern("^[a-zA-Z0-9_]+$"))]
+    #[schema(min_length = 3, max_length = 48)]
     #[schema(pattern = "^[a-zA-Z0-9_]+$")]
     pub username: Option<compact_str::CompactString>,
     #[garde(email, length(max = 255))]

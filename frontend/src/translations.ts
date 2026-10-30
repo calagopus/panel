@@ -387,7 +387,7 @@ const baseTranslations = defineTranslations({
           'Do you want to delete all files of this server before performing this action? This cannot be undone.',
         rule: {
           invalidCharacters: 'Contains characters that are not allowed here.',
-          username: '3 to 15 characters, letters, digits and underscores only.',
+          username: '3 to 48 characters, letters, digits and underscores only.',
           databaseName: 'Up to 31 characters, letters, digits and underscores only.',
           databaseInstanceIdentifier: '2 to 23 characters, letters and digits only.',
           captchaSiteKey: 'Letters, digits, dashes and underscores only.',

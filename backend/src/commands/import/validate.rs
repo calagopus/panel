@@ -128,7 +128,7 @@ fn sanitize_username(username: &str) -> String {
                 '_'
             }
         })
-        .take(15)
+        .take(48)
         .collect();
     while chars(&sanitized) < 3 {
         sanitized.push('_');
@@ -680,23 +680,23 @@ impl Validator<'_> {
                 let candidate = candidate.to_lowercase();
                 reserved.contains(&candidate) || usernames.holder(&candidate).is_some()
             };
-            if !(3..=15).contains(&length) || !pattern_ok {
+            if !(3..=48).contains(&length) || !pattern_ok {
                 let mut suggestion = sanitize_username(&username);
                 if taken(&suggestion) {
-                    suggestion = numbered(&suggestion, 15, "_", taken);
+                    suggestion = numbered(&suggestion, 48, "_", taken);
                 }
                 if self.problem(
                     &mut row,
                     "username",
                     "rule",
                     &username,
-                    "usernames must be 3-15 characters of a-z, A-Z, 0-9 and _",
+                    "usernames must be 3-48 characters of a-z, A-Z, 0-9 and _",
                     Some(format!("rename to {suggestion:?}")),
                 ) {
                     username = suggestion;
                 }
             } else if let Some(holder) = usernames.holder(&username.to_lowercase()) {
-                let suggestion = numbered(&username, 15, "_", taken);
+                let suggestion = numbered(&username, 48, "_", taken);
                 if self.problem(
                     &mut row,
                     "username",

@@ -18,8 +18,8 @@ mod post {
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
-        #[garde(length(chars, min = 3, max = 15), pattern("^[a-zA-Z0-9_]+$"))]
-        #[schema(min_length = 3, max_length = 15)]
+        #[garde(length(chars, min = 3, max = 48), pattern("^[a-zA-Z0-9_]+$"))]
+        #[schema(min_length = 3, max_length = 48)]
         #[schema(pattern = "^[a-zA-Z0-9_]+$")]
         username: compact_str::CompactString,
         #[garde(email)]

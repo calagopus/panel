@@ -150,7 +150,7 @@ export const usersTable = pgTable(
     role_uuid: uuid().references(() => rolesTable.uuid, { onDelete: 'set null' }),
     external_id: varchar({ length: 255 }),
     avatar: varchar({ length: 255 }),
-    username: varchar({ length: 15 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    username: varchar({ length: 48 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     email: varchar({ length: 255 }).notNull(),
     name_first: varchar({ length: 255 }),
     name_last: varchar({ length: 255 }),
