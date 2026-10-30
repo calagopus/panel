@@ -4425,7 +4425,6 @@
           },
           "card": {
             "repository": "リポジトリ",
-            "author": "作成者",
             "installedIn": "インストール先"
           },
           "badge": {
