@@ -4510,7 +4510,7 @@ const baseTranslations = defineTranslations({
           },
           card: {
             repository: 'Repository',
-            author: 'Author',
+            path: 'Path',
             installedIn: 'Installed in',
             dockerImages: 'Docker Images',
             features: 'Features',

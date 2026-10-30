@@ -55,56 +55,45 @@ export default function InstalledEggCard({
         <h3 className='text-md font-medium leading-tight'>
           <ScrollingText>{egg.name}</ScrollingText>
         </h3>
-        <p className='mt-0.5 text-[11px] text-(--mantine-color-dimmed)'>
+        <p className='mt-0.5 text-xs text-(--mantine-color-dimmed)'>
           <ScrollingText>{egg.author}</ScrollingText>
         </p>
       </div>
     </div>
   );
 
-  const badges = (
-    <div className='mb-2.5 flex flex-wrap gap-1.5'>
-      <Badge color='blue' variant='light' size='sm'>
-        {nest.name}
-      </Badge>
-      {updateAvailable && (
-        <Badge color='yellow' variant='light' size='sm'>
-          {t('common.badge.updateAvailable', {})}
+  const footer = (
+    <div className='mt-auto flex items-center justify-between gap-2'>
+      <div className='flex flex-wrap items-center gap-1.5 min-w-0'>
+        <Badge color='blue' variant='light' size='sm' radius='sm'>
+          {nest.name}
         </Badge>
-      )}
-      {!egg.eggRepositoryEgg && (
-        <Badge color='gray' variant='light' size='sm'>
-          {t('pages.admin.eggLibrary.badge.manual', {})}
-        </Badge>
-      )}
-    </div>
-  );
+        {updateAvailable && (
+          <Badge color='yellow' variant='light' size='sm' radius='sm'>
+            {t('common.badge.updateAvailable', {})}
+          </Badge>
+        )}
+        {!egg.eggRepositoryEgg && (
+          <Badge color='gray' variant='light' size='sm' radius='sm'>
+            {t('pages.admin.eggLibrary.badge.manual', {})}
+          </Badge>
+        )}
+      </div>
 
-  const repository = egg.eggRepositoryEgg && (
-    <div className='mb-3 flex items-center justify-between gap-2 min-w-0'>
-      <span className='text-xs text-(--mantine-color-dimmed) shrink-0'>
-        {t('pages.admin.eggLibrary.card.repository', {})}
-      </span>
-      <span className='text-xs text-(--mantine-color-text) min-w-0'>
-        <ScrollingText>{egg.eggRepositoryEgg.eggRepository.name}</ScrollingText>
-      </span>
-    </div>
-  );
-
-  const actions = (
-    <div className='mt-auto flex items-center gap-2'>
-      <Link to={`/admin/nests/${nest.uuid}/eggs/${egg.uuid}`} className='block flex-1'>
-        <Button variant='default' leftSection={<FontAwesomeIcon icon={faArrowUpRightFromSquare} />} className='w-full!'>
-          {t('pages.admin.eggLibrary.button.open', {})}
-        </Button>
-      </Link>
-      {updateAvailable && (
-        <AdminCan action='eggs.update'>
-          <Button leftSection={<FontAwesomeIcon icon={faRefresh} />} onClick={doUpdate} loading={loading}>
-            {t('common.button.update', {})}
+      <div className='flex items-center gap-2 shrink-0'>
+        <Link to={`/admin/nests/${nest.uuid}/eggs/${egg.uuid}`}>
+          <Button variant='default' leftSection={<FontAwesomeIcon icon={faArrowUpRightFromSquare} />}>
+            {t('pages.admin.eggLibrary.button.open', {})}
           </Button>
-        </AdminCan>
-      )}
+        </Link>
+        {updateAvailable && (
+          <AdminCan action='eggs.update'>
+            <Button leftSection={<FontAwesomeIcon icon={faRefresh} />} onClick={doUpdate} loading={loading}>
+              {t('common.button.update', {})}
+            </Button>
+          </AdminCan>
+        )}
+      </div>
     </div>
   );
 
@@ -113,8 +102,16 @@ export default function InstalledEggCard({
       preview={
         <>
           {header}
-          {badges}
-          {repository}
+          {egg.eggRepositoryEgg && (
+            <div className='mb-1 flex items-center justify-between gap-2 min-w-0'>
+              <span className='text-xs text-(--mantine-color-dimmed) shrink-0'>
+                {t('pages.admin.eggLibrary.card.repository', {})}
+              </span>
+              <span className='text-xs text-(--mantine-color-text) min-w-0'>
+                <ScrollingText>{egg.eggRepositoryEgg.eggRepository.name}</ScrollingText>
+              </span>
+            </div>
+          )}
           <div className='mb-3 flex items-center justify-between gap-2'>
             <span className='text-xs text-(--mantine-color-dimmed)'>{t('common.table.columns.created', {})}</span>
             <span className='text-xs text-(--mantine-color-text)'>{formatDateTime(egg.created)}</span>
@@ -129,7 +126,7 @@ export default function InstalledEggCard({
               </p>
               <div className='flex flex-wrap gap-1.5'>
                 {egg.features.map((feature) => (
-                  <Badge key={feature} color='gray' variant='light' size='sm'>
+                  <Badge key={feature} color='gray' variant='light' size='sm' radius='sm'>
                     {feature}
                   </Badge>
                 ))}
@@ -138,21 +135,21 @@ export default function InstalledEggCard({
           )}
           <EggCardDockerImages dockerImages={egg.dockerImages} />
           <Divider className='mb-3 mt-1' />
-          {actions}
+          {footer}
         </>
       }
     >
       {header}
-      {badges}
-      {repository}
 
       {egg.description && (
-        <p className='flex-1 line-clamp-3 text-xs leading-relaxed text-(--mantine-color-dimmed)'>{egg.description}</p>
+        <p className='mb-3 flex-1 line-clamp-3 text-xs leading-relaxed text-(--mantine-color-dimmed)'>
+          {egg.description}
+        </p>
       )}
 
       <Divider className='mb-3 mt-1' />
 
-      {actions}
+      {footer}
     </PreviewCard>
   );
 }
