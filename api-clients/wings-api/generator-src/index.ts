@@ -85,6 +85,54 @@ const serdeDefaultResponseProperties: Record<string, string[]> = {
 }
 
 const openapi: oas31.OpenAPIObject = JSON.parse(fs.readFileSync('../openapi.json', 'utf-8'))
+
+function resolveObjectSchema(schema: oas31.SchemaObject | oas31.ReferenceObject): oas31.SchemaObject | null {
+    if (schema.$ref) {
+        const target = openapi.components?.schemas?.[schema.$ref.split('/').at(-1)!]
+        return target ? resolveObjectSchema(target) : null
+    }
+
+    const object = schema as oas31.SchemaObject
+    if (object.allOf) return mergeAllOf(object)
+
+    return object.type === 'object' && !object.additionalProperties ? object : null
+}
+
+/**
+ * Turns an `allOf` of plain objects (what utoipa emits for `#[serde(flatten)]`) into one object schema.
+ * Referenced models become a `#[serde(flatten)]` property named after the model, inline parts are merged.
+ */
+function mergeAllOf(schema: oas31.SchemaObject): oas31.SchemaObject | null {
+    if (schema.allOf!.some((part) => !resolveObjectSchema(part))) return null
+
+    const properties: Record<string, oas31.SchemaObject | oas31.ReferenceObject> = {}
+    const required = new Set<string>()
+    for (const part of schema.allOf!) {
+        if (part.$ref) {
+            const name = snakeCase(part.$ref.split('/').at(-1)!)
+            properties[name] = { $ref: part.$ref, 'x-flatten': true } as oas31.ReferenceObject
+            required.add(name)
+        } else {
+            const object = resolveObjectSchema(part)!
+            Object.assign(properties, object.properties ?? {})
+            object.required?.forEach((name) => required.add(name))
+        }
+    }
+
+    const { allOf: _, ...rest } = schema
+    return { ...rest, type: 'object', properties, required: [...required] }
+}
+
+function flattenAllOf(value: any): any {
+    if (Array.isArray(value)) return value.map(flattenAllOf)
+    if (!value || typeof value !== 'object') return value
+
+    const flattened = Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, flattenAllOf(inner)]))
+    return Array.isArray(flattened.allOf) ? mergeAllOf(flattened) ?? flattened : flattened
+}
+
+openapi.paths = flattenAllOf(openapi.paths)
+openapi.components = flattenAllOf(openapi.components)
 const output = fs.createWriteStream('../src/lib.rs', { flags: 'w' })
 
 output.write(`//! The Calagopus Panel Wings API library.

@@ -51,6 +51,7 @@ export default function generateSchemaProperty(output: fs.WriteStream, _spaces: 
     const recursive = (target as oas31.ReferenceObject).$ref?.split('/').at(-1) === parent
 
     output.write(`${spaces}#[schema(${recursive ? 'no_recursion' : 'inline'})]\n`)
+    if ((object as any)['x-flatten']) output.write(`${spaces}#[serde(flatten)]\n`)
     if (serdeDefault) output.write(`${spaces}#[serde(default)]\n`)
     output.write(`${spaces}${name !== snakeCase(name) ? `#[serde(rename = "${name}")] ` : ''}`)
     output.write(`pub ${rustPropertyEscape(snakeCase(name))}: `)
