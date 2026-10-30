@@ -1,5 +1,6 @@
 import { faMinus, faPlus, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import attachDevice from '@/api/server/devices/attachDevice.ts';
@@ -13,6 +14,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverDeviceSchema } from '@/lib/schemas/server/devices.ts';
+import { setDeviceAttached } from '@/pages/server/devices/deviceCache.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -20,14 +22,13 @@ import { useServerStore } from '@/stores/server.ts';
 export default function DeviceActionBar({
   selectedDevices,
   clearSelection,
-  onFinished,
 }: {
   selectedDevices: ObjectSet<z.infer<typeof serverDeviceSchema>, 'uuid'>;
   clearSelection: () => void;
-  onFinished: () => void;
 }) {
   const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
+  const queryClient = useQueryClient();
   const { run, loading } = useBulkAction();
 
   const [confirmingDetach, setConfirmingDetach] = useState(false);
@@ -37,11 +38,6 @@ export default function DeviceActionBar({
   const detachable = devices.filter((device) => device.created);
   const skippedDetaches = selectedDevices.size - detachable.length;
 
-  const finish = () => {
-    clearSelection();
-    onFinished();
-  };
-
   const doAttach = () =>
     run({
       action: 'attach',
@@ -49,8 +45,11 @@ export default function DeviceActionBar({
       itemKey: 'device',
       verb: t('common.bulkActions.verb.attached', {}),
       skipped: selectedDevices.size - attachable.length,
-      request: (device) => attachDevice(server.uuid, device.uuid),
-      onFinished: finish,
+      request: (device) =>
+        attachDevice(server.uuid, device.uuid).then(() =>
+          setDeviceAttached(queryClient, server.uuid, device.uuid, true),
+        ),
+      onFinished: clearSelection,
     });
 
   const doDetach = () => {
@@ -62,8 +61,11 @@ export default function DeviceActionBar({
       itemKey: 'device',
       verb: t('common.bulkActions.verb.detached', {}),
       skipped: skippedDetaches,
-      request: (device) => detachDevice(server.uuid, device.uuid),
-      onFinished: finish,
+      request: (device) =>
+        detachDevice(server.uuid, device.uuid).then(() =>
+          setDeviceAttached(queryClient, server.uuid, device.uuid, false),
+        ),
+      onFinished: clearSelection,
     });
   };
 

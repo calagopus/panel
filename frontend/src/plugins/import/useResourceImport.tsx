@@ -5,6 +5,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import { parseFromApi } from '@/lib/serialization/api-transform.ts';
 import { useImportDragAndDrop } from '@/plugins/import/useImportDragAndDrop.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface UseResourceImportOptions<S extends z.ZodTypeAny> {
   schema: S;
@@ -17,7 +18,8 @@ interface UseResourceImportOptions<S extends z.ZodTypeAny> {
 }
 
 export function useResourceImport<S extends z.ZodTypeAny>(options: UseResourceImportOptions<S>) {
-  const { addToast } = useToast();
+  const { t } = useTranslations();
+  const { addToast, addPendingToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Keep the latest options without rebuilding the drag-and-drop listeners every render.
@@ -42,15 +44,17 @@ export function useResourceImport<S extends z.ZodTypeAny>(options: UseResourceIm
         return;
       }
 
+      const pendingToast = addPendingToast(t('common.toast.importing', { file: file.name }));
+
       try {
         await create(data);
         onImported?.();
-        addToast(importedMessage, 'success');
+        pendingToast.settle(importedMessage, 'success');
       } catch (err) {
-        addToast(httpErrorToHuman(err), 'error');
+        pendingToast.settle(httpErrorToHuman(err), 'error');
       }
     },
-    [addToast],
+    [addToast, addPendingToast, t],
   );
 
   const onDrop = useCallback((files: File[]) => Promise.all(files.map(importFile)), [importFile]);

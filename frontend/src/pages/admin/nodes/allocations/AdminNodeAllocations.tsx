@@ -99,6 +99,7 @@ export default function AdminNodeAllocations({ node }: { node: z.infer<typeof ad
     queryKey: queryKeys.admin.nodes.allocations(node.uuid),
     fetcher: (page, search, perPage) => getNodeAllocations(node.uuid, page, buildFilter(search), perPage),
     deps: [node.uuid, ipFilter, portFrom, portTo, assignedFilter],
+    backgroundRefetch: true,
   });
 
   useEffect(() => {

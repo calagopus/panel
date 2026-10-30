@@ -46,6 +46,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     'grant_admin' | 'delete' | 'disable_two_factor' | 'send_password_reset_email' | 'verify_email' | null
   >(null);
   const [confirmStay, setConfirmStay] = useState(false);
+  const [impersonateLoading, setImpersonateLoading] = useState(false);
 
   const form = useFormEngine<UserFormValues>('admin.users.createOrUpdate', {
     schema: adminUserUpdateSchema.unwrap(),
@@ -267,9 +268,12 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                 >
                   <Button
                     variant='outline'
-                    onClick={() => doImpersonate(contextUser)}
+                    onClick={() => {
+                      setImpersonateLoading(true);
+                      doImpersonate(contextUser).finally(() => setImpersonateLoading(false));
+                    }}
                     disabled={user?.uuid === contextUser.uuid}
-                    loading={loading}
+                    loading={loading || impersonateLoading}
                   >
                     {t('pages.admin.users.tabs.general.page.button.impersonate', {})}
                   </Button>

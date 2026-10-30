@@ -9,6 +9,7 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
@@ -16,6 +17,8 @@ import getLocations from '@/api/admin/locations/getLocations.ts';
 import getNodes from '@/api/admin/nodes/getNodes.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
 import updateOobeSettings from '@/api/admin/settings/updateOobeSettings.ts';
+import { httpErrorToHuman } from '@/api/axios.ts';
+import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
@@ -41,6 +44,8 @@ export default function OobeFinished() {
   const settings = useGlobalStore((state) => state.settings);
   const setSettings = useGlobalStore((state) => state.setSettings);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
     queryKey: queryKeys.admin.eggRepositories.all(),
@@ -60,10 +65,17 @@ export default function OobeFinished() {
   });
 
   const handleFinish = () => {
-    updateOobeSettings(null).then(() => {
-      setSettings({ ...settings, oobeStep: null });
-      navigate('/');
-    });
+    setLoading(true);
+
+    updateOobeSettings(null)
+      .then(() => {
+        setSettings({ ...settings, oobeStep: null });
+        navigate('/');
+      })
+      .catch((msg) => {
+        setError(httpErrorToHuman(msg));
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -212,8 +224,15 @@ export default function OobeFinished() {
         </Stack>
       </Paper>
 
+      {error && <AlertError error={error} setError={setError} />}
+
       <Group justify='center' mt='lg'>
-        <Button size='lg' rightSection={<FontAwesomeIcon icon={faArrowRight} />} onClick={handleFinish}>
+        <Button
+          size='lg'
+          rightSection={<FontAwesomeIcon icon={faArrowRight} />}
+          onClick={handleFinish}
+          loading={loading}
+        >
           {t('pages.oobe.finished.button', {})}
         </Button>
       </Group>

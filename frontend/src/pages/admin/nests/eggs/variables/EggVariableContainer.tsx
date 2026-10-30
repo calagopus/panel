@@ -90,7 +90,7 @@ export default function EggVariableContainer({
 
   const doRemove = () => {
     if (contextVariable?.uuid) {
-      deleteEggVariable(contextNest.uuid, contextEgg.uuid, contextVariable.uuid)
+      return deleteEggVariable(contextNest.uuid, contextEgg.uuid, contextVariable.uuid)
         .then(() => {
           removeEggVariable(contextVariable);
           addToast(t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.toast.deleted', {}), 'success');

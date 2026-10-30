@@ -23,6 +23,7 @@ export const useUndoHistoryStore = create<UndoHistoryStore>()(() => ({
 }));
 
 let nextUndoEntryId = 1;
+const runningScopes = new Set<string>();
 
 export function pushUndoEntry(scope: string, undo: () => void | Promise<void>): number {
   const id = nextUndoEntryId++;
@@ -53,10 +54,23 @@ function takeUndoEntry(match: (entry: UndoEntry) => boolean): UndoEntry | null {
   return taken;
 }
 
-export async function runUndoEntry(id: number): Promise<void> {
-  await takeUndoEntry((entry) => entry.id === id)?.undo();
+async function runUndo(entry: UndoEntry | null): Promise<void> {
+  if (!entry) return;
+
+  runningScopes.add(entry.scope);
+  try {
+    await entry.undo();
+  } finally {
+    runningScopes.delete(entry.scope);
+  }
 }
 
-export async function runLastUndoEntry(scope: string): Promise<void> {
-  await takeUndoEntry((entry) => entry.scope === scope)?.undo();
+export function runUndoEntry(id: number): Promise<void> {
+  return runUndo(takeUndoEntry((entry) => entry.id === id && !runningScopes.has(entry.scope)));
+}
+
+export function runLastUndoEntry(scope: string): Promise<void> {
+  if (runningScopes.has(scope)) return Promise.resolve();
+
+  return runUndo(takeUndoEntry((entry) => entry.scope === scope));
 }

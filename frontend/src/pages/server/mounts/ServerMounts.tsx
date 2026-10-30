@@ -25,11 +25,11 @@ export default function ServerMounts() {
     data: mounts,
     loading,
     error,
-    refetch,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).mounts.all(),
     fetcher: () => getMounts(server.uuid),
     canRequest: canReadMounts,
+    backgroundRefetch: true,
   });
 
   const {
@@ -52,7 +52,7 @@ export default function ServerMounts() {
     >
       <MountsSubNavigation />
 
-      <MountActionBar selectedMounts={selectedMounts} clearSelection={clearSelection} onFinished={refetch} />
+      <MountActionBar selectedMounts={selectedMounts} clearSelection={clearSelection} />
 
       <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
         <Table

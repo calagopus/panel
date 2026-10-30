@@ -30,6 +30,7 @@ function MountsContainer() {
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mounts.all(),
     fetcher: getMounts,
+    backgroundRefetch: true,
   });
 
   return (

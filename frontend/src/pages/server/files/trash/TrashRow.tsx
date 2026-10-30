@@ -42,12 +42,9 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
   const addRestoredToast = useRestoredToast(onFinished);
 
   const [openModal, setOpenModal] = useState<'restoreTo' | 'delete' | null>(null);
-  const [restoring, setRestoring] = useState(false);
   const [conflicts, setConflicts] = useState<TrashRestoreConflict[] | null>(null);
 
-  const doRestore = () => {
-    setRestoring(true);
-
+  const doRestore = () =>
     restoreTrashEntries({ uuid: server.uuid, entries: [{ uuid: entry.uuid }] })
       .then(({ restored, conflicts }) => {
         if (conflicts.length > 0) {
@@ -64,9 +61,7 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
-      })
-      .finally(() => setRestoring(false));
-  };
+      });
 
   const doDelete = async () => {
     await deleteTrashEntries(server.uuid, { type: 'uuids', uuids: [entry.uuid] })
@@ -118,7 +113,6 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
             label: t('common.button.restore', {}),
             onClick: doRestore,
             color: 'gray',
-            disabled: restoring,
             canAccess: canDelete,
           },
           {

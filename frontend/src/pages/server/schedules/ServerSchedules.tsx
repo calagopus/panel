@@ -33,7 +33,7 @@ const ScheduleCalendarModal = lazy(() => import('./modals/ScheduleCalendarModal.
 
 export default function ServerSchedules() {
   const { t } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
   const server = useServerStore((state) => state.server);
   const serverStoreApi = useServerStoreApi();
 
@@ -98,13 +98,15 @@ export default function ServerSchedules() {
       return;
     }
 
+    const pendingToast = addPendingToast(t('common.toast.importing', { file: file.name }));
+
     importSchedule(server.uuid, data)
       .then(() => {
         refetch();
-        addToast(t('pages.server.schedules.toast.imported', {}), 'success');
+        pendingToast.settle(t('pages.server.schedules.toast.imported', {}), 'success');
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        pendingToast.settle(httpErrorToHuman(msg), 'error');
       });
   };
 

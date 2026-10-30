@@ -50,13 +50,15 @@ const DatabaseInstanceRow = forwardRef<HTMLTableRowElement, DatabaseInstanceRowP
   const [openModal, setOpenModal] = useState<'delete' | 'kill' | null>(null);
   const host = instance.host ? `${instance.host}${instance.port ? `:${instance.port}` : ''}` : null;
 
-  const onPowerAction = (action: DatabaseInstancePowerAction) => {
-    setOpenModal(null);
-
+  const onPowerAction = (action: DatabaseInstancePowerAction) =>
     postDatabaseInstancePower(server.uuid, instance.uuid, action)
-      .then(() => addToast(t(`pages.server.databases.instance.power.toast.${action}`, {}), 'success'))
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
-  };
+      .then(() => {
+        setOpenModal(null);
+        addToast(t(`pages.server.databases.instance.power.toast.${action}`, {}), 'success');
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
 
   return (
     <>

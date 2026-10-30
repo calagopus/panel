@@ -10,6 +10,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -36,6 +37,11 @@ export default function EggDeviceRow({
     await deleteEggDevice(nest.uuid, egg.uuid, device.device.uuid)
       .then(() => {
         setOpenModal(null);
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.deviceAssignments.devicesByEgg(egg.uuid),
+          (item: z.infer<typeof adminNodeDeviceSchema>) => item.device.uuid === device.device.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.deviceAssignments.devicesByEgg(egg.uuid) });
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.devices.page.toast.deleted', {}), 'success');
       })

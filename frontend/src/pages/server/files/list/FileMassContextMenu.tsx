@@ -40,7 +40,7 @@ export default function FileMassContextMenu({
   children,
 }: FileMassContextMenuProps) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
   const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
   const actingMode = useFileManagerStore((state) => state.actingMode);
@@ -65,16 +65,16 @@ export default function FileMassContextMenu({
     if (files) state.doSelectFiles(files);
   }, [activeDirectory, activeWritableDirectory, files, store]);
   const withActiveFiles = useCallback(
-    (callback: (activeFiles: FileEntry[]) => void) => {
+    <T,>(callback: (activeFiles: FileEntry[]) => T): T => {
       prepareFileManager();
-      callback(getActiveFiles());
+      return callback(getActiveFiles());
     },
     [getActiveFiles, prepareFileManager],
   );
 
   const doDownload = useCallback(
-    (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-      withActiveFiles((activeFiles) => {
+    (archiveFormat: z.infer<typeof streamingArchiveFormat>) =>
+      withActiveFiles((activeFiles) =>
         downloadFilesWithToast(
           downloadFiles(
             server.uuid,
@@ -83,11 +83,10 @@ export default function FileMassContextMenu({
             activeFiles.length === 1 ? activeFiles[0].directory : false,
             archiveFormat,
           ),
-          { addToast, t },
-        );
-      });
-    },
-    [activeDirectory, addToast, server.uuid, t, withActiveFiles],
+          { addToast, addPendingToast, t },
+        ),
+      ),
+    [activeDirectory, addToast, addPendingToast, server.uuid, t, withActiveFiles],
   );
 
   const items = useMemo<ContextMenuItem[]>(

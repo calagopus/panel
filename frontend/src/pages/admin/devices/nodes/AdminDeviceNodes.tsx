@@ -12,6 +12,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -42,6 +43,11 @@ function DeviceNodeRow({
       .then(() => {
         setOpenModal(null);
         addToast(t('pages.admin.devices.tabs.nodes.page.toast.removed', {}), 'success');
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.deviceAssignments.nodesByDevice(device.uuid),
+          (item: { node: { uuid: string } }) => item.node.uuid === node.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.deviceAssignments.all() });
       })
       .catch((msg) => {
@@ -102,6 +108,7 @@ export default function AdminDeviceNodes({ device }: { device: z.infer<typeof ad
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.deviceAssignments.nodesByDevice(device.uuid),
     fetcher: (page, search, perPage) => getDeviceNodes(device.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

@@ -203,7 +203,7 @@ interface Props {
   onStepUpdate?: (step: z.infer<typeof serverScheduleStepSchema>) => void;
   onStepDelete?: (stepUuid: string) => void;
   onStepDuplicate?: (step: z.infer<typeof serverScheduleStepSchema>) => void;
-  onStepAddBranch?: (step: z.infer<typeof serverScheduleStepSchema>, type: 'else_if' | 'else') => void;
+  onStepAddBranch?: (step: z.infer<typeof serverScheduleStepSchema>, type: 'else_if' | 'else') => Promise<void>;
   canAddElse?: boolean;
   remainingSteps?: number;
   onStepToggle?: (open: boolean) => void;

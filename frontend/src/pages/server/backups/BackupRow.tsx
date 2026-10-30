@@ -37,6 +37,7 @@ import { downloadUrl } from '@/lib/network/url.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
+import { applyBackupUpdate } from '@/pages/server/backups/backupCache.ts';
 import DatabaseInstanceBackupRestoreModal from '@/pages/server/databases/instances/modals/DatabaseInstanceBackupRestoreModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
@@ -64,7 +65,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   ref,
 ) {
   const { t, tItem } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
 
   const server = useServerStore((state) => state.server);
   const socketInstance = useServerStore((state) => state.socketInstance);
@@ -80,13 +81,15 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-    downloadBackup(server.uuid, backup.uuid, archiveFormat)
+    const pendingToast = addPendingToast(t('common.toast.preparingDownload', {}));
+
+    return downloadBackup(server.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
-        addToast(t('pages.server.backups.toast.downloadStarted', {}), 'success');
-        downloadUrl(url);
+        pendingToast.settle(t('pages.server.backups.toast.downloadStarted', {}), 'success');
+        downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        pendingToast.settle(httpErrorToHuman(msg), 'error');
       });
   };
 
@@ -114,19 +117,18 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
       socketInstance.addListener(SocketEvent.BACKUP_DELETED, listener);
     });
 
-  const doSetLocked = (locked: boolean) => {
+  const doSetLocked = (locked: boolean) =>
     updateBackup(server.uuid, backup.uuid, { name: backup.name, locked, backupGroupUuid: backup.backupGroupUuid })
       .then(() => {
         addToast(
           locked ? t('pages.server.backups.toast.locked', {}) : t('pages.server.backups.toast.unlocked', {}),
           'success',
         );
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.all() });
+        applyBackupUpdate(queryClient, server.uuid, [backup], { locked });
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
   const doDelete = async () => {
     try {

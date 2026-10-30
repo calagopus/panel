@@ -28,6 +28,7 @@ export default function AdminServerMounts({ server }: { server: AdminServer }) {
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mountAssignments.mountsByServer(server.uuid),
     fetcher: (page, search, perPage) => getServerMounts(server.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

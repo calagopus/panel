@@ -30,6 +30,7 @@ function DevicesContainer() {
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.devices.all(),
     fetcher: getDevices,
+    backgroundRefetch: true,
   });
 
   return (

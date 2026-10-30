@@ -1,5 +1,6 @@
 import { faMinus, faPlus, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import attachMount from '@/api/server/mounts/attachMount.ts';
@@ -13,6 +14,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverMountSchema } from '@/lib/schemas/server/mounts.ts';
+import { setMountAttached } from '@/pages/server/mounts/mountCache.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -20,14 +22,13 @@ import { useServerStore } from '@/stores/server.ts';
 export default function MountActionBar({
   selectedMounts,
   clearSelection,
-  onFinished,
 }: {
   selectedMounts: ObjectSet<z.infer<typeof serverMountSchema>, 'uuid'>;
   clearSelection: () => void;
-  onFinished: () => void;
 }) {
   const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
+  const queryClient = useQueryClient();
   const { run, loading } = useBulkAction();
 
   const [confirmingDetach, setConfirmingDetach] = useState(false);
@@ -37,11 +38,6 @@ export default function MountActionBar({
   const detachable = mounts.filter((mount) => mount.created);
   const skippedDetaches = selectedMounts.size - detachable.length;
 
-  const finish = () => {
-    clearSelection();
-    onFinished();
-  };
-
   const doAttach = () =>
     run({
       action: 'attach',
@@ -49,8 +45,9 @@ export default function MountActionBar({
       itemKey: 'mount',
       verb: t('common.bulkActions.verb.attached', {}),
       skipped: selectedMounts.size - attachable.length,
-      request: (mount) => attachMount(server.uuid, mount.uuid),
-      onFinished: finish,
+      request: (mount) =>
+        attachMount(server.uuid, mount.uuid).then(() => setMountAttached(queryClient, server.uuid, mount.uuid, true)),
+      onFinished: clearSelection,
     });
 
   const doDetach = () => {
@@ -62,8 +59,9 @@ export default function MountActionBar({
       itemKey: 'mount',
       verb: t('common.bulkActions.verb.detached', {}),
       skipped: skippedDetaches,
-      request: (mount) => detachMount(server.uuid, mount.uuid),
-      onFinished: finish,
+      request: (mount) =>
+        detachMount(server.uuid, mount.uuid).then(() => setMountAttached(queryClient, server.uuid, mount.uuid, false)),
+      onFinished: clearSelection,
     });
   };
 

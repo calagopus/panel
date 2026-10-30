@@ -13,6 +13,7 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupEditSchema, serverBackupSchema } from '@/lib/schemas/server/backups.ts';
+import { applyBackupUpdate } from '@/pages/server/backups/backupCache.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -58,11 +59,15 @@ export default function BackupEditModal({ backup, ...props }: Props) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.server(server.uuid).backups.groups.all(),
         });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.server(server.uuid).backups.all(),
+        });
+      } else {
+        applyBackupUpdate(queryClient, server.uuid, [backup], {
+          name: values.name,
+          locked: values.locked !== backup.isLocked ? values.locked : undefined,
+        });
       }
-
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.server(server.uuid).backups.all(),
-      });
       addToast(t('pages.server.backups.modal.editBackup.toast.updated', {}), 'success');
     },
   });

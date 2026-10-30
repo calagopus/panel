@@ -27,10 +27,10 @@ export default function ServerDevices() {
     setSearch,
     setPage,
     setPerPage,
-    refetch,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).devices.all(),
     fetcher: (page, search, perPage) => getDevices(server.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   const {
@@ -51,7 +51,7 @@ export default function ServerDevices() {
     >
       <MountsSubNavigation />
 
-      <DeviceActionBar selectedDevices={selectedDevices} clearSelection={clearSelection} onFinished={refetch} />
+      <DeviceActionBar selectedDevices={selectedDevices} clearSelection={clearSelection} />
 
       <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
         <Table

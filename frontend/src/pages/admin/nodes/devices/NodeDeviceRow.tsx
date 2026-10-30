@@ -10,6 +10,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminNode, AdminNodeDevice } from '@/lib/schemas/admin/nodes.ts';
 import NodeAllowedSourceBadge from '@/pages/admin/nodes/NodeAllowedSourceBadge.tsx';
@@ -27,6 +28,11 @@ export default function NodeDeviceRow({ node, device }: { node: AdminNode; devic
     await deleteNodeDevice(node.uuid, device.device.uuid)
       .then(() => {
         setOpenModal(null);
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.deviceAssignments.devicesByNode(node.uuid),
+          (item: AdminNodeDevice) => item.device.uuid === device.device.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.deviceAssignments.all() });
         addToast(t('pages.admin.nodes.tabs.devices.page.toast.removed', {}), 'success');
       })

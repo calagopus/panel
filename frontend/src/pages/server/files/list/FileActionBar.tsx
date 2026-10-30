@@ -40,7 +40,7 @@ import { useServerStore } from '@/stores/server.ts';
 
 function FileActionBar() {
   const { t, tItem } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
   const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
   const {
@@ -197,7 +197,7 @@ function FileActionBar() {
         selectedFiles.size === 1 ? selectedFiles.values()[0].directory : false,
         'zip',
       ),
-      { addToast, t },
+      { addToast, addPendingToast, t },
     ).finally(() => setLoading(false));
   };
 

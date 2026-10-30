@@ -55,7 +55,7 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
       });
   };
 
-  const doExport = (format: 'json' | 'yaml') => {
+  const doExport = (format: 'json' | 'yaml') =>
     exportSchedule(server.uuid, schedule.uuid)
       .then((data) => {
         addToast(t('pages.server.schedules.toast.exported', {}), 'success');
@@ -69,9 +69,8 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
-  const doTriggerSchedule = (skipCondition: boolean) => {
+  const doTriggerSchedule = (skipCondition: boolean) =>
     triggerSchedule(server.uuid, schedule.uuid, skipCondition)
       .then(() => {
         addToast(t('pages.server.schedules.toast.triggered', {}), 'success');
@@ -79,7 +78,6 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
   return (
     <>

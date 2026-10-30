@@ -12,6 +12,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
@@ -44,6 +45,11 @@ function DeviceEggRow({
       .then(() => {
         setOpenModal(null);
         addToast(t('pages.admin.devices.tabs.eggs.page.toast.removed', {}), 'success');
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.deviceAssignments.eggsByDevice(device.uuid),
+          (item: { nestEgg: { uuid: string } }) => item.nestEgg.uuid === egg.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.deviceAssignments.all() });
       })
       .catch((msg) => {
@@ -98,6 +104,7 @@ export default function AdminDeviceNestEggs({ device }: { device: z.infer<typeof
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.deviceAssignments.eggsByDevice(device.uuid),
     fetcher: (page, search, perPage) => getDeviceNestEggs(device.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

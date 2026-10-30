@@ -129,6 +129,7 @@ export default function ServerBackups({
     deps: [filter],
     setStoreData: setBackups,
     modifyParams: modifyParams ?? variant === 'page',
+    backgroundRefetch: true,
   });
 
   const { data: groups } = useQuery({

@@ -16,6 +16,7 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import RedactedText from '@/elements/typography/RedactedText.tsx';
+import { patchPaginatedItems, removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
 import { useRedactedAddress } from '@/plugins/privacy/useRedactAddresses.ts';
@@ -50,13 +51,17 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
   const canUpdate = useServerCan('allocations.update');
   const canUnsetPrimary = !server.eggConfiguration?.allocationSelfAssignRequirePrimary;
 
+  const patchAllocations = (
+    patch: (item: z.infer<typeof serverAllocationSchema>) => z.infer<typeof serverAllocationSchema>,
+  ) => patchPaginatedItems(queryClient, queryKeys.server(server.uuid).network.all(), patch);
+
   const setDebouncedNotes = useMemo(
     () =>
       debounce((notes: string) => {
         updateAllocation(server.uuid, allocation.uuid, { notes: notes || null })
           .then(() => {
             addToast(t('pages.server.network.toast.updated', {}), 'success');
-            queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
+            patchAllocations((item) => (item.uuid === allocation.uuid ? { ...item, notes: notes || null } : item));
           })
           .catch((msg) => {
             addToast(httpErrorToHuman(msg), 'error');
@@ -71,26 +76,25 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
     }
   }, [notes]);
 
-  const doSetPrimary = () => {
+  const doSetPrimary = () =>
     updateAllocation(server.uuid, allocation.uuid, { primary: true })
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
+        patchAllocations((item) => ({ ...item, isPrimary: item.uuid === allocation.uuid }));
         updateServer({ allocation });
         addToast(t('pages.server.network.toast.setPrimary', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
   const doUnsetPrimary = () => {
     if (!canUnsetPrimary) {
       return;
     }
 
-    updateAllocation(server.uuid, allocation.uuid, { primary: false })
+    return updateAllocation(server.uuid, allocation.uuid, { primary: false })
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
+        patchAllocations((item) => (item.uuid === allocation.uuid ? { ...item, isPrimary: false } : item));
         updateServer({ allocation: null });
         addToast(t('pages.server.network.toast.unsetPrimary', {}), 'success');
       })
@@ -102,6 +106,11 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
   const doRemove = async () => {
     await deleteAllocation(server.uuid, allocation.uuid)
       .then(() => {
+        removePaginatedItems(
+          queryClient,
+          queryKeys.server(server.uuid).network.all(),
+          (item: z.infer<typeof serverAllocationSchema>) => item.uuid === allocation.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
         addToast(t('pages.server.network.toast.removed', {}), 'success');
         setOpenModal(null);

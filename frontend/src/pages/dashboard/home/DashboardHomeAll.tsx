@@ -1,4 +1,5 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
+import classNames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -182,7 +183,7 @@ export default function DashboardHomeAll() {
           <Divider my='md' />
         </>
       )}
-      {loading ? (
+      {loading && !servers ? (
         <Spinner.Centered />
       ) : error && !servers ? (
         <ErrorState error={error} onRetry={refetch} />
@@ -197,7 +198,12 @@ export default function DashboardHomeAll() {
           />
         )
       ) : (
-        <div className='gap-4 grid md:grid-cols-2'>
+        <div
+          className={classNames(
+            'gap-4 grid md:grid-cols-2',
+            loading && 'opacity-50 pointer-events-none transition-opacity',
+          )}
+        >
           {servers?.data.map((server) => (
             <ServerItem
               key={server.uuid}

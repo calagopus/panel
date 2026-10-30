@@ -16,6 +16,7 @@ import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupGroupSchema, serverBackupSchema } from '@/lib/schemas/server/backups.ts';
+import { applyBackupUpdate } from '@/pages/server/backups/backupCache.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -60,8 +61,16 @@ export default function BackupActionBar({
         updateBackups(server.uuid, {
           selector: { type: 'uuids', uuids: targets.map((backup) => backup.uuid) },
           locked,
-        }).then(({ updated, skipped }) => ({ affected: updated, skipped })),
-      onFinished: finish,
+        }).then(({ updated, skipped }) => {
+          if (skipped === 0) {
+            applyBackupUpdate(queryClient, server.uuid, targets, { locked });
+          } else {
+            queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).backups.all() });
+          }
+
+          return { affected: updated, skipped };
+        }),
+      onFinished: clearSelection,
     });
   };
 

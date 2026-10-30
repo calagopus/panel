@@ -13,8 +13,8 @@ import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverMountSchema } from '@/lib/schemas/server/mounts.ts';
+import { setMountAttached } from '@/pages/server/mounts/mountCache.ts';
 import { useToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/contexts/translationContext.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -45,7 +45,7 @@ export const MountRow = forwardRef<HTMLTableRowElement, MountRowProps>(function 
           }),
           'success',
         );
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).mounts.all() });
+        setMountAttached(queryClient, server.uuid, contextMount.uuid, true);
         setOpenModal(null);
       })
       .catch((msg) => {
@@ -62,7 +62,7 @@ export const MountRow = forwardRef<HTMLTableRowElement, MountRowProps>(function 
           }),
           'success',
         );
-        queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).mounts.all() });
+        setMountAttached(queryClient, server.uuid, contextMount.uuid, false);
         setOpenModal(null);
       })
       .catch((msg) => {

@@ -12,6 +12,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -42,6 +43,11 @@ function MountNodeRow({
       .then(() => {
         setOpenModal(null);
         addToast(t('pages.admin.mounts.tabs.nodes.page.toast.removed', {}), 'success');
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.mountAssignments.nodesByMount(mount.uuid),
+          (item: { node: { uuid: string } }) => item.node.uuid === node.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
@@ -102,6 +108,7 @@ export default function AdminMountNodes({ mount }: { mount: z.infer<typeof admin
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mountAssignments.nodesByMount(mount.uuid),
     fetcher: (page, search, perPage) => getMountNodes(mount.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

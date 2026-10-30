@@ -91,7 +91,7 @@ export default function FileRowContextMenu({
   children,
 }: FileRowContextMenuProps) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
   const { addWindow } = useWindows();
   const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
@@ -152,10 +152,10 @@ export default function FileRowContextMenu({
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     prepareFileManager();
-    downloadFilesWithToast(downloadFiles(server.uuid, activeDirectory, [file.name], file.directory, archiveFormat), {
-      addToast,
-      t,
-    });
+    return downloadFilesWithToast(
+      downloadFiles(server.uuid, activeDirectory, [file.name], file.directory, archiveFormat),
+      { addToast, addPendingToast, t },
+    );
   };
 
   return (

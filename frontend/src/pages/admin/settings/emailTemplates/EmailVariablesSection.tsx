@@ -195,10 +195,10 @@ export default function EmailVariablesSection({
 
   const doRemove = () => {
     if (!removing) return;
-    setRemoving(null);
 
-    deleteEmailVariable(templateIdentifier, removing.name)
+    return deleteEmailVariable(templateIdentifier, removing.name)
       .then(() => {
+        setRemoving(null);
         addToast(
           t(
             removing.system
@@ -210,7 +210,9 @@ export default function EmailVariablesSection({
         );
         invalidate();
       })
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'));
+      .catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+      });
   };
 
   return (

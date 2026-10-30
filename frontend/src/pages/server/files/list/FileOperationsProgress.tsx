@@ -78,7 +78,7 @@ function FileOperationsProgress() {
     addToast(t('pages.server.files.toast.allOperationsCancelled', {}), 'success');
   }, [fileOperations, failedFileOperations, server.uuid, removeFileOperation, invalidateFilemanager, addToast, t]);
 
-  const doCancelOperation = (uuid: string) => {
+  const doCancelOperation = (uuid: string) =>
     cancelOperation(server.uuid, uuid)
       .then(() => {
         invalidateFilemanager();
@@ -87,7 +87,6 @@ function FileOperationsProgress() {
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
   const hasOperations = fileOperations.size > 0 || uploadingFiles.size > 0;
   const hasErrors = hasUploadErrors || failedFileOperations.size > 0;

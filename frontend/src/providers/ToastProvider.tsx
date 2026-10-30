@@ -11,7 +11,9 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
 import { useToastPosition } from '@/plugins/toast/useToastPosition.ts';
 import {
+  PendingToast,
   ProgressToastOptions,
+  pendingToastDelay,
   Toast,
   ToastAction,
   ToastContext,
@@ -224,6 +226,51 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [dismissToastWithReason],
   );
 
+  const finishProgressToast = useCallback(
+    (id: number, message: ReactNode, type: ToastType) => {
+      updateToast(id, { message, type });
+
+      setToastList((prev) => {
+        const index = prev.findIndex((t) => t.id === id);
+        if (index === -1) return prev;
+
+        const next = [...prev];
+        next[index] = { ...prev[index], progress: undefined, withCloseButton: true, onClose: undefined };
+
+        return next;
+      });
+
+      setTimeout(() => dismissToastWithReason(id, 'timeout'), toastTimeout);
+    },
+    [updateToast, setToastList, dismissToastWithReason],
+  );
+
+  const addPendingToast = useCallback(
+    (message: ReactNode): PendingToast => {
+      let id: number | null = null;
+      const timer = setTimeout(() => {
+        id = addProgressToast(message);
+      }, pendingToastDelay);
+
+      return {
+        settle: (finalMessage, type = 'success') => {
+          clearTimeout(timer);
+
+          const shownId = toastsRef.current.some((t) => t.id === id) ? id : null;
+
+          if (finalMessage === undefined) {
+            if (shownId !== null) dismissToast(shownId);
+          } else if (shownId !== null) {
+            finishProgressToast(shownId, finalMessage, type);
+          } else {
+            addToast(finalMessage, type);
+          }
+        },
+      };
+    },
+    [addProgressToast, addToast, dismissToast, finishProgressToast],
+  );
+
   const contextValue = useMemo(
     () => ({
       toastPosition,
@@ -231,8 +278,9 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
       addProgressToast,
       updateToast,
       dismissToast,
+      addPendingToast,
     }),
-    [toastPosition, addToast, addProgressToast, updateToast, dismissToast],
+    [toastPosition, addToast, addProgressToast, updateToast, dismissToast, addPendingToast],
   );
 
   return (

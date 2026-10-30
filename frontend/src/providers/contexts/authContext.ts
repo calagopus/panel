@@ -7,7 +7,7 @@ export interface AuthContextType {
   impersonating: boolean;
 
   setUser: (user: z.infer<typeof fullUserSchema> | null) => void;
-  doImpersonate: (user: z.infer<typeof fullUserSchema>) => void;
+  doImpersonate: (user: z.infer<typeof fullUserSchema>) => Promise<void>;
   doLogin: (user: z.infer<typeof fullUserSchema>, doNavigate?: boolean) => void;
   doLogout: () => void;
 }

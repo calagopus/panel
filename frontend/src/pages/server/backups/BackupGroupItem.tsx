@@ -55,11 +55,12 @@ export default function BackupGroupItem({
   const [backups, setBackups] = useState(getEmptyPaginationSet<z.infer<typeof serverBackupSchema>>());
   const [openModal, setOpenModal] = useState<'createBackup' | 'edit' | 'delete' | null>(null);
 
-  const { loading, search, setSearch, setPage } = useSearchablePaginatedTable({
+  const { data, loading, search, setSearch, setPage } = useSearchablePaginatedTable({
     queryKey: [...queryKeys.server(server.uuid).backups.groups.detail(group.uuid)],
     fetcher: (page, search) => getBackupGroupBackups(server.uuid, group.uuid, page, search),
     setStoreData: setBackups,
     modifyParams: false,
+    backgroundRefetch: true,
   });
 
   const canSelect =
@@ -142,7 +143,7 @@ export default function BackupGroupItem({
           </>
         }
       >
-        {loading ? (
+        {loading && !data ? (
           <div className='py-4'>
             <Spinner.Centered />
           </div>
@@ -174,6 +175,7 @@ export default function BackupGroupItem({
                   : columns.headers
               }
               pagination={backups}
+              loading={loading}
             >
               {backups.data.map((backup) => (
                 <SelectionArea.Selectable key={backup.uuid} item={backup}>

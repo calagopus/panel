@@ -15,8 +15,6 @@ import {
 } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import copyFile from '@/api/server/files/copyFile.ts';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import { useNavbarPageHeader } from '@/elements/containers/useNavbarPageHeader.ts';
@@ -33,6 +31,7 @@ import Title from '@/elements/typography/Title.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
+import { useDuplicateFile } from '@/pages/server/files/hooks/useDuplicateFile.ts';
 import { useFileBrowserQuickActions } from '@/pages/server/files/hooks/useFileBrowserQuickActions.tsx';
 import useFileUploadSocket from '@/pages/server/files/hooks/useFileUploadSocket.ts';
 import IncompleteUploadsBanner from '@/pages/server/files/IncompleteUploadsBanner.tsx';
@@ -80,6 +79,7 @@ function FileBrowser() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
   const { addToast } = useToast();
+  const duplicateFile = useDuplicateFile();
   const [_, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const typeAheadBuffer = useRef('');
@@ -241,15 +241,7 @@ function FileBrowser() {
         callback: () => {
           const state = store.getState();
           if (canCreate && state.selectedFiles.size === 1 && state.browsingWritableDirectory) {
-            const file = state.selectedFiles.values()[0];
-
-            copyFile(server.uuid, join(state.browsingDirectory, file.name), null)
-              .then(() => {
-                addToast(t('pages.server.files.toast.fileCopyingStarted', {}), 'success');
-              })
-              .catch((msg) => {
-                addToast(httpErrorToHuman(msg), 'error');
-              });
+            duplicateFile(join(state.browsingDirectory, state.selectedFiles.values()[0].name));
           }
         },
       },

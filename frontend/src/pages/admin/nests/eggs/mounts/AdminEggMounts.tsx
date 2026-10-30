@@ -36,6 +36,7 @@ export default function AdminEggMounts({
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mountAssignments.mountsByEgg(contextEgg.uuid),
     fetcher: (page, search, perPage) => getEggMounts(contextNest.uuid, contextEgg.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

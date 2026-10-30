@@ -252,6 +252,9 @@ const baseTranslations = defineTranslations({
       },
       toast: {
         duplicated: '{resource} duplicated.',
+        preparingDownload: 'Preparing download...',
+        downloadFailed: 'The download could not be started.',
+        importing: 'Importing {file}...',
         failedBackupDeletionStarted: 'Deleting {count} failed backups in the background.',
         failedDeletionRetryStarted: 'Retrying {count} failed backup deletions in the background.',
         requestBlockedByExtension: 'This request was blocked by an extension.',
@@ -6061,6 +6064,7 @@ const baseTranslations = defineTranslations({
             archiveCreationStarted: 'Archive creation has begun.',
             decompressionStarted: 'Archive extraction has started.',
             fileCopyingStarted: 'File copying has started.',
+            duplicating: 'Duplicating file...',
             fileCopyingStartedMany: 'File copying to {servers} has started.',
             fileCopyingStartedPartial: 'File copying to {successfulServers} has started. {failedServers} failed:',
             fileInfoRetrieved: 'File information retrieved successfully.',

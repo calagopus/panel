@@ -1,6 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { skipToken, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { z } from 'zod';
 import getServer from '@/api/server/getServer.ts';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
@@ -25,12 +26,18 @@ export default function FileOperationRow({
   uuid: string;
   operation: z.infer<typeof serverFileOperationSchema>;
   failedAt: number | undefined;
-  onCancel: (uuid: string) => void;
+  onCancel: (uuid: string) => Promise<void>;
   onRemove: (uuid: string) => void;
 }) {
   const { t, tItem } = useTranslations();
   const serverUuid = useServerStore((state) => state.server.uuid);
   const canUpdate = useServerCan('files.update');
+  const [cancelling, setCancelling] = useState(false);
+
+  const doCancel = () => {
+    setCancelling(true);
+    onCancel(uuid).finally(() => setCancelling(false));
+  };
 
   const remoteServerUuid =
     operation.type === 'copy_remote'
@@ -118,7 +125,8 @@ export default function FileOperationRow({
             variant='light'
             color='red'
             className='ml-3'
-            onClick={() => (failedAt === undefined ? onCancel(uuid) : onRemove(uuid))}
+            loading={cancelling}
+            onClick={() => (failedAt === undefined ? doCancel() : onRemove(uuid))}
           >
             <FontAwesomeIcon icon={faXmark} size='sm' />
           </ActionIcon>

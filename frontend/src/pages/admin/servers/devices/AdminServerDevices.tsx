@@ -28,6 +28,7 @@ export default function AdminServerDevices({ server }: { server: AdminServer }) 
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.deviceAssignments.devicesByServer(server.uuid),
     fetcher: (page, search, perPage) => getServerDevices(server.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

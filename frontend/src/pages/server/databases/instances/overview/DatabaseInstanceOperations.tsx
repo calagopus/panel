@@ -42,6 +42,7 @@ export default function DatabaseInstanceOperations() {
   const canCancel = useServerCan('database-instances.import');
 
   const [cancelAllOpen, setCancelAllOpen] = useState(false);
+  const [cancelling, setCancelling] = useState<Set<string>>(new Set());
 
   if (!instance || operations.size === 0) return null;
 
@@ -52,12 +53,21 @@ export default function DatabaseInstanceOperations() {
   };
 
   const doCancelOperation = (uuid: string) => {
+    setCancelling((prev) => new Set(prev).add(uuid));
+
     deleteDatabaseInstanceOperation(server.uuid, instance.uuid, uuid)
       .then(() => {
         invalidateDatabases();
         addToast(t('pages.server.databases.instance.toast.operationCancelled', {}), 'success');
       })
-      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'));
+      .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
+      .finally(() =>
+        setCancelling((prev) => {
+          const next = new Set(prev);
+          next.delete(uuid);
+          return next;
+        }),
+      );
   };
 
   const cancelAllOperations = () => {
@@ -153,6 +163,7 @@ export default function DatabaseInstanceOperations() {
                     variant='light'
                     color='red'
                     className='ml-3'
+                    loading={cancelling.has(uuid)}
                     onClick={() => (failedAt === undefined ? doCancelOperation(uuid) : removeOperation(uuid))}
                   >
                     <FontAwesomeIcon icon={faXmark} size='sm' />

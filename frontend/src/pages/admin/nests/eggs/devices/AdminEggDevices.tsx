@@ -36,6 +36,7 @@ export default function AdminEggDevices({
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.deviceAssignments.devicesByEgg(contextEgg.uuid),
     fetcher: (page, search, perPage) => getEggDevices(contextNest.uuid, contextEgg.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (

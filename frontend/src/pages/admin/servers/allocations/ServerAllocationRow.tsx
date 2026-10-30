@@ -16,6 +16,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import RedactedText from '@/elements/typography/RedactedText.tsx';
 import { formatAllocation } from '@/lib/domain/server.ts';
+import { patchPaginatedItems, removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverAllocationSchema } from '@/lib/schemas/server/allocations.ts';
@@ -38,12 +39,15 @@ export default function ServerAllocationRow({
 
   const invalidateAllocations = () =>
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+  const patchAllocations = (
+    patch: (item: z.infer<typeof serverAllocationSchema>) => z.infer<typeof serverAllocationSchema>,
+  ) => patchPaginatedItems(queryClient, queryKeys.admin.servers.allocations(server.uuid), patch);
 
   const saveNotes = useDebouncedCallback((value: string) => {
     updateServerAllocation(server.uuid, allocation.uuid, { notes: value || null })
       .then(() => {
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.updated', {}), 'success');
-        invalidateAllocations();
+        patchAllocations((item) => (item.uuid === allocation.uuid ? { ...item, notes: value || null } : item));
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -56,10 +60,16 @@ export default function ServerAllocationRow({
     }
   }, [notes]);
 
-  const setPrimary = (next: boolean) => {
+  const setPrimary = (next: boolean) =>
     updateServerAllocation(server.uuid, allocation.uuid, { primary: next })
       .then(() => {
-        invalidateAllocations();
+        patchAllocations((item) =>
+          next
+            ? { ...item, isPrimary: item.uuid === allocation.uuid }
+            : item.uuid === allocation.uuid
+              ? { ...item, isPrimary: false }
+              : item,
+        );
         addToast(
           t(
             next
@@ -73,11 +83,15 @@ export default function ServerAllocationRow({
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
       });
-  };
 
   const doRemove = async () => {
     await deleteServerAllocation(server.uuid, allocation.uuid)
       .then(async () => {
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.servers.allocations(server.uuid),
+          (item: z.infer<typeof serverAllocationSchema>) => item.uuid === allocation.uuid,
+        );
         await invalidateAllocations();
         await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
         setOpenModal(null);

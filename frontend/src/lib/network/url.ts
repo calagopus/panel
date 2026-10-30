@@ -8,10 +8,18 @@ export const openUrl = (url: string, target = '_blank') => {
   document.body.removeChild(anchor);
 };
 
-export const downloadUrl = (url: string) => {
+// a response that becomes a download never loads a document into the iframe, so a load means the
+// server answered with an error page instead
+export const downloadUrl = (url: string, onFailed?: () => void) => {
   const iframe = document.createElement('iframe');
   iframe.style.display = 'none';
   iframe.src = url;
+  iframe.addEventListener('load', () => {
+    if (iframe.contentDocument?.URL === 'about:blank') return;
+
+    iframe.remove();
+    onFailed?.();
+  });
   document.body.appendChild(iframe);
 
   setTimeout(() => iframe.remove(), 60_000);

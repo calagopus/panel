@@ -107,16 +107,18 @@ export function BackupRetentionCell({ backup }: { backup: ServerBackup }) {
 
 export function useBackupDownload(nodeUuid: string, downloadStartedMessage: string) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
 
   const doDownload = (backupUuid: string, archiveFormat: ArchiveFormat) => {
-    downloadNodeBackup(nodeUuid, backupUuid, archiveFormat)
+    const pendingToast = addPendingToast(t('common.toast.preparingDownload', {}));
+
+    return downloadNodeBackup(nodeUuid, backupUuid, archiveFormat)
       .then(({ url }) => {
-        addToast(downloadStartedMessage, 'success');
-        downloadUrl(url);
+        pendingToast.settle(downloadStartedMessage, 'success');
+        downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        pendingToast.settle(httpErrorToHuman(msg), 'error');
       });
   };
 

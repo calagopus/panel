@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { userToastPosition } from '@/lib/schemas/user.ts';
 
 export const toastTimeout = 7500;
+export const pendingToastDelay = 300;
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -39,6 +40,10 @@ export interface ToastUpdate {
   progress?: number | null;
 }
 
+export interface PendingToast {
+  settle: (message?: ReactNode, type?: ToastType) => void;
+}
+
 export interface AddToast {
   (message: ReactNode, type?: ToastType, actions?: ToastAction[]): number;
   (message: ReactNode, actions: ToastAction[]): number;
@@ -51,6 +56,7 @@ interface ToastContextType {
   addProgressToast: (message: ReactNode, options?: ProgressToastOptions) => number;
   updateToast: (id: number, update: ToastUpdate) => void;
   dismissToast: (id: number) => void;
+  addPendingToast: (message: ReactNode) => PendingToast;
 }
 
 export const ToastContext = createContext<ToastContextType | undefined>(undefined);

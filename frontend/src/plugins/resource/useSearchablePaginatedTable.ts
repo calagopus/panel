@@ -17,6 +17,7 @@ interface UseSearchablePaginatedTableOptions<T> {
   modifyParams?: boolean;
   canRequest?: boolean;
   refetchInterval?: number | false | ((data: T | undefined) => number | false);
+  backgroundRefetch?: boolean;
 }
 
 function parseNumber(num: string | null): number | null {
@@ -42,6 +43,7 @@ export function useSearchablePaginatedTable<T>({
   modifyParams = true,
   canRequest = true,
   refetchInterval = false,
+  backgroundRefetch = false,
 }: UseSearchablePaginatedTableOptions<T>) {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
@@ -146,7 +148,8 @@ export function useSearchablePaginatedTable<T>({
 
   return {
     data: data as T | undefined,
-    loading: isFetching && (refetchInterval === false || isPlaceholderData || data === undefined),
+    loading:
+      isFetching && ((refetchInterval === false && !backgroundRefetch) || isPlaceholderData || data === undefined),
     error: error ? httpErrorToHuman(error) : null,
     search,
     debouncedSearch,

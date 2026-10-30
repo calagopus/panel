@@ -33,7 +33,7 @@ import EggImportUrlModal from './modals/EggImportUrlModal.tsx';
 
 function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestSchema> }) {
   const navigate = useNavigate();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
   const { t } = useTranslations();
 
   const canCreate = useAdminCan('eggs.create');
@@ -75,13 +75,15 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
       return;
     }
 
+    const pendingToast = addPendingToast(t('common.toast.importing', { file: file.name }));
+
     importEgg(contextNest.uuid, data)
       .then(() => {
         refetch();
-        addToast(t('pages.admin.nests.tabs.eggs.page.toast.imported', {}), 'success');
+        pendingToast.settle(t('pages.admin.nests.tabs.eggs.page.toast.imported', {}), 'success');
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        pendingToast.settle(httpErrorToHuman(msg), 'error');
       });
   };
 

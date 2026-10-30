@@ -10,6 +10,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer, AdminServerMount } from '@/lib/schemas/admin/servers.ts';
 import NodeAllowedSourceBadge from '@/pages/admin/nodes/NodeAllowedSourceBadge.tsx';
@@ -27,6 +28,11 @@ export default function ServerMountRow({ server, mount }: { server: AdminServer;
     await deleteServerMount(server.uuid, mount.mount.uuid)
       .then(() => {
         setOpenModal(null);
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.mountAssignments.mountsByServer(server.uuid),
+          (item: AdminServerMount) => item.mount.uuid === mount.mount.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
         addToast(t('pages.admin.servers.tabs.mounts.page.toast.deleted', {}), 'success');
       })

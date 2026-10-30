@@ -5,28 +5,34 @@ import { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 import { streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { downloadUrl } from '@/lib/network/url.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
-import { AddToast } from '@/providers/contexts/toastContext.ts';
+import { AddToast, PendingToast } from '@/providers/contexts/toastContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type TFunc = ReturnType<typeof useTranslations>['t'];
 
 export function downloadFilesWithToast(
   request: Promise<{ url: string }>,
-  { addToast, t }: { addToast: AddToast; t: TFunc },
+  {
+    addToast,
+    addPendingToast,
+    t,
+  }: { addToast: AddToast; addPendingToast: (message: string) => PendingToast; t: TFunc },
 ): Promise<void> {
+  const pendingToast = addPendingToast(t('common.toast.preparingDownload', {}));
+
   return request
     .then(({ url }) => {
-      addToast(t('pages.server.files.toast.downloadStarted', {}), 'success');
-      downloadUrl(url);
+      pendingToast.settle(t('pages.server.files.toast.downloadStarted', {}), 'success');
+      downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
     })
     .catch((msg) => {
-      addToast(httpErrorToHuman(msg), 'error');
+      pendingToast.settle(httpErrorToHuman(msg), 'error');
     });
 }
 
 export function buildDownloadAsMenuItems(
   t: TFunc,
-  onSelect: (archiveFormat: z.infer<typeof streamingArchiveFormat>) => void,
+  onSelect: (archiveFormat: z.infer<typeof streamingArchiveFormat>) => Promise<void>,
 ): ContextMenuItem[] {
   return Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
     type: 'action',

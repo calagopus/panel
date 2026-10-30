@@ -434,6 +434,9 @@
       },
       "toast": {
         "duplicated": "{resource} dupliziert.",
+        "preparingDownload": "Download wird vorbereitet...",
+        "downloadFailed": "Der Download konnte nicht gestartet werden.",
+        "importing": "{file} wird importiert...",
         "failedBackupDeletionStarted": "{count} fehlgeschlagene Backups werden im Hintergrund gelöscht.",
         "failedDeletionRetryStarted": "{count} fehlgeschlagene Backup-Löschungen werden im Hintergrund wiederholt.",
         "requestBlockedByExtension": "Diese Anfrage wurde von einer Erweiterung blockiert."
@@ -5978,6 +5981,7 @@
             "archiveCreationStarted": "Archiverstellung hat begonnen.",
             "decompressionStarted": "Das Entpacken des Archivs hat begonnen.",
             "fileCopyingStarted": "Dateikopiervorgang hat begonnen.",
+            "duplicating": "Datei wird dupliziert...",
             "fileCopyingStartedMany": "Dateikopiervorgang auf {servers} hat begonnen.",
             "fileCopyingStartedPartial": "Dateikopiervorgang auf {successfulServers} hat begonnen. {failedServers} fehlgeschlagen:",
             "fileInfoRetrieved": "Dateiinformationen erfolgreich abgerufen.",

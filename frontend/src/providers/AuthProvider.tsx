@@ -133,6 +133,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    setLoading(true);
     flushUserSettings()
       .then(() => logout())
       .then(() => {
@@ -142,7 +143,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (

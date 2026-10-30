@@ -12,6 +12,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
@@ -44,6 +45,11 @@ function MountEggRow({
       .then(() => {
         setOpenModal(null);
         addToast(t('pages.admin.mounts.tabs.eggs.page.toast.removed', {}), 'success');
+        removePaginatedItems(
+          queryClient,
+          queryKeys.admin.mountAssignments.eggsByMount(mount.uuid),
+          (item: { nestEgg: { uuid: string } }) => item.nestEgg.uuid === egg.uuid,
+        );
         queryClient.invalidateQueries({ queryKey: queryKeys.admin.mountAssignments.all() });
       })
       .catch((msg) => {
@@ -98,6 +104,7 @@ export default function AdminMountNestEggs({ mount }: { mount: z.infer<typeof ad
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.admin.mountAssignments.eggsByMount(mount.uuid),
     fetcher: (page, search, perPage) => getMountNestEggs(mount.uuid, page, search, perPage),
+    backgroundRefetch: true,
   });
 
   return (
