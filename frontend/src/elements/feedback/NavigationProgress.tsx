@@ -39,9 +39,14 @@ export default function NavigationProgress({ pending }: { pending: boolean }) {
     if (pendingFor < visibleAfter) return;
 
     setHandoff(true);
+  }, [pending]);
+
+  useEffect(() => {
+    if (!handoff) return;
+
     const timeout = setTimeout(() => setHandoff(false), handoffGrace);
     return () => clearTimeout(timeout);
-  }, [pending]);
+  }, [handoff]);
 
   useEffect(() => {
     if (handoff && busy) setSlow(true);
