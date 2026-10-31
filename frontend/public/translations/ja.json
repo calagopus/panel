@@ -5999,7 +5999,6 @@
             },
             "createSymlink": {
               "title": "シンボリックリンクを作成",
-              "targetDescription": "シンボリックリンクが作成されるディレクトリからの相対パス。",
               "createdAs": "このシンボリックリンクは次の名前で作成されます ",
               "pointsTo": "リンク先: "
             },
