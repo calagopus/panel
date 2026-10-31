@@ -5090,6 +5090,9 @@ const baseTranslations = defineTranslations({
                     'Allows API keys holding the users.oauth-links and users.impersonate permissions to link accounts they could impersonate to this provider, such as for billing integrations. Only enable this for providers whose identifiers you trust the integration to assign.',
                   userManageable: 'Link Manageable by User',
                   userManageableDescription: 'Allows the user to connect and disconnect with this provider.',
+                  loginViewable: 'Viewable on Login',
+                  loginViewableDescription:
+                    'Shows this provider on the login page. Turned off, the provider stays enabled, can still be connected from the account page and users can still sign in through its direct redirect URL.',
                 },
                 button: {
                   discover: 'Import from OpenID Discovery',

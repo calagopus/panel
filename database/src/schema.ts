@@ -474,6 +474,7 @@ export const oauthProvidersTable = pgTable(
     avatar_url_template: varchar({ length: 255 }),
     avatar_overwrite: boolean().default(false).notNull(),
     enabled: boolean().default(false).notNull(),
+    login_viewable: boolean().default(true).notNull(),
     login_only: boolean().default(false).notNull(),
     login_bypass_two_factor: boolean().default(true).notNull(),
     link_viewable: boolean().default(false).notNull(),

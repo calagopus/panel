@@ -42,6 +42,7 @@ mod get {
         ApiResponse::new_serialized(Response {
             oauth_providers: oauth_providers
                 .into_iter()
+                .filter(|oauth_provider| oauth_provider.login_viewable)
                 .map(|oauth_provider| oauth_provider.into_api_object(&state, ()))
                 .try_collect_async_vec()
                 .await?,

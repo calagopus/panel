@@ -2,7 +2,7 @@ import { faChevronDown, faFingerprint } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useEffect, useState } from 'react';
 import { z } from 'zod';
-import getOAuthProviders from '@/api/auth/getOAuthProviders.ts';
+import getOAuthLinkProviders from '@/api/me/oauth-links/getOAuthLinkProviders.ts';
 import getOAuthLinks from '@/api/me/oauth-links/getOAuthLinks.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
@@ -22,7 +22,7 @@ export default function DashboardOAuthLinks() {
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {
-    getOAuthProviders().then((oAuthProviders) => {
+    getOAuthLinkProviders().then((oAuthProviders) => {
       setOAuthProviders(oAuthProviders);
     });
   }, []);

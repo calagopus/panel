@@ -1,0 +1,1 @@
+ALTER TABLE "oauth_providers" ADD COLUMN "login_viewable" boolean DEFAULT true NOT NULL;

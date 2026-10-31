@@ -5038,7 +5038,9 @@
                   "apiLinkable": "Mit API-Schlüsseln verknüpfbar",
                   "apiLinkableDescription": "Erlaubt API-Schlüsseln mit den Berechtigungen users.oauth-links und users.impersonate, Konten, die sie impersonieren könnten, mit diesem Anbieter zu verknüpfen, etwa für Abrechnungsintegrationen. Aktiviere dies nur für Anbieter, deren Identifier du die Integration vergeben lässt.",
                   "userManageable": "Verknüpfung vom Benutzer verwaltbar",
-                  "userManageableDescription": "Erlaubt dem Benutzer, sich mit diesem Anbieter zu verbinden und die Verbindung zu trennen."
+                  "userManageableDescription": "Erlaubt dem Benutzer, sich mit diesem Anbieter zu verbinden und die Verbindung zu trennen.",
+                  "loginViewable": "Bei der Anmeldung sichtbar",
+                  "loginViewableDescription": "Zeigt diesen Anbieter auf der Anmeldeseite an. Ausgeschaltet bleibt der Anbieter aktiv, kann weiterhin auf der Kontoseite verbunden werden und Benutzer können sich weiterhin über die direkte Weiterleitungs-URL anmelden."
                 },
                 "button": {
                   "discover": "Aus OpenID Discovery importieren"

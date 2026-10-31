@@ -239,6 +239,7 @@ mod patch {
                     "description": oauth_provider.description,
                     "icon": oauth_provider.icon,
                     "enabled": oauth_provider.enabled,
+                    "login_viewable": oauth_provider.login_viewable,
                     "login_only": oauth_provider.login_only,
                     "login_bypass_two_factor": oauth_provider.login_bypass_two_factor,
                     "link_viewable": oauth_provider.link_viewable,

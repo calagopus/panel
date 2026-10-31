@@ -15,6 +15,11 @@ use std::{
 };
 use utoipa::ToSchema;
 
+#[inline]
+fn default_true() -> bool {
+    true
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct OAuthProvider {
     pub uuid: uuid::Uuid,
@@ -40,6 +45,7 @@ pub struct OAuthProvider {
     pub avatar_overwrite: bool,
 
     pub enabled: bool,
+    pub login_viewable: bool,
     pub login_only: bool,
     pub login_bypass_two_factor: bool,
     pub link_viewable: bool,
@@ -149,6 +155,10 @@ impl BaseModel for OAuthProvider {
                 compact_str::format_compact!("{prefix}enabled"),
             ),
             (
+                "oauth_providers.login_viewable",
+                compact_str::format_compact!("{prefix}login_viewable"),
+            ),
+            (
                 "oauth_providers.login_only",
                 compact_str::format_compact!("{prefix}login_only"),
             ),
@@ -217,6 +227,8 @@ impl BaseModel for OAuthProvider {
             avatar_overwrite: row
                 .try_get(compact_str::format_compact!("{prefix}avatar_overwrite").as_str())?,
             enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
+            login_viewable: row
+                .try_get(compact_str::format_compact!("{prefix}login_viewable").as_str())?,
             login_only: row.try_get(compact_str::format_compact!("{prefix}login_only").as_str())?,
             login_bypass_two_factor: row.try_get(
                 compact_str::format_compact!("{prefix}login_bypass_two_factor").as_str(),
@@ -832,6 +844,7 @@ impl IntoAdminApiObject for OAuthProvider {
                 avatar_url_template: self.avatar_url_template,
                 avatar_overwrite: self.avatar_overwrite,
                 enabled: self.enabled,
+                login_viewable: self.login_viewable,
                 login_only: self.login_only,
                 login_bypass_two_factor: self.login_bypass_two_factor,
                 link_viewable: self.link_viewable,
@@ -977,6 +990,9 @@ pub struct CreateOAuthProviderOptions {
     #[garde(skip)]
     pub enabled: bool,
     #[garde(skip)]
+    #[serde(default = "default_true")]
+    pub login_viewable: bool,
+    #[garde(skip)]
     pub login_only: bool,
     #[garde(skip)]
     pub login_bypass_two_factor: bool,
@@ -1109,6 +1125,7 @@ impl CreatableModel for OAuthProvider {
             .set("avatar_url_template", &options.avatar_url_template)
             .set("avatar_overwrite", options.avatar_overwrite)
             .set("enabled", options.enabled)
+            .set("login_viewable", options.login_viewable)
             .set("login_only", options.login_only)
             .set("login_bypass_two_factor", options.login_bypass_two_factor)
             .set("link_viewable", options.link_viewable)
@@ -1155,6 +1172,8 @@ pub struct UpdateOAuthProviderOptions {
     pub icon: Option<Option<compact_str::CompactString>>,
     #[garde(skip)]
     pub enabled: Option<bool>,
+    #[garde(skip)]
+    pub login_viewable: Option<bool>,
     #[garde(skip)]
     pub login_only: Option<bool>,
     #[garde(skip)]
@@ -1358,6 +1377,7 @@ impl UpdatableModel for OAuthProvider {
             )
             .set("avatar_overwrite", options.avatar_overwrite)
             .set("enabled", options.enabled)
+            .set("login_viewable", options.login_viewable)
             .set("login_only", options.login_only)
             .set("login_bypass_two_factor", options.login_bypass_two_factor)
             .set("link_viewable", options.link_viewable)
@@ -1380,6 +1400,9 @@ impl UpdatableModel for OAuthProvider {
         }
         if let Some(enabled) = options.enabled {
             self.enabled = enabled;
+        }
+        if let Some(login_viewable) = options.login_viewable {
+            self.login_viewable = login_viewable;
         }
         if let Some(login_only) = options.login_only {
             self.login_only = login_only;
@@ -1538,6 +1561,7 @@ impl DuplicableModel for OAuthProvider {
             .set("avatar_url_template", &self.avatar_url_template)
             .set("avatar_overwrite", self.avatar_overwrite)
             .set("enabled", self.enabled)
+            .set("login_viewable", self.login_viewable)
             .set("login_only", self.login_only)
             .set("login_bypass_two_factor", self.login_bypass_two_factor)
             .set("link_viewable", self.link_viewable)
@@ -1599,6 +1623,7 @@ pub struct AdminApiOAuthProvider {
     pub avatar_overwrite: bool,
 
     pub enabled: bool,
+    pub login_viewable: bool,
     pub login_only: bool,
     pub login_bypass_two_factor: bool,
     pub link_viewable: bool,

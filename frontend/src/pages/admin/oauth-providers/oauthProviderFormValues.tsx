@@ -27,6 +27,7 @@ export const oauthProviderEmptyFormValues: OAuthFormValues = {
   avatarUrlTemplate: null,
   avatarOverwrite: false,
   enabled: true,
+  loginViewable: true,
   loginOnly: false,
   loginBypassTwoFactor: false,
   linkViewable: true,
@@ -57,6 +58,7 @@ export const oauthProviderToFormValues = (
   avatarUrlTemplate: provider.avatarUrlTemplate,
   avatarOverwrite: provider.avatarOverwrite,
   enabled: provider.enabled,
+  loginViewable: provider.loginViewable,
   loginOnly: provider.loginOnly,
   loginBypassTwoFactor: provider.loginBypassTwoFactor,
   linkViewable: provider.linkViewable,
@@ -224,6 +226,12 @@ export function useOAuthProviderFormFields(): {
       name: 'userManageable',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageable', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageableDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'loginViewable',
+      label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginViewable', {}),
+      description: t('pages.admin.oAuthProviders.tabs.general.page.form.loginViewableDescription', {}),
     },
     { type: 'switch', name: 'enabled', label: t('common.form.enabled', {}) },
   ];
