@@ -320,6 +320,37 @@ fn expand(
                 Self::extend(resolver, transform);
             }
 
+            pub fn mutate<__Res: ::std::marker::Send + 'static>(
+                resolver: impl for<'__ia> ::std::ops::Fn(#(&'__ia #ia),*)
+                    -> ::std::pin::Pin<::std::boxed::Box<
+                        dyn ::std::future::Future<Output = ::std::result::Result<__Res, ::anyhow::Error>>
+                        + ::std::marker::Send + '__ia
+                    >>
+                    + ::std::marker::Send + ::std::marker::Sync + 'static,
+                mutator: impl for<'__ha> ::std::ops::Fn(&mut #ident, __Res, #(&'__ha #ha),*)
+                    -> ::std::result::Result<(), ::anyhow::Error>
+                    + ::std::marker::Send + ::std::marker::Sync + 'static,
+            ) {
+                let resolver = ::std::sync::Arc::new(resolver);
+                let mutator = ::std::sync::Arc::new(mutator);
+
+                let hook: #hook_fn_type = ::std::boxed::Box::new(move |#(#ia_n: &#ia),*| {
+                    let resolver = resolver.clone();
+                    let mutator = mutator.clone();
+                    ::std::boxed::Box::pin(async move {
+                        let resolved: __Res = resolver(#(#ia_n),*).await?;
+                        let applier: #applier_fn_type = ::std::boxed::Box::new(
+                            move |this: &mut #ident, #(#ha_n: &#ha),*| {
+                                mutator(this, resolved, #(#ha_n),*)
+                            }
+                        );
+                        Ok(applier)
+                    })
+                });
+
+                #hooks_static.write().push(hook);
+            }
+
             pub async fn init_hooks(#(#ia_n: &#ia),*) -> ::std::result::Result<#ready_type, ::anyhow::Error> {
                 let mut ready: #ready_type = ::std::vec::Vec::new();
                 let futs: ::std::vec::Vec<_> = {

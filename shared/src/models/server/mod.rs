@@ -1837,6 +1837,7 @@ impl Server {
         self,
         state: &crate::State,
     ) -> Result<RemoteApiServer, anyhow::Error> {
+        let api_object = RemoteApiServer::init_hooks(&self, state).await?;
         let trash = self
             .trash
             .unwrap_or(state.settings.get().await?.server.trash);
@@ -1920,154 +1921,158 @@ impl Server {
             schedule_steps.insert(schedules[i].uuid, steps);
         }
 
-        Ok(RemoteApiServer {
-            settings: wings_api::ServerConfiguration {
-                uuid: self.uuid,
-                start_on_completion: None,
-                meta: wings_api::ServerConfigurationMeta {
-                    name: self.name,
-                    description: self.description.unwrap_or_default(),
-                },
-                suspended: self.suspended,
-                invocation: self.startup,
-                entrypoint: None,
-                skip_egg_scripts: false,
-                environment: variables
-                    .into_iter()
-                    .map(|v| {
-                        (
-                            v.env_variable.into(),
-                            serde_json::Value::String(v.value.unwrap_or_default()),
-                        )
-                    })
-                    .collect(),
-                labels: self.labels,
-                backups: backups.into_iter().map(|b| b.uuid).collect(),
-                schedules: schedules
-                    .into_iter()
-                    .map(|s| {
-                        Ok::<_, serde_json::Error>(wings_api::Schedule {
-                            uuid: s.uuid,
-                            triggers: s.triggers,
-                            condition: s.condition,
-                            actions: schedule_steps
-                                .remove(&s.uuid)
-                                .unwrap_or_default()
-                                .into_iter()
-                                .map(|step| {
-                                    serde_json::to_value(wings_api::ScheduleAction {
-                                        uuid: step.uuid,
-                                        inner: serde_json::from_value(step.action)?,
-                                    })
-                                })
-                                .try_collect_vec()?,
-                        })
-                    })
-                    .try_collect_vec()?,
-                allocations: wings_api::ServerConfigurationAllocations {
-                    force_outgoing_ip: self.egg.force_outgoing_ip,
-                    default: self.allocation.map(|a| {
-                        wings_api::ServerConfigurationAllocationsDefault {
-                            ip: compact_str::format_compact!("{}", a.allocation.ip.ip()),
-                            port: a.allocation.port as u32,
-                        }
-                    }),
-                    mappings: {
-                        let mut mappings = IndexMap::new();
-                        for allocation in allocations {
-                            mappings
-                                .entry(compact_str::format_compact!("{}", allocation.ip.ip()))
-                                .or_insert_with(Vec::new)
-                                .push(allocation.port as u32);
-                        }
-
-                        mappings
+        finish_extendible!(
+            RemoteApiServer {
+                settings: wings_api::ServerConfiguration {
+                    uuid: self.uuid,
+                    start_on_completion: None,
+                    meta: wings_api::ServerConfigurationMeta {
+                        name: self.name,
+                        description: self.description.unwrap_or_default(),
                     },
-                },
-                build: wings_api::ServerConfigurationBuild {
-                    bandwidth: wings_api::BandwidthLimits {
-                        upload: self.bandwidth_upload as u64,
-                        download: self.bandwidth_download as u64,
-                    },
-                    memory_limit: self.memory,
-                    overhead_memory: self.memory_overhead,
-                    swap: self.swap,
-                    io_weight: self.io_weight.map(|w| w as u32),
-                    cpu_limit: self.cpu as i64,
-                    disk_space: self.disk as u64,
-                    threads: {
-                        let mut threads = compact_str::CompactString::default();
-                        for cpu in &self.pinned_cpus {
-                            if !threads.is_empty() {
-                                threads.push(',');
-                            }
-                            threads.push_str(&cpu.to_string());
-                        }
-
-                        if threads.is_empty() {
-                            None
-                        } else {
-                            Some(threads)
-                        }
-                    },
-                    oom_disabled: false,
-                },
-                mounts: mounts
-                    .into_iter()
-                    .map(|m| wings_api::Mount {
-                        source: m.source.into(),
-                        target: m.target.into(),
-                        read_only: m.read_only,
-                    })
-                    .collect(),
-                devices: devices
-                    .into_iter()
-                    .map(|d| {
-                        Ok::<_, sqlx::Error>(wings_api::Device {
-                            source: d.try_get("source")?,
-                            target: d.try_get("target")?,
-                            permissions: d.try_get("permissions")?,
-                        })
-                    })
-                    .try_collect_vec()?,
-                firewall: if firewall_enabled {
-                    firewall::decode_rules(firewall_rules)?
+                    suspended: self.suspended,
+                    invocation: self.startup,
+                    entrypoint: None,
+                    skip_egg_scripts: false,
+                    environment: variables
                         .into_iter()
-                        .map(Into::into)
-                        .collect()
-                } else {
-                    Vec::new()
-                },
-                egg: wings_api::ServerConfigurationEgg {
-                    id: self.egg.uuid,
-                    file_denylist: self.egg.file_denylist,
-                },
-                container: wings_api::ServerConfigurationContainer {
-                    image: self.image,
-                    timezone: self.timezone,
-                    hugepages_passthrough_enabled: self.hugepages_passthrough_enabled,
-                    kvm_passthrough_enabled: self.kvm_passthrough_enabled,
-                    seccomp: wings_api::ServerConfigurationContainerSeccomp {
-                        remove_allowed: vec![],
+                        .map(|v| {
+                            (
+                                v.env_variable.into(),
+                                serde_json::Value::String(v.value.unwrap_or_default()),
+                            )
+                        })
+                        .collect(),
+                    labels: self.labels,
+                    backups: backups.into_iter().map(|b| b.uuid).collect(),
+                    schedules: schedules
+                        .into_iter()
+                        .map(|s| {
+                            Ok::<_, serde_json::Error>(wings_api::Schedule {
+                                uuid: s.uuid,
+                                triggers: s.triggers,
+                                condition: s.condition,
+                                actions: schedule_steps
+                                    .remove(&s.uuid)
+                                    .unwrap_or_default()
+                                    .into_iter()
+                                    .map(|step| {
+                                        serde_json::to_value(wings_api::ScheduleAction {
+                                            uuid: step.uuid,
+                                            inner: serde_json::from_value(step.action)?,
+                                        })
+                                    })
+                                    .try_collect_vec()?,
+                            })
+                        })
+                        .try_collect_vec()?,
+                    allocations: wings_api::ServerConfigurationAllocations {
+                        force_outgoing_ip: self.egg.force_outgoing_ip,
+                        default: self.allocation.map(|a| {
+                            wings_api::ServerConfigurationAllocationsDefault {
+                                ip: compact_str::format_compact!("{}", a.allocation.ip.ip()),
+                                port: a.allocation.port as u32,
+                            }
+                        }),
+                        mappings: {
+                            let mut mappings = IndexMap::new();
+                            for allocation in allocations {
+                                mappings
+                                    .entry(compact_str::format_compact!("{}", allocation.ip.ip()))
+                                    .or_insert_with(Vec::new)
+                                    .push(allocation.port as u32);
+                            }
+
+                            mappings
+                        },
+                    },
+                    build: wings_api::ServerConfigurationBuild {
+                        bandwidth: wings_api::BandwidthLimits {
+                            upload: self.bandwidth_upload as u64,
+                            download: self.bandwidth_download as u64,
+                        },
+                        memory_limit: self.memory,
+                        overhead_memory: self.memory_overhead,
+                        swap: self.swap,
+                        io_weight: self.io_weight.map(|w| w as u32),
+                        cpu_limit: self.cpu as i64,
+                        disk_space: self.disk as u64,
+                        threads: {
+                            let mut threads = compact_str::CompactString::default();
+                            for cpu in &self.pinned_cpus {
+                                if !threads.is_empty() {
+                                    threads.push(',');
+                                }
+                                threads.push_str(&cpu.to_string());
+                            }
+
+                            if threads.is_empty() {
+                                None
+                            } else {
+                                Some(threads)
+                            }
+                        },
+                        oom_disabled: false,
+                    },
+                    mounts: mounts
+                        .into_iter()
+                        .map(|m| wings_api::Mount {
+                            source: m.source.into(),
+                            target: m.target.into(),
+                            read_only: m.read_only,
+                        })
+                        .collect(),
+                    devices: devices
+                        .into_iter()
+                        .map(|d| {
+                            Ok::<_, sqlx::Error>(wings_api::Device {
+                                source: d.try_get("source")?,
+                                target: d.try_get("target")?,
+                                permissions: d.try_get("permissions")?,
+                            })
+                        })
+                        .try_collect_vec()?,
+                    firewall: if firewall_enabled {
+                        firewall::decode_rules(firewall_rules)?
+                            .into_iter()
+                            .map(Into::into)
+                            .collect()
+                    } else {
+                        Vec::new()
+                    },
+                    egg: wings_api::ServerConfigurationEgg {
+                        id: self.egg.uuid,
+                        file_denylist: self.egg.file_denylist,
+                    },
+                    container: wings_api::ServerConfigurationContainer {
+                        image: self.image,
+                        timezone: self.timezone,
+                        hugepages_passthrough_enabled: self.hugepages_passthrough_enabled,
+                        kvm_passthrough_enabled: self.kvm_passthrough_enabled,
+                        seccomp: wings_api::ServerConfigurationContainerSeccomp {
+                            remove_allowed: vec![],
+                        },
+                    },
+                    auto_kill: self.auto_kill,
+                    auto_start_behavior: self.auto_start_behavior.into(),
+                    trash: Some(wings_api::ServerConfigurationTrash {
+                        retention: trash.retention,
+                        usage_threshold: Some(trash.usage_threshold),
+                    }),
+                    features: wings_api::ServerConfigurationFeatures {
+                        startup_cpu_boost: None,
+                        runtime_cpu_boost: None,
                     },
                 },
-                auto_kill: self.auto_kill,
-                auto_start_behavior: self.auto_start_behavior.into(),
-                trash: Some(wings_api::ServerConfigurationTrash {
-                    retention: trash.retention,
-                    usage_threshold: Some(trash.usage_threshold),
-                }),
-                features: wings_api::ServerConfigurationFeatures {
-                    startup_cpu_boost: None,
-                    runtime_cpu_boost: None,
+                process_configuration: super::nest_egg::ProcessConfiguration {
+                    startup: self.egg.config_startup,
+                    stop: self.egg.config_stop,
+                    configs: self.egg.config_files,
                 },
             },
-            process_configuration: super::nest_egg::ProcessConfiguration {
-                startup: self.egg.config_startup,
-                stop: self.egg.config_stop,
-                configs: self.egg.config_files,
-            },
-        })
+            api_object,
+            state
+        )
     }
 }
 
@@ -3177,11 +3182,14 @@ impl DeletableModel for Server {
     }
 }
 
+#[schema_extension_derive::extendible]
+#[init_args(Server, crate::State)]
+#[hook_args(crate::State)]
 #[derive(ToSchema, Serialize)]
 #[schema(title = "RemoteServer")]
 pub struct RemoteApiServer {
-    settings: wings_api::ServerConfiguration,
-    process_configuration: super::nest_egg::ProcessConfiguration,
+    pub settings: wings_api::ServerConfiguration,
+    pub process_configuration: super::nest_egg::ProcessConfiguration,
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Clone, Copy, Default)]
