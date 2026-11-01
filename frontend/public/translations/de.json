@@ -253,6 +253,7 @@
         "update": "Aktualisieren",
         "upgrade": "Aktualisieren",
         "close": "Schließen",
+        "copy": "Kopieren",
         "cancel": "Abbrechen",
         "continue": "Weiter",
         "skip": "Überspringen",
@@ -578,7 +579,9 @@
       "table": {
         "selectRow": "Zeile auswählen",
         "pagination": {
-          "results": "Zeige {start} bis {end} von {total} Ergebnissen."
+          "results": "Zeige {start} bis {end} von {total} Ergebnissen.",
+          "perPage": "{count} / Seite",
+          "perPageLabel": "Ergebnisse pro Seite"
         },
         "empty": {
           "title": "Keine Einträge gefunden",
@@ -681,6 +684,7 @@
         "page": "Seite {page}",
         "emptyDirectory": "Dieses Verzeichnis ist leer",
         "ignored": "Ignoriert",
+        "partiallyIgnored": "Teilweise ignoriert",
         "showingFirstEntries": "Die ersten {count} Einträge werden angezeigt"
       },
       "databaseAgentHost": {
@@ -786,7 +790,11 @@
           "started": "Gestartet",
           "stopped": "Gestoppt",
           "restarted": "Neu gestartet",
-          "killed": "Gekillt"
+          "killed": "Gekillt",
+          "suspended": "Suspendiert",
+          "unsuspended": "Entsuspendiert",
+          "clearedState": "Status zurückgesetzt für",
+          "deleted": "Gelöscht"
         },
         "compressionLevel": {
           "bestSpeed": "Beste Geschwindigkeit",
@@ -803,6 +811,11 @@
           "gibibytes": "GiB",
           "tebibytes": "TiB",
           "pebibytes": "PiB"
+        },
+        "rate": {
+          "kilobits": "Kbit/s",
+          "megabits": "Mbit/s",
+          "gigabits": "Gbit/s"
         }
       },
       "unlimited": "Unendlich",
@@ -1507,6 +1520,11 @@
       },
       "account": {
         "home": {
+          "empty": {
+            "title": "Keine Server",
+            "description": "Dieses Konto hat noch keine Server. Server, die dafür erstellt oder als Subuser mit ihm geteilt werden, erscheinen hier."
+          },
+          "emptyGroup": "Diese Gruppe ist leer. Ziehe einen Server hierher, um ihn hinzuzufügen.",
           "title": "Servers",
           "tooltip": {
             "removeFromGroup": "Aus der Gruppe entfernen",
@@ -1521,6 +1539,11 @@
             "groupedServers": {
               "title": "Gruppierte Server",
               "page": {
+                "empty": {
+                  "title": "Keine Servergruppen",
+                  "description": "Jeder Server wird einzeln aufgeführt. Erstelle eine Gruppe, um Server in Abschnitte zu sortieren und per Drag & Drop neu anzuordnen.",
+                  "descriptionReadOnly": "Jeder Server wird einzeln aufgeführt."
+                },
                 "button": {
                   "createGroup": "Neue Gruppe"
                 },
@@ -1573,11 +1596,6 @@
                   "toast": {
                     "moved": "Server nach {group} verschoben."
                   }
-                },
-                "empty": {
-                  "title": "Keine Servergruppen",
-                  "description": "Jeder Server wird einzeln aufgeführt. Erstelle eine Gruppe, um Server in Abschnitte zu sortieren und per Drag & Drop neu anzuordnen.",
-                  "descriptionReadOnly": "Jeder Server wird einzeln aufgeführt."
                 }
               }
             },
@@ -1605,12 +1623,7 @@
             "success": "Erfolgreich {servers} {action}.",
             "partial": "Erfolgreich {successfulServers} {action}. {failedServers} fehlgeschlagen.",
             "groupActions": "Gruppen-Aktionen"
-          },
-          "empty": {
-            "title": "Keine Server",
-            "description": "Dieses Konto hat noch keine Server. Server, die dafür erstellt oder als Subuser mit ihm geteilt werden, erscheinen hier."
-          },
-          "emptyGroup": "Diese Gruppe ist leer. Ziehe einen Server hierher, um ihn hinzuzufügen."
+          }
         },
         "admin": {
           "title": "Admin"
@@ -2145,7 +2158,11 @@
         "home": {
           "title": "Startseite",
           "alert": {
-            "newPanelVersion": "Eine neue Version für das Panel ist verfügbar! Du nutzt aktuell {current} und die neueste Version ist {latest}. Du solltest ein Upgrade in Betracht ziehen. [Klicke hier]({upgradeUrl}), um die Upgrade-Anweisungen anzuzeigen."
+            "newPanelVersion": "Eine neue Version für das Panel ist verfügbar! Du nutzt aktuell {current} und die neueste Version ist {latest}. Du solltest ein Upgrade in Betracht ziehen. [Klicke hier]({upgradeUrl}), um die Upgrade-Anweisungen anzuzeigen.",
+            "extensionBuildFailed": {
+              "content": "Der letzte Build der Erweiterungen ist fehlgeschlagen.",
+              "link": "Erweiterungen ansehen"
+            }
           },
           "tabs": {
             "overview": {
@@ -2804,6 +2821,11 @@
           }
         },
         "extensions": {
+          "empty": {
+            "title": "Keine Erweiterungen installiert",
+            "description": "Dieses Panel läuft ohne Erweiterungen. Ziehe eine Erweiterungsdatei auf diese Seite, um eine zu installieren.",
+            "descriptionDisabled": "Dieses Panel läuft ohne Erweiterungen. Die Erweiterungsverwaltung ist deaktiviert, daher können keine installiert werden."
+          },
           "title": "Erweiterungen",
           "unknownExtension": "Unbekannte Erweiterung",
           "alert": {
@@ -2924,11 +2946,6 @@
                 "removeMigrations": "Möchtest du die Datenbank-Migrationen dieser Erweiterung entfernen & zurückrollen?"
               }
             }
-          },
-          "empty": {
-            "title": "Keine Erweiterungen installiert",
-            "description": "Dieses Panel läuft ohne Erweiterungen. Ziehe eine Erweiterungsdatei auf diese Seite, um eine zu installieren.",
-            "descriptionDisabled": "Dieses Panel läuft ohne Erweiterungen. Die Erweiterungsverwaltung ist deaktiviert, daher können keine installiert werden."
           }
         },
         "users": {
@@ -3749,6 +3766,27 @@
             "clearState": "Serverstatus zurücksetzen",
             "delete": "Server löschen"
           },
+          "bulkActions": {
+            "verb": {
+              "suspend": "suspendieren",
+              "unsuspend": "entsuspendieren",
+              "clearState": "in ihrem Status zurücksetzen",
+              "delete": "löschen"
+            },
+            "modal": {
+              "title": "Massenaktion bestätigen",
+              "content": "Bist du sicher, dass du **{servers}** {action} möchtest?",
+              "deleteContent": "Bist du sicher, dass du **{servers}** samt allem, was sich darauf befindet, endgültig löschen möchtest? Dies kann nicht rückgängig gemacht werden.",
+              "form": {
+                "deleteBackups": "Möchtest du die Backups dieser Server löschen?"
+              },
+              "alert": {
+                "forceWarning": "Das erzwungene Löschen entfernt diese Server aus dem Panel, auch wenn ihre Nodes nicht erreichbar sind. Ihre Dateien und Datenbanken werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
+              }
+            },
+            "successWithSkipped": "Erfolgreich {servers} {action}. {skippedServers} übersprungen.",
+            "nothingToDo": "Jeder ausgewählte Server befindet sich bereits in diesem Zustand."
+          },
           "externalIdLookup": {
             "button": "Über externe ID suchen",
             "modal": {
@@ -3863,6 +3901,13 @@
                   "ioWeight": "IO-Gewichtung",
                   "ioWeightDescription": "Die relative IO-Gewichtung des Server-Containers im Vergleich zu anderen Containern.",
                   "ioWeightTooltip": "0-1000. Funktioniert möglicherweise nicht auf allen Systemen.",
+                  "bandwidth": {
+                    "upload": "Upload-Limit",
+                    "download": "Download-Limit",
+                    "description": "0 setzt kein Limit.",
+                    "unavailable": "Die Node unterstützt keine Bandbreitenlimits.",
+                    "disabled": "Bandbreitenlimits sind in der Node-Konfiguration deaktiviert."
+                  },
                   "pinnedCpus": "Angeheftete CPUs",
                   "pinnedCpusDescription": "Die CPU-Kerne, an die dieser Server angeheftet ist.",
                   "pinnedCpusTooltip": "Nach Index, z. B. 0, 1, 2. Leer lassen, um alle Kerne zuzulassen.",
@@ -4253,6 +4298,11 @@
                   "variables": {
                     "title": "Variablen",
                     "page": {
+                      "empty": {
+                        "title": "Keine Variablen",
+                        "description": "Server mit diesem Egg haben auf ihrer Startup-Seite nichts einzustellen. Füge eine Variable hinzu, um eine Einstellung an den Startbefehl und das Installationsskript zu übergeben.",
+                        "descriptionReadOnly": "Server mit diesem Egg haben auf ihrer Startup-Seite nichts einzustellen."
+                      },
                       "title": "Egg Variablen",
                       "aria": {
                         "reorder": "Variable verschieben"
@@ -4281,11 +4331,6 @@
                         "duplicate": {
                           "title": "Egg Variable duplizieren"
                         }
-                      },
-                      "empty": {
-                        "title": "Keine Variablen",
-                        "description": "Server mit diesem Egg haben auf ihrer Startup-Seite nichts einzustellen. Füge eine Variable hinzu, um eine Einstellung an den Startbefehl und das Installationsskript zu übergeben.",
-                        "descriptionReadOnly": "Server mit diesem Egg haben auf ihrer Startup-Seite nichts einzustellen."
                       }
                     }
                   },
@@ -4492,7 +4537,7 @@
           },
           "card": {
             "repository": "Repository",
-            "author": "Autor",
+            "path": "Pfad",
             "installedIn": "Installiert in",
             "dockerImages": "Docker-Images",
             "features": "Features"
@@ -4614,6 +4659,9 @@
                 },
                 "button": {
                   "testConnection": "Verbindung testen"
+                },
+                "tooltip": {
+                  "errorWhileFetchingVersion": "Fehler beim Abrufen der Version"
                 },
                 "toast": {
                   "tested": "Test erfolgreich abgeschlossen."
@@ -5764,6 +5812,11 @@
           "socketDisconnected": "Getrennt"
         },
         "files": {
+          "empty": {
+            "title": "Leeres Verzeichnis",
+            "description": "In diesem Verzeichnis ist noch nichts. Lade Dateien hoch oder erstelle neue, um es zu füllen.",
+            "descriptionReadOnly": "In diesem Verzeichnis ist noch nichts."
+          },
           "title": "Dateien",
           "editorNotFound": {
             "title": "Nicht gefunden",
@@ -6306,11 +6359,6 @@
               "hint": "Setze ihn im Upload-Bereich fort, wenn du ihn gestartet hast, oder lösche die unvollständige Datei, wenn du sie nicht mehr brauchst.",
               "empty": "Alle Uploads auf diesen Server sind abgeschlossen."
             }
-          },
-          "empty": {
-            "title": "Leeres Verzeichnis",
-            "description": "In diesem Verzeichnis ist noch nichts. Lade Dateien hoch oder erstelle neue, um es zu füllen.",
-            "descriptionReadOnly": "In diesem Verzeichnis ist noch nichts."
           }
         },
         "databases": {
@@ -6937,6 +6985,13 @@
             }
           },
           "view": {
+            "empty": {
+              "triggers": {
+                "title": "Keine Auslöser",
+                "description": "Dieser Zeitplan startet nie von selbst und läuft nur, wenn er manuell gestartet wird. Bearbeite ihn, um einen Auslöser hinzuzufügen.",
+                "descriptionReadOnly": "Dieser Zeitplan startet nie von selbst und läuft nur, wenn er manuell gestartet wird."
+              }
+            },
             "badge": {
               "running": "Läuft",
               "waits": "Wartet",
@@ -6954,13 +7009,6 @@
               "actions": "Zeitplan-Aktionen",
               "preConditions": "Zeitplan-Vorbedingungen",
               "triggers": "Zeitplan-Auslöser"
-            },
-            "empty": {
-              "triggers": {
-                "title": "Keine Auslöser",
-                "description": "Dieser Zeitplan startet nie von selbst und läuft nur, wenn er manuell gestartet wird. Bearbeite ihn, um einen Auslöser hinzuzufügen.",
-                "descriptionReadOnly": "Dieser Zeitplan startet nie von selbst und läuft nur, wenn er manuell gestartet wird."
-              }
             }
           },
           "step": {
@@ -7028,6 +7076,8 @@
                 "time": "Um",
                 "weekday": "Am",
                 "dayOfMonth": "Am Tag",
+                "weekInterval": "Alle (Wochen)",
+                "weekAnchor": "Ausgerichtet auf die Woche vom",
                 "advanced": "Als Cron-Ausdruck bearbeiten"
               },
               "frequency": {
@@ -7037,6 +7087,7 @@
                 "weekly": "Wöchentlich",
                 "monthly": "Monatlich"
               },
+              "everyWeeks": "alle {weeks} Wochen",
               "timezoneHint": "Zeiten verwenden die Server-Zeitzone ({timezone}).",
               "card": {
                 "content": "Im Cron-Intervall {schedule}, nächste Ausführung ist {timestamp} - letzte Ausführung war {lastTimestamp}."
@@ -7124,13 +7175,18 @@
               "limitReached": "Dieser Zeitplan ist auf {max} Schritte limitiert."
             },
             "empty": {
+              "descriptionReadOnly": "Dieser Zeitplan tut nichts, wenn er ausgeführt wird.",
               "title": "Keine Schritte konfiguriert",
-              "description": "Dieser Zeitplan hat noch keine Schritte. Füge einige Aktionen hinzu, um loszulegen.",
-              "descriptionReadOnly": "Dieser Zeitplan tut nichts, wenn er ausgeführt wird."
+              "description": "Dieser Zeitplan hat noch keine Schritte. Füge einige Aktionen hinzu, um loszulegen."
             },
             "warning": {
               "unclosedIf": "Einem \"Wenn\"-Block fehlt das zugehörige \"Ende Wenn\". Alle verbleibenden Schritte werden als Teil des Blocks ausgeführt.",
-              "orphanBranch": "Es gibt einen \"Sonst\"-, \"Sonst wenn\"- oder \"Ende Wenn\"-Schritt ohne ein passendes \"Wenn\" davor."
+              "orphanBranch": "Es gibt einen \"Sonst\"-, \"Sonst wenn\"- oder \"Ende Wenn\"-Schritt ohne ein passendes \"Wenn\" davor.",
+              "variable": {
+                "never": "Die Variable \"{variable}\" wird von diesem Zeitplan nie gesetzt und kann daher nicht aufgelöst werden.",
+                "unavailable": "Die Variable \"{variable}\" wird an dieser Stelle weder von einem Auslöser noch von einem vorherigen Schritt gesetzt.",
+                "conditional": "Die Variable \"{variable}\" wird nur bei manchen Ausführungen gesetzt, zum Beispiel in einem anderen Zweig, durch nur einen von mehreren Auslösern oder durch einen Schritt, der fehlschlagen kann."
+              }
             },
             "groups": {
               "server": "Server",
@@ -7651,7 +7707,9 @@
           "toast": {
             "downloadStarted": "Download gestartet.",
             "restoringBackup": "Backup wird wiederhergestellt...",
-            "exportStarted": "Backup-Export gestartet."
+            "exportStarted": "Backup-Export gestartet.",
+            "locked": "Backup gesperrt.",
+            "unlocked": "Backup entsperrt."
           },
           "modal": {
             "createBackup": {
@@ -7986,6 +8044,10 @@
           }
         },
         "startup": {
+          "empty": {
+            "title": "Keine Startvariablen",
+            "description": "Das Egg dieses Servers hat hier keine Einstellungen, der Startbefehl wird also unverändert ausgeführt."
+          },
           "title": "Start",
           "variables": "Variablen",
           "dockerImageDescription": "Das Docker Image, das verwendet wird, um diesen Server auszuführen. Dies kann geändert werden, um ein anderes Image zu verwenden.",
@@ -8001,11 +8063,7 @@
               "content": "Du hast ungespeicherte Änderungen an deinen Startvariablen. Bist du sicher, dass du diese Seite verlassen möchtest? Wenn du die Seite verlässt, gehen deine Änderungen verloren."
             }
           },
-          "predefinedStartupCommands": "Vordefinierte Startbefehle",
-          "empty": {
-            "title": "Keine Startvariablen",
-            "description": "Das Egg dieses Servers hat hier keine Einstellungen, der Startbefehl wird also unverändert ausgeführt."
-          }
+          "predefinedStartupCommands": "Vordefinierte Startbefehle"
         },
         "mounts": {
           "title": "Mounts",
