@@ -74,6 +74,8 @@ function PreviewCard({ preview, openDelay = 400, children, ...rest }: PreviewCar
     const growth = (room: number) => `${-Math.min(GROWTH_PX, Math.max(0, room - EDGE_MARGIN_PX))}px`;
     overlayRef.current!.style.left = growth(wrapper.left - bounds.left);
     overlayRef.current!.style.right = growth(bounds.right - wrapper.right);
+    contentRef.current!.style.minWidth = `${wrapper.width}px`;
+    contentRef.current!.style.minHeight = `${wrapper.height + GROWTH_PX * 2}px`;
 
     applyBox('collapsed');
     frameRef.current.getBoundingClientRect();
