@@ -73,38 +73,9 @@ impl UserPasswordReset {
         database: &crate::database::Database,
         user_uuid: uuid::Uuid,
     ) -> Result<String, anyhow::Error> {
-        let existing = sqlx::query(
-            r#"
-            SELECT COUNT(*)
-            FROM user_password_resets
-            WHERE user_password_resets.user_uuid = $1 AND user_password_resets.created > NOW() - INTERVAL '20 minutes'
-            "#,
-        )
-        .bind(user_uuid)
-        .fetch_optional(database.read())
-        .await?;
-
-        if let Some(row) = existing
-            && row.get::<i64, _>(0) > 0
-        {
-            return Err(anyhow::anyhow!(
-                "a password reset was already requested recently"
-            ));
-        }
-
-        let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 96);
-
-        sqlx::query(
-            r#"
-            INSERT INTO user_password_resets (user_uuid, token_start, token, created)
-            VALUES ($1, $2, crypt($3, gen_salt('bf', 12)), NOW())
-            "#,
-        )
-        .bind(user_uuid)
-        .bind(&token[0..16])
-        .bind(&token)
-        .execute(database.write())
-        .await?;
+        let mut transaction = database.write().begin().await?;
+        let token = Self::create_with_transaction(&mut transaction, user_uuid, false).await?;
+        transaction.commit().await?;
 
         Ok(token)
     }
@@ -112,37 +83,54 @@ impl UserPasswordReset {
     pub async fn create_with_transaction(
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         user_uuid: uuid::Uuid,
+        account_created: bool,
     ) -> Result<String, anyhow::Error> {
+        sqlx::query("SELECT 1 FROM users WHERE users.uuid = $1 FOR UPDATE")
+            .bind(user_uuid)
+            .execute(&mut **transaction)
+            .await?;
+
         let existing = sqlx::query(
             r#"
             SELECT COUNT(*)
             FROM user_password_resets
-            WHERE user_password_resets.user_uuid = $1 AND user_password_resets.created > NOW() - INTERVAL '20 minutes'
+            WHERE user_password_resets.user_uuid = $1
+                AND NOT user_password_resets.account_created
+                AND user_password_resets.created > NOW() - INTERVAL '20 minutes'
             "#,
         )
         .bind(user_uuid)
-        .fetch_optional(&mut **transaction)
+        .fetch_one(&mut **transaction)
         .await?;
 
-        if let Some(row) = existing
-            && row.get::<i64, _>(0) > 0
-        {
+        if existing.get::<i64, _>(0) > 0 {
             return Err(anyhow::anyhow!(
                 "a password reset was already requested recently"
             ));
         }
 
+        sqlx::query(
+            r#"
+            DELETE FROM user_password_resets
+            WHERE user_password_resets.user_uuid = $1 AND user_password_resets.account_created
+            "#,
+        )
+        .bind(user_uuid)
+        .execute(&mut **transaction)
+        .await?;
+
         let token = rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 96);
 
         sqlx::query(
             r#"
-            INSERT INTO user_password_resets (user_uuid, token_start, token, created)
-            VALUES ($1, $2, crypt($3, gen_salt('bf', 12)), NOW())
+            INSERT INTO user_password_resets (user_uuid, token_start, token, account_created, created)
+            VALUES ($1, $2, crypt($3, gen_salt('bf', 12)), $4, NOW())
             "#,
         )
         .bind(user_uuid)
         .bind(&token[0..16])
         .bind(&token)
+        .bind(account_created)
         .execute(&mut **transaction)
         .await?;
 
@@ -162,7 +150,7 @@ impl UserPasswordReset {
             WITH user_password_resets AS MATERIALIZED (
                 SELECT * FROM user_password_resets
                 WHERE user_password_resets.token_start = $1
-                AND user_password_resets.created > NOW() - INTERVAL '20 minutes'
+                AND user_password_resets.created > NOW() - CASE WHEN user_password_resets.account_created THEN INTERVAL '1 hour' ELSE INTERVAL '20 minutes' END
             )
             SELECT {}, {} FROM user_password_resets
             JOIN users ON users.uuid = user_password_resets.user_uuid
@@ -216,7 +204,7 @@ impl UserPasswordReset {
         Ok(sqlx::query(
             r#"
             DELETE FROM user_password_resets
-            WHERE user_password_resets.created < NOW() - INTERVAL '20 minutes'
+            WHERE user_password_resets.created < NOW() - CASE WHEN user_password_resets.account_created THEN INTERVAL '1 hour' ELSE INTERVAL '20 minutes' END
             "#,
         )
         .execute(database.write())

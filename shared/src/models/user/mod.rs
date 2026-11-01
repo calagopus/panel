@@ -220,6 +220,7 @@ impl User {
         let token = match super::user_password_reset::UserPasswordReset::create_with_transaction(
             transaction,
             self.uuid,
+            true,
         )
         .await
         {

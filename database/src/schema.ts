@@ -271,6 +271,7 @@ export const userPasswordResetsTable = pgTable(
       .notNull(),
     token_start: char({ length: 16 }).notNull(),
     token: text().notNull(),
+    account_created: boolean().default(false).notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [

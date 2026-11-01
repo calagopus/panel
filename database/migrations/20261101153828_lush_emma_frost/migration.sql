@@ -1,0 +1,1 @@
+ALTER TABLE "user_password_resets" ADD COLUMN "account_created" boolean DEFAULT false NOT NULL;
