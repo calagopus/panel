@@ -5741,7 +5741,6 @@
             },
             "createSymlink": {
               "title": "Tạo Symlink",
-              "targetDescription": "Tính theo thư mục nơi liên kết tượng trưng được tạo.",
               "createdAs": "Liên kết tượng trưng này sẽ được tạo như sau ",
               "pointsTo": "Nó sẽ chỉ ra "
             },

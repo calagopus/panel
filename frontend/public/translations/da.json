@@ -5045,7 +5045,6 @@
             },
             "createSymlink": {
               "title": "Opret symlink",
-              "targetDescription": "Relativt til den mappe, symlinket oprettes i.",
               "createdAs": "Dette symlink bliver oprettet som ",
               "pointsTo": "Det peger på "
             },

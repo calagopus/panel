@@ -5798,7 +5798,6 @@
             },
             "createSymlink": {
               "title": "Crear enlace simbólico",
-              "targetDescription": "En relación con el directorio en el que se crea el enlace simbólico.",
               "createdAs": "Este enlace simbólico se creará como ",
               "pointsTo": "Apuntará a "
             },
