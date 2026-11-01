@@ -768,6 +768,11 @@ pub async fn handle_startup() -> Result<
         )
         .await;
 
+    settings
+        .set_inactive_extensions(&extensions.inactive())
+        .await
+        .context("failed to render index.html")?;
+
     tasks::define_background_tasks(&background_task_builder).await;
 
     background_tasks

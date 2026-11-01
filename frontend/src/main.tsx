@@ -74,7 +74,12 @@ function setExtensionStylesEnabled(isEnabled: (identifier: string) => boolean) {
   }
 }
 
-setExtensionStylesEnabled(() => false);
+const renderedInactiveExtensions = document
+  .querySelector<HTMLMetaElement>('meta[name="inactive-extensions"]')
+  ?.content.split(',')
+  .filter(Boolean);
+
+setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(identifier) === false);
 
 (async () => {
   preloadRouterForPath(window.location.pathname);

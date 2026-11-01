@@ -1021,7 +1021,10 @@ impl Deref for SettingsReadGuard<'_> {
     }
 }
 
-fn render_index_html(settings: &AppSettings) -> Result<String, anyhow::Error> {
+fn render_index_html(
+    settings: &AppSettings,
+    inactive_extensions: &[compact_str::CompactString],
+) -> Result<String, anyhow::Error> {
     let mut environment = minijinja::Environment::new();
     environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
     environment.add_global(
@@ -1033,6 +1036,10 @@ fn render_index_html(settings: &AppSettings) -> Result<String, anyhow::Error> {
         minijinja::Value::from(minijinja::value::Serde(
             settings.metadata.resolve(&settings.app),
         )),
+    );
+    environment.add_global(
+        "inactive_extensions",
+        minijinja::Value::from(minijinja::value::Serde(inactive_extensions)),
     );
 
     let index_html = crate::frontend_index_html().ok_or_else(|| {
@@ -1109,7 +1116,10 @@ impl<'a> SettingsWriteGuard<'a> {
         .execute(self.parent.database.write())
         .await?;
 
-        let rendered_index_html = render_index_html(&settings_guard.settings)?;
+        let rendered_index_html = render_index_html(
+            &settings_guard.settings,
+            &self.parent.inactive_extensions.load(),
+        )?;
         self.parent
             .rendered_index_html
             .store(ArcedIndexHtml(Arc::new(rendered_index_html)));
@@ -1202,6 +1212,7 @@ pub struct Settings {
     write_serializing: Semaphore,
 
     rendered_index_html: arc_swap::ArcSwapAny<ArcedIndexHtml>,
+    inactive_extensions: arc_swap::ArcSwap<Vec<compact_str::CompactString>>,
 
     database: Arc<crate::database::Database>,
 }
@@ -1245,7 +1256,7 @@ impl Settings {
             Self::fetch_settings(&database)
         )?;
 
-        let rendered_index_html = render_index_html(&s1)?;
+        let rendered_index_html = render_index_html(&s1, &[])?;
         let rendered_index_html =
             arc_swap::ArcSwapAny::new(ArcedIndexHtml(Arc::new(rendered_index_html)));
 
@@ -1263,6 +1274,7 @@ impl Settings {
             cached_index: AtomicUsize::new(0),
             write_serializing: Semaphore::new(1),
             rendered_index_html,
+            inactive_extensions: arc_swap::ArcSwap::from_pointee(Vec::new()),
             database,
         })
     }
@@ -1270,6 +1282,28 @@ impl Settings {
     #[inline]
     pub fn get_rendered_index_html(&self) -> ArcedIndexHtml {
         self.rendered_index_html.load_full()
+    }
+
+    /// Package names are stored as frontend identifiers (`.` replaced by `_`).
+    pub async fn set_inactive_extensions(
+        &self,
+        package_names: &[compact_str::CompactString],
+    ) -> Result<(), anyhow::Error> {
+        self.inactive_extensions.store(Arc::new(
+            package_names
+                .iter()
+                .map(|package_name| package_name.replace('.', "_").into())
+                .collect(),
+        ));
+
+        let settings = self.get().await?;
+        let rendered_index_html = render_index_html(&settings, &self.inactive_extensions.load())?;
+        drop(settings);
+
+        self.rendered_index_html
+            .store(ArcedIndexHtml(Arc::new(rendered_index_html)));
+
+        Ok(())
     }
 
     pub async fn get(&self) -> Result<SettingsReadGuard<'_>, anyhow::Error> {
