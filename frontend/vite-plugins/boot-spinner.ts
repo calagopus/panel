@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 import { listExtensionIdentifiers } from './extension-overrides.ts';
+import { fetchBackendExtensionVariables } from './extension-variables.ts';
 
 const SPINNER_CSS = path.resolve(import.meta.dirname, '../src/elements/feedback/spinner.css');
 const EXTENSIONS_DIR = path.resolve(import.meta.dirname, '../extensions');
@@ -33,6 +34,27 @@ function extensionBootMarkup(): [identifier: string, markup: string] | null {
   return [providers[0], fs.readFileSync(path.join(EXTENSIONS_DIR, providers[0], 'src', 'boot.html'), 'utf8').trim()];
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#x27;');
+}
+
+async function devBootMarkup(identifier: string, source: string): Promise<string> {
+  if (source.includes('{%')) {
+    console.warn('[boot-spinner] boot.html block tags are only rendered in production builds');
+  }
+
+  const variables = (await fetchBackendExtensionVariables())?.variables[identifier.replaceAll('_', '.')] ?? {};
+
+  return source.replace(/\{\{\s*variables\.(\w+)\s*\}\}/g, (_, name: string) =>
+    escapeHtml(String(variables[name] ?? '')),
+  );
+}
+
 export function bootSpinner(): Plugin {
   let isBuild = false;
 
@@ -54,14 +76,16 @@ export function bootSpinner(): Plugin {
 
     transformIndexHtml: {
       order: 'post',
-      handler(html) {
+      async handler(html) {
         const css = fs.readFileSync(SPINNER_CSS, 'utf8');
         const extension = extensionBootMarkup();
 
-        let markup = extension ? extension[1] : DEFAULT_SPINNER;
-        if (isBuild) {
+        let markup = DEFAULT_SPINNER;
+        if (!isBuild && extension) {
+          markup = await devBootMarkup(extension[0], extension[1]);
+        } else if (isBuild) {
           markup = extension
-            ? `{% if "${extension[0]}" not in inactive_extensions %}${rawTemplate(extension[1])}{% else %}${DEFAULT_SPINNER}{% endif %}`
+            ? `{% if "${extension[0]}" not in inactive_extensions %}{% set boot %}{% filter boot_template("${extension[0]}") %}${rawTemplate(extension[1])}{% endfilter %}{% endset %}{% if boot %}{{ boot }}{% else %}${DEFAULT_SPINNER}{% endif %}{% else %}${DEFAULT_SPINNER}{% endif %}`
             : DEFAULT_SPINNER;
 
           html = html

@@ -114,6 +114,7 @@ impl ExtensionManager {
             super::background_tasks::BackgroundTaskBuilder::new(state.clone());
         let shutdown_handlers_builder =
             super::shutdown_handlers::ShutdownHandlerBuilder::new(state.clone());
+        let index_html_builder = super::index_html::IndexHtmlBuilder::new();
         let mut permissions_builder = ExtensionPermissionsBuilder::new(
             crate::permissions::BASE_USER_PERMISSIONS.clone(),
             crate::permissions::BASE_ADMIN_PERMISSIONS.clone(),
@@ -210,6 +211,9 @@ impl ExtensionManager {
                 stage.set("initialize_shutdown_handlers");
                 ext.initialize_shutdown_handlers(state.clone(), shutdown_handlers_builder.share())
                     .await;
+                stage.set("initialize_index_html");
+                ext.initialize_index_html(state.clone(), index_html_builder.share(package_name))
+                    .await;
                 stage.set("initialize_permissions");
                 let permissions = ext
                     .initialize_permissions(state.clone(), permissions_builder.clone())
@@ -233,6 +237,7 @@ impl ExtensionManager {
                 Err(err) => {
                     background_tasks_builder.rollback(&task_names).await;
                     shutdown_handlers_builder.rollback(&handler_names).await;
+                    index_html_builder.rollback(package_name);
                     crate::settings::SETTINGS_DESER_EXTENSIONS
                         .write()
                         .remove(package_name);
@@ -245,6 +250,10 @@ impl ExtensionManager {
         let (templates, variables) = email_templates_builder.finish();
         *state.mail.templates.templates.write() = templates;
         *state.mail.templates.variables.write() = variables;
+
+        state
+            .settings
+            .set_index_html_variables(index_html_builder.finish());
 
         crate::permissions::USER_PERMISSIONS
             .write()

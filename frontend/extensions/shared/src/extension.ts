@@ -10,6 +10,23 @@ class ExtensionSkip {
   }
 }
 
+function parseIndexVariables(): Record<string, Record<string, unknown>> {
+  try {
+    return JSON.parse(document.getElementById('extension-variables')?.textContent || '{}');
+  } catch (err) {
+    console.error('Failed to parse extension index variables', err);
+    return {};
+  }
+}
+
+let indexVariables: Record<string, Record<string, unknown>> | null = null;
+
+function getIndexVariables(): Record<string, Record<string, unknown>> {
+  indexVariables ??= parseIndexVariables();
+
+  return indexVariables;
+}
+
 export class ExtensionContext {
   public readonly extensions: Extension[];
   public extensionRegistry: ExtensionRegistry = new ExtensionRegistry();
@@ -51,6 +68,11 @@ export class ExtensionContext {
     return null;
   }
 
+  // Reads a variable another extension added to index.html through its backend `initialize_index_html`
+  public getIndexVariable<T = unknown>(packageName: string, name: string): T | undefined {
+    return getIndexVariables()[packageName]?.[name] as T | undefined;
+  }
+
   public call(name: string, args: object): unknown {
     for (const extension of this.extensions) {
       const result = extension.processCall(this, name, args);
@@ -79,6 +101,11 @@ export class Extension {
   public cardPreviewComponent: React.FC | null = null;
   // This overrides the icon element shown in your extension row in the admin extensions page
   public cardIcon: React.ReactNode = null;
+
+  // Reads a variable your backend extension added to index.html through `initialize_index_html`
+  public getIndexVariable<T = unknown>(name: string): T | undefined {
+    return getIndexVariables()[this.packageName]?.[name] as T | undefined;
+  }
 
   // Your extension entrypoint, this runs when the page is loaded
   public initialize(ctx: ExtensionContext): void {
