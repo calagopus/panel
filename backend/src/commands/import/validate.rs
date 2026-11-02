@@ -3375,7 +3375,7 @@ mod tests {
     }
 
     fn valid_username(name: &str) -> bool {
-        (3..=15).contains(&name.chars().count())
+        (3..=48).contains(&name.chars().count())
             && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
     }
 
@@ -3498,13 +3498,16 @@ mod tests {
         source.users.push(user(1));
         source.users.push(user(2));
         source.users[0].username = "bad name!".into();
-        source.users[1].username = "abcdefghijklmnopqrstuvwxyz".into();
+        source.users[1].username = "abcdefghijklmnopqrstuvwxyz".repeat(2);
 
         let (plan, findings) = plan(&source, OnInvalid::Fix);
 
         assert_eq!(decision(&findings, "users", 1), Some(Decision::Fix));
         assert_eq!(plan.users[0].username, "bad_name_");
-        assert_eq!(plan.users[1].username, "abcdefghijklmno");
+        assert_eq!(
+            plan.users[1].username,
+            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
+        );
     }
 
     #[test]
@@ -3630,8 +3633,8 @@ mod tests {
     fn sanitize_username_produces_valid_names() {
         assert_eq!(sanitize_username("bad name!"), "bad_name_");
         assert_eq!(
-            sanitize_username("abcdefghijklmnopqrstuvwxyz"),
-            "abcdefghijklmno"
+            sanitize_username(&"abcdefghijklmnopqrstuvwxyz".repeat(2)),
+            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
         );
         let padded = sanitize_username("a");
         assert!(padded.starts_with('a'));
