@@ -97,7 +97,7 @@ mod get {
     pub async fn route(state: GetState, permissions: GetPermissionManager) -> ApiResponseResult {
         permissions.has_admin_permission("stats.read")?;
 
-        let mut sys = System::new_all();
+        let mut sys = System::new_all()?;
         sys.refresh_cpu_all();
 
         let used_bytes_process = match shared::utils::process_memory_usage() {
@@ -169,7 +169,7 @@ mod get {
                 idle_write_connections: state.database.write().num_idle(),
             },
             architecture: std::env::consts::ARCH,
-            kernel_version: System::kernel_long_version(),
+            kernel_version: System::kernel_long_version().unwrap_or_else(|_| "unknown".into()),
         })
         .ok()
     }

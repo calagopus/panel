@@ -192,7 +192,9 @@ impl TelemetryData {
                 database_version: state.database.version().await?,
                 cache_version: state.cache.version().await?,
                 architecture: std::env::consts::ARCH,
-                kernel_version: sysinfo::System::kernel_long_version().into(),
+                kernel_version: sysinfo::System::kernel_long_version()
+                    .unwrap_or_else(|_| "unknown".into())
+                    .into(),
             },
             resources: TelemetryDataResources {
                 users: TelemetryDataResourcesUsers {

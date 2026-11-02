@@ -15,7 +15,7 @@ exclude = ["backend-extensions/node_modules"]
 default-members = ["bins/base", "bins/all-in-one", "bins/heavy-supervisor"]
 package.rust-version = "1.99.0"
 package.license = "MIT"
-package.version = "1.2.8"
+package.version = "1.2.9"
 package.edition = "2024"
 
 [workspace.dependencies]
@@ -68,14 +68,12 @@ regex = "1.11.1"
 serde_regex = "1.1.0"
 url = { version = "2.5.8", features = ["serde"] }
 urlencoding = "2.1.3"
-# webauthn-rs = { version = "0.6.1-dev", git = "https://github.com/kanidm/webauthn-rs.git", branch = "6.0-dev-drop-openssl", features = ["danger-allow-state-serialisation"] }
-# ^ not fully stable yet
-webauthn-rs = { version = "0.5.0", features = ["danger-allow-state-serialisation", "conditional-ui"] }
-webauthn-rs-proto = "=0.5.5"
+webauthn-rs = { version = "0.6.0", features = ["danger-allow-state-serialisation", "conditional-ui"] }
+webauthn-rs-proto = "=0.6.2"
 sha2 = "0.11.0"
 hmac = "0.13.0"
 colored = "3.0.0"
-russh = "0.64.0"
+russh = "0.65.0"
 futures-util = "0.3.31"
 clap = { version = "4.5.37", features = ["derive", "string"] }
 aws-sdk-s3 = { version = "1.132.0", default-features = false, features = ["sigv4a", "http-1x", "default-https-client", "rt-tokio"] }
@@ -88,7 +86,7 @@ tempfile = "3.23.0"
 totp-rs = { version = "6.0.0", default-features = false, features = ["std", "gen_secret"] }
 compact_str = { version = "0.10.0", features = ["serde", "utoipa", "garde", "sqlx", "sqlx-postgres", "sqlx-mysql"] }
 nestify = "0.3.3"
-sysinfo = { version = "0.39.0", default-features = false, features = ["system", "disk"] }
+sysinfo = { version = "0.40.0", default-features = false, features = ["system", "disk"] }
 serde_with = "3.16.1"
 minijinja = { version = "3.0.2", features = ["json", "serde"] }
 dialoguer = "0.12.0"

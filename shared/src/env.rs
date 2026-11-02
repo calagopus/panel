@@ -8,7 +8,7 @@ use std::{
 };
 use tracing_subscriber::{
     Layer,
-    filter::{LevelFilter, Targets},
+    filter::{FilterExt, LevelFilter, Targets, filter_fn},
     fmt::writer::MakeWriterExt,
     layer::{Layered, SubscriberExt},
     util::SubscriberInitExt,
@@ -236,7 +236,23 @@ impl Env {
             .with(LevelFilter::DEBUG)
             .with(reload_layer)
             .with(fmt_layer)
-            .with(sentry_tracing::layer().enable_span_attributes())
+            .with(sentry_tracing::SpanLayer::new().with_filter(LevelFilter::INFO))
+            .with(
+                sentry_tracing::BreadcrumbLayer::new()
+                    .enable_span_attributes()
+                    .with_filter(filter_fn(|metadata| {
+                        metadata.is_span()
+                            || matches!(
+                                *metadata.level(),
+                                tracing::Level::WARN | tracing::Level::INFO
+                            )
+                    })),
+            )
+            .with(
+                sentry_tracing::ErrorLayer::new()
+                    .enable_span_attributes()
+                    .with_filter(LevelFilter::ERROR.or(filter_fn(|metadata| metadata.is_span()))),
+            )
             .try_init()
             .context("failed to install tracing subscriber")?;
 

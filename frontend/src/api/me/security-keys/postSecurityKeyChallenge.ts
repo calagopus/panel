@@ -1,4 +1,5 @@
 import { axiosInstance } from '@/api/axios.ts';
+import { arrayBufferToBase64Url } from '@/lib/serialization/transformers.ts';
 
 type SerializedCredentialResponse = {
   clientDataJSON?: string;
@@ -17,22 +18,13 @@ type SerializedCredential = {
 };
 
 export function prepareCredentialForTransport(credential: PublicKeyCredential): SerializedCredential {
-  const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-  };
-
   if (!credential || !credential.id || !credential.rawId || !credential.type || !credential.response) {
     throw new Error('Invalid credential object');
   }
 
   const serializedCredential: SerializedCredential = {
     id: credential.id,
-    rawId: arrayBufferToBase64(credential.rawId),
+    rawId: arrayBufferToBase64Url(credential.rawId),
     type: credential.type,
     response: {},
   };
@@ -45,23 +37,23 @@ export function prepareCredentialForTransport(credential: PublicKeyCredential): 
   };
 
   if (response.clientDataJSON) {
-    serializedCredential.response.clientDataJSON = arrayBufferToBase64(response.clientDataJSON);
+    serializedCredential.response.clientDataJSON = arrayBufferToBase64Url(response.clientDataJSON);
   }
 
   if (response.attestationObject) {
-    serializedCredential.response.attestationObject = arrayBufferToBase64(response.attestationObject);
+    serializedCredential.response.attestationObject = arrayBufferToBase64Url(response.attestationObject);
   }
 
   if (response.authenticatorData) {
-    serializedCredential.response.authenticatorData = arrayBufferToBase64(response.authenticatorData);
+    serializedCredential.response.authenticatorData = arrayBufferToBase64Url(response.authenticatorData);
   }
 
   if (response.signature) {
-    serializedCredential.response.signature = arrayBufferToBase64(response.signature);
+    serializedCredential.response.signature = arrayBufferToBase64Url(response.signature);
   }
 
   if (response.userHandle) {
-    serializedCredential.response.userHandle = arrayBufferToBase64(response.userHandle);
+    serializedCredential.response.userHandle = arrayBufferToBase64Url(response.userHandle);
   }
 
   if (credential.getClientExtensionResults) {

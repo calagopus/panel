@@ -79,7 +79,7 @@ cap-std = "4.0.0"
 semver = { workspace = true }
 hickory-resolver = "0.26.0"
 ouroboros = "0.18.5"
-gix = { version = "0.89.0", default-features = false, features = [
+gix = { version = "0.90.0", default-features = false, features = [
 	"blocking-http-transport-reqwest-rust-tls",
 	"worktree-mutation",
 	"sha1",
@@ -101,11 +101,7 @@ hex = { workspace = true }
 tower = "0.5.3"
 parking_lot = { workspace = true }
 ipnetwork = { version = "0.21.1", features = ["serde"] }
-openssl = { version = "0.10.80", features = [
-	"vendored",
-] } # temporary for webauthn-rs
 tokio-tungstenite = { workspace = true }
 arc-swap = "1.9.1"
 flate2 = "1.1.10"
 ed25519-dalek = { version = "3.0.0", features = ["pkcs8"] }
-

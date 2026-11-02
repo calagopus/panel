@@ -84,9 +84,9 @@ async fn handle_aio_wings(
                 }
             };
 
-            let mut system = sysinfo::System::new();
+            let mut system = sysinfo::System::new()?;
             system.refresh_memory();
-            let mut disks = sysinfo::Disks::new();
+            let mut disks = sysinfo::Disks::new()?;
             disks.refresh(true);
 
             let disk = disks

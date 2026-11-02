@@ -80,7 +80,7 @@ mod post {
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
-    use webauthn_rs::prelude::{DiscoverableAuthentication, DiscoverableKey, PublicKeyCredential};
+    use webauthn_rs::prelude::{DiscoverableAuthentication, PublicKeyCredential};
 
     #[derive(ToSchema, Deserialize)]
     pub struct Payload {
@@ -159,7 +159,7 @@ mod post {
             }
         };
 
-        let (user_uuid, _) =
+        let (user_uuid, cred_id) =
             match webauthn.identify_discoverable_authentication(&data.public_key_credential) {
                 Ok(identified) => identified,
                 Err(err) => {
@@ -183,25 +183,27 @@ mod post {
         .fetch_all(state.database.read())
         .await?;
 
-        let mut passkeys = Vec::new();
-        passkeys.reserve_exact(raw_passkeys.len());
+        let matched = raw_passkeys.into_iter().find_map(|raw_passkey| {
+            let passkey =
+                serde_json::from_value::<webauthn_rs::prelude::Passkey>(raw_passkey.passkey?)
+                    .ok()?;
 
-        for raw_passkey in raw_passkeys {
-            if let Some(passkey) = raw_passkey.passkey
-                && let Ok(passkey) =
-                    serde_json::from_value::<webauthn_rs::prelude::Passkey>(passkey)
-            {
-                passkeys.push((raw_passkey.uuid, passkey));
+            (passkey.cred_id().as_slice() == cred_id).then_some((raw_passkey.uuid, passkey))
+        });
+
+        let (security_key_uuid, mut passkey) = match matched {
+            Some(matched) => matched,
+            None => {
+                return ApiResponse::error("failed to finish security key authentication")
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
             }
-        }
+        };
 
-        let discoverable_keys: Vec<DiscoverableKey> =
-            passkeys.iter().map(|(_, pk)| pk.into()).collect();
-
-        let result = match webauthn.finish_discoverable_authentication(
+        let result = match webauthn.finish_discoverable_authentication_v2(
             &data.public_key_credential,
             authentication,
-            &discoverable_keys,
+            &passkey,
         ) {
             Ok(result) => result,
             Err(err) => {
@@ -216,22 +218,7 @@ mod post {
             }
         };
 
-        let mut matched = None;
-        for (uuid, passkey) in passkeys.iter_mut() {
-            if passkey.update_credential(&result).is_some() {
-                matched = Some((*uuid, passkey));
-                break;
-            }
-        }
-
-        let (security_key_uuid, passkey) = match matched {
-            Some(matched) => matched,
-            None => {
-                return ApiResponse::error("failed to finish security key authentication")
-                    .with_status(StatusCode::BAD_REQUEST)
-                    .ok();
-            }
-        };
+        passkey.update_credential(&result);
 
         let user = match User::by_uuid_optional(&state.database, user_uuid).await? {
             Some(user) => user,

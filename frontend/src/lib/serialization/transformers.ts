@@ -38,6 +38,16 @@ export const transformKeysToSnakeCase = (obj: object): object => {
   return obj;
 };
 
+export const arrayBufferToBase64Url = (buffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return window.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
 export const base64ToArrayBuffer = (base64String: string): ArrayBuffer => {
   let paddedBase64 = base64String;
   while (paddedBase64.length % 4 !== 0) {
