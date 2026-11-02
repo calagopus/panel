@@ -18,7 +18,10 @@ export function FileImagePreview({ src, name }: FileImagePreviewProps) {
   const smoothing = useFileManagerStore((state) => state.imageViewerSmoothing);
 
   return (
-    <div data-file-manager-image-preview className='flex h-full min-w-0 items-center justify-center overflow-hidden'>
+    <div
+      data-file-manager-image-preview
+      className='flex h-full w-full min-w-0 items-center justify-center overflow-hidden'
+    >
       <TransformWrapper minScale={0.5} centerOnInit>
         <TransformComponent wrapperClass='h-full! w-full! rounded-md'>
           <img
@@ -74,7 +77,7 @@ export function FileAudioPreview({ src }: FileAudioPreviewProps) {
     <div
       ref={rootRef}
       data-file-manager-audio-preview
-      className='flex h-full min-w-0 items-center justify-center overflow-auto p-4'
+      className='flex h-full w-full min-w-0 items-center justify-center overflow-auto p-4'
     >
       <Audio
         size='xl'
