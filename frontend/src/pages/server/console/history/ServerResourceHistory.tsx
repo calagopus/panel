@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import classNames from 'classnames';
-import { FC, memo, startTransition, useEffect, useMemo, useState } from 'react';
+import { FC, memo, startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import type { ResourceHistoryItem, ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -14,10 +14,11 @@ import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import ErrorState from '@/elements/feedback/ErrorState.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
+import Divider from '@/elements/layout/Divider.tsx';
 import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { mbToBytes } from '@/lib/format/size.ts';
-import { formatDateTime } from '@/lib/format/time.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   buildResourceHistoryRows,
@@ -83,6 +84,43 @@ function HistoryItems({
   );
 }
 
+function TimeframePicker({
+  label,
+  value,
+  maxDate,
+  onCommit,
+}: {
+  label: string;
+  value: Date;
+  maxDate: Date;
+  onCommit: (value: number) => void;
+}) {
+  const draft = useRef(value);
+
+  return (
+    <DateTimePicker
+      aria-label={label}
+      placeholder={label}
+      className='w-48'
+      defaultValue={value}
+      maxDate={maxDate}
+      onChange={(next) => {
+        if (next) draft.current = new Date(next);
+      }}
+      onDropdownClose={() => {
+        if (draft.current.getTime() !== value.getTime()) onCommit(draft.current.getTime());
+      }}
+    />
+  );
+}
+
+function parseStart(value: string | null): number | null {
+  if (!value) return null;
+
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function resolveItems(
   stock: ResourceHistoryItem[],
   added: ResourceHistoryItem[],
@@ -119,7 +157,7 @@ export default function ServerResourceHistory() {
   const registry = window.extensionContext.extensionRegistry.pages.server.console.history;
   const [searchParams, setSearchParams] = useSearchParams();
   const [now, setNow] = useState(() => Date.now());
-  const [requested, setRequested] = useState<{ range: string; offset: number } | null>(null);
+  const [requested, setRequested] = useState<{ range: string; start: number | null } | null>(null);
   const queryClient = useQueryClient();
 
   const ranges = getDefaultResourceHistoryRanges();
@@ -131,15 +169,15 @@ export default function ServerResourceHistory() {
     ranges.find((entry) => entry.id === searchParams.get('range')) ??
     ranges.find((entry) => entry.id === DEFAULT_RANGE) ??
     ranges[0];
-  const offset = Math.max(Number.parseInt(searchParams.get('offset') ?? '', 10) || 0, 0);
-  const timeframe = getResourceHistoryTimeframe(range, offset, now);
+  const start = parseStart(searchParams.get('start'));
+  const timeframe = getResourceHistoryTimeframe(range, start, now);
 
   useEffect(() => {
-    if (offset !== 0) return;
+    if (!timeframe.live) return;
 
     const interval = setInterval(() => setNow(Date.now()), Math.max(timeframe.pointWidth, MIN_REFRESH));
     return () => clearInterval(interval);
-  }, [offset, timeframe.pointWidth]);
+  }, [timeframe.live, timeframe.pointWidth]);
 
   const historyQuery = (frame: ResourceHistoryTimeframe) => ({
     queryKey: queryKeys.server(server.uuid).resources.history(frame.start.getTime(), frame.end.getTime(), frame.points),
@@ -157,25 +195,36 @@ export default function ServerResourceHistory() {
   });
   const history = data?.history;
   const shown = data?.timeframe ?? timeframe;
-  const selected = requested ?? { range: range.id, offset };
-  const pending = !!data && (shown.range.id !== selected.range || shown.offset !== selected.offset);
+  const selected = requested ?? { range: range.id, start: timeframe.live ? null : timeframe.start.getTime() };
+  const selectedFrame = getResourceHistoryTimeframe(
+    ranges.find((entry) => entry.id === selected.range) ?? range,
+    selected.start,
+    now,
+  );
+  const selectedDuration = selectedFrame.end.getTime() - selectedFrame.start.getTime();
+  const pending =
+    !!data && (shown.range.id !== selected.range || (shown.live ? null : shown.start.getTime()) !== selected.start);
 
-  useEffect(() => setRequested(null), [range.id, offset]);
+  useEffect(() => setRequested(null), [range.id, start]);
 
-  const selectTimeframe = (rangeId: string, nextOffset: number) => {
-    setRequested({ range: rangeId, offset: nextOffset });
+  const selectTimeframe = (rangeId: string, nextStart: number | null) => {
     const at = Date.now();
     const nextRange = ranges.find((entry) => entry.id === rangeId) ?? range;
-    queryClient.prefetchQuery(historyQuery(getResourceHistoryTimeframe(nextRange, nextOffset, at)));
+    const frame = getResourceHistoryTimeframe(nextRange, nextStart, at);
+    const frameStart = frame.live ? null : frame.start.getTime();
+
+    setRequested({ range: rangeId, start: frameStart });
+    queryClient.prefetchQuery(historyQuery(frame));
 
     startTransition(() => setNow(at));
     setSearchParams(
       (params) => {
         params.set('range', rangeId);
-        if (nextOffset > 0) {
-          params.set('offset', String(nextOffset));
+        params.delete('offset');
+        if (frameStart !== null) {
+          params.set('start', new Date(frameStart).toISOString().replace(/\.\d{3}Z$/, 'Z'));
         } else {
-          params.delete('offset');
+          params.delete('start');
         }
         return params;
       },
@@ -211,7 +260,13 @@ export default function ServerResourceHistory() {
           <div className='mb-4 flex flex-wrap items-center gap-2'>
             <SegmentedControl
               value={selected.range}
-              onChange={(value) => selectTimeframe(value, 0)}
+              onChange={(value) => {
+                const nextRange = ranges.find((entry) => entry.id === value);
+                selectTimeframe(
+                  value,
+                  selectedFrame.live || !nextRange ? null : selectedFrame.end.getTime() - nextRange.duration,
+                );
+              }}
               data={ranges.map((entry) => ({ value: entry.id, label: entry.label() }))}
             />
             <div className='flex items-center gap-1'>
@@ -219,7 +274,7 @@ export default function ServerResourceHistory() {
                 <ActionIcon
                   variant='default'
                   size='lg'
-                  onClick={() => selectTimeframe(selected.range, selected.offset + 1)}
+                  onClick={() => selectTimeframe(selected.range, selectedFrame.start.getTime() - selectedDuration)}
                 >
                   <FontAwesomeIcon icon={faChevronLeft} />
                 </ActionIcon>
@@ -228,8 +283,8 @@ export default function ServerResourceHistory() {
                 <ActionIcon
                   variant='default'
                   size='lg'
-                  disabled={selected.offset === 0}
-                  onClick={() => selectTimeframe(selected.range, selected.offset - 1)}
+                  disabled={selectedFrame.live}
+                  onClick={() => selectTimeframe(selected.range, selectedFrame.start.getTime() + selectedDuration)}
                 >
                   <FontAwesomeIcon icon={faChevronRight} />
                 </ActionIcon>
@@ -238,19 +293,33 @@ export default function ServerResourceHistory() {
                 <ActionIcon
                   variant='default'
                   size='lg'
-                  disabled={selected.offset === 0}
-                  onClick={() => selectTimeframe(selected.range, 0)}
+                  disabled={selectedFrame.live}
+                  onClick={() => selectTimeframe(selected.range, null)}
                 >
                   <FontAwesomeIcon icon={faForwardFast} />
                 </ActionIcon>
               </Tooltip>
             </div>
-            <span className='text-sm text-(--mantine-color-dimmed) tabular-nums'>
-              {t('pages.server.console.history.timeframe', {
-                start: formatDateTime(timeframe.start),
-                end: formatDateTime(timeframe.end),
-              })}
-            </span>
+            <Divider orientation='vertical' className='hidden sm:block' />
+            <div className='flex flex-wrap items-center gap-2'>
+              <TimeframePicker
+                key={`start-${selectedFrame.start.getTime()}`}
+                label={t('pages.server.console.history.timeframeStart', {})}
+                value={selectedFrame.start}
+                maxDate={new Date(now)}
+                onCommit={(value) => selectTimeframe(selected.range, value)}
+              />
+              <span className='text-sm text-(--mantine-color-dimmed)'>
+                {t('pages.server.console.history.timeframeTo', {})}
+              </span>
+              <TimeframePicker
+                key={`end-${selectedFrame.end.getTime()}`}
+                label={t('pages.server.console.history.timeframeEnd', {})}
+                value={new Date(Math.min(selectedFrame.end.getTime(), now))}
+                maxDate={new Date(now)}
+                onCommit={(value) => selectTimeframe(selected.range, value - selectedDuration)}
+              />
+            </div>
             <div className='ml-auto flex items-center gap-2'>
               <ExtensionSlot
                 components={registry.headerComponents.prependedComponents}

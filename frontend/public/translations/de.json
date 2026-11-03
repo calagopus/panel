@@ -5812,7 +5812,9 @@
             "title": "Ressourcenverlauf",
             "loading": "Wird geladen...",
             "noData": "In diesem Zeitraum wurden keine Daten aufgezeichnet",
-            "timeframe": "{start} bis {end}",
+            "timeframeStart": "Beginn",
+            "timeframeEnd": "Ende",
+            "timeframeTo": "bis",
             "uptime": "{percent} gelaufen",
             "range": {
               "hours": "{hours} Std.",

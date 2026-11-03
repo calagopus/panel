@@ -17,7 +17,7 @@ export interface ResourceHistoryRange {
 
 export interface ResourceHistoryTimeframe {
   range: ResourceHistoryRange;
-  offset: number;
+  live: boolean;
   start: Date;
   end: Date;
   points: number;
@@ -97,21 +97,25 @@ export function getDefaultResourceHistoryRanges(): ResourceHistoryRange[] {
 
 /**
  * Splits `range` into whole-second points and anchors it to the point grid, so the window (and its
- * query key) only moves once a full point has passed. `offset` shifts the window back by whole ranges.
+ * query key) only moves once a full point has passed. `start` pins the window to a past point in time,
+ * `null` (or a start whose window would reach the present) follows the current time.
  */
 export function getResourceHistoryTimeframe(
   range: ResourceHistoryRange,
-  offset: number,
+  start: number | null,
   now: number,
 ): ResourceHistoryTimeframe {
   const points = Math.min(Math.max(Math.round(range.points), 1), RESOURCE_HISTORY_MAX_POINTS);
   const pointWidth = Math.max(Math.round(range.duration / points / 1000), 1) * 1000;
   const duration = pointWidth * points;
-  const end = Math.ceil(now / pointWidth) * pointWidth - offset * duration;
+  const liveEnd = Math.ceil(now / pointWidth) * pointWidth;
+  const snappedStart = start === null ? null : Math.floor(start / pointWidth) * pointWidth;
+  const live = snappedStart === null || snappedStart + duration >= liveEnd;
+  const end = live ? liveEnd : snappedStart + duration;
 
   return {
     range,
-    offset,
+    live,
     start: new Date(end - duration),
     end: new Date(end),
     points,

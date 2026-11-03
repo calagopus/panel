@@ -5843,7 +5843,9 @@ const baseTranslations = defineTranslations({
             title: 'Resource History',
             loading: 'Loading...',
             noData: 'No data recorded in this range',
-            timeframe: '{start} to {end}',
+            timeframeStart: 'Start',
+            timeframeEnd: 'End',
+            timeframeTo: 'to',
             uptime: '{percent} running',
             range: {
               hours: '{hours}h',
