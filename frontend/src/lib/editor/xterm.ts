@@ -13,6 +13,10 @@ export const commandSnippetFilter: OptionsFilter = ({ options, search }) => {
   });
 };
 
+export function fillBlockElements(line: string): string {
+  return line.replace(/█+/g, (run) => `\x1b[7m${' '.repeat(run.length)}\x1b[27m`);
+}
+
 export function getCellHeight(term: XTerm, fallback: number): number {
   const core = (
     term as unknown as {

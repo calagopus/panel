@@ -16,6 +16,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import { fillBlockElements } from '@/lib/editor/xterm.ts';
 import { redactConsoleLine } from '@/lib/network/redact.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useUserSetting } from '@/lib/userSettings.ts';
@@ -182,7 +183,7 @@ export default function Terminal({ popout = false }: { popout?: boolean }) {
 
   const addLine = useCallback(
     (text: string, prelude = false) => {
-      let processed = text.replaceAll('\x1b[?25h', '').replaceAll('\x1b[?25l', '');
+      let processed = fillBlockElements(text.replaceAll('\x1b[?25h', '').replaceAll('\x1b[?25l', ''));
 
       if (redactAddressesRef.current) {
         processed = redactConsoleLine(processed);
