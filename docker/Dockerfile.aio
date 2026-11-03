@@ -1,4 +1,4 @@
-FROM ghcr.io/calagopus/kopia:latest AS kopia
+FROM calagopus/kopia:latest AS kopia
 FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates coreutils curl btrfs-progs xfsprogs-extra zfs restic nftables conntrack-tools && \

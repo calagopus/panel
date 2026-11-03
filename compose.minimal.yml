@@ -1,7 +1,7 @@
 services:
   web:
-    # image: ghcr.io/calagopus/panel:nightly # if you want to live on the edge
-    image: ghcr.io/calagopus/panel:latest
+    # image: calagopus/panel:nightly # if you want to live on the edge
+    image: calagopus/panel:latest
     restart: unless-stopped
     environment:
       - TZ=Europe/Berlin
@@ -30,7 +30,7 @@ services:
       - db
 
   db:
-    image: ghcr.io/calagopus/pgautoupgrade:18-alpine
+    image: calagopus/pgautoupgrade:18-alpine
     restart: unless-stopped
     environment:
       - TZ=Europe/Berlin

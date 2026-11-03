@@ -2,11 +2,11 @@ ARG WINGS_SOURCE=release
 
 FROM node:24-slim AS node_source
 
-FROM ghcr.io/calagopus/wings:latest AS wings-release-image
+FROM calagopus/wings:latest AS wings-release-image
 FROM alpine AS wings-release
 COPY --from=wings-release-image /usr/bin/calagopus-wings /wings/calagopus-wings
 
-FROM ghcr.io/calagopus/wings:nightly AS wings-nightly-image
+FROM calagopus/wings:nightly AS wings-nightly-image
 FROM alpine AS wings-nightly
 COPY --from=wings-nightly-image /usr/bin/calagopus-wings /wings/calagopus-wings
 
@@ -21,7 +21,7 @@ WORKDIR /app/repo
 RUN cargo chef prepare --recipe-path recipe.json
 
 # ---
-FROM ghcr.io/calagopus/kopia:latest AS kopia
+FROM calagopus/kopia:latest AS kopia
 FROM rust:slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates coreutils curl btrfs-progs xfsprogs restic nftables conntrack && \

@@ -1,7 +1,7 @@
 services:
   web:
-    # image: ghcr.io/calagopus/panel:nightly-heavy-aio # if you want to live on the edge
-    image: ghcr.io/calagopus/panel:heavy-aio
+    # image: calagopus/panel:nightly-heavy-aio # if you want to live on the edge
+    image: calagopus/panel:heavy-aio
     restart: unless-stopped
     stop_grace_period: 40s # the panel's shutdown handlers need longer than docker's 10s default
     environment:
@@ -59,7 +59,7 @@ services:
       - cache
 
   db:
-    image: ghcr.io/calagopus/pgautoupgrade:18-alpine
+    image: calagopus/pgautoupgrade:18-alpine
     restart: unless-stopped
     environment:
       - TZ=Europe/Berlin
@@ -71,7 +71,7 @@ services:
       - ./postgres:/data
 
   cache:
-    image: ghcr.io/calagopus/valkey:latest
+    image: calagopus/valkey:latest
     restart: unless-stopped
     command: --protected-mode no --save 60 1
     environment:
