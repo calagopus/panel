@@ -21,7 +21,7 @@ WORKDIR /app/repo
 RUN cargo chef prepare --recipe-path recipe.json
 
 # ---
-FROM calagopus/kopia:latest AS kopia
+FROM ghcr.io/calagopus/kopia:latest AS kopia
 FROM rust:slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates coreutils curl btrfs-progs xfsprogs restic nftables conntrack && \
