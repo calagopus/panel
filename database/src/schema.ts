@@ -795,6 +795,32 @@ export const nodeAllocationsTable = pgTable(
   ],
 );
 
+export const nodePermissionInvalidationsTable = pgTable(
+  'node_permission_invalidations',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    node_uuid: uuid()
+      .references(() => nodesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    as_of: bigint({ mode: 'number' }).notNull(),
+    users: uuid().array().default([]).notNull(),
+    servers: uuid().array().default([]).notNull(),
+    all_servers: boolean().default(false).notNull(),
+    revoke_users: uuid().array().default([]).notNull(),
+    revoke_credentials: uuid().array().default([]).notNull(),
+    attempts: integer().default(0).notNull(),
+    next_attempt: timestamp().defaultNow().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('node_permission_invalidations_node_uuid_idx').on(cols.node_uuid),
+    index('node_permission_invalidations_next_attempt_idx').on(cols.next_attempt),
+    uniqueIndex('node_permission_invalidations_node_uuid_pending_idx')
+      .on(cols.node_uuid)
+      .where(sql`cardinality(${cols.revoke_users}) = 0 AND cardinality(${cols.revoke_credentials}) = 0`),
+  ],
+);
+
 export const eggRepositoriesTable = pgTable(
   'egg_repositories',
   {

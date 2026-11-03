@@ -1,5 +1,5 @@
 use serde::Serialize;
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
@@ -16,12 +16,15 @@ fn main() {
     }
     std::fs::create_dir_all(&out_dir).expect("Failed to create migrations");
 
-    for entry in std::fs::read_dir(&migrations_dir).expect("Failed to read database/migrations") {
-        let entry = entry.expect("Failed to read migration entry");
-        if !entry.path().is_dir() {
-            continue;
-        }
+    let mut entries: Vec<_> = std::fs::read_dir(&migrations_dir)
+        .expect("Failed to read database/migrations")
+        .map(|entry| entry.expect("Failed to read migration entry"))
+        .filter(|entry| entry.path().is_dir())
+        .collect();
+    entries.sort_by_key(|entry| entry.file_name());
 
+    let mut summaries: HashMap<String, Summary> = HashMap::new();
+    for entry in entries {
         let destination = out_dir.join(entry.file_name());
         std::fs::create_dir_all(&destination).expect("Failed to create migration directory");
         std::fs::copy(
@@ -36,18 +39,42 @@ fn main() {
         )
         .unwrap_or_else(|e| panic!("Failed to parse {}: {e}", entry.path().display()));
 
-        let mut summary = Summary::default();
-        for ddl_entry in snapshot["ddl"].as_array().into_iter().flatten() {
-            match ddl_entry["entityType"].as_str() {
-                Some("tables") => summary.tables += 1,
-                Some("sequences") => summary.sequences += 1,
-                Some("enums") => summary.enums += 1,
-                Some("columns") => summary.columns += 1,
-                Some("indexes") => summary.indexes += 1,
-                Some("fks") => summary.foreign_keys += 1,
-                Some("pks") => summary.primary_keys += 1,
+        let ddl = snapshot["ddl"].as_array().filter(|ddl| !ddl.is_empty());
+        let mut summary = match ddl {
+            Some(ddl) => {
+                let mut summary = Summary::default();
+                for ddl_entry in ddl {
+                    summary.apply(ddl_entry["entityType"].as_str(), true);
+                }
+
+                summary
+            }
+            None => match snapshot["prevIds"][0].as_str() {
+                Some(prev_id) if prev_id != "00000000-0000-0000-0000-000000000000" => {
+                    summaries.get(prev_id).copied().unwrap_or_else(|| {
+                        panic!(
+                            "{} follows unknown snapshot {prev_id}",
+                            entry.path().display()
+                        )
+                    })
+                }
+                _ => Summary::default(),
+            },
+        };
+
+        for delta in snapshot["deltas"].as_array().into_iter().flatten() {
+            match delta["op"].as_str() {
+                Some("create") => summary.apply(delta["row"]["entityType"].as_str(), true),
+                Some("drop") => summary.apply(
+                    delta["key"].as_str().and_then(|key| key.split('\0').next()),
+                    false,
+                ),
                 _ => {}
             }
+        }
+
+        if let Some(id) = snapshot["id"].as_str() {
+            summaries.insert(id.to_string(), summary);
         }
 
         std::fs::write(
@@ -62,7 +89,7 @@ fn main() {
     }
 }
 
-#[derive(Default, Serialize)]
+#[derive(Default, Clone, Copy, Serialize)]
 struct Summary {
     tables: usize,
     sequences: usize,
@@ -71,4 +98,25 @@ struct Summary {
     indexes: usize,
     foreign_keys: usize,
     primary_keys: usize,
+}
+
+impl Summary {
+    fn apply(&mut self, entity_type: Option<&str>, created: bool) {
+        let count = match entity_type {
+            Some("tables") => &mut self.tables,
+            Some("sequences") => &mut self.sequences,
+            Some("enums") => &mut self.enums,
+            Some("columns") => &mut self.columns,
+            Some("indexes") => &mut self.indexes,
+            Some("fks") => &mut self.foreign_keys,
+            Some("pks") => &mut self.primary_keys,
+            _ => return,
+        };
+
+        *count = if created {
+            *count + 1
+        } else {
+            count.saturating_sub(1)
+        };
+    }
 }

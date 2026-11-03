@@ -21,6 +21,19 @@ mod post {
         (status = OK, body = inline(Response)),
     ))]
     pub async fn route(state: GetState, node: GetNode) -> ApiResponseResult {
+        tokio::spawn({
+            let state = state.clone();
+            let node_uuid = node.uuid;
+
+            async move {
+                if let Err(err) =
+                    Node::flush_permission_invalidations(&state.database, node_uuid).await
+                {
+                    tracing::error!(node = %node_uuid, "failed to flush permissions invalidations: {:?}", err);
+                }
+            }
+        });
+
         let (reset_servers, backups, server_transfers) = tokio::try_join!(
             sqlx::query!(
                 "UPDATE servers

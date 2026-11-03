@@ -552,6 +552,17 @@ pub async fn define_background_tasks(
         .await;
     background_task_builder
         .add_cron_task(
+            "flush_permission_invalidations",
+            croner::Cron::from_str("*/10 * * * * *").unwrap(),
+            async |state| {
+                Node::flush_due_permission_invalidations(&state.database).await?;
+
+                Ok(())
+            },
+        )
+        .await;
+    background_task_builder
+        .add_cron_task(
             "prune_backup_groups",
             croner::Cron::from_str("0 0 * * * *").unwrap(),
             async |state| {

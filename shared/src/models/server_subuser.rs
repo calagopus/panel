@@ -106,16 +106,16 @@ impl ServerSubuser {
         }
         .await;
 
+        let invalidation = super::node::PermissionsInvalidation {
+            users: vec![self.user.uuid],
+            ..Default::default()
+        };
+
         match node {
-            Ok(node) => node.invalidate_permissions(
-                database,
-                super::node::PermissionsInvalidation {
-                    users: vec![self.user.uuid],
-                    ..Default::default()
-                },
-            ),
+            Ok(node) => node.invalidate_permissions(database, invalidation),
             Err(err) => {
-                tracing::error!(server = %self.server.uuid, "failed to invalidate permissions in wings: {:?}", err);
+                tracing::error!(server = %self.server.uuid, "failed to resolve node to invalidate permissions, invalidating everywhere: {:?}", err);
+                super::node::Node::invalidate_permissions_everywhere(database, invalidation);
             }
         }
     }

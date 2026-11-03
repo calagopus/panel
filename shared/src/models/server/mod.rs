@@ -2807,16 +2807,19 @@ impl UpdatableModel for Server {
         super::invalidate_cache_keys(&state.database, &self.cache_invalidation_keys()).await;
 
         if let Some(previous_owner) = previous_owner {
+            let invalidation = super::node::PermissionsInvalidation {
+                users: vec![previous_owner, self.owner.uuid],
+                ..Default::default()
+            };
+
             match self.node.fetch_cached(&state.database).await {
-                Ok(node) => node.invalidate_permissions(
-                    &state.database,
-                    super::node::PermissionsInvalidation {
-                        users: vec![previous_owner, self.owner.uuid],
-                        ..Default::default()
-                    },
-                ),
+                Ok(node) => node.invalidate_permissions(&state.database, invalidation),
                 Err(err) => {
-                    tracing::error!(server = %self.uuid, "failed to invalidate permissions in wings: {:?}", err);
+                    tracing::error!(server = %self.uuid, "failed to resolve node to invalidate permissions, invalidating everywhere: {:?}", err);
+                    super::node::Node::invalidate_permissions_everywhere(
+                        &state.database,
+                        invalidation,
+                    );
                 }
             }
         }

@@ -7,7 +7,6 @@ use crate::{
     prelude::*,
 };
 use compact_str::ToCompactString;
-use futures_util::StreamExt;
 use garde::Validate;
 use rand::{RngExt, distr::SampleString};
 use serde::{Deserialize, Serialize};
@@ -21,9 +20,11 @@ use utoipa::ToSchema;
 mod allowed_sources;
 mod enrollment;
 mod events;
+mod permissions_invalidation;
 pub use allowed_sources::NodeAllowedSources;
 pub use enrollment::NodeEnrollment;
 pub use events::NodeEvent;
+pub use permissions_invalidation::PermissionsInvalidation;
 
 pub type GetNode = crate::extract::ConsumingExtension<Node>;
 
@@ -69,28 +70,6 @@ impl NodeDeploymentBlocker {
                 "no single node in the selected location(s) has enough unallocated memory and disk at the same time"
             }
         }
-    }
-}
-
-/// A change to permissions that wings may hold, see [`Node::invalidate_permissions`].
-#[derive(Default)]
-pub struct PermissionsInvalidation {
-    /// Users whose permissions changed, refetched wherever wings holds them.
-    pub users: Vec<uuid::Uuid>,
-    /// Servers on which the permissions of every user changed.
-    pub servers: Option<wings_api::ServerSelector>,
-    /// Users whose sessions and tokens end, for changes to how they authenticate.
-    pub revoke_users: Vec<uuid::Uuid>,
-    /// API keys whose tokens end.
-    pub revoke_credentials: Vec<uuid::Uuid>,
-}
-
-impl PermissionsInvalidation {
-    pub fn is_empty(&self) -> bool {
-        self.users.is_empty()
-            && self.servers.is_none()
-            && self.revoke_users.is_empty()
-            && self.revoke_credentials.is_empty()
     }
 }
 
@@ -816,133 +795,6 @@ impl Node {
             upgradable: true,
             source: crate::updates::UpgradeStatusSource::Daemon,
         })
-    }
-
-    /// Tells wings that permissions changed: live sessions continue with their new
-    /// permissions and only those that lost access end. Must run after the change is
-    /// committed. Nodes that predate invalidation end the affected users' sessions instead.
-    /// Runs in the background, failures are only logged.
-    pub fn invalidate_permissions(
-        &self,
-        database: &Arc<crate::database::Database>,
-        invalidation: PermissionsInvalidation,
-    ) {
-        if invalidation.is_empty() {
-            return;
-        }
-
-        let as_of = chrono::Utc::now().timestamp_millis();
-        let node = self.clone();
-        let database = database.clone();
-
-        tokio::spawn(async move {
-            node.invalidate_permissions_as_of(&database, &invalidation, as_of)
-                .await;
-        });
-    }
-
-    /// [`Self::invalidate_permissions`] on every node.
-    pub fn invalidate_permissions_everywhere(
-        database: &Arc<crate::database::Database>,
-        invalidation: PermissionsInvalidation,
-    ) {
-        if invalidation.is_empty() {
-            return;
-        }
-
-        let as_of = chrono::Utc::now().timestamp_millis();
-        let database = database.clone();
-
-        tokio::spawn(async move {
-            let mut nodes = Vec::new();
-            let mut node_page = 1;
-            loop {
-                match Self::all_with_pagination(&database, node_page, 50, None).await {
-                    Ok(page) if page.data.is_empty() => break,
-                    Ok(page) => nodes.extend(page.data),
-                    Err(err) => {
-                        tracing::error!(
-                            "failed to list nodes to invalidate permissions: {:?}",
-                            err
-                        );
-                        break;
-                    }
-                }
-
-                node_page += 1;
-            }
-
-            let mut futures = Vec::with_capacity(nodes.len());
-            for node in &nodes {
-                futures.push(node.invalidate_permissions_as_of(&database, &invalidation, as_of));
-            }
-
-            let mut results_stream = futures_util::stream::iter(futures).buffer_unordered(10);
-            while results_stream.next().await.is_some() {}
-        });
-    }
-
-    async fn invalidate_permissions_as_of(
-        &self,
-        database: &crate::database::Database,
-        invalidation: &PermissionsInvalidation,
-        as_of: i64,
-    ) {
-        const PERMISSIONS_INVALIDATE_TIMEOUT: std::time::Duration =
-            std::time::Duration::from_secs(5);
-
-        let result = async {
-            let api_client = self.api_client(database).await?;
-
-            let response = tokio::time::timeout(
-                PERMISSIONS_INVALIDATE_TIMEOUT,
-                api_client.post_permissions_invalidate(
-                    &wings_api::permissions_invalidate::post::RequestBody {
-                        as_of,
-                        revoke_credentials: invalidation.revoke_credentials.clone(),
-                        revoke_users: invalidation.revoke_users.clone(),
-                        servers: invalidation.servers.clone(),
-                        users: invalidation.users.clone(),
-                    },
-                ),
-            )
-            .await?;
-
-            match response {
-                Ok(_) => Ok(()),
-                Err(wings_api::client::ApiHttpError::Http(reqwest::StatusCode::NOT_FOUND, _)) => {
-                    for &user in invalidation.users.iter().chain(&invalidation.revoke_users) {
-                        let deauthorized = async {
-                            tokio::time::timeout(
-                                PERMISSIONS_INVALIDATE_TIMEOUT,
-                                api_client.post_deauthorize_user(
-                                    &wings_api::deauthorize_user::post::RequestBody {
-                                        servers: Vec::new(),
-                                        user,
-                                    },
-                                ),
-                            )
-                            .await??;
-
-                            Ok::<_, anyhow::Error>(())
-                        }
-                        .await;
-
-                        if let Err(err) = deauthorized {
-                            tracing::error!(node = %self.uuid, user = %user, "failed to deauthorize user in wings: {:?}", err);
-                        }
-                    }
-
-                    Ok(())
-                }
-                Err(err) => Err(anyhow::Error::from(err)),
-            }
-        }
-        .await;
-
-        if let Err(err) = result {
-            tracing::error!(node = %self.uuid, "failed to invalidate permissions in wings: {:?}", err);
-        }
     }
 
     /// Whether this node will enforce firewall rules, `None` when its configuration could not

@@ -6,9 +6,9 @@ use std::{io::Read, path::Path};
 
 pub mod commands;
 
-#[derive(Debug, Clone, Deserialize)]
-#[serde(tag = "entityType", rename_all = "camelCase")]
-pub enum DDLEntry {
+#[derive(Debug, Clone, Copy, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DDLEntity {
     Tables,
     Sequences,
     Enums,
@@ -17,6 +17,38 @@ pub enum DDLEntry {
     Indexes,
     Fks,
     Pks,
+    #[serde(other)]
+    Other,
+}
+
+impl DDLEntity {
+    fn from_key(key: &str) -> Self {
+        let entity_type = key.split('\0').next().unwrap_or_default();
+
+        Self::deserialize(
+            serde::de::value::StrDeserializer::<serde::de::value::Error>::new(entity_type),
+        )
+        .unwrap_or(Self::Other)
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct DDLEntry {
+    #[serde(rename = "entityType")]
+    entity_type: DDLEntity,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "op", rename_all = "camelCase")]
+pub enum DDLDelta {
+    Create {
+        row: DDLEntry,
+    },
+    Drop {
+        key: String,
+    },
+    #[serde(other)]
+    Other,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
@@ -30,37 +62,103 @@ pub struct MigrationSnapshotSummary {
     pub primary_keys: usize,
 }
 
-/// Either a full drizzle snapshot (`ddl`) read from disk, or the reduced form
-/// (`summary`) that `build.rs` embeds.
+impl MigrationSnapshotSummary {
+    fn apply(&mut self, entity: DDLEntity, created: bool) {
+        let count = match entity {
+            DDLEntity::Tables => &mut self.tables,
+            DDLEntity::Sequences => &mut self.sequences,
+            DDLEntity::Enums => &mut self.enums,
+            DDLEntity::Columns => &mut self.columns,
+            DDLEntity::Indexes => &mut self.indexes,
+            DDLEntity::Fks => &mut self.foreign_keys,
+            DDLEntity::Pks => &mut self.primary_keys,
+            DDLEntity::Checks | DDLEntity::Other => return,
+        };
+
+        *count = if created {
+            *count + 1
+        } else {
+            count.saturating_sub(1)
+        };
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct MigrationSnapshot {
     pub id: uuid::Uuid,
+    #[serde(default, rename = "prevIds")]
+    prev_ids: Vec<uuid::Uuid>,
     #[serde(default)]
     ddl: Vec<DDLEntry>,
+    #[serde(default)]
+    deltas: Vec<DDLDelta>,
     #[serde(default)]
     summary: Option<MigrationSnapshotSummary>,
 }
 
 impl MigrationSnapshot {
     pub fn summary(&self) -> MigrationSnapshotSummary {
-        self.summary.unwrap_or_else(|| {
+        self.summary.unwrap_or_else(|| self.summary_from(None))
+    }
+
+    fn summary_from(&self, previous: Option<MigrationSnapshotSummary>) -> MigrationSnapshotSummary {
+        let mut summary = if self.ddl.is_empty() {
+            previous.unwrap_or_default()
+        } else {
             let mut summary = MigrationSnapshotSummary::default();
             for entry in &self.ddl {
-                match entry {
-                    DDLEntry::Tables => summary.tables += 1,
-                    DDLEntry::Sequences => summary.sequences += 1,
-                    DDLEntry::Enums => summary.enums += 1,
-                    DDLEntry::Columns => summary.columns += 1,
-                    DDLEntry::Indexes => summary.indexes += 1,
-                    DDLEntry::Fks => summary.foreign_keys += 1,
-                    DDLEntry::Pks => summary.primary_keys += 1,
-                    DDLEntry::Checks => {}
-                }
+                summary.apply(entry.entity_type, true);
             }
 
             summary
-        })
+        };
+
+        for delta in &self.deltas {
+            match delta {
+                DDLDelta::Create { row } => summary.apply(row.entity_type, true),
+                DDLDelta::Drop { key } => summary.apply(DDLEntity::from_key(key), false),
+                DDLDelta::Other => {}
+            }
+        }
+
+        summary
     }
+}
+
+pub fn resolve_snapshot_summaries<'a>(
+    snapshots: impl IntoIterator<Item = &'a mut MigrationSnapshot>,
+) -> Result<(), std::io::Error> {
+    let mut resolved = std::collections::HashMap::new();
+
+    for snapshot in snapshots {
+        let summary = match snapshot.summary {
+            Some(summary) => summary,
+            None if !snapshot.ddl.is_empty() => snapshot.summary_from(None),
+            None => {
+                let previous = match snapshot.prev_ids.first() {
+                    Some(prev_id) if !prev_id.is_nil() => {
+                        Some(*resolved.get(prev_id).ok_or_else(|| {
+                            std::io::Error::new(
+                                std::io::ErrorKind::InvalidData,
+                                format!(
+                                    "snapshot {} follows unknown snapshot {prev_id}",
+                                    snapshot.id
+                                ),
+                            )
+                        })?)
+                    }
+                    _ => None,
+                };
+
+                snapshot.summary_from(previous)
+            }
+        };
+
+        snapshot.summary = Some(summary);
+        resolved.insert(snapshot.id, summary);
+    }
+
+    Ok(())
 }
 
 pub struct AppliedMigration {
@@ -299,6 +397,7 @@ pub async fn collect_migrations(path: impl AsRef<Path>) -> Result<Vec<Migration>
     }
 
     migrations.sort_by_key(|m| m.date);
+    resolve_snapshot_summaries(migrations.iter_mut().map(|m| &mut m.snapshot))?;
 
     Ok(migrations)
 }
@@ -514,9 +613,23 @@ mod tests {
     #[test]
     fn embedded_snapshots_match_full_drizzle_snapshots() {
         let migrations_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../database/migrations");
-        let mut checked = 0;
 
-        for entry in MIGRATIONS.dirs() {
+        let mut dirs: Vec<_> = MIGRATIONS.dirs().collect();
+        dirs.sort_by_key(|entry| entry.path());
+
+        let mut full: Vec<MigrationSnapshot> = dirs
+            .iter()
+            .map(|entry| {
+                serde_json::from_slice(
+                    &std::fs::read(migrations_dir.join(entry.path()).join("snapshot.json"))
+                        .unwrap(),
+                )
+                .unwrap()
+            })
+            .collect();
+        resolve_snapshot_summaries(&mut full).unwrap();
+
+        for (entry, full) in dirs.iter().zip(&full) {
             let embedded: MigrationSnapshot = serde_json::from_slice(
                 MIGRATIONS
                     .get_file(entry.path().join("snapshot.json"))
@@ -524,17 +637,12 @@ mod tests {
                     .contents(),
             )
             .unwrap();
-            let full: MigrationSnapshot = serde_json::from_slice(
-                &std::fs::read(migrations_dir.join(entry.path()).join("snapshot.json")).unwrap(),
-            )
-            .unwrap();
 
             assert_eq!(full.id, embedded.id);
             assert_eq!(full.summary(), embedded.summary());
             assert!(full.summary().tables > 0);
-            checked += 1;
         }
 
-        assert!(checked > 0);
+        assert!(!full.is_empty());
     }
 }

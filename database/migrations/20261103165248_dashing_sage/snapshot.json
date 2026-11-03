@@ -1,0 +1,405 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "185683f1-1d8b-4980-9776-6004aa54ce56",
+  "prevIds": [
+    "286c27ce-2c60-436a-8a8a-2a4148b5bdf3"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "node_permission_invalidations"
+      ],
+      "writes": [
+        "s|tbl|public.node_permission_invalidations",
+        "n|tbl|public.node_permission_invalidations",
+        "e|tbl|public.node_permission_invalidations",
+        "n|rel|public.node_permission_invalidations",
+        "n|type|public.node_permission_invalidations",
+        "n|rel|public.node_permission_invalidations_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "node_permission_invalidations",
+        "node_permission_invalidations_node_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.node_permission_invalidations_node_uuid_idx",
+        "n|idx|public.node_permission_invalidations_node_uuid_idx",
+        "e|idx|public.node_permission_invalidations_node_uuid_idx",
+        "n|rel|public.node_permission_invalidations_node_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.node_permission_invalidations",
+        "n|sch|public",
+        "n|col|public.node_permission_invalidations.node_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "node_permission_invalidations",
+        "node_permission_invalidations_next_attempt_idx"
+      ],
+      "writes": [
+        "s|idx|public.node_permission_invalidations_next_attempt_idx",
+        "n|idx|public.node_permission_invalidations_next_attempt_idx",
+        "e|idx|public.node_permission_invalidations_next_attempt_idx",
+        "n|rel|public.node_permission_invalidations_next_attempt_idx"
+      ],
+      "reads": [
+        "n|tbl|public.node_permission_invalidations",
+        "n|sch|public",
+        "n|col|public.node_permission_invalidations.next_attempt"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "node_permission_invalidations",
+        "node_permission_invalidations_node_uuid_pending_idx"
+      ],
+      "writes": [
+        "s|idx|public.node_permission_invalidations_node_uuid_pending_idx",
+        "n|idx|public.node_permission_invalidations_node_uuid_pending_idx",
+        "e|idx|public.node_permission_invalidations_node_uuid_pending_idx",
+        "n|rel|public.node_permission_invalidations_node_uuid_pending_idx"
+      ],
+      "reads": [
+        "n|tbl|public.node_permission_invalidations",
+        "n|sch|public",
+        "n|col|public.node_permission_invalidations.node_uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "node_permission_invalidations"
+      ],
+      "writes": [
+        "s|fk|public.node_permission_invalidations.node_permission_invalidations_node_uuid_nodes_uuid_fkey",
+        "n|fk|public.node_permission_invalidations.node_permission_invalidations_node_uuid_nodes_uuid_fkey",
+        "e|fk|public.node_permission_invalidations.node_permission_invalidations_node_uuid_nodes_uuid_fkey",
+        "n|con|public.node_permission_invalidations.node_permission_invalidations_node_uuid_nodes_uuid_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.node_permission_invalidations",
+        "n|sch|public",
+        "n|tbl|public.nodes",
+        "n|sch|public",
+        "n|col|public.node_permission_invalidations.node_uuid",
+        "n|col|public.nodes.uuid",
+        "e|uniqueness|public.nodes.uuid"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "node_permission_invalidations",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "as_of",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "users",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 1,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "servers",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 1,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "all_servers",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "revoke_users",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 1,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "revoke_credentials",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 1,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "attempts",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "next_attempt",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "created",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_permission_invalidations_node_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "node_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_permission_invalidations_next_attempt_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "next_attempt",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_permission_invalidations_node_uuid_pending_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "node_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "cardinality(\"revoke_users\") = 0 AND cardinality(\"revoke_credentials\") = 0",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_permission_invalidations_node_uuid_nodes_uuid_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "node_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "nodes",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_permission_invalidations",
+        "name": "node_permission_invalidations_pkey",
+        "columns": [
+          "uuid"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    }
+  ]
+}
