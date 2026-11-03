@@ -269,13 +269,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Prepare binaries
         run: |
           for pair in x86_64:amd64 aarch64:arm64 riscv64:riscv64 ppc64le:ppc64le; do
@@ -318,6 +311,13 @@ jobs:
           sbom: true
           provenance: true
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Login to Docker Hub
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
@@ -358,8 +358,8 @@ jobs:
 
       - name: Sign image with cosign
         run: |
-          cosign sign --yes ${{ env.GHCR_IMAGE }}@${{ steps.build.outputs.digest }}
-          cosign sign --yes ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes --recursive ${{ env.GHCR_IMAGE }}@${{ steps.build.outputs.digest }}
+          cosign sign --yes --recursive ${{ env.DOCKERHUB_IMAGE }}@${{ steps.build.outputs.digest }}
 
   build-heavy-images:
     name: Build ${{ matrix.variant }} Docker image (${{ matrix.platform }})
@@ -488,5 +488,5 @@ jobs:
                 "$IMAGE:${IMAGE_TAG}-${VARIANT}-amd64" \
                 "$IMAGE:${IMAGE_TAG}-${VARIANT}-arm64"
             done
-            cosign sign --yes "$IMAGE:${SUFFIXES[0]}"
+            cosign sign --yes --recursive "$IMAGE:${SUFFIXES[0]}"
           done
