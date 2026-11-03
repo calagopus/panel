@@ -1564,6 +1564,36 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_utilization_history(
+        &self,
+        server: uuid::Uuid,
+        query: &super::servers_server_utilization_history::get::Query,
+    ) -> Result<super::servers_server_utilization_history::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = query.start {
+            query_parts.push(format!("start={}", urlencoding::encode(&value.to_rfc3339())).into());
+        }
+        if let Some(value) = query.end {
+            query_parts.push(format!("end={}", urlencoding::encode(&value.to_rfc3339())).into());
+        }
+        if let Some(value) = query.points {
+            query_parts.push(format!("points={}", value).into());
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/utilization/history{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn get_servers_server_version(
         &self,
         server: uuid::Uuid,

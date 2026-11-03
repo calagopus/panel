@@ -68,7 +68,7 @@ export function formatBytesRate(value: number): string {
   return `${bytesToString(value, 2, true)}/s`;
 }
 
-function niceCeil(value: number, scale: ChartScale): number {
+export function niceCeil(value: number, scale: ChartScale): number {
   if (!Number.isFinite(value) || value <= 0) {
     return scale === 'binary' ? 1024 : 1;
   }
@@ -151,11 +151,11 @@ function useChartClock(): number {
   return useSyncExternalStore(subscribeClock, getClockEnd);
 }
 
-function seriesColor(index: number): string {
+export function seriesColor(index: number): string {
   return `var(--chart-series-${(index % CHART_SERIES_COLORS) + 1})`;
 }
 
-function seriesDash(index: number, total: number): string | undefined {
+export function seriesDash(index: number, total: number): string | undefined {
   return total > 1 ? CHART_SERIES_DASHES[index % CHART_SERIES_DASHES.length] : undefined;
 }
 
@@ -290,5 +290,78 @@ export function useStreamChart({
     value: series.length === 1 ? series[0].formatted : null,
     push,
     clear,
+  };
+}
+
+export interface HistoryChartSeries {
+  key: string;
+  label: string;
+  color?: string;
+  dash?: string;
+  /** Draws the area under the line, defaults to `true`. */
+  fill?: boolean;
+  /**
+   * Marks the series as a limit: drawn as a red stepped line that only lifts the y axis while the
+   * other series come within reach of it, the same way the live charts treat their limit.
+   */
+  limit?: boolean;
+}
+
+export interface HistoryChartProps {
+  data: Record<string, unknown>[];
+  domain: [number, number];
+  series: HistoryChartSeries[];
+  format: (value: number) => string;
+  scale?: ChartScale;
+  min?: number;
+  height?: number;
+  syncId?: string;
+}
+
+export function historyChartSeriesColor(entry: HistoryChartSeries, index: number): string {
+  return entry.color ?? (entry.limit ? 'var(--mantine-color-red-filled)' : seriesColor(index));
+}
+
+export function historyChartLegend(series: HistoryChartSeries[]): ChartLegendProps {
+  const plotted = series.filter((entry) => !entry.limit);
+
+  return {
+    series: series.map((entry) => ({
+      key: entry.key,
+      label: entry.label,
+      color: historyChartSeriesColor(entry, plotted.indexOf(entry)),
+      value: null,
+      formatted: null,
+      dash: entry.dash ?? (entry.limit ? '4 3' : undefined),
+    })),
+  };
+}
+
+export function historyChartCeiling(
+  data: Record<string, unknown>[],
+  series: HistoryChartSeries[],
+  scale: ChartScale,
+  min: number,
+): { ceiling: number; limit: number | null } {
+  let peak = min;
+  let limit = 0;
+
+  for (const row of data) {
+    for (const entry of series) {
+      const value = row[entry.key];
+      if (typeof value !== 'number') continue;
+
+      if (entry.limit) {
+        limit = Math.max(limit, value);
+      } else {
+        peak = Math.max(peak, value);
+      }
+    }
+  }
+
+  return {
+    ceiling:
+      limit > 0 && peak >= limit * CHART_LIMIT_REACH && peak <= limit ? limit : niceCeil(peak * CHART_HEADROOM, scale),
+    limit: limit > 0 ? limit : null,
   };
 }

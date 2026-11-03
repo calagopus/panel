@@ -31,7 +31,7 @@ export default function StatCard({
 }: {
   icon?: IconDefinition;
   label: string;
-  value: string;
+  value: ReactNode;
   order?: number;
   className?: string;
   copyOnClick?: boolean;
@@ -45,7 +45,7 @@ export default function StatCard({
   redact?: boolean;
   loading?: boolean;
 }) {
-  const displayValue = redact ? <RedactedText value={value} /> : value;
+  const displayValue = redact && typeof value === 'string' ? <RedactedText value={value} /> : value;
   const shownProgress = loading ? null : progress;
   const color = usageColor(shownProgress, total);
 
@@ -80,7 +80,7 @@ export default function StatCard({
               <span className='flex h-7 items-center'>
                 <Spinner size={18} />
               </span>
-            ) : copyOnClick ? (
+            ) : copyOnClick && typeof value === 'string' ? (
               <ScrollingText>
                 <CopyOnClick content={value} className='text-left block'>
                   {displayValue} {limit && <span className='text-sm text-(--mantine-color-dimmed)'>/ {limit}</span>}

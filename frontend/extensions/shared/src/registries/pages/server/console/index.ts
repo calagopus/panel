@@ -1,8 +1,9 @@
 import type { FC } from 'react';
 import { ContainerRegistry, Registry } from 'shared';
 import type { Props as ContainerProps } from '@/elements/containers/ServerContentContainer.tsx';
-import { ComponentListRegistry } from '../../slices/componentList.ts';
-import { XTermRegistry } from '../../slices/xterm.ts';
+import { ComponentListRegistry } from '../../../slices/componentList.ts';
+import { XTermRegistry } from '../../../slices/xterm.ts';
+import { ResourceHistoryRegistry } from './history.ts';
 
 interface ConsoleFeatureDefinition {
   filter?: (features: string[]) => boolean;
@@ -16,6 +17,7 @@ export class ConsoleRegistry implements Registry {
     this.terminalHeaderLeftComponents.mergeFrom(other.terminalHeaderLeftComponents);
     this.terminalHeaderRightComponents.mergeFrom(other.terminalHeaderRightComponents);
     this.xterm.mergeFrom(other.xterm);
+    this.history.mergeFrom(other.history);
 
     this.features.push(...other.features);
     this.statCards.push(...other.statCards);
@@ -30,6 +32,7 @@ export class ConsoleRegistry implements Registry {
   public terminalHeaderLeftComponents: ComponentListRegistry = new ComponentListRegistry();
   public terminalHeaderRightComponents: ComponentListRegistry = new ComponentListRegistry();
   public xterm: XTermRegistry = new XTermRegistry();
+  public history: ResourceHistoryRegistry = new ResourceHistoryRegistry();
 
   public features: ConsoleFeatureDefinition[] = [];
   public statCards: FC[] = [];
@@ -58,6 +61,11 @@ export class ConsoleRegistry implements Registry {
 
   public enterXTerm(callback: (registry: XTermRegistry) => unknown): this {
     callback(this.xterm);
+    return this;
+  }
+
+  public enterHistory(callback: (registry: ResourceHistoryRegistry) => unknown): this {
+    callback(this.history);
     return this;
   }
 

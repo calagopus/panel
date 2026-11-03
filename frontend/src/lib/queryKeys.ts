@@ -319,6 +319,10 @@ const server = (serverUuid: string) => ({
   network: {
     all: () => ['server', serverUuid, 'network'] as const,
   },
+  resources: {
+    history: (start: number, end: number, points: number) =>
+      ['server', serverUuid, 'resources', 'history', { start, end, points }] as const,
+  },
   schedules: {
     all: () => ['server', serverUuid, 'schedules'] as const,
     detail: (scheduleUuid: string) => ['server', serverUuid, 'schedules', { uuid: scheduleUuid }] as const,

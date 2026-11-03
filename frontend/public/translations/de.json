@@ -5808,6 +5808,38 @@
             "offline": "Server ist offline",
             "connecting": "Verbindung wird hergestellt..."
           },
+          "history": {
+            "title": "Ressourcenverlauf",
+            "loading": "Wird geladen...",
+            "noData": "In diesem Zeitraum wurden keine Daten aufgezeichnet",
+            "timeframe": "{start} bis {end}",
+            "uptime": "{percent} gelaufen",
+            "range": {
+              "hours": "{hours} Std.",
+              "days": "{days} T.",
+              "years": "{years} J."
+            },
+            "tooltip": {
+              "earlier": "Früher",
+              "later": "Später",
+              "latest": "Zu Jetzt springen"
+            },
+            "block": {
+              "states": "Serverstatus"
+            },
+            "series": {
+              "average": "Durchschnitt",
+              "peak": "Spitze",
+              "limit": "Limit"
+            },
+            "summary": {
+              "peak": "Spitze {value}"
+            },
+            "unavailable": {
+              "title": "Ressourcenverlauf nicht verfügbar",
+              "description": "Der Node, auf dem dieser Server läuft, zeichnet keinen Ressourcenverlauf auf, entweder weil er deaktiviert ist oder weil der Node ein Update benötigt."
+            }
+          },
           "socketConnected": "Verbunden ({ping}ms ping)",
           "socketDisconnected": "Getrennt"
         },

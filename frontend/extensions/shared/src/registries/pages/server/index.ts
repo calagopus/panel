@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Registry } from 'shared';
 import { ActivityRegistry } from './activity.ts';
 import { BackupsRegistry } from './backups/index.ts';
-import { ConsoleRegistry } from './console.ts';
+import { ConsoleRegistry } from './console/index.ts';
 import { DatabasesRegistry } from './databases/index.ts';
 import { DevicesRegistry } from './devices.ts';
 import { FilesRegistry } from './files/index.ts';

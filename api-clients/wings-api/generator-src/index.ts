@@ -612,6 +612,7 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
                     const field = rustIdent(param.name)
                     const isArray = inner.startsWith('Vec<')
                     const isString = inner === 'compact_str::CompactString'
+                    const isDateTime = inner.startsWith('chrono::DateTime<')
                     const itemIsString = isArray && inner.slice(4, -1) === 'compact_str::CompactString'
 
                     clientOutput.write(`        if let Some(value) = ${isArray || isString ? '&' : ''}query.${field} {\n`)
@@ -625,6 +626,8 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
                         clientOutput.write('            }\n')
                     } else if (isString) {
                         clientOutput.write(`            query_parts.push(format!("${key}={}", urlencoding::encode(value)).into());\n`)
+                    } else if (isDateTime) {
+                        clientOutput.write(`            query_parts.push(format!("${key}={}", urlencoding::encode(&value.to_rfc3339())).into());\n`)
                     } else {
                         clientOutput.write(`            query_parts.push(format!("${key}={}", value).into());\n`)
                     }

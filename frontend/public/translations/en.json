@@ -5808,6 +5808,38 @@
             "offline": "Server is offline",
             "connecting": "Connecting..."
           },
+          "history": {
+            "title": "Resource History",
+            "loading": "Loading...",
+            "noData": "No data recorded in this range",
+            "timeframe": "{start} to {end}",
+            "uptime": "{percent} running",
+            "range": {
+              "hours": "{hours}h",
+              "days": "{days}d",
+              "years": "{years}y"
+            },
+            "tooltip": {
+              "earlier": "Earlier",
+              "later": "Later",
+              "latest": "Jump to Now"
+            },
+            "block": {
+              "states": "Server State"
+            },
+            "series": {
+              "average": "Average",
+              "peak": "Peak",
+              "limit": "Limit"
+            },
+            "summary": {
+              "peak": "Peak {value}"
+            },
+            "unavailable": {
+              "title": "Resource History Unavailable",
+              "description": "The node this server runs on doesn't record resource history, either because it is turned off or because the node needs an update."
+            }
+          },
           "socketConnected": "Connected ({ping}ms ping)",
           "socketDisconnected": "Disconnected"
         },

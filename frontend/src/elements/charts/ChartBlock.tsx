@@ -10,7 +10,9 @@ function ChartBlock({
   legend,
   overlayIcon,
   overlayLabel,
+  action,
   className,
+  bodyClassName,
   children,
 }: {
   icon: ReactNode;
@@ -19,7 +21,9 @@ function ChartBlock({
   legend?: ReactNode;
   overlayIcon?: ReactNode;
   overlayLabel?: string;
+  action?: ReactNode;
   className?: string;
+  bodyClassName?: string;
   children: ReactNode;
 }) {
   return (
@@ -29,6 +33,7 @@ function ChartBlock({
           <h3 className='flex min-w-0 max-w-full items-center transition-colors duration-100'>
             <span className='mr-2 shrink-0'>{icon}</span>
             <ScrollingText>{title}</ScrollingText>
+            {action && <span className='ml-1 shrink-0'>{action}</span>}
           </h3>
           {!overlayLabel && value !== undefined && value !== null && (
             <span className='shrink-0 text-sm tabular-nums'>{value}</span>
@@ -40,7 +45,7 @@ function ChartBlock({
           )}
         </div>
       </div>
-      <div className='min-h-60 flex-1 px-4 pt-4 pb-3'>
+      <div className={`flex-1 px-4 pt-4 pb-3 ${bodyClassName ?? 'min-h-60'}`}>
         {overlayLabel ? (
           <div className='flex h-full flex-col items-center justify-center gap-2 text-(--mantine-color-dimmed)'>
             {overlayIcon}

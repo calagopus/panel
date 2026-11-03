@@ -37,6 +37,7 @@ import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 const ServerConsole = lazy(() => import('@/pages/server/console/ServerConsole.tsx'));
 const PopoutConsole = lazy(() => import('@/pages/server/console/PopoutConsole.tsx'));
+const ServerResourceHistory = lazy(() => import('@/pages/server/console/history/ServerResourceHistory.tsx'));
 const ServerFilesEditor = lazy(() => import('@/pages/server/files/editor/FileEditor.tsx'));
 const FileRevisionDiff = lazy(() => import('@/pages/server/files/editor/FileRevisionDiff.tsx'));
 const DatabaseInstanceView = lazy(() => import('@/pages/server/databases/instances/DatabaseInstanceView.tsx'));
@@ -48,12 +49,19 @@ const routes: ServerRouteDefinition[] = [
     path: '/',
     element: ServerConsole,
     exact: true,
+    activeMatches: ['/server/:id/console/history'],
     permission: null,
   },
   {
     name: undefined,
     path: '/console/popout',
     element: PopoutConsole,
+    permission: null,
+  },
+  {
+    name: undefined,
+    path: '/console/history',
+    element: ServerResourceHistory,
     permission: null,
   },
   {

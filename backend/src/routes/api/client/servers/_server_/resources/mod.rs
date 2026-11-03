@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod history;
+
 mod get {
     use axum::http::StatusCode;
     use serde::Serialize;
@@ -45,6 +47,7 @@ mod get {
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
+        .nest("/history", history::router(state))
         .routes(routes!(get::route))
         .with_state(state.clone())
 }

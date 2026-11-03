@@ -1,17 +1,42 @@
-import { faCloudDownload, faMemory, faMicrochip, faPowerOff } from '@fortawesome/free-solid-svg-icons';
+import {
+  faClockRotateLeft,
+  faCloudDownload,
+  faMemory,
+  faMicrochip,
+  faPowerOff,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useRef } from 'react';
+import { NavLink } from 'react-router';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import ChartLegend from '@/elements/charts/ChartLegend.tsx';
 import ChartSyncGroup from '@/elements/charts/ChartSyncGroup.tsx';
 import StreamChart from '@/elements/charts/StreamChart.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { formatBytes, formatPercent, useStreamChart } from '@/lib/chart.ts';
 import { bitsPerSecondToString, mbToBytes } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import { useServerStatsPending } from './useServerStatsPending.ts';
+
+function HistoryLink() {
+  const { t } = useTranslations();
+  const server = useServerStore((state) => state.server);
+
+  return (
+    <Tooltip label={t('pages.server.console.history.title', {})}>
+      <NavLink
+        to={`/server/${server.uuidShort}/console/history`}
+        className='inline-flex p-1 text-(--mantine-color-dimmed) hover:text-(--mantine-color-text)'
+        aria-label={t('pages.server.console.history.title', {})}
+      >
+        <FontAwesomeIcon icon={faClockRotateLeft} size='sm' />
+      </NavLink>
+    </Tooltip>
+  );
+}
 
 export default function ServerStats() {
   const { t } = useTranslations();
@@ -102,6 +127,7 @@ export default function ServerStats() {
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
         <ChartBlock
           icon={<FontAwesomeIcon icon={faMicrochip} />}
+          action={<HistoryLink />}
           title={t('common.stat.cpuLoad', {})}
           value={cpu.value}
           overlayIcon={overlayIcon}
@@ -111,6 +137,7 @@ export default function ServerStats() {
         </ChartBlock>
         <ChartBlock
           icon={<FontAwesomeIcon icon={faMemory} />}
+          action={<HistoryLink />}
           title={t('common.stat.memoryLoad', {})}
           value={memory.value}
           overlayIcon={overlayIcon}
@@ -120,6 +147,7 @@ export default function ServerStats() {
         </ChartBlock>
         <ChartBlock
           icon={<FontAwesomeIcon icon={faCloudDownload} />}
+          action={<HistoryLink />}
           title={t('common.stat.network', {})}
           legend={<ChartLegend {...network.legend} />}
           overlayIcon={overlayIcon}
