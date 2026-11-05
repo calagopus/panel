@@ -733,6 +733,26 @@
           "resourcesUnavailable": "Ressourcennutzung nicht verfügbar"
         }
       },
+      "systemBackupPolicyRun": {
+        "state": {
+          "running": "Läuft",
+          "cancelling": "Wird abgebrochen",
+          "cancelled": "Abgebrochen",
+          "succeeded": "Erfolgreich",
+          "partiallySucceeded": "Teilweise erfolgreich",
+          "failed": "Fehlgeschlagen",
+          "nothingToBackUp": "Nichts zu sichern"
+        }
+      },
+      "systemBackupPolicyRunTarget": {
+        "state": {
+          "pending": "Ausstehend",
+          "running": "Läuft",
+          "successful": "Erfolgreich",
+          "failed": "Fehlgeschlagen",
+          "skipped": "Übersprungen"
+        }
+      },
       "enum": {
         "userToastPosition": {
           "topLeft": "Oben links",
@@ -771,6 +791,27 @@
         "serverBackupKind": {
           "server": "Server",
           "databaseInstance": "Datenbank"
+        },
+        "systemBackupPolicyRunTargetStatus": {
+          "pending": "Ausstehend",
+          "dispatched": "Ausgelöst",
+          "skipped": "Übersprungen",
+          "failed": "Fehlgeschlagen"
+        },
+        "systemBackupPolicyRunTargetReason": {
+          "nodeMaintenance": "Node im Wartungsmodus",
+          "backupConfigurationMaintenance": "Backup-Konfiguration im Wartungsmodus",
+          "databaseAgentHostMaintenance": "Datenbank-Agent-Host im Wartungsmodus",
+          "databaseInstanceStopped": "Datenbankinstanz läuft nicht",
+          "serverBusy": "Server beschäftigt (Installation, Wiederherstellung oder Transfer)",
+          "metadataFailed": "Backup-Metadaten konnten nicht erfasst werden",
+          "noBackupConfiguration": "Keine Backup-Konfiguration",
+          "unsupportedBackupDisk": "Backup-Konfiguration unterstützt keine Datenbank-Backups",
+          "targetRemoved": "Vor dem Backup entfernt",
+          "createFailed": "Backup konnte nicht erstellt werden",
+          "policyDisabled": "Richtlinie deaktiviert",
+          "superseded": "Nächste geplante Ausführung hat zuerst begonnen",
+          "cancelled": "Ausführung abgebrochen"
         },
         "serverFirewallRuleAction": {
           "allow": "Erlauben",
@@ -5371,13 +5412,11 @@
         "systemBackupPolicies": {
           "title": "System-Backup-Richtlinien",
           "resourceName": "System-Backup-Richtlinie",
-          "badge": {
-            "runPending": "Ausführung ausstehend"
-          },
           "table": {
             "columns": {
               "cron": "Zeitplan",
-              "backups": "Backups"
+              "backups": "Backups",
+              "lastRun": "Letzte Ausführung"
             }
           },
           "form": {
@@ -5426,6 +5465,45 @@
                 "title": "Backups der System-Backup-Richtlinie",
                 "toast": {
                   "downloadStarted": "Download gestartet."
+                }
+              }
+            },
+            "runs": {
+              "title": "Ausführungen",
+              "page": {
+                "title": "Ausführungen der System-Backup-Richtlinie",
+                "table": {
+                  "columns": {
+                    "started": "Gestartet",
+                    "trigger": "Auslöser",
+                    "progress": "Fortschritt",
+                    "completed": "Abgeschlossen",
+                    "reason": "Grund"
+                  }
+                },
+                "badge": {
+                  "manual": "Manuell",
+                  "scheduled": "Geplant"
+                },
+                "button": {
+                  "viewTargets": "Ziele anzeigen",
+                  "cancelRun": "Ausführung abbrechen"
+                },
+                "toast": {
+                  "cancelled": "Ausführung abgebrochen."
+                },
+                "progress": {
+                  "summary": "{done} von {total} erledigt"
+                },
+                "modal": {
+                  "targets": {
+                    "title": "Ziele der Ausführung",
+                    "allStatuses": "Alle Status"
+                  },
+                  "cancel": {
+                    "title": "Abbruch der Ausführung bestätigen",
+                    "content": "Möchtest du diese Ausführung wirklich abbrechen? Ihre `{pending}` ausstehenden Ziele werden übersprungen. Bereits gestartete Backups laufen weiter, bis sie fertig sind."
+                  }
                 }
               }
             },

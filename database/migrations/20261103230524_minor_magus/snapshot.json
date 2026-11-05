@@ -1,0 +1,1229 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "fb3f4d86-d0d7-4c3d-b507-84e69f5b367c",
+  "prevIds": [
+    "185683f1-1d8b-4980-9776-6004aa54ce56"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "system_backup_policy_run_target_reason"
+      ],
+      "writes": [
+        "s|enum|public.system_backup_policy_run_target_reason",
+        "n|enum|public.system_backup_policy_run_target_reason",
+        "e|enum|public.system_backup_policy_run_target_reason",
+        "n|type|public.system_backup_policy_run_target_reason"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "system_backup_policy_run_target_status"
+      ],
+      "writes": [
+        "s|enum|public.system_backup_policy_run_target_status",
+        "n|enum|public.system_backup_policy_run_target_status",
+        "e|enum|public.system_backup_policy_run_target_status",
+        "n|type|public.system_backup_policy_run_target_status"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_run_targets"
+      ],
+      "writes": [
+        "s|tbl|public.system_backup_policy_run_targets",
+        "n|tbl|public.system_backup_policy_run_targets",
+        "e|tbl|public.system_backup_policy_run_targets",
+        "n|rel|public.system_backup_policy_run_targets",
+        "n|type|public.system_backup_policy_run_targets",
+        "n|rel|public.system_backup_policy_run_targets_pkey"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.system_backup_policy_run_target_status",
+        "n|enum|public.system_backup_policy_run_target_reason"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_runs"
+      ],
+      "writes": [
+        "s|tbl|public.system_backup_policy_runs",
+        "n|tbl|public.system_backup_policy_runs",
+        "e|tbl|public.system_backup_policy_runs",
+        "n|rel|public.system_backup_policy_runs",
+        "n|type|public.system_backup_policy_runs",
+        "n|rel|public.system_backup_policy_runs_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "drop_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "system_backup_policies",
+        "triggered"
+      ],
+      "writes": [
+        "s|col|public.system_backup_policies.triggered",
+        "n|col|public.system_backup_policies.triggered",
+        "e|col|public.system_backup_policies.triggered"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policies",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "server_backups",
+        "server_backups_policy_uuid_server_uuid_created_idx"
+      ],
+      "writes": [
+        "s|idx|public.server_backups_policy_uuid_server_uuid_created_idx",
+        "n|idx|public.server_backups_policy_uuid_server_uuid_created_idx",
+        "e|idx|public.server_backups_policy_uuid_server_uuid_created_idx",
+        "n|rel|public.server_backups_policy_uuid_server_uuid_created_idx"
+      ],
+      "reads": [
+        "n|tbl|public.server_backups",
+        "n|sch|public",
+        "n|col|public.server_backups.system_backup_policy_uuid",
+        "n|col|public.server_backups.server_uuid",
+        "n|col|public.server_backups.created"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "server_backups",
+        "server_backups_policy_uuid_database_instance_uuid_created_idx"
+      ],
+      "writes": [
+        "s|idx|public.server_backups_policy_uuid_database_instance_uuid_created_idx",
+        "n|idx|public.server_backups_policy_uuid_database_instance_uuid_created_idx",
+        "e|idx|public.server_backups_policy_uuid_database_instance_uuid_created_idx",
+        "n|rel|public.server_backups_policy_uuid_database_instance_uuid_created_idx"
+      ],
+      "reads": [
+        "n|tbl|public.server_backups",
+        "n|sch|public",
+        "n|col|public.server_backups.system_backup_policy_uuid",
+        "n|col|public.server_backups.database_instance_uuid",
+        "n|col|public.server_backups.created"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_run_targets",
+        "system_backup_policy_run_targets_run_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_run_targets_run_uuid_idx",
+        "n|idx|public.system_backup_policy_run_targets_run_uuid_idx",
+        "e|idx|public.system_backup_policy_run_targets_run_uuid_idx",
+        "n|rel|public.system_backup_policy_run_targets_run_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.system_backup_policy_run_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_run_targets",
+        "system_backup_policy_run_targets_run_uuid_pending_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_run_targets_run_uuid_pending_idx",
+        "n|idx|public.system_backup_policy_run_targets_run_uuid_pending_idx",
+        "e|idx|public.system_backup_policy_run_targets_run_uuid_pending_idx",
+        "n|rel|public.system_backup_policy_run_targets_run_uuid_pending_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.system_backup_policy_run_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_run_targets",
+        "system_backup_policy_run_targets_server_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_run_targets_server_uuid_idx",
+        "n|idx|public.system_backup_policy_run_targets_server_uuid_idx",
+        "e|idx|public.system_backup_policy_run_targets_server_uuid_idx",
+        "n|rel|public.system_backup_policy_run_targets_server_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.server_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_run_targets",
+        "system_backup_policy_run_targets_database_instance_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_run_targets_database_instance_uuid_idx",
+        "n|idx|public.system_backup_policy_run_targets_database_instance_uuid_idx",
+        "e|idx|public.system_backup_policy_run_targets_database_instance_uuid_idx",
+        "n|rel|public.system_backup_policy_run_targets_database_instance_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.database_instance_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_run_targets",
+        "system_backup_policy_run_targets_server_backup_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_run_targets_server_backup_uuid_idx",
+        "n|idx|public.system_backup_policy_run_targets_server_backup_uuid_idx",
+        "e|idx|public.system_backup_policy_run_targets_server_backup_uuid_idx",
+        "n|rel|public.system_backup_policy_run_targets_server_backup_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.server_backup_uuid"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_runs",
+        "system_backup_policy_runs_policy_uuid_created_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_runs_policy_uuid_created_idx",
+        "n|idx|public.system_backup_policy_runs_policy_uuid_created_idx",
+        "e|idx|public.system_backup_policy_runs_policy_uuid_created_idx",
+        "n|rel|public.system_backup_policy_runs_policy_uuid_created_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_runs",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_runs.system_backup_policy_uuid",
+        "n|col|public.system_backup_policy_runs.created"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_runs",
+        "system_backup_policy_runs_policy_uuid_occurrence_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_runs_policy_uuid_occurrence_idx",
+        "n|idx|public.system_backup_policy_runs_policy_uuid_occurrence_idx",
+        "e|idx|public.system_backup_policy_runs_policy_uuid_occurrence_idx",
+        "n|rel|public.system_backup_policy_runs_policy_uuid_occurrence_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_runs",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_runs.system_backup_policy_uuid",
+        "n|col|public.system_backup_policy_runs.occurrence"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "system_backup_policy_runs",
+        "system_backup_policy_runs_policy_uuid_open_idx"
+      ],
+      "writes": [
+        "s|idx|public.system_backup_policy_runs_policy_uuid_open_idx",
+        "n|idx|public.system_backup_policy_runs_policy_uuid_open_idx",
+        "e|idx|public.system_backup_policy_runs_policy_uuid_open_idx",
+        "n|rel|public.system_backup_policy_runs_policy_uuid_open_idx"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_runs",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_runs.system_backup_policy_uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_run_targets"
+      ],
+      "writes": [
+        "s|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_J4jCMzIVLIRZ_fkey",
+        "n|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_J4jCMzIVLIRZ_fkey",
+        "e|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_J4jCMzIVLIRZ_fkey",
+        "n|con|public.system_backup_policy_run_targets.system_backup_policy_run_targets_J4jCMzIVLIRZ_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|tbl|public.system_backup_policy_runs",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.system_backup_policy_run_uuid",
+        "n|col|public.system_backup_policy_runs.uuid",
+        "e|uniqueness|public.system_backup_policy_runs.uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_run_targets"
+      ],
+      "writes": [
+        "s|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_server_uuid_servers_uuid_fkey",
+        "n|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_server_uuid_servers_uuid_fkey",
+        "e|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_server_uuid_servers_uuid_fkey",
+        "n|con|public.system_backup_policy_run_targets.system_backup_policy_run_targets_server_uuid_servers_uuid_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|tbl|public.servers",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.server_uuid",
+        "n|col|public.servers.uuid",
+        "e|uniqueness|public.servers.uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_run_targets"
+      ],
+      "writes": [
+        "s|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_OitbAt1mBZSR_fkey",
+        "n|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_OitbAt1mBZSR_fkey",
+        "e|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_OitbAt1mBZSR_fkey",
+        "n|con|public.system_backup_policy_run_targets.system_backup_policy_run_targets_OitbAt1mBZSR_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|tbl|public.server_database_instances",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.database_instance_uuid",
+        "n|col|public.server_database_instances.uuid",
+        "e|uniqueness|public.server_database_instances.uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_run_targets"
+      ],
+      "writes": [
+        "s|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_k1j9dlT82L25_fkey",
+        "n|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_k1j9dlT82L25_fkey",
+        "e|fk|public.system_backup_policy_run_targets.system_backup_policy_run_targets_k1j9dlT82L25_fkey",
+        "n|con|public.system_backup_policy_run_targets.system_backup_policy_run_targets_k1j9dlT82L25_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_run_targets",
+        "n|sch|public",
+        "n|tbl|public.server_backups",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_run_targets.server_backup_uuid",
+        "n|col|public.server_backups.uuid",
+        "e|uniqueness|public.server_backups.uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "system_backup_policy_runs"
+      ],
+      "writes": [
+        "s|fk|public.system_backup_policy_runs.system_backup_policy_runs_fXpo50O7NZcS_fkey",
+        "n|fk|public.system_backup_policy_runs.system_backup_policy_runs_fXpo50O7NZcS_fkey",
+        "e|fk|public.system_backup_policy_runs.system_backup_policy_runs_fXpo50O7NZcS_fkey",
+        "n|con|public.system_backup_policy_runs.system_backup_policy_runs_fXpo50O7NZcS_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.system_backup_policy_runs",
+        "n|sch|public",
+        "n|tbl|public.system_backup_policies",
+        "n|sch|public",
+        "n|col|public.system_backup_policy_runs.system_backup_policy_uuid",
+        "n|col|public.system_backup_policies.uuid",
+        "e|uniqueness|public.system_backup_policies.uuid"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "system_backup_policy_run_targets",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "system_backup_policy_runs",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "system_backup_policy_run_target_reason",
+        "values": [
+          "NODE_MAINTENANCE",
+          "BACKUP_CONFIGURATION_MAINTENANCE",
+          "DATABASE_AGENT_HOST_MAINTENANCE",
+          "DATABASE_INSTANCE_STOPPED",
+          "SERVER_BUSY",
+          "METADATA_FAILED",
+          "NO_BACKUP_CONFIGURATION",
+          "UNSUPPORTED_BACKUP_DISK",
+          "TARGET_REMOVED",
+          "CREATE_FAILED",
+          "POLICY_DISABLED",
+          "SUPERSEDED",
+          "CANCELLED"
+        ],
+        "entityType": "enums"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "system_backup_policy_run_target_status",
+        "values": [
+          "PENDING",
+          "DISPATCHED",
+          "SKIPPED",
+          "FAILED"
+        ],
+        "entityType": "enums"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "server_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "database_instance_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "server_backup_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "status",
+        "type": "system_backup_policy_run_target_status",
+        "typeSchema": "public",
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'PENDING'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "reason",
+        "type": "system_backup_policy_run_target_reason",
+        "typeSchema": "public",
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "last_attempt",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "not_before",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "updated",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "manual",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "occurrence",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "total_targets",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "successful_targets",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "failed_targets",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "skipped_targets",
+        "type": "integer",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "0",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "cancelled",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "completed",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "created",
+        "type": "timestamp",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "server_backups",
+        "name": "server_backups_policy_uuid_server_uuid_created_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "server_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "created",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": "\"system_backup_policy_uuid\" IS NOT NULL",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "server_backups",
+        "name": "server_backups_policy_uuid_database_instance_uuid_created_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "database_instance_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "created",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": "\"system_backup_policy_uuid\" IS NOT NULL AND \"database_instance_uuid\" IS NOT NULL",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_run_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_run_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_run_uuid_pending_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_run_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": "\"status\" = 'PENDING'",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_server_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "server_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_database_instance_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "database_instance_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_server_backup_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "server_backup_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_runs_policy_uuid_created_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "created",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_runs_policy_uuid_occurrence_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "occurrence",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "NOT \"manual\"",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_runs_policy_uuid_open_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "system_backup_policy_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": "\"completed\" IS NULL",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_J4jCMzIVLIRZ_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "system_backup_policy_run_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "system_backup_policy_runs",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_server_uuid_servers_uuid_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "server_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "servers",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_OitbAt1mBZSR_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "database_instance_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "server_database_instances",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_k1j9dlT82L25_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "server_backup_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "server_backups",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_runs_fXpo50O7NZcS_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "system_backup_policy_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "system_backup_policies",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_run_targets",
+        "name": "system_backup_policy_run_targets_pkey",
+        "columns": [
+          "uuid"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "system_backup_policy_runs",
+        "name": "system_backup_policy_runs_pkey",
+        "columns": [
+          "uuid"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "drop",
+      "key": "columns\u0000[\"public\",\"system_backup_policies\",\"triggered\"]"
+    }
+  ]
+}

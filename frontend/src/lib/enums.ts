@@ -67,6 +67,10 @@ import {
 import { processConfigurationConfigParser } from '@/lib/schemas/admin/eggs.ts';
 import { AdminOAuthProviderMappingMatcher } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminSettingsEmailSchema, adminSettingsStorageSchema } from '@/lib/schemas/admin/settings.ts';
+import {
+  systemBackupPolicyRunTargetReason,
+  systemBackupPolicyRunTargetStatus,
+} from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { backupRetentionRule } from '@/lib/schemas/backupRetention.ts';
 import {
   compressionType,
@@ -510,6 +514,40 @@ export const backupRetentionRuleLabelMapping: Record<z.infer<typeof backupRetent
 export const serverBackupKindLabelMapping: Record<z.infer<typeof serverBackupKind>, () => string> = {
   server: () => getTranslations().t('common.enum.serverBackupKind.server', {}),
   database_instance: () => getTranslations().t('common.enum.serverBackupKind.databaseInstance', {}),
+};
+
+export const systemBackupPolicyRunTargetStatusLabelMapping: Record<
+  z.infer<typeof systemBackupPolicyRunTargetStatus>,
+  () => string
+> = {
+  pending: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetStatus.pending', {}),
+  dispatched: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetStatus.dispatched', {}),
+  skipped: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetStatus.skipped', {}),
+  failed: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetStatus.failed', {}),
+};
+
+export const systemBackupPolicyRunTargetReasonLabelMapping: Record<
+  z.infer<typeof systemBackupPolicyRunTargetReason>,
+  () => string
+> = {
+  node_maintenance: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.nodeMaintenance', {}),
+  backup_configuration_maintenance: () =>
+    getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.backupConfigurationMaintenance', {}),
+  database_agent_host_maintenance: () =>
+    getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.databaseAgentHostMaintenance', {}),
+  database_instance_stopped: () =>
+    getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.databaseInstanceStopped', {}),
+  server_busy: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.serverBusy', {}),
+  metadata_failed: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.metadataFailed', {}),
+  no_backup_configuration: () =>
+    getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.noBackupConfiguration', {}),
+  unsupported_backup_disk: () =>
+    getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.unsupportedBackupDisk', {}),
+  target_removed: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.targetRemoved', {}),
+  create_failed: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.createFailed', {}),
+  policy_disabled: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.policyDisabled', {}),
+  superseded: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.superseded', {}),
+  cancelled: () => getTranslations().t('common.enum.systemBackupPolicyRunTargetReason.cancelled', {}),
 };
 
 export const serverFirewallRuleActionLabelMapping: Record<z.infer<typeof serverFirewallRuleAction>, () => string> = {

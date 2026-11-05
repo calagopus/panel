@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE system_backup_policy_run_targets\n            SET\n                status = 'SKIPPED',\n                reason = COALESCE(system_backup_policy_run_targets.reason, 'SUPERSEDED'),\n                updated = NOW()\n            FROM system_backup_policy_runs\n            WHERE\n                system_backup_policy_runs.uuid = system_backup_policy_run_targets.system_backup_policy_run_uuid\n                AND system_backup_policy_runs.system_backup_policy_uuid = $1\n                AND system_backup_policy_runs.uuid != $2\n                AND system_backup_policy_runs.completed IS NULL\n                AND system_backup_policy_run_targets.status = 'PENDING'\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32a6a512ab728ad03bc0d05c6f8956784673e203830d983c638646f882f9f721"
+}

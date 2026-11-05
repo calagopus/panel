@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _system_backup_policy_;
+mod latest_runs;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -146,5 +147,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
             "/{system_backup_policy}",
             _system_backup_policy_::router(state),
         )
+        .nest("/latest-runs", latest_runs::router(state))
         .with_state(state.clone())
 }

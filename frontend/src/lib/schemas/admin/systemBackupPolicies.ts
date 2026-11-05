@@ -19,7 +19,6 @@ export const adminSystemBackupPolicySchema = z.looseObject({
   cron: z.string().min(1),
   retention: backupRetentionSchema,
   parallelism: z.number().min(1).max(100),
-  triggered: z.coerce.date().nullable(),
   totalNodes: z.number(),
   totalDatabaseAgentHosts: z.number(),
   totalLocations: z.number(),
@@ -33,7 +32,6 @@ export const adminSystemBackupPolicyUpdateSchema = z.lazy(() =>
     .omit({
       uuid: true,
       backupConfiguration: true,
-      triggered: true,
       totalNodes: true,
       totalDatabaseAgentHosts: true,
       totalLocations: true,
@@ -65,4 +63,53 @@ export const adminSystemBackupPolicyLocationSchema = z.looseObject({
 export const adminSystemBackupPolicyServerSchema = z.looseObject({
   server: z.lazy(() => adminServerSchema),
   created: z.coerce.date(),
+});
+
+export const systemBackupPolicyRunTargetStatus = z.enum(['pending', 'dispatched', 'skipped', 'failed']);
+
+export const systemBackupPolicyRunTargetReason = z.enum([
+  'node_maintenance',
+  'backup_configuration_maintenance',
+  'database_agent_host_maintenance',
+  'database_instance_stopped',
+  'server_busy',
+  'metadata_failed',
+  'no_backup_configuration',
+  'unsupported_backup_disk',
+  'target_removed',
+  'create_failed',
+  'policy_disabled',
+  'superseded',
+  'cancelled',
+]);
+
+export const adminSystemBackupPolicyRunSchema = z.looseObject({
+  uuid: z.string(),
+  manual: z.boolean(),
+  occurrence: z.coerce.date(),
+  totalTargets: z.number(),
+  pendingTargets: z.number(),
+  runningTargets: z.number(),
+  successfulTargets: z.number(),
+  failedTargets: z.number(),
+  skippedTargets: z.number(),
+  cancelled: z.coerce.date().nullable(),
+  completed: z.coerce.date().nullable(),
+  created: z.coerce.date(),
+});
+
+export const adminSystemBackupPolicyLatestRunsSchema = z.record(z.string(), adminSystemBackupPolicyRunSchema);
+
+export const adminSystemBackupPolicyRunTargetSchema = z.looseObject({
+  uuid: z.string(),
+  server: z.lazy(() => adminServerSchema).nullable(),
+  databaseInstanceUuid: z.string().nullable(),
+  databaseInstanceName: z.string().nullable(),
+  serverBackupUuid: z.string().nullable(),
+  serverBackupSuccessful: z.boolean().nullable(),
+  serverBackupCompleted: z.coerce.date().nullable(),
+  status: systemBackupPolicyRunTargetStatus,
+  reason: systemBackupPolicyRunTargetReason.nullable(),
+  notBefore: z.coerce.date().nullable(),
+  updated: z.coerce.date(),
 });

@@ -6,6 +6,7 @@ import { BackupsRegistry } from './backups.ts';
 import { DatabaseAgentHostsRegistry } from './databaseAgentHosts.ts';
 import { LocationsRegistry } from './locations.ts';
 import { NodesRegistry } from './nodes.ts';
+import { RunsRegistry } from './runs.ts';
 import { ServersRegistry } from './servers.ts';
 
 export class ViewRegistry implements Registry {
@@ -15,6 +16,7 @@ export class ViewRegistry implements Registry {
     this.databaseAgentHosts.mergeFrom(other.databaseAgentHosts);
     this.locations.mergeFrom(other.locations);
     this.nodes.mergeFrom(other.nodes);
+    this.runs.mergeFrom(other.runs);
     this.servers.mergeFrom(other.servers);
 
     return this;
@@ -27,6 +29,7 @@ export class ViewRegistry implements Registry {
   public databaseAgentHosts: DatabaseAgentHostsRegistry = new DatabaseAgentHostsRegistry();
   public locations: LocationsRegistry = new LocationsRegistry();
   public nodes: NodesRegistry = new NodesRegistry();
+  public runs: RunsRegistry = new RunsRegistry();
   public servers: ServersRegistry = new ServersRegistry();
 
   public enterSubNavigation(
@@ -55,6 +58,11 @@ export class ViewRegistry implements Registry {
 
   public enterNodes(callback: (registry: NodesRegistry) => unknown): this {
     callback(this.nodes);
+    return this;
+  }
+
+  public enterRuns(callback: (registry: RunsRegistry) => unknown): this {
+    callback(this.runs);
     return this;
   }
 

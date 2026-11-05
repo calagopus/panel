@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM system_backup_policy_run_targets\n            USING (\n                SELECT\n                    system_backup_policy_runs.uuid,\n                    ROW_NUMBER() OVER (\n                        PARTITION BY system_backup_policy_runs.system_backup_policy_uuid\n                        ORDER BY system_backup_policy_runs.created DESC, system_backup_policy_runs.uuid DESC\n                    ) AS position\n                FROM system_backup_policy_runs\n                WHERE system_backup_policy_runs.completed IS NOT NULL\n            ) AS ranked\n            WHERE\n                ranked.uuid = system_backup_policy_run_targets.system_backup_policy_run_uuid\n                AND ranked.position > $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5ec927f6a8847ded693c7f6646f87eb658643d6364d95e1f97864b9a77dae9bc"
+}

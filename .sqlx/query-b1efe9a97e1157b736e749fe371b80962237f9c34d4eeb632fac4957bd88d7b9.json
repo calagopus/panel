@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO system_backup_policy_runs (system_backup_policy_uuid, manual, occurrence)\n            SELECT $1, $2, $3\n            WHERE $2 OR NOT EXISTS (\n                SELECT 1\n                FROM system_backup_policy_runs\n                WHERE\n                    system_backup_policy_runs.system_backup_policy_uuid = $1\n                    AND NOT system_backup_policy_runs.manual\n                    AND system_backup_policy_runs.occurrence >= $3\n            )\n            ON CONFLICT DO NOTHING\n            RETURNING system_backup_policy_runs.uuid\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policy_runs",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Bool",
+        "Timestamp"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b1efe9a97e1157b736e749fe371b80962237f9c34d4eeb632fac4957bd88d7b9"
+}

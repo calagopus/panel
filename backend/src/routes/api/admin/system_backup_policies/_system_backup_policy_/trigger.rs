@@ -3,10 +3,14 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod post {
     use crate::routes::api::admin::system_backup_policies::_system_backup_policy_::GetSystemBackupPolicy;
+    use axum::http::StatusCode;
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{admin_activity::GetAdminActivityLogger, user::GetPermissionManager},
+        models::{
+            admin_activity::GetAdminActivityLogger,
+            system_backup_policy_run::SystemBackupPolicyRun, user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -17,6 +21,7 @@ mod post {
     #[utoipa::path(post, path = "/", responses(
         (status = OK, body = inline(Response)),
         (status = NOT_FOUND, body = ApiError),
+        (status = CONFLICT, body = ApiError),
     ), params(
         (
             "system_backup_policy" = uuid::Uuid,
@@ -27,12 +32,29 @@ mod post {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
-        mut system_backup_policy: GetSystemBackupPolicy,
+        system_backup_policy: GetSystemBackupPolicy,
         activity_logger: GetAdminActivityLogger,
     ) -> ApiResponseResult {
         permissions.has_admin_permission("system-backup-policies.update")?;
 
-        system_backup_policy.trigger(&state.database).await?;
+        if SystemBackupPolicyRun::has_pending_by_system_backup_policy_uuid(
+            &state.database,
+            system_backup_policy.uuid,
+        )
+        .await?
+        {
+            return ApiResponse::error("a run of this system backup policy is still in progress")
+                .with_status(StatusCode::CONFLICT)
+                .ok();
+        }
+
+        let run_uuid = SystemBackupPolicyRun::create(
+            &state.database,
+            &system_backup_policy,
+            true,
+            chrono::Utc::now().naive_utc(),
+        )
+        .await?;
 
         activity_logger
             .log(
@@ -40,6 +62,7 @@ mod post {
                 serde_json::json!({
                     "uuid": system_backup_policy.uuid,
                     "name": system_backup_policy.name,
+                    "run_uuid": run_uuid,
                 }),
             )
             .await;

@@ -16,8 +16,26 @@ const withAccessibleName = (children: ReactNode, label: TooltipProps['label']) =
   return cloneElement(children, { 'aria-label': label });
 };
 
-const Tooltip = forwardRef<HTMLDivElement, TooltipProps & { innerClassName?: string }>(
-  ({ children, className, innerClassName, ...rest }, ref) => {
+type Props = TooltipProps & {
+  innerClassName?: string;
+  // the child must forward its ref to a DOM node and never be disabled, disabled elements emit no hover events
+  unwrapped?: boolean;
+};
+
+const Tooltip = forwardRef<HTMLDivElement, Props>(
+  ({ children, className, innerClassName, unwrapped, ...rest }, ref) => {
+    if (unwrapped && isValidElement<{ className?: string }>(children)) {
+      const child = innerClassName
+        ? cloneElement(children, { className: classNames(children.props.className, innerClassName) })
+        : children;
+
+      return (
+        <MantineTooltip ref={ref} className={className} {...rest}>
+          {withAccessibleName(child, rest.label)}
+        </MantineTooltip>
+      );
+    }
+
     return (
       <MantineTooltip
         ref={ref}

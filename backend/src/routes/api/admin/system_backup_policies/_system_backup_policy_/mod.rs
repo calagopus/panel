@@ -16,6 +16,7 @@ mod backups;
 mod database_agent_hosts;
 mod locations;
 mod nodes;
+mod runs;
 mod servers;
 mod trigger;
 
@@ -264,6 +265,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/database-agent-hosts", database_agent_hosts::router(state))
         .nest("/locations", locations::router(state))
         .nest("/nodes", nodes::router(state))
+        .nest("/runs", runs::router(state))
         .nest("/servers", servers::router(state))
         .nest("/trigger", trigger::router(state))
         .route_layer(axum::middleware::from_fn_with_state(state.clone(), auth))

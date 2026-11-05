@@ -66,6 +66,8 @@ pub mod system_backup_policy;
 pub mod system_backup_policy_database_agent_host;
 pub mod system_backup_policy_location;
 pub mod system_backup_policy_node;
+pub mod system_backup_policy_run;
+pub mod system_backup_policy_run_target;
 pub mod system_backup_policy_server;
 pub mod user;
 pub mod user_activity;

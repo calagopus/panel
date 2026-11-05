@@ -1,6 +1,6 @@
 import { faSliders } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MantineColor, Tooltip as MantineTooltip, Progress } from '@mantine/core';
+import { MantineColor, Progress } from '@mantine/core';
 import { ReactNode } from 'react';
 import { z } from 'zod';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
@@ -199,7 +199,8 @@ export default function AllocationBar({
           <div className='relative'>
             <Progress.Root size='xl'>
               {segments.map((segment) => (
-                <MantineTooltip
+                <Tooltip
+                  unwrapped
                   key={segment.key}
                   label={`${segment.label}: ${formatValue(segment.value)}${segment.hint ? ` (${segment.hint})` : ''}`}
                 >
@@ -209,7 +210,7 @@ export default function AllocationBar({
                     striped={segment.striped}
                     className='border-r border-(--mantine-color-body) last:border-r-0'
                   />
-                </MantineTooltip>
+                </Tooltip>
               ))}
             </Progress.Root>
             {overallocated && (

@@ -176,6 +176,10 @@ const admin = {
     databaseAgentHosts: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'database-agent-hosts'] as const,
     locations: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'locations'] as const,
     servers: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'servers'] as const,
+    runs: (uuid: string) => ['admin', 'system-backup-policies', uuid, 'runs'] as const,
+    runTargets: (uuid: string, runUuid: string) =>
+      ['admin', 'system-backup-policies', uuid, 'runs', runUuid, 'targets'] as const,
+    latestRuns: () => ['admin', 'system-backup-policies', 'latest-runs'] as const,
   },
 
   oAuthProviders: {

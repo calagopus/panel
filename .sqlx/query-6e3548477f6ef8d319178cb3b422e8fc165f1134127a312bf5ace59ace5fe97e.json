@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE system_backup_policy_run_targets\n            SET status = 'DISPATCHED', reason = NULL, server_backup_uuid = $2, not_before = NULL, updated = NOW()\n            WHERE system_backup_policy_run_targets.uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6e3548477f6ef8d319178cb3b422e8fc165f1134127a312bf5ace59ace5fe97e"
+}

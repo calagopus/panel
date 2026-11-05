@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE system_backup_policy_run_targets\n            SET status = 'SKIPPED', reason = $2, updated = NOW()\n            FROM system_backup_policy_runs\n            WHERE\n                system_backup_policy_runs.uuid = system_backup_policy_run_targets.system_backup_policy_run_uuid\n                AND system_backup_policy_runs.system_backup_policy_uuid = $1\n                AND NOT system_backup_policy_runs.manual\n                AND system_backup_policy_runs.completed IS NULL\n                AND system_backup_policy_run_targets.status = 'PENDING'\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "system_backup_policy_run_target_reason",
+            "kind": {
+              "Enum": [
+                "NODE_MAINTENANCE",
+                "BACKUP_CONFIGURATION_MAINTENANCE",
+                "DATABASE_AGENT_HOST_MAINTENANCE",
+                "DATABASE_INSTANCE_STOPPED",
+                "SERVER_BUSY",
+                "METADATA_FAILED",
+                "NO_BACKUP_CONFIGURATION",
+                "UNSUPPORTED_BACKUP_DISK",
+                "TARGET_REMOVED",
+                "CREATE_FAILED",
+                "POLICY_DISABLED",
+                "SUPERSEDED",
+                "CANCELLED"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0bb40103a806869729a1d23a45ecee4b059cf59d2efd28e7324784ba5fe795c8"
+}

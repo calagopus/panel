@@ -39,6 +39,7 @@ export const systemBackupPolicyTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('pages.admin.systemBackupPolicies.table.columns.cron', {}),
     t('pages.admin.systemBackupPolicies.table.columns.backups', {}),
+    t('pages.admin.systemBackupPolicies.table.columns.lastRun', {}),
     t('common.table.columns.created', {}),
   ];
 };
@@ -70,6 +71,18 @@ export const systemBackupPolicyServerTableColumns = (): string[] => {
     t('common.table.columns.name', {}),
     t('common.table.columns.node', {}),
     t('common.table.columns.added', {}),
+    '',
+  ];
+};
+
+export const systemBackupPolicyRunTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('pages.admin.systemBackupPolicies.tabs.runs.page.table.columns.started', {}),
+    t('pages.admin.systemBackupPolicies.tabs.runs.page.table.columns.trigger', {}),
+    t('common.table.columns.status', {}),
+    t('pages.admin.systemBackupPolicies.tabs.runs.page.table.columns.progress', {}),
+    t('pages.admin.systemBackupPolicies.tabs.runs.page.table.columns.completed', {}),
     '',
   ];
 };

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH cancelled_run AS (\n                UPDATE system_backup_policy_runs\n                SET cancelled = NOW()\n                WHERE\n                    system_backup_policy_runs.uuid = $2\n                    AND system_backup_policy_runs.system_backup_policy_uuid = $1\n                    AND system_backup_policy_runs.completed IS NULL\n                    AND system_backup_policy_runs.cancelled IS NULL\n                RETURNING system_backup_policy_runs.uuid\n            ), skipped_targets AS (\n                UPDATE system_backup_policy_run_targets\n                SET status = 'SKIPPED', reason = 'CANCELLED', not_before = NULL, updated = NOW()\n                FROM cancelled_run\n                WHERE\n                    system_backup_policy_run_targets.system_backup_policy_run_uuid = cancelled_run.uuid\n                    AND system_backup_policy_run_targets.status = 'PENDING'\n            )\n            SELECT uuid FROM cancelled_run\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policy_runs",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "97f31f6b65bebb9425f3994f7eb4e257c8e391daac15cf6263d19c35ed5d73b7"
+}

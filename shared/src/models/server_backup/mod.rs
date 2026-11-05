@@ -1008,58 +1008,6 @@ impl ServerBackup {
         .await
     }
 
-    /// In-flight system backups for a single policy on a node, ignoring rows older than a day
-    /// (those are only failed-out when the wings node resets and must not starve the scheduler
-    /// forever).
-    pub async fn count_system_inflight_by_system_backup_policy_uuid_node_uuid(
-        database: &crate::database::Database,
-        system_backup_policy_uuid: uuid::Uuid,
-        node_uuid: uuid::Uuid,
-    ) -> Result<i64, sqlx::Error> {
-        sqlx::query_scalar(
-            r#"
-            SELECT COUNT(*)
-            FROM server_backups
-            WHERE
-                server_backups.system_backup_policy_uuid = $1
-                AND server_backups.node_uuid = $2
-                AND server_backups.completed IS NULL
-                AND server_backups.deleted IS NULL
-                AND server_backups.created >= NOW() - INTERVAL '1 day'
-            "#,
-        )
-        .bind(system_backup_policy_uuid)
-        .bind(node_uuid)
-        .fetch_one(database.read())
-        .await
-    }
-
-    /// Sibling of [`Self::count_system_inflight_by_system_backup_policy_uuid_node_uuid`] for
-    /// database instance policies, whose dumps load the database agent host rather than the node.
-    pub async fn count_system_inflight_by_system_backup_policy_uuid_database_agent_host_uuid(
-        database: &crate::database::Database,
-        system_backup_policy_uuid: uuid::Uuid,
-        database_agent_host_uuid: uuid::Uuid,
-    ) -> Result<i64, sqlx::Error> {
-        sqlx::query_scalar(
-            r#"
-            SELECT COUNT(*)
-            FROM server_backups
-            JOIN server_database_instances ON server_database_instances.uuid = server_backups.database_instance_uuid
-            WHERE
-                server_backups.system_backup_policy_uuid = $1
-                AND server_database_instances.database_agent_host_uuid = $2
-                AND server_backups.completed IS NULL
-                AND server_backups.deleted IS NULL
-                AND server_backups.created >= NOW() - INTERVAL '1 day'
-            "#,
-        )
-        .bind(system_backup_policy_uuid)
-        .bind(database_agent_host_uuid)
-        .fetch_one(database.read())
-        .await
-    }
-
     pub async fn generate_metadata(
         state: &crate::State,
         server: &super::server::Server,

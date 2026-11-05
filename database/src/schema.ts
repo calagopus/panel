@@ -69,6 +69,27 @@ export const backupDiskEnum = pgEnum('backup_disk', [
   'KOPIA',
 ]);
 export const serverBackupKindEnum = pgEnum('server_backup_kind', ['SERVER', 'DATABASE_INSTANCE']);
+export const systemBackupPolicyRunTargetStatusEnum = pgEnum('system_backup_policy_run_target_status', [
+  'PENDING',
+  'DISPATCHED',
+  'SKIPPED',
+  'FAILED',
+]);
+export const systemBackupPolicyRunTargetReasonEnum = pgEnum('system_backup_policy_run_target_reason', [
+  'NODE_MAINTENANCE',
+  'BACKUP_CONFIGURATION_MAINTENANCE',
+  'DATABASE_AGENT_HOST_MAINTENANCE',
+  'DATABASE_INSTANCE_STOPPED',
+  'SERVER_BUSY',
+  'METADATA_FAILED',
+  'NO_BACKUP_CONFIGURATION',
+  'UNSUPPORTED_BACKUP_DISK',
+  'TARGET_REMOVED',
+  'CREATE_FAILED',
+  'POLICY_DISABLED',
+  'SUPERSEDED',
+  'CANCELLED',
+]);
 export const serverDatabaseInstanceStatusEnum = pgEnum('server_database_instance_status', ['RESTORING_BACKUP']);
 export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 export const tunnelProtocolEnum = pgEnum('tunnel_protocol', ['TCP', 'UDP']);
@@ -565,7 +586,6 @@ export const systemBackupPoliciesTable = pgTable(
     cron: varchar({ length: 255 }).notNull(),
     retention: jsonb().default({ count: 0, days: 0, daily: 0, weekly: 0, monthly: 0, yearly: 0 }).notNull(),
     parallelism: integer().default(2).notNull(),
-    triggered: timestamp(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
@@ -655,6 +675,61 @@ export const systemBackupPolicyServersTable = pgTable(
     }),
     index('system_backup_policy_servers_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
     index('system_backup_policy_servers_server_uuid_idx').on(cols.server_uuid),
+  ],
+);
+
+export const systemBackupPolicyRunsTable = pgTable(
+  'system_backup_policy_runs',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    system_backup_policy_uuid: uuid()
+      .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    manual: boolean().notNull(),
+    occurrence: timestamp().notNull(),
+    total_targets: integer().default(0).notNull(),
+    successful_targets: integer().default(0).notNull(),
+    failed_targets: integer().default(0).notNull(),
+    skipped_targets: integer().default(0).notNull(),
+    cancelled: timestamp(),
+    completed: timestamp(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('system_backup_policy_runs_policy_uuid_created_idx').on(cols.system_backup_policy_uuid, cols.created),
+    uniqueIndex('system_backup_policy_runs_policy_uuid_occurrence_idx')
+      .on(cols.system_backup_policy_uuid, cols.occurrence)
+      .where(sql`NOT ${cols.manual}`),
+    index('system_backup_policy_runs_policy_uuid_open_idx')
+      .on(cols.system_backup_policy_uuid)
+      .where(sql`${cols.completed} IS NULL`),
+  ],
+);
+
+export const systemBackupPolicyRunTargetsTable = pgTable(
+  'system_backup_policy_run_targets',
+  {
+    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    system_backup_policy_run_uuid: uuid()
+      .references(() => systemBackupPolicyRunsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    server_uuid: uuid().references(() => serversTable.uuid, { onDelete: 'set null' }),
+    database_instance_uuid: uuid().references(() => serverDatabaseInstancesTable.uuid, { onDelete: 'set null' }),
+    server_backup_uuid: uuid().references(() => serverBackupsTable.uuid, { onDelete: 'set null' }),
+    status: systemBackupPolicyRunTargetStatusEnum().default('PENDING').notNull(),
+    reason: systemBackupPolicyRunTargetReasonEnum(),
+    last_attempt: timestamp(),
+    not_before: timestamp(),
+    updated: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('system_backup_policy_run_targets_run_uuid_idx').on(cols.system_backup_policy_run_uuid),
+    index('system_backup_policy_run_targets_run_uuid_pending_idx')
+      .on(cols.system_backup_policy_run_uuid)
+      .where(sql`${cols.status} = 'PENDING'`),
+    index('system_backup_policy_run_targets_server_uuid_idx').on(cols.server_uuid),
+    index('system_backup_policy_run_targets_database_instance_uuid_idx').on(cols.database_instance_uuid),
+    index('system_backup_policy_run_targets_server_backup_uuid_idx').on(cols.server_backup_uuid),
   ],
 );
 
@@ -1412,6 +1487,12 @@ export const serverBackupsTable = pgTable(
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     index('server_backups_backup_group_uuid_idx').on(cols.backup_group_uuid),
     index('server_backups_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
+    index('server_backups_policy_uuid_server_uuid_created_idx')
+      .on(cols.system_backup_policy_uuid, cols.server_uuid, cols.created)
+      .where(sql`${cols.system_backup_policy_uuid} IS NOT NULL`),
+    index('server_backups_policy_uuid_database_instance_uuid_created_idx')
+      .on(cols.system_backup_policy_uuid, cols.database_instance_uuid, cols.created)
+      .where(sql`${cols.system_backup_policy_uuid} IS NOT NULL AND ${cols.database_instance_uuid} IS NOT NULL`),
     index('server_backups_database_instance_uuid_idx').on(cols.database_instance_uuid),
     index('server_backups_successful_idx').on(cols.successful),
     index('server_backups_deleting_idx').on(cols.deleting),

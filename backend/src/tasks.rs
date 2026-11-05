@@ -1,3 +1,4 @@
+use futures_util::StreamExt;
 use rand::RngExt;
 use shared::models::{
     ByUuid, CreatableModel,
@@ -7,11 +8,15 @@ use shared::models::{
     egg_repository::EggRepository,
     node::Node,
     oauth_provider_mapping::OAuthProviderMapping,
-    server::Server,
-    server_activity::ServerActivity,
-    server_backup::{BackupDisk, ServerBackup},
+    server_activity::{CreateServerActivityOptions, ServerActivity},
+    server_backup::{BackupDisk, CreateServerBackupOptions, ServerBackup, ServerBackupKind},
     server_database_instance::ServerDatabaseInstance,
     system_backup_policy::SystemBackupPolicy,
+    system_backup_policy_run::SystemBackupPolicyRun,
+    system_backup_policy_run_target::{
+        SystemBackupPolicyRunTarget, SystemBackupPolicyRunTargetClaim,
+        SystemBackupPolicyRunTargetReason, SystemBackupPolicyRunTargetStatus,
+    },
     user_activity::UserActivity,
     user_api_key::UserApiKey,
     user_command_snippet::UserCommandSnippet,
@@ -59,6 +64,286 @@ async fn database_instance_running(
             );
 
             false
+        }
+    }
+}
+
+enum SystemBackupTargetOutcome {
+    Dispatched(uuid::Uuid),
+    Deferred(Option<SystemBackupPolicyRunTargetReason>),
+    Skipped(SystemBackupPolicyRunTargetReason),
+    Failed(SystemBackupPolicyRunTargetReason),
+}
+
+async fn dispatch_system_backup_target(
+    state: &shared::State,
+    policy: &SystemBackupPolicy,
+    claim: &SystemBackupPolicyRunTargetClaim,
+) -> SystemBackupTargetOutcome {
+    if let Some(existing_server_backup) = &claim.existing_server_backup {
+        return SystemBackupTargetOutcome::Dispatched(existing_server_backup.uuid);
+    }
+
+    let Some(server) = &claim.server else {
+        return SystemBackupTargetOutcome::Skipped(
+            SystemBackupPolicyRunTargetReason::TargetRemoved,
+        );
+    };
+    if policy.kind == ServerBackupKind::DatabaseInstance && claim.database_instance.is_none() {
+        return SystemBackupTargetOutcome::Skipped(
+            SystemBackupPolicyRunTargetReason::TargetRemoved,
+        );
+    }
+
+    let server = match server.fetch_optional(&state.database).await {
+        Ok(Some(server)) => server,
+        Ok(None) => {
+            return SystemBackupTargetOutcome::Skipped(
+                SystemBackupPolicyRunTargetReason::TargetRemoved,
+            );
+        }
+        Err(err) => {
+            tracing::warn!(
+                server = %server.uuid,
+                "failed to load server for system backup: {err:#?}"
+            );
+            return SystemBackupTargetOutcome::Deferred(None);
+        }
+    };
+    if server.status.is_some() || server.destination_node.is_some() {
+        return SystemBackupTargetOutcome::Deferred(Some(
+            SystemBackupPolicyRunTargetReason::ServerBusy,
+        ));
+    }
+
+    let node = match server.node.fetch_cached(&state.database).await {
+        Ok(node) => node,
+        Err(err) => {
+            tracing::warn!(
+                server = %server.uuid,
+                "failed to load node for system backup: {err:#?}"
+            );
+            return SystemBackupTargetOutcome::Deferred(None);
+        }
+    };
+    if node.maintenance_enabled {
+        return SystemBackupTargetOutcome::Deferred(Some(
+            SystemBackupPolicyRunTargetReason::NodeMaintenance,
+        ));
+    }
+
+    let database_instance = match &claim.database_instance {
+        Some(database_instance) => {
+            match ServerDatabaseInstance::by_server_uuid_uuid(
+                &state.database,
+                server.uuid,
+                database_instance.uuid,
+            )
+            .await
+            {
+                Ok(Some(database_instance)) => Some(database_instance),
+                Ok(None) => {
+                    return SystemBackupTargetOutcome::Skipped(
+                        SystemBackupPolicyRunTargetReason::TargetRemoved,
+                    );
+                }
+                Err(err) => {
+                    tracing::warn!(
+                        database_instance = %database_instance.uuid,
+                        "failed to load database instance for system backup: {err:#?}"
+                    );
+                    return SystemBackupTargetOutcome::Deferred(None);
+                }
+            }
+        }
+        None => None,
+    };
+    if let Some(database_instance) = &database_instance {
+        if database_instance.status.is_some() {
+            return SystemBackupTargetOutcome::Deferred(Some(
+                SystemBackupPolicyRunTargetReason::ServerBusy,
+            ));
+        }
+        if database_instance.database_agent_host.maintenance_enabled {
+            return SystemBackupTargetOutcome::Deferred(Some(
+                SystemBackupPolicyRunTargetReason::DatabaseAgentHostMaintenance,
+            ));
+        }
+    }
+
+    let backup_configuration = match &policy.backup_configuration {
+        Some(backup_configuration) => {
+            match backup_configuration.fetch_cached(&state.database).await {
+                Ok(backup_configuration) => Some(backup_configuration),
+                Err(err) => {
+                    tracing::warn!(
+                        policy = %policy.uuid,
+                        "failed to load backup configuration for system backup policy: {err:#?}"
+                    );
+                    return SystemBackupTargetOutcome::Deferred(None);
+                }
+            }
+        }
+        None => server.backup_configuration(&state.database).await,
+    };
+    let Some(backup_configuration) = backup_configuration else {
+        return SystemBackupTargetOutcome::Skipped(
+            SystemBackupPolicyRunTargetReason::NoBackupConfiguration,
+        );
+    };
+    if backup_configuration.maintenance_enabled {
+        return SystemBackupTargetOutcome::Deferred(Some(
+            SystemBackupPolicyRunTargetReason::BackupConfigurationMaintenance,
+        ));
+    }
+
+    let metadata = match &database_instance {
+        Some(database_instance) => {
+            if matches!(
+                backup_configuration.backup_disk,
+                BackupDisk::Btrfs | BackupDisk::Zfs
+            ) {
+                return SystemBackupTargetOutcome::Skipped(
+                    SystemBackupPolicyRunTargetReason::UnsupportedBackupDisk,
+                );
+            }
+
+            if !database_instance_running(state, database_instance).await {
+                return SystemBackupTargetOutcome::Deferred(Some(
+                    SystemBackupPolicyRunTargetReason::DatabaseInstanceStopped,
+                ));
+            }
+
+            ServerBackup::generate_database_metadata(database_instance)
+        }
+        None => match ServerBackup::generate_metadata(state, &server).await {
+            Ok(metadata) => metadata,
+            Err(err) => {
+                tracing::warn!(
+                    server = %server.uuid,
+                    "failed to generate metadata for system backup: {err:#?}"
+                );
+                return SystemBackupTargetOutcome::Deferred(Some(
+                    SystemBackupPolicyRunTargetReason::MetadataFailed,
+                ));
+            }
+        },
+    };
+
+    let options = CreateServerBackupOptions {
+        server: &server,
+        name: ServerBackup::default_name(),
+        backup_group_uuid: None,
+        system_backup_policy_uuid: Some(policy.uuid),
+        database_instance: database_instance.as_ref(),
+        backup_configuration: Some(backup_configuration),
+        ignored_files: Vec::new(),
+        metadata,
+    };
+    let backup = match ServerBackup::create(state, options).await {
+        Ok(backup) => backup,
+        Err(err) => {
+            tracing::error!(
+                server = %server.uuid,
+                policy = %policy.uuid,
+                "failed to create system backup: {err:#?}"
+            );
+            return SystemBackupTargetOutcome::Failed(
+                SystemBackupPolicyRunTargetReason::CreateFailed,
+            );
+        }
+    };
+
+    let (event, data) = match &database_instance {
+        Some(database_instance) => (
+            "server:database-backup.create",
+            serde_json::json!({
+                "source": "system-backup-policy",
+                "uuid": backup.uuid,
+                "name": backup.name,
+                "policy": policy.name,
+                "database_instance_uuid": database_instance.uuid,
+                "database_instance_name": database_instance.name,
+            }),
+        ),
+        None => (
+            "server:backup.create",
+            serde_json::json!({
+                "source": "system-backup-policy",
+                "uuid": backup.uuid,
+                "name": backup.name,
+                "policy": policy.name,
+            }),
+        ),
+    };
+
+    if let Err(err) = ServerActivity::create(
+        state,
+        CreateServerActivityOptions {
+            server_uuid: server.uuid,
+            user_uuid: None,
+            impersonator_uuid: None,
+            api_key_uuid: None,
+            schedule_uuid: None,
+            event: event.into(),
+            ip: None,
+            data,
+            created: None,
+        },
+    )
+    .await
+    {
+        tracing::warn!(
+            server = %server.uuid,
+            "failed to log system backup creation activity: {err:#?}"
+        );
+    }
+
+    SystemBackupTargetOutcome::Dispatched(backup.uuid)
+}
+
+async fn record_system_backup_target_outcome(
+    state: &shared::State,
+    claim: &SystemBackupPolicyRunTargetClaim,
+    outcome: SystemBackupTargetOutcome,
+) -> Result<(), sqlx::Error> {
+    const RETRY_DELAY: chrono::TimeDelta = chrono::TimeDelta::minutes(2);
+
+    match outcome {
+        SystemBackupTargetOutcome::Dispatched(server_backup_uuid) => {
+            SystemBackupPolicyRunTarget::set_dispatched(
+                &state.database,
+                claim.uuid,
+                server_backup_uuid,
+            )
+            .await
+        }
+        SystemBackupTargetOutcome::Deferred(reason) => {
+            SystemBackupPolicyRunTarget::set_deferred(
+                &state.database,
+                claim.uuid,
+                reason,
+                (chrono::Utc::now() + RETRY_DELAY).naive_utc(),
+            )
+            .await
+        }
+        SystemBackupTargetOutcome::Skipped(reason) => {
+            SystemBackupPolicyRunTarget::set_resolved(
+                &state.database,
+                claim.uuid,
+                SystemBackupPolicyRunTargetStatus::Skipped,
+                reason,
+            )
+            .await
+        }
+        SystemBackupTargetOutcome::Failed(reason) => {
+            SystemBackupPolicyRunTarget::set_resolved(
+                &state.database,
+                claim.uuid,
+                SystemBackupPolicyRunTargetStatus::Failed,
+                reason,
+            )
+            .await
         }
     }
 }
@@ -622,7 +907,9 @@ pub async fn define_background_tasks(
     background_task_builder
         .add_task("run_system_backup_policies", async |state| {
             const CHECK_INTERVAL: std::time::Duration = std::time::Duration::from_secs(60);
-            const CANDIDATE_LIMIT: i64 = 256;
+            const CLAIM_LIMIT: i64 = 256;
+            const MAX_CLAIMS_PER_TICK: usize = 16;
+            const DISPATCH_CONCURRENCY: usize = 8;
 
             let mut interval = tokio::time::interval(CHECK_INTERVAL);
             interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
@@ -642,266 +929,111 @@ pub async fn define_background_tasks(
                 };
 
                 for policy in policies {
-                    let candidates =
-                        match policy.due_candidates(&state.database, CANDIDATE_LIMIT).await {
-                            Ok(candidates) => candidates,
-                            Err(err) => {
-                                tracing::error!(
-                                    policy = %policy.uuid,
-                                    "failed to load due servers for system backup policy: {err:#?}"
-                                );
-                                continue;
-                            }
-                        };
-
-                    let candidate_count = candidates.len() as i64;
-                    let mut pending_trigger = false;
-                    let mut inflight_by_scope: std::collections::HashMap<uuid::Uuid, i64> =
-                        Default::default();
-
-                    for candidate in candidates {
-                        let cron_due = policy.enabled
-                            && policy
-                                .cron
-                                .iter_after(
-                                    candidate
-                                        .last_attempt
-                                        .unwrap_or(candidate.coverage_start)
-                                        .and_utc(),
-                                )
-                                .next()
-                                .is_some_and(|next| next <= now);
-                        let trigger_due = policy.triggered.is_some_and(|triggered| {
-                            candidate
-                                .last_attempt
-                                .is_none_or(|last_attempt| last_attempt < triggered)
-                        });
-                        if !cron_due && !trigger_due {
-                            continue;
-                        }
-
-                        let parallelism_scope = candidate
-                            .database_agent_host_uuid
-                            .unwrap_or(candidate.node_uuid);
-                        let inflight = match inflight_by_scope.entry(parallelism_scope) {
-                            std::collections::hash_map::Entry::Occupied(entry) => entry.into_mut(),
-                            std::collections::hash_map::Entry::Vacant(entry) => {
-                                let count = match candidate.database_agent_host_uuid {
-                                    Some(database_agent_host_uuid) => ServerBackup::count_system_inflight_by_system_backup_policy_uuid_database_agent_host_uuid(
-                                        &state.database,
-                                        policy.uuid,
-                                        database_agent_host_uuid,
-                                    )
-                                    .await,
-                                    None => ServerBackup::count_system_inflight_by_system_backup_policy_uuid_node_uuid(
-                                        &state.database,
-                                        policy.uuid,
-                                        candidate.node_uuid,
-                                    )
-                                    .await,
-                                };
-
-                                match count {
-                                    Ok(count) => entry.insert(count),
-                                    Err(err) => {
-                                        tracing::error!(
-                                            policy = %policy.uuid,
-                                            scope = %parallelism_scope,
-                                            "failed to count in-flight system backups: {err:#?}"
-                                        );
-                                        continue;
-                                    }
-                                }
-                            }
-                        };
-                        if *inflight >= policy.parallelism as i64 {
-                            pending_trigger = pending_trigger || trigger_due;
-                            continue;
-                        }
-
-                        let server = match Server::by_uuid_optional(
-                            &state.database,
-                            candidate.server_uuid,
-                        )
-                        .await
+                    if policy.enabled {
+                        if let Some(occurrence) = policy.cron.iter_before(now).next()
+                            && occurrence.naive_utc() >= policy.created
+                            && let Err(err) = SystemBackupPolicyRun::create(
+                                &state.database,
+                                &policy,
+                                false,
+                                occurrence.naive_utc(),
+                            )
+                            .await
                         {
-                            Ok(Some(server)) => server,
-                            Ok(None) => continue,
-                            Err(err) => {
-                                tracing::warn!(
-                                    server = %candidate.server_uuid,
-                                    "failed to load server for system backup: {err:#?}"
-                                );
-                                continue;
-                            }
-                        };
-
-                        let node = match server.node.fetch_cached(&state.database).await {
-                            Ok(node) => node,
-                            Err(err) => {
-                                tracing::warn!(
-                                    node = %candidate.node_uuid,
-                                    "failed to load node for system backup: {err:#?}"
-                                );
-                                continue;
-                            }
-                        };
-                        if node.maintenance_enabled {
-                            continue;
-                        }
-
-                        let database_instance = match candidate.database_instance_uuid {
-                            Some(database_instance_uuid) => {
-                                match ServerDatabaseInstance::by_server_uuid_uuid(
-                                    &state.database,
-                                    server.uuid,
-                                    database_instance_uuid,
-                                )
-                                .await
-                                {
-                                    Ok(Some(database_instance)) => Some(database_instance),
-                                    Ok(None) => continue,
-                                    Err(err) => {
-                                        tracing::warn!(
-                                            database_instance = %database_instance_uuid,
-                                            "failed to load database instance for system backup: {err:#?}"
-                                        );
-                                        continue;
-                                    }
-                                }
-                            }
-                            None => None,
-                        };
-
-                        let backup_configuration = match &policy.backup_configuration {
-                            Some(backup_configuration) => {
-                                match backup_configuration.fetch_cached(&state.database).await {
-                                    Ok(backup_configuration) => Some(backup_configuration),
-                                    Err(err) => {
-                                        tracing::warn!(
-                                            policy = %policy.uuid,
-                                            "failed to load backup configuration for system backup policy: {err:#?}"
-                                        );
-                                        continue;
-                                    }
-                                }
-                            }
-                            None => server.backup_configuration(&state.database).await,
-                        };
-                        let Some(backup_configuration) = backup_configuration else {
-                            continue;
-                        };
-                        if backup_configuration.maintenance_enabled {
-                            continue;
-                        }
-
-                        let metadata = match &database_instance {
-                            Some(database_instance) => {
-                                if matches!(
-                                    backup_configuration.backup_disk,
-                                    BackupDisk::Btrfs | BackupDisk::Zfs
-                                ) {
-                                    continue;
-                                }
-
-                                if !database_instance_running(&state, database_instance).await {
-                                    continue;
-                                }
-
-                                ServerBackup::generate_database_metadata(database_instance)
-                            }
-                            None => match ServerBackup::generate_metadata(&state, &server).await {
-                                Ok(metadata) => metadata,
-                                Err(err) => {
-                                    tracing::warn!(
-                                        server = %server.uuid,
-                                        "failed to generate metadata for system backup: {err:#?}"
-                                    );
-                                    continue;
-                                }
-                            },
-                        };
-
-                        let options = shared::models::server_backup::CreateServerBackupOptions {
-                            server: &server,
-                            name: ServerBackup::default_name(),
-                            backup_group_uuid: None,
-                            system_backup_policy_uuid: Some(policy.uuid),
-                            database_instance: database_instance.as_ref(),
-                            backup_configuration: Some(backup_configuration),
-                            ignored_files: Vec::new(),
-                            metadata,
-                        };
-                        let backup = match ServerBackup::create(&state, options).await {
-                            Ok(backup) => backup,
-                            Err(err) => {
-                                tracing::error!(
-                                    server = %server.uuid,
-                                    policy = %policy.uuid,
-                                    "failed to create system backup: {err:#?}"
-                                );
-                                continue;
-                            }
-                        };
-
-                        *inflight += 1;
-                        pending_trigger = pending_trigger || trigger_due;
-
-                        let (event, data) = match &database_instance {
-                            Some(database_instance) => (
-                                "server:database-backup.create",
-                                serde_json::json!({
-                                    "source": "system-backup-policy",
-                                    "uuid": backup.uuid,
-                                    "name": backup.name,
-                                    "policy": policy.name,
-                                    "database_instance_uuid": database_instance.uuid,
-                                    "database_instance_name": database_instance.name,
-                                }),
-                            ),
-                            None => (
-                                "server:backup.create",
-                                serde_json::json!({
-                                    "source": "system-backup-policy",
-                                    "uuid": backup.uuid,
-                                    "name": backup.name,
-                                    "policy": policy.name,
-                                }),
-                            ),
-                        };
-
-                        if let Err(err) = ServerActivity::create(
-                            &state,
-                            shared::models::server_activity::CreateServerActivityOptions {
-                                server_uuid: server.uuid,
-                                user_uuid: None,
-                                impersonator_uuid: None,
-                                api_key_uuid: None,
-                                schedule_uuid: None,
-                                event: event.into(),
-                                ip: None,
-                                data,
-                                created: None,
-                            },
-                        )
-                        .await
-                        {
-                            tracing::warn!(
-                                server = %server.uuid,
-                                "failed to log system backup creation activity: {err:#?}"
+                            tracing::error!(
+                                policy = %policy.uuid,
+                                "failed to start system backup policy run: {err:#?}"
                             );
                         }
-                    }
-
-                    if let Some(triggered) = policy.triggered
-                        && !pending_trigger
-                        && candidate_count < CANDIDATE_LIMIT
-                        && let Err(err) = policy.clear_trigger(&state.database, triggered).await
+                    } else if let Err(err) =
+                        SystemBackupPolicyRun::skip_pending_scheduled_by_system_backup_policy_uuid(
+                            &state.database,
+                            policy.uuid,
+                            SystemBackupPolicyRunTargetReason::PolicyDisabled,
+                        )
+                        .await
                     {
                         tracing::error!(
                             policy = %policy.uuid,
-                            "failed to clear system backup policy trigger: {err:#?}"
+                            "failed to skip scheduled targets of disabled system backup policy: {err:#?}"
                         );
+                    }
+
+                    for _ in 0..MAX_CLAIMS_PER_TICK {
+                        let claims = match SystemBackupPolicyRunTarget::claimable(
+                            &state.database,
+                            policy.uuid,
+                            policy.kind,
+                            policy.parallelism,
+                            CLAIM_LIMIT,
+                        )
+                        .await
+                        {
+                            Ok(claims) => claims,
+                            Err(err) => {
+                                tracing::error!(
+                                    policy = %policy.uuid,
+                                    "failed to claim system backup policy run targets: {err:#?}"
+                                );
+                                break;
+                            }
+                        };
+                        let claimed = claims.len() as i64;
+
+                        futures_util::stream::iter(claims)
+                            .for_each_concurrent(DISPATCH_CONCURRENCY, |claim| {
+                                let state = &state;
+                                let policy = &policy;
+
+                                async move {
+                                    let outcome =
+                                        dispatch_system_backup_target(state, policy, &claim).await;
+                                    if let Err(err) =
+                                        record_system_backup_target_outcome(state, &claim, outcome)
+                                            .await
+                                    {
+                                        tracing::error!(
+                                            policy = %policy.uuid,
+                                            target = %claim.uuid,
+                                            "failed to record system backup policy run target outcome: {err:#?}"
+                                        );
+                                    }
+                                }
+                            })
+                            .await;
+
+                        if claimed < CLAIM_LIMIT {
+                            break;
+                        }
+                    }
+
+                    let runs = match SystemBackupPolicyRun::open_by_system_backup_policy_uuid(
+                        &state.database,
+                        policy.uuid,
+                    )
+                    .await
+                    {
+                        Ok(runs) => runs,
+                        Err(err) => {
+                            tracing::error!(
+                                policy = %policy.uuid,
+                                "failed to load open system backup policy runs: {err:#?}"
+                            );
+                            continue;
+                        }
+                    };
+
+                    for run in runs {
+                        if run.pending_targets == 0
+                            && run.running_targets == 0
+                            && let Err(err) = run.complete(&state.database).await
+                        {
+                            tracing::error!(
+                                policy = %policy.uuid,
+                                run = %run.uuid,
+                                "failed to complete system backup policy run: {err:#?}"
+                            );
+                        }
                     }
                 }
             }
@@ -912,6 +1044,9 @@ pub async fn define_background_tasks(
             "prune_system_backups",
             croner::Cron::from_str("0 30 * * * *").unwrap(),
             async |state| {
+                const RUNS_KEPT: i64 = 200;
+                const RUN_TARGETS_KEPT: i64 = 20;
+
                 let pruned =
                     shared::models::server_backup::ServerBackup::prune_system_backups(&state)
                         .await?;
@@ -920,6 +1055,13 @@ pub async fn define_background_tasks(
                         "pruned {} system backups past their policy retention window",
                         pruned
                     );
+                }
+
+                let pruned =
+                    SystemBackupPolicyRun::prune(&state.database, RUNS_KEPT, RUN_TARGETS_KEPT)
+                        .await?;
+                if pruned > 0 {
+                    tracing::info!("pruned {} old system backup policy runs", pruned);
                 }
 
                 Ok(())

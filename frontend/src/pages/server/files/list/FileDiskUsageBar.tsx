@@ -1,6 +1,7 @@
-import { getThemeColor, Progress, Tooltip, useMantineTheme } from '@mantine/core';
+import { getThemeColor, Progress, useMantineTheme } from '@mantine/core';
 import type { DiskUsageBarProps, DiskUsageSection } from 'shared/src/registries/pages/server/files/diskUsageBar.ts';
 import Card from '@/elements/data-display/Card.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { bytesToString, mbToBytes } from '@/lib/format/size.ts';
 import { usageColor, usagePercent } from '@/lib/format/usage.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -75,7 +76,7 @@ function DiskUsageBar(props: DiskUsageBarProps) {
         </div>
         <Progress.Root size='xl' radius='xl' className='flex-1 sm:mx-2'>
           {resolved.map((section) => (
-            <Tooltip key={section.id} label={`${section.label}: ${bytesToString(section.bytes)}`}>
+            <Tooltip unwrapped key={section.id} label={`${section.label}: ${bytesToString(section.bytes)}`}>
               <Progress.Section
                 value={(section.bytes / scale) * 100}
                 color={section.color}

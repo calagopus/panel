@@ -1,4 +1,12 @@
-import { faArchive, faCog, faDatabase, faDesktop, faEarthAmerica, faServer } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArchive,
+  faClockRotateLeft,
+  faCog,
+  faDatabase,
+  faDesktop,
+  faEarthAmerica,
+  faServer,
+} from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getSystemBackupPolicy from '@/api/admin/system-backup-policies/getSystemBackupPolicy.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -9,6 +17,7 @@ import AdminSystemBackupPolicyBackups from '@/pages/admin/system-backup-policies
 import AdminSystemBackupPolicyDatabaseAgentHosts from '@/pages/admin/system-backup-policies/database-agent-hosts/AdminSystemBackupPolicyDatabaseAgentHosts.tsx';
 import AdminSystemBackupPolicyLocations from '@/pages/admin/system-backup-policies/locations/AdminSystemBackupPolicyLocations.tsx';
 import AdminSystemBackupPolicyNodes from '@/pages/admin/system-backup-policies/nodes/AdminSystemBackupPolicyNodes.tsx';
+import AdminSystemBackupPolicyRuns from '@/pages/admin/system-backup-policies/runs/AdminSystemBackupPolicyRuns.tsx';
 import AdminSystemBackupPolicyServers from '@/pages/admin/system-backup-policies/servers/AdminSystemBackupPolicyServers.tsx';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -40,6 +49,12 @@ export default function SystemBackupPolicyView() {
                 icon: faCog,
                 path: `/`,
                 element: <SystemBackupPolicyCreateOrUpdate contextSystemBackupPolicy={systemBackupPolicy} />,
+              },
+              {
+                name: t('pages.admin.systemBackupPolicies.tabs.runs.title', {}),
+                icon: faClockRotateLeft,
+                path: `/runs`,
+                element: <AdminSystemBackupPolicyRuns systemBackupPolicy={systemBackupPolicy} />,
               },
               {
                 name: t('pages.admin.systemBackupPolicies.tabs.backups.title', {}),

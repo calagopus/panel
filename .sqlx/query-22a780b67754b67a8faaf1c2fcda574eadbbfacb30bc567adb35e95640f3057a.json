@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE system_backup_policy_run_targets\n            SET reason = COALESCE($2, system_backup_policy_run_targets.reason), not_before = $3, updated = NOW()\n            WHERE system_backup_policy_run_targets.uuid = $1 AND system_backup_policy_run_targets.status = 'PENDING'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        {
+          "Custom": {
+            "name": "system_backup_policy_run_target_reason",
+            "kind": {
+              "Enum": [
+                "NODE_MAINTENANCE",
+                "BACKUP_CONFIGURATION_MAINTENANCE",
+                "DATABASE_AGENT_HOST_MAINTENANCE",
+                "DATABASE_INSTANCE_STOPPED",
+                "SERVER_BUSY",
+                "METADATA_FAILED",
+                "NO_BACKUP_CONFIGURATION",
+                "UNSUPPORTED_BACKUP_DISK",
+                "TARGET_REMOVED",
+                "CREATE_FAILED",
+                "POLICY_DISABLED",
+                "SUPERSEDED",
+                "CANCELLED"
+              ]
+            }
+          }
+        },
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "22a780b67754b67a8faaf1c2fcda574eadbbfacb30bc567adb35e95640f3057a"
+}

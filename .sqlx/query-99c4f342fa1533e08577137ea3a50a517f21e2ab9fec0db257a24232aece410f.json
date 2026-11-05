@@ -1,0 +1,61 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    WITH in_flight AS (\n                        SELECT server_database_instances.database_agent_host_uuid AS scope_uuid, COUNT(*) AS count\n                        FROM server_backups\n                        JOIN server_database_instances ON server_database_instances.uuid = server_backups.database_instance_uuid\n                        WHERE\n                            server_backups.system_backup_policy_uuid = $1\n                            AND server_backups.completed IS NULL\n                            AND server_backups.deleted IS NULL\n                            AND server_backups.created >= NOW() - INTERVAL '1 day'\n                        GROUP BY server_database_instances.database_agent_host_uuid\n                    ),\n                    ranked AS (\n                        SELECT\n                            system_backup_policy_run_targets.uuid,\n                            system_backup_policy_run_targets.server_uuid,\n                            system_backup_policy_run_targets.database_instance_uuid,\n                            system_backup_policy_runs.created AS run_created,\n                            server_database_instances.database_agent_host_uuid AS scope_uuid,\n                            ROW_NUMBER() OVER (\n                                PARTITION BY server_database_instances.database_agent_host_uuid\n                                ORDER BY system_backup_policy_run_targets.last_attempt ASC NULLS FIRST, system_backup_policy_run_targets.uuid\n                            ) AS position\n                        FROM system_backup_policy_run_targets\n                        JOIN system_backup_policy_runs ON system_backup_policy_runs.uuid = system_backup_policy_run_targets.system_backup_policy_run_uuid\n                        LEFT JOIN server_database_instances ON server_database_instances.uuid = system_backup_policy_run_targets.database_instance_uuid\n                        WHERE\n                            system_backup_policy_runs.system_backup_policy_uuid = $1\n                            AND system_backup_policy_runs.completed IS NULL\n                            AND system_backup_policy_run_targets.status = 'PENDING'\n                            AND (\n                                system_backup_policy_run_targets.not_before IS NULL\n                                OR system_backup_policy_run_targets.not_before <= NOW()\n                            )\n                    )\n                    SELECT\n                        ranked.uuid AS \"uuid!\",\n                        ranked.server_uuid AS \"server_uuid?\",\n                        ranked.database_instance_uuid AS \"database_instance_uuid?\",\n                        (\n                            SELECT server_backups.uuid\n                            FROM server_backups\n                            WHERE\n                                server_backups.system_backup_policy_uuid = $1\n                                AND server_backups.database_instance_uuid = ranked.database_instance_uuid\n                                AND server_backups.created >= ranked.run_created\n                            ORDER BY server_backups.created DESC\n                            LIMIT 1\n                        ) AS \"existing_server_backup_uuid?\"\n                    FROM ranked\n                    LEFT JOIN in_flight ON in_flight.scope_uuid = ranked.scope_uuid\n                    WHERE\n                        ranked.scope_uuid IS NULL\n                        OR ranked.position <= $2 - COALESCE(in_flight.count, 0)\n                    ORDER BY ranked.position, ranked.uuid\n                    LIMIT $3\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policy_run_targets",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "server_uuid?",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policy_run_targets",
+            "name": "server_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "database_instance_uuid?",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "system_backup_policy_run_targets",
+            "name": "database_instance_uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "existing_server_backup_uuid?",
+        "type_info": "Uuid",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "99c4f342fa1533e08577137ea3a50a517f21e2ab9fec0db257a24232aece410f"
+}

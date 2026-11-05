@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE system_backup_policy_runs\n            SET\n                completed = NOW(),\n                successful_targets = $2,\n                failed_targets = $3,\n                skipped_targets = $4\n            WHERE system_backup_policy_runs.uuid = $1 AND system_backup_policy_runs.completed IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "91e641caa26fecba0a94535aeee5bdf2d651226958a7b297c4b46f566653d19d"
+}

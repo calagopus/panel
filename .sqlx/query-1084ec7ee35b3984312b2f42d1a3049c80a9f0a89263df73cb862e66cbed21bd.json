@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    INSERT INTO system_backup_policy_run_targets (system_backup_policy_run_uuid, server_uuid, database_instance_uuid, last_attempt)\n                    SELECT $2, server_database_instances.server_uuid, server_database_instances.uuid, attempts.last_attempt\n                    FROM server_database_instances\n                    LEFT JOIN LATERAL (\n                        SELECT MIN(scopes.created) AS attached\n                        FROM (\n                            SELECT system_backup_policy_database_agent_hosts.created\n                            FROM system_backup_policy_database_agent_hosts\n                            WHERE\n                                system_backup_policy_database_agent_hosts.system_backup_policy_uuid = $1\n                                AND system_backup_policy_database_agent_hosts.database_agent_host_uuid = server_database_instances.database_agent_host_uuid\n                            UNION ALL\n                            SELECT system_backup_policy_locations.created\n                            FROM system_backup_policy_locations\n                            JOIN location_database_agent_hosts ON location_database_agent_hosts.location_uuid = system_backup_policy_locations.location_uuid\n                            WHERE\n                                system_backup_policy_locations.system_backup_policy_uuid = $1\n                                AND location_database_agent_hosts.database_agent_host_uuid = server_database_instances.database_agent_host_uuid\n                            UNION ALL\n                            SELECT system_backup_policy_servers.created\n                            FROM system_backup_policy_servers\n                            WHERE\n                                system_backup_policy_servers.system_backup_policy_uuid = $1\n                                AND system_backup_policy_servers.server_uuid = server_database_instances.server_uuid\n                        ) AS scopes\n                    ) AS coverage ON TRUE\n                    LEFT JOIN LATERAL (\n                        SELECT\n                            MAX(server_backups.created) AS last_attempt,\n                            BOOL_OR(\n                                server_backups.completed IS NULL\n                                AND server_backups.deleted IS NULL\n                                AND server_backups.created >= NOW() - INTERVAL '1 day'\n                            ) AS in_flight\n                        FROM server_backups\n                        WHERE\n                            server_backups.system_backup_policy_uuid = $1\n                            AND server_backups.database_instance_uuid = server_database_instances.uuid\n                    ) AS attempts ON TRUE\n                    WHERE\n                        coverage.attached IS NOT NULL\n                        AND ($3 OR GREATEST(server_database_instances.created, coverage.attached) < $4)\n                        AND (attempts.last_attempt IS NULL OR attempts.last_attempt < $4)\n                        AND NOT COALESCE(attempts.in_flight, FALSE)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Bool",
+        "Timestamp"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1084ec7ee35b3984312b2f42d1a3049c80a9f0a89263df73cb862e66cbed21bd"
+}
