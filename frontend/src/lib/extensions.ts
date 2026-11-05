@@ -28,6 +28,22 @@ export function upsertByPackageName<T extends PackageNamed>(list: T[], item: T):
   return [...removeByPackageName(list, pkgName(item)), item];
 }
 
+export function matchesExtensionSearch(
+  packageName: string,
+  backendExtension: AdminBackendExtension | undefined,
+  search: string,
+): boolean {
+  const term = search.trim().toLowerCase();
+  if (!term) return true;
+
+  return [
+    packageName,
+    backendExtension?.metadataToml.name,
+    backendExtension?.description,
+    ...(backendExtension?.authors ?? []),
+  ].some((value) => value?.toLowerCase().includes(term));
+}
+
 export function getBackendOnlyExtensions(adminExtensions: AdminExtensionList | undefined): AdminBackendExtension[] {
   const frontend = window.extensionContext.extensions;
   return (adminExtensions?.extensions ?? []).filter((be) => !someByPackageName(frontend, pkgName(be)));

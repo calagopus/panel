@@ -1,4 +1,4 @@
-import { faPuzzlePiece } from '@fortawesome/free-solid-svg-icons';
+import { faCubesStacked, faPuzzlePiece } from '@fortawesome/free-solid-svg-icons';
 import { useMemo } from 'react';
 import { AdminExtensionList } from '@/api/admin/extensions/getAdminExtensions.ts';
 import { ExtensionStatus } from '@/api/admin/extensions/manage/getExtensionStatus.ts';
@@ -8,6 +8,7 @@ import {
   computeInstalledCount,
   findByPackageName,
   getBackendOnlyExtensions,
+  matchesExtensionSearch,
   someByPackageName,
 } from '@/lib/extensions.ts';
 import { AdminBackendExtension } from '@/lib/schemas/admin/backendExtension.ts';
@@ -22,6 +23,7 @@ export default function InstalledExtensionsGrid({
   onRemove,
   onToggle,
   isPending,
+  search,
 }: {
   adminExtensions: AdminExtensionList | undefined;
   extensionStatus: ExtensionStatus | undefined;
@@ -29,11 +31,23 @@ export default function InstalledExtensionsGrid({
   onRemove: (extension: AdminBackendExtension) => void;
   onToggle: (packageName: string, enabled: boolean) => void;
   isPending: (key: string) => boolean;
+  search: string;
 }) {
   const { t } = useTranslations();
 
   const installedCount = useMemo(() => computeInstalledCount(adminExtensions), [adminExtensions]);
   const backendOnlyExtensions = useMemo(() => getBackendOnlyExtensions(adminExtensions), [adminExtensions]);
+
+  const frontendMatches = window.extensionContext.extensions.filter((extension) =>
+    matchesExtensionSearch(
+      extension.packageName,
+      findByPackageName(adminExtensions?.extensions ?? [], extension.packageName),
+      search,
+    ),
+  );
+  const backendOnlyMatches = backendOnlyExtensions.filter((backendExtension) =>
+    matchesExtensionSearch(backendExtension.metadataToml.packageName, backendExtension, search),
+  );
 
   const isRemoved = (packageName: string) => someByPackageName(extensionStatus?.removedExtensions ?? [], packageName);
 
@@ -59,9 +73,19 @@ export default function InstalledExtensionsGrid({
     );
   }
 
+  if (frontendMatches.length === 0 && backendOnlyMatches.length === 0) {
+    return (
+      <EmptyState
+        icon={faCubesStacked}
+        title={t('common.table.empty.title', {})}
+        description={t('common.table.empty.description', {})}
+      />
+    );
+  }
+
   return (
     <ExtensionGrid>
-      {window.extensionContext.extensions.map((extension) => {
+      {frontendMatches.map((extension) => {
         const backendExtension = findByPackageName(adminExtensions.extensions, extension.packageName);
 
         return (
@@ -80,7 +104,7 @@ export default function InstalledExtensionsGrid({
           />
         );
       })}
-      {backendOnlyExtensions.map((backendExtension) => (
+      {backendOnlyMatches.map((backendExtension) => (
         <ExtensionCard
           key={backendExtension.metadataToml.packageName}
           backendExtension={backendExtension}

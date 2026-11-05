@@ -1,11 +1,12 @@
 import { faFileText, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import { computeInstalledCount } from '@/lib/extensions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ExtensionInstallOverlay from './ExtensionInstallOverlay.tsx';
 import ExtensionStatusAlerts from './ExtensionStatusAlerts.tsx';
@@ -21,10 +22,15 @@ export default function AdminExtensions() {
   const { t } = useTranslations();
   const ext = useExtensionManagement();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [search, setSearch] = useState('');
+
+  const installedCount = useMemo(() => computeInstalledCount(ext.adminExtensions), [ext.adminExtensions]);
 
   return (
     <AdminContentContainer
       title={t('pages.admin.extensions.title', {})}
+      search={search}
+      setSearch={installedCount > 0 ? setSearch : undefined}
       contentRight={
         <AdminCan action='extensions.manage'>
           <Group hidden={!ext.extensionStatus} gap='xs'>
@@ -91,6 +97,7 @@ export default function AdminExtensions() {
         onRemove={ext.setRemovalExtension}
         onToggle={ext.handleToggle}
         isPending={ext.isPending}
+        search={search}
       />
 
       {ext.extensionStatus && (
