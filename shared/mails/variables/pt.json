@@ -1,0 +1,79 @@
+{
+  "account_created": {
+    "subject": "Conta criada",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este e-mail porque uma conta foi criada para você em <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Por favor, clique no botão abaixo para definir com segurança sua senha e acessar sua conta:",
+    "button": "Defina sua senha",
+    "note": "<strong>Nota:</strong> Por razões de segurança, este link irá expirar em <strong>20 minutos</strong>.",
+    "footer": "Se você não solicitou esta conta, pode ignorar este e-mail."
+  },
+  "password_reset": {
+    "subject": "Redefinir a senha",
+    "greeting": "Olá, <strong>{{ user.username }}</strong>,",
+    "intro": "Recebemos um pedido para redefinir a senha da sua conta em <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Se você fez esse pedido, por favor, clique no botão abaixo para escolher uma nova senha:",
+    "button": "Redefinir senha",
+    "note": "<strong>Nota:</strong> Esse link irá expirar em <strong>20 minutos</strong>.",
+    "footer": "Se você não solicitou uma redefinição de senha, ignore este e-mail. Sua senha permanecerá inalterada e sua conta estará segura."
+  },
+  "email_verification": {
+    "subject": "Verificar Seu E-mail",
+    "greeting": "Olá, <strong>{{ user.username }}</strong>,",
+    "intro": "Por favor, confirme que <strong>{{ email }}</strong> pertence a você para concluir a configuração da sua conta no <strong>{{ settings.app.name }}</strong>.",
+    "button": "Verificar E-mail",
+    "note": "<strong>Nota:</strong> Esse link vai expirar em <strong>24 horas</strong>.",
+    "footer": "Se você não criou esta conta ou solicitou essa mudança, por favor, ignore esta mensagem. Nada será alterado."
+  },
+  "two_factor_code": {
+    "subject": "Seu código de login",
+    "greeting": "Olá, <strong>{{ user.username }}</strong>,",
+    "intro": "Utilize o código abaixo para terminar de entrar no <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Nota:</strong> Esse código irá expirar em <strong>10 minutos</strong> e só pode ser usado uma vez.",
+    "footer": "Se você não tentou fazer o login, alguém talvez conheça sua senha. Recomendamos alterá-la o mais rápido possível."
+  },
+  "session_created": {
+    "subject": "Nova sessão criada",
+    "greeting": "Olá, <strong>{{ user.username }}</strong>,",
+    "intro": "Sua conta acabou de entrar em <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "Endereço IP",
+    "device_label": "Dispositivo",
+    "button": "Revisar Sessões",
+    "note": "<strong>Nota:</strong> Se foi você, nenhuma ação é necessária. Você pode revogar qualquer sessão que não reconhecer em suas configurações de conta.",
+    "footer": "Se você não tentou fazer o login, alguém talvez conheça sua senha. Recomendamos alterá-la o mais rápido possível."
+  },
+  "connection_test": {
+    "subject": "Teste de conexão",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este e-mail porque um administrador em <strong>{{ settings.app.name }}</strong> solicitou uma mensagem de teste para verificar as configurações de envio de e-mail do sistema.",
+    "success": "🎉 Sucesso! A conexão de e-mail funciona.",
+    "footer": "Esta é uma mensagem de teste automática de seu aplicativo. Nenhuma ação adicional é necessária."
+  },
+  "added_to_server": {
+    "subject": "Adicionado ao servidor",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este e-mail porque você foi adicionado como um sub-usuário em <strong>{{ server.name }}</strong>.",
+    "instruction": "Clique no botão abaixo para acessar o servidor:",
+    "button": "Acessar Servidor"
+  },
+  "removed_from_server": {
+    "subject": "Removido do servidor",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este e-mail porque você foi removido como um sub-usuário de <strong>{{ server.name }}</strong>.",
+    "footer": "Não há nenhuma ação necessária em seu lado. Se você acredita que isso foi um erro, por favor contate o administrador do servidor para mais informações."
+  },
+  "server_installed": {
+    "subject": "Servidor Instalado",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este email porque seu servidor, <strong>{{ server.name }}</strong>, terminou a instalação.",
+    "instruction": "Clique no botão abaixo para acessar o servidor:",
+    "button": "Acessar Servidor"
+  },
+  "server_restored": {
+    "subject": "Servidor restaurado",
+    "greeting": "Olá,",
+    "intro": "Você está recebendo este email porque o seu servidor, <strong>{{ server.name }}</strong>, finalizou a restauração de um backup.",
+    "instruction": "Clique no botão abaixo para acessar o servidor:",
+    "button": "Acessar Servidor"
+  }
+}

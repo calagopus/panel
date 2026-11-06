@@ -5017,9 +5017,6 @@
         "systemBackupPolicies": {
           "title": "Políticas de copia de seguridad del sistema",
           "resourceName": "Política de las copias de seguridad del sistema",
-          "badge": {
-            "runPending": "Ejecutar pendiente"
-          },
           "table": {
             "columns": {
               "cron": "Programa",

@@ -4996,9 +4996,6 @@
         "systemBackupPolicies": {
           "title": "Các chính sách sao lưu hệ thống",
           "resourceName": "Chính sách sao lưu hệ thống",
-          "badge": {
-            "runPending": "Đang chờ chạy"
-          },
           "table": {
             "columns": {
               "cron": "Lịch trình",

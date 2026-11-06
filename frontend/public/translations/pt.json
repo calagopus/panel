@@ -1,0 +1,2242 @@
+{
+  "items": {
+    "user": {
+      "zero": "{count} Usuários",
+      "one": "{count} Usuário",
+      "two": "{count} Usuários",
+      "few": "{count} Usuários",
+      "many": "{count} Usuários",
+      "other": "{count} Usuários"
+    },
+    "file": {
+      "zero": "{count} Arquivos",
+      "one": "{count} Arquivo",
+      "two": "{count} Arquivos",
+      "few": "{count} Arquivos",
+      "many": "{count} Arquivos",
+      "other": "{count} Arquivos"
+    },
+    "directory": {
+      "zero": "{count} Pastas",
+      "one": "{count} Pasta",
+      "two": "{count} Pastas",
+      "few": "{count} Pastas",
+      "many": "{count} Pastas",
+      "other": "{count} Pastas"
+    },
+    "server": {
+      "zero": "{count} Servidores",
+      "one": "{count} Servidor",
+      "two": "{count} Servidores",
+      "few": "{count} Servidores",
+      "many": "{count} Servidores",
+      "other": "{count} Servidores"
+    },
+    "sshKey": {
+      "zero": "{count} Chaves SSH",
+      "one": "{count} Chave SSH",
+      "two": "{count} Chaves SSH",
+      "few": "{count} Chaves SSH",
+      "many": "{count} Chaves SSH",
+      "other": "{count} Chaves SSH"
+    },
+    "asset": {
+      "zero": "{count} Recursos",
+      "one": "{count} Recurso",
+      "two": "{count} Recursos",
+      "few": "{count} Recursos",
+      "many": "{count} Recursos",
+      "other": "{count} Recursos"
+    },
+    "node": {
+      "zero": "{count} Instâncias",
+      "one": "{count} Instância",
+      "two": "{count} Instâncias",
+      "few": "{count} Instâncias",
+      "many": "{count} Instâncias",
+      "other": "{count} Instâncias"
+    },
+    "databaseAgentHost": {
+      "zero": "{count} Agentes de Banco de Dados",
+      "one": "{count} Agente de Banco de Dados",
+      "two": "{count} Agentes de Banco de Dados",
+      "few": "{count} Agentes de Banco de Dados",
+      "many": "{count} Agentes de Banco de Dados",
+      "other": "{count} Agentes de Banco de Dados"
+    },
+    "allocation": {
+      "zero": "{count} Alocações de Nó",
+      "one": "{count} Alocações de Nó",
+      "two": "{count} Alocações de Nó",
+      "few": "{count} Alocações de Nó",
+      "many": "{count} Alocações de Nó",
+      "other": "{count} Alocações de Nó"
+    },
+    "egg": {
+      "zero": "{count} Ovos",
+      "one": "{count} Ovo",
+      "two": "{count} Ovos",
+      "few": "{count} Ovos",
+      "many": "{count} Ovos",
+      "other": "{count} Ovos"
+    },
+    "instance": {
+      "zero": "{count} Instâncias",
+      "one": "{count} Instância",
+      "two": "{count} Instâncias",
+      "few": "{count} Instâncias",
+      "many": "{count} Instâncias",
+      "other": "{count} Instâncias"
+    },
+    "shortcut": {
+      "zero": "{count} Atalhos",
+      "one": "{count} Atalho",
+      "two": "{count} Atalhos",
+      "few": "{count} Atalhos",
+      "many": "{count} Atalhos",
+      "other": "{count} Atalhos"
+    },
+    "line": {
+      "zero": "{count} Linhas",
+      "one": "{count} Linha",
+      "two": "{count} Linhas",
+      "few": "{count} Linhas",
+      "many": "{count} Linhas",
+      "other": "{count} Linhas"
+    },
+    "header": {
+      "zero": "{count} Cabeçalhos",
+      "one": "{count} Cabeçalho",
+      "two": "{count} Cabeçalhos",
+      "few": "{count} Cabeçalhos",
+      "many": "{count} Cabeçalhos",
+      "other": "{count} Cabeçalhos"
+    },
+    "row": {
+      "zero": "{count} Linhas",
+      "one": "{count} Linha",
+      "two": "{count} Linhas",
+      "few": "{count} Linhas",
+      "many": "{count} Linhas",
+      "other": "{count} Linhas"
+    },
+    "change": {
+      "zero": "{count} Alterações",
+      "one": "{count} Alteração",
+      "two": "{count} Alterações",
+      "few": "{count} Alterações",
+      "many": "{count} Alterações",
+      "other": "{count} Alterações"
+    },
+    "session": {
+      "zero": "{count} Sessões",
+      "one": "{count} Sessão",
+      "two": "{count} Sessões",
+      "few": "{count} Sessões",
+      "many": "{count} Sessões",
+      "other": "{count} Sessões"
+    },
+    "serverAllocation": {
+      "zero": "{count} Alocações",
+      "one": "{count} Alocação",
+      "two": "{count} Alocações",
+      "few": "{count} Alocações",
+      "many": "{count} Alocações",
+      "other": "{count} Alocações"
+    },
+    "database": {
+      "zero": "{count} Bancos de Dados",
+      "one": "{count} Banco de Dados",
+      "two": "{count} Bancos de Dados",
+      "few": "{count} Bancos de Dados",
+      "many": "{count} Bancos de Dados",
+      "other": "{count} Bancos de Dados"
+    },
+    "databaseInstance": {
+      "zero": "{count} Bancos de Dados Gerenciados",
+      "one": "{count} Banco de Dados Gerenciado",
+      "two": "{count} Bancos de Dados Gerenciados",
+      "few": "{count} Bancos de Dados Gerenciados",
+      "many": "{count} Bancos de Dados Gerenciados",
+      "other": "{count} Bancos de Dados Gerenciados"
+    },
+    "schedule": {
+      "zero": "{count} Agendamentos",
+      "one": "{count} Agendamento",
+      "two": "{count} Agendamentos",
+      "few": "{count} Agendamentos",
+      "many": "{count} Agendamentos",
+      "other": "{count} Agendamentos"
+    },
+    "subuser": {
+      "zero": "{count} Sub-usuários",
+      "one": "{count} Sub-usuário",
+      "two": "{count} Sub-usuários",
+      "few": "{count} Sub-usuários",
+      "many": "{count} Sub-usuários",
+      "other": "{count} Sub-usuários"
+    },
+    "mount": {
+      "zero": "{count} Montagens",
+      "one": "{count} Montagem",
+      "two": "{count} Montagens",
+      "few": "{count} Montagens",
+      "many": "{count} Montagens",
+      "other": "{count} Montagens"
+    },
+    "device": {
+      "zero": "{count} Dispositivos",
+      "one": "{count} Dispositivo",
+      "two": "{count} Dispositivos",
+      "few": "{count} Dispositivos",
+      "many": "{count} Dispositivos",
+      "other": "{count} Dispositivos"
+    },
+    "apiKey": {
+      "zero": "{count} Chaves de API",
+      "one": "{count} Chave de API",
+      "two": "{count} Chaves de API",
+      "few": "{count} Chaves de API",
+      "many": "{count} Chaves de API",
+      "other": "{count} Chaves de API"
+    },
+    "oauthLink": {
+      "zero": "{count} Contas Vinculadas",
+      "one": "{count} Conta Vinculada",
+      "two": "{count} Contas Vinculadas",
+      "few": "{count} Contas Vinculadas",
+      "many": "{count} Contas Vinculadas",
+      "other": "{count} Contas Vinculadas"
+    },
+    "commandSnippet": {
+      "zero": "{count} Trechos de Comando",
+      "one": "{count} Trecho de Comando",
+      "two": "{count} Trechos de Comando",
+      "few": "{count} Trechos de Comando",
+      "many": "{count} Trechos de Comando",
+      "other": "{count} Trechos de Comando"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Criar",
+        "add": "Adicionar",
+        "retry": "Tentar Novamente",
+        "addDefaultPort": "Adicionar :{port}",
+        "save": "Salvar",
+        "saveAndStay": "Salvar e Permanecer",
+        "edit": "Editar",
+        "duplicate": "Duplicar",
+        "delete": "Deletar",
+        "remove": "Remover",
+        "enable": "Habilitar",
+        "disable": "Desabilitar",
+        "disableTwoFactor": "Desativar autenticação de duas etapas",
+        "verify": "Verificar",
+        "update": "Atualizar",
+        "upgrade": "Melhorar",
+        "close": "Fechar",
+        "copy": "Copiar",
+        "cancel": "Cancelar",
+        "continue": "Continuar",
+        "skip": "Pular",
+        "okay": "Ok",
+        "back": "Voltar",
+        "next": "Próximo",
+        "install": "Instalar",
+        "selectAll": "Selecionar tudo",
+        "deselectAll": "Desselecionar Tudo",
+        "restore": "Restaurar",
+        "discard": "Descartar",
+        "download": "Baixar",
+        "downloadAs": "Baixar como {format}",
+        "export": "Exportar",
+        "exportAs": "Exportar como {format}",
+        "recreate": "Recriar",
+        "move": "Mover",
+        "transfer": "Transferir",
+        "reattach": "Reanexar",
+        "reassign": "Reatribuir",
+        "detach": "Desanexar",
+        "send": "Enviar",
+        "reset": "Redefinir",
+        "view": "Exibir",
+        "import": "Importar",
+        "details": "Detalhes",
+        "loadLogs": "Carregar Registros",
+        "sendTestEmail": "Enviar E-Mail De Teste",
+        "test": "Testar",
+        "setPrimary": "Definir Primário",
+        "unsetPrimary": "Remover Primário",
+        "leavePage": "Sair da Página",
+        "viewDocumentation": "Ver Documentação",
+        "undo": "Desfazer",
+        "clearUserFilter": "Limpar Filtro de Usuário",
+        "deleteFailedBackups": "Falha ao excluir {count}",
+        "retryFailedDeletions": "Repetir {count} Exclusões com Falha"
+      },
+      "alert": {
+        "error": "Erro",
+        "warning": "Aviso",
+        "success": "Sucesso",
+        "clockOffset": "O relógio do seu sistema está fora de sincronia com o servidor em {offset} segundos, isso poderá causar problema com a autenticação. Por favor, corrija seu relógio caso tenha problemas.",
+        "passwordAuthUnavailable": "Sua senha não vai funcionar para esta conexão. Use uma Chave SSH, você pode criar uma na página de Chaves SSH da sua conta."
+      },
+      "divider": {
+        "or": "OU"
+      },
+      "input": {
+        "search": "Pesquisar..."
+      },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "Cadeia de caracteres",
+              "number": "Número",
+              "boolean": "Booleano",
+              "object": "Objeto",
+              "array": "Lista",
+              "null": "Nulo"
+            }
+          },
+          "textMode": "Texto",
+          "invalidJson": "JSON inválido"
+        },
+        "tagsInput": {
+          "copyAll": "Copiar Tudo",
+          "pasteReplace": "Colar (Substituir)"
+        },
+        "serverFileInput": {
+          "notFound": "Ainda não existe nenhum arquivo com este nome.",
+          "isDirectory": "Isto é um diretório, não um arquivo."
+        },
+        "nodeAllocationIpInput": {
+          "anyAddress": "Todos os endereços",
+          "nodeInterfaces": "Interfaces do nó",
+          "inUse": "Em Uso"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "Um padrão por linha.",
+          "countMatches": "Contagem de correspondências",
+          "matches": "{count} resultados",
+          "noMatches": "Sem resultados",
+          "exception": "Exceção",
+          "invalid": "Padrão inválido",
+          "unavailable": "Contagem indisponível"
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Segundo",
+            "minute": "Minuto",
+            "hour": "Hora",
+            "day": "Dia",
+            "month": "Mês",
+            "weekday": "Dia da semana"
+          },
+          "nextRun": "A próxima execução em {timestamp}."
+        },
+        "iconInput": {
+          "defaultIcon": "Ícone padrão",
+          "searchPlaceholder": "Buscar ícones...",
+          "noResults": "Nenhum ícone corresponde à sua busca.",
+          "button": {
+            "reset": "Usar ícone padrão"
+          }
+        },
+        "trashRetention": {
+          "days": "dias"
+        },
+        "trashSettings": {
+          "custom": "Use configurações personalizadas do lixo para este servidor",
+          "default": "Padrão do painel: {summary}",
+          "summary": {
+            "disabled": "Desabilitado"
+          },
+          "retention": "Retenção",
+          "retentionDescription": "Quanto tempo os arquivos excluídos ficam na lixeira. Defina como 0 para desativar a lixeira.",
+          "usageThreshold": "Limpar por uso de disco"
+        },
+        "backupRetention": {
+          "title": "Retenção",
+          "disabled": "Sem regras de retenção",
+          "count": "Manter o mais recente",
+          "days": "Manter tudo dentro de dias",
+          "daily": "Manter diariamente",
+          "weekly": "Manter semanalmente",
+          "monthly": "Manter mensalmente",
+          "yearly": "Manter anualmente",
+          "status": {
+            "locked": "Trancado",
+            "indefinite": "Manter indefinidamente",
+            "expired": "Removação pendente",
+            "failed": "Limpar",
+            "keptBy": "Mantido por: {rules}.",
+            "forecastDescription": "O tempo de exclusão é uma estimativa baseada na programação de backup.",
+            "lockedDescription": "Os backups trancados nunca serão removidos por retenção.",
+            "indefiniteDescription": "Nenhuma regra de retenção se aplica.",
+            "expiredDescription": "Nenhuma regra mantém este backup. Ele será removido na próxima execução da retenção.",
+            "failedDescription": "Os backups que falham são removidos após 24 horas.",
+            "expires": "Expira em {timestamp}",
+            "expiresUnknown": "Nenhuma previsão de exclusão"
+          }
+        }
+      },
+      "modal": {
+        "duplicate": {
+          "title": "{resource} Duplicado"
+        },
+        "unsavedChanges": {
+          "title": "Alterações Não Salvas",
+          "content": "Você tem alterações não salvas. Tem certeza que deseja sair desta página? Se sair, suas alterações serão perdidas."
+        },
+        "delete": {
+          "content": "Tem certeza que deseja excluir **{name}**?"
+        },
+        "deleteFailedBackups": {
+          "title": "Confirmar Exclusão do Backup falhou",
+          "content": "Tem certeza que deseja excluir `{count}` Backups falhados? Backups Trancados e backups cuja a configuração está em manutenção serão mantidos. A exclusão é executada em segundo plano e pode demorar um pouco para terminar.",
+          "alert": {
+            "forceWarning": "Força a exclusão remove esses backups mesmo que sua configuração esteja ausente ou o armazenamento remoto não possa ser alcançado. Os próprios arquivos de backup podem não ser totalmente limpos, deixando os dados órfãos para trás."
+          }
+        },
+        "retryFailedDeletions": {
+          "title": "Confirmar Tentativa de Exclusão Falhada",
+          "content": "Tem certeza que deseja tentar excluir `{count}` Backups que tiveram a exclusão falhada? Backups Trancados e backups cuja a configuração está em manutenção serão mantidos. A exclusão é executada em segundo plano e pode demorar um pouco para terminar."
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplicado.",
+        "preparingDownload": "Preparando o download...",
+        "downloadFailed": "Não foi possível iniciar o download.",
+        "importing": "Importando {file}...",
+        "failedBackupDeletionStarted": "Excluindo {count} backups falhados em segundo plano.",
+        "failedDeletionRetryStarted": "Tentar novamente {count} exclusões de backup falhadas em segundo plano.",
+        "requestBlockedByExtension": "Este pedido foi bloqueado por uma extensão."
+      },
+      "settingScope": {
+        "account": "Sincronizar com a Conta",
+        "device": "Apenas este dispositivo",
+        "useAccountValue": "Usar o Valor da Conta",
+        "saveToAccount": "Salvar esse valor em minha conta",
+        "stateAccount": "Conta",
+        "stateDevice": "Este Dispositivo",
+        "tooltip": {
+          "account": "Esta configuração está sincronizada com a sua conta.",
+          "device": "Esta configuração só é substituída neste dispositivo."
+        },
+        "toast": {
+          "saved": "Configuração salva em sua conta.",
+          "saveFailed": "Falha ao salvar esta configuração para a sua conta."
+        }
+      },
+      "tooltip": {
+        "resetToDefault": "Redefinir para o padrão",
+        "edit": "Editar",
+        "delete": "Deletar",
+        "remove": "Remover",
+        "primary": "Primário",
+        "backupOnDifferentNode": "Este backup está em um nó diferente do servidor. Ele não está visível a partir da API do cliente."
+      },
+      "form": {
+        "force": "Você deseja executar esta exclusão de forma forçada?",
+        "name": "Nome",
+        "icon": "Ícone",
+        "newName": "Novo Nome",
+        "description": "Descrição",
+        "author": "Autor",
+        "type": "Tipo",
+        "password": "Senha",
+        "host": "Servidor",
+        "username": "Usuário",
+        "usernameOrEmail": "Usuário/E-mail",
+        "server": "Servidor",
+        "servers": "Servidores",
+        "email": "E-mail",
+        "path": "Caminho",
+        "port": "Porta",
+        "provider": "Provedor",
+        "command": "Comando",
+        "fromAddress": "Do endereço",
+        "fromName": "Do nome",
+        "siteKey": "Chave do site",
+        "secretKey": "Chave secreta",
+        "apiKey": "Chave da API",
+        "accessKey": "Tecla de Acesso",
+        "bucket": "Balde",
+        "region": "Região",
+        "publicUrl": "URL pública",
+        "firstName": "Primeiro Nome",
+        "lastName": "Último nome",
+        "language": "Idioma",
+        "identifier": "Identificador",
+        "enabled": "Habilitado",
+        "disabled": "Desabilitado",
+        "title": "Título",
+        "content": "Conteúdo",
+        "backupConfiguration": "Configuração de backup",
+        "fileName": "Nome do Arquivo",
+        "sftpPort": "Porta SFTP",
+        "sftpHost": "Domínio SFTP",
+        "dockerImage": "Imagem Docker",
+        "memory": "Memória",
+        "disk": "Disco",
+        "serverName": "Nome do servidor",
+        "startupCommand": "Comando de Inicialização",
+        "archiveName": "Nome do Arquivo",
+        "archiveFormat": "Formato do Arquivo",
+        "compressionLevel": "Nível de Compressão",
+        "multiplexChannels": "Canais Multiplex",
+        "multiplexChannelsDescription": "Adicionar conexões HTTP adicionais (e, portanto, também threads) para a transferência de arquivos divididos, o total de transmissões é de 1 + múltiplos canais.",
+        "deleteSourceBackups": "Excluir backups de origem",
+        "deleteSourceBackupsDescription": "Exclui os backups transferidos no nó de origem quando a transferência terminar.",
+        "node": "Instância",
+        "location": "Localização",
+        "primaryAllocation": "Alocação Primária",
+        "additionalAllocations": "Alocações Adicionais",
+        "externalId": "ID Externo",
+        "mount": "Montar",
+        "device": "Dispositivo",
+        "nest": "Ninho",
+        "nestCreateHint": "Não consegue encontrar um? Crie um novo ninho",
+        "lines": "Linhas",
+        "databaseHost": "Host do Banco de Dados",
+        "databaseAgentHost": "Host do Agente de Banco de Dados",
+        "databaseInstance": "Instância do Banco de Dados",
+        "timezone": "Fuso horário",
+        "timezoneSystem": "Sistema",
+        "protocol": "Protocolo",
+        "powerAction": "Ação de energia",
+        "destination": "Destino",
+        "destinationDirectory": "Diretório destino",
+        "directoryName": "Nome do diretório",
+        "symlinkName": "Nome do Link Simbólico",
+        "symlinkTarget": "Destino do Link Simbólico",
+        "locked": "Trancado",
+        "portRanges": "Intervalos de Portas",
+        "portRangesPlaceholder": "Intervalos de Portas (ex: 3000-4000)",
+        "currentPassword": "Senha Atual",
+        "confirmPassword": "Confirmar Senha",
+        "passwordRequired": "A senha é obrigatória",
+        "authenticationCode": "Código de Autenticação",
+        "restoreStartup": "Restaurar o comando de inicialização, imagem e variáveis a partir deste backup.",
+        "lineContains": "Linha contém",
+        "filePath": "Caminho do Arquivo",
+        "envVariable": "Variáveis de Ambiente",
+        "value": "Valor",
+        "eggs": "Ovos",
+        "ignoredFiles": "Arquivos Ignorados",
+        "previewIgnoredFiles": "Pré-visualizar arquivos ignorados",
+        "yourControlPanelPassword": "Sua senha do Painel de Controle",
+        "deploymentEnabled": "Implantação habilitada",
+        "maintenanceEnabled": "Manutenção habilitada",
+        "source": "Origem",
+        "target": "Destino"
+      },
+      "table": {
+        "columns": {
+          "notes": "Anotações",
+          "source": "Origem",
+          "target": "Destino",
+          "files": "Arquivos",
+          "server": "Servidor",
+          "address": "Endereço",
+          "eggs": "Ovos",
+          "nodes": "Instâncias",
+          "servers": "Servidores",
+          "users": "Usuários",
+          "databases": "Bancos de Dados",
+          "template": "Modelo",
+          "version": "Versão",
+          "host": "Servidor"
+        }
+      },
+      "bulkActions": {
+        "success": "{action} com sucesso {items}.",
+        "partial": "{action}: {successfulItems} com sucesso. {failedItems} falharam.",
+        "successWithSkipped": "{action}: {items} com sucesso. {skippedItems} ignorados.",
+        "nothingToDo": "Nada na seleção pode ser alterado por essa ação.",
+        "verb": {
+          "deleted": "excluído",
+          "removed": "removido",
+          "triggered": "acionado",
+          "locked": "trancado",
+          "unlocked": "destrancado",
+          "moved": "movido",
+          "enabled": "habilitado",
+          "disabled": "desabilitado",
+          "attached": "anexado",
+          "detached": "desanexado",
+          "started": "iniciado",
+          "stopped": "parado",
+          "restarted": "reiniciado",
+          "killed": "finalizado"
+        }
+      },
+      "tabs": {
+        "general": "Geral"
+      },
+      "stat": {
+        "cpu": "Processador",
+        "cpuLoad": "Carga da CPU",
+        "memoryUsage": "Uso de Memória",
+        "memoryLoad": "Carga da Memória",
+        "diskUsage": "Uso de Disco",
+        "network": "Rede",
+        "inbound": "Entrada",
+        "outbound": "Saída",
+        "uptime": "Tempo de atividade",
+        "resources": "Recursos",
+        "limit": "Limite {limit}"
+      },
+      "badge": {
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "enabled": "Habilitado",
+        "disabled": "Desabilitado",
+        "successful": "Sucesso",
+        "failed": "Falha",
+        "installed": "Instalado",
+        "updateAvailable": "Atualização Disponível",
+        "systemBackup": "Sistema",
+        "restarting": "Reiniciando"
+      },
+      "label": {
+        "noSubdirectories": "Nenhum subdiretório",
+        "page": "Página {page}",
+        "emptyDirectory": "Este diretório está vazio",
+        "ignored": "Ignorado",
+        "partiallyIgnored": "Ignorado parcialmente",
+        "showingFirstEntries": "Mostrando as primeiras entradas {count}"
+      },
+      "databaseAgentHost": {
+        "deployment": {
+          "available": "Implantação habilitada",
+          "nearlyFull": "Quase Cheio",
+          "full": "Sem capacidade",
+          "disabled": "Implantação Desabilitada",
+          "maintenance": "Em manutenção",
+          "typesDisabled": "Nenhum tipo habilitado",
+          "memoryUsage": "Memória: {used} / {limit}",
+          "memoryUsageUnlimited": "Memória: {used} usado, sem limite de host",
+          "diskUsage": "Disco: {used} / {limit}",
+          "diskUsageUnlimited": "Disco: {used} usado, sem limite de host"
+        }
+      },
+      "node": {
+        "deployment": {
+          "available": "Implantação habilitada",
+          "nearlyFull": "Quase Cheio",
+          "full": "Sem capacidade",
+          "disabled": "Implantação Desabilitada",
+          "maintenance": "Em manutenção",
+          "memoryUsage": "Memória: {used} / {limit}",
+          "memoryUsageUnlimited": "Memória: {used} usado, sem limite de host",
+          "diskUsage": "Disco: {used} / {limit}",
+          "diskUsageUnlimited": "Disco: {used} usado, sem limite de host"
+        },
+        "allowedSources": {
+          "checking": "Verificando nó",
+          "notAllowed": "Não permitido no nó",
+          "mountNotAllowed": "O nó `allowed_mounts` não cobre a fonte desta montaria, então as asas ignoram ao iniciar o servidor.",
+          "deviceNotAllowed": "O nó 'allowed_devices' não cobre a fonte deste dispositivo (ou suas permissões são inválidas), então as asas são ignoradas ao iniciar o servidor."
+        }
+      },
+      "server": {
+        "noAllocation": "Sem Alocação",
+        "state": {
+          "suspended": "Suspenso",
+          "transferring": "Servidor está sendo transferido",
+          "nodeMaintenance": "O nó está em manutenção",
+          "restoringBackup": "Restaurando o backup",
+          "installing": "Instalando",
+          "installFailed": "Falha na Instalação",
+          "backupRestoreFailed": "Falha ao Restaurar Backup",
+          "resourcesUnavailable": "Uso de Recursos Indisponível"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Superior Esquerdo",
+          "topCenter": "Centro Superior",
+          "topRight": "Superior Direito",
+          "bottomLeft": "Inferior Esquerdo",
+          "bottomCenter": "Inferior centralizado",
+          "bottomRight": "Inferior Direito"
+        },
+        "serverState": {
+          "unknown": "Desconhecido",
+          "offline": "Desconectado",
+          "running": "Executando",
+          "starting": "Iniciando",
+          "stopping": "Parando"
+        },
+        "serverPowerAction": {
+          "start": "Iniciar",
+          "stop": "Parar",
+          "restart": "Reiniciar",
+          "kill": "Interromper"
+        },
+        "serverBackupStatus": {
+          "starting": "Iniciando",
+          "finished": "Finalizado",
+          "failed": "Falhou"
+        },
+        "backupRetentionRule": {
+          "count": "Ultimo",
+          "days": "Recente",
+          "daily": "Diariamente",
+          "weekly": "Semanalmente",
+          "monthly": "Mensalmente",
+          "yearly": "Anualmente"
+        },
+        "serverBackupKind": {
+          "server": "Servidor",
+          "databaseInstance": "Banco de Dados"
+        },
+        "serverFirewallRuleAction": {
+          "allow": "Permitir",
+          "deny": "Negar"
+        },
+        "connectionStatus": {
+          "connected": "Conectado",
+          "connecting": "Conectando...",
+          "offline": "Desconectado"
+        },
+        "serverAutoStartBehavior": {
+          "always": "Sempre",
+          "unlessStopped": "A menos que seja parado",
+          "never": "Nunca"
+        },
+        "bulkActionServerAction": {
+          "started": "Iniciado",
+          "stopped": "Parado",
+          "restarted": "Reiniciado",
+          "killed": "Finalizado",
+          "suspended": "Suspenso",
+          "unsuspended": "Dessuspenso",
+          "clearedState": "Limpou o estado de",
+          "deleted": "Excluído"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Melhor Velocidade",
+          "goodSpeed": "Boa Velocidade",
+          "goodCompression": "Boa Compressão",
+          "bestCompression": "Melhor compactação"
+        }
+      },
+      "unlimited": "Ilimitado",
+      "readOnly": "Somente Leitura",
+      "na": "Não Disponível",
+      "never": "Nunca",
+      "none": "Nenhum",
+      "unknown": "Desconhecido",
+      "yes": "Sim",
+      "no": "Não",
+      "default": "Padrão",
+      "custom": "Personalizado",
+      "system": "Sistema",
+      "schedule": "Agendamento",
+      "impersonatedBy": "Representado por {username}"
+    },
+    "elements": {
+      "chartLegend": {
+        "hide": "Esconder {series}",
+        "show": "Exibir {series}"
+      },
+      "dragAndDrop": {
+        "item": {
+          "labelled": "{label} (posição {position})",
+          "unlabelled": "item na posição {position}"
+        },
+        "announcement": {
+          "pickedUp": "Coletou {item}.",
+          "movedOver": "{item} foi movido sobre {target}.",
+          "leftTarget": "{item} não está mais acima de um drop do alvo.",
+          "droppedOn": "{item} foi deixado em {target}.",
+          "dropped": "{item} foi deixado.",
+          "cancelled": "Arrastar {item} foi cancelado."
+        }
+      },
+      "routeOrderEditor": {
+        "title": "Configuração de Rota",
+        "label": {
+          "route": "Rota",
+          "divider": "Divisor",
+          "redirect": "Redirecionar"
+        }
+      },
+      "estimatedTimeArrival": {
+        "tooltip": {
+          "estimating": "Estimando tempo de conclusão...",
+          "estimated": "Tempo de conclusão estimado: {time}"
+        },
+        "calculating": "ETA: Calculando..."
+      },
+      "container": {
+        "alert": {
+          "impersonating": "Você está representando um usuário no momento. Por favor, esteja ciente de que suas ações podem afetar a conta de usuário representada. Para sair do modo de representação, clique no botão \"Parar de Representar\" no canto inferior esquerdo."
+        },
+        "connectedTo": "Conectado a {name}"
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Sair",
+          "stopImpersonating": "Parar de Representar",
+          "openInVirtualWindow": "Abrir em Janela Virtual",
+          "openInPopup": "Abrir em pop-up",
+          "openInNewTab": "Abrir em Nova Aba",
+          "theme": "Tema",
+          "themeAuto": "Automático",
+          "themeDark": "Escuro",
+          "themeLight": "Claro",
+          "redactAddresses": "Ocultar endereços",
+          "resetDeviceOverrides": "Redefinir substituições do dispositivo ({count})"
+        },
+        "modal": {
+          "logout": {
+            "title": "Sair",
+            "content": "Tem certeza que deseja sair?"
+          }
+        }
+      },
+      "quickActions": {
+        "trigger": "Ações rápidas...",
+        "placeholder": "Pesquisar ações e páginas...",
+        "category": {
+          "navigation": "Navegação",
+          "power": "Energia",
+          "account": "Conta",
+          "servers": "Servidores",
+          "users": "Usuários",
+          "page": "Esta página",
+          "pageNavigation": "Navegação da Página",
+          "math": "Calculadora"
+        },
+        "math": {
+          "calculating": "Calculando...",
+          "unsolvable": "Esta expressão não pode ser resolvida",
+          "copyResult": "Copiar resultado"
+        },
+        "hint": {
+          "navigate": "para navegar",
+          "select": "para selecionar",
+          "close": "para fechar",
+          "calculate": "para calcular",
+          "pages": "somente para páginas",
+          "servers": "apenas para servidores",
+          "users": "somente para usuários"
+        }
+      },
+      "permissionSelector": {
+        "button": {
+          "copyPermissions": "Copiar Permissões",
+          "pastePermissions": "Colar Permissões"
+        },
+        "selectedPermissions": "Permissões Selecionadas ({count})",
+        "noPermissions": "Nenhuma permissão selecionada."
+      },
+      "selectInput": {
+        "noResults": "Nenhum resultado encontrado."
+      },
+      "serverSelect": {
+        "showOtherUsersServers": "Mostrar servidores de outros usuários"
+      },
+      "allocationBar": {
+        "tooltip": {
+          "total": "Alterar Total"
+        },
+        "form": {
+          "total": "Medir Novamente",
+          "customTotal": "Total Personalizado"
+        },
+        "total": {
+          "limit": "Limite Configurado"
+        }
+      },
+      "can": {
+        "tooltip": {
+          "cantSave": "Você não tem permissão para salvar.",
+          "cantDelete": "Você não tem permissão para excluir."
+        }
+      },
+      "resource": {
+        "tooltip": {
+          "created": "{resource} criado.",
+          "updated": "{resource} atualizado.",
+          "deleted": "{resource} excluído."
+        }
+      },
+      "formEngine": {
+        "advancedMode": "Modo avançado"
+      },
+      "activityInfoButton": {
+        "modal": {
+          "info": {
+            "title": "Detalhes de Atividade"
+          }
+        }
+      },
+      "screenBlock": {
+        "permissionDenied": {
+          "title": "Permissão Negada",
+          "content": "Você não tem permissão para acessar esta página."
+        },
+        "notFound": {
+          "title": "Não encontrado",
+          "content": "A página que você procura não foi encontrada."
+        },
+        "suspended": {
+          "title": "Conta Suspensa",
+          "content": "Sua conta foi suspensa. Você não pode alterar sua conta. Por favor contate um administrador para mais informações."
+        },
+        "serverConflict": {
+          "title": "Estado do servidor conflitante",
+          "contentSuspended": "Este servidor está suspenso e não pode ser acessado.",
+          "contentNodeMaintenance": "Este servidor está em um nó que está em manutenção e não pode ser acessado.",
+          "contentTransferring": "Este servidor está sendo transferido no momento e não pode ser acessado até que a transferência seja concluída.",
+          "contentInstallFailed": "Este servidor falhou em instalar e não pode ser acessado até ser reconhecido.",
+          "contentInstalling": "Este servidor está instalando no momento e não pode ser acessado até ser concluído.",
+          "contentRestoringBackup": "Este servidor está restaurando a partir de um backup e não pode ser acessado até ser completado.",
+          "contentBackupRestoreFailed": "Este servidor falhou em restaurar um backup e não pode ser acessado até ser reconhecido. Seus arquivos podem estar incompletos.",
+          "button": {
+            "viewInstallLogs": "Visualizar Logs da Instalação",
+            "acknowledgeFailure": "Reconhecer Falha"
+          },
+          "modal": {
+            "acknowledgeInstallFailure": {
+              "title": "Falha na Instalação Reconhecida",
+              "content": "Reconhecendo esta falha de instalação, você está confirmando que está ciente da falha de instalação e tomou quaisquer medidas necessárias para resolver o problema. Isso permitirá que você recupere o controle sobre o servidor."
+            },
+            "acknowledgeBackupRestoreFailure": {
+              "title": "Falha ao Reconhecer Restauração de Backup",
+              "content": "Ao reconhecer esta falha de restauração de backup, você está confirmando que está ciente da falha de restauração e que os arquivos do servidor podem estar incompletos. Isso permitirá que você recupere o controle sobre o servidor."
+            }
+          }
+        }
+      },
+      "scheduleDynamicInput": {
+        "none": "Nenhum",
+        "variable": "Variável",
+        "enterVariable": "Lendo de uma variável.",
+        "writeVariable": "O resultado é armazenado nesta variável.",
+        "useVariable": "Usar uma variável em vez de texto simples",
+        "usePlainText": "Use texto simples em vez de uma variável",
+        "optionalPlaceholder": "Nenhuma (opcional)"
+      },
+      "serverWebsocket": {
+        "error": {
+          "connectionFailed": "Não é possível conectar após várias tentativas. Por favor, atualize a página.",
+          "connectionClosed": "A conexão com o servidor foi encerrada. Tentando reconectar...",
+          "connectionRetry": "Conexão perdida. Tentar novamente (tentativa {attempt})...",
+          "authFailed": "Falha de autenticação. Tentando atualizar credenciais... ({error})",
+          "authRefreshFailed": "Falha ao atualizar as credenciais. Por favor, atualize a página para tentar novamente.",
+          "permissionRevoked": "Conexão fechada: seu acesso a este servidor foi revogado.",
+          "tokenRefreshLoop": "Loop de autenticação detectado. Por favor, atualize a página para tentar novamente."
+        },
+        "banner": {
+          "retrying": "Tentando novamente em {countdown}..."
+        },
+        "listener": {
+          "toast": {
+            "backupCompleted": "Backup concluído com êxito.",
+            "backupFailed": "O backup falhou.",
+            "backupDeleteFailed": "A exclusão do backup falhou.",
+            "backupRestoreCompleted": "Restauração de backup concluída com sucesso.",
+            "backupRestoreFailed": "Falha ao Restaurar Backup.",
+            "installCompleted": "Instalação do Servidor concluída com sucesso.",
+            "installFailed": "Falha na instalação do servidor.",
+            "transferFailed": "Transferência de servidor falhou, o servidor permanece nesta instância.",
+            "operations": {
+              "compressing": {
+                "completed": "{files} compactados para `{path}` em {time}.",
+                "failed": "Falha ao comprimir {files} para `{path}`:\n{error}",
+                "aborted": "A compressão de {files} para `{path}` foi cancelada."
+              },
+              "decompressing": {
+                "completed": "Descompactado `{path}` para `{destination}` em {time}.",
+                "failed": "Falha ao descompactar `{path}` para `{destination}`:\n{error}",
+                "aborted": "A descompressão de `{path}` para `{destination}` foi cancelada."
+              },
+              "pulling": {
+                "completed": "Puxou `{destination}` em {time}.",
+                "failed": "Falha ao puxar `{destination}`:\n{error}",
+                "aborted": "Puxar de `{destination}` foi cancelado."
+              },
+              "copying": {
+                "completed": "Copiou `{path}` para `{destination}` em {time}.",
+                "completedMany": "Copiado `{path}` para `{destination}` ({files}) em {time}.",
+                "failed": "Falha ao copiar `{path}` para `{destination}`:\n{error}",
+                "aborted": "A cópia de `{path}` para `{destination}` foi cancelada."
+              },
+              "copyingMany": {
+                "completed": "Copiado {files} em {time}.",
+                "failed": "Falha ao copiar {files}:\n{error}",
+                "aborted": "Cópia de {files} foi cancelada."
+              },
+              "copyingRemote": {
+                "completedFrom": "Copiado {files} do servidor remoto em {time}.",
+                "completedTo": "Copiado {files} para o servidor remoto em {time}.",
+                "failedFrom": "Falha ao copiar {files} do servidor remoto:\n{error}",
+                "failedTo": "Falha ao copiar {files} para o servidor remoto:\n{error}",
+                "abortedFrom": "Cópia de {files} do servidor remoto foi cancelada.",
+                "abortedTo": "Cópia de {files} para o servidor remoto foi cancelada."
+              },
+              "exportingBackup": {
+                "completed": "Backup exportado para `{destination}` em {time}.",
+                "failed": "Falha ao exportar backup para `{destination}`:\n{error}",
+                "aborted": "A exportação de backup para `{destination}` foi cancelada."
+              }
+            }
+          }
+        }
+      },
+      "fileUpload": {
+        "title": "Enviando {files}",
+        "adminAssets": "Mídias Administrativas",
+        "waiting": "Aguardando: {file}",
+        "uploading": "Enviando: {file}",
+        "uploadingFolder": "Enviando pasta: {folder} ({files})",
+        "failed": "Falha: {file}",
+        "failedFolder": "Falha no envio: {folder} ({files})",
+        "paused": "Pausado: {file}",
+        "pause": "Pausar envio",
+        "resume": "Retomar envio",
+        "cancel": "Cancelar Envio",
+        "reselect": "Reselecionar arquivo para retomar",
+        "badge": {
+          "uploading": "Enviando",
+          "uploadingPercent": "Enviando {percent}%",
+          "waiting": "Aguardando",
+          "paused": "Pausado",
+          "incomplete": "Incompleto"
+        },
+        "rateLimited": "A taxa de envio foi limitada. Aguarde...",
+        "cancelAllUploads": "Cancelar Todos os Envios",
+        "modal": {
+          "cancelAllUploads": {
+            "content": "Tem certeza de que deseja cancelar todos os uploads ativos? Arquivos carregados parcialmente serão descartados."
+          },
+          "uploadConflict": {
+            "title": "Resolver conflitos de envio",
+            "description": "{items} Já existe em `{directory}`.",
+            "alsoUploading": "{files} sem conflitos serão enviados de qualquer maneira.",
+            "source": "Selecionado",
+            "selectedFolder": "Contém {files}."
+          }
+        }
+      }
+    },
+    "pages": {
+      "oobe": {
+        "location": {
+          "title": "Configuração de Localização",
+          "form": {
+            "locationName": "Nome da Localização",
+            "locationNamePlaceholder": "Minha Casa",
+            "locationFlag": "Bandeira da Localização",
+            "locationFlagPlaceholder": "O melhor país",
+            "backupName": "Nome da Configuração de Backup",
+            "backupNamePlaceholder": "Nuvem unicórnio",
+            "backupDisk": "Disco de Backup",
+            "backupDiskPlaceholder": "Disco de Backup"
+          },
+          "button": {
+            "create": "Criar e Continuar"
+          }
+        },
+        "node": {
+          "title": "Configurações da Instância",
+          "allocationsTitle": "Configuração de Alocações",
+          "form": {
+            "namePlaceholder": "Meu servidor",
+            "urlDescription": "Usado para comunicação interna com a instância.",
+            "publicUrlDescription": "usado para websocket/downloads"
+          },
+          "error": {
+            "noLocations": "Algo deu errado. Nenhum local encontrado."
+          },
+          "button": {
+            "create": "Criar e Continuar"
+          }
+        },
+        "nodeConfiguration": {
+          "title": "Configurações da Instância",
+          "error": {
+            "noNodes": "Algo deu errado. Nenhuma instância foi encontrada.",
+            "connectionError": "O painel não pôde alcançar a instância. Verifique se as asas estão sendo executadas e se o URL (incluindo a porta) está correto.",
+            "frontendConnectionError": "Seu navegador não pôde alcançar a instanância. Verifique a URL pública, certificado TLS e firewall. Os websockets e downloads dependem desta conexão."
+          },
+          "configurationDescription": "Coloque isso no arquivo de configuração '{file}' ou execute:",
+          "button": {
+            "verify": "Verificar conexão"
+          }
+        },
+        "configuration": {
+          "title": "Configurações da aplicação",
+          "form": {
+            "applicationName": "Nome da Aplicação",
+            "applicationUrl": "URL da Aplicação",
+            "registration": "Habilitar Cadastro",
+            "registrationDescription": "Permitir que novos usuários registrem suas próprias contas.",
+            "securityKeys": "Habilitar chaves de segurança",
+            "securityKeysDescription": "Permitir que os usuários façam login com chaves de acesso e chaves de segurança de hardware, com o escopo {rpId}. Você poderá alterar isso mais tarde nas configurações de administrador."
+          },
+          "button": {
+            "submit": "Atualizar Configurações e Continuar"
+          }
+        },
+        "eggRepositories": {
+          "title": "Repositórios de Ovos",
+          "description": "Estes são os repositórios fonte dos seus ovos. Você pode alterar esses repositórios a qualquer momento.",
+          "repositories": {
+            "pterodactylGame": {
+              "title": "Ovos de jogo Pterodactyl",
+              "description": "Ovos para jogos como Minecraft, Terraria, e muito mais.",
+              "nest": "Jogos"
+            },
+            "pterodactylApplication": {
+              "title": "Ovos de Aplicativos Pterodactyl",
+              "description": "Ovos para aplicações como Grafana, Meilisearch e vários bancos de dados.",
+              "nest": "Aplicações"
+            },
+            "pterodactylGeneral": {
+              "title": "Ovos Pterodactyl Genéricos",
+              "description": "Ovos para execuções genéricas de aplicativos como Node JS, Java e Rust.",
+              "nest": "Genérico"
+            }
+          }
+        },
+        "server": {
+          "title": "Servidor",
+          "existingServer": "Um servidor já foi criado. Você pode alterar as configurações mais tarde no menu do administrador.",
+          "egg": {
+            "title": "Ovo",
+            "description": "Vamos colocar o seu primeiro servidor em funcionamento. Qual ovo você gostaria de usar?",
+            "nestDescription": "Para começar a usar este ovo, você precisará criar um ninho, ninhos são coleções de ovos. Dê um nome a ele:"
+          },
+          "error": {
+            "noNodes": "Algo deu errado. Nenhum nó foi encontrado."
+          },
+          "button": {
+            "create": "Criar e Continuar"
+          }
+        },
+        "finished": {
+          "title": "Instalação concluída!",
+          "subtitle": "Seu painel Calagopus está pronto para ser usado",
+          "setupTitle": "O que estabelecemos",
+          "items": {
+            "account": "Conta de administrador",
+            "configuration": {
+              "title": "Configurações do Sistema",
+              "subtitle": "Configurações e preferências do painel configuradas"
+            },
+            "eggRepositories": {
+              "title": "Repositórios de Ovos",
+              "subtitle": "{count} Diretórios"
+            },
+            "location": "Localização",
+            "node": "Nó",
+            "server": "Servidor"
+          },
+          "badge": {
+            "skipped": "Ignorado"
+          },
+          "button": "Ir para o Painel de controle"
+        }
+      },
+      "auth": {
+        "button": {
+          "login": "Entrar",
+          "loginWith": "Entrar com {name}"
+        },
+        "alert": {
+          "urlMismatch": "A URL da aplicação não corresponde ao URL atual. Esperado: `{appUrl}`, Atual: `{currentUrl}`."
+        },
+        "login": {
+          "error": {
+            "usernameRequired": "Por favor, digite um nome de usuário",
+            "registrationDisabled": "Nenhuma conta correspondente foi encontrada e o registro está desativado no momento.",
+            "userAlreadyExists": "Já existe uma conta com este nome de usuário ou e-mail.",
+            "securityKeyRequired": "Esta conta requer autenticação de dois fatores, faça o login com uma chave de segurança.",
+            "passwordLoginDisabled": "O login com senha está desativado neste painel, use uma das opções abaixo."
+          },
+          "passkey": {
+            "error": {
+              "notSupported": "Seu navegador não suporta chaves de acesso.",
+              "unexpected": "Um erro inesperado ocorreu enquanto utilizava sua chave de acesso.",
+              "cancelled": "O pedido de chave de acesso foi cancelado.",
+              "dismissed": "Você descartou ou não interagiu com o prompt de chave de acesso. A chave usada também não pôde ser registrada.",
+              "invalidState": "Esta chave de acesso não está disponível ou já está registrada.",
+              "notSupportedType": "Seu navegador ou dispositivo não suporta esse tipo de chave de acesso.",
+              "securityError": "As chaves de acesso só podem ser utilizadas por HTTPS e com um domínio válido.",
+              "authenticatorError": "Algo deu errado com o autenticador.",
+              "constraintError": "O autenticador não pôde cumprir as restrições exigidas.",
+              "noUsernamelessKey": "Nenhuma senha que possa ser usada sem um nome de usuário foi encontrada neste dispositivo. Se você tiver uma que foi criada sem \"Permitir entrar sem nome de usuário\", primeiro digite seu nome de usuário e funcionará como de costume."
+            }
+          },
+          "step": {
+            "username": {
+              "title": "Entrar",
+              "subtitle": "Digite seu nome de usuário ou endereço de e-mail para continuar",
+              "subtitleProviderOnly": "Escolha um provedor para continuar",
+              "form": {
+                "usernameOrEmailPlaceholder": "Seu nome de usuário ou endereço de e-mail"
+              },
+              "link": {
+                "forgotPassword": "Esqueci minha senha",
+                "notRegistered": "Não registrado?",
+                "createAccount": "Criar conta"
+              },
+              "button": {
+                "passkeyLogin": "Entrar com Chave de Acesso",
+                "oauthLogin": "Login OAuth"
+              }
+            },
+            "passkey": {
+              "title": "Autenticação com chave de aceso",
+              "subtitle": "Encontramos uma chave de acesso associada ao {username}",
+              "button": {
+                "usePasskey": "Usar chave de acesso",
+                "usePassword": "Usar senha"
+              }
+            },
+            "password": {
+              "title": "Digite a senha",
+              "subtitle": "Por favor, digite a sua senha para o {username}",
+              "form": {
+                "passwordPlaceholder": "Digite sua senha"
+              },
+              "button": {
+                "signIn": "Fazer login",
+                "forgotPassword": "Esqueci minha senha"
+              }
+            },
+            "totp": {
+              "title": "Autenticação em dois fatores",
+              "welcomeBack": "Bem-vindo de volta, {username}!",
+              "enterCode": "Insira o código de 6 dígitos do aplicativo autenticador",
+              "button": {
+                "verify": "Verificar código",
+                "useRecoveryCode": "Usar Código de Recuperação",
+                "useTotp": "Usar TOTP"
+              }
+            },
+            "email": {
+              "subtitle": "Podemos enviar um e-mail para você com um código único para finalizar o login.",
+              "enterCode": "Digite o código de 6 dígitos que enviamos para o seu endereço de e-mail",
+              "button": {
+                "useEmail": "Enviar um código por e-mail",
+                "sendCode": "Enviar código",
+                "resend": "Reenviar Código",
+                "resendIn": "Reenviar Código ({seconds}s)"
+              }
+            },
+            "totpRecovery": {
+              "subtitle": "Digite um código de recuperação",
+              "form": {
+                "label": "Código de recuperação",
+                "placeholder": "Digite um código de recuperação"
+              }
+            }
+          }
+        },
+        "register": {
+          "title": "Registrar",
+          "subtitle": "Por favor, insira seus dados para registrar",
+          "form": {
+            "usernamePlaceholder": "Seu usuário",
+            "emailPlaceholder": "voce@exemplo.com",
+            "firstNamePlaceholder": "Seu primeiro nome",
+            "lastNamePlaceholder": "Seu sobrenome",
+            "passwordPlaceholder": "Insira uma senha forte"
+          },
+          "button": {
+            "register": "Registrar"
+          }
+        },
+        "forgotPassword": {
+          "title": "Esqueci minha senha",
+          "subtitle": "Digite seu e-mail para receber as instruções para redefinir sua senha",
+          "form": {
+            "emailPlaceholder": "voce@exemplo.com"
+          },
+          "button": {
+            "request": "Solicitar redefinição de senha"
+          },
+          "success": "Foi enviado um email com instruções sobre como redefinir sua senha."
+        },
+        "verifyEmail": {
+          "title": "Verificar E-mail",
+          "success": "Seu endereço de e-mail **{email}** foi verificado.",
+          "failed": "Este link de verificação é inválido ou expirou. Solicite um novo e tente novamente.",
+          "button": {
+            "continue": "Continuar"
+          }
+        },
+        "resetPassword": {
+          "title": "Redefinir senha",
+          "subtitle": "Por favor, digite sua nova senha",
+          "form": {
+            "passwordPlaceholder": "Insira uma senha forte",
+            "confirmPasswordPlaceholder": "Re-insira sua senha"
+          },
+          "button": {
+            "reset": "Redefinir senha"
+          },
+          "toast": {
+            "success": "A senha foi redefinida."
+          }
+        },
+        "oauth": {
+          "title": "Autenticar com OAuth",
+          "subtitle": "Escolha qualquer um dos provedores abaixo para fazer login"
+        }
+      },
+      "account": {
+        "home": {
+          "empty": {
+            "title": "Sem Servidores",
+            "description": "Esta conta ainda não tem servidores. Os servidores criados para ela, ou compartilhados com ela como um subusuário, aparecem aqui."
+          },
+          "emptyGroup": "Este grupo está vazio. Arraste um servidor para cá para adicioná-lo.",
+          "title": "Servidores",
+          "tooltip": {
+            "removeFromGroup": "Remover do grupo",
+            "addToGroup": "Adicionar ao grupo",
+            "addServerToGroup": "Adicionar Servidores ao Grupo",
+            "groupActions": "Ações do Grupo",
+            "noGroups": "Nenhum grupo disponível para adicionar servidor a"
+          }
+        },
+        "account": {
+          "containers": {
+            "password": {
+              "toast": {
+                "updated": "Senha atualizada com sucesso."
+              },
+              "form": {
+                "newPassword": "Senha nova",
+                "confirmNewPassword": "Confirmar Nova Senha"
+              },
+              "modal": {
+                "logOutOtherSessions": {
+                  "title": "Encerrar outras Sessões",
+                  "content": "Sua senha foi atualizada. Você deseja encerrar todas as sessões, exceto a que você está usando atualmente? Qualquer outro dispositivo conectado à sua conta terá de entrar novamente.",
+                  "toast": {
+                    "deleted": "{sessions} excluído."
+                  }
+                }
+              }
+            },
+            "email": {
+              "title": "E-mail",
+              "toast": {
+                "updated": "E-mail atualizado com sucesso.",
+                "pending": "Link de confirmação enviado para {email}. Suas alterações de endereço mudam quando você abri-lo."
+              },
+              "form": {
+                "newEmail": "Novo E-mail"
+              }
+            },
+            "twoFactor": {
+              "title": "Autenticação em dois fatores",
+              "toast": {
+                "disabled": "Autenticação de dois fatores desativada com sucesso.",
+                "enabled": "Autenticação de dois fatores habilitada com sucesso. Copie seus códigos de recuperação."
+              },
+              "modal": {
+                "disableTwoFactor": {
+                  "title": "Desativar a autenticação de dois fatores",
+                  "description": "Desabilitar a autenticação de dois fatores tornará a sua conta menos segura."
+                },
+                "setupTwoFactor": {
+                  "title": "Configurar Autenticação de Dois Fatores",
+                  "description": "Ajude a proteger sua conta de acesso não autorizado. Será solicitado um código de verificação toda vez que fizer o login.",
+                  "descriptionQR": "Leia o código QR acima usando o aplicativo de autenticação de dois fatores da sua escolha. Em seguida, insira o código de 6 dígitos gerado no campo abaixo."
+                },
+                "recoveryCodes": {
+                  "title": "Códigos de recuperação",
+                  "description": "Abaixo estão seus códigos de recuperação. Armazene-os em um lugar seguro. Se você perder o acesso ao seu dispositivo de autenticação, poderá usar esses códigos para recuperar o acesso à sua conta."
+                }
+              },
+              "button": {
+                "setupTwoFactor": "Configurar Dois Fatores",
+                "enableEmail": "Ativar E-mail",
+                "disableEmail": "Desativar E-mail",
+                "securityKeys": "Chaves de segurança"
+              },
+              "twoFactorLastUsed": "Último uso: {timestamp}",
+              "none": "Nenhum segundo fator foi configurado na sua conta ainda.",
+              "requirementMet": "Sua conta atende ao requisito de duas etapas.",
+              "requirementUnmet": "Sua conta ainda não satisfaz os requisitos de dois fatores.",
+              "enum": {
+                "twoFactorMethod": {
+                  "totp": "Aplicativo de Autenticação",
+                  "securityKey": "Chave De Segurança",
+                  "email": "E-mail"
+                }
+              }
+            },
+            "emailTwoFactor": {
+              "toast": {
+                "disabled": "E-mail com dois fatores desativado com sucesso."
+              },
+              "modal": {
+                "enable": {
+                  "title": "Ativar E-mail com Dois Fatores",
+                  "description": "Um código único será enviado para **{email}** cada vez que você fizer o login. Qualquer pessoa com acesso a essa caixa de correio pode fazer login como você."
+                },
+                "disable": {
+                  "title": "Desativar e-mail como duas etapas",
+                  "description": "Desativar o e-mail como dois fatores tornará a sua conta menos segura."
+                }
+              }
+            },
+            "passwordLogin": {
+              "title": "Login com Senha",
+              "enabled": "Você pode entrar com a sua senha.",
+              "disabled": "O login de senha está desativado. Somente as chaves de segurança podem fazer login em sua conta.",
+              "toast": {
+                "updated": "Login de senha atualizado com sucesso."
+              },
+              "tooltip": {
+                "needsSecurityKey": "Adicione uma chave de segurança antes de desativar o login por senha."
+              },
+              "modal": {
+                "disable": {
+                  "title": "Desativar login por senha",
+                  "description": "Sua senha não irá mais logar você em qualquer lugar, incluindo SFTP. Somente as suas chaves de segurança funcionarão, por isso, certifique-se de que você pode usar uma antes de continuar."
+                },
+                "enable": {
+                  "title": "Habilitar Login por Senha",
+                  "description": "Sua senha poderá fazer login novamente."
+                }
+              }
+            },
+            "account": {
+              "title": "Detalhes da Conta",
+              "toast": {
+                "updated": "Detalhes da conta atualizados com sucesso."
+              }
+            },
+            "preferences": {
+              "title": "Preferências",
+              "form": {
+                "toastPosition": "Posição da notificação",
+                "startOnGroupedServers": "Iniciar na página de servidores agrupados"
+              }
+            },
+            "avatar": {
+              "toast": {
+                "removed": "Foto de perfil removida com sucesso.",
+                "loadFailed": "Falha ao carregar a pré-visualização da imagem. Por favor, certifique-se que o arquivo é uma imagem válida."
+              },
+              "form": {
+                "avatar": "Imagem de perfil"
+              }
+            }
+          }
+        },
+        "securityKeys": {
+          "title": "Chaves de segurança",
+          "subtitle": "{current} de {max} chaves de segurança criadas.",
+          "table": {
+            "columns": {
+              "credentialId": "ID da Credencial"
+            }
+          },
+          "tooltip": {
+            "secureContextRequired": "Um contexto seguro (HTTPS) é necessário para usar as chaves de segurança.",
+            "limitReached": "Você tem o limite de {max} chaves de segurança.",
+            "disabled": "As chaves de segurança foram desativadas por um administrador."
+          },
+          "alert": {
+            "disabled": "As chaves de segurança foram desativadas por um administrador. Suas chaves existentes estão listadas abaixo e ainda podem ser removidas, mas eles não podem ser usados para entrar e nenhuma chave nova pode ser criada."
+          },
+          "modal": {
+            "createSecurityKey": {
+              "title": "Criar chave de segurança",
+              "allowUsernamelessLogin": "Permitir entrar sem um nome de usuário",
+              "allowUsernamelessLoginDescription": "Salva a senha no dispositivo para que você possa pegá-la em uma lista em vez de digitar. Chaves de segurança de hardware têm armazenamento limitado e podem recusá-lo - se a configuração falhar, desligue e tente novamente.",
+              "toast": {
+                "created": "Chave de segurança criada com sucesso.",
+                "aborted": "Criação de chave de segurança abortada."
+              }
+            },
+            "editSecurityKey": {
+              "title": "Editar chave de segurança",
+              "toast": {
+                "updated": "Chave de segurança atualizada com sucesso."
+              }
+            },
+            "deleteSecurityKey": {
+              "title": "Confirmar Exclusão de Chave de Segurança",
+              "content": "Tem certeza que deseja excluir **{key}** da sua conta?",
+              "toast": {
+                "deleted": "Chave de segurança excluída com sucesso."
+              }
+            }
+          }
+        },
+        "sessions": {
+          "title": "Sessões",
+          "button": {
+            "deleteOthers": "Sair de outros"
+          },
+          "tooltip": {
+            "noOtherSessions": "Não há outras sessões para sair."
+          },
+          "table": {
+            "columns": {
+              "thisDevice": "Este Dispositivo?",
+              "userAgent": "Agente de Usuário"
+            }
+          },
+          "modal": {
+            "deleteSession": {
+              "title": "Confirmar exclusão de sessão",
+              "content": "Tem certeza que deseja excluir a sessão **{ip}** da sua conta?",
+              "toast": {
+                "deleted": "Sessão excluída."
+              }
+            },
+            "deleteOtherSessions": {
+              "title": "Confirmar exclusão de sessão",
+              "content": "Tem certeza que deseja encerrar todas as sessões, exceto a que você está usando atualmente? Qualquer outro dispositivo conectado à sua conta terá de entrar novamente.",
+              "toast": {
+                "deleted": "{sessions} excluído."
+              }
+            }
+          }
+        },
+        "shortcuts": {
+          "title": "Atalhos de Teclado",
+          "subtitle": "Use estes atalhos de teclado para navegar e interagir com o painel de forma mais eficiente.",
+          "detectedMac": "macOS detectado",
+          "detectedWindows": "Windows/Linux detectado",
+          "label": {
+            "disabled": "Desabilitado",
+            "modified": "Modificado",
+            "recording": "Pressione as teclas..."
+          },
+          "button": {
+            "rebind": "Revincular",
+            "resetAll": "Redefinir tudo",
+            "copy": "Copiar Tudo",
+            "paste": "Colar"
+          },
+          "toast": {
+            "imported": "Atualizado {shortcuts}.",
+            "importedNone": "Nenhum atalho foi alterado.",
+            "importErrors": "Ignorado {unknown} e {invalid}.",
+            "resetAll": "Redefinir todos os atalhos para os padrões."
+          },
+          "general": {
+            "title": "Geral",
+            "undo": "Desfazer última ação",
+            "quickActions": "Abrir ações rápidas",
+            "save": "Salvar o formulário atual"
+          },
+          "fileManager": {
+            "title": "Gerenciador de Arquivos",
+            "selectAll": "Selecionar todos os arquivos",
+            "cutFiles": "Recortar arquivos selecionados",
+            "copyFiles": "Copiar arquivos selecionados",
+            "duplicateFile": "Duplicar arquivo selecionado",
+            "pasteFiles": "Colar arquivos",
+            "searchFiles": "Procurar arquivos",
+            "moveUpDirectory": "Mover para cima um diretório",
+            "moveUpSelection": "Mover a seleção para cima",
+            "moveDownSelection": "Mover a seleção para baixo",
+            "renameFile": "Renomear arquivo",
+            "deselectAll": "Desmarcar Todos os Arquivos",
+            "deleteFiles": "Excluir arquivos selecionados",
+            "closeEditorTab": "Fechar a aba ativa do editor",
+            "nextEditorTab": "Próxima aba do editor",
+            "previousEditorTab": "Aba anterior do editor",
+            "increaseEditorFontSize": "Aumentar o tamanho da fonte do editor",
+            "decreaseEditorFontSize": "Diminuir o tamanho da fonte do editor",
+            "resetEditorFontSize": "Redefinir o tamanho da fonte do editor"
+          },
+          "table": {
+            "title": "Navegação da tabela",
+            "previousPage": "Página anterior",
+            "nextPage": "Próxima página",
+            "firstPage": "Primeira página",
+            "lastPage": "Última página",
+            "selectAll": "Selecionar todas as linhas",
+            "deselectAll": "Deselecionar todas as linhas"
+          },
+          "console": {
+            "title": "Console do servidor",
+            "searchContent": "Pesquisar na saída do console",
+            "previousCommand": "Comando anterior no histórico",
+            "nextCommand": "Próximo comando no histórico",
+            "increaseFontSize": "Aumentar o tamanho da fonte do console",
+            "decreaseFontSize": "Diminuir o tamanho da fonte do console",
+            "resetFontSize": "Redefinir o tamanho da fonte do console"
+          },
+          "serverList": {
+            "selectServer": "Segure S e clique para selecionar/desselecionar servidor"
+          }
+        },
+        "sshKeys": {
+          "title": "Chaves SSH",
+          "subtitle": "{current} de {max} chaves SSH criadas.",
+          "tooltip": {
+            "limitReached": "Você tem o limite de {max} chaves SSH."
+          },
+          "table": {
+            "columns": {
+              "fingerprint": "Assinatura"
+            }
+          },
+          "modal": {
+            "createSshKey": {
+              "title": "Criar Chave SSH",
+              "toast": {
+                "created": "Chave SSH criada."
+              },
+              "button": {
+                "uploadKeyFile": "Carregar Arquivo Chave"
+              },
+              "form": {
+                "publicKey": "Chave Pública"
+              }
+            },
+            "editSshKey": {
+              "title": "Editar Chave SSH",
+              "toast": {
+                "updated": "Chave SSH atualizada."
+              }
+            },
+            "importSshKeys": {
+              "title": "Importar chaves SSH",
+              "toast": {
+                "created": "{sshKeys} criada."
+              }
+            },
+            "deleteSshKeys": {
+              "title": "Confirmar a exclusão da chave SSH",
+              "content": "Tem certeza que deseja excluir **{sshKeys}** da sua conta?"
+            },
+            "deleteSshKey": {
+              "title": "Confirmar a exclusão da chave SSH",
+              "content": "Tem certeza que deseja excluir **{name}** da sua conta?"
+            }
+          }
+        },
+        "apiKeys": {
+          "modal": {
+            "deleteApiKey": {
+              "title": "Confirmar Exclusão da Chave API",
+              "content": "Tem certeza que deseja excluir **{name}** da sua conta?",
+              "toast": {
+                "removed": "Chave de API removida."
+              }
+            },
+            "apiKeyToken": {
+              "titleCreated": "Chave de API criada",
+              "titleRecreated": "Chave de API recriada",
+              "descriptionCreated": "Sua nova chave de API foi criada. Certifique-se de copiá-la agora, pois ela não será exibida novamente.",
+              "descriptionRecreated": "Sua chave de API foi recriada. Certifique-se de copiar a nova chave agora, pois ela não será exibida novamente."
+            }
+          },
+          "form": {
+            "allowedIps": "IPs Permitidos",
+            "userPermissions": "Permissões de Usuário",
+            "serverPermissions": "Permissões do servidor",
+            "adminPermissions": "Permissões do Admin"
+          },
+          "create": {
+            "title": "Criar Chave de API",
+            "subtitle": "Uma aplicação está solicitando uma chave de API a ser criada para sua conta.",
+            "alert": {
+              "adminPermissions": "Essa chave de API solicita **permissões de administrador**. Qualquer pessoa na posse desta chave poderá executar ações administrativas neste painel em seu nome. Só continue se você confiar absolutamente no aplicativo solicitado.",
+              "callbackUrl": "Após a criação, a nova chave de API será enviada para **{url}**."
+            },
+            "noPermissions": "Esta chave de API não terá nenhuma permissão.",
+            "keyCreated": "Sua nova chave de API foi criada. Certifique-se de copiá-la agora, pois ela não será exibida novamente.",
+            "button": {
+              "goToApiKeys": "Ir para Chaves API"
+            }
+          },
+          "update": {
+            "title": "Atualizar chave API",
+            "subtitle": "Uma aplicação está solicitando alterações nas permissões de uma das suas chaves de API.",
+            "alert": {
+              "replaceMode": "Este pedido **responde** as permissões desta chave API. As permissões marcadas como removidas serão revogadas.",
+              "callbackUrl": "Após atualizar, você voltará para **{url}**."
+            },
+            "badge": {
+              "added": "Adicionado",
+              "existing": "Concedido",
+              "removed": "Removido"
+            },
+            "noChanges": "Esta requisição não altera as permissões desta chave da API.",
+            "keyUpdated": "As permissões da sua chave API foram atualizadas."
+          }
+        },
+        "activity": {
+          "title": "Atividade"
+        }
+      },
+      "admin": {
+        "categories": {
+          "infrastructure": "Infraestrutura",
+          "eggs": "Ninhos e Ovos",
+          "databases": "Bancos de Dados",
+          "storage": "Armazenamento",
+          "access": "Usuários & Acesso",
+          "system": "Sistema"
+        },
+        "home": {
+          "title": "Início",
+          "alert": {
+            "newPanelVersion": "Uma nova versão está disponível para o painel! Você está atualmente no {current} e a versão mais recente é {latest}. Você pode querer considerar a atualização. [Clique aqui]({upgradeUrl}) para visualizar as instruções de atualização.",
+            "extensionBuildFailed": {
+              "content": "A última compilação de extensão falhou.",
+              "link": "Ver extensões"
+            }
+          },
+          "tabs": {
+            "overview": {
+              "title": "Visão geral",
+              "page": {
+                "permissionDenied": "Você não tem permissão para ler as estatísticas que teriam estado aqui de outra forma. Por enquanto, aprecie este pássaro.",
+                "card": {
+                  "systemOverview": "Resumo do sistema",
+                  "generalStatistics": "Estatísticas gerais",
+                  "backupStatistics": "Estatísticas de backup"
+                },
+                "system": {
+                  "memoryUsage": "Uso da memória ({process} utilizado pelo painel)",
+                  "kernelVersion": "Versão do kernel ({architecture})",
+                  "containerType": "Tipo de container",
+                  "databaseVersion": "Versão da Base de Dados ({size})",
+                  "cacheVersion": "Versão do cache",
+                  "cacheCalls": "Chamadas em cache",
+                  "slowestCachedCall": "Chamada em cache lenta",
+                  "cacheBreakdown": {
+                    "title": "Interrupção da chamada",
+                    "calls": "Chamadas",
+                    "averageLatency": "Latência Média",
+                    "localHits": "Buscas na memória",
+                    "remoteHits": "Buscas do Redis",
+                    "coalescedWaits": "Aguardando em outra chamada",
+                    "misses": "Computado"
+                  }
+                },
+                "enum": {
+                  "containerType": {
+                    "none": "Nenhum detectado",
+                    "official": "Oficial",
+                    "officialAio": "Oficial AIO",
+                    "officialHeavy": "Oficial Heavy",
+                    "officialHeavyAio": "Oficial Heavy AIO"
+                  }
+                },
+                "stats": {
+                  "users": "Usuários",
+                  "servers": "Servidores",
+                  "locations": "Localizações",
+                  "nodes": "Nós",
+                  "nestEggs": "Aninhar Ovos",
+                  "databaseHosts": "Hosts de Database",
+                  "backupConfigurations": "Configuração de backup",
+                  "roles": "Funções"
+                }
+              }
+            },
+            "updates": {
+              "title": "Atualizações",
+              "page": {
+                "alert": {
+                  "extensionUpdateErrors": "Houve erros ao verificar se há atualizações para algumas extensões."
+                },
+                "card": {
+                  "panelVersion": "Versão do Painel",
+                  "versionHistory": "Histórico de versões",
+                  "outdatedExtensions": "Extensões desatualizadas",
+                  "outdatedNodes": "Nós desatualizados"
+                },
+                "panelVersion": "Seu painel está executando a versão `{current}`. A última versão disponível é `{latest}`.",
+                "button": {
+                  "recheck": "Verificar atualizações novamente"
+                },
+                "toast": {
+                  "recheckComplete": "Verificação concluída."
+                },
+                "selectHistory": "Selecione um histórico de atualização para ver.",
+                "historyPanel": "Painel",
+                "historyExtension": "Extensão: {name}",
+                "extensionsUpToDate": "Todas as extensões estão atualizadas.",
+                "extensionsOutdated": "Algumas extensões estão desatualizadas ou tiveram erros ao procurar por atualizações.",
+                "noChangelog": "Nenhum relatório de alterações",
+                "nodesUpToDate": "Parece que todos os nós estão atualizados. ({failed} falhou ao verificar)",
+                "nodesOutdatedSummary": "Alguns nós estão desatualizados. ({outdated} desatualizado, {failed} falhou ao verificar)",
+                "databaseAgentHostsUpToDate": "Parece que todos os hosts do agente do banco de dados estão atualizados. ({failed} falhou ao verificar)",
+                "databaseAgentHostsOutdatedSummary": "Alguns hosts do agente do banco de dados estão desatualizados. ({outdated} desatualizado, {failed} falhou ao verificar)",
+                "badge": {
+                  "latestVersion": "Última {version}"
+                },
+                "table": {
+                  "version": "Versão",
+                  "installed": "Instalado",
+                  "packageName": "Nome do Pacote",
+                  "latestVersion": "Ultima versão",
+                  "changes": "Mudanças",
+                  "error": "Erro"
+                }
+              }
+            },
+            "health": {
+              "title": "Saúde",
+              "page": {
+                "card": {
+                  "generalHealth": "Saúde geral",
+                  "extensionMigrationHealth": "Saúde da Migração de Extensão",
+                  "desyncNodes": "Instâncias não sincronizadas",
+                  "debugMode": "Modo de Depuração"
+                },
+                "appliedMigrations": "Migrações aplicadas ({percent}%)",
+                "avgNtpOffset": "Deslocamento médio de NTP",
+                "noExtensions": "Nenhuma extensão encontrada.",
+                "nodesSynced": "Parece que todas as instâncias têm um relógio sincronizado (dentro de 5 segundos de relógio do painel). ({failed} falhou em verificar)",
+                "nodesDesync": "Algumas instâncias têm relógios dessincronizados (ao longo de 5 segundos fora do relógio do painel). Isto pode causar problemas no download/console de arquivos. ({desync} desync, {failed} falhou ao verificar)",
+                "debugEnabled": "Modo de depuração está atualmente ativado.",
+                "debugDisabled": "Modo de depuração desativado no momento.",
+                "debugResetNote": "Esta configuração será redefinida para o padrão ({default}) quando o aplicativo reiniciar.",
+                "table": {
+                  "packageName": "Nome do Pacote",
+                  "applied": "Aplicado",
+                  "desync": "Dessincronizar"
+                },
+                "button": {
+                  "enableDebug": "Habilitar Modo de Depuração",
+                  "disableDebug": "Desabilitar o Modo de Depuração"
+                },
+                "toast": {
+                  "debugEnabled": "Modo de depuração habilitado.",
+                  "debugDisabled": "Modo de depuração desabilitado."
+                }
+              }
+            }
+          }
+        },
+        "settings": {
+          "title": "Configurações",
+          "tabs": {
+            "application": {
+              "title": "Aplicação",
+              "page": {
+                "title": "Configurações da aplicação",
+                "form": {
+                  "additionalUrls": "URLs adicionais",
+                  "additionalUrlsDescription": "O painel é acessível a outros endereços. Logins, OAuth e e-mails de auto-serviço usam qualquer URL em que a solicitação apareça; todo o resto usa a URL principal. Chaves de segurança só funcionam em URLs sob o ID RP WebAuthn.",
+                  "icon": "Ícone",
+                  "iconLight": "Ícone (Modo claro)",
+                  "bannerLight": "Banner (Modo Claro)",
+                  "sessionCookie": "Cookies de Sessão",
+                  "sessionDurationSeconds": "Duração da sessão (segundos)",
+                  "twoFactorRequirement": "Requisito autenticação de dois fatores",
+                  "emailTwoFactorEnabled": "Duas etapas por E-mail",
+                  "emailTwoFactorEnabledDescription": "Permite que os usuários recebam um código de login único por e-mail. Requer um servidor de e-mail configurado.",
+                  "twoFactorAcceptedMethods": "Métodos de Dois Fatores Aceitos",
+                  "twoFactorAcceptedMethodsDescription": "Que fatores matriculados contam para o requisito de dois fatores. E-mail está desativado por padrão: redefinições de senha também passam por e-mail, então ele não é independente da senha.",
+                  "emailVerificationRequired": "Exigir verificação de e-mail",
+                  "emailVerificationRequiredDescription": "Novos usuários devem confirmar seu endereço de e-mail antes de usarem o painel. Requer um servidor de e-mail configurado.",
+                  "telemetryEnabled": "Habilitar telemetria",
+                  "telemetryEnabledDescription": "Permita que Calagopus colete dados de uso limitados e anônimos para ajudar a melhorar o aplicativo.",
+                  "registrationEnabled": "Habilitar Cadastro",
+                  "passwordLoginEnabled": "Habilitar Login por Senha",
+                  "passwordLoginEnabledDescription": "Permite que os usuários façam login com um nome de usuário e senha. Desativar isso, deixa os provedores OAuth e as chaves de segurança como as únicas entradas, além de parar o registro local, redefinições de senha e autenticação de senha SFTP."
+                },
+                "section": {
+                  "general": "Geral",
+                  "branding": "Marca",
+                  "authentication": "Autenticação",
+                  "sessions": "Sessões",
+                  "telemetry": "Telemetria"
+                }
+              }
+            },
+            "mail": {
+              "page": {
+                "enum": {
+                  "provider": {
+                    "sendmail": "Comando do Sendmail",
+                    "filesystem": "Sistema de arquivos"
+                  },
+                  "tlsMode": {
+                    "none": "Nenhum",
+                    "implicitTls": "TLS implícito"
+                  }
+                },
+                "toast": {
+                  "updated": "Configurações de e-mail atualizadas."
+                },
+                "tooltip": {
+                  "noProvider": "Salve um provedor de e-mail antes de enviar um e-mail de teste."
+                },
+                "modal": {
+                  "sendTestEmail": {
+                    "title": "Enviar E-Mail De Teste",
+                    "toast": {
+                      "sent": "Email de teste foi enviado com sucesso."
+                    }
+                  }
+                },
+                "smtp": {
+                  "form": {
+                    "tlsMode": "Modo TLS",
+                    "skipCertValidation": "Ignorar validação de certificado",
+                    "heloDomain": "Domínio HELO/EHLO",
+                    "heloDomainDescription": "Domínio enviado na saudação HELO/EHLO. Alguns provedores, como o espaço de trabalho do Google, rejeitam o padrão."
+                  }
+                }
+              }
+            },
+            "mailTemplates": {
+              "title": "Modelos de e-mail",
+              "page": {
+                "title": "Configurações de Modelo de E-mail",
+                "sidebar": {
+                  "templates": "Modelos",
+                  "globalVariables": "Variáveis Globais",
+                  "availableVariables": "Variáveis Disponíveis"
+                },
+                "alert": {
+                  "syntaxBefore": "Modelos usam o",
+                  "syntaxMiddle": "sintaxe de template. As variáveis são referenciadas com",
+                  "syntaxAnd": "e controlam estruturas como",
+                  "syntaxOr": "e",
+                  "syntaxAfter": "são suportadas.",
+                  "variablesBefore": "Fragmentos de texto são referenciados com",
+                  "variablesAfter": "e são traduzidas por idioma na seção Variáveis, então um template só precisa de um layout para cada idioma que um usuário pode escolher."
+                },
+                "variables": {
+                  "title": "Variáveis",
+                  "description": "Fragmentos de texto deste modelo de referências como",
+                  "globalDescription": "Fragmentos de texto que cada modelo pode referir-se como",
+                  "descriptionAfter": "Fragmentos são snippets MiniJinja com acesso às mesmas variáveis do template. Um campo vazio usa o padrão mostrado nele; idiomas sem valor caem para o valor inglês, e depois para a tradução interna.",
+                  "custom": "Personalizado",
+                  "add": "Adicionar variável",
+                  "empty": "Nenhuma variável definida.",
+                  "error": {
+                    "valueRequired": "As variáveis personalizadas precisam de um valor em inglês."
+                  },
+                  "toast": {
+                    "saved": "Variável de e-mail salva.",
+                    "created": "Variável de e-mail criada.",
+                    "reset": "Variável de e-mail redefinida para o padrão.",
+                    "deleted": "Variável de e-mail excluída."
+                  },
+                  "modal": {
+                    "create": {
+                      "title": "Criar Variável",
+                      "nameDescription": "Letras minúsculas, dígitos e sublinhados, começando com uma letra.",
+                      "valueDescription": "O valor em inglês. As traduções podem ser adicionadas depois de criar a variável."
+                    },
+                    "reset": {
+                      "title": "Redefinir para o padrão",
+                      "content": "Isto irá descartar seus valores personalizados para **{name}** em todos os idiomas e restaurará os padrões embutidos. Isso não pode ser desfeito."
+                    },
+                    "delete": {
+                      "title": "Excluir Variável",
+                      "content": "Isto irá apagar a variável personalizada **{name}** em todas as línguas. Modelos referenciando ela não renderizarão nada em seu lugar. Isso não pode ser desfeito."
+                    }
+                  }
+                },
+                "form": {
+                  "subject": "Assunto"
+                },
+                "toast": {
+                  "saved": "Modelo de e-mail salvo.",
+                  "reset": "Modelo de e-mail redefinido para o padrão."
+                },
+                "modal": {
+                  "reset": {
+                    "title": "Redefinir para o padrão"
+                  }
+                }
+              }
+            },
+            "captcha": {
+              "page": {
+                "toast": {
+                  "updated": "Configurações de captcha atualizadas."
+                },
+                "cap": {
+                  "form": {
+                    "apiUrl": "URL da Instância"
+                  }
+                },
+                "recaptcha": {
+                  "form": {
+                    "threshold": "Limite de pontuação",
+                    "thresholdDescription": "Pontuação mínima necessária para passar a verificação, de 0 a 1. Valores mais altos são mais rigorosos. Padrão: 0.5."
+                  }
+                }
+              }
+            },
+            "webauthn": {
+              "page": {
+                "title": "Configurações de Webauthn",
+                "form": {
+                  "enabled": "Habilitar chaves de segurança",
+                  "enabledDescription": "Permitir que os usuários se registrem e efetuem login com chaves de segurança. Chaves existentes são mantidas e mantidas visíveis, mas não podem ser usadas para entrar enquanto isto estiver desativado.",
+                  "allowDiscoverable": "Permitir login sem nome de usuário",
+                  "allowDiscoverableDescription": "Permite que os usuários armazenem as senhas em seus dispositivos e selecione uma na lista em vez de digitar um nome de usuário.",
+                  "rpOrigin": "Origem do RP",
+                  "authenticationTimeoutSeconds": "Tempo limite de autenticação (segundos)",
+                  "registrationTimeoutSeconds": "Tempo limite do registro (segundos)"
+                },
+                "button": {
+                  "autofill": "Preenchimento Automático"
+                },
+                "toast": {
+                  "updated": "Configurações de Webauthn atualizadas.",
+                  "ipNotAllowed": "Não é possível utilizar WebAuthn em um endereço IP."
+                },
+                "modal": {
+                  "changeRpId": {
+                    "title": "Confirmar Mudança de ID RP",
+                    "content": "Tem certeza que deseja alterar o ID do RP? Alterar a ID de RP quebrará todas as credenciais de Webauthn existentes e exige que os usuários cadastrem novamente seus dispositivos. Isso pode ter consequências significativas, portanto, por favor, certifique-se de que você entende as implicações antes de prosseguir."
+                  }
+                }
+              }
+            },
+            "server": {
+              "title": "Servidor",
+              "page": {
+                "title": "Configurações do servidor",
+                "form": {
+                  "maxFileManagerViewSize": "Tamanho de exibição do Gerenciador de Arquivos Máximo",
+                  "maxScheduleStepCount": "Etapas máximas de agendamento",
+                  "maxFirewallRuleCount": "Regras de Firewall Máximas",
+                  "maxFirewallRuleSourceCount": "Fontes Máximas da Regra do Firewall",
+                  "maxTunnelConnectionCount": "Máximo de Conexões Privadas por Servidor",
+                  "maxTunnelPortCount": "Máximo de Portas Privadas por Servidor",
+                  "maxFileManagerContentSearchSize": "Tamanho máximo da pesquisa de conteúdo do gerenciador de arquivos",
+                  "maxFileManagerSearchResults": "Máximo de resultados da pesquisa no Gerenciador de Arquivos",
+                  "maxSubuserCount": "Quantidade Máxima de Sub-usuário",
+                  "maxBackupGroupCount": "Máximo de Grupos de Backup por Servidor",
+                  "maxDatabaseInstanceDatabaseCount": "Máximo de Banco de Dados por Instância de Banco de Dados",
+                  "maxDatabaseInstanceUserCount": "Máximo de Usuários por Instância de Banco de Dados",
+                  "allowOverwritingCustomDockerImage": "Permitir sobreescrever a imagem Docker personalizada",
+                  "allowOverwritingCustomDockerImageDescription": "Se ativado, os usuários poderão substituir a imagem Docker especificada na configuração do servidor usando a lista de Ovos, Mesmo que um administrador tenha definido uma imagem personalizada do Docker.",
+                  "allowViewingInstallationLogs": "Permitir visualização de logs de instalação",
+                  "allowViewingInstallationLogsDescription": "Se ativado, os usuários com permissões de leitura do console também poderão ver os logs de instalação através da conexão websocket. Se desativado, logs de instalação só estarão disponíveis para administradores.",
+                  "allowAcknowledgingInstallationFailure": "Permitir Reconhecimento de Falha na Instalação",
+                  "allowAcknowledgingInstallationFailureDescription": "Se ativado, os usuários serão capazes de reconhecer falhas de instalação para servidores que estão no estado de \"Falha de Instalação\", permitindo que tente iniciar o servidor em vez de ter que esperar por um administrador. Se desativado, somente os administradores poderão reconhecer falhas de instalação.",
+                  "allowViewingTransferProgress": "Permitir ver o Progresso de Transferência",
+                  "allowViewingTransferProgressDescription": "Se ativado, os usuários com permissões de leitura do console também poderão ver os logs de progresso da transferência através da conexão websocket. Se desativado, os logs de progresso da transferência só estarão disponíveis para administradores.",
+                  "trashRetention": "Retenção de Lixo",
+                  "trashRetentionDescription": "Quanto tempo os arquivos apagados ficam na lixeira de servidor antes de serem removidos permanentemente. Defina como 0 para desativar a lixeira. Arquivos na contagem do lixo para o disco do servidor. Cada servidor pode usar suas próprias configurações de lixeira.",
+                  "trashUsageThreshold": "Limpar Lixeira por Uso de Disco",
+                  "trashUsageThresholdDescription": "Limpe as entradas de lixo mais antigas quando um servidor atingir essa porcentagem de seu limite de disco. Definir como 0 para só limpar a lixeira quando uma gravação exceder o limite.",
+                  "allowChangingTrashSettings": "Permitir alterar as configurações de Lixeira",
+                  "allowChangingTrashSettingsDescription": "Se ativado, os usuários serão capazes de definir configurações de lixo personalizado para seus servidores. Se desativado, somente os administradores podem alterá-las. Configurações personalizadas já definidas em um servidor permanecem em vigor.",
+                  "containerPrelude": "Prelúdio do Contêiner"
+                }
+              }
+            },
+            "ratelimits": {
+              "page": {
+                "exemptions": {
+                  "title": "Isenções",
+                  "form": {
+                    "exemptIps": "IPs isentos",
+                    "exemptIpsDescription": "Endereços IP ou intervalos CIDR que ignoram os limites de clientes e taxas remotas. Limites de login e por servidor ainda se aplicam.",
+                    "exemptApiKeys": "Chaves isentas de API",
+                    "exemptApiKeysDescription": "UUIDs de chaves de API que ignoram o taxtelimit do cliente. Os usuários podem copiar o UUID do menu de contexto de suas chaves de API. Chaves deletadas são removidas automaticamente."
+                  }
+                },
+                "toast": {
+                  "updated": "Configurações de limite atualizadas."
+                }
+              }
+            },
+            "updates": {
+              "title": "Atualizações",
+              "page": {
+                "title": "Configurações de atualização",
+                "form": {
+                  "wingsReleaseToken": "Token de Lançamento de Asas"
+                }
+              }
+            }
+          }
+        },
+        "announcements": {
+          "title": "Avisos",
+          "resourceName": "Aviso",
+          "tabs": {
+            "general": {
+              "page": {
+                "modal": {
+                  "delete": {
+                    "title": "Confirmar exclusão do aviso",
+                    "content": "Tem certeza que deseja excluir **{title}**?"
+                  },
+                  "duplicate": {
+                    "content": "Tem certeza que deseja duplicar **{title}**?"
+                  }
+                },
+                "form": {
+                  "dismissibleEnd": "Fim Dispensável",
+                  "enabledStart": "Início habilitado",
+                  "enabledEnd": "Fim habilitado",
+                  "locations": "Localizações",
+                  "locationsDescription": "Deixe em branco para aplicar a todos os locais.",
+                  "nodes": "Nós",
+                  "nodesDescription": "Deixe em branco para aplicar a todos os nós.",
+                  "backupConfigurations": "Configuração de backup",
+                  "backupConfigurationsDescription": "Deixe em branco para aplicar a todas as configurações de backup.",
+                  "eggsPlaceholder": "Selecionar Ovos",
+                  "dismissible": "Dispensável"
+                },
+                "titleCreate": "Criar aviso",
+                "titleUpdate": "Editar aviso"
+              }
+            }
+          },
+          "enum": {
+            "announcementType": {
+              "info": "Informação",
+              "success": "Sucesso",
+              "warning": "Aviso",
+              "error": "Erro"
+            }
+          }
+        },
+        "assets": {
+          "title": "Recursos",
+          "button": {
+            "newDirectory": "Novo diretório",
+            "upload": "Enviar",
+            "copyLink": "Copiar Link"
+          },
+          "quickAction": {
+            "uploadFiles": "Enviar recursos",
+            "parentDirectory": "Ir para o diretório pai",
+            "deleteSelection": "Excluir seleção"
+          },
+          "dropzone": {
+            "title": "Solte arquivos ou pastas aqui para fazer o upload",
+            "subtitle": "Solte para começar a enviar"
+          },
+          "toast": {
+            "assetDeleted": "Recurso excluído.",
+            "assetsDeleted": "{assets} excluído."
+          },
+          "modal": {
+            "createDirectory": {
+              "title": "Novo diretório",
+              "createdAs": "Será criado em "
+            },
+            "deleteAssets": {
+              "title": "Confirmar a exclusão do recurso",
+              "content": "Tem certeza que deseja excluir **{count}** recursos?"
+            },
+            "deleteAsset": {
+              "title": "Excluir Recurso"
+            }
+          }
+        },
+        "extensions": {
+          "badge": {
+            "frontendMissing": "Frontend faltando",
+            "backendMissing": "Backend faltando",
+            "pendingBuild": "Compilação pendente",
+            "buildFailed": "Compilação falhou",
+            "startFailed": "Falha ao iniciar",
+            "pendingRemoval": "Removação pendente",
+            "pendingRestart": "Reinício pendente",
+            "disabled": "Desabilitado",
+            "processing": "Processando"
+          },
+          "card": {
+            "version": "Versão",
+            "authors": "Autores",
+            "panelVersion": "Versão do Painel"
+          },
+          "section": {
+            "pendingExtensions": "Extensões pendentes",
+            "noPendingExtensions": "Nenhuma extensão pendente."
+          },
+          "dropzone": {
+            "title": "Arraste alguns arquivos aqui para instalar como Extensões",
+            "subtitle": "Solte para iniciar a instalação"
+          },
+          "toast": {
+            "buildStarted": "Reconstrução da extensão iniciada com sucesso.",
+            "buildCompleted": "Construção de extensão concluída. Talvez seja necessário atualizar a página.",
+            "buildFailed": "Falha na compilação de extensão: {reason}",
+            "cancelRequested": "Cancelamento solicitado. A compilação termina quando a etapa atual termina.",
+            "added": "Extensão `{packageName}` adicionada com sucesso.",
+            "removed": "Extensão `{packageName}` removida com sucesso.",
+            "enabled": "A extensão `{packageName}` será ativada novamente assim que o painel reiniciar.",
+            "disabled": "A extensão `{packageName}` será desabilitada quando o painel reiniciar.",
+            "restarting": "O painel está reiniciando."
+          },
+          "notFound": {
+            "title": "Extensão não encontrada",
+            "content": "Extensão com o nome de pacote \"{packageName}\" não encontrada."
+          },
+          "configure": {
+            "title": "Configurar {packageName}",
+            "noConfigurationPage": "Esta extensão não tem uma página de configuração."
+          },
+          "modal": {
+            "buildLogs": {
+              "title": "Logs de Compilação",
+              "empty": "Nenhum registro encontrado."
+            },
+            "license": {
+              "title": "Acordo de Licença",
+              "description": "A extensão `{packageName}` exige que você aceite a seguinte licença antes que ela possa ser instalada."
+            },
+            "remove": {
+              "title": "Remover extensão",
+              "content": "Tem certeza que deseja remover a extensão `{packageName}`? Esta ação não pode ser desfeita.",
+              "form": {
+                "removeMigrations": "Você deseja remover e reverter as migrações do banco de dados desta extensão?"
+              }
+            }
+          }
+        },
+        "users": {
+          "title": "Usuários",
+          "resourceName": "Usuário",
+          "externalIdLookup": {
+            "button": "Localizar por ID Externo",
+            "modal": {
+              "title": "Procurar por ID Externo",
+              "form": {
+                "externalIdPlaceholder": "ex. meu-usuário-001",
+                "search": "Pesquisar"
+              },
+              "result": {
+                "title": "Usuário Encontrado",
+                "username": "Nome de usuário",
+                "email": "E-mail",
+                "role": "Função",
+                "viewUser": "Visualizar usuário"
+              },
+              "notFound": "Nenhum usuário encontrado com esse ID externo."
+            }
+          },
+          "tooltip": {
+            "admin": "Administrador",
+            "twoFactorEnabled": "2FA Habilitada"
+          }
+        }
+      }
+    }
+  }
+}

@@ -24,6 +24,13 @@
       "many": "{count} Dosya",
       "other": "{count} Dosya"
     },
+    "directory": {
+      "one": "{count} Klasör",
+      "two": "{count} Klasörler",
+      "few": "{count} Klasörler",
+      "many": "{count} Klasörler",
+      "other": "{count} Klasörler"
+    },
     "server": {
       "zero": "{count} Sunucu",
       "one": "{count} Sunucu",
@@ -39,6 +46,73 @@
       "few": "{count} SSH Anahtarı",
       "many": "{count} SSH Anahtarı",
       "other": "{count} SSH Anahtarı"
+    },
+    "asset": {
+      "zero": "{count} Öğeler",
+      "one": "{count} Dosya",
+      "two": "{count} Dosyalar",
+      "few": "{count} Dosyalar",
+      "many": "{count} Dosyalar",
+      "other": "{count} Dosyalar"
+    },
+    "node": {
+      "zero": "{count} Düğümler",
+      "one": "{count} Düğüm",
+      "two": "{count} Düğümler",
+      "few": "{count} Düğümler",
+      "many": "{count} Düğümler",
+      "other": "{count} Düğümler"
+    },
+    "databaseAgentHost": {
+      "zero": "{count} Veritabanı Aracısı Ana Makineleri",
+      "one": "{count} Veritabanı Aracısı Ana Makinesi",
+      "two": "{count} Veritabanı Aracısı Ana Makineleri",
+      "few": "{count} Veritabanı Aracısı Ana Makineleri",
+      "many": "{count} Veritabanı Aracısı Ana Makineleri",
+      "other": "{count} Veritabanı Aracısı Ana Makineleri"
+    },
+    "allocation": {
+      "zero": "{count} Düğüm Tahsisleri",
+      "one": "{count} Düğüm Tahsisi",
+      "two": "{count} Düğüm Tahsisleri",
+      "few": "{count} Düğüm Tahsisleri",
+      "many": "{count} Düğüm Tahsisleri",
+      "other": "{count} Düğüm Tahsisleri"
+    },
+    "egg": {
+      "zero": "{count} Yumurtalar",
+      "one": "{count} Yumurta",
+      "two": "{count} Yumurtalar",
+      "few": "{count} Yumurtalar",
+      "many": "{count} Yumurtalar",
+      "other": "{count} Yumurtalar"
+    },
+    "instance": {
+      "zero": "{count} Sunucu Örnekleri",
+      "one": "{count} Sunucu Örneği",
+      "two": "{count} Sunucu Örnekleri",
+      "few": "{count} Sunucu Örnekleri",
+      "many": "{count} Sunucu Örnekleri",
+      "other": "{count} Sunucu Örnekleri"
+    },
+    "shortcut": {
+      "zero": "{count} Kestirmeler",
+      "one": "{count} Kestirme",
+      "two": "{count} Kestirmeler",
+      "few": "{count} Kestirmeler",
+      "many": "{count} Kestirmeler",
+      "other": "{count} Kestirmeler"
+    },
+    "line": {
+      "zero": "{count} Satırlar",
+      "one": "{count} Satır",
+      "two": "{count} Satırlar",
+      "few": "{count} Satırlar",
+      "many": "{count} Satırlar",
+      "other": "{count} Satırlar"
+    },
+    "header": {
+      "zero": "{count} Başlıklar"
     }
   },
   "translations": {

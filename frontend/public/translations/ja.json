@@ -5202,9 +5202,6 @@
         "systemBackupPolicies": {
           "title": "システムバックアップポリシー",
           "resourceName": "システムバックアップポリシー",
-          "badge": {
-            "runPending": "実行待機中"
-          },
           "table": {
             "columns": {
               "cron": "スケジュール",

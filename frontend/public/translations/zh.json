@@ -4092,9 +4092,6 @@
         },
         "systemBackupPolicies": {
           "title": "系統備份政策",
-          "badge": {
-            "runPending": "等待執行"
-          },
           "table": {
             "columns": {
               "cron": "排程",
