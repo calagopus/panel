@@ -128,7 +128,7 @@ fn sanitize_username(username: &str) -> String {
                 '_'
             }
         })
-        .take(15)
+        .take(48)
         .collect();
     while chars(&sanitized) < 3 {
         sanitized.push('_');
@@ -680,23 +680,23 @@ impl Validator<'_> {
                 let candidate = candidate.to_lowercase();
                 reserved.contains(&candidate) || usernames.holder(&candidate).is_some()
             };
-            if !(3..=15).contains(&length) || !pattern_ok {
+            if !(3..=48).contains(&length) || !pattern_ok {
                 let mut suggestion = sanitize_username(&username);
                 if taken(&suggestion) {
-                    suggestion = numbered(&suggestion, 15, "_", taken);
+                    suggestion = numbered(&suggestion, 48, "_", taken);
                 }
                 if self.problem(
                     &mut row,
                     "username",
                     "rule",
                     &username,
-                    "usernames must be 3-15 characters of a-z, A-Z, 0-9 and _",
+                    "usernames must be 3-48 characters of a-z, A-Z, 0-9 and _",
                     Some(format!("rename to {suggestion:?}")),
                 ) {
                     username = suggestion;
                 }
             } else if let Some(holder) = usernames.holder(&username.to_lowercase()) {
-                let suggestion = numbered(&username, 15, "_", taken);
+                let suggestion = numbered(&username, 48, "_", taken);
                 if self.problem(
                     &mut row,
                     "username",
@@ -3377,7 +3377,7 @@ mod tests {
     }
 
     fn valid_username(name: &str) -> bool {
-        (3..=15).contains(&name.chars().count())
+        (3..=48).contains(&name.chars().count())
             && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
     }
 
@@ -3500,13 +3500,16 @@ mod tests {
         source.users.push(user(1));
         source.users.push(user(2));
         source.users[0].username = "bad name!".into();
-        source.users[1].username = "abcdefghijklmnopqrstuvwxyz".into();
+        source.users[1].username = "abcdefghijklmnopqrstuvwxyz".repeat(2);
 
         let (plan, findings) = plan(&source, OnInvalid::Fix);
 
         assert_eq!(decision(&findings, "users", 1), Some(Decision::Fix));
         assert_eq!(plan.users[0].username, "bad_name_");
-        assert_eq!(plan.users[1].username, "abcdefghijklmno");
+        assert_eq!(
+            plan.users[1].username,
+            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
+        );
     }
 
     #[test]
@@ -3632,8 +3635,8 @@ mod tests {
     fn sanitize_username_produces_valid_names() {
         assert_eq!(sanitize_username("bad name!"), "bad_name_");
         assert_eq!(
-            sanitize_username("abcdefghijklmnopqrstuvwxyz"),
-            "abcdefghijklmno"
+            sanitize_username(&"abcdefghijklmnopqrstuvwxyz".repeat(2)),
+            "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
         );
         let padded = sanitize_username("a");
         assert!(padded.starts_with('a'));
