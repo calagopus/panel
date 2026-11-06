@@ -1,9 +1,19 @@
-import { faFolder, faFolderOpen, faRotateLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowUpRightFromSquare,
+  faFile,
+  faFileArrowDown,
+  faFolder,
+  faFolderOpen,
+  faRotateLeft,
+  faTrashCan,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dirname, join } from 'pathe';
 import { forwardRef, useState } from 'react';
+import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import downloadFiles from '@/api/server/files/downloadFiles.ts';
 import deleteTrashEntries from '@/api/server/files/trash/deleteTrashEntries.ts';
 import restoreTrashEntries from '@/api/server/files/trash/restoreTrashEntries.ts';
 import { TableData, TableRow, TableSelectionCell } from '@/elements/data-display/Table.tsx';
@@ -13,6 +23,7 @@ import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { bytesToString } from '@/lib/format/size.ts';
 import { serverTrashEntrySchema } from '@/lib/schemas/server/files.ts';
+import { downloadFilesWithToast } from '@/pages/server/files/list/downloadFilesWithToast.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,15 +47,36 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
   ref,
 ) {
   const { t, tItem } = useTranslations();
-  const { addToast } = useToast();
+  const { addToast, addPendingToast } = useToast();
+  const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
   const canDelete = useServerCan('files.delete');
+  const canReadContent = useServerCan('files.read-content');
   const addRestoredToast = useRestoredToast(onFinished);
 
   const [openModal, setOpenModal] = useState<'restoreTo' | 'delete' | null>(null);
+  const [restoring, setRestoring] = useState(false);
   const [conflicts, setConflicts] = useState<TrashRestoreConflict[] | null>(null);
 
-  const doRestore = () =>
+  const entryDirectory = `/.trash/${entry.uuid}`;
+
+  const doOpen = () =>
+    navigate(
+      `/server/${server.uuidShort}/files?${createSearchParams({
+        directory: entry.directory ? join(entryDirectory, entry.name) : entryDirectory,
+      })}`,
+    );
+
+  const doDownload = () =>
+    downloadFilesWithToast(downloadFiles(server.uuid, entryDirectory, [entry.name], false, 'tar_gz'), {
+      addToast,
+      addPendingToast,
+      t,
+    });
+
+  const doRestore = () => {
+    setRestoring(true);
+
     restoreTrashEntries({ uuid: server.uuid, entries: [{ uuid: entry.uuid }] })
       .then(({ restored, conflicts }) => {
         if (conflicts.length > 0) {
@@ -61,7 +93,9 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
-      });
+      })
+      .finally(() => setRestoring(false));
+  };
 
   const doDelete = async () => {
     await deleteTrashEntries(server.uuid, { type: 'uuids', uuids: [entry.uuid] })
@@ -109,8 +143,25 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
         items={[
           {
             type: 'action',
+            icon: faArrowUpRightFromSquare,
+            label: t('pages.server.files.button.open', {}),
+            onClick: doOpen,
+            color: 'gray',
+          },
+          {
+            type: 'action',
+            icon: faFileArrowDown,
+            label: t('common.button.download', {}),
+            hidden: !entry.file,
+            onClick: doDownload,
+            color: 'gray',
+            canAccess: canReadContent,
+          },
+          {
+            type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
+            disabled: restoring,
             onClick: doRestore,
             color: 'gray',
             canAccess: canDelete,
@@ -139,6 +190,8 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
           <TableRow
             ref={ref}
             bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
+            className='cursor-pointer'
+            onClick={doOpen}
             onContextMenu={(e) => {
               e.preventDefault();
               openMenu(e.clientX, e.clientY);
@@ -150,7 +203,7 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
 
             <TableData>
               <span className='flex items-center gap-2'>
-                {entry.directory && <FontAwesomeIcon icon={faFolder} className='text-(--mantine-color-dimmed)' />}
+                <FontAwesomeIcon icon={entry.directory ? faFolder : faFile} className='text-(--mantine-color-dimmed)' />
                 {entry.name}
               </span>
             </TableData>
@@ -162,7 +215,7 @@ const TrashRow = forwardRef<HTMLTableRowElement, TrashRowProps>(function TrashRo
             <TableData>{bytesToString(entry.size)}</TableData>
 
             <TableData>
-              <FormattedTimestamp timestamp={entry.deletedAt} precise />
+              <FormattedTimestamp timestamp={entry.deleted} precise />
             </TableData>
 
             <ContextMenuToggle items={items} openMenu={openMenu} />

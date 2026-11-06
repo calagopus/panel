@@ -1306,6 +1306,71 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_files_trash_entry(
+        &self,
+        server: uuid::Uuid,
+        entry: uuid::Uuid,
+        query: &super::servers_server_files_trash_entry::get::Query,
+    ) -> Result<super::servers_server_files_trash_entry::get::Response, ApiHttpError> {
+        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
+        if let Some(value) = &query.ignored {
+            for value in value {
+                query_parts.push(format!("ignored={}", urlencoding::encode(value)).into());
+            }
+        }
+        let query = if query_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", query_parts.join("&"))
+        };
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/files/trash/{entry}{query}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_trash_entry_restore(
+        &self,
+        server: uuid::Uuid,
+        entry: uuid::Uuid,
+        data: &super::servers_server_files_trash_entry_restore::post::RequestBody,
+    ) -> Result<super::servers_server_files_trash_entry_restore::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/trash/{entry}/restore"),
+            Some(&ServersServerFilesTrashEntryRestorePostBody {
+                inner: data,
+                ignored: &self.ignored,
+            }),
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_files_trash_entry_return(
+        &self,
+        server: uuid::Uuid,
+        entry: uuid::Uuid,
+        data: &super::servers_server_files_trash_entry_return::post::RequestBody,
+    ) -> Result<super::servers_server_files_trash_entry_return::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/trash/{entry}/return"),
+            Some(&ServersServerFilesTrashEntryReturnPostBody {
+                inner: data,
+                ignored: &self.ignored,
+            }),
+            None,
+        )
+        .await
+    }
+
     pub async fn post_servers_server_files_write(
         &self,
         server: uuid::Uuid,
@@ -2042,6 +2107,20 @@ struct ServersServerFilesTrashPurgePostBody<'a> {
 struct ServersServerFilesTrashRestorePostBody<'a> {
     #[serde(flatten)]
     inner: &'a super::servers_server_files_trash_restore::post::RequestBody,
+    ignored: &'a Vec<compact_str::CompactString>,
+}
+
+#[derive(Serialize)]
+struct ServersServerFilesTrashEntryRestorePostBody<'a> {
+    #[serde(flatten)]
+    inner: &'a super::servers_server_files_trash_entry_restore::post::RequestBody,
+    ignored: &'a Vec<compact_str::CompactString>,
+}
+
+#[derive(Serialize)]
+struct ServersServerFilesTrashEntryReturnPostBody<'a> {
+    #[serde(flatten)]
+    inner: &'a super::servers_server_files_trash_entry_return::post::RequestBody,
     ignored: &'a Vec<compact_str::CompactString>,
 }
 

@@ -1,6 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod _entry_;
 mod restore;
 
 mod get {
@@ -243,5 +244,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .nest("/restore", restore::router(state))
+        .nest("/{entry}", _entry_::router(state))
         .with_state(state.clone())
 }

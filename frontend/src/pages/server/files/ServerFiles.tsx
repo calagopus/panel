@@ -29,6 +29,7 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
+import { isVirtualRoot } from '@/lib/files/virtualRoot.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import { useDuplicateFile } from '@/pages/server/files/hooks/useDuplicateFile.ts';
@@ -91,7 +92,6 @@ function FileBrowser() {
   const browsingError = useFileManagerStore((state) => state.browsingError);
   const anyActing = useFileManagerStore((state) => state.actingFiles.size > 0);
   const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
-  const browsingBackup = useFileManagerStore((state) => state.browsingBackup);
   const searchInfo = useFileManagerStore((state) => state.searchInfo);
   const collapsedSearchPreviews = useFileManagerStore((state) => state.collapsedSearchPreviews);
   const sortMode = useFileManagerStore((state) => state.sortMode);
@@ -302,9 +302,8 @@ function FileBrowser() {
   }, [t, sortMode, preferPhysicalSize, wide]);
 
   const normalizedBrowsingDirectory = join('/', browsingDirectory);
-  const backupRootDirectory = browsingBackup ? `/.backups/${browsingBackup.uuid}` : null;
   const showParentDirectoryRow =
-    normalizedBrowsingDirectory !== '/' && normalizedBrowsingDirectory !== backupRootDirectory && !searchInfo;
+    normalizedBrowsingDirectory !== '/' && !isVirtualRoot(normalizedBrowsingDirectory) && !searchInfo;
 
   const tableAnchorRef = useRef<HTMLDivElement>(null);
   const [scrollMargin, setScrollMargin] = useState(0);

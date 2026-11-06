@@ -17,6 +17,7 @@ import { join } from 'pathe';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { hasIncompleteUploads } from '@/lib/files/stagingUploads.ts';
+import { isVirtualRoot } from '@/lib/files/virtualRoot.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -137,10 +138,10 @@ export function useFileBrowserQuickActions({
       isVisible: () => {
         if (treeView) return false;
 
-        const { browsingDirectory, browsingBackup, searchInfo } = store.getState();
+        const { browsingDirectory, searchInfo } = store.getState();
         const directory = join('/', browsingDirectory);
 
-        return !searchInfo && directory !== '/' && directory !== (browsingBackup && `/.backups/${browsingBackup.uuid}`);
+        return !searchInfo && directory !== '/' && !isVirtualRoot(directory);
       },
     },
     {

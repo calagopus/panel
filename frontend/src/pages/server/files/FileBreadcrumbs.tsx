@@ -10,6 +10,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import Breadcrumbs from '@/elements/data-display/Breadcrumbs.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { virtualRootOf } from '@/lib/files/virtualRoot.ts';
 import { pathSegments } from '@/lib/path.ts';
 import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMove.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
@@ -23,6 +24,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
   const {
     selectedFilesCount,
     browsingBackup,
+    browsingTrashEntry,
     browsingEntries,
     browsingPrimaryFilesystem,
     setBrowsingDirectory,
@@ -33,6 +35,7 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     useShallow((state) => ({
       selectedFilesCount: state.selectedFiles.size,
       browsingBackup: state.browsingBackup,
+      browsingTrashEntry: state.browsingTrashEntry,
       browsingEntries: state.browsingEntries,
       browsingPrimaryFilesystem: state.browsingPrimaryFilesystem,
       setBrowsingDirectory: state.setBrowsingDirectory,
@@ -42,11 +45,16 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     })),
   );
 
-  const splittedPath = path.split('/').filter(Boolean);
   const pathItems = pathSegments(path);
+  const virtualRoot = virtualRootOf(path);
+  const rootDirectory = virtualRoot?.directory ?? '/';
+  const rootSegments = pathSegments(rootDirectory).length;
 
-  const isBackupPath = path.startsWith('/.backups/');
-  const backupUuid = isBackupPath ? (splittedPath[1] ?? '') : null;
+  const rootName = !virtualRoot
+    ? 'container'
+    : virtualRoot.type === 'backup'
+      ? (browsingBackup?.name ?? virtualRoot.uuid)
+      : (virtualRoot.name ?? browsingTrashEntry?.name ?? virtualRoot.uuid);
 
   const breadcrumbClassName = (targetDirectory: string) =>
     classNames(
@@ -55,23 +63,21 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     );
 
   const items: ReactNode[] = [
-    isBackupPath ? 'backups' : 'home',
+    virtualRoot?.type === 'backup' ? 'backups' : virtualRoot?.type === 'trash' ? 'trash' : 'home',
     <NavLink
       key='first-segment'
       to={
-        isBackupPath
-          ? `/server/${server?.uuidShort}/files?${createSearchParams({
-              directory: `/.backups/${backupUuid}`,
-            })}`
+        virtualRoot
+          ? `/server/${server?.uuidShort}/files?${createSearchParams({ directory: rootDirectory })}`
           : `/server/${server?.uuidShort}/files`
       }
-      className={breadcrumbClassName(isBackupPath ? `/.backups/${backupUuid}` : '/')}
-      {...getDropHandlers(isBackupPath ? `/.backups/${backupUuid}` : '/')}
+      className={breadcrumbClassName(rootDirectory)}
+      {...getDropHandlers(rootDirectory)}
     >
-      {isBackupPath ? (browsingBackup?.name ?? backupUuid) : 'container'}
+      {rootName}
     </NavLink>,
-    ...pathItems.slice(isBackupPath ? 2 : 0).map((item, index) =>
-      index === pathItems.length - 1 && inFileEditor ? (
+    ...pathItems.slice(rootSegments).map((item, index) =>
+      index === pathItems.length - rootSegments - 1 && inFileEditor ? (
         item.name
       ) : (
         <NavLink
@@ -113,9 +119,14 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
 
       {!inFileEditor && (
         <div className='flex flex-row space-x-2'>
-          <NavLink to={`/server/${server?.uuidShort}/files`} hidden={!isBackupPath}>
+          <NavLink
+            to={`/server/${server?.uuidShort}/files${virtualRoot?.type === 'trash' ? '/trash' : ''}`}
+            hidden={!virtualRoot}
+          >
             <Button variant='light' leftSection={<FontAwesomeIcon icon={faDoorOpen} />}>
-              {t('pages.server.files.button.exitBackup', {})}
+              {virtualRoot?.type === 'trash'
+                ? t('pages.server.files.button.backToTrash', {})
+                : t('pages.server.files.button.exitBackup', {})}
             </Button>
           </NavLink>
           <span className='flex flex-row space-x-2'>

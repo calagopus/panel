@@ -17,6 +17,7 @@ import {
   serverDirectoryUploadSchema,
   serverFilesContentMatchesSchema,
   serverFilesSearchSchema,
+  serverTrashEntrySchema,
 } from '@/lib/schemas/server/files.ts';
 import {
   DEVICE_ONLY_SETTING_KEYS,
@@ -26,6 +27,7 @@ import {
   subscribeUserSetting,
 } from '@/lib/userSettings.ts';
 import type { FileMoveGroup } from '@/pages/server/files/list/fileMove.ts';
+import type { TrashItemConflict } from '@/pages/server/files/trash/entry/trashItems.ts';
 import { FileUploader } from '@/stores/uploads.ts';
 
 export type ModalType =
@@ -46,6 +48,8 @@ export type ModalType =
   | 'largestDirectories'
   | 'incompleteUploads'
   | 'sftp'
+  | 'trashRestoreTo'
+  | 'trashRestoreConflict'
   | null;
 
 export interface SearchInfo {
@@ -90,6 +94,7 @@ export interface FileManagerStore {
   draggingTarget: string | null;
   selectedFiles: ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>;
   browsingBackup: z.infer<typeof serverBackupSchema> | null;
+  browsingTrashEntry: z.infer<typeof serverTrashEntrySchema> | null;
   browsingDirectory: string;
   setBrowsingDirectory: (directory: string) => void;
   setBrowsingContext: (context: FileManagerBrowsingContext) => void;
@@ -115,6 +120,8 @@ export interface FileManagerStore {
   setOpenModal: (modal: ModalType) => void;
   modalDirectoryEntries: z.infer<typeof serverDirectoryEntrySchema>[];
   setModalDirectoryEntries: (files: z.infer<typeof serverDirectoryEntrySchema>[]) => void;
+  trashRestoreConflicts: TrashItemConflict[];
+  setTrashRestoreConflicts: (conflicts: TrashItemConflict[]) => void;
   searchInfo: SearchInfo | null;
   searchModalQuery: string | null;
   setSearchModalQuery: (query: string | null) => void;
@@ -353,6 +360,7 @@ export const createFileManagerStore = (
       draggingTarget: null,
       selectedFiles: new ObjectSet<z.infer<typeof serverDirectoryEntrySchema>, 'name'>('name'),
       browsingBackup: null,
+      browsingTrashEntry: null,
       browsingDirectory: initial.browsingDirectory,
       setBrowsingDirectory: (directory) =>
         set((state) => {
@@ -419,6 +427,8 @@ export const createFileManagerStore = (
       setOpenModal: (modal) => set({ openModal: modal }),
       modalDirectoryEntries: [],
       setModalDirectoryEntries: (files) => set({ modalDirectoryEntries: files }),
+      trashRestoreConflicts: [],
+      setTrashRestoreConflicts: (conflicts) => set({ trashRestoreConflicts: conflicts }),
       searchInfo: null,
       searchModalQuery: null,
       setSearchModalQuery: (query) => set({ searchModalQuery: query }),

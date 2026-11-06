@@ -6,7 +6,9 @@ import {
   faClone,
   faCopy,
   faFileDownload,
+  faFolderOpen,
   faPen,
+  faRotateLeft,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +25,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { isTrashEnabled } from '@/lib/domain/server.ts';
+import { isInsideTrashPayload } from '@/lib/files/virtualRoot.ts';
 import { useFileSelectionQuickActions } from '@/pages/server/files/hooks/useFileSelectionQuickActions.tsx';
 import { downloadFilesWithToast } from '@/pages/server/files/list/downloadFilesWithToast.ts';
 import { canMoveFilesToDirectory } from '@/pages/server/files/list/fileMove.ts';
@@ -31,6 +34,8 @@ import FileCopyConflictModal, {
   ConflictResolutions,
   FileConflict,
 } from '@/pages/server/files/modals/FileCopyConflictModal.tsx';
+import { trashItemTargets } from '@/pages/server/files/trash/entry/trashItems.ts';
+import { useTrashItemRestore } from '@/pages/server/files/trash/entry/useTrashItemRestore.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useFileManager, useFileManagerApi } from '@/providers/contexts/fileManagerContext.ts';
@@ -81,6 +86,7 @@ function FileActionBar() {
   const canUpdate = useServerCan('files.update');
   const canDelete = useServerCan('files.delete');
   const trashEnabled = isTrashEnabled(server, browsingPrimaryFilesystem);
+  const trashRestore = useTrashItemRestore();
 
   const [loading, setLoading] = useState(false);
   const [conflicts, setConflicts] = useState<FileConflict[] | null>(null);
@@ -335,6 +341,31 @@ function FileActionBar() {
           </>
         ) : (
           <>
+            {trashRestore.available && isInsideTrashPayload(browsingDirectory) && (
+              <>
+                <ServerCan action='files.delete'>
+                  <Tooltip label={t('common.button.restore', {})}>
+                    <Button
+                      onClick={() =>
+                        trashRestore.restore(
+                          trashItemTargets(browsingDirectory, store.getState().selectedFiles.values()),
+                        )
+                      }
+                      loading={trashRestore.restoring}
+                    >
+                      <FontAwesomeIcon icon={faRotateLeft} />
+                    </Button>
+                  </Tooltip>
+                </ServerCan>
+                <ServerCan action='files.delete'>
+                  <Tooltip label={t('pages.server.files.button.restoreTo', {})}>
+                    <Button onClick={() => doOpenModal('trashRestoreTo', store.getState().selectedFiles.values())}>
+                      <FontAwesomeIcon icon={faFolderOpen} />
+                    </Button>
+                  </Tooltip>
+                </ServerCan>
+              </>
+            )}
             <ServerCan action='files.read-content'>
               <Tooltip label={t('common.button.download', {})}>
                 <Button onClick={doDownload} loading={loading}>

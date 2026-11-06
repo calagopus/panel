@@ -307,8 +307,15 @@ export const serverTrashEntrySchema = z.object({
   name: z.string(),
   path: z.string(),
   directory: z.boolean(),
+  file: z.boolean(),
   size: z.number(),
-  deletedAt: z.coerce.date(),
+  deleted: z.coerce.date(),
+});
+
+export const serverTrashRestoredFileSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  restoration: z.string().nullable(),
 });
 
 export const serverTrashSelectorSchema = z.discriminatedUnion('type', [

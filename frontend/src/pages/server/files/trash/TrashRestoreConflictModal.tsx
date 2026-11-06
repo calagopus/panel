@@ -54,7 +54,7 @@ export function collectRestoreConflicts(
   });
 }
 
-function EntryMeta({
+export function EntryMeta({
   label,
   size,
   timestampLabel,
@@ -202,7 +202,7 @@ export default function TrashRestoreConflictModal({ conflicts, onResolved, onUnd
                       label={t('pages.server.files.trash.title', {})}
                       size={conflict.entry.size}
                       timestampLabel={t('pages.server.files.trash.table.columns.deletedAt', {})}
-                      timestamp={<FormattedTimestamp timestamp={conflict.entry.deletedAt} />}
+                      timestamp={<FormattedTimestamp timestamp={conflict.entry.deleted} />}
                     />
                     <EntryMeta
                       label={t('pages.server.files.modal.copyConflict.destination', {})}

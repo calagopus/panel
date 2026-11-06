@@ -5,7 +5,9 @@ import { useStore } from 'zustand';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
 import loadDirectory, { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
+import getTrashEntry from '@/api/server/files/trash/getTrashEntry.ts';
 import { registerUploadRefresh } from '@/lib/files/uploadManager.ts';
+import { virtualRootOf } from '@/lib/files/virtualRoot.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useUploader } from '@/plugins/import/useUploader.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -93,13 +95,9 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [infiniteData]);
 
-  const backupUuid = useMemo(() => {
-    if (!browsingDirectory.startsWith('/.backups/')) return null;
-
-    const rest = browsingDirectory.slice('/.backups/'.length);
-    const slash = rest.indexOf('/');
-    return slash === -1 ? rest : rest.slice(0, slash);
-  }, [browsingDirectory]);
+  const virtualRoot = useMemo(() => virtualRootOf(browsingDirectory), [browsingDirectory]);
+  const backupUuid = virtualRoot?.type === 'backup' ? virtualRoot.uuid : null;
+  const trashEntryUuid = virtualRoot?.type === 'trash' ? virtualRoot.uuid : null;
 
   const { data: browsingBackup = null, error: browsingBackupError } = useQuery({
     queryKey: queryKeys.server(server.uuid).backups.detail(backupUuid!),
@@ -113,6 +111,19 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
       addToast(httpErrorToHuman(browsingBackupError), 'error');
     }
   }, [browsingBackupError]);
+
+  const { data: browsingTrashEntry = null, error: browsingTrashEntryError } = useQuery({
+    queryKey: queryKeys.server(server.uuid).files.trashEntry(trashEntryUuid!),
+    queryFn: () => getTrashEntry(server.uuid, trashEntryUuid!),
+    enabled: !!trashEntryUuid && canReadFiles,
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (browsingTrashEntryError) {
+      addToast(httpErrorToHuman(browsingTrashEntryError), 'error');
+    }
+  }, [browsingTrashEntryError]);
 
   useEffect(() => {
     if (directoryError) {
@@ -170,6 +181,10 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     store.setState({ browsingBackup });
   }, [browsingBackup]);
+
+  useEffect(() => {
+    store.setState({ browsingTrashEntry });
+  }, [browsingTrashEntry]);
 
   useEffect(() => {
     if (store.getState().searchInfo) return;

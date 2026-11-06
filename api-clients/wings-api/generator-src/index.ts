@@ -69,6 +69,8 @@ const compatBodyProperties: Record<string, Record<string, 'client' | 'extra'>> =
     'post /api/servers/{server}/files/trash': { ignored: 'client' },
     'post /api/servers/{server}/files/trash/restore': { ignored: 'client' },
     'post /api/servers/{server}/files/trash/purge': { ignored: 'client' },
+    'post /api/servers/{server}/files/trash/{entry}/restore': { ignored: 'client' },
+    'post /api/servers/{server}/files/trash/{entry}/return': { ignored: 'client' },
     'post /api/servers/{server}/reinstall': { start_on_completion: 'extra' },
 }
 

@@ -310,6 +310,7 @@ const server = (serverUuid: string) => ({
     pathStat: (directory: string, names: string[]) =>
       ['server', serverUuid, 'files', 'path-stat', directory, names] as const,
     trash: () => ['server', serverUuid, 'files', 'trash'] as const,
+    trashEntry: (uuid: string) => ['server', serverUuid, 'files', 'trash', { uuid }] as const,
   },
   firewall: {
     all: () => ['server', serverUuid, 'firewall'] as const,

@@ -40,6 +40,7 @@ mod post {
         (status = BAD_REQUEST, body = ApiError),
         (status = NOT_FOUND, body = ApiError),
         (status = EXPECTATION_FAILED, body = ApiError),
+        (status = NOT_IMPLEMENTED, body = ApiError),
     ), request_body = inline(Payload))]
     pub async fn route(
         state: GetState,
@@ -166,8 +167,8 @@ mod post {
         {
             Ok(Ok(result)) => result,
             Ok(Err(wings_api::client::ApiHttpError::Http(StatusCode::NOT_FOUND, _))) => {
-                return ApiResponse::error("node's wings version does not support backup tests")
-                    .with_status(StatusCode::EXPECTATION_FAILED)
+                return ApiResponse::error("this node does not support backup tests")
+                    .with_status(StatusCode::NOT_IMPLEMENTED)
                     .ok();
             }
             Ok(Err(err)) => return Err(err.into()),

@@ -6051,6 +6051,7 @@ const baseTranslations = defineTranslations({
             trash: 'Trash',
             emptyTrash: 'Empty Trash',
             backToFiles: 'Back to Files',
+            backToTrash: 'Back to Trash',
             restoreTo: 'Restore to...',
             remoteCopy: 'Remote Copy',
             search: 'Search',
