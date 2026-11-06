@@ -4423,9 +4423,6 @@
         "systemBackupPolicies": {
           "title": "Systembackup-politikker",
           "resourceName": "Systembackup-politik",
-          "badge": {
-            "runPending": "Kørsel afventer"
-          },
           "form": {
             "backupConfigurationPlaceholder": "Nedarv fra server",
             "kind": "Backup-type",
