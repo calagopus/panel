@@ -149,8 +149,9 @@ export default function ConsoleCommandInput({
             if (snippet) {
               inputValueUpdatedRef.current = true;
               inputValueCompletedRef.current = true;
-              inputValueRef.current = snippet.command;
-              setInputValue(snippet.command);
+              const command = snippet.command.replace(/\r?\n/g, '\\n');
+              inputValueRef.current = command;
+              setInputValue(command);
             }
           }}
         />
