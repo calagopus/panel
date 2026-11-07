@@ -6598,7 +6598,6 @@
           },
           "preCondition": {
             "valueSeconds": "Giá Trị (giây)",
-            "valuePercent": "Giá Trị (%)",
             "value": "Giá Trị"
           },
           "triggers": {

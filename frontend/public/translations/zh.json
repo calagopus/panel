@@ -5348,7 +5348,6 @@
           },
           "preCondition": {
             "valueSeconds": "值（秒）",
-            "valuePercent": "值（%）",
             "value": "值"
           },
           "triggers": {

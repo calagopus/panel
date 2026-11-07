@@ -6871,7 +6871,6 @@
           },
           "preCondition": {
             "valueSeconds": "値 (秒)",
-            "valuePercent": "値 (%)",
             "value": "値"
           },
           "triggers": {

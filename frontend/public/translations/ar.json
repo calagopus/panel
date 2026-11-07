@@ -1430,7 +1430,6 @@
           },
           "preCondition": {
             "valueSeconds": "القيمة (ثوانٍ)",
-            "valuePercent": "القيمة (٪)",
             "value": "القيمة"
           },
           "triggers": {

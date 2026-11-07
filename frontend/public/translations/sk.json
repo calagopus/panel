@@ -3606,7 +3606,6 @@
           },
           "preCondition": {
             "valueSeconds": "Hodnota (sekundy)",
-            "valuePercent": "Hodnota (%)",
             "value": "Hodnota"
           },
           "triggers": {
