@@ -3,6 +3,7 @@ use axum::http::StatusCode;
 use compact_str::ToCompactString;
 use rand::distr::SampleString;
 use rustis::{
+    ErrorKind, RedisError, RedisErrorKind,
     client::Client,
     commands::{
         GenericCommands, InfoSection, ScriptingCommands, ServerCommands, SetCondition,
@@ -11,12 +12,13 @@ use rustis::{
     resp::BulkString,
 };
 use serde::{Serialize, de::DeserializeOwned};
+use sha1::Digest;
 use std::{
     borrow::Cow,
     collections::HashMap,
     future::Future,
     sync::{
-        Arc,
+        Arc, LazyLock,
         atomic::{AtomicU8, AtomicU64, Ordering},
     },
     time::{Duration, Instant},
@@ -31,6 +33,9 @@ if ttl < 0 then
 end
 return {hits, ttl}
 "#;
+
+static RATELIMIT_SCRIPT_SHA: LazyLock<String> =
+    LazyLock::new(|| hex::encode(sha1::Sha1::digest(RATELIMIT_SCRIPT)));
 
 const LOCK_RELEASE_SCRIPT: &str = r#"
 if redis.call('GET', KEYS[1]) == ARGV[1] then
@@ -86,6 +91,50 @@ impl moka::Expiry<compact_str::CompactString, DataEntry> for DataExpiry {
     ) -> Option<Duration> {
         Some(value.intended_ttl)
     }
+}
+
+#[derive(Clone, Copy, Debug)]
+struct RatelimitBlock {
+    limit_used: u64,
+    expire_unix: u64,
+    ttl: Duration,
+}
+
+struct RatelimitBlockExpiry;
+
+impl moka::Expiry<compact_str::CompactString, RatelimitBlock> for RatelimitBlockExpiry {
+    fn expire_after_create(
+        &self,
+        _key: &compact_str::CompactString,
+        value: &RatelimitBlock,
+        _created_at: Instant,
+    ) -> Option<Duration> {
+        Some(value.ttl)
+    }
+
+    fn expire_after_update(
+        &self,
+        _key: &compact_str::CompactString,
+        value: &RatelimitBlock,
+        _updated_at: Instant,
+        _duration_until_expiry: Option<Duration>,
+    ) -> Option<Duration> {
+        Some(value.ttl)
+    }
+}
+
+fn ratelimited_response(limit: u64, limit_used: u64, expire_unix: u64, now: u64) -> ApiResponse {
+    let retry_after = expire_unix.saturating_sub(now);
+
+    ApiResponse::error(format!("you are ratelimited, retry in {retry_after}s"))
+        .with_status(StatusCode::TOO_MANY_REQUESTS)
+        .with_header("X-RateLimit-Limit", limit.to_compact_string())
+        .with_header(
+            "X-RateLimit-Remaining",
+            limit.saturating_sub(limit_used).to_compact_string(),
+        )
+        .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
+        .with_header("Retry-After", retry_after.to_compact_string())
 }
 
 const OUTCOME_COALESCED: u8 = 0;
@@ -191,6 +240,7 @@ pub struct Cache {
     local_locks: LocalLocks,
     local_locks_task: tokio::task::JoinHandle<()>,
     local_ratelimits: moka::future::Cache<compact_str::CompactString, (u64, u64)>,
+    ratelimit_blocks: moka::future::Cache<compact_str::CompactString, RatelimitBlock>,
     local_resolutions: moka::future::Cache<compact_str::CompactString, Resolution>,
 
     cache_local_hits: CacheBucket,
@@ -263,6 +313,10 @@ impl Cache {
         });
 
         let local_ratelimits = moka::future::Cache::builder().max_capacity(16384).build();
+        let ratelimit_blocks = moka::future::Cache::builder()
+            .max_capacity(16384)
+            .expire_after(RatelimitBlockExpiry)
+            .build();
         let local_resolutions = moka::future::Cache::builder()
             .max_capacity(65536)
             .time_to_idle(Duration::from_secs(3600))
@@ -280,6 +334,7 @@ impl Cache {
             local_locks,
             local_locks_task,
             local_ratelimits,
+            ratelimit_blocks,
             local_resolutions,
             cache_local_hits: CacheBucket::default(),
             cache_remote_hits: CacheBucket::default(),
@@ -347,16 +402,53 @@ impl Cache {
 
         let now = chrono::Utc::now().timestamp() as u64;
 
-        let remote = match &self.client {
-            Some(redis_client) => match redis_client
-                .eval::<(u64, i64)>(
-                    RATELIMIT_SCRIPT,
-                    [self.redis_key(&key).as_ref()],
-                    [limit_window],
-                )
+        // the counter only grows and the ttl is never extended within a window, so a blocked
+        // client stays blocked until the window ends and needs no counting round trip
+        let blocked = match &self.client {
+            Some(_) => self
+                .ratelimit_blocks
+                .get(&key)
                 .await
+                .filter(|block| block.expire_unix > now + 1)
+                .map(|block| (block.limit_used, block.expire_unix)),
+            None => self
+                .local_ratelimits
+                .get(&key)
+                .await
+                .filter(|(_, expire_unix)| *expire_unix > now + 2),
+        };
+        if let Some((limit_used, expire_unix)) = blocked
+            && limit_used >= limit
+        {
+            return Err(ratelimited_response(limit, limit_used, expire_unix, now));
+        }
+
+        let remote = match &self.client {
+            Some(redis_client) => match Self::eval_ratelimit(
+                redis_client,
+                self.redis_key(&key).as_ref(),
+                limit_window,
+            )
+            .await
             {
-                Ok((limit_used, ttl)) => Some((limit_used, now + ttl.max(0) as u64)),
+                Ok((limit_used, ttl)) => {
+                    let expire_unix = now + ttl.max(0) as u64;
+
+                    if limit_used >= limit && expire_unix > now + 1 {
+                        self.ratelimit_blocks
+                            .insert(
+                                key.clone(),
+                                RatelimitBlock {
+                                    limit_used,
+                                    expire_unix,
+                                    ttl: Duration::from_secs(expire_unix - now),
+                                },
+                            )
+                            .await;
+                    }
+
+                    Some((limit_used, expire_unix))
+                }
                 Err(err) => {
                     tracing::warn!(
                         "failed to apply redis ratelimit for {key}, falling back to local ratelimit: {err:#?}"
@@ -388,22 +480,36 @@ impl Cache {
         };
 
         if limit_used >= limit {
-            let retry_after = expire_unix.saturating_sub(now);
-
-            return Err(ApiResponse::error(format!(
-                "you are ratelimited, retry in {retry_after}s"
-            ))
-            .with_status(StatusCode::TOO_MANY_REQUESTS)
-            .with_header("X-RateLimit-Limit", limit.to_compact_string())
-            .with_header(
-                "X-RateLimit-Remaining",
-                limit.saturating_sub(limit_used).to_compact_string(),
-            )
-            .with_header("X-RateLimit-Reset", expire_unix.to_compact_string())
-            .with_header("Retry-After", retry_after.to_compact_string()));
+            return Err(ratelimited_response(limit, limit_used, expire_unix, now));
         }
 
         Ok(())
+    }
+
+    async fn eval_ratelimit(
+        client: &Client,
+        redis_key: &str,
+        limit_window: u64,
+    ) -> Result<(u64, i64), rustis::Error> {
+        match client
+            .evalsha::<(u64, i64)>(RATELIMIT_SCRIPT_SHA.as_str(), [redis_key], [limit_window])
+            .await
+        {
+            Err(err)
+                if matches!(
+                    err.kind(),
+                    ErrorKind::Redis(RedisError {
+                        kind: RedisErrorKind::NoScript,
+                        ..
+                    })
+                ) =>
+            {
+                client
+                    .eval::<(u64, i64)>(RATELIMIT_SCRIPT, [redis_key], [limit_window])
+                    .await
+            }
+            result => result,
+        }
     }
 
     pub async fn ratelimit_reached(
@@ -419,19 +525,30 @@ impl Cache {
         );
 
         let remote = match &self.client {
-            Some(redis_client) => match redis_client
-                .get::<Option<u64>>(self.redis_key(&key).as_ref())
-                .await
-            {
-                Ok(limit_used) => Some(limit_used.unwrap_or(0)),
-                Err(err) => {
-                    tracing::warn!(
-                        "failed to read redis ratelimit for {key}, falling back to local ratelimit: {err:#?}"
-                    );
+            Some(redis_client) => {
+                let now = chrono::Utc::now().timestamp() as u64;
 
-                    None
+                if let Some(block) = self.ratelimit_blocks.get(&key).await
+                    && block.expire_unix > now + 1
+                    && block.limit_used >= limit
+                {
+                    return true;
                 }
-            },
+
+                match redis_client
+                    .get::<Option<u64>>(self.redis_key(&key).as_ref())
+                    .await
+                {
+                    Ok(limit_used) => Some(limit_used.unwrap_or(0)),
+                    Err(err) => {
+                        tracing::warn!(
+                            "failed to read redis ratelimit for {key}, falling back to local ratelimit: {err:#?}"
+                        );
+
+                        None
+                    }
+                }
+            }
             None => None,
         };
 
@@ -992,6 +1109,10 @@ mod tests {
             local_locks: LocalLocks::default(),
             local_locks_task: tokio::spawn(async {}),
             local_ratelimits: moka::future::Cache::builder().max_capacity(16).build(),
+            ratelimit_blocks: moka::future::Cache::builder()
+                .max_capacity(16)
+                .expire_after(RatelimitBlockExpiry)
+                .build(),
             local_resolutions: moka::future::Cache::builder().max_capacity(16).build(),
             cache_local_hits: CacheBucket::default(),
             cache_remote_hits: CacheBucket::default(),

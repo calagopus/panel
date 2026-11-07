@@ -10,7 +10,6 @@ use colored::Colorize;
 use compact_str::ToCompactString;
 use hyper::body::Body as _;
 use sentry_tower::{NewSentryLayer, SentryHttpLayer};
-use sha2::Digest;
 use shared::{
     ApiError, GetIp, GetState,
     extensions::commands::CliCommandGroupBuilder,
@@ -42,8 +41,7 @@ pub mod tasks;
 
 struct RequestLogBudget {
     second: AtomicU64,
-    logged: AtomicUsize,
-    suppressed: AtomicU64,
+    requests: AtomicUsize,
 }
 
 impl RequestLogBudget {
@@ -58,26 +56,41 @@ impl RequestLogBudget {
                 .compare_exchange(second, now, Ordering::AcqRel, Ordering::Relaxed)
                 .is_ok()
         {
-            self.logged.store(0, Ordering::Relaxed);
-            self.suppressed.swap(0, Ordering::Relaxed)
+            self.requests
+                .swap(0, Ordering::Relaxed)
+                .saturating_sub(limit) as u64
         } else {
             0
         };
 
-        if self.logged.fetch_add(1, Ordering::Relaxed) < limit {
-            (true, suppressed)
-        } else {
-            self.suppressed.fetch_add(1, Ordering::Relaxed);
-            (false, suppressed)
-        }
+        (
+            self.requests.fetch_add(1, Ordering::Relaxed) < limit,
+            suppressed,
+        )
     }
 }
 
 static REQUEST_LOG_BUDGET: RequestLogBudget = RequestLogBudget {
     second: AtomicU64::new(0),
-    logged: AtomicUsize::new(0),
-    suppressed: AtomicU64::new(0),
+    requests: AtomicUsize::new(0),
 };
+
+fn lowercase_method(method: &axum::http::Method) -> Cow<'static, str> {
+    use axum::http::Method;
+
+    Cow::Borrowed(match *method {
+        Method::GET => "get",
+        Method::POST => "post",
+        Method::PUT => "put",
+        Method::PATCH => "patch",
+        Method::DELETE => "delete",
+        Method::HEAD => "head",
+        Method::OPTIONS => "options",
+        Method::CONNECT => "connect",
+        Method::TRACE => "trace",
+        _ => return Cow::Owned(method.as_str().to_lowercase()),
+    })
+}
 
 pub async fn handle_request(
     state: GetState,
@@ -111,7 +124,7 @@ pub async fn handle_request(
             path = req.uri().path(),
             query = %shared::utils::redact_query(req.uri().query().unwrap_or_default()),
             "http {}",
-            req.method().to_string().to_lowercase(),
+            lowercase_method(req.method()),
         );
     }
 
@@ -269,11 +282,7 @@ pub async fn handle_postprocessing(
     req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    let if_none_match = req
-        .headers()
-        .get("If-None-Match")
-        .and_then(|v| v.to_str().ok())
-        .map(|s| s.to_string());
+    let if_none_match = req.headers().get("If-None-Match").cloned();
     let mut response = next.run(req).await;
 
     if let Some(server_name) = &state.env.server_name
@@ -312,25 +321,23 @@ pub async fn handle_postprocessing(
         let (mut parts, body) = response.into_parts();
 
         let bytes_body = match axum::body::to_bytes(body, usize::MAX).await {
-            Ok(bytes) => bytes.into_iter().collect::<Vec<u8>>(),
+            Ok(bytes) => bytes,
             Err(_) => return Ok(Response::from_parts(parts, Body::empty())),
         };
 
-        match String::from_utf8(bytes_body) {
+        response = match std::str::from_utf8(&bytes_body) {
             Ok(text_body) => {
                 parts
                     .headers
                     .insert("Content-Type", HeaderValue::from_static("application/json"));
 
-                response = Response::from_parts(
+                Response::from_parts(
                     parts,
-                    Body::from(ApiError::new_value(&[&text_body]).to_string()),
-                );
+                    Body::from(ApiError::new_value(&[text_body]).to_string()),
+                )
             }
-            Err(err) => {
-                response = Response::from_parts(parts, Body::from(err.into_bytes()));
-            }
-        }
+            Err(_) => Response::from_parts(parts, Body::from(bytes_body)),
+        };
     }
 
     let (etag, mut response) = if let Some(etag) = response.headers().get("ETag") {
@@ -342,13 +349,14 @@ pub async fn handle_postprocessing(
     {
         let (mut parts, body) = response.into_parts();
         let body_bytes = match axum::body::to_bytes(body, usize::MAX).await {
-            Ok(bytes) => bytes.into_iter().collect::<Vec<u8>>(),
+            Ok(bytes) => bytes,
             Err(_) => return Ok(Response::from_parts(parts, Body::empty())),
         };
 
-        let mut hash = sha2::Sha256::new();
-        hash.update(&body_bytes);
-        let hash = hex::encode(hash.finalize());
+        let hash = hex::encode(aws_lc_rs::digest::digest(
+            &aws_lc_rs::digest::SHA256,
+            &body_bytes,
+        ));
 
         let etag = format!("\"{hash}\"");
         parts.headers.insert("ETag", etag.parse().unwrap());
@@ -363,7 +371,10 @@ pub async fn handle_postprocessing(
 
     // we cant directly compare because if both are None, It'd return NOT_MODIFIED
     if let Some(etag) = etag
-        && if_none_match.is_some_and(|if_none_match| etag_matches(&if_none_match, &etag))
+        && if_none_match
+            .as_ref()
+            .and_then(|if_none_match| if_none_match.to_str().ok())
+            .is_some_and(|if_none_match| etag_matches(if_none_match, &etag))
     {
         let mut cached_response = Response::builder()
             .status(StatusCode::NOT_MODIFIED)
@@ -553,7 +564,7 @@ pub async fn handle_startup() -> Result<
 
     let (env, _env_guard) = env.context("failed to parse environment")?;
 
-    let _guard = sentry::init((
+    let sentry_guard = sentry::init((
         env.sentry_url.clone(),
         sentry::ClientOptions::default()
             .server_name(
@@ -956,7 +967,7 @@ pub async fn handle_startup() -> Result<
                             shared::utils::redact_url(request.url().as_str())
                         );
 
-                        let response = match state.client.execute(request).await {
+                        let mut response = match state.client.execute(request).await {
                             Ok(response) => response,
                             Err(err) => {
                                 let status = if err.is_connect() || err.is_timeout() {
@@ -977,9 +988,7 @@ pub async fn handle_startup() -> Result<
                         };
 
                         let status = response.status();
-                        let headers = response.headers().clone();
-
-                        let mut headers = headers;
+                        let mut headers = std::mem::take(response.headers_mut());
                         for header in [
                             axum::http::header::TRANSFER_ENCODING,
                             axum::http::header::CONNECTION,
@@ -1259,10 +1268,15 @@ pub async fn handle_startup() -> Result<
         .layer(axum::middleware::map_response(weaken_encoded_etag))
         .layer(tower_http::catch_panic::CatchPanicLayer::custom(
             handle_panic,
-        ))
-        .route_layer(SentryHttpLayer::new().enable_transaction())
-        .route_layer(NewSentryLayer::<Request>::new_from_top())
-        .with_state(state.clone());
+        ));
+
+    let app = if sentry_guard.is_enabled() {
+        app.route_layer(SentryHttpLayer::new().enable_transaction())
+            .route_layer(NewSentryLayer::<Request>::new_from_top())
+    } else {
+        app
+    }
+    .with_state(state.clone());
 
     let settings = settings.get().await.context("failed to load settings")?;
 
@@ -1322,13 +1336,20 @@ pub async fn handle_startup() -> Result<
         }
     }
 
-    let openapi = Arc::new(openapi);
+    let openapi = axum::body::Bytes::from(
+        serde_json::to_vec(&openapi).context("failed to serialize openapi document")?,
+    );
     let router = router.route(
         "/openapi.json",
-        axum::routing::get(|| async move { axum::Json(openapi) }),
+        axum::routing::get(|| async move {
+            (
+                [(axum::http::header::CONTENT_TYPE, "application/json")],
+                openapi,
+            )
+        }),
     );
 
     *state.app_router.write().await = Some(router);
 
-    Ok((_guard, _env_guard, state))
+    Ok((sentry_guard, _env_guard, state))
 }

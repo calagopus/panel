@@ -1173,6 +1173,10 @@ impl<F: Send + Sync + 'static, AfterF: Send + Sync + 'static> Default
 }
 
 impl<F: Send + Sync + 'static, AfterF: Send + Sync + 'static> ModelHandlerList<F, AfterF> {
+    pub fn is_empty(&self) -> bool {
+        self.before_handlers.read().is_empty() && self.after_handlers.read().is_empty()
+    }
+
     pub fn register_handler(
         self: &Arc<Self>,
         priority: ListenerPriority,

@@ -12,15 +12,16 @@ use garde::Validate;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
+    marker::PhantomData,
     ops::{Deref, DerefMut},
     path::Path,
     str::FromStr,
     sync::{
         Arc, LazyLock,
-        atomic::{AtomicUsize, Ordering},
+        atomic::{AtomicBool, Ordering},
     },
 };
-use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard, Semaphore, SemaphorePermit};
+use tokio::sync::{Semaphore, SemaphorePermit};
 use utoipa::ToSchema;
 
 pub mod activity;
@@ -1010,7 +1011,17 @@ pub async fn fetch_disabled_extensions(
 }
 
 pub struct SettingsReadGuard<'a> {
-    settings: RwLockReadGuard<'a, SettingsBuffer>,
+    settings: Arc<SettingsBuffer>,
+    _parent: PhantomData<&'a Settings>,
+}
+
+impl SettingsReadGuard<'_> {
+    fn new(settings: Arc<SettingsBuffer>) -> Self {
+        Self {
+            settings,
+            _parent: PhantomData,
+        }
+    }
 }
 
 impl Deref for SettingsReadGuard<'_> {
@@ -1110,23 +1121,20 @@ impl AsRef<[u8]> for ArcedIndexHtml {
 
 pub struct SettingsWriteGuard<'a> {
     parent: &'a Settings,
-    buffer_index: usize,
-    settings: Option<RwLockWriteGuard<'a, SettingsBuffer>>,
+    settings: Option<AppSettings>,
     _writer_token: SemaphorePermit<'a>,
 }
 
 impl<'a> SettingsWriteGuard<'a> {
     pub async fn save(mut self) -> Result<(), crate::database::DatabaseError> {
-        let buffer_index = self.buffer_index;
-
-        let mut settings_guard = self.settings.take().ok_or_else(|| {
+        let settings = self.settings.take().ok_or_else(|| {
             crate::database::DatabaseError::Any(anyhow::anyhow!(
                 "settings have already been saved or dropped"
             ))
         })?;
 
         let (keys, values) = SettingsSerializeExt::serialize(
-            &settings_guard.settings,
+            &settings,
             SettingsSerializer::new(self.parent.database.clone(), ""),
         )
         .await?
@@ -1142,15 +1150,12 @@ impl<'a> SettingsWriteGuard<'a> {
         .execute(self.parent.database.write())
         .await?;
 
-        self.parent.rerender_index_html(&settings_guard.settings)?;
+        self.parent.rerender_index_html(&settings)?;
 
-        settings_guard.expires = std::time::Instant::now() + std::time::Duration::from_secs(60);
-
-        drop(settings_guard);
-
-        self.parent
-            .cached_index
-            .store(buffer_index, Ordering::Release);
+        self.parent.cached.store(Arc::new(SettingsBuffer::new(
+            settings,
+            std::time::Instant::now() + std::time::Duration::from_secs(60),
+        )));
 
         crate::models::invalidate_cache_keys(
             &self.parent.database,
@@ -1175,11 +1180,7 @@ impl<'a> SettingsWriteGuard<'a> {
     /// [`Self::save`] writes to the database, so censoring it in place would persist the
     /// placeholder as the real secret. The secret bearing settings are censored on clones instead.
     pub fn censored(&self) -> serde_json::Value {
-        let settings = &self
-            .settings
-            .as_ref()
-            .expect("settings have been dropped")
-            .settings;
+        let settings = self.settings.as_ref().expect("settings have been dropped");
 
         let mut json = serde_json::to_value(settings).unwrap();
 
@@ -1198,37 +1199,42 @@ impl Deref for SettingsWriteGuard<'_> {
     type Target = AppSettings;
 
     fn deref(&self) -> &Self::Target {
-        &self
-            .settings
-            .as_ref()
-            .expect("settings have been dropped")
-            .settings
+        self.settings.as_ref().expect("settings have been dropped")
     }
 }
 
 impl DerefMut for SettingsWriteGuard<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self
-            .settings
-            .as_mut()
-            .expect("settings have been dropped")
-            .settings
+        self.settings.as_mut().expect("settings have been dropped")
     }
 }
 
 struct SettingsBuffer {
     settings: AppSettings,
     expires: std::time::Instant,
+    invalidated: AtomicBool,
+}
+
+impl SettingsBuffer {
+    fn new(settings: AppSettings, expires: std::time::Instant) -> Self {
+        Self {
+            settings,
+            expires,
+            invalidated: AtomicBool::new(false),
+        }
+    }
+
+    #[inline]
+    fn is_fresh(&self, now: std::time::Instant) -> bool {
+        now < self.expires && !self.invalidated.load(Ordering::Acquire)
+    }
 }
 
 pub struct Settings {
-    // Write protocol: every writer (refresh in `get`, `get_mut`, `invalidate_cache`)
-    // holds `write_serializing`, locks only the buffer that is INACTIVE at the index
-    // it loaded, and publishes it by flipping `cached_index`. Readers only ever lock
-    // the buffer `cached_index` points at. Locking the active buffer in place is what
-    // deadlocks against long-lived `SettingsReadGuard`s, so never do it.
-    cached: [RwLock<SettingsBuffer>; 2],
-    cached_index: AtomicUsize,
+    // Every writer (refresh, `get_mut` + `save`, `invalidate_cache`) holds `write_serializing`
+    // and publishes a whole new buffer. Readers never lock, so a long-lived `SettingsReadGuard`
+    // only keeps its own snapshot alive.
+    cached: arc_swap::ArcSwap<SettingsBuffer>,
     write_serializing: Semaphore,
 
     rendered_index_html: arc_swap::ArcSwapAny<ArcedIndexHtml>,
@@ -1272,27 +1278,17 @@ impl Settings {
     }
 
     pub async fn new(database: Arc<crate::database::Database>) -> Result<Self, anyhow::Error> {
-        let (s1, s2) = tokio::try_join!(
-            Self::fetch_settings(&database),
-            Self::fetch_settings(&database)
-        )?;
+        let settings = Self::fetch_settings(&database).await?;
 
-        let rendered_index_html = render_index_html(&s1, &[], &Default::default())?;
+        let rendered_index_html = render_index_html(&settings, &[], &Default::default())?;
         let rendered_index_html =
             arc_swap::ArcSwapAny::new(ArcedIndexHtml(Arc::new(rendered_index_html)));
 
         Ok(Self {
-            cached: [
-                RwLock::new(SettingsBuffer {
-                    settings: s1,
-                    expires: std::time::Instant::now() + std::time::Duration::from_secs(60),
-                }),
-                RwLock::new(SettingsBuffer {
-                    settings: s2,
-                    expires: std::time::Instant::now() + std::time::Duration::from_secs(60),
-                }),
-            ],
-            cached_index: AtomicUsize::new(0),
+            cached: arc_swap::ArcSwap::from_pointee(SettingsBuffer::new(
+                settings,
+                std::time::Instant::now() + std::time::Duration::from_secs(60),
+            )),
             write_serializing: Semaphore::new(1),
             rendered_index_html,
             inactive_extensions: arc_swap::ArcSwap::from_pointee(Vec::new()),
@@ -1348,22 +1344,20 @@ impl Settings {
     pub async fn get(&self) -> Result<SettingsReadGuard<'_>, anyhow::Error> {
         let now = std::time::Instant::now();
 
-        let index = self.cached_index.load(Ordering::Acquire);
-        {
-            let guard = self.cached[index % 2].read().await;
-            if now < guard.expires {
-                return Ok(SettingsReadGuard { settings: guard });
-            }
+        let buffer = self.cached.load_full();
+        if buffer.is_fresh(now) {
+            return Ok(SettingsReadGuard::new(buffer));
         }
 
+        Ok(SettingsReadGuard::new(self.refresh(now).await?))
+    }
+
+    async fn refresh(&self, now: std::time::Instant) -> Result<Arc<SettingsBuffer>, anyhow::Error> {
         let _write_token = self.write_serializing.acquire().await?;
 
-        let index = self.cached_index.load(Ordering::Acquire);
-        {
-            let guard = self.cached[index % 2].read().await;
-            if now < guard.expires {
-                return Ok(SettingsReadGuard { settings: guard });
-            }
+        let buffer = self.cached.load_full();
+        if buffer.is_fresh(now) {
+            return Ok(buffer);
         }
 
         let start = std::time::Instant::now();
@@ -1371,32 +1365,35 @@ impl Settings {
 
         let settings = Self::fetch_settings(&self.database).await?;
 
-        let inactive_index = (index + 1) % 2;
-        {
-            let mut guard = self.cached[inactive_index].write().await;
-            guard.settings = settings;
-            guard.expires = now + std::time::Duration::from_secs(60);
-
-            if let Err(err) = self.rerender_index_html(&guard.settings) {
-                tracing::error!("failed to re-render index.html after settings reload: {err:#}");
-            }
+        if let Err(err) = self.rerender_index_html(&settings) {
+            tracing::error!("failed to re-render index.html after settings reload: {err:#}");
         }
 
-        self.cached_index.store(inactive_index, Ordering::Release);
+        let buffer = Arc::new(SettingsBuffer::new(
+            settings,
+            now + std::time::Duration::from_secs(60),
+        ));
+        self.cached.store(Arc::clone(&buffer));
 
         tracing::info!(
             "reloaded settings from database in {} ms",
             start.elapsed().as_millis()
         );
 
-        Ok(SettingsReadGuard {
-            settings: self.cached[inactive_index].read().await,
-        })
+        Ok(buffer)
     }
 
     pub async fn get_as<F: FnOnce(&AppSettings) -> T, T>(&self, f: F) -> Result<T, anyhow::Error> {
-        let settings = self.get().await?;
-        Ok(f(&settings))
+        let now = std::time::Instant::now();
+
+        {
+            let buffer = self.cached.load();
+            if buffer.is_fresh(now) {
+                return Ok(f(&buffer.settings));
+            }
+        }
+
+        Ok(f(&self.refresh(now).await?.settings))
     }
 
     pub async fn get_webauthn(&self) -> Result<webauthn_rs::Webauthn, anyhow::Error> {
@@ -1434,18 +1431,9 @@ impl Settings {
     pub async fn get_mut(&self) -> Result<SettingsWriteGuard<'_>, anyhow::Error> {
         let writer_token = self.write_serializing.acquire().await?;
 
-        let active_index = self.cached_index.load(Ordering::Acquire);
-        let buffer_index = (active_index + 1) % 2;
-        let inactive_buffer = &self.cached[buffer_index];
-
-        let mut guard = inactive_buffer.write().await;
-
-        guard.settings = Self::fetch_settings(&self.database).await?;
-
         Ok(SettingsWriteGuard {
             parent: self,
-            buffer_index,
-            settings: Some(guard),
+            settings: Some(Self::fetch_settings(&self.database).await?),
             _writer_token: writer_token,
         })
     }
@@ -1538,10 +1526,10 @@ impl Settings {
         let Ok(_lock) = self.write_serializing.acquire().await else {
             return;
         };
-        let index = self.cached_index.load(Ordering::Acquire);
-        let inactive_index = (index + 1) % 2;
-        self.cached[inactive_index].write().await.expires = std::time::Instant::now();
-        self.cached_index.store(inactive_index, Ordering::Release);
+        self.cached
+            .load()
+            .invalidated
+            .store(true, Ordering::Release);
     }
 }
 

@@ -30,6 +30,8 @@ pub struct ExtensionManager {
     vec: RwLock<Vec<ConstructedExtension>>,
     disabled: parking_lot::RwLock<Vec<compact_str::CompactString>>,
     failed: parking_lot::RwLock<BTreeMap<compact_str::CompactString, String>>,
+    inactive: arc_swap::ArcSwap<Vec<compact_str::CompactString>>,
+    inactive_refresh: parking_lot::Mutex<()>,
 }
 
 impl ExtensionManager {
@@ -38,6 +40,8 @@ impl ExtensionManager {
             vec: RwLock::new(vec),
             disabled: parking_lot::RwLock::new(Vec::new()),
             failed: parking_lot::RwLock::new(BTreeMap::new()),
+            inactive: arc_swap::ArcSwap::from_pointee(Vec::new()),
+            inactive_refresh: parking_lot::Mutex::new(()),
         }
     }
 
@@ -45,6 +49,7 @@ impl ExtensionManager {
     /// and before extension migrations are collected.
     pub fn set_disabled(&self, disabled: Vec<compact_str::CompactString>) {
         *self.disabled.write() = disabled;
+        self.refresh_inactive();
     }
 
     #[inline]
@@ -70,7 +75,20 @@ impl ExtensionManager {
     }
 
     /// Extensions that are not running, either disabled or failed to start.
+    #[inline]
     pub fn inactive(&self) -> Vec<compact_str::CompactString> {
+        self.inactive.load().as_ref().clone()
+    }
+
+    /// Same as [`Self::inactive`], without cloning the list.
+    #[inline]
+    pub fn load_inactive(&self) -> arc_swap::Guard<Arc<Vec<compact_str::CompactString>>> {
+        self.inactive.load()
+    }
+
+    fn refresh_inactive(&self) {
+        let _refresh = self.inactive_refresh.lock();
+
         let mut inactive = self.disabled();
         for package_name in self.failed.read().keys() {
             if !inactive.contains(package_name) {
@@ -78,7 +96,7 @@ impl ExtensionManager {
             }
         }
 
-        inactive
+        self.inactive.store(Arc::new(inactive));
     }
 
     fn fail(&self, package_name: &str, stage: &str, reason: &str) {
@@ -89,6 +107,7 @@ impl ExtensionManager {
         );
 
         self.failed.write().insert(package_name.into(), reason);
+        self.refresh_inactive();
     }
 
     /// Runs the entrypoints of every enabled extension and merges their routes into `router`,

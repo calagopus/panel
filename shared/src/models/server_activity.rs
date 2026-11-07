@@ -114,6 +114,66 @@ impl BaseModel for ServerActivity {
 }
 
 impl ServerActivity {
+    /// Inserts every row in one statement when no create handlers are registered and every row
+    /// validates. Returns `false` without writing anything when that is not possible, so the
+    /// caller can fall back to per-row [`CreatableModel::create`].
+    pub async fn try_create_many(
+        database: &crate::database::Database,
+        options: &[CreateServerActivityOptions],
+    ) -> Result<bool, crate::database::DatabaseError> {
+        if !Self::get_create_handlers().is_empty()
+            || options.iter().any(|options| options.validate().is_err())
+        {
+            return Ok(false);
+        }
+
+        if options.is_empty() {
+            return Ok(true);
+        }
+
+        let mut server_uuids = Vec::with_capacity(options.len());
+        let mut user_uuids = Vec::with_capacity(options.len());
+        let mut impersonator_uuids = Vec::with_capacity(options.len());
+        let mut api_key_uuids = Vec::with_capacity(options.len());
+        let mut schedule_uuids = Vec::with_capacity(options.len());
+        let mut events = Vec::with_capacity(options.len());
+        let mut ips = Vec::with_capacity(options.len());
+        let mut data = Vec::with_capacity(options.len());
+        let mut created = Vec::with_capacity(options.len());
+
+        for options in options {
+            server_uuids.push(options.server_uuid);
+            user_uuids.push(options.user_uuid);
+            impersonator_uuids.push(options.impersonator_uuid);
+            api_key_uuids.push(options.api_key_uuid);
+            schedule_uuids.push(options.schedule_uuid);
+            events.push(options.event.as_str());
+            ips.push(options.ip);
+            data.push(&options.data);
+            created.push(options.created);
+        }
+
+        sqlx::query!(
+            r#"INSERT INTO server_activities (server_uuid, user_uuid, impersonator_uuid, api_key_uuid, schedule_uuid, event, ip, data, created)
+            SELECT rows.server_uuid, rows.user_uuid, rows.impersonator_uuid, rows.api_key_uuid, rows.schedule_uuid, rows.event, rows.ip, rows.data, COALESCE(rows.created, NOW())
+            FROM UNNEST($1::uuid[], $2::uuid[], $3::uuid[], $4::uuid[], $5::uuid[], $6::varchar[], $7::inet[], $8::jsonb[], $9::timestamp[])
+                AS rows(server_uuid, user_uuid, impersonator_uuid, api_key_uuid, schedule_uuid, event, ip, data, created)"#,
+            &server_uuids,
+            &user_uuids as &[Option<uuid::Uuid>],
+            &impersonator_uuids as &[Option<uuid::Uuid>],
+            &api_key_uuids as &[Option<uuid::Uuid>],
+            &schedule_uuids as &[Option<uuid::Uuid>],
+            &events as &[&str],
+            &ips as &[Option<sqlx::types::ipnetwork::IpNetwork>],
+            &data as &[&serde_json::Value],
+            &created as &[Option<chrono::NaiveDateTime>],
+        )
+        .execute(database.write())
+        .await?;
+
+        Ok(true)
+    }
+
     pub async fn by_server_uuid_with_pagination(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,

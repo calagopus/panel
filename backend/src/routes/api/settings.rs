@@ -73,7 +73,7 @@ mod get {
     struct Response<'a> {
         time: chrono::DateTime<chrono::Utc>,
         oobe_step: Option<&'a str>,
-        disabled_extensions: Vec<compact_str::CompactString>,
+        disabled_extensions: &'a [compact_str::CompactString],
 
         #[schema(inline)]
         captcha_provider: shared::settings::PublicCaptchaProvider<'a>,
@@ -92,11 +92,12 @@ mod get {
     ))]
     pub async fn route(state: GetState) -> ApiResponseResult {
         let settings = state.settings.get().await?;
+        let inactive_extensions = state.extensions.load_inactive();
 
         ApiResponse::new_serialized(Response {
             time: chrono::Utc::now(),
             oobe_step: settings.oobe_step.as_deref(),
-            disabled_extensions: state.extensions.inactive(),
+            disabled_extensions: &inactive_extensions,
             captcha_provider: settings.captcha_provider.to_public_provider(),
             app: ResponseApp {
                 url: &settings.app.url,

@@ -5,6 +5,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
+use compact_str::ToCompactString;
 use shared::{
     models::{
         ByUuid,
@@ -208,7 +209,11 @@ pub async fn auth(
         && let Some(api_token) = bearer_api_token(req.headers())
         && !state
             .cache
-            .ratelimit_reached("client:api-key-miss", ratelimit.hits, ip.to_string())
+            .ratelimit_reached(
+                "client:api-key-miss",
+                ratelimit.hits,
+                ip.to_compact_string(),
+            )
             .await
     {
         let resolved = match User::by_api_key_cached(&state.database, api_token).await {
@@ -236,7 +241,7 @@ pub async fn auth(
                         "client:api-key-miss",
                         ratelimit.hits,
                         ratelimit.window_seconds,
-                        ip.to_string(),
+                        ip.to_compact_string(),
                     )
                     .await;
             }
@@ -252,7 +257,7 @@ pub async fn auth(
                 "client",
                 ratelimit.hits,
                 ratelimit.window_seconds,
-                ip.to_string(),
+                ip.to_compact_string(),
             )
             .await
     {

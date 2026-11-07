@@ -147,7 +147,7 @@ async fn request_impl<T: DeserializeOwned + 'static>(
         request = request.body(bytes);
     } else if let Some(body_reader) = body_reader {
         request = request.body(reqwest::Body::wrap_stream(
-            tokio_util::io::ReaderStream::new(body_reader),
+            tokio_util::io::ReaderStream::with_capacity(body_reader, 64 * 1024),
         ));
     }
 

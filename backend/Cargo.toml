@@ -29,7 +29,7 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true }
 indexmap = { workspace = true }
 reqwest = { workspace = true }
-sha2 = { workspace = true }
+aws-lc-rs = "1.19.0"
 tower-cookies = { workspace = true }
 tower-http = { workspace = true }
 rand = { workspace = true }

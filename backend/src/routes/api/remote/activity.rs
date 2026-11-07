@@ -5,7 +5,11 @@ mod post {
     use serde::{Deserialize, Serialize};
     use shared::{
         ApiError, GetState,
-        models::{CreatableModel, node::GetNode, server_activity::ServerActivity},
+        models::{
+            CreatableModel,
+            node::GetNode,
+            server_activity::{CreateServerActivityOptions, ServerActivity},
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use std::collections::HashSet;
@@ -59,16 +63,12 @@ mod post {
         .map(|row| row.uuid)
         .collect();
 
-        for activity in data.data {
-            if !owned_servers.contains(&activity.server) {
-                continue;
-            }
-
-            if activity.schedule.is_some() && !server_log_schedule_activity {
-                continue;
-            }
-
-            let options = shared::models::server_activity::CreateServerActivityOptions {
+        let options: Vec<_> = data
+            .data
+            .into_iter()
+            .filter(|activity| owned_servers.contains(&activity.server))
+            .filter(|activity| activity.schedule.is_none() || server_log_schedule_activity)
+            .map(|activity| CreateServerActivityOptions {
                 server_uuid: activity.server,
                 user_uuid: activity.user,
                 impersonator_uuid: None,
@@ -78,10 +78,25 @@ mod post {
                 ip: activity.ip.map(|ip| ip.into()),
                 data: activity.metadata.unwrap_or_else(|| serde_json::json!({})),
                 created: Some(activity.timestamp.naive_utc()),
-            };
+            })
+            .collect();
+
+        match ServerActivity::try_create_many(&state.database, &options).await {
+            Ok(true) => return ApiResponse::new_serialized(Response {}).ok(),
+            Ok(false) => {}
+            Err(err) => {
+                tracing::debug!(
+                    "bulk remote activity insert failed, retrying per row: {:?}",
+                    err
+                )
+            }
+        }
+
+        for options in options {
+            let server_uuid = options.server_uuid;
             if let Err(err) = ServerActivity::create(&state, options).await {
                 tracing::warn!(
-                    server = %activity.server,
+                    server = %server_uuid,
                     "failed to log remote activity for server: {:#?}",
                     err
                 );

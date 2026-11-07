@@ -1846,7 +1846,16 @@ impl Server {
             .await?
             .firewall_enabled();
 
-        let (variables, backups, schedules, mounts, devices, allocations, firewall_rules) = tokio::try_join!(
+        let (
+            variables,
+            backups,
+            schedules,
+            schedule_step_rows,
+            mounts,
+            devices,
+            allocations,
+            firewall_rules,
+        ) = tokio::try_join!(
             sqlx::query!(
                 "SELECT nest_egg_variables.env_variable, COALESCE(server_variables.value, nest_egg_variables.default_value) AS value
                 FROM nest_egg_variables
@@ -1867,6 +1876,15 @@ impl Server {
                 "SELECT server_schedules.uuid, server_schedules.triggers, server_schedules.condition
                 FROM server_schedules
                 WHERE server_schedules.server_uuid = $1 AND server_schedules.enabled",
+                self.uuid
+            )
+            .fetch_all(state.database.read()),
+            sqlx::query!(
+                "SELECT server_schedule_steps.uuid, server_schedule_steps.schedule_uuid, server_schedule_steps.action
+                FROM server_schedule_steps
+                JOIN server_schedules ON server_schedules.uuid = server_schedule_steps.schedule_uuid
+                WHERE server_schedules.server_uuid = $1
+                ORDER BY server_schedule_steps.order_, server_schedule_steps.created, server_schedule_steps.uuid",
                 self.uuid
             )
             .fetch_all(state.database.read()),
@@ -1897,28 +1915,14 @@ impl Server {
             firewall::fetch_raw_rules(&state.database, self.uuid),
         )?;
 
-        let mut futures = Vec::new();
-        futures.reserve_exact(schedules.len());
-
-        for schedule in &schedules {
-            futures.push(
-                sqlx::query!(
-                    "SELECT server_schedule_steps.uuid, server_schedule_steps.schedule_uuid, server_schedule_steps.action
-                    FROM server_schedule_steps
-                    WHERE server_schedule_steps.schedule_uuid = $1
-                    ORDER BY server_schedule_steps.order_, server_schedule_steps.created, server_schedule_steps.uuid",
-                    schedule.uuid
-                )
-                .fetch_all(state.database.read()),
-            );
-        }
-
-        let results = futures_util::future::try_join_all(futures).await?;
         let mut schedule_steps = HashMap::new();
         schedule_steps.reserve(schedules.len());
 
-        for (i, steps) in results.into_iter().enumerate() {
-            schedule_steps.insert(schedules[i].uuid, steps);
+        for step in schedule_step_rows {
+            schedule_steps
+                .entry(step.schedule_uuid)
+                .or_insert_with(Vec::new)
+                .push(step);
         }
 
         finish_extendible!(

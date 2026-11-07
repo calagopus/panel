@@ -5,6 +5,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
+use compact_str::ToCompactString;
 use shared::{
     models::{ResolvableModel, node::Node},
     response::ApiResponse,
@@ -41,7 +42,7 @@ pub async fn auth(
                 "remote",
                 ratelimit.hits,
                 ratelimit.window_seconds,
-                ip.to_string(),
+                ip.to_compact_string(),
             )
             .await
     {

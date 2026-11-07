@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT server_schedule_steps.uuid, server_schedule_steps.schedule_uuid, server_schedule_steps.action\n                    FROM server_schedule_steps\n                    WHERE server_schedule_steps.schedule_uuid = $1\n                    ORDER BY server_schedule_steps.order_, server_schedule_steps.created, server_schedule_steps.uuid",
+  "query": "SELECT server_schedule_steps.uuid, server_schedule_steps.schedule_uuid, server_schedule_steps.action\n                FROM server_schedule_steps\n                JOIN server_schedules ON server_schedules.uuid = server_schedule_steps.schedule_uuid\n                WHERE server_schedules.server_uuid = $1\n                ORDER BY server_schedule_steps.order_, server_schedule_steps.created, server_schedule_steps.uuid",
   "describe": {
     "columns": [
       {
@@ -48,5 +48,5 @@
       false
     ]
   },
-  "hash": "b2979106728586374c07df434137166cf0b576813e37a578cedaa0c335226cdb"
+  "hash": "7e1b241faabb10580961dc10a9af3edeab52ce6c185890dc328c0b102d8af84c"
 }

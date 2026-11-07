@@ -1,8 +1,8 @@
 use base64::Engine;
+use parking_lot::Mutex;
 use sha2::Digest;
 use sqlx::postgres::PgPoolOptions;
 use std::{collections::HashMap, fmt::Display, pin::Pin, sync::Arc};
-use tokio::sync::Mutex;
 
 pub static BASE64_ENGINE: base64::engine::GeneralPurpose = base64::engine::GeneralPurpose::new(
     &base64::alphabet::STANDARD,
@@ -83,7 +83,7 @@ impl Database {
                 loop {
                     interval.tick().await;
 
-                    let actions = batch_actions.lock().await.drain().collect::<Vec<_>>();
+                    let actions = batch_actions.lock().drain().collect::<Vec<_>>();
 
                     for (key, action) in actions {
                         tracing::debug!("executing batch action for {}:{}", key.0, key.1);
@@ -105,7 +105,7 @@ impl Database {
     }
 
     pub async fn flush_batch_actions(&self) {
-        let actions = self.batch_actions.lock().await.drain().collect::<Vec<_>>();
+        let actions = self.batch_actions.lock().drain().collect::<Vec<_>>();
 
         for (key, action) in actions {
             tracing::debug!("executing batch action for {}:{}", key.0, key.1);
@@ -329,8 +329,10 @@ impl Database {
         uuid: uuid::Uuid,
         action: impl Future<Output = Result<(), anyhow::Error>> + Send + 'static,
     ) {
-        let mut actions = self.batch_actions.lock().await;
-        actions.insert((key, uuid), Box::pin(action));
+        let _replaced = self
+            .batch_actions
+            .lock()
+            .insert((key, uuid), Box::pin(action));
     }
 }
 

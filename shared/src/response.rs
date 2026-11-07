@@ -70,17 +70,20 @@ impl ApiResponse {
     /// The same as [`ApiResponse::new_serialized`], preallocating `capacity` bytes for the
     /// serialized JSON body.
     pub fn new_serialized_with_capacity(body: impl serde::Serialize, capacity: usize) -> Self {
-        let accept_header = ACCEPT_HEADER.try_with(|h| h.clone()).ok().flatten();
-
         static AVAILABLE_SERIALIZERS: &[mime::Mime] = &[
             mime::APPLICATION_JSON,
             mime::APPLICATION_MSGPACK,
             mime::TEXT_XML,
         ];
 
-        let negotiated = accept_header
-            .as_ref()
-            .and_then(|accept| accept.negotiate(AVAILABLE_SERIALIZERS).ok())
+        let negotiated = ACCEPT_HEADER
+            .try_with(|accept| {
+                accept
+                    .as_ref()
+                    .and_then(|accept| accept.negotiate(AVAILABLE_SERIALIZERS).ok())
+            })
+            .ok()
+            .flatten()
             .unwrap_or(mime::APPLICATION_JSON);
 
         let (content_type, body) = match negotiated {

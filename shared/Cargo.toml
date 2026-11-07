@@ -57,6 +57,7 @@ async-trait = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true }
 sha2 = { workspace = true }
+sha1 = "0.11.0"
 dotenvy = { workspace = true }
 colored = { workspace = true }
 uuid = { workspace = true }

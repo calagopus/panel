@@ -115,6 +115,10 @@ impl<Event: 'static + Send + Sync> EventEmitter<Event> {
 
     #[inline]
     pub fn emit(&self, state: crate::State, event: Event) {
+        if self.listeners.read().is_empty() {
+            return;
+        }
+
         let _ = self.event_channel.try_send((state, event));
     }
 }

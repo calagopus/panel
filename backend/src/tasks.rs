@@ -721,6 +721,10 @@ pub async fn define_background_tasks(
                         }
                     }
 
+                    if (backup_configurations.data.len() as i64) < backup_configurations.per_page {
+                        break;
+                    }
+
                     page += 1;
                 }
 

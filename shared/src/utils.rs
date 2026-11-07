@@ -234,10 +234,15 @@ pub fn axum_to_tungstenite(
     msg: axum::extract::ws::Message,
 ) -> tokio_tungstenite::tungstenite::Message {
     use axum::extract::ws::Message;
-    use tokio_tungstenite::tungstenite::{Message as Tung, protocol::CloseFrame as TungClose};
+    use tokio_tungstenite::tungstenite::{
+        Message as Tung, Utf8Bytes as TungUtf8Bytes, protocol::CloseFrame as TungClose,
+    };
 
     match msg {
-        Message::Text(text) => Tung::Text(text.as_str().into()),
+        // SAFETY: axum's Utf8Bytes is guaranteed to hold valid UTF-8.
+        Message::Text(text) => Tung::Text(unsafe {
+            TungUtf8Bytes::from_bytes_unchecked(axum::body::Bytes::from(text))
+        }),
         Message::Binary(data) => Tung::Binary(data),
         Message::Ping(data) => Tung::Ping(data),
         Message::Pong(data) => Tung::Pong(data),
@@ -255,7 +260,7 @@ pub fn tungstenite_to_axum(
     use tokio_tungstenite::tungstenite::Message as Tung;
 
     Some(match msg {
-        Tung::Text(text) => Message::Text(text.as_str().into()),
+        Tung::Text(text) => Message::Text(axum::body::Bytes::from(text).try_into().ok()?),
         Tung::Binary(data) => Message::Binary(data),
         Tung::Ping(data) => Message::Ping(data),
         Tung::Pong(data) => Message::Pong(data),

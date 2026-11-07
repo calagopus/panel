@@ -112,6 +112,81 @@ opt-level = "z"
 codegen-units = 1
 strip = true
 
+# per-request hot paths: http stack, async runtime, (de)serialization, cache codecs, allocator
+[profile.release.package.tokio]
+opt-level = 3
+
+[profile.release.package.hyper]
+opt-level = 3
+
+[profile.release.package.hyper-util]
+opt-level = 3
+
+[profile.release.package.http]
+opt-level = 3
+
+[profile.release.package.httparse]
+opt-level = 3
+
+[profile.release.package.bytes]
+opt-level = 3
+
+[profile.release.package.axum]
+opt-level = 3
+
+[profile.release.package.matchit]
+opt-level = 3
+
+[profile.release.package.tower-http]
+opt-level = 3
+
+[profile.release.package.serde_json]
+opt-level = 3
+
+[profile.release.package.itoa]
+opt-level = 3
+
+[profile.release.package.zmij]
+opt-level = 3
+
+[profile.release.package.memchr]
+opt-level = 3
+
+[profile.release.package.rmp]
+opt-level = 3
+
+[profile.release.package.rmp-serde]
+opt-level = 3
+
+[profile.release.package.moka]
+opt-level = 3
+
+[profile.release.package.rustis]
+opt-level = 3
+
+[profile.release.package.sqlx-core]
+opt-level = 3
+
+[profile.release.package.sqlx-postgres]
+opt-level = 3
+
+[profile.release.package.hashbrown]
+opt-level = 3
+
+# bundled c builds inherit the profile's size optimization otherwise
+[profile.release.package.libmimalloc-sys]
+opt-level = 3
+
+[profile.release.package.aws-lc-sys]
+opt-level = 3
+
+# response gzip, zlib-rs is flate2's backend here
+[profile.release.package.zlib-rs]
+opt-level = 3
+
+[profile.release.package.crc32fast]
+opt-level = 3
+
 [profile.release]
 opt-level = "z"
 lto = "fat"

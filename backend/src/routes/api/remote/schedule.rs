@@ -8,7 +8,7 @@ mod post {
         models::node::GetNode,
         response::{ApiResponse, ApiResponseResult},
     };
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
     use utoipa::ToSchema;
 
     #[derive(ToSchema, Deserialize)]
@@ -37,21 +37,24 @@ mod post {
         node: GetNode,
         shared::Payload(data): shared::Payload<Payload>,
     ) -> ApiResponseResult {
-        for schedule_status in data.data {
-            let schedule = sqlx::query!(
-                "SELECT server_schedules.uuid FROM server_schedules
-                JOIN servers ON servers.uuid = server_schedules.server_uuid
-                WHERE server_schedules.uuid = $1 AND servers.node_uuid = $2",
-                schedule_status.uuid,
-                node.uuid
-            )
-            .fetch_optional(state.database.read())
-            .await?;
+        let schedule_uuids: Vec<_> = data.data.iter().map(|status| status.uuid).collect();
+        let owned_schedules: HashSet<_> = sqlx::query!(
+            "SELECT server_schedules.uuid FROM server_schedules
+            JOIN servers ON servers.uuid = server_schedules.server_uuid
+            WHERE server_schedules.uuid = ANY($1) AND servers.node_uuid = $2",
+            &schedule_uuids,
+            node.uuid
+        )
+        .fetch_all(state.database.read())
+        .await?
+        .into_iter()
+        .map(|row| row.uuid)
+        .collect();
 
-            let schedule_uuid = match schedule {
-                Some(schedule) => schedule.uuid,
-                None => continue,
-            };
+        for schedule_status in data.data {
+            if !owned_schedules.contains(&schedule_status.uuid) {
+                continue;
+            }
 
             let mut futures = Vec::new();
             futures.reserve_exact(2 + schedule_status.errors.len());
@@ -62,7 +65,7 @@ mod post {
                         "UPDATE server_schedules
                         SET last_run = $2
                         WHERE server_schedules.uuid = $1",
-                        schedule_uuid,
+                        schedule_status.uuid,
                         schedule_status.timestamp.naive_utc()
                     )
                     .execute(state.database.write()),
@@ -73,7 +76,7 @@ mod post {
                         "UPDATE server_schedules
                         SET last_failure = $2, last_run = $2
                         WHERE server_schedules.uuid = $1",
-                        schedule_uuid,
+                        schedule_status.uuid,
                         schedule_status.timestamp.naive_utc()
                     )
                     .execute(state.database.write()),
@@ -86,7 +89,7 @@ mod post {
                     SET error = NULL
                     WHERE server_schedule_steps.schedule_uuid = $1
                         AND (array_length($2::uuid[], 1) IS NULL OR server_schedule_steps.uuid != ALL($2))",
-                    schedule_uuid,
+                    schedule_status.uuid,
                     &schedule_status.errors.keys().copied().collect::<Vec<_>>()
                 )
                 .execute(state.database.write()),
@@ -99,7 +102,7 @@ mod post {
                         SET error = $3
                         WHERE server_schedule_steps.uuid = $1 AND server_schedule_steps.schedule_uuid = $2",
                         step_uuid,
-                        schedule_uuid,
+                        schedule_status.uuid,
                         error_message
                     )
                     .execute(state.database.write()),

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO server_activities (server_uuid, user_uuid, impersonator_uuid, api_key_uuid, schedule_uuid, event, ip, data, created)\n            SELECT rows.server_uuid, rows.user_uuid, rows.impersonator_uuid, rows.api_key_uuid, rows.schedule_uuid, rows.event, rows.ip, rows.data, COALESCE(rows.created, NOW())\n            FROM UNNEST($1::uuid[], $2::uuid[], $3::uuid[], $4::uuid[], $5::uuid[], $6::varchar[], $7::inet[], $8::jsonb[], $9::timestamp[])\n                AS rows(server_uuid, user_uuid, impersonator_uuid, api_key_uuid, schedule_uuid, event, ip, data, created)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "UuidArray",
+        "VarcharArray",
+        "InetArray",
+        "JsonbArray",
+        "TimestampArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e312a305917a783f7232cd7c660f0d1f398db3f3ecf6f58159a36879175a4643"
+}
