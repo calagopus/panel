@@ -573,7 +573,8 @@
           "captchaSiteKey": "Nur Buchstaben, Ziffern, Bindestriche und Unterstriche.",
           "variableName": "Beginnt mit einem Kleinbuchstaben, gefolgt von bis zu 63 Kleinbuchstaben, Ziffern oder Unterstrichen.",
           "hexColor": "Eine Hex-Farbe wie #1c7ed6.",
-          "devicePermissions": "Beliebige Kombination aus r (lesen), w (schreiben) und m (mknod)."
+          "devicePermissions": "Beliebige Kombination aus r (lesen), w (schreiben) und m (mknod).",
+          "percentage": "Ein Prozentwert zwischen 0 und 100."
         }
       },
       "table": {
@@ -7175,7 +7176,12 @@
           },
           "preCondition": {
             "valueSeconds": "Wert (Sekunden)",
-            "valuePercent": "Wert (%)",
+            "percentOfLimit": "% des Limits",
+            "percentOfLimitHint": "Relativ zum Limit des Servers, passt sich an, wenn sich das Limit ändert",
+            "cpuPercentHint": "100% entspricht einem vollen CPU-Kern, unabhängig vom Limit",
+            "cpuPercentOfLimitHint": "Relativ zum CPU-Limit des Servers, oder allen Host-Kernen ohne Limit",
+            "percentNoLimit": "Dieser Server hat kein Limit für diese Ressource, daher trifft ein Prozentwert nie zu",
+            "valueOfLimit": "{value}% des Limits",
             "value": "Wert"
           },
           "triggers": {

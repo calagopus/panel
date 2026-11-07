@@ -103,7 +103,15 @@ export default function ConditionRenderer({ condition }: { condition: Condition 
           {tReact('pages.server.schedules.condition.renderer.resourceUsage', {
             metric: <Code>{scheduleResourceMetricLabelMapping[condition.metric]()}</Code>,
             comparator: <Code>{scheduleComparatorOperatorMapping[condition.comparator]}</Code>,
-            value: <Code>{condition.metric === 'cpu' ? `${condition.value}%` : bytesToString(condition.value)}</Code>,
+            value: (
+              <Code>
+                {condition.percentage
+                  ? t('pages.server.schedules.preCondition.valueOfLimit', { value: condition.value })
+                  : condition.metric === 'cpu'
+                    ? `${condition.value}%`
+                    : bytesToString(condition.value)}
+              </Code>
+            ),
           })}
         </Text>
       );

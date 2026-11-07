@@ -1,6 +1,7 @@
 import cronstrue from 'cronstrue';
 import { ZodType, z } from 'zod';
 import { archiveFormatLabelMapping, scheduleHttpMethodLabelMapping } from '@/lib/enums.ts';
+import { ruleMessage } from '@/lib/schemas/rules.ts';
 
 export function isValidCronExpression(schedule: string): boolean {
   const fields = schedule.trim().split(/\s+/).length;
@@ -81,16 +82,24 @@ export const serverScheduleTriggerScheduleCompletionSchema = z.object({
   successful: z.boolean(),
 });
 
-export const serverScheduleTriggerResourceUsageSchema = z.object({
-  type: z.literal('resource_usage'),
-  metric: serverScheduleResourceMetric,
-  comparator: serverScheduleComparator,
-  value: z.number(),
-  forSeconds: z
-    .number()
-    .min(0)
-    .max(24 * 60 * 60),
-});
+const percentageRule = ruleMessage((t) => t('common.form.rule.percentage', {}));
+
+export const serverScheduleTriggerResourceUsageSchema = z
+  .object({
+    type: z.literal('resource_usage'),
+    metric: serverScheduleResourceMetric,
+    comparator: serverScheduleComparator,
+    value: z.number().min(0),
+    percentage: z.boolean(),
+    forSeconds: z
+      .number()
+      .min(0)
+      .max(24 * 60 * 60),
+  })
+  .refine((data) => !data.percentage || data.value <= 100, {
+    ...percentageRule,
+    path: ['value'],
+  });
 
 export const serverScheduleTriggerSchema = z.discriminatedUnion('type', [
   serverScheduleTriggerCronSchema,
@@ -119,12 +128,18 @@ export const serverScheduleConditionUptimeSchema = z.object({
   comparator: serverScheduleComparator,
 });
 
-export const serverScheduleConditionResourceUsageSchema = z.object({
-  type: z.literal('resource_usage'),
-  metric: serverScheduleResourceMetric,
-  comparator: serverScheduleComparator,
-  value: z.number(),
-});
+export const serverScheduleConditionResourceUsageSchema = z
+  .object({
+    type: z.literal('resource_usage'),
+    metric: serverScheduleResourceMetric,
+    comparator: serverScheduleComparator,
+    value: z.number().min(0),
+    percentage: z.boolean(),
+  })
+  .refine((data) => !data.percentage || data.value <= 100, {
+    ...percentageRule,
+    path: ['value'],
+  });
 
 export const serverScheduleConditionFileExistsSchema = z.object({
   type: z.literal('file_exists'),

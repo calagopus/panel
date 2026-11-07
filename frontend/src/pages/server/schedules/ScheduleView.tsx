@@ -32,6 +32,7 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Title from '@/elements/typography/Title.tsx';
+import { serverScheduleConditionSchema } from '@/lib/schemas/server/schedules.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -306,7 +307,11 @@ export default function ScheduleView() {
 
             <ServerCan action='schedules.update'>
               <div className='flex flex-row mt-4'>
-                <Button loading={loading} disabled={!conditionsDirty} onClick={doUpdate}>
+                <Button
+                  loading={loading}
+                  disabled={!conditionsDirty || !serverScheduleConditionSchema.safeParse(schedule.condition).success}
+                  onClick={doUpdate}
+                >
                   {t('common.button.update', {})}
                 </Button>
               </div>

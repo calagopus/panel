@@ -394,6 +394,7 @@ const baseTranslations = defineTranslations({
           variableName: 'Starts with a lowercase letter, then up to 63 lowercase letters, digits or underscores.',
           hexColor: 'A hex color such as #1c7ed6.',
           devicePermissions: 'Any combination of r (read), w (write) and m (mknod).',
+          percentage: 'A percentage between 0 and 100.',
         },
       },
       table: {
@@ -7244,7 +7245,12 @@ const baseTranslations = defineTranslations({
           },
           preCondition: {
             valueSeconds: 'Value (seconds)',
-            valuePercent: 'Value (%)',
+            percentOfLimit: '% of limit',
+            percentOfLimitHint: "Relative to the server's limit, follows it when the limit changes",
+            cpuPercentHint: '100% is one full CPU core, regardless of the limit',
+            cpuPercentOfLimitHint: "Relative to the server's CPU limit, or all host cores when unlimited",
+            percentNoLimit: 'This server has no limit for this resource, so a percentage will never match',
+            valueOfLimit: '{value}% of limit',
             value: 'Value',
           },
           triggers: {

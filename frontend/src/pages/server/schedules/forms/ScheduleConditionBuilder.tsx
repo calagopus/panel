@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import SizeInput from '@/elements/input/SizeInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import RecursiveGroupBuilder from '@/elements/RecursiveGroupBuilder.tsx';
 import {
@@ -18,6 +17,7 @@ import {
 } from '@/lib/schemas/server/schedules.ts';
 import { serverPowerState } from '@/lib/schemas/server/server.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import ResourceUsageValueInput from './ResourceUsageValueInput.tsx';
 import ScheduleDynamicParameterInput from './ScheduleDynamicParameterInput.tsx';
 
 type Condition = z.infer<typeof serverScheduleConditionSchema>;
@@ -29,7 +29,13 @@ const conditionDefaults: Record<Condition['type'], () => Condition> = {
   not: () => ({ type: 'not', condition: { type: 'none' } }),
   server_state: () => ({ type: 'server_state', state: 'running' }),
   uptime: () => ({ type: 'uptime', comparator: 'greater_than', value: 0 }),
-  resource_usage: () => ({ type: 'resource_usage', metric: 'cpu', comparator: 'greater_than', value: 0 }),
+  resource_usage: () => ({
+    type: 'resource_usage',
+    metric: 'cpu',
+    comparator: 'greater_than',
+    value: 0,
+    percentage: false,
+  }),
   file_exists: () => ({ type: 'file_exists', file: '' }),
   variable_exists: () => ({ type: 'variable_exists', variable: { variable: '' } }),
   variable_equals: () => ({ type: 'variable_equals', variable: { variable: '' }, equals: '' }),
@@ -86,21 +92,12 @@ export default function ScheduleConditionBuilder({ condition, onChange, depth = 
               min={0}
             />
           )}
-          {node.type === 'resource_usage' && node.metric === 'cpu' && (
-            <NumberInput
-              label={t('pages.server.schedules.preCondition.valuePercent', {})}
+          {node.type === 'resource_usage' && (
+            <ResourceUsageValueInput
+              metric={node.metric}
               value={node.value}
-              onChange={(value) => change({ ...node, value: Number(value) || 0 })}
-              min={0}
-            />
-          )}
-          {node.type === 'resource_usage' && node.metric !== 'cpu' && (
-            <SizeInput
-              label={t('pages.server.schedules.preCondition.value', {})}
-              mode='b'
-              min={0}
-              value={node.value}
-              onChange={(value) => change({ ...node, value })}
+              percentage={node.percentage}
+              onChange={(next) => change({ ...node, ...next })}
             />
           )}
         </div>

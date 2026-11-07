@@ -4,7 +4,6 @@ import { z } from 'zod';
 import getSchedules from '@/api/server/schedules/getSchedules.ts';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
-import SizeInput from '@/elements/input/SizeInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -20,6 +19,7 @@ import {
 import { serverScheduleTriggerSchema, serverScheduleUpdateSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import ResourceUsageValueInput from '../forms/ResourceUsageValueInput.tsx';
 import ScheduleDynamicParameterInput from '../forms/ScheduleDynamicParameterInput.tsx';
 import CronTriggerExtraForm from './CronTriggerExtraForm.tsx';
 
@@ -170,22 +170,12 @@ function ResourceUsageExtraForm({ form, index }: TriggerFormProps) {
         data={mappingToSelectData(scheduleComparatorLabelMapping)}
         {...form.getInputProps(`triggers.${index}.comparator`)}
       />
-      {trigger.metric === 'cpu' ? (
-        <NumberInput
-          label={t('pages.server.schedules.preCondition.valuePercent', {})}
-          min={0}
-          value={trigger.value}
-          onChange={(value) => form.setFieldValue(`triggers.${index}.value`, Number(value) || 0)}
-        />
-      ) : (
-        <SizeInput
-          label={t('pages.server.schedules.preCondition.value', {})}
-          mode='b'
-          min={0}
-          value={trigger.value}
-          onChange={(value) => form.setFieldValue(`triggers.${index}.value`, value)}
-        />
-      )}
+      <ResourceUsageValueInput
+        metric={trigger.metric}
+        value={trigger.value}
+        percentage={trigger.percentage}
+        onChange={(next) => form.setFieldValue(`triggers.${index}`, { ...trigger, ...next })}
+      />
       <NumberInput
         label={t('pages.server.schedules.triggers.resourceUsage.form.forSeconds', {})}
         min={0}

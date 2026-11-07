@@ -134,7 +134,11 @@ export default function TriggerCard({ date, timezone, trigger }: TriggerCardProp
             {t('pages.server.schedules.triggers.resourceUsage.card.content', {
               metric: scheduleResourceMetricLabelMapping[trigger.metric](),
               comparator: scheduleComparatorLabelMapping[trigger.comparator](),
-              value: trigger.metric === 'cpu' ? `${trigger.value}%` : bytesToString(trigger.value),
+              value: trigger.percentage
+                ? t('pages.server.schedules.preCondition.valueOfLimit', { value: trigger.value })
+                : trigger.metric === 'cpu'
+                  ? `${trigger.value}%`
+                  : bytesToString(trigger.value),
             }).md()}
           </Text>
         ) : trigger.type === 'console_line' ? (

@@ -1087,6 +1087,7 @@ export const scheduleTriggerDefaultMapping: Record<
     metric: 'cpu',
     comparator: 'greater_than',
     value: 0,
+    percentage: false,
     forSeconds: 0,
   },
   console_line: { type: 'console_line', contains: '', caseInsensitive: false, outputInto: null },

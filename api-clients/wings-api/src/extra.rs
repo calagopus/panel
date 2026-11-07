@@ -723,8 +723,11 @@ pub enum ScheduleTrigger {
         metric: ScheduleResourceMetric,
         #[garde(skip)]
         comparator: ScheduleConditionComparator,
-        #[garde(range(min = 0.0))]
+        #[garde(range(min = 0.0), if(cond = *percentage, range(max = 100.0)))]
         value: f64,
+        #[garde(custom(|_: &bool, _: &()| -> garde::Result { Ok(()) }))]
+        #[serde(default)]
+        percentage: bool,
         #[garde(range(min = 0, max = 24 * 60 * 60))]
         #[schema(minimum = 0, maximum = 86400)]
         #[serde(default)]
@@ -851,8 +854,11 @@ pub enum ScheduleCondition {
         metric: ScheduleResourceMetric,
         #[garde(skip)]
         comparator: ScheduleConditionComparator,
-        #[garde(range(min = 0.0))]
+        #[garde(range(min = 0.0), if(cond = *percentage, range(max = 100.0)))]
         value: f64,
+        #[garde(custom(|_: &bool, _: &()| -> garde::Result { Ok(()) }))]
+        #[serde(default)]
+        percentage: bool,
     },
     FileExists {
         #[garde(length(chars, min = 1, max = 255))]

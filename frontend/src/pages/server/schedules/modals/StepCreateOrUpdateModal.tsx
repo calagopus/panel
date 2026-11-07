@@ -258,7 +258,7 @@ export default function StepCreateOrUpdateModal({
         )}
 
         <ModalFooter>
-          <Button type='submit' loading={loading}>
+          <Button type='submit' loading={loading} disabled={!form.isValid()}>
             {propStep ? t('common.button.update', {}) : t('common.button.create', {})}
           </Button>
           <Button variant='default' onClick={handleClose}>
