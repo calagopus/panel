@@ -301,17 +301,6 @@ jobs:
           done
           echo "IMAGE_TAGS=$IMAGE_TAGS" >> $GITHUB_ENV
 
-      - name: Build multi-arch image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          context: .
-          file: ./docker/${{ matrix.dockerfile }}
-          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le
-          push: false
-          tags: ${{ env.IMAGE_TAGS }}
-          sbom: true
-          provenance: true
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
@@ -325,8 +314,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
         env:
           DOCKERHUB_OIDC_CONNECTIONID: ${{ secrets.DOCKERHUB_OIDC_CONNECTIONID }}
+          DOCKERHUB_OIDC_EXPIREIN: 7200
 
-      - name: Push multi-arch image
+      - name: Build and push multi-arch image
         id: build
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -401,31 +391,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build platform image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          context: .
-          file: ./docker/${{ matrix.dockerfile }}
-          platforms: ${{ matrix.platform }}
-          # Only Dockerfile.heavy.aio declares WINGS_SOURCE; buildx ignores it elsewhere.
-          build-args: WINGS_SOURCE=${{ inputs.wings_channel }}
-          push: false
-          tags: |
-            ${{ env.GHCR_IMAGE }}:${{ inputs.image_tag }}-${{ matrix.variant }}-${{ matrix.arch }}
-            ${{ env.DOCKERHUB_IMAGE }}:${{ inputs.image_tag }}-${{ matrix.variant }}-${{ matrix.arch }}
-          sbom: scan-stages=true
-          provenance: true
-          cache-from: type=gha,scope=${{ matrix.variant }}-${{ matrix.arch }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}-${{ matrix.arch }}
-
       - name: Login to Docker Hub
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
         env:
           DOCKERHUB_OIDC_CONNECTIONID: ${{ secrets.DOCKERHUB_OIDC_CONNECTIONID }}
+          DOCKERHUB_OIDC_EXPIREIN: 7200
 
-      - name: Push platform image
+      - name: Build and push platform image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
@@ -440,6 +414,7 @@ jobs:
           sbom: scan-stages=true
           provenance: true
           cache-from: type=gha,scope=${{ matrix.variant }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.variant }}-${{ matrix.arch }}
 
   merge-heavy-images:
     name: Merge ${{ matrix.variant }} Docker manifest
