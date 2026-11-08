@@ -640,6 +640,10 @@ pub async fn define_background_tasks(
                     }
 
                     for backup_configuration in &backup_configurations.data {
+                        if backup_configuration.maintenance_enabled {
+                            continue;
+                        }
+
                         let config_uuid = backup_configuration.uuid;
                         let Some(restic) = &backup_configuration.backup_configs.restic else {
                             continue;
