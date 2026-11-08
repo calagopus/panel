@@ -50,7 +50,7 @@ export function useSearchableResource<T>({
 
   return {
     items: data?.data ?? EMPTY_ITEMS,
-    loading: isFetching,
+    loading: isFetching || search !== debouncedSearch,
     search,
     setSearch,
     refetch: () => refetch(),

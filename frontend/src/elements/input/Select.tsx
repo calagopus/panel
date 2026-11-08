@@ -7,10 +7,24 @@ import {
 } from '@mantine/core';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
+import Spinner from '@/elements/feedback/Spinner.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const Select = forwardRef<HTMLInputElement, SelectProps>(
-  ({ className, allowDeselect = false, data, value, onChange, searchValue, onSearchChange, ...rest }, ref) => {
+  (
+    {
+      className,
+      allowDeselect = false,
+      data,
+      value,
+      onChange,
+      searchValue,
+      onSearchChange,
+      nothingFoundMessage,
+      ...rest
+    },
+    ref,
+  ) => {
     const { t } = useTranslations();
 
     const optionsLockup = useMemo(() => getOptionsLockup(getParsedComboboxData(data)), [data]);
@@ -54,7 +68,15 @@ const Select = forwardRef<HTMLInputElement, SelectProps>(
         ref={ref}
         className={className}
         allowDeselect={allowDeselect}
-        nothingFoundMessage={t('elements.selectInput.noResults', {})}
+        nothingFoundMessage={
+          rest.loading ? (
+            <div className='flex justify-center'>
+              <Spinner size={16} />
+            </div>
+          ) : (
+            (nothingFoundMessage ?? t('elements.selectInput.noResults', {}))
+          )
+        }
         placeholder={typeof rest.label === 'string' ? rest.label : undefined}
         data={data}
         value={value}

@@ -63,6 +63,7 @@ function PruneJobRow({ form, index, nodes }: { form: ResticForm; index: number; 
             data={nodes.items.map((node) => ({ value: node.uuid, label: node.name }))}
             searchValue={nodes.search}
             onSearchChange={nodes.setSearch}
+            loading={nodes.loading}
             key={form.key(`pruneJobs.${index}.nodes`)}
             {...form.getInputProps(`pruneJobs.${index}.nodes`)}
           />
