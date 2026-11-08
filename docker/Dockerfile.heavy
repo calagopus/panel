@@ -22,24 +22,23 @@ COPY --from=node_source /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node_source /usr/local/bin/node /usr/local/bin/node
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
-RUN npm install -g npm@latest pnpm@11
-
-RUN cargo install cargo-chef
+RUN npm install -g npm@latest pnpm@11 && npm cache clean --force
 
 WORKDIR /app/repo
 
 COPY --from=planner /app/repo/recipe.json recipe.json
 RUN mkdir -p .cargo && \
     printf '[target."x86_64-unknown-linux-gnu"]\nrustflags = ["-C", "link-arg=-fuse-ld=mold"]\n\n[target."aarch64-unknown-linux-gnu"]\nrustflags = ["-C", "link-arg=-fuse-ld=mold"]\n' > .cargo/config.toml
-RUN cargo chef cook --profile heavy-release --recipe-path recipe.json -p panel-rs -p heavy-supervisor \
+RUN --mount=type=bind,from=planner,source=/usr/local/cargo/bin/cargo-chef,target=/usr/local/bin/cargo-chef \
+    cargo chef cook --profile heavy-release --recipe-path recipe.json -p panel-rs -p heavy-supervisor \
     && rm -rf "$CARGO_HOME/registry/src"
 
 COPY . /app/repo
-RUN cd frontend && pnpm install --frozen-lockfile && pnpm build:ci
-RUN cargo build --profile heavy-release -p panel-rs -p heavy-supervisor \
-    && rm -rf "$CARGO_HOME/registry/src"
+RUN (cd frontend && pnpm install --frozen-lockfile && pnpm build:ci) \
+    && cargo build --profile heavy-release -p panel-rs -p heavy-supervisor \
+    && rm -rf "$CARGO_HOME/registry/src" frontend/dist /root/.cache/pnpm \
+    && ln target/heavy-release/panel-rs /app/panel-rs.stock
 
-RUN cp /app/repo/target/heavy-release/panel-rs /app/panel-rs.stock
 RUN cp /app/repo/target/heavy-release/heavy-supervisor /app/heavy-supervisor
 
 RUN ln -s /app/repo/target/heavy-release/panel-rs /usr/local/bin/panel-rs
