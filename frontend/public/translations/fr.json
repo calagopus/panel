@@ -3841,7 +3841,6 @@
           },
           "preCondition": {
             "valueSeconds": "Valeur (secondes)",
-            "valuePercent": "Valeur (%)",
             "value": "Valeur"
           },
           "triggers": {

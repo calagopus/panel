@@ -1421,7 +1421,6 @@
           },
           "preCondition": {
             "valueSeconds": "Значение (секунды)",
-            "valuePercent": "Значение (%)",
             "value": "Значение"
           },
           "triggers": {

@@ -3274,7 +3274,6 @@
           },
           "preCondition": {
             "valueSeconds": "Wartość (sekundy)",
-            "valuePercent": "Wartość (%)",
             "value": "Wartość"
           },
           "triggers": {

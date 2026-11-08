@@ -1502,7 +1502,6 @@
           },
           "preCondition": {
             "valueSeconds": "Değer (saniye)",
-            "valuePercent": "Değer (%)",
             "value": "Değer"
           },
           "triggers": {

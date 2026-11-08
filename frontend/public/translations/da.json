@@ -5818,7 +5818,6 @@
           },
           "preCondition": {
             "valueSeconds": "Værdi (sekunder)",
-            "valuePercent": "Værdi (%)",
             "value": "Værdi"
           },
           "triggers": {
