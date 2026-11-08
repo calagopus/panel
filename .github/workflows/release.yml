@@ -65,6 +65,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+      artifact-metadata: write
     secrets: inherit
     with:
       image_tag: ${{ needs.release-info.outputs.version }}
