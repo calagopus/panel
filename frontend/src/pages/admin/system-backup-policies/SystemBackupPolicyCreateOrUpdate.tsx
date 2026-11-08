@@ -27,9 +27,9 @@ import {
   adminSystemBackupPolicyUpdateSchema,
 } from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -110,9 +110,9 @@ export default function SystemBackupPolicyCreateOrUpdate({
 
   useHydrateForm(form, contextSystemBackupPolicy, systemBackupPolicyToFormValues);
 
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: contextSystemBackupPolicy?.backupConfiguration?.name,
     canRequest: canReadBackupConfigurations,
   });

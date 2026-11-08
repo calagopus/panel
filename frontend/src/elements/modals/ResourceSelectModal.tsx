@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ReactNode, useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import { InfiniteScroll } from '@/elements/input/infiniteScrollOptions.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -17,6 +18,7 @@ interface ResourceSelectModalProps extends ModalProps {
   loading?: boolean;
   searchValue?: string;
   onSearchChange?: (search: string) => void;
+  infiniteScroll?: InfiniteScroll;
   confirmLabel?: string;
   addedToast?: string;
   disabled?: boolean;
@@ -35,6 +37,7 @@ export default function ResourceSelectModal({
   loading,
   searchValue,
   onSearchChange,
+  infiniteScroll,
   confirmLabel,
   addedToast,
   disabled = false,
@@ -100,6 +103,7 @@ export default function ResourceSelectModal({
             searchable
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            infiniteScroll={infiniteScroll}
             loading={loading}
           />
         )}

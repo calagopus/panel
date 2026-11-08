@@ -33,7 +33,7 @@ import { adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -47,21 +47,21 @@ export default function OobeFinished() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
+  const eggRepositories = useInfiniteSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
     queryKey: queryKeys.admin.eggRepositories.all(),
-    fetcher: () => getEggRepositories(1),
+    fetcher: (page) => getEggRepositories(page),
   });
-  const locations = useSearchableResource<z.infer<typeof adminLocationSchema>>({
+  const locations = useInfiniteSearchableResource<z.infer<typeof adminLocationSchema>>({
     queryKey: queryKeys.admin.locations.all(),
-    fetcher: () => getLocations(1),
+    fetcher: (page) => getLocations(page),
   });
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: () => getNodes(1),
+    fetcher: (page) => getNodes(page),
   });
-  const servers = useSearchableResource<z.infer<typeof adminServerSchema>>({
+  const servers = useInfiniteSearchableResource<z.infer<typeof adminServerSchema>>({
     queryKey: queryKeys.admin.servers.all(),
-    fetcher: () => getServers(1),
+    fetcher: (page) => getServers(page),
   });
 
   const handleFinish = () => {

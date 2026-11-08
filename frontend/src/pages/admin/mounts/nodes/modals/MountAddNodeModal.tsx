@@ -6,7 +6,7 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function MountAddNodeModal({
@@ -15,9 +15,9 @@ export default function MountAddNodeModal({
 }: ModalProps & { mount: z.infer<typeof adminMountSchema> }) {
   const { t } = useTranslations();
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
   });
 
   return (
@@ -29,6 +29,7 @@ export default function MountAddNodeModal({
       loading={nodes.loading}
       searchValue={nodes.search}
       onSearchChange={nodes.setSearch}
+      infiniteScroll={nodes.infiniteScroll}
       addedToast={t('pages.admin.mounts.tabs.nodes.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.mountAssignments.all()]}
       onConfirm={(nodeUuid) => createNodeMount(nodeUuid, mount.uuid)}

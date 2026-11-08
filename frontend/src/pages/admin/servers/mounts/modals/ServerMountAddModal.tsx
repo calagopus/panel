@@ -6,15 +6,15 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer, adminServerMountSchema } from '@/lib/schemas/admin/servers.ts';
 import NodeAllowedSourceAlert from '@/pages/admin/nodes/NodeAllowedSourceAlert.tsx';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerMountAddModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
 
-  const mounts = useSearchableResource<z.infer<typeof adminServerMountSchema>>({
+  const mounts = useInfiniteSearchableResource<z.infer<typeof adminServerMountSchema>>({
     queryKey: queryKeys.admin.mountAssignments.availableMountsByServer(server.uuid),
-    fetcher: (search) => getAvailableServerMounts(server.uuid, 1, search),
+    fetcher: (page, search) => getAvailableServerMounts(server.uuid, page, search),
   });
 
   return (
@@ -26,6 +26,7 @@ export default function ServerMountAddModal({ server, ...props }: ModalProps & {
       loading={mounts.loading}
       searchValue={mounts.search}
       onSearchChange={mounts.setSearch}
+      infiniteScroll={mounts.infiniteScroll}
       renderBelowSelect={(value) => <NodeAllowedSourceAlert nodeUuid={server.node.uuid} kind='mount' uuid={value} />}
       addedToast={t('pages.admin.servers.tabs.mounts.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.mountAssignments.all()]}

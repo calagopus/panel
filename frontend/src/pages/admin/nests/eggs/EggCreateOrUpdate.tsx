@@ -38,8 +38,8 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { trackActivity } from '@/stores/activity.ts';
@@ -100,18 +100,18 @@ export default function EggCreateOrUpdate({
   useHydrateForm(form, contextEgg, eggToFormValues);
   const syncDraft = useFormDraft(form, 'general');
 
-  const eggRepositories = useSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
+  const eggRepositories = useInfiniteSearchableResource<z.infer<typeof adminEggRepositorySchema>>({
     queryKey: queryKeys.admin.eggRepositories.all(),
-    fetcher: (search) => getEggRepositories(1, search),
+    fetcher: (page, search) => getEggRepositories(page, search),
     defaultSearchValue: contextEgg?.eggRepositoryEgg?.eggRepository.name,
   });
-  const eggRepositoryEggs = useSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
+  const eggRepositoryEggs = useInfiniteSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
     queryKey: selectedEggRepositoryUuid
       ? queryKeys.admin.eggRepositories.eggs(selectedEggRepositoryUuid)
       : queryKeys.admin.eggRepositories.eggsUnscoped(),
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedEggRepositoryUuid
-        ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)
+        ? getEggRepositoryEggs(selectedEggRepositoryUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     defaultSearchValue: contextEgg?.eggRepositoryEgg?.exportedEgg.name,
     deps: [selectedEggRepositoryUuid],
@@ -283,6 +283,7 @@ export default function EggCreateOrUpdate({
               searchable
               searchValue={eggRepositories.search}
               onSearchChange={eggRepositories.setSearch}
+              infiniteScroll={eggRepositories.infiniteScroll}
               loading={eggRepositories.loading}
             />
             <Select
@@ -298,6 +299,7 @@ export default function EggCreateOrUpdate({
               clearable
               searchValue={eggRepositoryEggs.search}
               onSearchChange={eggRepositoryEggs.setSearch}
+              infiniteScroll={eggRepositoryEggs.infiniteScroll}
               loading={eggRepositoryEggs.loading}
               key={form.key('eggRepositoryEggUuid')}
               {...form.getInputProps('eggRepositoryEggUuid')}

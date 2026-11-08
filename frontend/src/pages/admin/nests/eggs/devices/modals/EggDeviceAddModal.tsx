@@ -7,7 +7,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggDeviceAddModal({
@@ -17,9 +17,9 @@ export default function EggDeviceAddModal({
 }: ModalProps & { nest: z.infer<typeof adminNestSchema>; egg: z.infer<typeof adminEggSchema> }) {
   const { t } = useTranslations();
 
-  const devices = useSearchableResource<z.infer<typeof adminDeviceSchema>>({
+  const devices = useInfiniteSearchableResource<z.infer<typeof adminDeviceSchema>>({
     queryKey: queryKeys.admin.devices.all(),
-    fetcher: (search) => getDevices(1, search),
+    fetcher: (page, search) => getDevices(page, search),
   });
 
   return (
@@ -31,6 +31,7 @@ export default function EggDeviceAddModal({
       loading={devices.loading}
       searchValue={devices.search}
       onSearchChange={devices.setSearch}
+      infiniteScroll={devices.infiniteScroll}
       addedToast={t('pages.admin.nests.tabs.eggs.page.tabs.devices.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.deviceAssignments.all()]}
       onConfirm={(deviceUuid) => createEggDevice(nest.uuid, egg.uuid, deviceUuid)}

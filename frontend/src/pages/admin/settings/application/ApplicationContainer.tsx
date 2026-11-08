@@ -15,7 +15,7 @@ import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { adminSettingsApplicationSchema } from '@/lib/schemas/admin/settings.ts';
 import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -50,9 +50,9 @@ export default function ApplicationContainer() {
     initialValues: applicationEmptyFormValues,
   });
 
-  const assets = useSearchableResource<z.infer<typeof storageAssetSchema>>({
+  const assets = useInfiniteSearchableResource<z.infer<typeof storageAssetSchema>>({
     queryKey: queryKeys.admin.assets.all(),
-    fetcher: () => getAssets(1, ''),
+    fetcher: (page) => getAssets(page, ''),
     canRequest: canReadAssets,
   });
 

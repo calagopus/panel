@@ -46,8 +46,8 @@ import { fullUserSchema } from '@/lib/schemas/user.ts';
 import EggRepositoryCatalogModal, {
   EggRepositoryCatalogInstallResult,
 } from '@/pages/admin/egg-repositories/eggs/modals/EggRepositoryCatalogModal.tsx';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -112,24 +112,24 @@ export default function ServerCreate() {
   });
   form.watch('nodeUuid', ({ value }) => setSelectedNodeUuid(value));
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
     canRequest: canReadNodes,
   });
-  const users = useSearchableResource<z.infer<typeof fullUserSchema>>({
+  const users = useInfiniteSearchableResource<z.infer<typeof fullUserSchema>>({
     queryKey: queryKeys.admin.users.all(),
-    fetcher: (search) => getUsers(1, search),
+    fetcher: (page, search) => getUsers(page, search),
     canRequest: canReadUsers,
   });
-  const nests = useSearchableResource<z.infer<typeof adminNestSchema>>({
+  const nests = useInfiniteSearchableResource<z.infer<typeof adminNestSchema>>({
     queryKey: queryKeys.admin.nests.all(),
-    fetcher: (search) => getNests(1, search),
+    fetcher: (page, search) => getNests(page, search),
     canRequest: canReadNests,
   });
-  const eggsWithNests = useSearchableResource<z.infer<typeof adminEggWithNestSchema>>({
+  const eggsWithNests = useInfiniteSearchableResource<z.infer<typeof adminEggWithNestSchema>>({
     queryKey: queryKeys.admin.eggs.list(selectedNestUuid),
-    fetcher: (search) => searchEggs(selectedNestUuid || null, 1, search),
+    fetcher: (page, search) => searchEggs(selectedNestUuid || null, page, search),
     canRequest: canReadEggs,
   });
   useEffect(() => {
@@ -141,8 +141,15 @@ export default function ServerCreate() {
       loading: eggsWithNests.loading,
       search: eggsWithNests.search,
       setSearch: eggsWithNests.setSearch,
+      infiniteScroll: eggsWithNests.infiniteScroll,
     }),
-    [eggsWithNests.items, eggsWithNests.loading, eggsWithNests.search, eggsWithNests.setSearch],
+    [
+      eggsWithNests.items,
+      eggsWithNests.loading,
+      eggsWithNests.search,
+      eggsWithNests.setSearch,
+      eggsWithNests.infiniteScroll,
+    ],
   );
   const eggNests = useMemo(
     () => new Map(eggsWithNests.items.map((item) => [item.egg.uuid, item.nest])),
@@ -162,31 +169,31 @@ export default function ServerCreate() {
     form.setFieldValue('image', Object.values(egg.dockerImages)[0] ?? '');
     form.setFieldValue('startup', egg.startupCommands['Default'] || Object.values(egg.startupCommands)[0] || '');
   };
-  const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availablePrimaryAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
       ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'primary-allocations'],
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedNodeUuid
-        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
+        ? getAvailableNodeAllocations(selectedNodeUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedNodeUuid],
     canRequest: canReadNodes && canReadNodeAllocations,
   });
-  const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availableAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
       ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'allocations'],
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedNodeUuid
-        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
+        ? getAvailableNodeAllocations(selectedNodeUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedNodeUuid],
     canRequest: canReadNodes && canReadNodeAllocations,
   });
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     canRequest: canReadBackupConfigurations,
   });
 
@@ -328,6 +335,7 @@ export default function ServerCreate() {
                   searchable
                   searchValue={availablePrimaryAllocations.search}
                   onSearchChange={availablePrimaryAllocations.setSearch}
+                  infiniteScroll={availablePrimaryAllocations.infiniteScroll}
                   allowDeselect
                   key={form.key('allocationUuid')}
                   {...form.getInputProps('allocationUuid')}
@@ -344,6 +352,7 @@ export default function ServerCreate() {
                   searchable
                   searchValue={availableAllocations.search}
                   onSearchChange={availableAllocations.setSearch}
+                  infiniteScroll={availableAllocations.infiniteScroll}
                   key={form.key('allocationUuids')}
                   {...form.getInputProps('allocationUuids')}
                 />

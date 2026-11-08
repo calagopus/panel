@@ -7,7 +7,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { asSinglePage, useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerSelectItem {
@@ -20,19 +20,23 @@ type Props<T extends ServerSelectItem> = Omit<SelectProps, 'data' | 'value' | 'o
   onChange: (uuid: string | null, server: T | null) => void;
   queryKey?: readonly unknown[];
   fetcher?: (search: string, showOthers: boolean) => Promise<Pagination<T>>;
+  paginatedFetcher?: (page: number, search: string, showOthers: boolean) => Promise<Pagination<T>>;
   exclude?: string[];
   groupBy?: (server: T) => string;
   selectedItem?: T | null;
   withOthersSwitch?: boolean;
 };
 
-const defaultFetcher = (search: string, showOthers: boolean) => getServers(1, search, showOthers);
+const defaultFetcher = (page: number, search: string, showOthers: boolean) => getServers(page, search, showOthers);
 
 export default function ServerSelect<T extends ServerSelectItem = z.infer<typeof serverSchema>>({
   value,
   onChange,
   queryKey = queryKeys.user.servers.all(),
-  fetcher = defaultFetcher as unknown as (search: string, showOthers: boolean) => Promise<Pagination<T>>,
+  fetcher,
+  paginatedFetcher = fetcher
+    ? undefined
+    : (defaultFetcher as unknown as (page: number, search: string, showOthers: boolean) => Promise<Pagination<T>>),
   exclude,
   groupBy,
   selectedItem,
@@ -47,9 +51,10 @@ export default function ServerSelect<T extends ServerSelectItem = z.infer<typeof
   const [showOthers, setShowOthers] = useState(false);
   const [lastSelected, setLastSelected] = useState<T | null>(null);
 
-  const servers = useSearchableResource<T>({
+  const servers = useInfiniteSearchableResource<T>({
     queryKey: [...queryKey, { showOthers }],
-    fetcher: (search) => fetcher(search, showOthers),
+    fetcher: (page, search) =>
+      paginatedFetcher ? paginatedFetcher(page, search, showOthers) : asSinglePage(fetcher!(search, showOthers)),
   });
 
   const items = exclude?.length ? servers.items.filter((s) => !exclude.includes(s.uuid)) : servers.items;
@@ -99,6 +104,7 @@ export default function ServerSelect<T extends ServerSelectItem = z.infer<typeof
       searchable
       searchValue={servers.search}
       onSearchChange={servers.setSearch}
+      infiniteScroll={servers.infiniteScroll}
       loading={servers.loading}
       label={inlineLabel ? undefined : label}
       withAsterisk={inlineLabel ? undefined : withAsterisk}

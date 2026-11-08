@@ -18,7 +18,7 @@ import {
   adminBackupConfigurationTestSchema,
 } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -35,9 +35,9 @@ export default function BackupConfigurationTestModal({
   const [testing, setTesting] = useState(false);
   const [result, setResult] = useState<z.infer<typeof adminBackupConfigurationTestResultSchema> | null>(null);
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
   });
 
   useEffect(() => {
@@ -78,6 +78,7 @@ export default function BackupConfigurationTestModal({
           searchable
           searchValue={nodes.search}
           onSearchChange={nodes.setSearch}
+          infiniteScroll={nodes.infiniteScroll}
           filter={({ options }) => options}
           loading={nodes.loading}
         />

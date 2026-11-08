@@ -30,7 +30,7 @@ export default function SystemBackupPolicyAddServerModal({
           label={t('common.form.server', {})}
           placeholder={t('common.form.server', {})}
           queryKey={queryKeys.admin.servers.all()}
-          fetcher={(search) => getServers(1, search)}
+          paginatedFetcher={(page, search) => getServers(page, search)}
           value={value}
           onChange={(uuid) => onChange(uuid)}
         />

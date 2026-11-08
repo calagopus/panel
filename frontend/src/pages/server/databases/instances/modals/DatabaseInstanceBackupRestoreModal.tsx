@@ -14,8 +14,8 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import useInvalidateServerCache from '@/pages/server/hooks/useInvalidateServerCache.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -37,9 +37,9 @@ export default function DatabaseInstanceBackupRestoreModal({ backup, ...props }:
   const [databaseInstanceUuid, setDatabaseInstanceUuid] = useState<string | null>(backup.databaseInstanceUuid);
 
   const canReadInstances = useServerCan('database-instances.read');
-  const instances = useSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
+  const instances = useInfiniteSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
     queryKey: queryKeys.server(server.uuid).databases.instances.all(),
-    fetcher: (search) => getDatabaseInstances(server.uuid, 1, search),
+    fetcher: (page, search) => getDatabaseInstances(server.uuid, page, search),
     canRequest: canReadInstances && props.opened,
   });
   const resource = useResource({
@@ -114,6 +114,7 @@ export default function DatabaseInstanceBackupRestoreModal({ backup, ...props }:
           searchable
           searchValue={instances.search}
           onSearchChange={instances.setSearch}
+          infiniteScroll={instances.infiniteScroll}
           loading={instances.loading || resource.loading}
           disabled={loading}
           onChange={setDatabaseInstanceUuid}

@@ -18,7 +18,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { serverSelectorSchema, transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -47,9 +47,9 @@ export default function ServersTransferModal({
   const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_speed');
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
   });
 
   const closeAll = () => {
@@ -120,6 +120,7 @@ export default function ServersTransferModal({
             searchable
             searchValue={nodes.search}
             onSearchChange={nodes.setSearch}
+            infiniteScroll={nodes.infiniteScroll}
             loading={nodes.loading}
           />
 

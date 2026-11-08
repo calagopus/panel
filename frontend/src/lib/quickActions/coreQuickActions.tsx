@@ -37,7 +37,7 @@ import type { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import type { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import type { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useQuickActionLocation, useQuickActionTerm } from '@/plugins/quick-actions/useQuickActions.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -260,22 +260,22 @@ export function useCoreQuickActionModes(): QuickActionMode[] {
     }
   }, [mathActive]);
 
-  const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+  const servers = useInfiniteSearchableResource<z.infer<typeof serverSchema>>({
     queryKey: [...queryKeys.user.servers.all(), { showOthers }],
-    fetcher: (search) => getServers(1, search, showOthers),
+    fetcher: (page, search) => getServers(page, search, showOthers),
     canRequest: open && serversTerm !== null && !searchesAllServers,
   });
 
-  const adminServers = useSearchableResource<z.infer<typeof adminServerSchema>>({
+  const adminServers = useInfiniteSearchableResource<z.infer<typeof adminServerSchema>>({
     queryKey: queryKeys.admin.servers.all(),
-    fetcher: (search) => getAdminServers(1, search),
+    fetcher: (page, search) => getAdminServers(page, search),
     canRequest: open && serversTerm !== null && searchesAllServers,
   });
 
   const usersTerm = useQuickActionTerm(USERS_PREFIX);
-  const users = useSearchableResource<z.infer<typeof adminFullUserSchema>>({
+  const users = useInfiniteSearchableResource<z.infer<typeof adminFullUserSchema>>({
     queryKey: queryKeys.admin.users.all(),
-    fetcher: (search) => getAdminUsers(1, search),
+    fetcher: (page, search) => getAdminUsers(page, search),
     canRequest: open && usersTerm !== null && canSearchUsers,
   });
 

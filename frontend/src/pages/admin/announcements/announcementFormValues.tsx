@@ -4,7 +4,7 @@ import { type FieldDef } from '@/elements/form-engine/index.ts';
 import { announcementTypeLabelMapping, mappingToSelectData } from '@/lib/enums.ts';
 import { adminAnnouncementSchema, adminAnnouncementUpdateSchema } from '@/lib/schemas/admin/announcements.ts';
 import { searchableMultiselectField } from '@/lib/searchableMultiselectField.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useGroupedEggOptions } from '@/plugins/useGroupedEggOptions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -46,7 +46,7 @@ export const announcementToFormValues = (
   eggs: announcement.eggs,
 });
 
-type SearchableResource = ReturnType<typeof useSearchableResource<{ uuid: string; name: string }>>;
+type SearchableResource = ReturnType<typeof useInfiniteSearchableResource<{ uuid: string; name: string }>>;
 
 interface AnnouncementFormFieldsOptions {
   languages: string[];

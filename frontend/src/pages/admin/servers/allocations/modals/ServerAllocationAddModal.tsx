@@ -13,7 +13,7 @@ import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -25,9 +25,9 @@ export default function ServerAllocationAddModal({ server, ...props }: ModalProp
   const [loading, setLoading] = useState(false);
   const [selectedAllocationUuids, setSelectedAllocationUuids] = useState<string[]>([]);
 
-  const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availableAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: queryKeys.admin.nodes.availableAllocations(server.node.uuid),
-    fetcher: (search) => getAvailableNodeAllocations(server.node.uuid, 1, search),
+    fetcher: (page, search) => getAvailableNodeAllocations(server.node.uuid, page, search),
   });
 
   useEffect(() => {
@@ -72,6 +72,7 @@ export default function ServerAllocationAddModal({ server, ...props }: ModalProp
           searchable
           searchValue={availableAllocations.search}
           onSearchChange={availableAllocations.setSearch}
+          infiniteScroll={availableAllocations.infiniteScroll}
           loading={availableAllocations.loading}
         />
 

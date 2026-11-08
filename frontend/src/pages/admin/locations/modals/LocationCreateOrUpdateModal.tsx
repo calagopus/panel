@@ -12,7 +12,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -51,9 +51,9 @@ export default function LocationCreateOrUpdateModal({
     },
   });
 
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: '',
     canRequest: canReadBackupConfigurations,
   });

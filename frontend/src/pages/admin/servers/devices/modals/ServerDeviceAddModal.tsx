@@ -6,15 +6,15 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer, adminServerDeviceSchema } from '@/lib/schemas/admin/servers.ts';
 import NodeAllowedSourceAlert from '@/pages/admin/nodes/NodeAllowedSourceAlert.tsx';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerDeviceAddModal({ server, ...props }: ModalProps & { server: AdminServer }) {
   const { t } = useTranslations();
 
-  const devices = useSearchableResource<z.infer<typeof adminServerDeviceSchema>>({
+  const devices = useInfiniteSearchableResource<z.infer<typeof adminServerDeviceSchema>>({
     queryKey: queryKeys.admin.deviceAssignments.availableDevicesByServer(server.uuid),
-    fetcher: (search) => getAvailableServerDevices(server.uuid, 1, search),
+    fetcher: (page, search) => getAvailableServerDevices(server.uuid, page, search),
   });
 
   return (
@@ -26,6 +26,7 @@ export default function ServerDeviceAddModal({ server, ...props }: ModalProps & 
       loading={devices.loading}
       searchValue={devices.search}
       onSearchChange={devices.setSearch}
+      infiniteScroll={devices.infiniteScroll}
       renderBelowSelect={(value) => <NodeAllowedSourceAlert nodeUuid={server.node.uuid} kind='device' uuid={value} />}
       addedToast={t('pages.admin.servers.tabs.devices.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.deviceAssignments.all()]}

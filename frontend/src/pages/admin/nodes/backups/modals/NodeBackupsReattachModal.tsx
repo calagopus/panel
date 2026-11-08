@@ -64,7 +64,9 @@ export default function NodeBackupsReattachModal({ node, backup, ...props }: Pro
           label={t('common.table.columns.server', {})}
           placeholder={t('common.table.columns.server', {})}
           queryKey={backup.isShared ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid)}
-          fetcher={(search) => (backup.isShared ? getServers(1, search) : getNodeServers(node.uuid, 1, search))}
+          paginatedFetcher={(page, search) =>
+            backup.isShared ? getServers(page, search) : getNodeServers(node.uuid, page, search)
+          }
           value={selectedServer?.uuid ?? null}
           selectedItem={selectedServer}
           onChange={(_, server) => setSelectedServer(server)}

@@ -13,8 +13,8 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { AdminServer, AdminServerCreate, AdminServerUpdate } from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import EggInstallField from './EggInstallField.tsx';
 import OwnerCreateField from './OwnerCreateField.tsx';
@@ -22,10 +22,10 @@ import OwnerCreateField from './OwnerCreateField.tsx';
 type TFunc = ReturnType<typeof useTranslations>['t'];
 type ServerCreateFormValues = AdminServerCreate;
 type ServerUpdateFormValues = AdminServerUpdate;
-type SearchableResource<T> = ReturnType<typeof useSearchableResource<T>>;
+type SearchableResource<T> = ReturnType<typeof useInfiniteSearchableResource<T>>;
 type EggsResource = Pick<
   SearchableResource<z.infer<typeof adminEggSchema>>,
-  'items' | 'loading' | 'search' | 'setSearch'
+  'items' | 'loading' | 'search' | 'setSearch' | 'infiniteScroll'
 >;
 
 export type ServerFormMode = 'create' | 'update';
@@ -323,6 +323,7 @@ function buildNestSelectField<T extends ServerEggAssignmentFormValues>(
         searchable
         searchValue={nests.search}
         onSearchChange={nests.setSearch}
+        infiniteScroll={nests.infiniteScroll}
         disabled={!canReadNests}
         loading={nests.loading}
       />
@@ -478,6 +479,7 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
       searchable: true,
       searchValue: nodes?.search,
       onSearchChange: nodes?.setSearch,
+      infiniteScroll: nodes?.infiniteScroll,
       disabled: !canReadNodes,
       loading: nodes?.loading,
     },
@@ -495,6 +497,7 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
           searchable
           searchValue={users.search}
           onSearchChange={users.setSearch}
+          infiniteScroll={users.infiniteScroll}
           loading={users.loading}
           disabled={!canReadUsers}
           key={f.key('ownerUuid')}
@@ -529,6 +532,7 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
           searchable
           searchValue={eggs.search}
           onSearchChange={eggs.setSearch}
+          infiniteScroll={eggs.infiniteScroll}
           loading={eggs.loading}
           disabled={!canReadEggs || (!eggNests && !selectedNestUuid)}
           key={f.key('eggUuid')}
@@ -549,6 +553,7 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
       searchable: true,
       searchValue: backupConfigurations.search,
       onSearchChange: backupConfigurations.setSearch,
+      infiniteScroll: backupConfigurations.infiniteScroll,
       allowDeselect: true,
       clearable: true,
       disabled: !canReadBackupConfigurations,

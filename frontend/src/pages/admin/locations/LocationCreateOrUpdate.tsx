@@ -15,8 +15,8 @@ import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfig
 import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 import LocationDuplicateModal from '@/pages/admin/locations/modals/LocationDuplicateModal.tsx';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { locationEmptyFormValues, locationToFormValues, useLocationFormFields } from './locationFormValues.tsx';
@@ -49,9 +49,9 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
 
   useHydrateForm(form, contextLocation, locationToFormValues);
 
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: contextLocation?.backupConfiguration?.name,
     canRequest: canReadBackupConfigurations,
   });

@@ -16,7 +16,7 @@ import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerBackupSchema, adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -41,9 +41,9 @@ export default function NodeBackupsReassignModal({ node, backup, ...props }: Pro
     }
   }, [props.opened]);
 
-  const instances = useSearchableResource({
+  const instances = useInfiniteSearchableResource({
     queryKey: queryKeys.admin.databaseInstances.byServer(selectedServer?.uuid ?? ''),
-    fetcher: (search) => getServerDatabaseInstances(selectedServer!.uuid, 1, search),
+    fetcher: (page, search) => getServerDatabaseInstances(selectedServer!.uuid, page, search),
     canRequest: !!selectedServer,
   });
 
@@ -84,7 +84,9 @@ export default function NodeBackupsReassignModal({ node, backup, ...props }: Pro
           label={t('common.table.columns.server', {})}
           placeholder={t('common.table.columns.server', {})}
           queryKey={backup.isShared ? queryKeys.admin.servers.all() : queryKeys.admin.nodes.servers(node.uuid)}
-          fetcher={(search) => (backup.isShared ? getServers(1, search) : getNodeServers(node.uuid, 1, search))}
+          paginatedFetcher={(page, search) =>
+            backup.isShared ? getServers(page, search) : getNodeServers(node.uuid, page, search)
+          }
           value={selectedServer?.uuid ?? null}
           selectedItem={selectedServer}
           onChange={(_, server) => {
@@ -109,6 +111,7 @@ export default function NodeBackupsReassignModal({ node, backup, ...props }: Pro
           searchable
           searchValue={instances.search}
           onSearchChange={instances.setSearch}
+          infiniteScroll={instances.infiniteScroll}
           nothingFoundMessage={t('pages.admin.nodes.tabs.backups.page.modal.reassign.noInstances', {})}
         />
       </Stack>

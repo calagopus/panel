@@ -13,7 +13,7 @@ import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { userEmptyFormValues, useUserFormFields } from '@/pages/admin/users/userFormValues.tsx';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -66,9 +66,9 @@ export default function OwnerCreateModal({ opened, onClose, initialSearch, onCre
     },
   });
 
-  const roles = useSearchableResource<z.infer<typeof roleSchema>>({
+  const roles = useInfiniteSearchableResource<z.infer<typeof roleSchema>>({
     queryKey: queryKeys.admin.roles.all(),
-    fetcher: (search) => getRoles(1, search),
+    fetcher: (page, search) => getRoles(page, search),
     canRequest: canReadRoles,
   });
 

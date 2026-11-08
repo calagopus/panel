@@ -32,7 +32,7 @@ import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { oobeServerSchema } from '@/lib/schemas/oobe.ts';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAuth } from '@/providers/contexts/authContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
@@ -56,26 +56,26 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
   const selectedEggRepository = data.eggRepositories.find((repo) => repo.uuid === selectedEggRepositoryUuid) ?? null;
   const needsNest = !!selectedEggRepository && !selectedEggRepository.defaultNest;
 
-  const eggs = useSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
+  const eggs = useInfiniteSearchableResource<z.infer<typeof adminEggRepositoryEggSchema>>({
     queryKey: selectedEggRepositoryUuid
       ? queryKeys.admin.eggRepositories.eggs(selectedEggRepositoryUuid)
       : ['oobe', 'eggs'],
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedEggRepositoryUuid
-        ? getEggRepositoryEggs(selectedEggRepositoryUuid, 1, search)
+        ? getEggRepositoryEggs(selectedEggRepositoryUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedEggRepositoryUuid],
   });
-  const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availablePrimaryAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: node ? queryKeys.admin.nodes.availableAllocations(node.uuid) : ['oobe', 'primary-allocations'],
-    fetcher: (search) =>
-      node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
+    fetcher: (page, search) =>
+      node ? getAvailableNodeAllocations(node.uuid, page, search) : Promise.resolve(getEmptyPaginationSet()),
     deps: [node?.uuid],
   });
-  const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availableAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: node ? queryKeys.admin.nodes.availableAllocations(node.uuid) : ['oobe', 'allocations'],
-    fetcher: (search) =>
-      node ? getAvailableNodeAllocations(node.uuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
+    fetcher: (page, search) =>
+      node ? getAvailableNodeAllocations(node.uuid, page, search) : Promise.resolve(getEmptyPaginationSet()),
     deps: [node?.uuid],
   });
 
@@ -231,6 +231,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     searchable
                     searchValue={eggs.search}
                     onSearchChange={eggs.setSearch}
+                    infiniteScroll={eggs.infiniteScroll}
                     loading={eggs.loading}
                     disabled={!selectedEggRepositoryUuid}
                     value={selectedEgg?.uuid}
@@ -379,6 +380,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     searchable
                     searchValue={availablePrimaryAllocations.search}
                     onSearchChange={availablePrimaryAllocations.setSearch}
+                    infiniteScroll={availablePrimaryAllocations.infiniteScroll}
                     allowDeselect
                     key={form.key('allocationUuid')}
                     {...form.getInputProps('allocationUuid')}
@@ -395,6 +397,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
                     searchable
                     searchValue={availableAllocations.search}
                     onSearchChange={availableAllocations.setSearch}
+                    infiniteScroll={availableAllocations.infiniteScroll}
                     key={form.key('allocationUuids')}
                     {...form.getInputProps('allocationUuids')}
                   />

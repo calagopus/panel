@@ -6,7 +6,7 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function SystemBackupPolicyAddDatabaseAgentHostModal({
@@ -16,9 +16,9 @@ export default function SystemBackupPolicyAddDatabaseAgentHostModal({
 }: ModalProps & { systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>; refetch: () => void }) {
   const { t } = useTranslations();
 
-  const databaseAgentHosts = useSearchableResource<z.infer<typeof adminDatabaseAgentHostSchema>>({
+  const databaseAgentHosts = useInfiniteSearchableResource<z.infer<typeof adminDatabaseAgentHostSchema>>({
     queryKey: queryKeys.admin.databaseAgentHosts.all(),
-    fetcher: (search) => getDatabaseAgentHosts(1, search),
+    fetcher: (page, search) => getDatabaseAgentHosts(page, search),
   });
 
   return (
@@ -30,6 +30,7 @@ export default function SystemBackupPolicyAddDatabaseAgentHostModal({
       loading={databaseAgentHosts.loading}
       searchValue={databaseAgentHosts.search}
       onSearchChange={databaseAgentHosts.setSearch}
+      infiniteScroll={databaseAgentHosts.infiniteScroll}
       addedToast={t('pages.admin.systemBackupPolicies.tabs.databaseAgentHosts.page.toast.added', {})}
       onAdded={refetch}
       onConfirm={(databaseAgentHostUuid) =>

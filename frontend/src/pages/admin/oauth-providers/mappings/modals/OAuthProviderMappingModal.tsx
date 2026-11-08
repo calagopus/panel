@@ -20,7 +20,7 @@ import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -50,9 +50,9 @@ export default function OAuthProviderMappingModal({
 
   const isEdit = !!mapping;
 
-  const roles = useSearchableResource<z.infer<typeof roleSchema>>({
+  const roles = useInfiniteSearchableResource<z.infer<typeof roleSchema>>({
     queryKey: queryKeys.admin.roles.all(),
-    fetcher: (search) => getRoles(1, search),
+    fetcher: (page, search) => getRoles(page, search),
     canRequest: canReadRoles,
   });
 
@@ -121,6 +121,7 @@ export default function OAuthProviderMappingModal({
             searchable
             searchValue={roles.search}
             onSearchChange={roles.setSearch}
+            infiniteScroll={roles.infiniteScroll}
             loading={roles.loading}
             {...form.getInputProps('roleUuid')}
           />
@@ -130,7 +131,7 @@ export default function OAuthProviderMappingModal({
               withAsterisk
               label={t('common.form.server', {})}
               queryKey={queryKeys.admin.servers.all()}
-              fetcher={(search) => getServers(1, search)}
+              paginatedFetcher={(page, search) => getServers(page, search)}
               value={form.values.serverUuid}
               error={form.errors.serverUuid}
               onChange={(value) => form.setFieldValue('serverUuid', value || '')}

@@ -4,7 +4,7 @@ import { type FieldDef } from '@/elements/form-engine/index.ts';
 import Select from '@/elements/input/Select.tsx';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
@@ -24,7 +24,9 @@ export const locationToFormValues = (location: z.infer<typeof adminLocationSchem
 });
 
 export function useLocationFormFields(
-  backupConfigurations: ReturnType<typeof useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>>,
+  backupConfigurations: ReturnType<
+    typeof useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>
+  >,
   canReadBackupConfigurations: boolean,
 ): FieldDef<LocationFormValues>[] {
   const { t, language } = useTranslations();
@@ -41,6 +43,7 @@ export function useLocationFormFields(
         searchable: true,
         searchValue: backupConfigurations.search,
         onSearchChange: backupConfigurations.setSearch,
+        infiniteScroll: backupConfigurations.infiniteScroll,
         allowDeselect: true,
         clearable: true,
         disabled: !canReadBackupConfigurations,

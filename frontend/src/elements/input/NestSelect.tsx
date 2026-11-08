@@ -5,7 +5,7 @@ import getNests from '@/api/admin/nests/getNests.ts';
 import Select from '@/elements/input/Select.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 
 type Nest = z.infer<typeof adminNestSchema>;
 
@@ -18,9 +18,9 @@ type Props = Omit<SelectProps, 'data' | 'value' | 'onChange'> & {
 export default function NestSelect({ value, onChange, includeItems = [], ...rest }: Props) {
   const [lastSelected, setLastSelected] = useState<Nest | null>(null);
 
-  const nests = useSearchableResource<Nest>({
+  const nests = useInfiniteSearchableResource<Nest>({
     queryKey: queryKeys.admin.nests.all(),
-    fetcher: (search) => getNests(1, search),
+    fetcher: (page, search) => getNests(page, search),
   });
 
   const known = new Map<string, Nest>();
@@ -44,6 +44,7 @@ export default function NestSelect({ value, onChange, includeItems = [], ...rest
       searchable
       searchValue={nests.search}
       onSearchChange={nests.setSearch}
+      infiniteScroll={nests.infiniteScroll}
       loading={nests.loading}
       {...rest}
     />

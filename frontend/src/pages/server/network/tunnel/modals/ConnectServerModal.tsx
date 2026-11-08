@@ -196,7 +196,9 @@ export default function ConnectServerModal({ initial, tunnel, onCreated, ...prop
           nothingFoundMessage={t('pages.server.tunnel.modal.connect.empty', {})}
           withOthersSwitch
           queryKey={queryKeys.server(server.uuid).tunnel.available()}
-          fetcher={(search, showOthers) => getAvailableTunnelServers(server.uuid, 1, search, showOthers)}
+          paginatedFetcher={(page, search, showOthers) =>
+            getAvailableTunnelServers(server.uuid, page, search, showOthers)
+          }
           value={selected}
           selectedItem={selectedServer}
           onChange={(uuid, item) => {

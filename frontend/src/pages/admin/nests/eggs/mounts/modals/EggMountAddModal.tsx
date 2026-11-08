@@ -7,7 +7,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminMountSchema } from '@/lib/schemas/admin/mounts.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function EggMountAddModal({
@@ -17,9 +17,9 @@ export default function EggMountAddModal({
 }: ModalProps & { nest: z.infer<typeof adminNestSchema>; egg: z.infer<typeof adminEggSchema> }) {
   const { t } = useTranslations();
 
-  const mounts = useSearchableResource<z.infer<typeof adminMountSchema>>({
+  const mounts = useInfiniteSearchableResource<z.infer<typeof adminMountSchema>>({
     queryKey: queryKeys.admin.mounts.all(),
-    fetcher: (search) => getMounts(1, search),
+    fetcher: (page, search) => getMounts(page, search),
   });
 
   return (
@@ -31,6 +31,7 @@ export default function EggMountAddModal({
       loading={mounts.loading}
       searchValue={mounts.search}
       onSearchChange={mounts.setSearch}
+      infiniteScroll={mounts.infiniteScroll}
       addedToast={t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.mountAssignments.all()]}
       onConfirm={(mountUuid) => createEggMount(nest.uuid, egg.uuid, mountUuid)}

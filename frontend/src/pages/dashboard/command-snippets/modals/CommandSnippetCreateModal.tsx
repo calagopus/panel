@@ -14,7 +14,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -23,9 +23,9 @@ export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
-  const eggs = useSearchableResource<z.infer<typeof serverEggSchema>>({
+  const eggs = useInfiniteSearchableResource<z.infer<typeof serverEggSchema>>({
     queryKey: queryKeys.user.eggs.all(),
-    fetcher: (search) => getUserEggs(1, search),
+    fetcher: (page, search) => getUserEggs(page, search),
   });
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
@@ -66,6 +66,7 @@ export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
           searchable
           searchValue={eggs.search}
           onSearchChange={eggs.setSearch}
+          infiniteScroll={eggs.infiniteScroll}
           loading={eggs.loading}
           {...form.getInputProps('eggs')}
         />

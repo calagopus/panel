@@ -11,7 +11,7 @@ import { getUrlConnectPort, withUrlPort } from '@/lib/network/url.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema, adminNodeUpdateSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type NodeFormValues = z.infer<typeof adminNodeUpdateSchema>;
@@ -47,8 +47,10 @@ export const nodeToFormValues = (node: z.infer<typeof adminNodeSchema>): Partial
 });
 
 interface NodeFormFieldsOptions {
-  locations: ReturnType<typeof useSearchableResource<z.infer<typeof adminLocationSchema>>>;
-  backupConfigurations: ReturnType<typeof useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>>;
+  locations: ReturnType<typeof useInfiniteSearchableResource<z.infer<typeof adminLocationSchema>>>;
+  backupConfigurations: ReturnType<
+    typeof useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>
+  >;
   urlValue: string;
   isAIO: boolean;
   contextNode?: z.infer<typeof adminNodeSchema>;
@@ -75,6 +77,7 @@ export function useNodeFormFields({
         searchable: true,
         searchValue: locations.search,
         onSearchChange: locations.setSearch,
+        infiniteScroll: locations.infiniteScroll,
         loading: locations.loading,
       },
     },
@@ -184,6 +187,7 @@ export function useNodeFormFields({
         searchable: true,
         searchValue: backupConfigurations.search,
         onSearchChange: backupConfigurations.setSearch,
+        infiniteScroll: backupConfigurations.infiniteScroll,
         allowDeselect: true,
         clearable: true,
         loading: backupConfigurations.loading,

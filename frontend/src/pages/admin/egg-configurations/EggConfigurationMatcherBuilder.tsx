@@ -74,7 +74,7 @@ export default function EggConfigurationMatcherBuilder({
           onChange={(nodes) => change({ ...node, nodes })}
           listQueryKey={queryKeys.admin.nodes.all()}
           detailQueryKey={queryKeys.admin.nodes.detail}
-          fetchPage={(search) => getNodes(1, search)}
+          paginatedFetcher={(page, search) => getNodes(page, search)}
           fetchOne={getNode}
         />
       )}
@@ -86,7 +86,7 @@ export default function EggConfigurationMatcherBuilder({
           onChange={(locations) => change({ ...node, locations })}
           listQueryKey={queryKeys.admin.locations.all()}
           detailQueryKey={queryKeys.admin.locations.detail}
-          fetchPage={(search) => getLocations(1, search)}
+          paginatedFetcher={(page, search) => getLocations(page, search)}
           fetchOne={getLocation}
         />
       )}

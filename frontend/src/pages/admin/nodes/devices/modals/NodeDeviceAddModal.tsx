@@ -6,15 +6,15 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function NodeDeviceAddModal({ node, ...props }: ModalProps & { node: z.infer<typeof adminNodeSchema> }) {
   const { t } = useTranslations();
 
-  const devices = useSearchableResource<z.infer<typeof adminDeviceSchema>>({
+  const devices = useInfiniteSearchableResource<z.infer<typeof adminDeviceSchema>>({
     queryKey: queryKeys.admin.devices.all(),
-    fetcher: (search) => getDevices(1, search),
+    fetcher: (page, search) => getDevices(page, search),
   });
 
   return (
@@ -26,6 +26,7 @@ export default function NodeDeviceAddModal({ node, ...props }: ModalProps & { no
       loading={devices.loading}
       searchValue={devices.search}
       onSearchChange={devices.setSearch}
+      infiniteScroll={devices.infiniteScroll}
       addedToast={t('pages.admin.nodes.tabs.devices.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.deviceAssignments.all()]}
       onConfirm={(deviceUuid) => createNodeDevice(node.uuid, deviceUuid)}

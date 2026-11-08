@@ -19,8 +19,8 @@ import {
   adminAnnouncementUpdateSchema,
 } from '@/lib/schemas/admin/announcements.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useGroupedEggOptions } from '@/plugins/useGroupedEggOptions.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -74,21 +74,21 @@ export default function AnnouncementCreateOrUpdate({
 
   const { eggOptions, loading: eggsLoading } = useGroupedEggOptions();
 
-  const locations = useSearchableResource({
+  const locations = useInfiniteSearchableResource({
     queryKey: queryKeys.admin.locations.all(),
-    fetcher: (search) => getLocations(1, search),
+    fetcher: (page, search) => getLocations(page, search),
     canRequest: canReadLocations,
   });
 
-  const nodes = useSearchableResource({
+  const nodes = useInfiniteSearchableResource({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
     canRequest: canReadNodes,
   });
 
-  const backupConfigurations = useSearchableResource({
+  const backupConfigurations = useInfiniteSearchableResource({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     canRequest: canReadBackupConfigurations,
   });
 

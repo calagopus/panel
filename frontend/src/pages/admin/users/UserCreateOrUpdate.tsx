@@ -20,8 +20,8 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -74,9 +74,9 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     }
   };
 
-  const roles = useSearchableResource<z.infer<typeof roleSchema>>({
+  const roles = useInfiniteSearchableResource<z.infer<typeof roleSchema>>({
     queryKey: queryKeys.admin.roles.all(),
-    fetcher: (search) => getRoles(1, search),
+    fetcher: (page, search) => getRoles(page, search),
     defaultSearchValue: contextUser?.role?.name,
     canRequest: canReadRoles,
   });

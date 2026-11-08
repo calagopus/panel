@@ -25,7 +25,7 @@ import { adminNodeAllocationSchema, adminNodeSchema } from '@/lib/schemas/admin/
 import { AdminServer, adminServerBackupSchema } from '@/lib/schemas/admin/servers.ts';
 import { transferArchiveFormat } from '@/lib/schemas/generic.ts';
 import { compressionLevel as compressionLevelEnum } from '@/lib/schemas/server/files.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -46,35 +46,35 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
   const [compressionLevel, setCompressionLevel] = useState<z.infer<typeof compressionLevelEnum>>('good_speed');
   const [multiplexChannels, setMultiplexChannels] = useState(0);
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
   });
-  const availablePrimaryAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availablePrimaryAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
       ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'primary-allocations'],
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedNodeUuid
-        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
+        ? getAvailableNodeAllocations(selectedNodeUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedNodeUuid],
     canRequest: canReadNodeAllocations,
   });
-  const availableAllocations = useSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
+  const availableAllocations = useInfiniteSearchableResource<z.infer<typeof adminNodeAllocationSchema>>({
     queryKey: selectedNodeUuid
       ? queryKeys.admin.nodes.availableAllocations(selectedNodeUuid)
       : ['admin', 'nodes', 'allocations'],
-    fetcher: (search) =>
+    fetcher: (page, search) =>
       selectedNodeUuid
-        ? getAvailableNodeAllocations(selectedNodeUuid, 1, search)
+        ? getAvailableNodeAllocations(selectedNodeUuid, page, search)
         : Promise.resolve(getEmptyPaginationSet()),
     deps: [selectedNodeUuid],
     canRequest: canReadNodeAllocations,
   });
-  const backups = useSearchableResource<z.infer<typeof adminServerBackupSchema>>({
+  const backups = useInfiniteSearchableResource<z.infer<typeof adminServerBackupSchema>>({
     queryKey: queryKeys.admin.backups.byServer(server.uuid),
-    fetcher: (search) => getServerBackups(server.uuid, 1, search).then(({ backups }) => backups),
+    fetcher: (page, search) => getServerBackups(server.uuid, page, search).then(({ backups }) => backups),
     canRequest: props.opened,
   });
 
@@ -148,6 +148,7 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             searchable
             searchValue={nodes.search}
             onSearchChange={nodes.setSearch}
+            infiniteScroll={nodes.infiniteScroll}
             loading={nodes.loading}
           />
 
@@ -166,6 +167,7 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             searchable
             searchValue={availablePrimaryAllocations.search}
             onSearchChange={availablePrimaryAllocations.setSearch}
+            infiniteScroll={availablePrimaryAllocations.infiniteScroll}
             onDropdownOpen={() => availablePrimaryAllocations.refetch()}
             allowDeselect
             loading={availablePrimaryAllocations.loading}
@@ -186,6 +188,7 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             searchable
             searchValue={availableAllocations.search}
             onSearchChange={availableAllocations.setSearch}
+            infiniteScroll={availableAllocations.infiniteScroll}
             onDropdownOpen={() => availableAllocations.refetch()}
             loading={availableAllocations.loading}
           />
@@ -204,6 +207,7 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             searchable
             searchValue={backups.search}
             onSearchChange={backups.setSearch}
+            infiniteScroll={backups.infiniteScroll}
             loading={backups.loading}
           />
 

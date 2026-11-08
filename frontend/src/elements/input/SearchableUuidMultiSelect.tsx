@@ -1,7 +1,7 @@
 import { MultiSelectProps } from '@mantine/core';
 import { useQueries } from '@tanstack/react-query';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { asSinglePage, useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 
 interface Item {
   uuid: string;
@@ -13,7 +13,8 @@ type Props<T extends Item> = Omit<MultiSelectProps, 'data' | 'value' | 'onChange
   onChange: (value: string[]) => void;
   listQueryKey: readonly unknown[];
   detailQueryKey: (uuid: string) => readonly unknown[];
-  fetchPage: (search: string) => Promise<Pagination<T>>;
+  fetchPage?: (search: string) => Promise<Pagination<T>>;
+  paginatedFetcher?: (page: number, search: string) => Promise<Pagination<T>>;
   fetchOne: (uuid: string) => Promise<T>;
 };
 
@@ -27,10 +28,14 @@ export default function SearchableUuidMultiSelect<T extends Item>({
   listQueryKey,
   detailQueryKey,
   fetchPage,
+  paginatedFetcher,
   fetchOne,
   ...rest
 }: Props<T>) {
-  const resource = useSearchableResource<T>({ queryKey: listQueryKey, fetcher: fetchPage });
+  const resource = useInfiniteSearchableResource<T>({
+    queryKey: listQueryKey,
+    fetcher: (page, search) => (paginatedFetcher ? paginatedFetcher(page, search) : asSinglePage(fetchPage!(search))),
+  });
 
   const missing = value.filter((uuid) => !resource.items.some((item) => item.uuid === uuid));
   const details = useQueries({
@@ -55,6 +60,7 @@ export default function SearchableUuidMultiSelect<T extends Item>({
       searchable
       searchValue={resource.search}
       onSearchChange={resource.setSearch}
+      infiniteScroll={resource.infiniteScroll}
       loading={resource.loading}
       hidePickedOptions
       {...rest}

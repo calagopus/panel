@@ -6,7 +6,7 @@ import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import { serverScheduleStepUpdateSchema } from '@/lib/schemas/server/schedules.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useServerStore } from '@/stores/server.ts';
 
@@ -30,9 +30,9 @@ export default function DatabaseInstanceSelectorInput({
   const server = useServerStore((state) => state.server);
 
   const canReadInstances = useServerCan('database-instances.read');
-  const instances = useSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
+  const instances = useInfiniteSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
     queryKey: queryKeys.server(server.uuid).databases.instances.all(),
-    fetcher: (search) => getDatabaseInstances(server.uuid, 1, search),
+    fetcher: (page, search) => getDatabaseInstances(server.uuid, page, search),
     canRequest: canReadInstances,
   });
 
@@ -52,6 +52,7 @@ export default function DatabaseInstanceSelectorInput({
       searchable
       searchValue={instances.search}
       onSearchChange={instances.setSearch}
+      infiniteScroll={instances.infiniteScroll}
       loading={instances.loading}
       onChange={(value) => form.setFieldValue(field, allowNull ? value : (value ?? ''))}
     />

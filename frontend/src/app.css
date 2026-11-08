@@ -527,3 +527,12 @@ strong {
     color: #dcc6e0;
   }
 }
+
+[data-combobox-disabled]:has(.select-load-more) {
+  opacity: 1;
+  cursor: default;
+}
+
+[data-combobox-disabled]:has(.select-load-more) > span {
+  flex: 1;
+}

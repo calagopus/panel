@@ -18,7 +18,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupCreateSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -42,9 +42,9 @@ export default function BackupCreateModal({
     enabled: canReadGroups && props.opened,
   });
 
-  const instances = useSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
+  const instances = useInfiniteSearchableResource<z.infer<typeof serverDatabaseInstanceSchema>>({
     queryKey: queryKeys.server(server.uuid).databases.instances.all(),
-    fetcher: (search) => getDatabaseInstances(server.uuid, 1, search),
+    fetcher: (page, search) => getDatabaseInstances(server.uuid, page, search),
     canRequest: canReadInstances && props.opened,
   });
 
@@ -121,6 +121,7 @@ export default function BackupCreateModal({
                 searchable
                 searchValue={instances.search}
                 onSearchChange={instances.setSearch}
+                infiniteScroll={instances.infiniteScroll}
                 loading={instances.loading}
                 onChange={(value) => form.setFieldValue('databaseInstanceUuid', value ?? '')}
               />

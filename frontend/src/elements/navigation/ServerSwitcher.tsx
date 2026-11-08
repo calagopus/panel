@@ -8,7 +8,7 @@ import Select from '@/elements/input/Select.tsx';
 import { serverStatusInfo } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverPowerState, serverSchema, serverStatus } from '@/lib/schemas/server/server.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerStats } from '@/plugins/server/useServerStats.ts';
 import { usePageBreakpoint } from '@/plugins/viewport/usePageBreakpoint.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -60,9 +60,9 @@ export default function ServerSwitcher({ className, isServer }: { className?: st
   const wide = usePageBreakpoint('md');
   const [opened, setOpened] = useState(false);
 
-  const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+  const servers = useInfiniteSearchableResource<z.infer<typeof serverSchema>>({
     queryKey: queryKeys.user.servers.all(),
-    fetcher: (search) => getServers(1, search),
+    fetcher: (page, search) => getServers(page, search),
     canRequest: opened,
   });
 
@@ -103,6 +103,7 @@ export default function ServerSwitcher({ className, isServer }: { className?: st
       selectFirstOptionOnChange
       searchValue={servers.search}
       onSearchChange={servers.setSearch}
+      infiniteScroll={servers.infiniteScroll}
       loading={servers.loading}
       renderOption={renderOption}
       comboboxProps={{ withinPortal: wide, position: 'top' }}

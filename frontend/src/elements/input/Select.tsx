@@ -3,12 +3,17 @@ import {
   getOptionsLockup,
   getParsedComboboxData,
   Select as MantineSelect,
-  SelectProps,
+  SelectProps as MantineSelectProps,
 } from '@mantine/core';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { makeComponentHookable } from 'shared';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import { InfiniteScroll, useInfiniteScrollOptions } from '@/elements/input/infiniteScrollOptions.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+
+export interface SelectProps extends MantineSelectProps {
+  infiniteScroll?: InfiniteScroll;
+}
 
 const Select = forwardRef<HTMLInputElement, SelectProps>(
   (
@@ -21,11 +26,15 @@ const Select = forwardRef<HTMLInputElement, SelectProps>(
       searchValue,
       onSearchChange,
       nothingFoundMessage,
+      infiniteScroll,
+      filter,
+      renderOption,
       ...rest
     },
     ref,
   ) => {
     const { t } = useTranslations();
+    const infiniteOptions = useInfiniteScrollOptions({ infiniteScroll, data, filter, renderOption });
 
     const optionsLockup = useMemo(() => getOptionsLockup(getParsedComboboxData(data)), [data]);
     const lastSelected = useRef<ComboboxItem | null>(null);
@@ -50,7 +59,7 @@ const Select = forwardRef<HTMLInputElement, SelectProps>(
       );
     };
 
-    const searchProps: Pick<SelectProps, 'searchValue' | 'onSearchChange'> = onSearchChange
+    const searchProps: Pick<MantineSelectProps, 'searchValue' | 'onSearchChange'> = onSearchChange
       ? {
           searchValue: displaySearch,
           onSearchChange: (search) => {
@@ -78,7 +87,9 @@ const Select = forwardRef<HTMLInputElement, SelectProps>(
           )
         }
         placeholder={typeof rest.label === 'string' ? rest.label : undefined}
-        data={data}
+        data={infiniteOptions.data}
+        filter={infiniteOptions.filter}
+        renderOption={infiniteOptions.renderOption}
         value={value}
         onChange={(v, option) => {
           lastSelected.current = option;

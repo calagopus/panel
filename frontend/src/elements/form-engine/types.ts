@@ -14,6 +14,8 @@ import { DateTimePickerProps } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
 import type { ZodType } from 'zod';
+import type { MultiSelectProps as WrappedMultiSelectProps } from '@/elements/input/MultiSelect.tsx';
+import type { SelectProps as WrappedSelectProps } from '@/elements/input/Select.tsx';
 import { LazyString } from '@/lib/lazy.ts';
 
 export { resolveString } from '@/lib/lazy.ts';
@@ -78,13 +80,13 @@ export interface CheckboxFieldDef<T extends Record<string, unknown>> extends Bas
 export interface SelectFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'select';
   options: FieldOption[];
-  props?: Partial<SelectProps>;
+  props?: Partial<WrappedSelectProps>;
 }
 
 export interface MultiSelectFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'multiselect';
   options: FieldOption[];
-  props?: Partial<MultiSelectProps>;
+  props?: Partial<WrappedMultiSelectProps>;
 }
 
 export interface MultiSelectGroupFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {

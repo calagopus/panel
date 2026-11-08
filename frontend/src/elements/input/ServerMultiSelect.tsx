@@ -7,7 +7,7 @@ import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { asSinglePage, useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerSelectItem {
@@ -20,18 +20,22 @@ type Props<T extends ServerSelectItem> = Omit<MultiSelectProps, 'data' | 'value'
   onChange: (servers: T[]) => void;
   queryKey?: readonly unknown[];
   fetcher?: (search: string, showOthers: boolean) => Promise<Pagination<T>>;
+  paginatedFetcher?: (page: number, search: string, showOthers: boolean) => Promise<Pagination<T>>;
   exclude?: string[];
   groupBy?: (server: T) => string;
   withOthersSwitch?: boolean;
 };
 
-const defaultFetcher = (search: string, showOthers: boolean) => getServers(1, search, showOthers);
+const defaultFetcher = (page: number, search: string, showOthers: boolean) => getServers(page, search, showOthers);
 
 export default function ServerMultiSelect<T extends ServerSelectItem = z.infer<typeof serverSchema>>({
   value,
   onChange,
   queryKey = queryKeys.user.servers.all(),
-  fetcher = defaultFetcher as unknown as (search: string, showOthers: boolean) => Promise<Pagination<T>>,
+  fetcher,
+  paginatedFetcher = fetcher
+    ? undefined
+    : (defaultFetcher as unknown as (page: number, search: string, showOthers: boolean) => Promise<Pagination<T>>),
   exclude,
   groupBy,
   withOthersSwitch,
@@ -44,9 +48,10 @@ export default function ServerMultiSelect<T extends ServerSelectItem = z.infer<t
 
   const [showOthers, setShowOthers] = useState(false);
 
-  const servers = useSearchableResource<T>({
+  const servers = useInfiniteSearchableResource<T>({
     queryKey: [...queryKey, { showOthers }],
-    fetcher: (search) => fetcher(search, showOthers),
+    fetcher: (page, search) =>
+      paginatedFetcher ? paginatedFetcher(page, search, showOthers) : asSinglePage(fetcher!(search, showOthers)),
   });
 
   const items = exclude?.length ? servers.items.filter((s) => !exclude.includes(s.uuid)) : servers.items;
@@ -93,6 +98,7 @@ export default function ServerMultiSelect<T extends ServerSelectItem = z.infer<t
       searchable
       searchValue={servers.search}
       onSearchChange={servers.setSearch}
+      infiniteScroll={servers.infiniteScroll}
       loading={servers.loading}
       hidePickedOptions
       label={inlineLabel ? undefined : label}

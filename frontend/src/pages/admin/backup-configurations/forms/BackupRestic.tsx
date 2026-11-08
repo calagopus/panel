@@ -19,14 +19,14 @@ import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationResticSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import BackupProviderSection from './BackupProviderSection.tsx';
 
 type ResticFormValues = z.infer<typeof adminBackupConfigurationResticSchema>;
 type ResticForm = UseFormReturnType<ResticFormValues>;
-type NodeResource = ReturnType<typeof useSearchableResource<z.infer<typeof adminNodeSchema>>>;
+type NodeResource = ReturnType<typeof useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>>;
 
 function cronDescription(cron: string, language: string): string | null {
   try {
@@ -63,6 +63,7 @@ function PruneJobRow({ form, index, nodes }: { form: ResticForm; index: number; 
             data={nodes.items.map((node) => ({ value: node.uuid, label: node.name }))}
             searchValue={nodes.search}
             onSearchChange={nodes.setSearch}
+            infiniteScroll={nodes.infiniteScroll}
             loading={nodes.loading}
             key={form.key(`pruneJobs.${index}.nodes`)}
             {...form.getInputProps(`pruneJobs.${index}.nodes`)}
@@ -81,9 +82,9 @@ export default function BackupRestic({ form, onRemove }: { form: ResticForm; onR
   const canReadNodes = useAdminCan('nodes.read');
   const pruneJobs = form.values.pruneJobs ?? [];
 
-  const nodes = useSearchableResource<z.infer<typeof adminNodeSchema>>({
+  const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
-    fetcher: (search) => getNodes(1, search),
+    fetcher: (page, search) => getNodes(page, search),
     canRequest: canReadNodes,
   });
 

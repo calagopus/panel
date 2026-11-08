@@ -29,7 +29,7 @@ import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { useQuickActionLocation } from '@/plugins/quick-actions/useQuickActions.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';
 import { checkPermissions } from '@/plugins/usePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -127,9 +127,9 @@ function Palette() {
     }
   }, [open]);
 
-  const servers = useSearchableResource<z.infer<typeof serverSchema>>({
+  const servers = useInfiniteSearchableResource<z.infer<typeof serverSchema>>({
     queryKey: [...queryKeys.user.servers.all(), { showOthers }],
-    fetcher: (search) => getServers(1, search, showOthers),
+    fetcher: (page, search) => getServers(page, search, showOthers),
     canRequest: open && scope === 'dashboard',
   });
 

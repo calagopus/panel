@@ -36,8 +36,8 @@ import NodeDuplicateModal from '@/pages/admin/nodes/modals/NodeDuplicateModal.ts
 import NodePairingConnect, { NodePairingTarget } from '@/pages/admin/nodes/pairing/NodePairingConnect.tsx';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useNodeOnlineWait } from '@/plugins/nodes/useNodeOnlineWait.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { nodeEmptyFormValues, nodeToFormValues, useNodeFormFields } from './nodeFormValues.tsx';
@@ -94,14 +94,14 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
 
   useHydrateForm(form, contextNode, nodeToFormValues, { key: (node) => node.uuid });
 
-  const locations = useSearchableResource<z.infer<typeof adminLocationSchema>>({
+  const locations = useInfiniteSearchableResource<z.infer<typeof adminLocationSchema>>({
     queryKey: queryKeys.admin.locations.all(),
-    fetcher: (search) => getLocations(1, search),
+    fetcher: (page, search) => getLocations(page, search),
     defaultSearchValue: contextNode?.location.name,
   });
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: contextNode?.backupConfiguration?.name,
   });
 

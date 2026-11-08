@@ -6,7 +6,7 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminSystemBackupPolicySchema } from '@/lib/schemas/admin/systemBackupPolicies.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function SystemBackupPolicyAddLocationModal({
@@ -16,9 +16,9 @@ export default function SystemBackupPolicyAddLocationModal({
 }: ModalProps & { systemBackupPolicy: z.infer<typeof adminSystemBackupPolicySchema>; refetch: () => void }) {
   const { t } = useTranslations();
 
-  const locations = useSearchableResource<z.infer<typeof adminLocationSchema>>({
+  const locations = useInfiniteSearchableResource<z.infer<typeof adminLocationSchema>>({
     queryKey: queryKeys.admin.locations.all(),
-    fetcher: (search) => getLocations(1, search),
+    fetcher: (page, search) => getLocations(page, search),
   });
 
   return (
@@ -30,6 +30,7 @@ export default function SystemBackupPolicyAddLocationModal({
       loading={locations.loading}
       searchValue={locations.search}
       onSearchChange={locations.setSearch}
+      infiniteScroll={locations.infiniteScroll}
       addedToast={t('pages.admin.systemBackupPolicies.tabs.locations.page.toast.added', {})}
       onAdded={refetch}
       onConfirm={(locationUuid) => createSystemBackupPolicyLocation(systemBackupPolicy.uuid, locationUuid)}

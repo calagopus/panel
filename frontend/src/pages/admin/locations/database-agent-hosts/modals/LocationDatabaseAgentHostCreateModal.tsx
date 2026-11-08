@@ -12,7 +12,7 @@ import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentHostSchema } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -27,9 +27,9 @@ export default function LocationDatabaseAgentHostCreateModal({
   const [loading, setLoading] = useState(false);
   const [databaseAgentHost, setDatabaseAgentHost] = useState<z.infer<typeof adminDatabaseAgentHostSchema> | null>(null);
 
-  const databaseAgentHosts = useSearchableResource<z.infer<typeof adminDatabaseAgentHostSchema>>({
+  const databaseAgentHosts = useInfiniteSearchableResource<z.infer<typeof adminDatabaseAgentHostSchema>>({
     queryKey: queryKeys.admin.databaseAgentHosts.all(),
-    fetcher: (search) => getDatabaseAgentHosts(1, search),
+    fetcher: (page, search) => getDatabaseAgentHosts(page, search),
   });
 
   const doCreate = () => {
@@ -66,6 +66,7 @@ export default function LocationDatabaseAgentHostCreateModal({
           searchable
           searchValue={databaseAgentHosts.search}
           onSearchChange={databaseAgentHosts.setSearch}
+          infiniteScroll={databaseAgentHosts.infiniteScroll}
           loading={databaseAgentHosts.loading}
         />
 

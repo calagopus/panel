@@ -9,7 +9,7 @@ import {
   adminSystemBackupPolicyUpdateSchema,
 } from '@/lib/schemas/admin/systemBackupPolicies.ts';
 import { emptyBackupRetention } from '@/lib/schemas/backupRetention.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type SystemBackupPolicyFormValues = z.infer<typeof adminSystemBackupPolicyUpdateSchema>;
@@ -43,7 +43,9 @@ export function useSystemBackupPolicyFormFields({
   canReadBackupConfigurations,
   doUpdate,
 }: {
-  backupConfigurations: ReturnType<typeof useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>>;
+  backupConfigurations: ReturnType<
+    typeof useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>
+  >;
   canReadBackupConfigurations: boolean;
   doUpdate: boolean;
 }): FieldDef<SystemBackupPolicyFormValues>[] {
@@ -75,6 +77,7 @@ export function useSystemBackupPolicyFormFields({
         searchable: true,
         searchValue: backupConfigurations.search,
         onSearchChange: backupConfigurations.setSearch,
+        infiniteScroll: backupConfigurations.infiniteScroll,
         allowDeselect: true,
         clearable: true,
         disabled: !canReadBackupConfigurations,

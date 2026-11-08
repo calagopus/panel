@@ -31,8 +31,8 @@ import { AdminServer, adminServerUpdateSchema } from '@/lib/schemas/admin/server
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import {
@@ -78,29 +78,29 @@ export default function ServerUpdate({ contextServer }: { contextServer: AdminSe
   useHydrateForm(form, contextServer, serverToFormValues);
   const syncDraft = useFormDraft(form, 'general');
 
-  const users = useSearchableResource<z.infer<typeof fullUserSchema>>({
+  const users = useInfiniteSearchableResource<z.infer<typeof fullUserSchema>>({
     queryKey: queryKeys.admin.users.all(),
-    fetcher: (search) => getUsers(1, search),
+    fetcher: (page, search) => getUsers(page, search),
     defaultSearchValue: contextServer?.owner.username,
     canRequest: canReadUsers,
   });
-  const nests = useSearchableResource<z.infer<typeof adminNestSchema>>({
+  const nests = useInfiniteSearchableResource<z.infer<typeof adminNestSchema>>({
     queryKey: queryKeys.admin.nests.all(),
-    fetcher: (search) => getNests(1, search),
+    fetcher: (page, search) => getNests(page, search),
     defaultSearchValue: contextServer?.nest.name,
     canRequest: canReadNests,
   });
-  const eggs = useSearchableResource<z.infer<typeof adminEggSchema>>({
+  const eggs = useInfiniteSearchableResource<z.infer<typeof adminEggSchema>>({
     queryKey: selectedNestUuid ? queryKeys.admin.nests.eggs(selectedNestUuid) : ['admin', 'nests', 'eggs'],
-    fetcher: (search) =>
-      selectedNestUuid ? getEggs(selectedNestUuid, 1, search) : Promise.resolve(getEmptyPaginationSet()),
+    fetcher: (page, search) =>
+      selectedNestUuid ? getEggs(selectedNestUuid, page, search) : Promise.resolve(getEmptyPaginationSet()),
     defaultSearchValue: contextServer?.egg.name,
     deps: [selectedNestUuid],
     canRequest: canReadEggs,
   });
-  const backupConfigurations = useSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
-    fetcher: (search) => getBackupConfigurations(1, search),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: contextServer?.backupConfiguration?.name,
     canRequest: canReadBackupConfigurations,
   });

@@ -8,7 +8,7 @@ import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function UserOAuthLinkAddModal({
@@ -19,9 +19,9 @@ export default function UserOAuthLinkAddModal({
 
   const [identifier, setIdentifier] = useState('');
 
-  const oauthProviders = useSearchableResource<z.infer<typeof adminOAuthProviderSchema>>({
+  const oauthProviders = useInfiniteSearchableResource<z.infer<typeof adminOAuthProviderSchema>>({
     queryKey: queryKeys.admin.oAuthProviders.all(),
-    fetcher: (search) => getOAuthProviders(1, search),
+    fetcher: (page, search) => getOAuthProviders(page, search),
   });
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export default function UserOAuthLinkAddModal({
       loading={oauthProviders.loading}
       searchValue={oauthProviders.search}
       onSearchChange={oauthProviders.setSearch}
+      infiniteScroll={oauthProviders.infiniteScroll}
       disabled={!identifier}
       addedToast={t('pages.admin.users.tabs.oauthLinks.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.users.oauthLinks(user.uuid)]}

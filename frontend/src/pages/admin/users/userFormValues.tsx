@@ -3,7 +3,7 @@ import { type FieldDef } from '@/elements/form-engine/index.ts';
 import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/users.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
-import { useSearchableResource } from '@/plugins/resource/useSearchableResource.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type UserFormValues = z.infer<typeof adminUserUpdateSchema>;
@@ -42,7 +42,7 @@ interface UserFormFieldsOptions {
   editingOtherUser: boolean;
   isUpdate: boolean;
   languages: string[];
-  roles: ReturnType<typeof useSearchableResource<z.infer<typeof roleSchema>>>;
+  roles: ReturnType<typeof useInfiniteSearchableResource<z.infer<typeof roleSchema>>>;
   canReadRoles: boolean;
 }
 
@@ -96,6 +96,7 @@ export function useUserFormFields({
         searchable: true,
         searchValue: roles.search,
         onSearchChange: roles.setSearch,
+        infiniteScroll: roles.infiniteScroll,
         allowDeselect: true,
         clearable: true,
         disabled: !canReadRoles,
