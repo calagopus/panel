@@ -320,27 +320,28 @@ impl CaptchaProvider {
         }
     }
 
-    pub fn to_csp_script_src(&self) -> &'static str {
+    pub fn to_csp_script_src(&self) -> &'static [&'static str] {
         match self {
-            CaptchaProvider::None => "",
-            CaptchaProvider::Turnstile { .. } => "https://challenges.cloudflare.com",
-            CaptchaProvider::Recaptcha { .. } => {
-                "https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/"
-            }
-            CaptchaProvider::Hcaptcha { .. } => "https://hcaptcha.com https://*.hcaptcha.com",
-            CaptchaProvider::FriendlyCaptcha { .. } => "",
-            CaptchaProvider::Cap { .. } => "'wasm-unsafe-eval'",
+            CaptchaProvider::None => &[],
+            CaptchaProvider::Turnstile { .. } => &["https://challenges.cloudflare.com"],
+            CaptchaProvider::Recaptcha { .. } => &[
+                "https://www.google.com/recaptcha/",
+                "https://www.gstatic.com/recaptcha/",
+            ],
+            CaptchaProvider::Hcaptcha { .. } => &["https://hcaptcha.com", "https://*.hcaptcha.com"],
+            CaptchaProvider::FriendlyCaptcha { .. } => &[],
+            CaptchaProvider::Cap { .. } => &["'wasm-unsafe-eval'"],
         }
     }
 
-    pub fn to_csp_style_src(&self) -> &'static str {
+    pub fn to_csp_style_src(&self) -> &'static [&'static str] {
         match self {
-            CaptchaProvider::None => "",
-            CaptchaProvider::Turnstile { .. } => "",
-            CaptchaProvider::Recaptcha { .. } => "",
-            CaptchaProvider::Hcaptcha { .. } => "https://hcaptcha.com https://*.hcaptcha.com",
-            CaptchaProvider::FriendlyCaptcha { .. } => "",
-            CaptchaProvider::Cap { .. } => "",
+            CaptchaProvider::None => &[],
+            CaptchaProvider::Turnstile { .. } => &[],
+            CaptchaProvider::Recaptcha { .. } => &[],
+            CaptchaProvider::Hcaptcha { .. } => &["https://hcaptcha.com", "https://*.hcaptcha.com"],
+            CaptchaProvider::FriendlyCaptcha { .. } => &[],
+            CaptchaProvider::Cap { .. } => &[],
         }
     }
 }
@@ -1035,8 +1036,8 @@ impl Deref for SettingsReadGuard<'_> {
 fn render_index_html(
     settings: &AppSettings,
     inactive_extensions: &[compact_str::CompactString],
-    variables: &crate::extensions::index_html::IndexHtmlVariables,
-) -> Result<String, anyhow::Error> {
+    contributions: &crate::extensions::index_html::IndexHtmlContributions,
+) -> Result<RenderedIndexHtml, anyhow::Error> {
     let mut environment = minijinja::Environment::new();
     environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
     environment.add_global(
@@ -1054,12 +1055,19 @@ fn render_index_html(
         anyhow::anyhow!("no frontend registered, call shared::register_frontend first")
     })?;
 
-    render_index_template(
+    let html = render_index_template(
         environment,
         index_html,
         inactive_extensions,
-        &variables.evaluate(settings),
-    )
+        &contributions.evaluate(settings),
+    )?;
+    let content_security_policy = contributions.content_security_policy(settings);
+
+    Ok(RenderedIndexHtml {
+        html: ArcedIndexHtml(Arc::new(html)),
+        content_security_policy: content_security_policy.render(),
+        uses_script_nonce: content_security_policy.uses_script_nonce(),
+    })
 }
 
 fn render_index_template(
@@ -1089,24 +1097,6 @@ fn render_index_template(
 #[derive(Clone)]
 pub struct ArcedIndexHtml(Arc<String>);
 
-// SAFETY: Just wrapping Arc
-unsafe impl arc_swap::RefCnt for ArcedIndexHtml {
-    type Base = String;
-
-    fn into_ptr(me: Self) -> *mut Self::Base {
-        arc_swap::RefCnt::into_ptr(me.0)
-    }
-
-    fn as_ptr(me: &Self) -> *mut Self::Base {
-        arc_swap::RefCnt::as_ptr(&me.0)
-    }
-
-    unsafe fn from_ptr(ptr: *const Self::Base) -> Self {
-        // SAFETY: Just wrapping Arc
-        Self(unsafe { arc_swap::RefCnt::from_ptr(ptr) })
-    }
-}
-
 impl AsRef<str> for ArcedIndexHtml {
     fn as_ref(&self) -> &str {
         &self.0
@@ -1116,6 +1106,26 @@ impl AsRef<str> for ArcedIndexHtml {
 impl AsRef<[u8]> for ArcedIndexHtml {
     fn as_ref(&self) -> &[u8] {
         self.0.as_bytes()
+    }
+}
+
+pub struct RenderedIndexHtml {
+    pub html: ArcedIndexHtml,
+    content_security_policy: String,
+    uses_script_nonce: bool,
+}
+
+impl RenderedIndexHtml {
+    #[inline]
+    pub fn uses_script_nonce(&self) -> bool {
+        self.uses_script_nonce
+    }
+
+    pub fn content_security_policy(&self, script_nonce: Option<&str>) -> std::borrow::Cow<'_, str> {
+        match script_nonce {
+            Some(nonce) => format!("{} 'nonce-{nonce}'", self.content_security_policy).into(),
+            None => std::borrow::Cow::Borrowed(&self.content_security_policy),
+        }
     }
 }
 
@@ -1237,9 +1247,10 @@ pub struct Settings {
     cached: arc_swap::ArcSwap<SettingsBuffer>,
     write_serializing: Semaphore,
 
-    rendered_index_html: arc_swap::ArcSwapAny<ArcedIndexHtml>,
+    rendered_index_html: arc_swap::ArcSwap<RenderedIndexHtml>,
     inactive_extensions: arc_swap::ArcSwap<Vec<compact_str::CompactString>>,
-    index_html_variables: arc_swap::ArcSwap<crate::extensions::index_html::IndexHtmlVariables>,
+    index_html_contributions:
+        arc_swap::ArcSwap<crate::extensions::index_html::IndexHtmlContributions>,
 
     database: Arc<crate::database::Database>,
 }
@@ -1280,9 +1291,11 @@ impl Settings {
     pub async fn new(database: Arc<crate::database::Database>) -> Result<Self, anyhow::Error> {
         let settings = Self::fetch_settings(&database).await?;
 
-        let rendered_index_html = render_index_html(&settings, &[], &Default::default())?;
-        let rendered_index_html =
-            arc_swap::ArcSwapAny::new(ArcedIndexHtml(Arc::new(rendered_index_html)));
+        let rendered_index_html = arc_swap::ArcSwap::from_pointee(render_index_html(
+            &settings,
+            &[],
+            &Default::default(),
+        )?);
 
         Ok(Self {
             cached: arc_swap::ArcSwap::from_pointee(SettingsBuffer::new(
@@ -1292,13 +1305,13 @@ impl Settings {
             write_serializing: Semaphore::new(1),
             rendered_index_html,
             inactive_extensions: arc_swap::ArcSwap::from_pointee(Vec::new()),
-            index_html_variables: arc_swap::ArcSwap::from_pointee(Default::default()),
+            index_html_contributions: arc_swap::ArcSwap::from_pointee(Default::default()),
             database,
         })
     }
 
     #[inline]
-    pub fn get_rendered_index_html(&self) -> ArcedIndexHtml {
+    pub fn get_rendered_index_html(&self) -> Arc<RenderedIndexHtml> {
         self.rendered_index_html.load_full()
     }
 
@@ -1320,23 +1333,23 @@ impl Settings {
         Ok(())
     }
 
-    /// Only stores the variables, they are rendered by the following `set_inactive_extensions`.
-    pub(crate) fn set_index_html_variables(
+    /// Only stores the contributions, they are rendered by the following `set_inactive_extensions`.
+    pub(crate) fn set_index_html_contributions(
         &self,
-        variables: crate::extensions::index_html::IndexHtmlVariables,
+        contributions: crate::extensions::index_html::IndexHtmlContributions,
     ) {
-        self.index_html_variables.store(Arc::new(variables));
+        self.index_html_contributions.store(Arc::new(contributions));
     }
 
     fn rerender_index_html(&self, settings: &AppSettings) -> Result<(), anyhow::Error> {
         let rendered_index_html = render_index_html(
             settings,
             &self.inactive_extensions.load(),
-            &self.index_html_variables.load(),
+            &self.index_html_contributions.load(),
         )?;
 
         self.rendered_index_html
-            .store(ArcedIndexHtml(Arc::new(rendered_index_html)));
+            .store(Arc::new(rendered_index_html));
 
         Ok(())
     }
@@ -1536,6 +1549,77 @@ impl Settings {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // RenderedIndexHtml
+    #[test]
+    fn rendered_index_html_puts_nonce_inside_script_src() {
+        let rendered = RenderedIndexHtml {
+            html: ArcedIndexHtml(Arc::new(String::new())),
+            content_security_policy: "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://ext.example".into(),
+            uses_script_nonce: true,
+        };
+
+        assert_eq!(
+            rendered.content_security_policy(None),
+            rendered.content_security_policy
+        );
+
+        let with_nonce = rendered.content_security_policy(Some("abc123"));
+        let directives: Vec<_> = with_nonce.split("; ").collect();
+        assert_eq!(directives.len(), 3);
+        let script_src: Vec<_> = directives[2].split(' ').collect();
+        assert_eq!(script_src[0], "script-src");
+        assert!(script_src.contains(&"'self'"));
+        assert!(script_src.contains(&"https://ext.example"));
+        assert!(script_src.contains(&"'nonce-abc123'"));
+        assert_eq!(
+            directives[..2],
+            ["default-src 'self'", "style-src 'self' 'unsafe-inline'"]
+        );
+    }
+
+    // CaptchaProvider::to_csp_script_src / to_csp_style_src
+    #[test]
+    fn captcha_csp_sources_are_single_tokens() {
+        for provider in [
+            CaptchaProvider::None,
+            CaptchaProvider::Turnstile {
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::Recaptcha {
+                v3: true,
+                threshold: 0.5,
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::Hcaptcha {
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::FriendlyCaptcha {
+                site_key: "public".into(),
+                api_key: "s3cr3t".into(),
+            },
+            CaptchaProvider::Cap {
+                api_url: "https://cap.example.com".into(),
+                site_key: "public".into(),
+                secret_key: "s3cr3t".into(),
+            },
+        ] {
+            for source in provider
+                .to_csp_script_src()
+                .iter()
+                .chain(provider.to_csp_style_src())
+            {
+                assert!(
+                    !source.is_empty()
+                        && !source.contains(|c: char| c.is_whitespace() || c == ';' || c == ','),
+                    "{source:?}"
+                );
+            }
+        }
+    }
 
     #[test]
     fn storage_driver_censors_its_s3_credentials() {

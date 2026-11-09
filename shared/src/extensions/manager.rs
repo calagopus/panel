@@ -272,7 +272,7 @@ impl ExtensionManager {
 
         state
             .settings
-            .set_index_html_variables(index_html_builder.finish());
+            .set_index_html_contributions(index_html_builder.finish());
 
         crate::permissions::USER_PERMISSIONS
             .write()

@@ -344,7 +344,8 @@ pub trait Extension: Send + Sync {
     }
 
     /// Your extension index.html entrypoint, this runs as soon as the database is migrated and before the webserver starts.
-    /// Variables added here are rendered into index.html and readable in your frontend with `this.getIndexVariable(name)`
+    /// Variables added here are rendered into index.html and readable in your frontend with `this.getIndexVariable(name)`,
+    /// CSP sources added here are allowed in the index.html `Content-Security-Policy`
     async fn initialize_index_html(
         &mut self,
         state: State,
