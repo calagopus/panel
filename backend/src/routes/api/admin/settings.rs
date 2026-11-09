@@ -107,6 +107,21 @@ mod put {
         twitter_card: Option<shared::settings::metadata::TwitterCard>,
         #[garde(skip)]
         indexable: Option<bool>,
+        #[garde(skip)]
+        pwa_enabled: Option<bool>,
+        #[garde(length(chars, min = 1, max = 64))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        pwa_name: Option<Option<compact_str::CompactString>>,
+        #[garde(length(chars, min = 1, max = 32))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        pwa_short_name: Option<Option<compact_str::CompactString>>,
+        #[garde(skip)]
+        pwa_display: Option<shared::settings::metadata::PwaDisplay>,
+        #[garde(pattern("^#[0-9a-fA-F]{6}$"))]
+        pwa_background_color: Option<compact_str::CompactString>,
+        #[garde(length(chars, min = 1, max = 255))]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        pwa_icon: Option<Option<compact_str::CompactString>>,
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -450,6 +465,24 @@ mod put {
             }
             if let Some(indexable) = metadata.indexable {
                 settings.metadata.indexable = indexable;
+            }
+            if let Some(pwa_enabled) = metadata.pwa_enabled {
+                settings.metadata.pwa_enabled = pwa_enabled;
+            }
+            if let Some(pwa_name) = metadata.pwa_name {
+                settings.metadata.pwa_name = pwa_name;
+            }
+            if let Some(pwa_short_name) = metadata.pwa_short_name {
+                settings.metadata.pwa_short_name = pwa_short_name;
+            }
+            if let Some(pwa_display) = metadata.pwa_display {
+                settings.metadata.pwa_display = pwa_display;
+            }
+            if let Some(pwa_background_color) = metadata.pwa_background_color {
+                settings.metadata.pwa_background_color = pwa_background_color;
+            }
+            if let Some(pwa_icon) = metadata.pwa_icon {
+                settings.metadata.pwa_icon = pwa_icon;
             }
         }
         if let Some(user) = data.user {

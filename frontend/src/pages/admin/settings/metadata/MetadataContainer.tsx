@@ -55,6 +55,7 @@ export default function MetadataContainer() {
     assetUrls: assets.items.map((a) => a.url),
     descriptionPlaceholder: defaultDescription,
     ogImagePlaceholder: defaultOgImage,
+    pwaNamePlaceholder: app.name,
   });
 
   return (
@@ -66,7 +67,14 @@ export default function MetadataContainer() {
           <SettingsSaveButton loading={loading} disabled={!form.isValid()} />
           <Button
             variant='outline'
-            onClick={() => form.setValues({ description: defaultDescription, ogImage: defaultOgImage })}
+            onClick={() =>
+              form.setValues({
+                description: defaultDescription,
+                ogImage: defaultOgImage,
+                pwaName: app.name,
+                pwaShortName: app.name,
+              })
+            }
             disabled={loading}
           >
             {t('pages.admin.settings.tabs.metadata.page.button.autofill', {})}

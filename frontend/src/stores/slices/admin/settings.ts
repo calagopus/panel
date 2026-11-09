@@ -53,6 +53,12 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     ogImage: null,
     twitterCard: 'summary_large_image',
     indexable: true,
+    pwaEnabled: true,
+    pwaName: null,
+    pwaShortName: null,
+    pwaDisplay: 'standalone',
+    pwaBackgroundColor: '#222222',
+    pwaIcon: null,
   },
   server: {
     maxFileManagerViewSize: 10 * 1024 * 1024 * 1024,

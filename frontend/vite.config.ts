@@ -212,6 +212,7 @@ export default defineConfig({
       },
       '/assets': `http://localhost:${process.env.BACKEND_PORT ?? 8000}`,
       '/avatars': `http://localhost:${process.env.BACKEND_PORT ?? 8000}`,
+      '/site.webmanifest': `http://localhost:${process.env.BACKEND_PORT ?? 8000}`,
     },
     allowedHosts: true,
   },

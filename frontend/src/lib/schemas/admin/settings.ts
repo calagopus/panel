@@ -310,6 +310,15 @@ export const adminSettingsMetadataSchema = z.object({
   ogImage: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   twitterCard: z.enum(['summary', 'summary_large_image']),
   indexable: z.boolean(),
+  pwaEnabled: z.boolean(),
+  pwaName: z.preprocess(nullableString, z.string().min(1).max(64).nullable()),
+  pwaShortName: z.preprocess(nullableString, z.string().min(1).max(32).nullable()),
+  pwaDisplay: z.enum(['fullscreen', 'standalone', 'minimal_ui', 'browser']),
+  pwaBackgroundColor: z.string().regex(
+    /^#[0-9a-fA-F]{6}$/,
+    ruleMessage((t) => t('common.form.rule.hexColor', {})),
+  ),
+  pwaIcon: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
 });
 
 export const adminSettingsUpdatesSchema = z.object({

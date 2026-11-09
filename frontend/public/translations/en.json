@@ -2425,12 +2425,28 @@
                   "themeColor": "Theme Color",
                   "themeColorDescription": "Tints the browser UI on mobile and link previews.",
                   "indexable": "Allow Search Engine Indexing",
-                  "twitterCard": "Twitter Card Type"
+                  "twitterCard": "Twitter Card Type",
+                  "pwa": "Installable App (PWA)",
+                  "pwaName": "App Name",
+                  "pwaNameDescription": "Shown in the install prompt and on the splash screen.",
+                  "pwaShortName": "Short App Name",
+                  "pwaShortNameDescription": "Shown under the home screen icon when the full name does not fit.",
+                  "pwaIcon": "App Icon",
+                  "pwaIconDescription": "A square PNG of at least 512x512, or an SVG.",
+                  "pwaDisplay": "Display Mode",
+                  "pwaBackgroundColor": "Splash Screen Color",
+                  "pwaBackgroundColorDescription": "Background of the splash screen shown while the app opens."
                 },
                 "enum": {
                   "twitterCard": {
                     "summary": "Summary",
                     "summaryLargeImage": "Summary with Large Image"
+                  },
+                  "pwaDisplay": {
+                    "standalone": "Standalone",
+                    "fullscreen": "Fullscreen",
+                    "minimalUi": "Minimal UI",
+                    "browser": "Browser Tab"
                   }
                 },
                 "placeholder": {

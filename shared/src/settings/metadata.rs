@@ -15,6 +15,26 @@ pub enum TwitterCard {
     SummaryLargeImage,
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum PwaDisplay {
+    Fullscreen,
+    Standalone,
+    MinimalUi,
+    Browser,
+}
+
+impl PwaDisplay {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            PwaDisplay::Fullscreen => "fullscreen",
+            PwaDisplay::Standalone => "standalone",
+            PwaDisplay::MinimalUi => "minimal-ui",
+            PwaDisplay::Browser => "browser",
+        }
+    }
+}
+
 #[derive(Clone, ToSchema, Serialize, Deserialize)]
 pub struct AppSettingsMetadata {
     pub description: Option<compact_str::CompactString>,
@@ -22,6 +42,13 @@ pub struct AppSettingsMetadata {
     pub og_image: Option<compact_str::CompactString>,
     pub twitter_card: TwitterCard,
     pub indexable: bool,
+
+    pub pwa_enabled: bool,
+    pub pwa_name: Option<compact_str::CompactString>,
+    pub pwa_short_name: Option<compact_str::CompactString>,
+    pub pwa_display: PwaDisplay,
+    pub pwa_background_color: compact_str::CompactString,
+    pub pwa_icon: Option<compact_str::CompactString>,
 }
 
 #[derive(Serialize)]
@@ -31,6 +58,7 @@ pub struct ResolvedMetadata {
     pub og_image: compact_str::CompactString,
     pub twitter_card: &'static str,
     pub robots: &'static str,
+    pub pwa_enabled: bool,
 }
 
 impl AppSettingsMetadata {
@@ -67,7 +95,37 @@ impl AppSettingsMetadata {
             } else {
                 "noindex, nofollow"
             },
+            pwa_enabled: self.pwa_enabled,
         }
+    }
+
+    pub fn web_manifest(&self, app: &AppSettingsApp) -> serde_json::Value {
+        let icons = match self.pwa_icon.as_deref() {
+            Some(icon) if icon.ends_with(".svg") => serde_json::json!([
+                { "src": icon, "sizes": "any", "type": "image/svg+xml" },
+            ]),
+            Some(icon) => serde_json::json!([
+                { "src": icon, "sizes": "192x192" },
+                { "src": icon, "sizes": "512x512" },
+            ]),
+            None => serde_json::json!([
+                { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+                { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
+            ]),
+        };
+
+        serde_json::json!({
+            "name": self.pwa_name.as_deref().unwrap_or(&app.name),
+            "short_name": self.pwa_short_name.as_deref().unwrap_or(&app.name),
+            "description": self.resolve(app).description,
+            "start_url": "/",
+            "scope": "/",
+            "display": self.pwa_display.as_str(),
+            "background_color": self.pwa_background_color,
+            "theme_color": self.theme_color,
+            "orientation": "any",
+            "icons": icons,
+        })
     }
 }
 
@@ -88,7 +146,16 @@ impl SettingsSerializeExt for AppSettingsMetadata {
                     TwitterCard::SummaryLargeImage => "summary_large_image",
                 },
             )
-            .write_raw_setting("indexable", self.indexable.to_compact_string()))
+            .write_raw_setting("indexable", self.indexable.to_compact_string())
+            .write_raw_setting("pwa_enabled", self.pwa_enabled.to_compact_string())
+            .write_raw_setting("pwa_name", self.pwa_name.as_deref().unwrap_or(""))
+            .write_raw_setting(
+                "pwa_short_name",
+                self.pwa_short_name.as_deref().unwrap_or(""),
+            )
+            .write_raw_setting("pwa_display", self.pwa_display.as_str())
+            .write_raw_setting("pwa_background_color", &*self.pwa_background_color)
+            .write_raw_setting("pwa_icon", self.pwa_icon.as_deref().unwrap_or("")))
     }
 }
 
@@ -118,6 +185,28 @@ impl SettingsDeserializeExt for AppSettingsMetadataDeserializer {
                 .take_raw_setting("indexable")
                 .map(|s| s == "true")
                 .unwrap_or(true),
+            pwa_enabled: deserializer
+                .take_raw_setting("pwa_enabled")
+                .map(|s| s == "true")
+                .unwrap_or(true),
+            pwa_name: deserializer
+                .take_raw_setting("pwa_name")
+                .and_then(|s| s.into_optional()),
+            pwa_short_name: deserializer
+                .take_raw_setting("pwa_short_name")
+                .and_then(|s| s.into_optional()),
+            pwa_display: match deserializer.take_raw_setting("pwa_display").as_deref() {
+                Some("fullscreen") => PwaDisplay::Fullscreen,
+                Some("minimal-ui") => PwaDisplay::MinimalUi,
+                Some("browser") => PwaDisplay::Browser,
+                _ => PwaDisplay::Standalone,
+            },
+            pwa_background_color: deserializer
+                .take_raw_setting("pwa_background_color")
+                .unwrap_or_else(|| "#222222".into()),
+            pwa_icon: deserializer
+                .take_raw_setting("pwa_icon")
+                .and_then(|s| s.into_optional()),
         }))
     }
 }

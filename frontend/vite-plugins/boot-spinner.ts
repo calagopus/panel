@@ -7,6 +7,8 @@ import { fetchBackendExtensionVariables } from './extension-variables.ts';
 const SPINNER_CSS = path.resolve(import.meta.dirname, '../src/elements/feedback/spinner.css');
 const EXTENSIONS_DIR = path.resolve(import.meta.dirname, '../extensions');
 
+const MANIFEST_LINK = '<link rel="manifest" href="/site.webmanifest"/>';
+
 const DEFAULT_SPINNER =
   '<div style="display:flex;align-items:center;justify-content:center;padding:1.5rem 0"><span class="spinner" aria-label="Loading Spinner"></span></div>';
 
@@ -88,7 +90,12 @@ export function bootSpinner(): Plugin {
             ? `{% if "${extension[0]}" not in inactive_extensions %}{% set boot %}{% filter boot_template("${extension[0]}") %}${rawTemplate(extension[1])}{% endfilter %}{% endset %}{% if boot %}{{ boot }}{% else %}${DEFAULT_SPINNER}{% endif %}{% else %}${DEFAULT_SPINNER}{% endif %}`
             : DEFAULT_SPINNER;
 
+          if (!html.includes(MANIFEST_LINK)) {
+            throw new Error(`[boot-spinner] index.html must contain ${MANIFEST_LINK}`);
+          }
+
           html = html
+            .replace(MANIFEST_LINK, `{% if metadata.pwa_enabled %}${MANIFEST_LINK}{% endif %}`)
             .replace(
               /(<link rel="stylesheet"[^>]*? href="\/assets\/extension-([a-z0-9_]+)\.[^"/]+\.css")/g,
               '$1{% if "$2" in inactive_extensions %} disabled{% endif %}',

@@ -2425,12 +2425,28 @@
                   "themeColor": "Themenfarbe",
                   "themeColorDescription": "Färbt die Browser-Oberfläche auf Mobilgeräten und Link-Vorschauen.",
                   "indexable": "Indexierung durch Suchmaschinen erlauben",
-                  "twitterCard": "Twitter-Card-Typ"
+                  "twitterCard": "Twitter-Card-Typ",
+                  "pwa": "Installierbare App (PWA)",
+                  "pwaName": "App-Name",
+                  "pwaNameDescription": "Wird in der Installationsaufforderung und auf dem Startbildschirm angezeigt.",
+                  "pwaShortName": "Kurzer App-Name",
+                  "pwaShortNameDescription": "Wird unter dem Symbol auf dem Startbildschirm angezeigt, wenn der volle Name nicht passt.",
+                  "pwaIcon": "App-Symbol",
+                  "pwaIconDescription": "Ein quadratisches PNG mit mindestens 512x512 oder ein SVG.",
+                  "pwaDisplay": "Anzeigemodus",
+                  "pwaBackgroundColor": "Farbe des Startbildschirms",
+                  "pwaBackgroundColorDescription": "Hintergrund des Startbildschirms, der beim Öffnen der App angezeigt wird."
                 },
                 "enum": {
                   "twitterCard": {
                     "summary": "Zusammenfassung",
                     "summaryLargeImage": "Zusammenfassung mit großem Bild"
+                  },
+                  "pwaDisplay": {
+                    "standalone": "Eigenständig",
+                    "fullscreen": "Vollbild",
+                    "minimalUi": "Minimale Oberfläche",
+                    "browser": "Browser-Tab"
                   }
                 },
                 "placeholder": {

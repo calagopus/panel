@@ -1349,6 +1349,28 @@ pub async fn handle_startup() -> Result<
         }),
     );
 
+    let manifest_state = state.clone();
+    let router = router.route(
+        "/site.webmanifest",
+        axum::routing::get(|| async move {
+            let settings = manifest_state.settings.get().await?;
+            if manifest_state.env.app_disable_frontend || !settings.metadata.pwa_enabled {
+                return ApiResponse::error("route not found")
+                    .with_status(StatusCode::NOT_FOUND)
+                    .ok();
+            }
+
+            let manifest = settings.metadata.web_manifest(&settings.app);
+            drop(settings);
+
+            ApiResponse::new(Body::from(serde_json::to_vec(&manifest)?))
+                .with_header("Content-Type", "application/manifest+json")
+                .with_header("Cache-Control", "no-cache")
+                .with_header("X-Content-Type-Options", "nosniff")
+                .ok()
+        }),
+    );
+
     *state.app_router.write().await = Some(router);
 
     Ok((sentry_guard, _env_guard, state))
