@@ -4456,11 +4456,19 @@
         "eggConfigurations": {
           "title": "Egg-Konfigurationen",
           "resourceName": "Egg-Konfiguration",
+          "dropzone": {
+            "title": "Lege einige Dateien hier ab, um sie als Egg-Konfigurationen zu importieren",
+            "subtitle": "Loslassen, um den Import zu starten"
+          },
           "table": {
             "columns": {
               "order": "Reihenfolge",
               "appliesTo": "Gilt für"
             }
+          },
+          "toast": {
+            "imported": "Egg-Konfiguration importiert.",
+            "parseFailed": "Egg-Konfiguration konnte nicht verarbeitet werden: {error}"
           },
           "tabs": {
             "general": {
@@ -4566,6 +4574,9 @@
                     "allowCustomStartupCommand": "Benutzerdefinierten Startup-Befehl erlauben",
                     "allowCustomStartupCommandDescription": "Erlaube Benutzern, ihre eigenen, nicht vordefinierten Startup-Befehle festzulegen."
                   }
+                },
+                "toast": {
+                  "exported": "Egg-Konfiguration exportiert."
                 },
                 "modal": {
                   "delete": {

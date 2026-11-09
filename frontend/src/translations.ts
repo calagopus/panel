@@ -4422,11 +4422,19 @@ const baseTranslations = defineTranslations({
         eggConfigurations: {
           title: 'Egg Configurations',
           resourceName: 'Egg Configuration',
+          dropzone: {
+            title: 'Drop some files here to import as Egg Configurations',
+            subtitle: 'Release to start importing',
+          },
           table: {
             columns: {
               order: 'Order',
               appliesTo: 'Applies To',
             },
+          },
+          toast: {
+            imported: 'Egg Configuration imported.',
+            parseFailed: 'Failed to parse egg configuration: {error}',
           },
           tabs: {
             general: {
@@ -4540,6 +4548,9 @@ const baseTranslations = defineTranslations({
                     allowCustomStartupCommandDescription:
                       'Allow users to set their own, non-predefined startup commands.',
                   },
+                },
+                toast: {
+                  exported: 'Egg Configuration exported.',
                 },
                 modal: {
                   delete: {

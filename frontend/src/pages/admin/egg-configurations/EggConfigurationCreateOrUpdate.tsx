@@ -14,7 +14,9 @@ import Alert from '@/elements/feedback/Alert.tsx';
 import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ResourceExportMenu from '@/elements/ResourceExportMenu.tsx';
 import { eggConfigurationMatcherUsesEggs } from '@/lib/domain/eggConfiguration.ts';
+import { downloadResourceFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   adminEggConfigurationSchema,
@@ -76,6 +78,19 @@ export default function EggConfigurationCreateOrUpdate({
   });
 
   useHydrateForm(form, contextEggConfiguration, eggConfigurationToFormValues);
+
+  const doExport = (format: ResourceExportFormat) => {
+    if (!contextEggConfiguration) return;
+
+    downloadResourceFile(
+      adminEggConfigurationUpdateSchema,
+      contextEggConfiguration,
+      `egg-configuration-${contextEggConfiguration.uuid}`,
+      format,
+    );
+
+    addToast(t('pages.admin.eggConfigurations.tabs.general.page.toast.exported', {}), 'success');
+  };
 
   useEffect(() => {
     loadServerRoutes()
@@ -155,6 +170,7 @@ export default function EggConfigurationCreateOrUpdate({
                 {t('common.button.saveAndStay', {})}
               </Button>
             )}
+            {contextEggConfiguration && <ResourceExportMenu loading={loading} onExport={doExport} />}
           </AdminCan>
           {contextEggConfiguration && (
             <AdminCan action='egg-configurations.create'>
