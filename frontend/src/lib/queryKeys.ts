@@ -234,6 +234,7 @@ const admin = {
   health: {
     nodes: () => ['admin', 'health', 'nodes'] as const,
     general: () => ['admin', 'health', 'general'] as const,
+    proxies: () => ['admin', 'health', 'proxies'] as const,
   },
 
   emailTemplates: {

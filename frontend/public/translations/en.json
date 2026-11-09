@@ -2309,6 +2309,7 @@
                   "generalHealth": "General Health",
                   "extensionMigrationHealth": "Extension Migration Health",
                   "desyncNodes": "Desync Nodes",
+                  "reverseProxy": "Reverse Proxy",
                   "debugMode": "Debug Mode"
                 },
                 "appliedMigrations": "Applied Migrations ({percent}%)",
@@ -2317,6 +2318,13 @@
                 "noExtensions": "No extensions found.",
                 "nodesSynced": "Seems like all nodes have a synced clock (within 5 seconds of panel clock). ({failed} failed to check)",
                 "nodesDesync": "Some nodes have desync clocks (over 5 seconds off of the panel's clock). This can cause file download/console issues. ({desync} desync, {failed} failed to check)",
+                "alert": {
+                  "flagged": "Some health checks need attention: {cards}"
+                },
+                "proxiesOk": "No IP address is shared by an unusual number of users. ({activeUsers} active users in the last 7 days)",
+                "proxiesSuspicious": "Some IP addresses are shared by an unusual number of users. This usually means the panel sees the IP of a reverse proxy instead of the real client IP. ({activeUsers} active users in the last 7 days)",
+                "proxyHintUntrusted": "Add this IP to `APP_TRUSTED_PROXIES` if it belongs to your reverse proxy.",
+                "proxyHintTrusted": "This IP is already trusted, make sure the proxy sends an `X-Forwarded-For` or `X-Real-IP` header.",
                 "debugEnabled": "Debug mode is currently enabled.",
                 "debugDisabled": "Debug mode is currently disabled.",
                 "debugResetNote": "This setting will be reset to the default ({default}) when the application restarts.",
@@ -2326,6 +2334,10 @@
                   "total": "Total",
                   "id": "ID",
                   "desync": "Desync",
+                  "ip": "IP",
+                  "users": "Users",
+                  "sessions": "Sessions",
+                  "hint": "Hint",
                   "appliedValue": "{applied} ({percent}%)"
                 },
                 "button": {

@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(DISTINCT user_sessions.user_uuid) AS \"count!\"\n                        FROM user_sessions\n                        WHERE user_sessions.last_used > NOW() - INTERVAL '7 days'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "c0ddb574c8cd897eba7e03000cb8c7ad4b87b828314c441bd82b1926c0bf91a3"
+}

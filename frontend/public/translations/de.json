@@ -2309,6 +2309,7 @@
                   "generalHealth": "Allgemeiner Zustand",
                   "extensionMigrationHealth": "Erweiterungsmigrations-Zustand",
                   "desyncNodes": "Asynchrone Nodes",
+                  "reverseProxy": "Reverse Proxy",
                   "debugMode": "Debug-Modus"
                 },
                 "appliedMigrations": "Angewendete Migrationen ({percent}%)",
@@ -2317,6 +2318,13 @@
                 "noExtensions": "Keine Erweiterungen gefunden.",
                 "nodesSynced": "Es scheint, als hätten alle Nodes eine synchrone Uhr (innerhalb von 5 Sekunden zur Panel-Uhr). ({failed} Prüfungen fehlgeschlagen)",
                 "nodesDesync": "Einige Nodes haben asynchrone Uhren (mehr als 5 Sekunden Abweichung von der Panel-Uhr). Dies kann zu Problemen beim Dateidownload oder der Konsole führen. ({desync} asynchron, {failed} Prüfungen fehlgeschlagen)",
+                "alert": {
+                  "flagged": "Einige Zustandsprüfungen erfordern Aufmerksamkeit: {cards}"
+                },
+                "proxiesOk": "Keine IP-Adresse wird von ungewöhnlich vielen Benutzern geteilt. ({activeUsers} aktive Benutzer in den letzten 7 Tagen)",
+                "proxiesSuspicious": "Einige IP-Adressen werden von ungewöhnlich vielen Benutzern geteilt. Das bedeutet meist, dass das Panel die IP eines Reverse Proxys statt der echten Client-IP sieht. ({activeUsers} aktive Benutzer in den letzten 7 Tagen)",
+                "proxyHintUntrusted": "Füge diese IP zu `APP_TRUSTED_PROXIES` hinzu, falls sie zu deinem Reverse Proxy gehört.",
+                "proxyHintTrusted": "Diese IP ist bereits vertrauenswürdig, stelle sicher, dass der Proxy einen `X-Forwarded-For`- oder `X-Real-IP`-Header sendet.",
                 "debugEnabled": "Der Debug-Modus ist derzeit aktiviert. Im Debug-Modus werden zusätzliche Informationen protokolliert, die bei der Fehlersuche helfen können. Du solltest den Debug-Modus in der Produktion nicht aktiviert lassen.",
                 "debugDisabled": "Der Debug-Modus ist derzeit deaktiviert. Aktiviere den Debug-Modus nur, wenn du Probleme untersuchst.",
                 "debugResetNote": "Hinweis: Diese Einstellung wird beim nächsten Neustart der Anwendung auf den Standardwert ({default}) zurückgesetzt.",
@@ -2326,6 +2334,10 @@
                   "total": "Gesamt",
                   "id": "ID",
                   "desync": "Asynchron",
+                  "ip": "IP",
+                  "users": "Benutzer",
+                  "sessions": "Sitzungen",
+                  "hint": "Hinweis",
                   "appliedValue": "{applied} ({percent}%)"
                 },
                 "button": {
