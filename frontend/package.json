@@ -19,9 +19,8 @@
     "build:translations": "tsx build-translations.mts",
     "diff:translations": "tsx diff-translations.mts",
     "format:translations": "tsx format-translations.mts",
-    "biome:validate": "biome format --css-parse-tailwind-directives=true && biome lint --css-parse-tailwind-directives=true && biome check",
-    "biome:fix": "biome format --write --css-parse-tailwind-directives=true && biome lint --write --css-parse-tailwind-directives=true && biome check --write",
-    "biome:fix-unsafe": "biome format --write --css-parse-tailwind-directives=true && biome lint --write --css-parse-tailwind-directives=true && biome check --write --unsafe"
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix"
   },
   "dependencies": {
     "@cap.js/wasm": "0.0.8",
@@ -100,7 +99,6 @@
     "zustand-utils": "^2.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.4",
     "@types/events": "^3.0.3",
     "@types/grecaptcha": "^3.0.9",
     "@types/js-yaml": "^4.0.9",
@@ -116,6 +114,7 @@
     "globals": "^17.14.0",
     "monaco-editor": "^0.57.0",
     "oxc-transform-react": "^0.156.0",
+    "oxlint": "^1.92.0",
     "tsx": "^4.23.15",
     "typedoc": "^0.28.20",
     "typedoc-plugin-rename-defaults": "^0.7.3",

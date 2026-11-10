@@ -28,7 +28,9 @@ function readClipboard(): Promise<string> {
       const successful = document.execCommand('paste');
       const value = textArea.value;
       textArea.remove();
-      successful && value ? resolve(value) : reject();
+
+      if (successful && value) resolve(value)
+      else reject();
     }).catch(() => {
       const result = window.prompt(getTranslations().t('elements.pasteOnClick.toast.pasteManual', {}), '');
       if (result === null) {

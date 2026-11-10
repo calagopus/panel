@@ -46,9 +46,9 @@ const booleanValues = (column: Column, engine: DatabaseExplorerContextType['engi
   const type = column.typeName.trim().toLowerCase();
 
   if (engine === 'postgres') return type === 'boolean' ? ['f', 't'] : null;
-  if (engine === 'mysql') return /^tinyint\(1\)/.test(type) ? ['0', '1'] : null;
+  if (engine === 'mysql') return type.startsWith('tinyint(1)') ? ['0', '1'] : null;
 
-  return /^bool/.test(type) ? ['0', '1'] : null;
+  return type.startsWith('bool') ? ['0', '1'] : null;
 };
 
 function ValuePicker({

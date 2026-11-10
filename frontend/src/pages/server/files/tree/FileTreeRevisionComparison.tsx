@@ -107,7 +107,10 @@ export default function FileTreeRevisionComparison({
             disabled={!revisions}
             leftSection={<FontAwesomeIcon icon={faRotateLeft} />}
             onClick={() => {
-              if (revisions) dirty ? setRestoreConfirm(true) : onRestore(revisions.original);
+              if (!revisions) return;
+
+              if (dirty) setRestoreConfirm(true)
+              else onRestore(revisions.original)
             }}
           >
             {t('pages.server.files.drawer.revisions.tooltip.restore', {})}

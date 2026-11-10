@@ -49,7 +49,6 @@ interface UserFormFieldsOptions {
 export function useUserFormFields({
   isRootAdmin,
   editingOtherUser,
-  isUpdate,
   languages,
   roles,
   canReadRoles,

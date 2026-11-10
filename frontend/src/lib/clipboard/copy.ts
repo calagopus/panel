@@ -26,7 +26,9 @@ export function copyToClipboard(rawText: string) {
     textArea.select();
 
     return new Promise<void>((resolve, reject) => {
-      document.execCommand('copy') ? resolve() : reject();
+      if (document.execCommand('copy')) resolve()
+      else reject();
+
       textArea.remove();
     }).catch(() => {
       const successful = window.prompt(getTranslations().t('elements.copyOnClick.toast.copyManual', {}), text);

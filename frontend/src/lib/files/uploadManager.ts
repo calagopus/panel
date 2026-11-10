@@ -1263,7 +1263,7 @@ export function cancelAllUploads(scope?: string, options?: { silent?: boolean })
     settledErrorBatches.delete(batchId);
   });
 
-  for (const countKey of [...folderFileCounts.keys()]) {
+  for (const countKey of folderFileCounts.keys()) {
     if (scope === undefined || countKey.startsWith(`${scope}\n`)) folderFileCounts.delete(countKey);
   }
 

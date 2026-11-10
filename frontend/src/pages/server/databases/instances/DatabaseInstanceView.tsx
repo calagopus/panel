@@ -522,7 +522,7 @@ export default function DatabaseInstanceView() {
 
               <div className='grid xl:grid-cols-4 gap-4'>
                 <div className='xl:col-span-3 flex flex-col h-[60vh] xl:h-auto'>
-                  <DatabaseInstanceStats instance={instance} />
+                  <DatabaseInstanceStats />
                 </div>
 
                 <div className='flex flex-col'>

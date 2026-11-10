@@ -149,7 +149,7 @@ function ipv6Bytes(address: string): number[] {
   const headBytes = expand(head ? head.split(':') : []);
   const tailBytes = expand(tail ? tail.split(':') : []);
 
-  return [...headBytes, ...new Array(16 - headBytes.length - tailBytes.length).fill(0), ...tailBytes];
+  return [...headBytes, ...Array.from<number>({length: 16 - headBytes.length - tailBytes.length}).fill(0), ...tailBytes];
 }
 
 function hasZeroedHostBits(bytes: number[], length: number): boolean {

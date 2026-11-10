@@ -1,22 +1,16 @@
 import { faMemory, faMicrochip, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useMemo, useRef } from 'react';
-import { z } from 'zod';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import ChartSyncGroup from '@/elements/charts/ChartSyncGroup.tsx';
 import StreamChart from '@/elements/charts/StreamChart.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import { formatBytes, formatPercent, useStreamChart } from '@/lib/chart.ts';
 import { mbToBytes } from '@/lib/format/size.ts';
-import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-export default function DatabaseInstanceStats({
-  instance,
-}: {
-  instance: z.infer<typeof serverDatabaseInstanceSchema>;
-}) {
+export default function DatabaseInstanceStats() {
   const { t } = useTranslations();
   const usage = useServerStore((state) => state.databaseInstanceUsage);
 

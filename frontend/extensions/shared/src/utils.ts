@@ -66,7 +66,6 @@ export type HookableComponent<P extends object> = React.FC<P> & HookableComponen
 
 export function makeComponentHookable<
   P extends object,
-  // biome-ignore lint/suspicious/noExplicitAny: We want to allow any additional components without forcing the caller to specify them
   AdditionalComponents extends Record<string, React.FC<any>> = {},
 >(
   Component: React.ComponentType<P>,
@@ -116,9 +115,7 @@ export function makeComponentHookable<
 }
 
 function unwrapZodObject(schema: z.ZodTypeAny): {
-  // biome-ignore lint/suspicious/noExplicitAny: its fine
   inner: z.ZodObject<any>;
-  // biome-ignore lint/suspicious/noExplicitAny: its fine
   rewrap: (s: z.ZodObject<any>) => z.ZodTypeAny;
 } | null {
   if (schema instanceof z.ZodObject) {
@@ -150,12 +147,10 @@ function unwrapZodObject(schema: z.ZodTypeAny): {
     if (result)
       return {
         inner: result.inner,
-        // biome-ignore lint/suspicious/noExplicitAny: its fine
         rewrap: (s) => result.rewrap(s).default((schema as any)._zod.def.defaultValue),
       };
   }
   if ('unwrap' in schema && !(schema instanceof z.ZodObject)) {
-    // biome-ignore lint/suspicious/noExplicitAny: its fine
     const result = unwrapZodObject((schema as any).unwrap() as z.ZodTypeAny);
     if (result) return { inner: result.inner, rewrap: result.rewrap };
   }

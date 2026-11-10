@@ -36,7 +36,7 @@ export interface SchedulesSlice {
   setScheduleSteps: (scheduleSteps: ServerScheduleStep[]) => void;
 }
 
-export const createSchedulesSlice: StateCreator<ServerStore, [], [], SchedulesSlice> = (set, get): SchedulesSlice => ({
+export const createSchedulesSlice: StateCreator<ServerStore, [], [], SchedulesSlice> = (set, _get): SchedulesSlice => ({
   runningScheduleSteps: new Map(),
   scheduleCompletions: new Map(),
 

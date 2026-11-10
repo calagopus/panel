@@ -108,17 +108,17 @@ export class Extension {
   }
 
   // Your extension entrypoint, this runs when the page is loaded
-  public initialize(ctx: ExtensionContext): void {
+  public initialize(_ctx: ExtensionContext): void {
     // to be implemented
   }
 
   // Your extension mantine theme entrypoint, this runs when the page is loaded
-  public initializeMantineTheme(ctx: ExtensionContext): MantineThemeOverride {
+  public initializeMantineTheme(_ctx: ExtensionContext): MantineThemeOverride {
     return {};
   }
 
   // Your extension can also provide a resolver for css variables, this runs when the page is loaded
-  public initializeMantineCssResolver(ctx: ExtensionContext): CSSVariablesResolver | null {
+  public initializeMantineCssResolver(_ctx: ExtensionContext): CSSVariablesResolver | null {
     return null;
   }
 
@@ -128,7 +128,7 @@ export class Extension {
    *
    * Optimally (if applies) make sure your calls are globally unique, for example by prepending them with `yourauthorname_yourextensioname_`
    */
-  public processCall(ctx: ExtensionContext, name: string, args: object): unknown {
+  public processCall(ctx: ExtensionContext, _name: string, _args: object): unknown {
     return ctx.skip();
   }
 }
