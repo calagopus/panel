@@ -1,40 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ settings.app.language }}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="darkreader-lock" />
-    <link class="app-icon" rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link class="app-icon" rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link class="app-icon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preload" href="/api/icons" as="fetch" crossorigin />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="darkreader-lock"/>
+    <link class="app-icon" rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+    <link class="app-icon" rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+    <link class="app-icon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
+    <link rel="manifest" href="/site.webmanifest"/>
+    <link rel="preload" href="/api/icons" as="fetch" crossorigin/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"/>
 
     <!-- Primary & Social Embed Meta Tags (Discord, Twitter, OpenGraph) -->
     <title>{{ settings.app.name }}</title>
-    <meta name="title" content="{{ settings.app.name }}" />
-    <meta name="description" content="{{ metadata.description }}" />
-    <meta name="theme-color" content="{{ metadata.theme_color }}" id="meta-theme-color" />
-    <meta name="robots" content="{{ metadata.robots }}" />
+    <meta name="title" content="{{ settings.app.name }}"/>
+    <meta name="description" content="{{ metadata.description }}"/>
+    <meta name="theme-color" content="{{ metadata.theme_color }}" id="meta-theme-color"/>
+    <meta name="robots" content="{{ metadata.robots }}"/>
 
     <!-- Open Graph / Facebook / Discord -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ settings.app.url }}" />
-    <meta property="og:title" content="{{ settings.app.name }}" id="meta-og-title" />
-    <meta property="og:description" content="{{ metadata.description }}" id="meta-og-desc" />
-    <meta property="og:image" content="{{ metadata.og_image }}" id="meta-og-image" />
-    <meta property="og:site_name" content="{{ settings.app.name }}" />
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ settings.app.url }}"/>
+    <meta property="og:title" content="{{ settings.app.name }}" id="meta-og-title"/>
+    <meta property="og:description" content="{{ metadata.description }}" id="meta-og-desc"/>
+    <meta property="og:image" content="{{ metadata.og_image }}" id="meta-og-image"/>
+    <meta property="og:site_name" content="{{ settings.app.name }}"/>
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="{{ metadata.twitter_card }}" />
-    <meta property="twitter:url" content="{{ settings.app.url }}" />
-    <meta property="twitter:title" content="{{ settings.app.name }}" id="meta-tw-title" />
-    <meta property="twitter:description" content="{{ metadata.description }}" id="meta-tw-desc" />
-    <meta property="twitter:image" content="{{ metadata.og_image }}" id="meta-tw-image" />
-  </head>
+    <meta property="twitter:card" content="{{ metadata.twitter_card }}"/>
+    <meta property="twitter:url" content="{{ settings.app.url }}"/>
+    <meta property="twitter:title" content="{{ settings.app.name }}" id="meta-tw-title"/>
+    <meta property="twitter:description" content="{{ metadata.description }}" id="meta-tw-desc"/>
+    <meta property="twitter:image" content="{{ metadata.og_image }}" id="meta-tw-image"/>
+</head>
 
-  <body>
+<body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+</body>
+
 </html>

@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [],
+  "ignorePatterns": ["index.html"],
   "printWidth": 120,
   "singleQuote": true,
   "jsxSingleQuote": true
