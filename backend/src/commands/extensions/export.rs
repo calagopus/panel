@@ -121,9 +121,15 @@ impl shared::extensions::commands::CliCommand<ExportArgs> for ExportCommand {
                             dir: ".",
                         },
                         Check {
-                            name: "pnpm biome:validate",
+                            name: "pnpm lint",
                             bin: &pnpm_bin,
-                            args: &["biome:validate"],
+                            args: &["lint"],
+                            dir: "frontend",
+                        },
+                        Check {
+                            name: "pnpm fmt:check",
+                            bin: &pnpm_bin,
+                            args: &["fmt:check"],
                             dir: "frontend",
                         },
                         Check {

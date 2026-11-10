@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-run_biome_fix() {
+run_oxc_scripts() {
   local dir="$1"
   if git diff --cached --quiet -- "$dir/"; then
     return
   fi
 
-  echo "Running biome:fix-unsafe in $dir..."
-  (cd "$dir" && pnpm biome:fix-unsafe)
+  echo "Running lint:fix in $dir..."
+  (cd "$dir" && pnpm lint:fix)
+
+  echo "Running fmt in $dir..."
+  (cd "$dir" && pnpm fmt)
 
   git diff --quiet -- "$dir/" || git add "$dir/"
 }
@@ -25,6 +28,6 @@ build_translations() {
   git diff --quiet -- "$dir/" || git add "$dir/"
 }
 
-run_biome_fix frontend
-run_biome_fix database
+run_oxc_scripts frontend
+run_oxc_scripts database
 build_translations frontend

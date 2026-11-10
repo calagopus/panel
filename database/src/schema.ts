@@ -113,7 +113,10 @@ export const versionHistoryTable = pgTable(
 export const announcementsTable = pgTable(
   'announcements',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     type: announcementTypeEnum().notNull(),
     enabled: boolean().default(false).notNull(),
     enabled_start: timestamp(),
@@ -167,7 +170,10 @@ export const emailVariablesTable = pgTable(
 export const usersTable = pgTable(
   'users',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     role_uuid: uuid().references(() => rolesTable.uuid, { onDelete: 'set null' }),
     external_id: varchar({ length: 255 }),
     avatar: varchar({ length: 255 }),
@@ -241,7 +247,10 @@ export const userActivitiesTable = pgTable(
 export const userSessionsTable = pgTable(
   'user_sessions',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -286,7 +295,10 @@ export const userSettingsTable = pgTable('user_settings', {
 export const userPasswordResetsTable = pgTable(
   'user_password_resets',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -305,7 +317,10 @@ export const userPasswordResetsTable = pgTable(
 export const userEmailVerificationsTable = pgTable(
   'user_email_verifications',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -324,7 +339,10 @@ export const userEmailVerificationsTable = pgTable(
 export const userTwoFactorCodesTable = pgTable(
   'user_two_factor_codes',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -338,7 +356,10 @@ export const userTwoFactorCodesTable = pgTable(
 export const userSecurityKeysTable = pgTable(
   'user_security_keys',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -360,7 +381,10 @@ export const userSecurityKeysTable = pgTable(
 export const userSshKeysTable = pgTable(
   'user_ssh_keys',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -379,7 +403,10 @@ export const userSshKeysTable = pgTable(
 export const userApiKeysTable = pgTable(
   'user_api_keys',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -407,7 +434,10 @@ export const userApiKeysTable = pgTable(
 export const userOauthLinksTable = pgTable(
   'user_oauth_links',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -429,7 +459,10 @@ export const userOauthLinksTable = pgTable(
 export const userCommandSnippetsTable = pgTable(
   'user_command_snippets',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -448,7 +481,10 @@ export const userCommandSnippetsTable = pgTable(
 export const userServerGroupsTable = pgTable(
   'user_server_groups',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     user_uuid: uuid()
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -463,7 +499,10 @@ export const userServerGroupsTable = pgTable(
 export const rolesTable = pgTable(
   'roles',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     require_two_factor: boolean().default(false).notNull(),
@@ -477,7 +516,10 @@ export const rolesTable = pgTable(
 export const oauthProvidersTable = pgTable(
   'oauth_providers',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     icon: varchar({ length: 128 }),
@@ -512,7 +554,10 @@ export const oauthProvidersTable = pgTable(
 export const oauthProviderMappingsTable = pgTable(
   'oauth_provider_mappings',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     oauth_provider_uuid: uuid()
       .references(() => oauthProvidersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -526,7 +571,10 @@ export const oauthProviderMappingsTable = pgTable(
 export const mountsTable = pgTable(
   'mounts',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     source: varchar({ length: 255 }).notNull(),
@@ -544,7 +592,10 @@ export const mountsTable = pgTable(
 export const devicesTable = pgTable(
   'devices',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     source: varchar({ length: 255 }).notNull(),
@@ -562,7 +613,10 @@ export const devicesTable = pgTable(
 export const backupConfigurationsTable = pgTable(
   'backup_configurations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     maintenance_enabled: boolean().default(false).notNull(),
     shared: boolean().default(false).notNull(),
@@ -577,7 +631,10 @@ export const backupConfigurationsTable = pgTable(
 export const systemBackupPoliciesTable = pgTable(
   'system_backup_policies',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
@@ -681,7 +738,10 @@ export const systemBackupPolicyServersTable = pgTable(
 export const systemBackupPolicyRunsTable = pgTable(
   'system_backup_policy_runs',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     system_backup_policy_uuid: uuid()
       .references(() => systemBackupPoliciesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -709,7 +769,10 @@ export const systemBackupPolicyRunsTable = pgTable(
 export const systemBackupPolicyRunTargetsTable = pgTable(
   'system_backup_policy_run_targets',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     system_backup_policy_run_uuid: uuid()
       .references(() => systemBackupPolicyRunsTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -736,7 +799,10 @@ export const systemBackupPolicyRunTargetsTable = pgTable(
 export const locationsTable = pgTable(
   'locations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
@@ -770,7 +836,10 @@ export const locationDatabaseHostsTable = pgTable(
 export const nodesTable = pgTable(
   'nodes',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     location_uuid: uuid()
       .references(() => locationsTable.uuid)
       .notNull(),
@@ -855,7 +924,10 @@ export const nodeDatabaseHostsTable = pgTable(
 export const nodeAllocationsTable = pgTable(
   'node_allocations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     node_uuid: uuid()
       .references(() => nodesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -873,7 +945,10 @@ export const nodeAllocationsTable = pgTable(
 export const nodePermissionInvalidationsTable = pgTable(
   'node_permission_invalidations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     node_uuid: uuid()
       .references(() => nodesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -899,7 +974,10 @@ export const nodePermissionInvalidationsTable = pgTable(
 export const eggRepositoriesTable = pgTable(
   'egg_repositories',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     git_repository: text().notNull(),
@@ -918,7 +996,10 @@ export const eggRepositoriesTable = pgTable(
 export const eggRepositoriesEggsTable = pgTable(
   'egg_repository_eggs',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     egg_repository_uuid: uuid()
       .references(() => eggRepositoriesTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -938,7 +1019,10 @@ export const eggRepositoriesEggsTable = pgTable(
 export const eggConfigurationsTable = pgTable(
   'egg_configurations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     order_: smallint().default(0).notNull(),
@@ -955,7 +1039,10 @@ export const eggConfigurationsTable = pgTable(
 export const nestsTable = pgTable(
   'nests',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     author: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
@@ -967,7 +1054,10 @@ export const nestsTable = pgTable(
 export const nestEggsTable = pgTable(
   'nest_eggs',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     nest_uuid: uuid()
       .references(() => nestsTable.uuid)
       .notNull(),
@@ -1034,7 +1124,10 @@ export const nestEggDevicesTable = pgTable(
 export const nestEggVariablesTable = pgTable(
   'nest_egg_variables',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     egg_uuid: uuid()
       .references(() => nestEggsTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -1060,7 +1153,10 @@ export const nestEggVariablesTable = pgTable(
 export const databaseHostsTable = pgTable(
   'database_hosts',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     deployment_enabled: boolean().default(false).notNull(),
     maintenance_enabled: boolean().default(false).notNull(),
@@ -1076,7 +1172,10 @@ export const databaseHostsTable = pgTable(
 export const databaseAgentHostsTable = pgTable(
   'database_agent_hosts',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     deployment_enabled: boolean().default(false).notNull(),
@@ -1146,7 +1245,10 @@ export const nodeDatabaseAgentHostsTable = pgTable(
 export const databaseAgentTemplatesTable = pgTable(
   'database_agent_templates',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     type: databaseAgentTypeEnum().notNull(),
@@ -1234,7 +1336,10 @@ export const serversTable = pgTable(
 export const serverAllocationsTable = pgTable(
   'server_allocations',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     server_uuid: uuid()
       .references(() => serversTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -1431,7 +1536,10 @@ export const serverDevicesTable = pgTable(
 export const serverBackupGroupsTable = pgTable(
   'server_backup_groups',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     server_uuid: uuid()
       .references(() => serversTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -1449,7 +1557,10 @@ export const serverBackupGroupsTable = pgTable(
 export const serverBackupsTable = pgTable(
   'server_backups',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     server_uuid: uuid().references(() => serversTable.uuid, { onDelete: 'set null' }),
     node_uuid: uuid()
       .references(() => nodesTable.uuid, { onDelete: 'cascade' })
@@ -1483,7 +1594,9 @@ export const serverBackupsTable = pgTable(
   (cols) => [
     index('server_backups_server_uuid_idx').on(cols.server_uuid),
     index('server_backups_node_uuid_idx').on(cols.node_uuid),
-    index('server_backups_node_uuid_created_idx').on(cols.node_uuid, cols.created).where(sql`${cols.deleted} IS NULL`),
+    index('server_backups_node_uuid_created_idx')
+      .on(cols.node_uuid, cols.created)
+      .where(sql`${cols.deleted} IS NULL`),
     index('server_backups_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     index('server_backups_backup_group_uuid_idx').on(cols.backup_group_uuid),
     index('server_backups_system_backup_policy_uuid_idx').on(cols.system_backup_policy_uuid),
@@ -1503,7 +1616,10 @@ export const serverBackupsTable = pgTable(
 export const serverDatabasesTable = pgTable(
   'server_databases',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     server_uuid: uuid()
       .references(() => serversTable.uuid)
       .notNull(),
@@ -1560,7 +1676,10 @@ export const serverDatabaseInstancesTable = pgTable(
 export const serverSchedulesTable = pgTable(
   'server_schedules',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     server_uuid: uuid()
       .references(() => serversTable.uuid, { onDelete: 'cascade' })
       .notNull(),
@@ -1582,7 +1701,10 @@ export const serverSchedulesTable = pgTable(
 export const serverScheduleStepsTable = pgTable(
   'server_schedule_steps',
   {
-    uuid: uuid().default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
     schedule_uuid: uuid()
       .references(() => serverSchedulesTable.uuid, { onDelete: 'cascade' })
       .notNull(),

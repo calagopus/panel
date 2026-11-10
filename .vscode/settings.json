@@ -1,4 +1,3 @@
 {
-	"biome.configurationPath": "frontend/biome.json",
   "js/ts.experimental.useTsgo": true
 }

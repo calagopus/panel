@@ -34,10 +34,11 @@ jobs:
           cd frontend
           pnpm install
 
-      - name: Run biome:validate
+      - name: Run oxc validation
         run: |
           cd frontend
-          pnpm run biome:validate
+          pnpm run lint
+          pnpm run fmt:check
 
   lint-translations:
     name: Lint Translations

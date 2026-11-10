@@ -63,11 +63,10 @@ pnpm dev
 pnpm build
 
 # Lint & format check
-pnpm biome:validate
+pnpm lint
+pnpm fmt:check
 
-# Auto-fix lint/format issues
-pnpm biome:fix
-
-# Auto-fix unsafe lint/format issues (Check output before committing)
-pnpm biome:fix-unsafe
+# Lint & format fix
+pnpm lint:fix
+pnpm fmt
 ```

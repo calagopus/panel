@@ -43,7 +43,8 @@ cargo clippy
 
 # Frontend
 cd frontend
-pnpm biome:fix-unsafe
+pnpm fmt
+pnpm lint:fix
 ```
 
 Alternatively, you can set up the git commit hook to automatically handle the frontend portion. Do this by running `git config core.hooksPath '.hooks'`.
