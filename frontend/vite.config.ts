@@ -1,7 +1,7 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath } from 'vite';
 import dynamicPublicDirectory from 'vite-multiple-assets';
 import { viteStaticCopy } from 'vite-plugin-static-copy';

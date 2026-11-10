@@ -8,8 +8,8 @@ import deleteDatabaseInstanceDatabaseRows from '@/api/server/databases/instances
 import deleteDatabaseInstanceDatabaseTable from '@/api/server/databases/instances/deleteDatabaseInstanceDatabaseTable.ts';
 import getDatabaseInstance from '@/api/server/databases/instances/getDatabaseInstance.ts';
 import getDatabaseInstanceDatabaseColumnTypes from '@/api/server/databases/instances/getDatabaseInstanceDatabaseColumnTypes.ts';
-import getDatabaseInstanceDatabaseSchema from '@/api/server/databases/instances/getDatabaseInstanceDatabaseSchema.ts';
 import getDatabaseInstanceDatabases from '@/api/server/databases/instances/getDatabaseInstanceDatabases.ts';
+import getDatabaseInstanceDatabaseSchema from '@/api/server/databases/instances/getDatabaseInstanceDatabaseSchema.ts';
 import insertDatabaseInstanceDatabaseRows from '@/api/server/databases/instances/insertDatabaseInstanceDatabaseRows.ts';
 import queryDatabaseInstanceDatabase from '@/api/server/databases/instances/queryDatabaseInstanceDatabase.ts';
 import renameDatabaseInstanceDatabaseColumn from '@/api/server/databases/instances/renameDatabaseInstanceDatabaseColumn.ts';

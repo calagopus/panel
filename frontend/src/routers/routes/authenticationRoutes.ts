@@ -1,8 +1,8 @@
 import type { GlobalRouteDefinition } from 'shared';
 import ForgotPassword from '@/pages/auth/ForgotPassword.tsx';
-import Login from '@/pages/auth/Login.tsx';
 import LoginCheckpoint from '@/pages/auth/login-steps/LoginCheckpoint.tsx';
 import LoginOAuth from '@/pages/auth/login-steps/LoginOAuth.tsx';
+import Login from '@/pages/auth/Login.tsx';
 import Register from '@/pages/auth/Register.tsx';
 import ResetPassword from '@/pages/auth/ResetPassword.tsx';
 import { getGlobalStore } from '@/stores/global.ts';

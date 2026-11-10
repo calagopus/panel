@@ -4,10 +4,10 @@ import { Unicode11Addon } from '@xterm/addon-unicode11';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITerminalInitOnlyOptions, ITerminalOptions, Terminal as XTerm } from '@xterm/xterm';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import type { AddToast } from '@/providers/contexts/toastContext.ts';
 import { applyClipboardCopyHandlers, handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { getCellHeight, getXtermTheme } from '@/lib/editor/xterm.ts';
 import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
-import type { AddToast } from '@/providers/contexts/toastContext.ts';
 
 interface UseTerminalInitOptions {
   terminalRef: RefObject<HTMLDivElement | null>;

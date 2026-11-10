@@ -1,7 +1,7 @@
+import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { faCloudDownload, faHardDrive, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
-import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import ChartLegend from '@/elements/charts/ChartLegend.tsx';
 import HistoryChart from '@/elements/charts/HistoryChart.tsx';

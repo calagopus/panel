@@ -1,9 +1,9 @@
+import type { Plugin, ResolvedConfig } from 'vite';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import zlib from 'node:zlib';
-import type { Plugin, ResolvedConfig } from 'vite';
 
 const COMPRESSIBLE_EXTENSIONS = new Set(['.css', '.html', '.ico', '.js', '.json', '.svg', '.webmanifest']);
 

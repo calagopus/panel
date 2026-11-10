@@ -45,8 +45,8 @@ import DetailCard from './renderers/DetailCard.tsx';
 import TriggerCard from './renderers/TriggerCard.tsx';
 import StepCard from './StepCard.tsx';
 import StepsEditor, { stepIndentStyle, stepIndents } from './StepsEditor.tsx';
-import VariableIssueList from './VariableIssueList.tsx';
 import { analyzeScheduleVariables } from './variableAnalysis.ts';
+import VariableIssueList from './VariableIssueList.tsx';
 
 export default function ScheduleView() {
   const params = useParams<'id'>();

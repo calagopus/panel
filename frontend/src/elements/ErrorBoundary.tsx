@@ -1,7 +1,7 @@
+import type { ReactNode } from 'react';
 import { faChevronDown, faChevronUp, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Code, Collapse, MantineProvider, type MantineThemeOverride, Stack, Text } from '@mantine/core';
-import type { ReactNode } from 'react';
 import { Component, type ErrorInfo } from 'react';
 import { globalTranslationHandle } from 'shared';
 import Button from '@/elements/buttons/Button.tsx';

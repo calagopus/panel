@@ -1,6 +1,6 @@
+import type { CSSProperties, ReactNode } from 'react';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import type { CSSProperties, ReactNode } from 'react';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Select from '@/elements/input/Select.tsx';

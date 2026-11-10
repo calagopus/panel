@@ -1,9 +1,9 @@
 import { InputWrapper, Loader, mergeThemeOverrides, Tooltip } from '@mantine/core';
 import { createRoot } from 'react-dom/client';
 import { Extension, ExtensionContext } from 'shared';
-import App from '@/App.tsx';
 import getIcons from '@/api/getIcons.ts';
 import getSettings from '@/api/getSettings.ts';
+import App from '@/App.tsx';
 import { SpinnerLoader } from '@/elements/feedback/Spinner.tsx';
 import { preloadRouterForPath } from '@/routers/routerImports.ts';
 import { registerAssetReloadHandler } from '@/stores/assetReload.ts';

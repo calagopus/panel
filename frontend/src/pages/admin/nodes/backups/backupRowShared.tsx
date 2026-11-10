@@ -1,5 +1,6 @@
 import { faFileArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { z } from 'zod';
+import type { ContextMenuActionItem } from '@/elements/overlays/ContextMenu.tsx';
 import downloadNodeBackup from '@/api/admin/nodes/backups/downloadNodeBackup.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import BackupRetentionStatusBadge from '@/elements/data-display/BackupRetentionStatusBadge.tsx';
@@ -7,7 +8,6 @@ import BackupSourceLabel from '@/elements/data-display/BackupSourceLabel.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
 import { TableData } from '@/elements/data-display/Table.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
-import type { ContextMenuActionItem } from '@/elements/overlays/ContextMenu.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { serverBackupKindLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { bytesToString } from '@/lib/format/size.ts';

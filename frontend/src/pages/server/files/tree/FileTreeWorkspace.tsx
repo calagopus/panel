@@ -14,10 +14,6 @@ import {
 import { isOpenableFile } from '@/lib/files/files.ts';
 import { removeUserSetting, setUserSettingLocal, useUserSetting } from '@/lib/userSettings.ts';
 import FileTree from '@/pages/server/files/tree/FileTree.tsx';
-import FileTreeEditorPane from '@/pages/server/files/tree/FileTreeEditorPane.tsx';
-import FileTreeEditorSplit from '@/pages/server/files/tree/FileTreeEditorSplit.tsx';
-import FileTreeEditorTabContent from '@/pages/server/files/tree/FileTreeEditorTabContent.tsx';
-import FileTreeResizeHandle from '@/pages/server/files/tree/FileTreeResizeHandle.tsx';
 import { TreeDirectoryCapabilities, TreeSelectionItem } from '@/pages/server/files/tree/fileTreeData.ts';
 import {
   FileTreeEditorSelection,
@@ -27,6 +23,10 @@ import {
   getFileTreeEditorTabDragData,
   getFileTreeEditorTabId,
 } from '@/pages/server/files/tree/fileTreeEditor.ts';
+import FileTreeEditorPane from '@/pages/server/files/tree/FileTreeEditorPane.tsx';
+import FileTreeEditorSplit from '@/pages/server/files/tree/FileTreeEditorSplit.tsx';
+import FileTreeEditorTabContent from '@/pages/server/files/tree/FileTreeEditorTabContent.tsx';
+import FileTreeResizeHandle from '@/pages/server/files/tree/FileTreeResizeHandle.tsx';
 import {
   closeFileTreeWorkspaceTabs,
   FileTreeEditorWorkspaceState,

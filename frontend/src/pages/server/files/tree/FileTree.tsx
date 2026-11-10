@@ -11,8 +11,6 @@ import { useDraggedFileMove } from '@/pages/server/files/hooks/useDraggedFileMov
 import { useDuplicateFile } from '@/pages/server/files/hooks/useDuplicateFile.ts';
 import { getFilesFromDataTransfer } from '@/pages/server/files/hooks/useFileDragAndDrop.ts';
 import FileMassContextMenu from '@/pages/server/files/list/FileMassContextMenu.tsx';
-import FileTreeToolbar from '@/pages/server/files/tree/FileTreeToolbar.tsx';
-import FileTreeVirtualList from '@/pages/server/files/tree/FileTreeVirtualList.tsx';
 import {
   appendDirectoryRows,
   appendSearchRows,
@@ -34,6 +32,8 @@ import {
   TreeSelectionItem,
 } from '@/pages/server/files/tree/fileTreeData.ts';
 import { setFileTreeEditorDragData } from '@/pages/server/files/tree/fileTreeEditor.ts';
+import FileTreeToolbar from '@/pages/server/files/tree/FileTreeToolbar.tsx';
+import FileTreeVirtualList from '@/pages/server/files/tree/FileTreeVirtualList.tsx';
 import {
   isInputFocused,
   matchesActiveShortcut,

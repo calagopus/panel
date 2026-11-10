@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import {
   faArrowRightFromBracket,
   faCalculator,
@@ -16,7 +17,15 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import type { z } from 'zod';
+import type {
+  QuickActionCategory,
+  QuickActionDefinition,
+  QuickActionItem,
+  QuickActionMode,
+} from '@/lib/quickActions/quickActions.ts';
+import type { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import type { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
+import type { serverSchema } from '@/lib/schemas/server/server.ts';
 import getAdminServers from '@/api/admin/servers/getServers.ts';
 import getAdminUsers from '@/api/admin/users/getUsers.ts';
 import { getImpersonatedUser } from '@/api/axios.ts';
@@ -26,16 +35,7 @@ import Group from '@/elements/layout/Group.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import type {
-  QuickActionCategory,
-  QuickActionDefinition,
-  QuickActionItem,
-  QuickActionMode,
-} from '@/lib/quickActions/quickActions.ts';
 import { evaluateMathExpression, getLoadedMath, loadMath } from '@/lib/quickActions/quickActionsMath.ts';
-import type { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import type { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
-import type { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useQuickActionLocation, useQuickActionTerm } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';

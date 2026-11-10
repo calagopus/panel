@@ -3,12 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import Card from '@/elements/data-display/Card.tsx';
 import Text from '@/elements/typography/Text.tsx';
-import FileTreeEditorTabs from '@/pages/server/files/tree/FileTreeEditorTabs.tsx';
 import {
   FileTreeEditorSelection,
   FileTreeTabCloseAction,
   FileTreeTabPosition,
 } from '@/pages/server/files/tree/fileTreeEditor.ts';
+import FileTreeEditorTabs from '@/pages/server/files/tree/FileTreeEditorTabs.tsx';
 import useFileTreeTabQuickActions from '@/pages/server/files/tree/useFileTreeTabQuickActions.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 

@@ -1,7 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import type { LanguageData } from 'shared';
 import type { Plugin } from 'vite';
+import fs from 'node:fs';
+import path from 'node:path';
 
 function mergeLanguageTranslations(translationsDir: string, language: string): Record<string, LanguageData> | null {
   const namespaces: Record<string, LanguageData> = {};

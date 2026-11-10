@@ -1,3 +1,4 @@
+import type { RouteDefinition } from 'shared';
 import {
   faBriefcase,
   faClipboard,
@@ -9,7 +10,6 @@ import {
   faUser,
   faUserSecret,
 } from '@fortawesome/free-solid-svg-icons';
-import type { RouteDefinition } from 'shared';
 import DashboardAccount from '@/pages/dashboard/account/DashboardAccount.tsx';
 import DashboardActivity from '@/pages/dashboard/activity/DashboardActivity.tsx';
 import DashboardApiKeys from '@/pages/dashboard/api-keys/DashboardApiKeys.tsx';

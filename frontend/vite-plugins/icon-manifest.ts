@@ -1,6 +1,6 @@
+import type { Plugin } from 'vite';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import type { Plugin } from 'vite';
 import { loadIconPackage } from './fontawesome-icons.ts';
 
 const VIRTUAL_ID = 'virtual:icon-manifest';

@@ -7,13 +7,13 @@ import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import { useElementVirtualizer } from '@/lib/elementVirtualizer.ts';
 import { canPreviewFile, estimateFileSearchPreviewHeight } from '@/pages/server/files/list/FileSearchPreview.tsx';
-import FileTreeRow from '@/pages/server/files/tree/FileTreeRow.tsx';
-import FileTreeScrollingRow from '@/pages/server/files/tree/FileTreeScrollingRow.tsx';
 import {
   FileTreeRow as FileTreeRowData,
   TreeDirectoryCapabilities,
   TreeSelectionItem,
 } from '@/pages/server/files/tree/fileTreeData.ts';
+import FileTreeRow from '@/pages/server/files/tree/FileTreeRow.tsx';
+import FileTreeScrollingRow from '@/pages/server/files/tree/FileTreeScrollingRow.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerStore } from '@/stores/fileManager.ts';
 

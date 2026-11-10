@@ -1,6 +1,6 @@
+import type { Plugin } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Plugin } from 'vite';
 import { parseSync } from 'vite';
 
 const FRONTEND_ROOT = path.resolve(import.meta.dirname, '..');

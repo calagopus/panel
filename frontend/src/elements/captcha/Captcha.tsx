@@ -1,8 +1,8 @@
 import type HCaptcha from '@hcaptcha/react-hcaptcha';
-import { useComputedColorScheme } from '@mantine/core';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
-import { lazy, Suspense, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type ReCAPTCHA from 'react-google-recaptcha';
+import { useComputedColorScheme } from '@mantine/core';
+import { lazy, Suspense, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { CapRef } from '@/elements/captcha/Cap.tsx';
 import type { FriendlyCaptchaRef } from '@/elements/captcha/FriendlyCaptcha.tsx';
 import { useGlobalStore } from '@/stores/global.ts';

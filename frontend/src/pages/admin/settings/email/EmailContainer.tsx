@@ -19,8 +19,8 @@ import { useAdminStore } from '@/stores/admin.tsx';
 import DiscriminatedSettingsForm from '../DiscriminatedSettingsForm.tsx';
 import SettingsSaveButton from '../SettingsSaveButton.tsx';
 import { useSettingsSection } from '../useSettingsSection.ts';
-import EmailSendTestModal from './EmailSendTestModal.tsx';
 import { emailEmptyFormValues, emailToFormValues, useEmailModeVariants } from './emailFormValues.tsx';
+import EmailSendTestModal from './EmailSendTestModal.tsx';
 
 type EmailValues = z.infer<typeof adminSettingsEmailSchema>;
 

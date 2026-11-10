@@ -1,5 +1,5 @@
-import { basename, dirname, join } from 'pathe';
 import type { StoreApi } from 'zustand';
+import { basename, dirname, join } from 'pathe';
 import type { FileManagerStore, StagingUpload } from '@/stores/fileManager.ts';
 import { UploadItem, useUploadsStore } from '@/stores/uploads.ts';
 

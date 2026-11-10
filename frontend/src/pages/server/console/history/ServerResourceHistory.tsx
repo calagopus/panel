@@ -1,3 +1,4 @@
+import type { ResourceHistoryItem, ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { faChevronLeft, faChevronRight, faClockRotateLeft, faForwardFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
@@ -5,7 +6,6 @@ import { isAxiosError } from 'axios';
 import classNames from 'classnames';
 import { FC, memo, startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import type { ResourceHistoryItem, ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getResourceHistory from '@/api/server/resources/getResourceHistory.ts';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';

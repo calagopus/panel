@@ -6,10 +6,10 @@ import {
   faTrash,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
+import type { AdminServerModal } from '@/stores/slices/admin/server.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import type { AdminServerModal } from '@/stores/slices/admin/server.ts';
 
 const mgmt = 'pages.admin.servers.tabs.management.page';
 const palette = 'pages.admin.servers.quickAction';

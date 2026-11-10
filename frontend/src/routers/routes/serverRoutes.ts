@@ -1,3 +1,4 @@
+import type { ServerRouteDefinition } from 'shared';
 import {
   faBoxArchive,
   faBriefcase,
@@ -12,7 +13,6 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { lazy } from 'react';
-import type { ServerRouteDefinition } from 'shared';
 import ServerActivity from '@/pages/server/activity/ServerActivity.tsx';
 import ServerBackups from '@/pages/server/backups/ServerBackups.tsx';
 import ServerSystemBackups from '@/pages/server/backups/system/ServerSystemBackups.tsx';

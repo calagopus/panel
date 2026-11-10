@@ -1,5 +1,5 @@
-import { CancellableEvent, EventHandler, EventHandlerList, EventHandlerOptions, Registry } from 'shared';
 import type { z } from 'zod';
+import { CancellableEvent, EventHandler, EventHandlerList, EventHandlerOptions, Registry } from 'shared';
 import type { fullUserSchema } from '@/lib/schemas/user.ts';
 
 type FullUser = z.infer<typeof fullUserSchema>;

@@ -1,11 +1,12 @@
+import type { AdminRouteDefinition, RouteDefinition, ServerRouteDefinition } from 'shared';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Combobox, useCombobox } from '@mantine/core';
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import type { AdminRouteDefinition, RouteDefinition, ServerRouteDefinition } from 'shared';
 import { QuickActionSelectEvent } from 'shared';
 import { z } from 'zod';
+import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import getServers from '@/api/server/getServers.ts';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -24,7 +25,6 @@ import {
   useCoreQuickActionModes,
   useServerQuickActionTarget,
 } from '@/lib/quickActions/coreQuickActions.tsx';
-import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import { getAccessibleRoutePaths, to } from '@/lib/routes.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';

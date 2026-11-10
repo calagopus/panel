@@ -1,9 +1,9 @@
 import { faChevronDown, faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MenuProps } from '@mantine/core';
+import type { ResourceExportFormat } from '@/lib/download/export.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
-import type { ResourceExportFormat } from '@/lib/download/export.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ResourceExportMenuProps {

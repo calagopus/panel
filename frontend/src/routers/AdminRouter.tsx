@@ -1,7 +1,7 @@
+import type { AdminRouteDefinition } from 'shared';
 import { faReply } from '@fortawesome/free-solid-svg-icons';
 import { Fragment, Suspense, useEffect, useMemo } from 'react';
 import { NavLink, Route, Routes } from 'react-router';
-import type { AdminRouteDefinition } from 'shared';
 import AppIcon from '@/elements/AppIcon.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';

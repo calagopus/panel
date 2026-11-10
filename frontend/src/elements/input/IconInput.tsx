@@ -1,4 +1,3 @@
-import { iconManifestUrl } from 'virtual:icon-manifest';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faMagnifyingGlass, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,6 +6,7 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { makeComponentHookable } from 'shared';
+import { iconManifestUrl } from 'virtual:icon-manifest';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';

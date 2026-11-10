@@ -1,3 +1,4 @@
+import type { AdminRouteDefinition } from 'shared';
 import {
   faBriefcase,
   faBuilding,
@@ -22,7 +23,6 @@ import {
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { faComputer } from '@fortawesome/free-solid-svg-icons/faComputer';
-import type { AdminRouteDefinition } from 'shared';
 import type { LazyString } from '@/lib/lazy.ts';
 import AdminActivity from '@/pages/admin/activity/AdminActivity.tsx';
 import AdminAnnouncements from '@/pages/admin/announcements/AdminAnnouncements.tsx';

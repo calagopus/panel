@@ -1,7 +1,7 @@
 import { Window } from '@gfazioli/mantine-window';
 import { FC, ReactNode, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CurrentWindowProvider } from '@/providers/CurrentWindowProvider.tsx';
 import { WindowContext } from '@/providers/contexts/windowContext.ts';
+import { CurrentWindowProvider } from '@/providers/CurrentWindowProvider.tsx';
 
 const MAX_WINDOWS = 32;
 

@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import { Ref } from 'react';
 import { bytesToString } from '@/lib/format/size.ts';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
-import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 import { FileTreeRow as FileTreeRowData } from '@/pages/server/files/tree/fileTreeData.ts';
+import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 
 type EntryTreeRow = Extract<FileTreeRowData, { type: 'entry' }>;
 

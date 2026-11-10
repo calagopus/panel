@@ -25,13 +25,13 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
-import OAuthProviderMappingMatcherBuilder from '../OAuthProviderMappingMatcherBuilder.tsx';
 import {
   type OAuthProviderMappingFormValues,
   oauthProviderMappingEmptyFormValues,
   oauthProviderMappingFormValuesToPayload,
   oauthProviderMappingToFormValues,
 } from '../oauthProviderMappingFormValues.ts';
+import OAuthProviderMappingMatcherBuilder from '../OAuthProviderMappingMatcherBuilder.tsx';
 
 export default function OAuthProviderMappingModal({
   oauthProvider,

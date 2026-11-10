@@ -15,7 +15,6 @@ import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
 import ScrollArea from '@/elements/layout/ScrollArea.tsx';
 import { useContextMenu } from '@/elements/overlays/ContextMenu.tsx';
 import FileRowIcon from '@/pages/server/files/list/FileRowIcon.tsx';
-import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 import {
   acceptsFileTreeEditorDrop,
   FILE_TREE_EDITOR_TAB_DRAG_TYPE,
@@ -25,6 +24,7 @@ import {
   getFileTreeEditorTabId,
   setFileTreeEditorTabDragData,
 } from '@/pages/server/files/tree/fileTreeEditor.ts';
+import FileTreeName from '@/pages/server/files/tree/FileTreeName.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface FileTreeEditorTabsProps {

@@ -1,7 +1,7 @@
+import type { Plugin } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Plugin } from 'vite';
 
 const VIRTUAL_ID = 'virtual:country-flags';
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;

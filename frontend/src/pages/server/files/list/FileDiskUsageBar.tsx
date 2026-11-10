@@ -1,5 +1,5 @@
-import { getThemeColor, Progress, useMantineTheme } from '@mantine/core';
 import type { DiskUsageBarProps, DiskUsageSection } from 'shared/src/registries/pages/server/files/diskUsageBar.ts';
+import { getThemeColor, Progress, useMantineTheme } from '@mantine/core';
 import Card from '@/elements/data-display/Card.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { bytesToString, mbToBytes } from '@/lib/format/size.ts';

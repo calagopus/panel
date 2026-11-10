@@ -1,6 +1,6 @@
-import { pathToFileURL } from 'node:url';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import type { Plugin } from 'vite';
+import { pathToFileURL } from 'node:url';
 
 const VIRTUAL_PREFIX = '\0fontawesome-icon:';
 const IMPORT_REGEX = /import\s*\{([^}]*)\}\s*from\s*(['"])(@fortawesome\/free-(?:solid|brands)-svg-icons)\2;?/g;

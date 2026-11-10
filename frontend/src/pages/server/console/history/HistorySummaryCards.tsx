@@ -1,3 +1,4 @@
+import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import {
   faArrowDown,
   faArrowUp,
@@ -8,7 +9,6 @@ import {
   faPowerOff,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import StatCard from '@/elements/data-display/StatCard.tsx';
 import { formatBytes, formatPercent } from '@/lib/chart.ts';
 import { bytesToString } from '@/lib/format/size.ts';

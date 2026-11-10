@@ -1,7 +1,7 @@
+import type { editor } from 'monaco-editor';
 import { faArrowLeft, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMergedRef } from '@mantine/hooks';
-import type { editor } from 'monaco-editor';
 import { basename, dirname } from 'pathe';
 import { useEffect, useRef, useState } from 'react';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router';

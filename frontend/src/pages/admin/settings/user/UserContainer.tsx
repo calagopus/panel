@@ -1,7 +1,7 @@
+import type { RouteDefinition } from 'shared';
 import { faList } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import type { RouteDefinition } from 'shared';
 import { z } from 'zod';
 import updateUserSettings from '@/api/admin/settings/updateUserSettings.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';

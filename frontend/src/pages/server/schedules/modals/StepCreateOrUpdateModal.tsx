@@ -62,8 +62,8 @@ import StepUpdateStartupVariable from '../steps/StepUpdateStartupVariable.tsx';
 import StepWaitForConsoleLine from '../steps/StepWaitForConsoleLine.tsx';
 import StepWaitForState from '../steps/StepWaitForState.tsx';
 import StepWriteFile from '../steps/StepWriteFile.tsx';
-import VariableIssueList from '../VariableIssueList.tsx';
 import { analyzeScheduleVariables } from '../variableAnalysis.ts';
+import VariableIssueList from '../VariableIssueList.tsx';
 
 type Props = ModalProps & {
   schedule: z.infer<typeof serverScheduleSchema>;

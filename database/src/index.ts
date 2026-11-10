@@ -1,5 +1,5 @@
-import * as fs from 'node:fs';
 import { system } from '@rjweb/utils';
+import * as fs from 'node:fs';
 import logger from '@/globals/logger.ts';
 
 export default function getVersion() {

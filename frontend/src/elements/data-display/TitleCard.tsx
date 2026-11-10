@@ -1,6 +1,6 @@
+import type { ReactNode } from 'react';
 import { Box, Group, Title } from '@mantine/core';
 import classNames from 'classnames';
-import type { ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
 import Card from '@/elements/data-display/Card.tsx';
 

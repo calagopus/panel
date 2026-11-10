@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
+import type { FileTreeWorkspaceHandle } from '@/pages/server/files/tree/FileTreeWorkspace.tsx';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import { useNavbarPageHeader } from '@/elements/containers/useNavbarPageHeader.ts';
@@ -56,7 +57,6 @@ import ServerFilesColumnRightSection, {
   columnOnClick,
   type ServerFilesColumn,
 } from '@/pages/server/files/list/ServerFilesColumnRightSection.tsx';
-import type { FileTreeWorkspaceHandle } from '@/pages/server/files/tree/FileTreeWorkspace.tsx';
 import {
   isInputFocused,
   matchesActiveShortcut,

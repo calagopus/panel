@@ -36,8 +36,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import StepCreateOrUpdateModal from './modals/StepCreateOrUpdateModal.tsx';
 import ActionRenderer from './renderers/ActionRenderer.tsx';
-import VariableIssueList from './VariableIssueList.tsx';
 import { VariableIssue } from './variableAnalysis.ts';
+import VariableIssueList from './VariableIssueList.tsx';
 
 interface StepCardBodyProps {
   step: z.infer<typeof serverScheduleStepSchema>;

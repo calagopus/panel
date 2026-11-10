@@ -42,10 +42,10 @@ import useFileDraftPersistence from '@/pages/server/files/hooks/useFileDraftPers
 import FileEditorConflictDiffModal from '@/pages/server/files/modals/FileEditorConflictDiffModal.tsx';
 import FileEditorDraftModal from '@/pages/server/files/modals/FileEditorDraftModal.tsx';
 import FileNameModal from '@/pages/server/files/modals/FileNameModal.tsx';
+import { FileTreeEditorSelection, getFileTreeEditorDraftPath } from '@/pages/server/files/tree/fileTreeEditor.ts';
 import FileTreeRevisionComparison, {
   type FileRevisionComparison,
 } from '@/pages/server/files/tree/FileTreeRevisionComparison.tsx';
-import { FileTreeEditorSelection, getFileTreeEditorDraftPath } from '@/pages/server/files/tree/fileTreeEditor.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';

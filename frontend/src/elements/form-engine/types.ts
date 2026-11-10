@@ -1,4 +1,5 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { ZodType } from 'zod';
 import {
   AutocompleteProps,
   CheckboxProps,
@@ -13,7 +14,6 @@ import {
 import { DateTimePickerProps } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
-import type { ZodType } from 'zod';
 import type { MultiSelectProps as WrappedMultiSelectProps } from '@/elements/input/MultiSelect.tsx';
 import type { SelectProps as WrappedSelectProps } from '@/elements/input/Select.tsx';
 import { LazyString } from '@/lib/lazy.ts';

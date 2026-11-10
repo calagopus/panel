@@ -1,9 +1,9 @@
-import { countryFlagCodes } from 'virtual:country-flags';
 import { faAddressCard, faChevronLeft, faFloppyDisk, faRainbow } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
+import { countryFlagCodes } from 'virtual:country-flags';
 import { z } from 'zod';
 import createBackupConfiguration from '@/api/admin/backup-configurations/createBackupConfiguration.ts';
 import updateBackupConfiguration from '@/api/admin/backup-configurations/updateBackupConfiguration.ts';

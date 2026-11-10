@@ -1,6 +1,6 @@
+import type { Plugin } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Plugin } from 'vite';
 import { listExtensionIdentifiers } from './extension-overrides.ts';
 import { fetchBackendExtensionVariables } from './extension-variables.ts';
 
