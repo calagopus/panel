@@ -1765,6 +1765,7 @@ impl WingsClient {
         file: &str,
         query: &super::system_logs_file::get::Query,
     ) -> Result<super::system_logs_file::get::Response, ApiHttpError> {
+        let file = urlencoding::encode(file);
         let mut query_parts: Vec<compact_str::CompactString> = Vec::new();
         if let Some(value) = query.lines {
             query_parts.push(format!("lines={}", value).into());

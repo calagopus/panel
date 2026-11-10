@@ -604,6 +604,12 @@ for (const [path, route] of Object.entries(openapi.paths ?? {})) {
             clientOutput.write(`    pub async fn ${method}_${modName}${extraProps.length ? '_with' : ''}(&self${args.length ? `, ${args.join(', ')}` : ''})`)
             clientOutput.write(` -> Result<super::${modName}::${method}::Response, ApiHttpError> {\n`)
 
+            for (const param of pathParams) {
+                if (!param.schema || convertType(param.schema) === 'compact_str::CompactString') {
+                    clientOutput.write(`        let ${rustIdent(param.name)} = urlencoding::encode(${rustIdent(param.name)});\n`)
+                }
+            }
+
             let endpoint: string
             if (queryParams.length) {
                 clientOutput.write('        let mut query_parts: Vec<compact_str::CompactString> = Vec::new();\n')

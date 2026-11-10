@@ -38,6 +38,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                             .ok();
                     }
 
+                    let file = urlencoding::encode(&file);
                     let endpoint = match params.lines {
                         Some(lines) => format!("/api/system/logs/{file}/ws?lines={lines}"),
                         None => format!("/api/system/logs/{file}/ws"),

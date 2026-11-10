@@ -10,7 +10,8 @@ mod post {
         ApiError, GetState,
         models::{
             DuplicableModel, IntoAdminApiObject, admin_activity::GetAdminActivityLogger,
-            oauth_provider::DuplicateOAuthProviderOptions, user::GetPermissionManager,
+            oauth_provider::DuplicateOAuthProviderOptions,
+            oauth_provider_mapping::OAuthProviderMapping, user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -63,6 +64,21 @@ mod post {
             )
             .with_status(StatusCode::FORBIDDEN)
             .ok();
+        }
+
+        for mapping in
+            OAuthProviderMapping::all_by_oauth_provider_uuid(&state.database, oauth_provider.uuid)
+                .await?
+        {
+            if !mapping
+                .mapping
+                .is_within_permissions_of(&state.database, &permissions)
+                .await?
+            {
+                return ApiResponse::error("permissions: more permissions than self")
+                    .with_status(StatusCode::FORBIDDEN)
+                    .ok();
+            }
         }
 
         let options = DuplicateOAuthProviderOptions { name: data.name };

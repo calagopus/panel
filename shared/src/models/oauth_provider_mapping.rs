@@ -264,7 +264,9 @@ pub enum OAuthProviderMappingType {
 impl OAuthProviderMappingType {
     /// Whether `permissions` holds every permission this mapping hands out, so a delegated
     /// operator cannot grant more through a provider than they have themselves. A mapping to a
-    /// role that no longer exists grants nothing.
+    /// role that no longer exists grants nothing. A subuser mapping writes, and with
+    /// `revoke_unmatched` deletes, subusers on its server, so it needs the same access to that
+    /// server as the client subuser routes.
     pub async fn is_within_permissions_of(
         &self,
         database: &crate::database::Database,
@@ -280,9 +282,35 @@ impl OAuthProviderMappingType {
                 }
             }
             OAuthProviderMappingType::ServerSubuser {
+                server_uuid,
                 permissions: subuser_permissions,
-                ..
-            } => permissions.can_grant(&[], subuser_permissions),
+                ignored_files,
+                revoke_unmatched,
+            } => {
+                let Some(server) = super::server::Server::by_user_identifier(
+                    database,
+                    permissions,
+                    &server_uuid.to_string(),
+                )
+                .await?
+                else {
+                    return Ok(false);
+                };
+
+                let permissions = permissions.for_server(&server);
+
+                permissions
+                    .missing_server_permission(subuser_permissions)
+                    .is_none()
+                    && server
+                        .subuser_ignored_files
+                        .as_ref()
+                        .is_none_or(|own| ignored_files.ends_with(own))
+                    && permissions.has_server_permission("subusers.create").is_ok()
+                    && permissions.has_server_permission("subusers.update").is_ok()
+                    && (!revoke_unmatched
+                        || permissions.has_server_permission("subusers.delete").is_ok())
+            }
         })
     }
 

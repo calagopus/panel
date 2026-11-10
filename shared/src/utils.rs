@@ -283,6 +283,13 @@ pub fn push_scope_or_star<'a>(
 }
 
 pub fn is_single_component_file_name(name: &str) -> bool {
+    if name
+        .chars()
+        .any(|c| matches!(c, '\\' | '%' | '?' | '#') || c.is_control())
+    {
+        return false;
+    }
+
     let mut components = std::path::Path::new(name).components();
 
     match (components.next(), components.next()) {
@@ -348,6 +355,19 @@ mod tests {
         assert!(!is_single_component_file_name("wings.log/../../config"));
         assert!(!is_single_component_file_name("a/b"));
         assert!(!is_single_component_file_name("wings.log/"));
+    }
+
+    #[test]
+    fn single_component_rejects_url_significant_characters() {
+        assert!(!is_single_component_file_name("..\\config"));
+        assert!(!is_single_component_file_name("a\\b"));
+        assert!(!is_single_component_file_name("%2e%2e"));
+        assert!(!is_single_component_file_name("..%5Cconfig"));
+        assert!(!is_single_component_file_name("a?b"));
+        assert!(!is_single_component_file_name("a#b"));
+        assert!(!is_single_component_file_name("a\0b"));
+        assert!(!is_single_component_file_name("a\nb"));
+        assert!(is_single_component_file_name("wings.2026-11-10.log"));
     }
 
     #[test]
