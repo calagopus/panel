@@ -109,8 +109,8 @@ export default function FileTreeRevisionComparison({
             onClick={() => {
               if (!revisions) return;
 
-              if (dirty) setRestoreConfirm(true)
-              else onRestore(revisions.original)
+              if (dirty) setRestoreConfirm(true);
+              else onRestore(revisions.original);
             }}
           >
             {t('pages.server.files.drawer.revisions.tooltip.restore', {})}

@@ -2,7 +2,7 @@ packages:
   - 'extensions/*'
   - '../backend-extensions/*/frontend'
 allowBuilds:
-  "@tailwindcss/oxide": true
+  '@tailwindcss/oxide': true
   esbuild: true
 minimumReleaseAge: 4320 # 3 days
 blockExoticSubdeps: true

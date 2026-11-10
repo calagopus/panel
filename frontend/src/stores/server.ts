@@ -14,7 +14,8 @@ import { createTransferSlice, TransferSlice } from '@/stores/slices/server/trans
 import { createWebsocketSlice, WebsocketSlice } from '@/stores/slices/server/websocket.ts';
 
 export interface ServerStore
-  extends ServerAnnouncementsSlice,
+  extends
+    ServerAnnouncementsSlice,
     BackupsSlice,
     TransferSlice,
     DatabaseInstancesSlice,

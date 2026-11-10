@@ -41,8 +41,10 @@ export function schemaFormOptions<T, P = T>(schema?: ExtendableSchema) {
   };
 }
 
-export interface UseFormEngineOptions<T extends Record<string, unknown>, P = T>
-  extends Omit<UseFormInput<T, P>, 'validate' | 'transformValues'> {
+export interface UseFormEngineOptions<T extends Record<string, unknown>, P = T> extends Omit<
+  UseFormInput<T, P>,
+  'validate' | 'transformValues'
+> {
   schema?: ExtendableSchema;
   initialValues: T;
 }

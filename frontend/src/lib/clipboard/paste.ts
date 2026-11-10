@@ -29,7 +29,7 @@ function readClipboard(): Promise<string> {
       const value = textArea.value;
       textArea.remove();
 
-      if (successful && value) resolve(value)
+      if (successful && value) resolve(value);
       else reject();
     }).catch(() => {
       const result = window.prompt(getTranslations().t('elements.pasteOnClick.toast.pasteManual', {}), '');

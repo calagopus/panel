@@ -1,24 +1,24 @@
-@import "tailwindcss";
-@import "highlight.js/styles/a11y-light.min.css";
-@import "./breakpoints.css";
+@import 'tailwindcss';
+@import 'highlight.js/styles/a11y-light.min.css';
+@import './breakpoints.css';
 
 @custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
 @custom-variant light (&:where([data-mantine-color-scheme="light"], [data-mantine-color-scheme="light"] *));
 
 @font-face {
-  font-family: "Helvetica";
+  font-family: 'Helvetica';
   font-style: normal;
   font-weight: normal;
   font-display: swap;
   src:
-    local("Helvetica"),
-    url("./assets/fonts/Helvetica.woff2") format("woff2");
+    local('Helvetica'),
+    url('./assets/fonts/Helvetica.woff2') format('woff2');
 }
 
 @theme {
   --font-sans:
-    "Helvetica", "Arial", system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
+    'Helvetica', 'Arial', system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
 
   --color-neutral-850: oklch(25.4% 0 0);
 
@@ -139,7 +139,7 @@
   gap: var(--file-manager-workspace-gap);
 }
 
-.file-manager-workspace-grid[data-file-manager-tree-visible="false"] {
+.file-manager-workspace-grid[data-file-manager-tree-visible='false'] {
   grid-template-columns: var(--file-manager-tree-collapsed-width) minmax(0, 1fr);
 }
 
@@ -152,10 +152,10 @@
   transition: opacity 120ms ease;
 }
 
-.file-manager-tree-shell[data-file-manager-tree-collapsed="true"] [data-file-manager-tree-header],
-.file-manager-tree-shell[data-file-manager-tree-collapsed="true"] [data-file-manager-tree-table],
-.file-manager-tree-shell[data-file-manager-tree-collapsed="true"] [data-file-manager-tree-selection-control],
-.file-manager-tree-shell[data-file-manager-tree-collapsed="true"] [data-file-manager-tree-actions] {
+.file-manager-tree-shell[data-file-manager-tree-collapsed='true'] [data-file-manager-tree-header],
+.file-manager-tree-shell[data-file-manager-tree-collapsed='true'] [data-file-manager-tree-table],
+.file-manager-tree-shell[data-file-manager-tree-collapsed='true'] [data-file-manager-tree-selection-control],
+.file-manager-tree-shell[data-file-manager-tree-collapsed='true'] [data-file-manager-tree-actions] {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -171,7 +171,7 @@
   width: 2px;
   border-radius: var(--mantine-radius-xl);
   background-color: var(--mantine-color-default-border);
-  content: "";
+  content: '';
   transform: translateX(-50%);
   transition: background-color 120ms ease;
 }
@@ -221,28 +221,28 @@
 }
 
 @container page (width >= 48rem) {
-  [data-file-manager-editor-split]:has([data-file-manager-editor-tabs] [data-mantine-scrollbar][data-state="visible"]) {
+  [data-file-manager-editor-split]:has([data-file-manager-editor-tabs] [data-mantine-scrollbar][data-state='visible']) {
     --file-manager-editor-tab-gutter: 10px;
   }
 }
 
 @container page (width < 48rem) {
-  [data-file-manager-editor-tabs]:has([data-mantine-scrollbar][data-state="visible"]) {
+  [data-file-manager-editor-tabs]:has([data-mantine-scrollbar][data-state='visible']) {
     --file-manager-editor-tab-gutter: 10px;
   }
 
   .file-manager-workspace-grid,
-  .file-manager-workspace-grid[data-file-manager-tree-visible="false"] {
+  .file-manager-workspace-grid[data-file-manager-tree-visible='false'] {
     --file-manager-workspace-min-height: 0px;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
   }
 
-  [data-file-manager-tree-visible="true"] [data-file-manager-editor-group] {
+  [data-file-manager-tree-visible='true'] [data-file-manager-editor-group] {
     display: none;
   }
 
-  [data-file-manager-tree-visible="false"] [data-file-manager-editor-group] {
+  [data-file-manager-tree-visible='false'] [data-file-manager-editor-group] {
     height: calc(var(--file-manager-workspace-height) - 2.75rem - var(--file-manager-workspace-gap));
   }
 
@@ -267,7 +267,7 @@
   }
 }
 
-:root[data-mantine-color-scheme="light"] {
+:root[data-mantine-color-scheme='light'] {
   --mantine-color-body: #f0eff0;
 
   /* Chart colors */
@@ -279,7 +279,7 @@
   --chart-series-4: #16a34a;
 }
 
-:root[data-mantine-color-scheme="dark"] {
+:root[data-mantine-color-scheme='dark'] {
   --mantine-color-anchor: var(--mantine-color-blue-4);
   --mantine-color-blue-filled: var(--mantine-color-blue-8);
   --mantine-color-blue-filled-hover: var(--mantine-color-blue-9);
@@ -481,7 +481,7 @@ strong {
   width: max-content;
 }
 
-[data-mantine-color-scheme="dark"] {
+[data-mantine-color-scheme='dark'] {
   .hljs {
     background: #2b2b2b;
     color: #f8f8f2;

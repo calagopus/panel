@@ -1,6 +1,6 @@
 /* shared by the React Spinner, the Mantine Loader override and the pre-React boot markup, so it must stay plain CSS on a single element */
 @property --spinner-arc {
-  syntax: "<angle>";
+  syntax: '<angle>';
   inherits: false;
   initial-value: 120deg;
 }
@@ -33,7 +33,7 @@
 }
 
 .spinner::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 50%;

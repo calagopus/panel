@@ -1,9 +1,9 @@
 {
   "name": "shared",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "private": true,
   "license": "MIT",
+  "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {}

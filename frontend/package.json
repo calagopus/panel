@@ -1,14 +1,10 @@
 {
   "name": "panel-rs",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "engines": {
-    "node": ">=24.0.0",
-    "pnpm": ">=11.0.0"
-  },
-  "author": "Calagopus",
+  "private": true,
   "license": "MIT",
+  "author": "Calagopus",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc",
@@ -20,7 +16,9 @@
     "diff:translations": "tsx diff-translations.mts",
     "format:translations": "tsx format-translations.mts",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
   },
   "dependencies": {
     "@cap.js/wasm": "0.0.8",
@@ -114,6 +112,7 @@
     "globals": "^17.14.0",
     "monaco-editor": "^0.57.0",
     "oxc-transform-react": "^0.156.0",
+    "oxfmt": "^0.77.0",
     "oxlint": "^1.92.0",
     "tsx": "^4.23.15",
     "typedoc": "^0.28.20",
@@ -123,5 +122,9 @@
     "vite": "^8.3.6",
     "vite-multiple-assets": "^2.2.6",
     "vite-plugin-static-copy": "^4.1.1"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
   }
 }

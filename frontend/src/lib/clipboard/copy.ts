@@ -26,7 +26,7 @@ export function copyToClipboard(rawText: string) {
     textArea.select();
 
     return new Promise<void>((resolve, reject) => {
-      if (document.execCommand('copy')) resolve()
+      if (document.execCommand('copy')) resolve();
       else reject();
 
       textArea.remove();
