@@ -366,7 +366,7 @@ impl ContentSecurityPolicy {
                 directive("base-uri", &["'self'"]),
                 directive("form-action", &["'self'"]),
                 directive("frame-ancestors", &["'self'"]),
-                directive("script-src", &["'self'", "blob:"]),
+                directive("script-src", &["'self'", "blob:", "'wasm-unsafe-eval'"]),
             ],
             length: 0,
             uses_script_nonce,
