@@ -316,6 +316,7 @@ export interface HistoryChartProps {
   min?: number;
   height?: number;
   syncId?: string;
+  onSelectRange?: (start: number, end: number) => void;
 }
 
 export function historyChartSeriesColor(entry: HistoryChartSeries, index: number): string {

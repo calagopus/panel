@@ -18,7 +18,7 @@ function HistoryBlock({
   format,
   scale,
   min,
-  props: { timeframe, rows, loading },
+  props: { timeframe, rows, loading, selectTimeframe },
 }: {
   icon: ReactNode;
   title: string;
@@ -53,6 +53,7 @@ function HistoryBlock({
         scale={scale}
         min={min}
         syncId={RESOURCE_HISTORY_CHART_SYNC_ID}
+        onSelectRange={(from, to) => selectTimeframe(new Date(from), new Date(to))}
       />
     </ChartBlock>
   );

@@ -5966,7 +5966,8 @@
             "range": {
               "hours": "{hours} Std.",
               "days": "{days} T.",
-              "years": "{years} J."
+              "years": "{years} J.",
+              "custom": "Benutzerdefiniert"
             },
             "tooltip": {
               "earlier": "Früher",

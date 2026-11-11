@@ -6002,6 +6002,7 @@ const baseTranslations = defineTranslations({
               hours: '{hours}h',
               days: '{days}d',
               years: '{years}y',
+              custom: 'Custom',
             },
             tooltip: {
               earlier: 'Earlier',

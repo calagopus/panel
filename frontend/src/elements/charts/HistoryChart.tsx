@@ -1,7 +1,8 @@
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AreaChart } from '@mantine/charts';
-import { useMemo } from 'react';
+import { PointerEvent, useEffect, useMemo, useState } from 'react';
+import { DefaultZIndexes, usePlotArea, ZIndexLayer } from 'recharts';
 import { makeComponentHookable } from 'shared';
 import { HistoryChartProps, historyChartCeiling, historyChartSeriesColor } from '@/lib/chart.ts';
 import { formatDateTime } from '@/lib/format/time.ts';
@@ -11,6 +12,91 @@ import '@mantine/charts/styles.css';
 
 const X_TICKS = 5;
 const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
+const MIN_SELECTION_PX = 5;
+
+function HistoryChartSelection({
+  domain: [start, end],
+  onSelect,
+}: {
+  domain: [number, number];
+  onSelect: (start: number, end: number) => void;
+}) {
+  const plot = usePlotArea();
+  const [selection, setSelection] = useState<{ from: number; to: number } | null>(null);
+  const selecting = selection !== null;
+
+  useEffect(() => {
+    if (!selecting) return;
+
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelection(null);
+    };
+    window.addEventListener('keydown', cancel);
+    return () => window.removeEventListener('keydown', cancel);
+  }, [selecting]);
+
+  if (!plot || end <= start) return null;
+
+  const toTime = (event: PointerEvent<SVGRectElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const ratio = bounds.width > 0 ? (event.clientX - bounds.left) / bounds.width : 0;
+    return start + Math.min(Math.max(ratio, 0), 1) * (end - start);
+  };
+  const toX = (time: number) => plot.x + ((Math.min(Math.max(time, start), end) - start) / (end - start)) * plot.width;
+  const from = selection ? Math.min(selection.from, selection.to) : 0;
+  const to = selection ? Math.max(selection.from, selection.to) : 0;
+
+  return (
+    <>
+      {selection && (
+        <ZIndexLayer zIndex={DefaultZIndexes.area + 1}>
+          <rect
+            x={toX(from)}
+            y={plot.y}
+            width={toX(to) - toX(from)}
+            height={plot.height}
+            fill='var(--mantine-primary-color-filled)'
+            fillOpacity={0.15}
+            pointerEvents='none'
+          />
+        </ZIndexLayer>
+      )}
+      <ZIndexLayer zIndex={DefaultZIndexes.label + 1}>
+        <rect
+          x={plot.x}
+          y={plot.y}
+          width={plot.width}
+          height={plot.height}
+          fill='transparent'
+          onPointerDown={(event) => {
+            if (event.pointerType === 'touch' || event.button !== 0) return;
+
+            event.preventDefault();
+            event.currentTarget.setPointerCapture(event.pointerId);
+            const time = toTime(event);
+            setSelection({ from: time, to: time });
+          }}
+          onPointerMove={(event) => {
+            if (!selection) return;
+
+            const time = toTime(event);
+            setSelection((current) => (current ? { ...current, to: time } : current));
+          }}
+          onPointerUp={(event) => {
+            if (!selection) return;
+
+            const bounds = event.currentTarget.getBoundingClientRect();
+            const width = (Math.abs(toTime(event) - selection.from) / (end - start)) * bounds.width;
+            const [a, b] = [selection.from, toTime(event)].sort((x, y) => x - y);
+            setSelection(null);
+            if (width >= MIN_SELECTION_PX) onSelect(Math.round(a), Math.round(b));
+          }}
+          onLostPointerCapture={() => setSelection(null)}
+        />
+      </ZIndexLayer>
+    </>
+  );
+}
 
 function HistoryChart({
   data,
@@ -21,6 +107,7 @@ function HistoryChart({
   min = 0,
   height = 210,
   syncId,
+  onSelectRange,
 }: HistoryChartProps) {
   const { t, language } = useTranslations();
   const [start, end] = domain;
@@ -100,7 +187,9 @@ function HistoryChart({
             : false,
         })}
         areaChartProps={{ syncId, style: { cursor: 'crosshair' } }}
-      />
+      >
+        {onSelectRange && <HistoryChartSelection domain={domain} onSelect={onSelectRange} />}
+      </AreaChart>
     </div>
   );
 }

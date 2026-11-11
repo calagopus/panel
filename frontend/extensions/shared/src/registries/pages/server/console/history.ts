@@ -20,6 +20,12 @@ export interface ResourceHistoryProps {
   rows: ResourceHistoryRow[];
   summary: ResourceHistorySummary;
   loading: boolean;
+  /**
+   * Switches the page to the window from `start` to `end`, `null` follows the current time. Matches a
+   * preset when the duration is one, otherwise picks a custom resolution. Windows shorter than a
+   * minute are ignored. Stable across renders.
+   */
+  selectTimeframe: (start: Date, end: Date | null) => void;
 }
 
 export interface ResourceHistoryItem {

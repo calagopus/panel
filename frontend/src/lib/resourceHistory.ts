@@ -4,6 +4,11 @@ import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 export const RESOURCE_HISTORY_MAX_POINTS = 2000;
 export const RESOURCE_HISTORY_CHART_SYNC_ID = 'server-resource-history';
+export const RESOURCE_HISTORY_CUSTOM_RANGE = 'custom';
+export const RESOURCE_HISTORY_MIN_DURATION = 60 * 1000;
+export const RESOURCE_HISTORY_MAX_DURATION = 10 * 365 * 24 * 60 * 60 * 1000;
+
+const CUSTOM_POINTS = 150;
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -93,6 +98,23 @@ export function getDefaultResourceHistoryRanges(): ResourceHistoryRange[] {
       points: 365,
     },
   ];
+}
+
+/**
+ * A range for an arbitrary `duration`, at about 150 points but never coarser than the narrowest
+ * preset that covers it, so zooming into a preset never lowers its resolution.
+ */
+export function getCustomResourceHistoryRange(ranges: ResourceHistoryRange[], duration: number): ResourceHistoryRange {
+  const { t } = getTranslations();
+  const covering = ranges.filter((entry) => entry.duration >= duration).map((entry) => entry.duration / entry.points);
+  const width = Math.max(Math.min(duration / CUSTOM_POINTS, ...covering), 1000);
+
+  return {
+    id: RESOURCE_HISTORY_CUSTOM_RANGE,
+    label: () => t('pages.server.console.history.range.custom', {}),
+    duration,
+    points: Math.min(Math.ceil(duration / width), RESOURCE_HISTORY_MAX_POINTS),
+  };
 }
 
 /**
