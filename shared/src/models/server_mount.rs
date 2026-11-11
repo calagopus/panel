@@ -193,7 +193,7 @@ impl ServerMount {
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
             ),
-            "server_mounts.mount_uuid ASC",
+            "server_mounts.created, server_mounts.server_uuid",
         )
         .bind(mount_uuid)
         .bind(search)

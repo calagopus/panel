@@ -33,6 +33,14 @@ pub enum DatabasePool {
 }
 
 impl DatabasePool {
+    async fn close(self) {
+        match self {
+            Self::Mysql(pool) => pool.close().await,
+            Self::Postgres(pool) => pool.close().await,
+            Self::Mongodb(_) => {}
+        }
+    }
+
     pub async fn version(&self) -> Result<String, anyhow::Error> {
         Ok(match self {
             Self::Mysql(pool) => {
@@ -373,6 +381,12 @@ impl BaseModel for DatabaseHost {
 }
 
 impl DatabaseHost {
+    async fn evict_connection(&self) {
+        if let Some((_, pool)) = DATABASE_CLIENTS.lock().await.remove(&self.uuid) {
+            tokio::spawn(pool.close());
+        }
+    }
+
     pub async fn get_connection(
         &mut self,
         database: &crate::database::Database,
@@ -1035,6 +1049,7 @@ impl UpdatableModel for DatabaseHost {
         }
         if let Some(credentials) = options.credentials {
             self.credentials = credentials;
+            self.evict_connection().await;
         }
 
         self.run_after_update_handlers(state, transaction).await?;
@@ -1072,6 +1087,8 @@ impl DeletableModel for DatabaseHost {
         .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
+
+        self.evict_connection().await;
 
         self.run_after_delete_handlers(&options, state, transaction)
             .await?;

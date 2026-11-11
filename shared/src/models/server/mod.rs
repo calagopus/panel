@@ -615,8 +615,14 @@ impl Server {
 
         let mut row = sqlx::query(sqlx::AssertSqlSafe(query));
         row = match identifier.len() {
-            8 => row.bind(u32::from_str_radix(identifier, 16).map_err(anyhow::Error::new)? as i32),
-            36 => row.bind(uuid::Uuid::parse_str(identifier).map_err(anyhow::Error::new)?),
+            8 => match u32::from_str_radix(identifier, 16) {
+                Ok(uuid_short) => row.bind(uuid_short as i32),
+                Err(_) => return Ok(None),
+            },
+            36 => match uuid::Uuid::parse_str(identifier) {
+                Ok(uuid) => row.bind(uuid),
+                Err(_) => return Ok(None),
+            },
             _ => return Ok(None),
         };
         let row = row.fetch_optional(database.read()).await?;
@@ -740,7 +746,7 @@ impl Server {
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         super::PaginatedQueryBuilder::new(
-            Self::columns_sql(None),
+            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
             format!(
                 r#"
                 FROM servers
@@ -1407,6 +1413,8 @@ impl Server {
         };
 
         transaction.commit().await?;
+
+        Self::invalidate_cached(&state.database, self.uuid).await;
 
         Self::get_event_emitter().emit(
             state.clone(),
@@ -3116,6 +3124,25 @@ impl DeletableModel for Server {
         let server_uuid = self.uuid;
 
         tokio::spawn(async move {
+            match node
+                .api_client(&state.database)
+                .await?
+                .delete_servers_server(server_uuid)
+                .await
+            {
+                Ok(_) => {}
+                Err(wings_api::client::ApiHttpError::Http(reqwest::StatusCode::NOT_FOUND, _)) => {}
+                Err(err) if options.force => {
+                    tracing::error!(server = %server_uuid, node = %node.uuid, "failed to delete server: {:?}", err);
+                }
+                Err(err) => {
+                    tracing::error!(server = %server_uuid, node = %node.uuid, "failed to delete server: {:?}", err);
+
+                    transaction.rollback().await?;
+                    return Err(err.into());
+                }
+            }
+
             for db in databases {
                 match db.delete(&state, super::server_database::DeleteServerDatabaseOptions { force: options.force }).await {
                     Ok(_) => {}
@@ -3149,42 +3176,15 @@ impl DeletableModel for Server {
                 .execute(&mut *transaction)
                 .await?;
 
-            match node
-                .api_client(&state.database)
-                .await?
-                .delete_servers_server(server_uuid)
-                .await
-            {
-                Ok(_) => {
-                    transaction.commit().await?;
+            transaction.commit().await?;
 
-                    Self::invalidate_cached(&state.database, server_uuid).await;
+            Self::invalidate_cached(&state.database, server_uuid).await;
 
-                    if on_mesh {
-                        crate::tunnel::poke_nodes(&state.database).await;
-                    }
-
-                    Ok(())
-                }
-                Err(err) => {
-                    tracing::error!(server = %server_uuid, node = %node.uuid, "failed to delete server: {:?}", err);
-
-                    if options.force {
-                        transaction.commit().await?;
-
-                        Self::invalidate_cached(&state.database, server_uuid).await;
-
-                        if on_mesh {
-                            crate::tunnel::poke_nodes(&state.database).await;
-                        }
-
-                        Ok(())
-                    } else {
-                        transaction.rollback().await?;
-                        Err(err.into())
-                    }
-                }
+            if on_mesh {
+                crate::tunnel::poke_nodes(&state.database).await;
             }
+
+            Ok(())
         }).await?
     }
 }

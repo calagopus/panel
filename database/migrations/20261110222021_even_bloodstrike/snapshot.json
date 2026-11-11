@@ -1,0 +1,94 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "030cc385-93e8-49d0-b8f0-5d4d5221292e",
+  "prevIds": [
+    "fb3f4d86-d0d7-4c3d-b507-84e69f5b367c"
+  ],
+  "footprints": [
+    {
+      "statementType": "drop_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "user_command_snippets",
+        "command_snippets_eggs_idx"
+      ],
+      "writes": [
+        "s|idx|public.command_snippets_eggs_idx",
+        "n|idx|public.command_snippets_eggs_idx",
+        "e|idx|public.command_snippets_eggs_idx",
+        "n|rel|public.command_snippets_eggs_idx"
+      ],
+      "reads": [
+        "e|tbl|public.user_command_snippets",
+        "n|sch|public",
+        "e|col|public.user_command_snippets.eggs"
+      ],
+      "sharedWrites": []
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "user_command_snippets",
+        "matcher"
+      ],
+      "writes": [
+        "s|col|public.user_command_snippets.matcher",
+        "n|col|public.user_command_snippets.matcher",
+        "e|col|public.user_command_snippets.matcher"
+      ],
+      "reads": [
+        "n|tbl|public.user_command_snippets",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "drop_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "user_command_snippets",
+        "eggs"
+      ],
+      "writes": [
+        "s|col|public.user_command_snippets.eggs",
+        "n|col|public.user_command_snippets.eggs",
+        "e|col|public.user_command_snippets.eggs"
+      ],
+      "reads": [
+        "n|tbl|public.user_command_snippets",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_command_snippets",
+        "name": "matcher",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "drop",
+      "key": "columns\u0000[\"public\",\"user_command_snippets\",\"eggs\"]"
+    },
+    {
+      "op": "drop",
+      "key": "indexes\u0000[\"public\",\"command_snippets_eggs_idx\"]"
+    }
+  ]
+}

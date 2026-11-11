@@ -151,7 +151,7 @@ impl AdminActivity {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             WHERE ($1 IS NULL OR admin_activities.event ILIKE '%' || $1 || '%' OR users.username ILIKE '%' || $1 || '%')
             "#,
-            "admin_activities.created DESC",
+            "admin_activities.created DESC, admin_activities.ctid DESC",
         )
         .bind(search)
         .fetch(database, page, per_page)
@@ -173,7 +173,7 @@ impl AdminActivity {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             WHERE admin_activities.user_uuid = $1 AND ($2 IS NULL OR admin_activities.event ILIKE '%' || $2 || '%' OR users.username ILIKE '%' || $2 || '%')
             "#,
-            "admin_activities.created DESC",
+            "admin_activities.created DESC, admin_activities.ctid DESC",
         )
         .bind(user_uuid)
         .bind(search)
@@ -208,7 +208,7 @@ impl AdminActivity {
             WHERE ctid IN (
                 SELECT ctid 
                 FROM admin_activities
-                ORDER BY admin_activities.created DESC
+                ORDER BY admin_activities.created DESC, admin_activities.ctid DESC
                 OFFSET $1
             )
             "#,

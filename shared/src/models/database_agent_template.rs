@@ -529,7 +529,8 @@ pub struct UpdateDatabaseAgentTemplateOptions {
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
     pub disk: Option<i64>,
-    #[garde(skip)]
+    #[garde(inner(inner(range(min = 0, max = 1000))))]
+    #[schema(minimum = 0, maximum = 1000)]
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",

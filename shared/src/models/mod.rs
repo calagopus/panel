@@ -85,8 +85,8 @@ pub mod user_two_factor_code;
 
 #[derive(ToSchema, Validate, Deserialize, Serialize)]
 pub struct PaginationParams {
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 1, max = 1_000_000))]
+    #[schema(minimum = 1, maximum = 1_000_000)]
     #[serde(default = "Pagination::default_page")]
     pub page: i64,
     #[garde(range(min = 1, max = 100))]
@@ -97,8 +97,8 @@ pub struct PaginationParams {
 
 #[derive(ToSchema, Validate, Deserialize, Serialize)]
 pub struct PaginationParamsWithSearch {
-    #[garde(range(min = 1))]
-    #[schema(minimum = 1)]
+    #[garde(range(min = 1, max = 1_000_000))]
+    #[schema(minimum = 1, maximum = 1_000_000)]
     #[serde(default = "Pagination::default_page")]
     pub page: i64,
     #[garde(range(min = 1, max = 100))]
@@ -1336,13 +1336,26 @@ impl<'a> InsertQueryBuilder<'a> {
             }
         }
 
-        let mut expr = expression.to_string();
         let added_count = self.arguments.len() - start_len;
+        let mut expr = String::with_capacity(expression.len());
+        let mut rest = expression;
 
-        for i in (1..=added_count).rev() {
-            let global_idx = start_len + i;
-            expr = expr.replace(&format!("${}", i), &format!("${}", global_idx));
+        while let Some(dollar) = rest.find('$') {
+            expr.push_str(&rest[..=dollar]);
+            rest = &rest[dollar + 1..];
+
+            let digits = rest
+                .find(|c: char| !c.is_ascii_digit())
+                .unwrap_or(rest.len());
+            match rest[..digits].parse::<usize>() {
+                Ok(i) if (1..=added_count).contains(&i) => {
+                    expr.push_str(&(start_len + i).to_string());
+                }
+                _ => expr.push_str(&rest[..digits]),
+            }
+            rest = &rest[digits..];
         }
+        expr.push_str(rest);
 
         self.columns.push(column);
         self.expressions.push(expr);
@@ -1439,7 +1452,7 @@ impl<'a> PaginatedQueryBuilder<'a> {
     ) -> Result<Pagination<M>, DatabaseError> {
         let mut arguments = self.arguments.map_err(sqlx::Error::Encode)?;
         let count_arguments = arguments.clone();
-        let offset = (page - 1) * per_page;
+        let offset = (page.max(1) - 1).saturating_mul(per_page);
 
         let limit_param = arguments.len() + 1;
         arguments.add(per_page).map_err(sqlx::Error::Encode)?;

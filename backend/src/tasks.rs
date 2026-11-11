@@ -19,7 +19,6 @@ use shared::models::{
     },
     user_activity::UserActivity,
     user_api_key::UserApiKey,
-    user_command_snippet::UserCommandSnippet,
     user_email_verification::UserEmailVerification,
     user_password_reset::UserPasswordReset,
     user_security_key::UserSecurityKey,
@@ -546,15 +545,6 @@ pub async fn define_background_tasks(
                     tracing::info!(
                         "cleaned up {} invalid UUIDs in announcements",
                         cleaned_announcements
-                    );
-                }
-
-                let cleaned_user_command_snippets =
-                    UserCommandSnippet::cleanup_uuid_arrays(&state.database).await?;
-                if cleaned_user_command_snippets > 0 {
-                    tracing::info!(
-                        "cleaned up {} invalid UUIDs in user command snippets",
-                        cleaned_user_command_snippets
                     );
                 }
 

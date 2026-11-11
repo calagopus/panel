@@ -137,7 +137,7 @@ impl UserActivity {
             FROM user_activities
             WHERE user_activities.user_uuid = $1 AND ($2 IS NULL OR user_activities.event ILIKE '%' || $2 || '%')
             "#,
-            "user_activities.created DESC",
+            "user_activities.created DESC, user_activities.ctid DESC",
         )
         .bind(user_uuid)
         .bind(search)
@@ -174,7 +174,7 @@ impl UserActivity {
                 FROM (
                     SELECT
                         ctid, 
-                        ROW_NUMBER() OVER (PARTITION BY user_activities.user_uuid ORDER BY user_activities.created DESC) rn
+                        ROW_NUMBER() OVER (PARTITION BY user_activities.user_uuid ORDER BY user_activities.created DESC, user_activities.ctid DESC) rn
                     FROM user_activities
                 ) sub
                 WHERE sub.rn > $1

@@ -1006,31 +1006,24 @@ pub fn resync_extension_list() -> Result<(), anyhow::Error> {
             r#"
         ConstructedExtension {{
             metadata_toml: MetadataToml {{
-                package_name: {}.to_string(),
-                name: {}.to_string(),
-                panel_version: semver::VersionReq::parse({}).unwrap(),
+                package_name: {:?}.to_string(),
+                name: {:?}.to_string(),
+                panel_version: semver::VersionReq::parse({:?}).unwrap(),
                 license_text: None,
             }},
-            package_name: {},
-            description: {},
-            authors: &{},
-            version: semver::Version::parse({}).unwrap(),
+            package_name: {:?},
+            description: {:?},
+            authors: &{:?},
+            version: semver::Version::parse({:?}).unwrap(),
             extension: Arc::new({}::ExtensionStruct::default()),
         }},"#,
-            toml::Value::String(metadata.package_name.clone()),
-            toml::Value::String(metadata.name),
-            toml::Value::String(metadata.panel_version.to_string()),
-            toml::Value::String(metadata.package_name.clone()),
-            toml::Value::String(package.description.unwrap_or_default()),
-            toml::Value::Array(
-                package
-                    .authors
-                    .unwrap_or_default()
-                    .into_iter()
-                    .map(toml::Value::String)
-                    .collect(),
-            ),
-            toml::Value::String(package.version.to_string()),
+            metadata.package_name,
+            metadata.name,
+            metadata.panel_version.to_string(),
+            metadata.package_name,
+            package.description.unwrap_or_default(),
+            package.authors.unwrap_or_default(),
+            package.version.to_string(),
             metadata.package_name.replace('.', "_"),
         ));
     }

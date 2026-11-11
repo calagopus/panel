@@ -90,7 +90,7 @@ export default function DashboardCommandSnippets() {
               onChange: (checked) => (checked ? selectAll() : clearSelection()),
             }),
             t('common.table.columns.name', {}),
-            t('common.table.columns.eggs', {}),
+            t('pages.account.commandSnippets.table.columns.appliesTo', {}),
             t('common.table.columns.created', {}),
             '',
           ]}

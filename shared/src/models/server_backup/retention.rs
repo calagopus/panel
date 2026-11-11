@@ -313,6 +313,10 @@ fn forecast_retention(
     let mut plans = HashMap::new();
     for rule in BackupRetentionRule::PERIODS {
         let limit = rule.period_limit(retention);
+        let before_period_end = |time| {
+            rule.period_end(time)
+                .map(|end| end - chrono::Duration::seconds(1))
+        };
 
         let mut ranks = HashMap::new();
         for (_, created) in &sorted {
@@ -332,10 +336,10 @@ fn forecast_retention(
             .unwrap_or(0);
         let start = sorted
             .first()
-            .and_then(|(_, created)| rule.period_end(*created))
+            .and_then(|(_, created)| before_period_end(*created))
             .map_or(now, |end| end.max(now));
         let jumps = cadence
-            .map(|cadence| cadence.walk(start, needed, &mut budget, |time| rule.period_end(time)))
+            .map(|cadence| cadence.walk(start, needed, &mut budget, before_period_end))
             .unwrap_or_default();
         let supersede = cadence
             .and_then(|cadence| cadence.next_after(now))
@@ -2197,6 +2201,57 @@ mod tests {
         assert_eq!(
             forecasts[&uuid::Uuid::from_u128(2)].expires,
             Some(date("2026-10-01 02:00:00"))
+        );
+    }
+
+    #[test]
+    fn period_rules_count_runs_exactly_at_the_period_boundary() {
+        let daily = cadence(&["0 0 0 * * *"], chrono_tz::Tz::UTC);
+        let forecasts = forecast(
+            BackupRetention {
+                daily: 3,
+                ..Default::default()
+            },
+            &[
+                (1, "2026-09-22 00:00:00"),
+                (2, "2026-09-21 00:00:00"),
+                (3, "2026-09-20 00:00:00"),
+            ],
+            "2026-09-22 12:00:00",
+            Some(&daily),
+        );
+
+        assert_eq!(
+            forecasts[&uuid::Uuid::from_u128(1)].expires,
+            Some(date("2026-09-25 00:00:00"))
+        );
+        assert_eq!(
+            forecasts[&uuid::Uuid::from_u128(2)].expires,
+            Some(date("2026-09-24 00:00:00"))
+        );
+        assert_eq!(
+            forecasts[&uuid::Uuid::from_u128(3)].expires,
+            Some(date("2026-09-23 00:00:00"))
+        );
+
+        let monthly = cadence(&["0 0 0 1 * *"], chrono_tz::Tz::UTC);
+        let forecasts = forecast(
+            BackupRetention {
+                monthly: 2,
+                ..Default::default()
+            },
+            &[(1, "2026-09-01 00:00:00"), (2, "2026-08-01 00:00:00")],
+            "2026-09-22 12:00:00",
+            Some(&monthly),
+        );
+
+        assert_eq!(
+            forecasts[&uuid::Uuid::from_u128(1)].expires,
+            Some(date("2026-11-01 00:00:00"))
+        );
+        assert_eq!(
+            forecasts[&uuid::Uuid::from_u128(2)].expires,
+            Some(date("2026-10-01 00:00:00"))
         );
     }
 

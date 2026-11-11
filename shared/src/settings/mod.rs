@@ -1456,7 +1456,7 @@ impl Settings {
         oobe_step: Option<compact_str::CompactString>,
     ) -> Result<(), crate::database::DatabaseError> {
         sqlx::query(
-            "INSERT INTO settings (key, value) VALUES ('oobe_step', $1)
+            "INSERT INTO settings (key, value) VALUES ('::oobe_step', $1)
             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
         )
         .bind(oobe_step.map(|s| s.to_string()).unwrap_or_default())

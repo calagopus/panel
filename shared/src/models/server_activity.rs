@@ -189,7 +189,7 @@ impl ServerActivity {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             WHERE server_activities.server_uuid = $1 AND ($2 IS NULL OR server_activities.event ILIKE '%' || $2 || '%' OR users.username ILIKE '%' || $2 || '%')
             "#,
-            "server_activities.created DESC",
+            "server_activities.created DESC, server_activities.ctid DESC",
         )
         .bind(server_uuid)
         .bind(search)
@@ -214,7 +214,7 @@ impl ServerActivity {
             WHERE server_activities.server_uuid = $1 AND server_activities.user_uuid = $2
                 AND ($3 IS NULL OR server_activities.event ILIKE '%' || $3 || '%')
             "#,
-            "server_activities.created DESC",
+            "server_activities.created DESC, server_activities.ctid DESC",
         )
         .bind(server_uuid)
         .bind(user_uuid)
@@ -252,7 +252,7 @@ impl ServerActivity {
                 FROM (
                     SELECT
                         ctid, 
-                        ROW_NUMBER() OVER (PARTITION BY server_activities.server_uuid ORDER BY server_activities.created DESC) rn
+                        ROW_NUMBER() OVER (PARTITION BY server_activities.server_uuid ORDER BY server_activities.created DESC, server_activities.ctid DESC) rn
                     FROM server_activities
                 ) sub
                 WHERE sub.rn > $1

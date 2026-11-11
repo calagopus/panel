@@ -255,8 +255,8 @@ pub fn deserialize_public_key<'de, D>(deserializer: D) -> Result<russh::keys::Pu
 where
     D: Deserializer<'de>,
 {
-    let value = <&str>::deserialize(deserializer)?;
-    let public_key = russh::keys::PublicKey::from_openssh(value)
+    let value = compact_str::CompactString::deserialize(deserializer)?;
+    let public_key = russh::keys::PublicKey::from_openssh(value.trim())
         .map_err(|_| serde::de::Error::custom("invalid public key"))?;
 
     Ok(public_key)

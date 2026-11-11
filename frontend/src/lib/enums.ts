@@ -94,6 +94,7 @@ import {
 } from '@/lib/schemas/server/schedules.ts';
 import { serverBackupStatus, serverPowerAction, serverPowerState } from '@/lib/schemas/server/server.ts';
 import { publicSettingsCaptchaProviderSchema } from '@/lib/schemas/settings.ts';
+import { UserCommandSnippetMatcher } from '@/lib/schemas/user/commandSnippets.ts';
 import { userSshKeyProvider } from '@/lib/schemas/user/sshKeys.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts';
@@ -375,6 +376,29 @@ export function eggConfigurationMatcherSummary(matcher: AdminEggConfigurationMat
       return `${label} (${matcher.nodes.length})`;
     case 'locations':
       return `${label} (${matcher.locations.length})`;
+    default:
+      return label;
+  }
+}
+
+export const commandSnippetMatcherLabelMapping: Record<UserCommandSnippetMatcher['type'], () => string> = {
+  never: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.never', {}),
+  all: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.all', {}),
+  and: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.and', {}),
+  or: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.or', {}),
+  not: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.not', {}),
+  eggs: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.eggs', {}),
+};
+
+export function commandSnippetMatcherSummary(matcher: UserCommandSnippetMatcher): string {
+  const label = commandSnippetMatcherLabelMapping[matcher.type]();
+
+  switch (matcher.type) {
+    case 'and':
+    case 'or':
+      return `${label} (${matcher.matchers.length})`;
+    case 'eggs':
+      return `${label} (${matcher.eggs.length})`;
     default:
       return label;
   }

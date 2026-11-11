@@ -15,6 +15,7 @@ use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, ClientSecret, HttpRequest, HttpResponse,
     PkceCodeVerifier, RedirectUrl, TokenResponse, TokenUrl, basic::BasicClient,
 };
+use rand::distr::SampleString;
 use serde::Deserialize;
 use shared::models::IntoApiObject;
 use shared::{
@@ -474,37 +475,50 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                                 .ok();
                         }
 
-                        let username = oauth_provider.extract_username(&info.info)?.into();
-                        let email = oauth_provider.extract_email(&info.info)?.into();
-                        let name_first = oauth_provider.extract_name_first(&info.info)?.map(Into::into);
-                        let name_last = oauth_provider.extract_name_last(&info.info)?.map(Into::into);
-
-                        let options = shared::models::user::CreateUserOptions {
-                            role_uuid: None,
-                            external_id: None,
-                            username,
-                            email,
-                            name_first,
-                            name_last,
-                            password: None,
-                            admin: false,
-                            frozen: false,
-                            suspended: false,
-                            verify_email: false,
-                            send_email: false,
-                            language: settings.app.language.clone(),
-                        };
+                        let username = oauth_provider.extract_username(&info.info)?;
+                        let email: compact_str::CompactString = oauth_provider.extract_email(&info.info)?.into();
+                        let name_first: Option<compact_str::CompactString> = oauth_provider.extract_name_first(&info.info)?.map(Into::into);
+                        let name_last: Option<compact_str::CompactString> = oauth_provider.extract_name_last(&info.info)?.map(Into::into);
+                        let language = settings.app.language.clone();
                         drop(settings);
 
-                        let user = match User::create(&state, options).await {
-                            Ok(user) => user,
-                            Err(err) if err.is_unique_violation() => {
-                                return ApiResponse::new(Body::empty())
-                                    .with_header("Location", format!("{app_url}/auth/login?error=user_already_exists"))
-                                    .with_status(StatusCode::TEMPORARY_REDIRECT)
-                                    .ok();
+                        let mut attempt_username = compact_str::CompactString::from(username.as_str());
+                        let mut attempts = 0;
+                        let user = loop {
+                            let options = shared::models::user::CreateUserOptions {
+                                role_uuid: None,
+                                external_id: None,
+                                username: attempt_username.clone(),
+                                email: email.clone(),
+                                name_first: name_first.clone(),
+                                name_last: name_last.clone(),
+                                password: None,
+                                admin: false,
+                                frozen: false,
+                                suspended: false,
+                                verify_email: false,
+                                send_email: false,
+                                language: language.clone(),
+                            };
+
+                            match User::create(&state, options).await {
+                                Ok(user) => break user,
+                                Err(err) if attempts < 5 && err.is_unique_constraint_violation("users_username_idx") => {
+                                    attempts += 1;
+                                    attempt_username = compact_str::format_compact!(
+                                        "{}_{}",
+                                        shared::utils::slice_up_to(&username, 10),
+                                        rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 4)
+                                    );
+                                }
+                                Err(err) if err.is_unique_violation() => {
+                                    return ApiResponse::new(Body::empty())
+                                        .with_header("Location", format!("{app_url}/auth/login?error=user_already_exists"))
+                                        .with_status(StatusCode::TEMPORARY_REDIRECT)
+                                        .ok();
+                                }
+                                Err(err) => return ApiResponse::from(err).ok(),
                             }
-                            Err(err) => return ApiResponse::from(err).ok(),
                         };
 
                         let options = shared::models::user_oauth_link::CreateUserOAuthLinkOptions {

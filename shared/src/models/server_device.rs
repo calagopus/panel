@@ -193,7 +193,7 @@ impl ServerDevice {
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
             ),
-            "server_devices.device_uuid ASC",
+            "server_devices.created, server_devices.server_uuid",
         )
         .bind(device_uuid)
         .bind(search)

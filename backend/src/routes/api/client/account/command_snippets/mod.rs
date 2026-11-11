@@ -77,7 +77,7 @@ mod post {
             CreatableModel, IntoApiObject,
             user::{GetPermissionManager, GetUser},
             user_activity::GetUserActivityLogger,
-            user_command_snippet::UserCommandSnippet,
+            user_command_snippet::{UserCommandSnippet, UserCommandSnippetMatcher},
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -89,9 +89,8 @@ mod post {
         #[schema(min_length = 1, max_length = 31)]
         name: compact_str::CompactString,
 
-        #[garde(length(max = 100))]
-        #[schema(max_length = 100)]
-        eggs: Vec<uuid::Uuid>,
+        #[garde(dive, custom(UserCommandSnippetMatcher::validate_nesting))]
+        matcher: UserCommandSnippetMatcher,
         #[garde(length(min = 1, max = 1024))]
         #[schema(min_length = 1, max_length = 1024)]
         command: compact_str::CompactString,
@@ -136,7 +135,7 @@ mod post {
             user_uuid: user.uuid,
             name: data.name,
             command: data.command,
-            eggs: data.eggs,
+            matcher: data.matcher,
         };
         let command_snippet = match UserCommandSnippet::create(&state, options).await {
             Ok(command_snippet) => command_snippet,
@@ -156,7 +155,7 @@ mod post {
                 serde_json::json!({
                     "uuid": command_snippet.uuid,
                     "name": command_snippet.name,
-                    "eggs": command_snippet.eggs,
+                    "matcher": command_snippet.matcher,
                     "command": command_snippet.command,
                 }),
             )

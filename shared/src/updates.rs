@@ -1,7 +1,15 @@
 use compact_str::ToCompactString;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
-use std::{collections::BTreeMap, fmt::Display, str::FromStr, sync::Arc};
+use std::{
+    collections::BTreeMap,
+    fmt::Display,
+    str::FromStr,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+};
 use tokio::sync::{RwLock, RwLockReadGuard};
 use utoipa::ToSchema;
 
@@ -145,6 +153,7 @@ pub struct UpdateInformation {
 type ChannelData = Result<Arc<UpdateInformation>, Arc<anyhow::Error>>;
 
 pub struct UpdateManager {
+    running: AtomicBool,
     recheck_notifier: Arc<tokio::sync::Notify>,
     recheck_finished_receiver: tokio::sync::broadcast::Receiver<ChannelData>,
     recheck_finished_sender: tokio::sync::broadcast::Sender<ChannelData>,
@@ -160,6 +169,7 @@ impl Default for UpdateManager {
             tokio::sync::broadcast::channel(1);
 
         Self {
+            running: AtomicBool::new(false),
             recheck_notifier: Arc::new(tokio::sync::Notify::new()),
             recheck_finished_receiver,
             recheck_finished_sender,
@@ -175,6 +185,8 @@ impl UpdateManager {
         if !state.env.app_primary {
             return;
         }
+
+        self.running.store(true, Ordering::Relaxed);
 
         let recheck_notifier = self.recheck_notifier.clone();
         let recheck_finished_sender = self.recheck_finished_sender.clone();
@@ -368,18 +380,28 @@ impl UpdateManager {
     }
 
     pub async fn trigger_recheck_and_wait(&self) -> ChannelData {
+        if !self.running.load(Ordering::Relaxed) {
+            return Err(Arc::new(anyhow::anyhow!(
+                "update checks only run on the primary instance"
+            )));
+        }
+
+        let mut receiver = self.recheck_finished_receiver.resubscribe();
         self.trigger_recheck();
-        self.recheck_finished_receiver
-            .resubscribe()
-            .recv()
-            .await
-            .map_err(|err| {
-                Arc::new(anyhow::anyhow!(
-                    "failed to receive update check result: {:#?}",
-                    err
-                ))
-            })
-            .flatten()
+
+        match tokio::time::timeout(std::time::Duration::from_secs(120), receiver.recv()).await {
+            Ok(result) => result
+                .map_err(|err| {
+                    Arc::new(anyhow::anyhow!(
+                        "failed to receive update check result: {:#?}",
+                        err
+                    ))
+                })
+                .flatten(),
+            Err(_) => Err(Arc::new(anyhow::anyhow!(
+                "timed out waiting for update check"
+            ))),
+        }
     }
 }
 

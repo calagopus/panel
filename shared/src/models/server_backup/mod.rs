@@ -1001,10 +1001,12 @@ impl ServerBackup {
                 server_backups.server_uuid = $1
                 AND server_backups.system_backup_policy_uuid IS NULL
                 AND server_backups.deleted IS NULL
+                AND (server_backups.deleting IS NULL OR server_backups.deletion_retries >= $2)
             "#,
         )
         .bind(server_uuid)
-        .fetch_one(database.read())
+        .bind(Self::MAX_DELETION_RETRIES)
+        .fetch_one(database.write())
         .await
     }
 

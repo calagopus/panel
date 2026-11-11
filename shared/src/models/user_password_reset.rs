@@ -147,40 +147,26 @@ impl UserPasswordReset {
 
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            WITH user_password_resets AS MATERIALIZED (
-                SELECT * FROM user_password_resets
+            WITH user_password_resets AS (
+                DELETE FROM user_password_resets
                 WHERE user_password_resets.token_start = $1
                 AND user_password_resets.created > NOW() - CASE WHEN user_password_resets.account_created THEN INTERVAL '1 hour' ELSE INTERVAL '20 minutes' END
+                AND user_password_resets.token = crypt($2, user_password_resets.token)
+                RETURNING *
             )
             SELECT {}, {} FROM user_password_resets
             JOIN users ON users.uuid = user_password_resets.user_uuid
             LEFT JOIN roles ON roles.uuid = users.role_uuid
-            WHERE user_password_resets.token = crypt($2, user_password_resets.token)
             "#,
             Self::columns_sql(None),
             super::user::User::columns_sql(Some("user_"))
         )))
         .bind(token_start)
         .bind(token)
-        .fetch_optional(database.read())
+        .fetch_optional(database.write())
         .await?;
 
-        let row = match row {
-            Some(row) => row,
-            None => return Ok(None),
-        };
-
-        sqlx::query(
-            r#"
-            DELETE FROM user_password_resets
-            WHERE user_password_resets.uuid = $1
-            "#,
-        )
-        .bind(row.get::<uuid::Uuid, _>("uuid"))
-        .execute(database.write())
-        .await?;
-
-        Ok(Some(Self::map(None, &row)?))
+        row.try_map(|row| Self::map(None, &row))
     }
 
     pub async fn delete_by_user_uuid(

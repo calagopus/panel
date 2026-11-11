@@ -219,15 +219,16 @@ impl UserEmailVerification {
 
         let row = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            WITH user_email_verifications AS MATERIALIZED (
-                SELECT * FROM user_email_verifications
+            WITH user_email_verifications AS (
+                DELETE FROM user_email_verifications
                 WHERE user_email_verifications.token_start = $1
                 AND user_email_verifications.created > NOW() - make_interval(hours => $3)
+                AND user_email_verifications.token = crypt($2, user_email_verifications.token)
+                RETURNING *
             )
             SELECT {}, {} FROM user_email_verifications
             JOIN users ON users.uuid = user_email_verifications.user_uuid
             LEFT JOIN roles ON roles.uuid = users.role_uuid
-            WHERE user_email_verifications.token = crypt($2, user_email_verifications.token)
             "#,
             Self::columns_sql(None),
             super::user::User::columns_sql(Some("user_"))
@@ -235,25 +236,10 @@ impl UserEmailVerification {
         .bind(token_start)
         .bind(token)
         .bind(TOKEN_VALIDITY_HOURS)
-        .fetch_optional(database.read())
+        .fetch_optional(database.write())
         .await?;
 
-        let row = match row {
-            Some(row) => row,
-            None => return Ok(None),
-        };
-
-        sqlx::query(
-            r#"
-            DELETE FROM user_email_verifications
-            WHERE user_email_verifications.uuid = $1
-            "#,
-        )
-        .bind(row.get::<uuid::Uuid, _>("uuid"))
-        .execute(database.write())
-        .await?;
-
-        Ok(Some(Self::map(None, &row)?))
+        row.try_map(|row| Self::map(None, &row))
     }
 
     pub async fn delete_by_user_uuid(

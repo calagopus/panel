@@ -11,14 +11,43 @@ use std::{
 };
 use utoipa::ToSchema;
 
-pub fn validate_config_allocations(
-    config_allocations: &EggConfigAllocations,
+fn validate_user_self_assign(
+    user_self_assign: &EggConfigAllocationsUserSelfAssign,
     _context: &(),
 ) -> Result<(), garde::Error> {
-    if !config_allocations.user_self_assign.is_valid() {
+    if !user_self_assign.is_valid() {
         return Err(garde::Error::new(
             "port ranges must be 1-65535 and start_port < end_port",
         ));
+    }
+
+    Ok(())
+}
+
+fn validate_primary_allocation(
+    primary: &Option<EggConfigAllocationDeploymentPrimaryAllocation>,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    if let Some(primary) = primary
+        && primary.start_port > primary.end_port
+    {
+        return Err(garde::Error::new("start_port must be <= end_port"));
+    }
+
+    Ok(())
+}
+
+fn validate_additional_allocation_mode(
+    mode: &EggConfigAllocationDeploymentAdditionalAllocationMode,
+    _context: &(),
+) -> Result<(), garde::Error> {
+    if let EggConfigAllocationDeploymentAdditionalAllocationMode::Range {
+        start_port,
+        end_port,
+    } = mode
+        && start_port > end_port
+    {
+        return Err(garde::Error::new("start_port must be <= end_port"));
     }
 
     Ok(())
@@ -82,7 +111,7 @@ pub enum EggConfigAllocationDeploymentAdditionalAllocationMode {
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 pub struct EggConfigAllocationDeploymentAdditionalAllocation {
     #[schema(inline)]
-    #[garde(dive)]
+    #[garde(dive, custom(validate_additional_allocation_mode))]
     pub mode: EggConfigAllocationDeploymentAdditionalAllocationMode,
     #[garde(length(chars, min = 1, max = 255))]
     pub assign_to_variable: Option<compact_str::CompactString>,
@@ -105,17 +134,19 @@ pub struct EggConfigAllocationsDeployment {
     pub dedicated: bool,
 
     #[schema(inline)]
-    #[garde(dive)]
+    #[garde(dive, custom(validate_primary_allocation))]
     pub primary: Option<EggConfigAllocationDeploymentPrimaryAllocation>,
     #[schema(inline)]
     #[garde(dive)]
     pub additional: Vec<EggConfigAllocationDeploymentAdditionalAllocation>,
 }
 
-#[derive(ToSchema, Serialize, Deserialize, Default, Clone)]
+#[derive(ToSchema, Validate, Serialize, Deserialize, Default, Clone)]
 pub struct EggConfigAllocations {
+    #[garde(custom(validate_user_self_assign))]
     #[serde(default)]
     pub user_self_assign: EggConfigAllocationsUserSelfAssign,
+    #[garde(dive)]
     #[serde(default)]
     pub deployment: EggConfigAllocationsDeployment,
 }
@@ -695,7 +726,7 @@ pub struct CreateEggConfigurationOptions {
     pub order: i16,
     #[garde(dive, custom(EggConfigurationMatcher::validate_nesting))]
     pub matcher: EggConfigurationMatcher,
-    #[garde(inner(custom(validate_config_allocations)))]
+    #[garde(dive)]
     #[schema(inline)]
     pub config_allocations: Option<EggConfigAllocations>,
     #[garde(dive)]
@@ -801,7 +832,7 @@ pub struct UpdateEggConfigurationOptions {
     #[garde(dive, custom(EggConfigurationMatcher::validate_optional_nesting))]
     pub matcher: Option<EggConfigurationMatcher>,
 
-    #[garde(inner(inner(custom(validate_config_allocations))))]
+    #[garde(dive)]
     #[schema(inline)]
     #[serde(
         default,

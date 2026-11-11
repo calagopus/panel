@@ -1882,6 +1882,35 @@ const baseTranslations = defineTranslations({
           tooltip: {
             limitReached: 'You are limited to {max} command snippets.',
           },
+          table: {
+            columns: {
+              appliesTo: 'Applies To',
+            },
+          },
+          form: {
+            eggsPlaceholder: 'Select Eggs',
+            matcher: 'Applies To',
+            matcherDescription: 'Decides on which servers this snippet is available, by their egg.',
+            matcherType: 'Matcher Type',
+          },
+          matcher: {
+            allMustMatch: 'All matchers must match:',
+            anyMustMatch: 'Any matcher must match:',
+            mustNotMatch: 'Matcher must not match:',
+          },
+          button: {
+            addMatcher: 'Add Matcher',
+          },
+          enum: {
+            matcherType: {
+              never: 'Never (Available nowhere)',
+              all: 'All (Available on every server)',
+              and: 'AND (All must match)',
+              or: 'OR (Any must match)',
+              not: 'NOT (Must not match)',
+              eggs: 'Eggs',
+            },
+          },
           modal: {
             createCommandSnippet: {
               title: 'Create Command Snippet',

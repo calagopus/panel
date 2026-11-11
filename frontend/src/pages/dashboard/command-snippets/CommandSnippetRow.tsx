@@ -8,6 +8,7 @@ import { TableData, TableRow, TableSelectionCell } from '@/elements/data-display
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { commandSnippetMatcherSummary } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userCommandSnippetSchema } from '@/lib/schemas/user/commandSnippets.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -111,7 +112,7 @@ const CommandSnippetRow = forwardRef<HTMLTableRowElement, CommandSnippetRowProps
 
             <TableData>!{commandSnippet.name}</TableData>
 
-            <TableData>{commandSnippet.eggs.length}</TableData>
+            <TableData>{commandSnippetMatcherSummary(commandSnippet.matcher)}</TableData>
 
             <TableData>
               <FormattedTimestamp timestamp={commandSnippet.created} />

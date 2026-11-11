@@ -137,7 +137,10 @@ impl<T: DeserializeOwned, S: Send + Sync> FromRequest<S> for Payload<T> {
             )));
         };
 
-        if !AVAILABLE_DESERIALIZERS.contains(&content_type) {
+        if !AVAILABLE_DESERIALIZERS
+            .iter()
+            .any(|m| m.essence_str() == content_type.essence_str())
+        {
             return Err(PayloadRejection(anyhow::anyhow!(
                 "unsupported content type"
             )));
@@ -168,7 +171,10 @@ where
             return Ok(None);
         };
 
-        if !AVAILABLE_DESERIALIZERS.contains(&content_type) {
+        if !AVAILABLE_DESERIALIZERS
+            .iter()
+            .any(|m| m.essence_str() == content_type.essence_str())
+        {
             return Err(PayloadRejection(anyhow::anyhow!(
                 "unsupported content type"
             )));

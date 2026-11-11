@@ -6,6 +6,7 @@ use crate::{
     },
     prelude::*,
 };
+use axum::http::StatusCode;
 use garde::Validate;
 use rand::{RngExt, distr::SampleString};
 use serde::{Deserialize, Serialize};
@@ -706,6 +707,30 @@ impl CreatableModel for ServerDatabase {
         let username = Self::generate_username(options.server.uuid);
         let password = Self::generate_password();
 
+        let name_conflict = || {
+            crate::database::DatabaseError::from(anyhow::Error::new(
+                crate::response::DisplayError::new("database with name already exists")
+                    .with_status(StatusCode::CONFLICT),
+            ))
+        };
+
+        if sqlx::query_scalar!(
+            r#"
+            SELECT EXISTS (
+                SELECT 1
+                FROM server_databases
+                WHERE server_databases.server_uuid = $1 AND server_databases.name = $2
+            ) AS "exists!"
+            "#,
+            options.server.uuid,
+            &name
+        )
+        .fetch_one(&mut **transaction)
+        .await?
+        {
+            return Err(name_conflict());
+        }
+
         let db_transaction: DatabaseTransaction = match options
             .database_host
             .clone()
@@ -715,44 +740,98 @@ impl CreatableModel for ServerDatabase {
             crate::models::database_host::DatabasePool::Mysql(pool) => {
                 let mut transaction = pool.begin().await?;
 
+                let drop_database = format!("DROP DATABASE IF EXISTS `{name}`");
+                let drop_user = format!("DROP USER IF EXISTS '{username}'@'%'");
+
                 sqlx::query(sqlx::AssertSqlSafe(format!(
-                    "CREATE USER IF NOT EXISTS '{username}'@'%' IDENTIFIED BY '{password}'"
+                    "CREATE USER '{username}'@'%' IDENTIFIED BY '{password}'"
                 )))
                 .execute(&mut *transaction)
                 .await?;
-                sqlx::query(sqlx::AssertSqlSafe(format!("CREATE DATABASE IF NOT EXISTS `{name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")))
+                if let Err(err) = sqlx::query(sqlx::AssertSqlSafe(format!("CREATE DATABASE `{name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")))
                     .execute(&mut *transaction)
-                    .await?;
-                sqlx::query(sqlx::AssertSqlSafe(format!(
+                    .await
+                {
+                    transaction.rollback().await.ok();
+                    sqlx::query(sqlx::AssertSqlSafe(drop_user))
+                        .execute(&pool)
+                        .await
+                        .ok();
+
+                    return Err(err.into());
+                }
+                if let Err(err) = sqlx::query(sqlx::AssertSqlSafe(format!(
                     "GRANT ALL PRIVILEGES ON `{name}`.* TO '{username}'@'%' WITH GRANT OPTION"
                 )))
                 .execute(&mut *transaction)
-                .await?;
+                .await
+                {
+                    transaction.rollback().await.ok();
+                    let (_, _) = tokio::join!(
+                        sqlx::query(sqlx::AssertSqlSafe(drop_database)).execute(&pool),
+                        sqlx::query(sqlx::AssertSqlSafe(drop_user)).execute(&pool)
+                    );
+
+                    return Err(err.into());
+                }
 
                 DatabaseTransaction::Mysql(transaction, pool)
             }
             crate::models::database_host::DatabasePool::Postgres(pool) => {
                 let transaction = pool.begin().await?;
 
+                let drop_database = format!("DROP DATABASE IF EXISTS \"{name}\"");
+                let drop_user = format!("DROP USER IF EXISTS \"{username}\"");
+
                 sqlx::query(sqlx::AssertSqlSafe(format!(
                     "CREATE USER \"{username}\" WITH PASSWORD '{password}'"
                 )))
                 .execute(&pool)
                 .await?;
-                sqlx::query(sqlx::AssertSqlSafe(format!(
+                if let Err(err) = sqlx::query(sqlx::AssertSqlSafe(format!(
                     "CREATE DATABASE \"{name}\" WITH OWNER \"{username}\" ENCODING 'UTF8'"
                 )))
                 .execute(&pool)
-                .await?;
-                sqlx::query(sqlx::AssertSqlSafe(format!(
+                .await
+                {
+                    sqlx::query(sqlx::AssertSqlSafe(drop_user))
+                        .execute(&pool)
+                        .await
+                        .ok();
+
+                    return Err(err.into());
+                }
+                if let Err(err) = sqlx::query(sqlx::AssertSqlSafe(format!(
                     "REVOKE ALL ON DATABASE \"{name}\" FROM PUBLIC"
                 )))
                 .execute(&pool)
-                .await?;
+                .await
+                {
+                    sqlx::query(sqlx::AssertSqlSafe(drop_database))
+                        .execute(&pool)
+                        .await
+                        .ok();
+                    sqlx::query(sqlx::AssertSqlSafe(drop_user))
+                        .execute(&pool)
+                        .await
+                        .ok();
+
+                    return Err(err.into());
+                }
 
                 DatabaseTransaction::Postgres(transaction, pool)
             }
             crate::models::database_host::DatabasePool::Mongodb(client) => {
+                if client
+                    .list_database_names()
+                    .filter(mongodb::bson::doc! { "name": &name })
+                    .await?
+                    .iter()
+                    .any(|database| database == &name)
+                {
+                    return Err(name_conflict());
+                }
+
                 let db = client.database(&name);
                 let cmd = mongodb::bson::doc! {
                     "createUser": &username,
@@ -769,28 +848,33 @@ impl CreatableModel for ServerDatabase {
 
         let mut query_builder = InsertQueryBuilder::new("server_databases");
 
-        Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
+        let row = match async {
+            Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
 
-        query_builder
-            .set("server_uuid", options.server.uuid)
-            .set("database_host_uuid", options.database_host.uuid)
-            .set("name", &name)
-            .set("username", &username)
-            .set(
-                "password",
-                EncryptedString::from_plaintext(password, &state.database).await?,
-            );
+            query_builder
+                .set("server_uuid", options.server.uuid)
+                .set("database_host_uuid", options.database_host.uuid)
+                .set("name", &name)
+                .set("username", &username)
+                .set(
+                    "password",
+                    EncryptedString::from_plaintext(password, &state.database).await?,
+                );
 
-        let row = match query_builder
-            .returning("uuid")
-            .fetch_one(&mut **transaction)
-            .await
+            Ok::<_, crate::database::DatabaseError>(
+                query_builder
+                    .returning("uuid")
+                    .fetch_one(&mut **transaction)
+                    .await?,
+            )
+        }
+        .await
         {
             Ok(row) => row,
             Err(err) => {
                 match db_transaction {
                     DatabaseTransaction::Mysql(db_tx, pool) => {
-                        db_tx.rollback().await?;
+                        db_tx.rollback().await.ok();
 
                         let drop_database = format!("DROP DATABASE IF EXISTS `{name}`");
                         let drop_user = format!("DROP USER IF EXISTS '{username}'@'%'");
@@ -801,22 +885,29 @@ impl CreatableModel for ServerDatabase {
                         );
                     }
                     DatabaseTransaction::Postgres(db_tx, pool) => {
-                        db_tx.rollback().await?;
+                        db_tx.rollback().await.ok();
 
                         let drop_database = format!("DROP DATABASE IF EXISTS \"{name}\"");
                         let drop_user = format!("DROP USER IF EXISTS \"{username}\"");
 
-                        let (_, _) = tokio::join!(
-                            sqlx::query(sqlx::AssertSqlSafe(drop_database)).execute(&pool),
-                            sqlx::query(sqlx::AssertSqlSafe(drop_user)).execute(&pool)
-                        );
+                        sqlx::query(sqlx::AssertSqlSafe(drop_database))
+                            .execute(&pool)
+                            .await
+                            .ok();
+                        sqlx::query(sqlx::AssertSqlSafe(drop_user))
+                            .execute(&pool)
+                            .await
+                            .ok();
                     }
                     DatabaseTransaction::Mongodb(client) => {
-                        let _ = client.database(&name).drop().await;
+                        let _ = client
+                            .database(&name)
+                            .run_command(mongodb::bson::doc! { "dropUser": &username })
+                            .await;
                     }
                 }
 
-                return Err(err.into());
+                return Err(err);
             }
         };
 

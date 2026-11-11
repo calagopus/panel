@@ -2023,6 +2023,35 @@
           "tooltip": {
             "limitReached": "Du bist auf {max} Befehlskürzel limitiert."
           },
+          "table": {
+            "columns": {
+              "appliesTo": "Gilt für"
+            }
+          },
+          "form": {
+            "eggsPlaceholder": "Eggs auswählen",
+            "matcher": "Gilt für",
+            "matcherDescription": "Legt anhand ihres Eggs fest, auf welchen Servern dieses Befehlskürzel verfügbar ist.",
+            "matcherType": "Matcher-Typ"
+          },
+          "matcher": {
+            "allMustMatch": "Alle Matcher müssen zutreffen:",
+            "anyMustMatch": "Mindestens ein Matcher muss zutreffen:",
+            "mustNotMatch": "Matcher darf nicht zutreffen:"
+          },
+          "button": {
+            "addMatcher": "Matcher hinzufügen"
+          },
+          "enum": {
+            "matcherType": {
+              "never": "Nie (Nirgends verfügbar)",
+              "all": "Alle (Auf jedem Server verfügbar)",
+              "and": "UND (Alle müssen zutreffen)",
+              "or": "ODER (Mindestens einer muss zutreffen)",
+              "not": "NICHT (Darf nicht zutreffen)",
+              "eggs": "Eggs"
+            }
+          },
           "modal": {
             "createCommandSnippet": {
               "title": "Befehlskürzel erstellen",

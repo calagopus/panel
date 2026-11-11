@@ -567,6 +567,8 @@ impl NestEgg {
     ) -> Result<(), crate::database::DatabaseError> {
         let exported_egg_hash = exported_egg.content_hash();
 
+        let mut transaction = database.write().begin().await?;
+
         sqlx::query!(
             "UPDATE nest_eggs
             SET
@@ -613,10 +615,8 @@ impl NestEgg {
                 .collect::<Vec<_>>(),
             from_repository.then(|| exported_egg_hash.as_str()),
         )
-        .execute(database.write())
+        .execute(&mut *transaction)
         .await?;
-
-        Self::invalidate_cached(database, self.uuid).await;
 
         let unused_variables = sqlx::query!(
             "SELECT nest_egg_variables.uuid
@@ -629,7 +629,7 @@ impl NestEgg {
                 .map(|v| v.env_variable.as_str())
                 .collect::<Vec<_>>() as &[&str]
         )
-        .fetch_all(database.read())
+        .fetch_all(&mut *transaction)
         .await?;
 
         for (i, variable) in exported_egg.variables.iter_mut().enumerate() {
@@ -641,12 +641,12 @@ impl NestEgg {
                 variable.description = None;
             }
 
-            if let Err(err) = sqlx::query!(
+            sqlx::query!(
                 "INSERT INTO nest_egg_variables (
                     egg_uuid, name, name_translations, description, description_translations, order_, env_variable,
-                    default_value, user_viewable, user_editable, rules
+                    default_value, user_viewable, user_editable, secret, rules
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
                 ON CONFLICT (egg_uuid, env_variable) DO UPDATE SET
                     name = EXCLUDED.name,
                     name_translations = EXCLUDED.name_translations,
@@ -656,6 +656,7 @@ impl NestEgg {
                     default_value = EXCLUDED.default_value,
                     user_viewable = EXCLUDED.user_viewable,
                     user_editable = EXCLUDED.user_editable,
+                    secret = EXCLUDED.secret,
                     rules = EXCLUDED.rules",
                 self.uuid,
                 &variable.name,
@@ -671,17 +672,15 @@ impl NestEgg {
                 variable.default_value.as_deref(),
                 variable.user_viewable,
                 variable.user_editable,
+                variable.secret,
                 &variable
                     .rules
                     .iter()
                     .map(|r| r.as_str())
                     .collect::<Vec<_>>() as &[&str]
             )
-            .execute(database.read())
-            .await
-            {
-                tracing::warn!("error while importing nest egg variable: {:?}", err);
-            }
+            .execute(&mut *transaction)
+            .await?;
         }
 
         let order_base = exported_egg.variables.len() as i16
@@ -703,8 +702,12 @@ impl NestEgg {
                 .collect::<Vec<_>>(),
             self.uuid,
         )
-        .execute(database.write())
+        .execute(&mut *transaction)
         .await?;
+
+        transaction.commit().await?;
+
+        Self::invalidate_cached(database, self.uuid).await;
 
         Ok(())
     }

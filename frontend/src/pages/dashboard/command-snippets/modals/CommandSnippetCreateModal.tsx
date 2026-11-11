@@ -2,38 +2,31 @@ import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import createCommandSnippet from '@/api/me/command-snippets/createCommandSnippet.ts';
-import getUserEggs from '@/api/me/servers/eggs/getUserEggs.ts';
 import Button from '@/elements/buttons/Button.tsx';
-import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { serverEggSchema } from '@/lib/schemas/server/server.ts';
 import { userCommandSnippetUpdateSchema } from '@/lib/schemas/user/commandSnippets.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
-import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import CommandSnippetMatcherBuilder from '../CommandSnippetMatcherBuilder.tsx';
 
 export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
-  const eggs = useInfiniteSearchableResource<z.infer<typeof serverEggSchema>>({
-    queryKey: queryKeys.user.eggs.all(),
-    fetcher: (page, search) => getUserEggs(page, search),
-  });
-
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof userCommandSnippetUpdateSchema>
   >({
     initialValues: {
       name: '',
-      eggs: [],
+      matcher: { type: 'all' },
       command: 'say hello world',
     },
     schema: userCommandSnippetUpdateSchema,
@@ -57,19 +50,18 @@ export default function CommandSnippetCreateModal({ ...props }: ModalProps) {
       <Stack>
         <TextInput withAsterisk label={t('common.form.name', {})} {...form.getInputProps('name')} />
 
-        <MultiSelect
-          label={t('common.form.eggs', {})}
-          data={eggs.items.map((egg) => ({
-            label: egg.name,
-            value: egg.uuid,
-          }))}
-          searchable
-          searchValue={eggs.search}
-          onSearchChange={eggs.setSearch}
-          infiniteScroll={eggs.infiniteScroll}
-          loading={eggs.loading}
-          {...form.getInputProps('eggs')}
-        />
+        <Stack gap='xs'>
+          <div>
+            <Text fw={500}>{t('pages.account.commandSnippets.form.matcher', {})}</Text>
+            <Text size='xs' c='dimmed'>
+              {t('pages.account.commandSnippets.form.matcherDescription', {})}
+            </Text>
+          </div>
+          <CommandSnippetMatcherBuilder
+            matcher={form.values.matcher}
+            onChange={(matcher) => form.setFieldValue('matcher', matcher)}
+          />
+        </Stack>
 
         <TextArea
           withAsterisk

@@ -336,8 +336,11 @@ impl Env {
                 .unwrap_or("".to_string())
                 .trim_matches('"')
                 .split(',')
-                .filter_map(|s| if s.is_empty() { None } else { s.parse().ok() })
-                .collect(),
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(str::parse)
+                .collect::<Result<_, _>>()
+                .context("Invalid APP_TRUSTED_PROXIES value")?,
             app_blocked_cidrs: match std::env::var("APP_BLOCKED_CIDRS") {
                 Ok(cidrs) => cidrs
                     .trim_matches('"')

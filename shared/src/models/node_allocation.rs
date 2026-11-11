@@ -707,7 +707,7 @@ impl NodeAllocation {
                             None => continue 'primary,
                         };
                         if !is_unused!(allocation.uuid) {
-                            return Err(anyhow::anyhow!("allocated additional allocation is already in use").into());
+                            continue 'primary;
                         }
                         additional.push(allocation.uuid);
 
@@ -730,7 +730,7 @@ impl NodeAllocation {
                             None => continue 'primary,
                         };
                         if !is_unused!(allocation.uuid) {
-                            return Err(anyhow::anyhow!("allocated additional allocation is already in use").into());
+                            continue 'primary;
                         }
                         additional.push(allocation.uuid);
 
@@ -753,7 +753,7 @@ impl NodeAllocation {
                             None => continue 'primary,
                         };
                         if !is_unused!(allocation.uuid) {
-                            return Err(anyhow::anyhow!("allocated additional allocation is already in use").into());
+                            continue 'primary;
                         }
                         additional.push(allocation.uuid);
 
@@ -776,7 +776,7 @@ impl NodeAllocation {
                             None => continue 'primary,
                         };
                         if !is_unused!(allocation.uuid) {
-                            return Err(anyhow::anyhow!("allocated additional allocation is already in use").into());
+                            continue 'primary;
                         }
                         additional.push(allocation.uuid);
 

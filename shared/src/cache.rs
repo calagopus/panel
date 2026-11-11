@@ -479,7 +479,7 @@ impl Cache {
                 .into_value(),
         };
 
-        if limit_used >= limit {
+        if limit_used > limit {
             return Err(ratelimited_response(limit, limit_used, expire_unix, now));
         }
 
@@ -1145,9 +1145,30 @@ mod tests {
         cache.ratelimit("test", 2, 60, "client").await.unwrap();
         assert!(!cache.ratelimit_reached("test", 2, "client").await);
 
-        cache.ratelimit("test", 2, 60, "client").await.unwrap_err();
+        cache.ratelimit("test", 2, 60, "client").await.unwrap();
         assert!(cache.ratelimit_reached("test", 2, "client").await);
         assert!(!cache.ratelimit_reached("test", 2, "other").await);
+    }
+
+    #[tokio::test]
+    async fn ratelimit_allows_exactly_hits_per_window() {
+        let cache = memory_only();
+
+        for limit in [1, 3] {
+            let client = limit.to_string();
+
+            for _ in 0..limit {
+                cache.ratelimit("test", limit, 60, &client).await.unwrap();
+            }
+            cache
+                .ratelimit("test", limit, 60, &client)
+                .await
+                .unwrap_err();
+            cache
+                .ratelimit("test", limit, 60, &client)
+                .await
+                .unwrap_err();
+        }
     }
 
     #[tokio::test]

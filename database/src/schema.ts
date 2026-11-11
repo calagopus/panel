@@ -467,13 +467,12 @@ export const userCommandSnippetsTable = pgTable(
       .references(() => usersTable.uuid, { onDelete: 'cascade' })
       .notNull(),
     name: varchar({ length: 31 * UTF8_MAX_SCALAR_SIZE }).notNull(),
-    eggs: uuid().array().default([]).notNull(),
+    matcher: jsonb().notNull(),
     command: text().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
     index('command_snippets_user_uuid_idx').on(cols.user_uuid),
-    index('command_snippets_eggs_idx').using('gin', cols.eggs),
     uniqueIndex('command_snippets_user_uuid_name_idx').on(cols.user_uuid, cols.name),
   ],
 );

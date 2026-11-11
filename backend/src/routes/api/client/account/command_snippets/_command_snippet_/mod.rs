@@ -71,7 +71,7 @@ mod patch {
                 serde_json::json!({
                     "uuid": command_snippet.uuid,
                     "name": command_snippet.name,
-                    "eggs": command_snippet.eggs,
+                    "matcher": command_snippet.matcher,
                     "command": command_snippet.command,
                 }),
             )
