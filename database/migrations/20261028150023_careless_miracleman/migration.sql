@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "username" SET DATA TYPE varchar(192) USING "username"::varchar(192);
