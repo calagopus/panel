@@ -273,6 +273,7 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
   const contextValue = useMemo(() => {
     const numberFormat = new Intl.NumberFormat(language, { maximumFractionDigits: 20 });
+    const pluralRules = new Intl.PluralRules(language);
 
     const formatValue = (value: unknown): string => {
       if (typeof value !== 'number') {
@@ -388,10 +389,13 @@ const TranslationProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(`Language item key ${key} not found.`);
       }
 
-      const translationItem = languageData?.items[key] || baseTranslations.items[key as never];
-      const rules = new Intl.PluralRules(language);
+      const translatedItem = languageData?.items[key];
+      const baseItem = baseTranslations.items[key as never] as TranslationItemRecord[string] | undefined;
+      const form = pluralRules.select(count);
+      const translation =
+        translatedItem?.[form] || translatedItem?.other || baseItem?.[form] || baseItem?.other || `{count} ${key}`;
 
-      return translationItem[rules.select(count)].replaceAll('{count}', formatValue(count));
+      return translation.replaceAll('{count}', formatValue(count));
     };
 
     return { language, setLanguage, t, tReact, tItem };
