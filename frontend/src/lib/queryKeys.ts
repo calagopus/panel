@@ -54,6 +54,7 @@ const admin = {
     allocations: (serverUuid: string) => ['admin', 'servers', serverUuid, 'allocations'] as const,
     databases: (serverUuid: string) => ['admin', 'servers', serverUuid, 'databases'] as const,
     variables: (serverUuid: string) => ['admin', 'servers', serverUuid, 'variables'] as const,
+    crashes: (serverUuid: string) => ['admin', 'servers', serverUuid, 'crashes'] as const,
   },
 
   extensions: {
@@ -253,6 +254,10 @@ const server = (serverUuid: string) => ({
   },
   announcements: {
     all: () => ['server', serverUuid, 'announcements'] as const,
+  },
+  crashes: {
+    all: () => ['server', serverUuid, 'crashes'] as const,
+    log: (crashId: number) => ['server', serverUuid, 'crashes', crashId, 'log'] as const,
   },
   backups: {
     all: () => ['server', serverUuid, 'backups'] as const,

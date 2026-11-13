@@ -4149,13 +4149,28 @@
               "page": {
                 "title": "Server Logs",
                 "form": {
-                  "logType": "Log-Typ"
+                  "logType": "Log-Typ",
+                  "crash": "Absturz"
                 },
                 "enum": {
                   "logType": {
                     "console": "Konsole",
-                    "install": "Installation"
+                    "install": "Installation",
+                    "crash": "Absturz"
                   }
+                },
+                "crashOption": "{timestamp} - Exit-Code {exitCode}",
+                "crashOptionOom": "{timestamp} - Exit-Code {exitCode} (Speicher erschöpft)",
+                "noCrashes": "Keine Abstürze aufgezeichnet",
+                "crashesUnavailable": "Absturzverlauf nicht verfügbar",
+                "modal": {
+                  "deleteCrash": {
+                    "title": "Absturz löschen",
+                    "content": "Möchtest du den Absturz vom **{timestamp}** samt Konsolenausgabe wirklich löschen?"
+                  }
+                },
+                "toast": {
+                  "crashDeleted": "Absturz gelöscht."
                 }
               }
             },
@@ -5890,7 +5905,9 @@
             "increaseFontSize": "Schriftgröße erhöhen",
             "copySelection": "Auswahl kopieren",
             "popout": "In separatem Fenster öffnen",
-            "commandPrefix": "Befehlspräfix"
+            "commandPrefix": "Befehlspräfix",
+            "crashHistory": "Absturzverlauf",
+            "recentCrash": "In den letzten 24 Stunden abgestürzt"
           },
           "quickAction": {
             "search": "Konsole durchsuchen",
@@ -5988,6 +6005,45 @@
             "unavailable": {
               "title": "Ressourcenverlauf nicht verfügbar",
               "description": "Der Node, auf dem dieser Server läuft, zeichnet keinen Ressourcenverlauf auf, entweder weil er deaktiviert ist oder weil der Node ein Update benötigt."
+            }
+          },
+          "crashes": {
+            "title": "Absturzverlauf",
+            "button": {
+              "backToConsole": "Zurück zur Konsole"
+            },
+            "sidebar": {
+              "title": "Abstürze"
+            },
+            "exitCode": "Exit-Code {exitCode}",
+            "exitCodeSignal": "Exit-Code {exitCode} ({signal})",
+            "badge": {
+              "oomKilled": "Speicher erschöpft",
+              "truncated": "Gekürzt"
+            },
+            "tooltip": {
+              "truncated": "Ältere Ausgabe wurde abgeschnitten, um das Größenlimit einzuhalten."
+            },
+            "empty": {
+              "title": "Keine Abstürze",
+              "description": "Wenn der Server abstürzt, werden hier sein Exit-Code und die letzte Konsolenausgabe gespeichert."
+            },
+            "missing": {
+              "title": "Absturz nicht gefunden",
+              "description": "Dieser Absturzeintrag ist abgelaufen oder wurde gelöscht."
+            },
+            "unavailable": {
+              "title": "Absturzverlauf nicht verfügbar",
+              "description": "Die Node, auf der dieser Server läuft, speichert keinen Absturzverlauf, entweder weil er deaktiviert ist oder weil die Node aktualisiert werden muss."
+            },
+            "modal": {
+              "delete": {
+                "title": "Absturz löschen",
+                "content": "Möchtest du den Absturz vom **{timestamp}** samt Konsolenausgabe wirklich löschen?"
+              }
+            },
+            "toast": {
+              "deleted": "Absturz gelöscht."
             }
           },
           "socketConnected": "Verbunden ({ping}ms ping)",

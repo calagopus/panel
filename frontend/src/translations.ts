@@ -4102,12 +4102,27 @@ const baseTranslations = defineTranslations({
                 title: 'Server Logs',
                 form: {
                   logType: 'Log Type',
+                  crash: 'Crash',
                 },
                 enum: {
                   logType: {
                     console: 'Console',
                     install: 'Install',
+                    crash: 'Crash',
                   },
+                },
+                crashOption: '{timestamp} - Exit Code {exitCode}',
+                crashOptionOom: '{timestamp} - Exit Code {exitCode} (Out of Memory)',
+                noCrashes: 'No crashes recorded',
+                crashesUnavailable: 'Crash history unavailable',
+                modal: {
+                  deleteCrash: {
+                    title: 'Delete Crash',
+                    content: 'Are you sure you want to delete the crash from **{timestamp}** and its console output?',
+                  },
+                },
+                toast: {
+                  crashDeleted: 'Crash deleted.',
                 },
               },
             },
@@ -5923,6 +5938,8 @@ const baseTranslations = defineTranslations({
             copySelection: 'Copy Selection',
             popout: 'Open in Separate Window',
             commandPrefix: 'Command Prefix',
+            crashHistory: 'Crash History',
+            recentCrash: 'Crashed in the Last 24 Hours',
           },
           quickAction: {
             search: 'Search Console',
@@ -6024,6 +6041,46 @@ const baseTranslations = defineTranslations({
               title: 'Resource History Unavailable',
               description:
                 "The node this server runs on doesn't record resource history, either because it is turned off or because the node needs an update.",
+            },
+          },
+          crashes: {
+            title: 'Crash History',
+            button: {
+              backToConsole: 'Back to Console',
+            },
+            sidebar: {
+              title: 'Crashes',
+            },
+            exitCode: 'Exit Code {exitCode}',
+            exitCodeSignal: 'Exit Code {exitCode} ({signal})',
+            badge: {
+              oomKilled: 'Out of Memory',
+              truncated: 'Truncated',
+            },
+            tooltip: {
+              truncated: 'Older output was cut off to stay within the size limit.',
+            },
+            empty: {
+              title: 'No Crashes',
+              description: 'When the server crashes, its exit code and last console output are kept here.',
+            },
+            missing: {
+              title: 'Crash Not Found',
+              description: 'This crash record has expired or was deleted.',
+            },
+            unavailable: {
+              title: 'Crash History Unavailable',
+              description:
+                "The node this server runs on doesn't keep crash history, either because it is turned off or because the node needs an update.",
+            },
+            modal: {
+              delete: {
+                title: 'Delete Crash',
+                content: 'Are you sure you want to delete the crash from **{timestamp}** and its console output?',
+              },
+            },
+            toast: {
+              deleted: 'Crash deleted.',
             },
           },
           socketConnected: 'Connected ({ping}ms ping)',

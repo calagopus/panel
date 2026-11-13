@@ -1442,6 +1442,50 @@ impl WingsClient {
         .await
     }
 
+    pub async fn get_servers_server_logs_crashes(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_logs_crashes::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/logs/crashes"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn get_servers_server_logs_crashes_crash(
+        &self,
+        server: uuid::Uuid,
+        crash: i64,
+    ) -> Result<super::servers_server_logs_crashes_crash::get::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::GET,
+            format!("/api/servers/{server}/logs/crashes/{crash}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn delete_servers_server_logs_crashes_crash(
+        &self,
+        server: uuid::Uuid,
+        crash: i64,
+    ) -> Result<super::servers_server_logs_crashes_crash::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/logs/crashes/{crash}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn get_servers_server_logs_install(
         &self,
         server: uuid::Uuid,

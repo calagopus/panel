@@ -649,6 +649,10 @@ pub(crate) static BASE_SERVER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permi
                     permissions: IndexMap::from([
                         ("read-console", "Allows reading the server console logs."),
                         (
+                            "delete-crashes",
+                            "Allows deleting stored crash records and their console output.",
+                        ),
+                        (
                             "console",
                             "Allows sending commands to the server instance via the console.",
                         ),

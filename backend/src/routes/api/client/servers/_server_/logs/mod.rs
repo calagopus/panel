@@ -1,6 +1,8 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod crashes;
+
 mod get {
     use axum::{extract::Query, http::StatusCode};
     use garde::Validate;
@@ -77,5 +79,6 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/crashes", crashes::router(state))
         .with_state(state.clone())
 }

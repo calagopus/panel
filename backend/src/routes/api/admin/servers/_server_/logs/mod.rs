@@ -1,6 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod crashes;
 mod install;
 
 mod get {
@@ -78,6 +79,7 @@ mod get {
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
+        .nest("/crashes", crashes::router(state))
         .nest("/install", install::router(state))
         .with_state(state.clone())
 }

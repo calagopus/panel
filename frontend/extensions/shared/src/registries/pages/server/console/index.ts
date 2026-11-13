@@ -3,6 +3,7 @@ import { ContainerRegistry, Registry } from 'shared';
 import type { Props as ContainerProps } from '@/elements/containers/ServerContentContainer.tsx';
 import { ComponentListRegistry } from '../../../slices/componentList.ts';
 import { XTermRegistry } from '../../../slices/xterm.ts';
+import { CrashHistoryRegistry } from './crashes.ts';
 import { ResourceHistoryRegistry } from './history.ts';
 
 interface ConsoleFeatureDefinition {
@@ -18,6 +19,7 @@ export class ConsoleRegistry implements Registry {
     this.terminalHeaderRightComponents.mergeFrom(other.terminalHeaderRightComponents);
     this.xterm.mergeFrom(other.xterm);
     this.history.mergeFrom(other.history);
+    this.crashes.mergeFrom(other.crashes);
 
     this.features.push(...other.features);
     this.statCards.push(...other.statCards);
@@ -33,6 +35,7 @@ export class ConsoleRegistry implements Registry {
   public terminalHeaderRightComponents: ComponentListRegistry = new ComponentListRegistry();
   public xterm: XTermRegistry = new XTermRegistry();
   public history: ResourceHistoryRegistry = new ResourceHistoryRegistry();
+  public crashes: CrashHistoryRegistry = new CrashHistoryRegistry();
 
   public features: ConsoleFeatureDefinition[] = [];
   public statCards: FC[] = [];
@@ -66,6 +69,11 @@ export class ConsoleRegistry implements Registry {
 
   public enterHistory(callback: (registry: ResourceHistoryRegistry) => unknown): this {
     callback(this.history);
+    return this;
+  }
+
+  public enterCrashes(callback: (registry: CrashHistoryRegistry) => unknown): this {
+    callback(this.crashes);
     return this;
   }
 

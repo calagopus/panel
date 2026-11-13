@@ -165,6 +165,25 @@ nestify::nest! {
 }
 
 nestify::nest! {
+    #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Crash {
+        #[schema(inline)]
+        pub id: i64,
+        #[schema(inline)]
+        pub timestamp: chrono::DateTime<chrono::Local>,
+        #[schema(inline)]
+        pub exit_code: i32,
+        #[schema(inline)]
+        pub oom_killed: bool,
+        #[schema(inline)]
+        pub lines: u64,
+        #[schema(inline)]
+        pub bytes: u64,
+        #[schema(inline)]
+        pub truncated: bool,
+    }
+}
+
+nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Device {
         #[schema(inline)]
         pub target: compact_str::CompactString,
@@ -2876,6 +2895,52 @@ pub mod servers_server_logs {
             #[doc(hidden)]
             pub __priv: (),
         }
+    }
+}
+pub mod servers_server_logs_crashes {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub crashes: Vec<Crash>,
+            }
+        }
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod servers_server_logs_crashes_crash {
+    use super::*;
+
+    pub mod get {
+        use super::*;
+
+        pub type Response200 = AsyncResponseReader;
+
+        pub type Response404 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
+    }
+
+    pub mod delete {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response = Response200;
     }
 }
 pub mod servers_server_logs_install {

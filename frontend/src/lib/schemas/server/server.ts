@@ -143,3 +143,13 @@ export const serverResourceHistorySchema = z.object({
   points: z.array(serverResourceHistoryPointSchema),
   limits: z.array(serverResourceHistoryLimitsSchema),
 });
+
+export const serverCrashSchema = z.object({
+  id: z.number(),
+  timestamp: z.coerce.date(),
+  exitCode: z.number(),
+  oomKilled: z.boolean(),
+  lines: z.number(),
+  bytes: z.number(),
+  truncated: z.boolean(),
+});

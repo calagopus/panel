@@ -5,6 +5,7 @@ type PropsInterceptor<P> = (props: P) => P;
 
 export class ContainerRegistry<Props = {}, AdditionalFC = {}> implements Registry {
   public mergeFrom(other: this): this {
+    this.propsInterceptors.push(...other.propsInterceptors);
     this.prependedComponents.push(...other.prependedComponents);
     this.prependedContentComponents.push(...other.prependedContentComponents);
     this.appendedContentComponents.push(...other.appendedContentComponents);

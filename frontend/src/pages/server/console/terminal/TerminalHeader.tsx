@@ -23,6 +23,7 @@ import { useUserSetting } from '@/lib/userSettings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import openConsolePopout from '../openConsolePopout.ts';
+import CrashHistoryLink from './CrashHistoryLink.tsx';
 
 export const CONSOLE_FONT_SIZE_KEY = 'console::font_size';
 export const consoleFontSizeSchema = z.number();
@@ -96,6 +97,7 @@ export default function TerminalHeader({
           }
           name='console-terminalHeaderRight-prepended'
         />
+        {!popout && <CrashHistoryLink />}
         <Popover
           trapFocus
           opened={openModal === 'search'}
