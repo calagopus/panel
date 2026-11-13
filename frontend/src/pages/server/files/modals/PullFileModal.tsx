@@ -1,14 +1,19 @@
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import classNames from 'classnames';
 import { resolve } from 'pathe';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import pullFile from '@/api/server/files/pullFile.ts';
 import queryFilePull from '@/api/server/files/queryFilePull.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
+import { freeDiskBytes } from '@/lib/files/diskSpace.ts';
 import { bytesToString } from '@/lib/format/size.ts';
 import { serverFilesPullQueryResultSchema, serverFilesPullSchema } from '@/lib/schemas/server/files.ts';
 import FilePathPreview from '@/pages/server/files/modals/FilePathPreview.tsx';
@@ -21,7 +26,10 @@ import { useServerStore } from '@/stores/server.ts';
 export default function PullFileModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
+  const diskBytes = useServerStore((state) => state.stats?.diskBytes ?? null);
+  const trashBytes = useServerStore((state) => state.stats?.trashBytes ?? 0);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
 
   const [queryLoading, setQueryLoading] = useState(false);
@@ -63,6 +71,9 @@ export default function PullFileModal({ ...props }: ModalProps) {
       .finally(() => setQueryLoading(false));
   };
 
+  const freeBytes = freeDiskBytes(server.limits.disk, diskBytes);
+  const exceedsFreeSpace = freeBytes !== null && !!queryResult?.fileSize && queryResult.fileSize > freeBytes;
+
   return (
     <FormModal
       title={t('pages.server.files.modal.pullFile.title', {})}
@@ -101,6 +112,26 @@ export default function PullFileModal({ ...props }: ModalProps) {
         label={t('pages.server.files.modal.pullFile.createdAs', {})}
         path={resolve(browsingDirectory, form.values.name ?? '')}
       />
+
+      {exceedsFreeSpace && (
+        <Alert color='yellow' className='mt-2' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          {t('pages.server.files.modal.pullFile.insufficientDisk', {
+            size: bytesToString(queryResult?.fileSize ?? 0),
+            free: bytesToString(Math.max(0, freeBytes ?? 0)),
+          })}
+          {trashBytes > 0 && (
+            <Button
+              size='xs'
+              variant='light'
+              color='yellow'
+              className='mt-2 block'
+              onClick={() => navigate(`/server/${server.uuidShort}/files/trash`)}
+            >
+              {t('elements.fileUpload.openTrash', {})}
+            </Button>
+          )}
+        </Alert>
+      )}
 
       <ModalFooter>
         <Button type='submit' loading={loading} disabled={!form.isValid()}>

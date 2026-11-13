@@ -67,11 +67,13 @@ export function formatBinding(binding: ShortcutBinding | null): string {
 }
 
 export function parseBinding(text: string): ShortcutBinding | null {
-  const tokens = text
+  const trimmed = text.trim();
+  const plusKey = /(^|\+)\s*\+$/.test(trimmed);
+  const tokens = (plusKey ? trimmed.replace(/\+$/, '') : trimmed)
     .split('+')
     .map((t) => t.trim())
     .filter(Boolean);
-  if (tokens.length === 0) return null;
+  if (tokens.length === 0 && !plusKey) return null;
 
   const modifiers: ModifierKey[] = [];
   let key: string | null = null;
@@ -85,6 +87,7 @@ export function parseBinding(text: string): ShortcutBinding | null {
     key = token.toLowerCase() === 'space' ? ' ' : token.length === 1 ? token.toLowerCase() : token;
   }
 
+  if (plusKey) key = '+';
   if (key === null) return null;
   return { key, modifiers };
 }
@@ -117,9 +120,12 @@ function layoutSafeKey(event: KeyboardEvent): string {
 export function bindingFromEvent(event: KeyboardEvent): ShortcutBinding | null {
   if (['Control', 'Meta', 'Shift', 'Alt', 'AltGraph'].includes(event.key)) return null;
 
+  const isMac = navigator.platform.toUpperCase().includes('MAC');
+  const primary = isMac ? event.metaKey : event.ctrlKey;
   const modifiers: ModifierKey[] = [];
-  if (event.ctrlKey) modifiers.push('ctrl');
-  if (event.metaKey) modifiers.push('meta');
+  if (primary) modifiers.push('ctrlOrMeta');
+  if (event.ctrlKey && isMac) modifiers.push('ctrl');
+  if (event.metaKey && !isMac) modifiers.push('meta');
   if (event.altKey) modifiers.push('alt');
   if (event.shiftKey) modifiers.push('shift');
 

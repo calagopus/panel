@@ -1,9 +1,12 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import deleteSecurityKey from '@/api/me/security-keys/deleteSecurityKey.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -13,6 +16,7 @@ import Text from '@/elements/typography/Text.tsx';
 import { withTwoFactorMethod } from '@/lib/auth/twoFactor.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userSecurityKeyDeleteSchema, userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
+import { useTwoFactorRequirement } from '@/pages/dashboard/account/useTwoFactorRequirement.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -30,6 +34,7 @@ export default function SecurityKeyDeleteModal({ securityKey, total, ...props }:
   const queryClient = useQueryClient();
   const { user, setUser } = useAuth();
   const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
+  const { isLastAcceptedMethod } = useTwoFactorRequirement();
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof userSecurityKeyDeleteSchema>
@@ -74,6 +79,12 @@ export default function SecurityKeyDeleteModal({ securityKey, total, ...props }:
             key: securityKey.name,
           }).md()}
         </Text>
+
+        {total <= 1 && isLastAcceptedMethod('security_key') && (
+          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
+          </Alert>
+        )}
 
         {user?.hasPassword && (
           <PasswordInput

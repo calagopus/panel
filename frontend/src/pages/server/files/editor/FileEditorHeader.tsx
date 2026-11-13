@@ -6,6 +6,7 @@ import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
 import Avatar from '@/elements/data-display/Avatar.tsx';
+import Badge from '@/elements/data-display/Badge.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Menu from '@/elements/overlays/Menu.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
@@ -30,6 +31,7 @@ interface FileEditorHeaderProps {
   onRevertClick: () => void;
   onHistoryClick: () => void;
   fileName: string;
+  writable: boolean;
   saving: boolean;
   onSave: () => void;
   onCreateClick: () => void;
@@ -46,13 +48,13 @@ export default function FileEditorHeader({
   onRevertClick,
   onHistoryClick,
   fileName,
+  writable,
   saving,
   onSave,
   onCreateClick,
 }: FileEditorHeaderProps) {
   const { t } = useTranslations();
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
-  const browsingWritableDirectory = useFileManager((state) => state.browsingWritableDirectory);
 
   return (
     <div className='flex flex-wrap justify-between items-center gap-2 lg:pt-6 px-4 lg:px-6 lg:pb-0'>
@@ -143,7 +145,12 @@ export default function FileEditorHeader({
               </Menu>
             </div>
           )}
-          <div hidden={!browsingWritableDirectory || action === 'image' || action === 'audio'}>
+          {!writable && (action === 'new' || action === 'edit') && (
+            <Badge variant='light' color='gray'>
+              {t('common.readOnly', {})}
+            </Badge>
+          )}
+          <div hidden={!writable || action === 'image' || action === 'audio'}>
             {action !== 'new' ? (
               <ServerCan action={collabActive ? 'files.update' : 'files.create'}>
                 <Button loading={saving} onClick={onSave}>

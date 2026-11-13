@@ -3,6 +3,7 @@ import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import createLocation from '@/api/admin/locations/createLocation.ts';
 import deleteLocation from '@/api/admin/locations/deleteLocation.ts';
+import getLocationCounts from '@/api/admin/locations/getLocationCounts.ts';
 import updateLocation from '@/api/admin/locations/updateLocation.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -10,12 +11,14 @@ import AdminContentContainer from '@/elements/containers/AdminContentContainer.t
 import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 import LocationDuplicateModal from '@/pages/admin/locations/modals/LocationDuplicateModal.tsx';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -55,6 +58,14 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
     defaultSearchValue: contextLocation?.backupConfiguration?.name,
     canRequest: canReadBackupConfigurations,
   });
+
+  const { data: counts } = useResource({
+    queryKey: queryKeys.admin.locations.counts(),
+    queryFn: getLocationCounts,
+    enabled: !!contextLocation,
+    silent: true,
+  });
+  const locationNodes = contextLocation ? (counts?.[contextLocation.uuid]?.locationNodes ?? 0) : 0;
 
   const fields = useLocationFormFields(backupConfigurations, canReadBackupConfigurations);
 
@@ -110,9 +121,21 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
           )}
           {contextLocation && (
             <AdminCan action='locations.delete' cantDelete>
-              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                {t('common.button.delete', {})}
-              </Button>
+              <ConditionalTooltip
+                enabled={locationNodes > 0}
+                label={t('pages.admin.locations.tabs.general.page.tooltip.deleteBlocked', {
+                  count: String(locationNodes),
+                })}
+              >
+                <Button
+                  color='red'
+                  onClick={() => setOpenModal('delete')}
+                  loading={loading}
+                  disabled={locationNodes > 0}
+                >
+                  {t('common.button.delete', {})}
+                </Button>
+              </ConditionalTooltip>
             </AdminCan>
           )}
         </Group>

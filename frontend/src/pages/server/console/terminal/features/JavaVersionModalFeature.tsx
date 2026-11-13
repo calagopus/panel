@@ -11,6 +11,7 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import useWebsocketEvent, { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 const MATCHERS: (string | RegExp)[] = [
@@ -42,7 +43,11 @@ export default function JavaVersionModal() {
     })),
   );
 
+  const settings = useGlobalStore((state) => state.settings);
   const canRestart = useServerCan('control.restart');
+  const imageLocked =
+    !settings.server.allowOverwritingCustomDockerImage &&
+    !Object.values(server.egg.dockerImages).includes(server.image);
 
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -105,28 +110,38 @@ export default function JavaVersionModal() {
       </Text>
 
       <ServerCan action='startup.docker-image'>
-        <Text size='sm' mb='md'>
-          {t('pages.server.console.feature.javaVersion.contentDetails', {}).md()}
-        </Text>
+        {imageLocked ? (
+          <Text size='sm' mb='md'>
+            {t('pages.server.console.feature.javaVersion.contentCustomImage', {}).md()}
+          </Text>
+        ) : (
+          <>
+            <Text size='sm' mb='md'>
+              {t('pages.server.console.feature.javaVersion.contentDetails', {}).md()}
+            </Text>
 
-        <Select
-          label={t('common.form.dockerImage', {})}
-          value={selectedImage}
-          onChange={(value) => setSelectedImage(value ?? '')}
-          data={Object.entries(server.egg.dockerImages).map(([key, value]) => ({
-            value,
-            label: key,
-          }))}
-          searchable
-        />
+            <Select
+              label={t('common.form.dockerImage', {})}
+              value={selectedImage}
+              onChange={(value) => setSelectedImage(value ?? '')}
+              data={Object.entries(server.egg.dockerImages).map(([key, value]) => ({
+                value,
+                label: key,
+              }))}
+              searchable
+            />
+          </>
+        )}
       </ServerCan>
 
       <ModalFooter>
-        <ServerCan action='startup.docker-image'>
-          <Button color='green' loading={loading} disabled={!selectedImage} onClick={updateImage}>
-            {t('pages.server.console.feature.javaVersion.button.update', {})}
-          </Button>
-        </ServerCan>
+        {!imageLocked && (
+          <ServerCan action='startup.docker-image'>
+            <Button color='green' loading={loading} disabled={!selectedImage} onClick={updateImage}>
+              {t('pages.server.console.feature.javaVersion.button.update', {})}
+            </Button>
+          </ServerCan>
+        )}
         <Button variant='default' onClick={() => setOpened(false)}>
           {t('common.button.cancel', {})}
         </Button>

@@ -18,6 +18,7 @@ import PasswordContainer from './PasswordContainer.tsx';
 import PasswordLoginContainer from './PasswordLoginContainer.tsx';
 import PreferencesContainer from './PreferencesContainer.tsx';
 import TwoFactorContainer from './TwoFactorContainer.tsx';
+import { useTwoFactorRequirement } from './useTwoFactorRequirement.ts';
 
 export interface AccountCardProps {
   requireTwoFactorActivation?: boolean;
@@ -27,6 +28,7 @@ export default function DashboardAccount() {
   const { t } = useTranslations();
   const { user } = useAuth();
   const { addToast } = useToast();
+  const { availableAcceptedMethods, acceptedMethodsList } = useTwoFactorRequirement();
 
   const [resending, setResending] = useState(false);
 
@@ -82,7 +84,9 @@ export default function DashboardAccount() {
           color='red'
           mb='md'
         >
-          {t('pages.account.account.alert.requireTwoFactor.description', {})}
+          {availableAcceptedMethods.length > 0
+            ? t('pages.account.account.alert.requireTwoFactor.description', { methods: acceptedMethodsList }).md()
+            : t('pages.account.account.alert.requireTwoFactor.descriptionNoMethods', {})}
         </Alert>
       )}
 
@@ -101,7 +105,7 @@ export default function DashboardAccount() {
         />
 
         <PasswordContainer requireTwoFactorActivation={requireTwoFactorActivation} />
-        <EmailContainer requireTwoFactorActivation={requireTwoFactorActivation} />
+        <EmailContainer requireTwoFactorActivation={requireTwoFactorActivation && !requireEmailVerification} />
         <TwoFactorContainer />
         <PasswordLoginContainer requireTwoFactorActivation={requireTwoFactorActivation} />
         <AccountContainer requireTwoFactorActivation={requireTwoFactorActivation} />

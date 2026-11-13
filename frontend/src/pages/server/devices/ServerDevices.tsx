@@ -1,8 +1,10 @@
+import { faMicrochip } from '@fortawesome/free-solid-svg-icons';
 import { Ref } from 'react';
 import getDevices from '@/api/server/devices/getDevices.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import DeviceActionBar from '@/pages/server/devices/DeviceActionBar.tsx';
 import { DeviceRow } from '@/pages/server/devices/DeviceRow.tsx';
@@ -25,6 +27,7 @@ export default function ServerDevices() {
     error,
     search,
     setSearch,
+    debouncedSearch,
     setPage,
     setPerPage,
   } = useSearchablePaginatedTable({
@@ -77,6 +80,16 @@ export default function ServerDevices() {
           onPageSelect={setPage}
           onPerPageSelect={setPerPage}
           error={error}
+          empty={
+            debouncedSearch ? undefined : (
+              <EmptyState
+                flush
+                icon={faMicrochip}
+                title={t('pages.server.devices.empty.title', {})}
+                description={t('pages.server.devices.empty.description', {})}
+              />
+            )
+          }
         >
           {devices?.data.map((device) => (
             <SelectionArea.Selectable key={device.uuid} item={device}>

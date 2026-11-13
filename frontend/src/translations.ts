@@ -348,6 +348,7 @@ const baseTranslations = defineTranslations({
         device: 'Device',
         nest: 'Nest',
         nestCreateHint: "Can't find one? Create a new nest",
+        locationCreateHint: "Can't find one? Create a new location",
         lines: 'Lines',
         databaseHost: 'Database Host',
         databaseAgentHost: 'Database Agent Host',
@@ -853,6 +854,19 @@ const baseTranslations = defineTranslations({
       selectInput: {
         noResults: 'No Results found.',
       },
+      resourceSelectModal: {
+        empty: {
+          mounts: 'No mounts exist yet. Create a mount first, then link it here.',
+          nodes: 'No nodes exist yet. Create a node first, then link it here.',
+          eggs: 'No eggs exist yet. Create or import an egg in a nest first, then link it here.',
+          locations: 'No locations exist yet. Create a location first, then link it here.',
+          databaseHosts: 'No database hosts exist yet. Create a database host first, then link it here.',
+          databaseAgentHosts: 'No database agent hosts exist yet. Create one first, then link it here.',
+          serverMounts:
+            "No mounts are available for this server. A mount is only offered once it is linked to both this server's node and its egg. Link it from the mount's **Nodes** and **Eggs** tabs.",
+        },
+        manageMounts: 'Manage Mounts',
+      },
       serverSelect: {
         showOtherUsersServers: "Show other user's servers",
       },
@@ -893,6 +907,10 @@ const baseTranslations = defineTranslations({
             title: 'Activity Details',
           },
         },
+      },
+      captcha: {
+        loadFailed:
+          'The captcha failed to load. A browser extension such as an ad blocker may be blocking it, disable it for this site and retry.',
       },
       screenBlock: {
         permissionDenied: {
@@ -954,12 +972,13 @@ const baseTranslations = defineTranslations({
           connectionClosed: 'Connection to server was closed. Attempting to reconnect...',
           connectionRetry: 'Connection lost. Retrying (attempt {attempt})...',
           authFailed: 'Authentication failed. Attempting to refresh credentials... ({error})',
-          authRefreshFailed: 'Failed to refresh credentials. Please refresh the page to try again.',
+          authRefreshFailed: 'Failed to refresh credentials. Reconnect to try again.',
           permissionRevoked: 'Connection closed: your access to this server has been revoked.',
-          tokenRefreshLoop: 'Authentication loop detected. Please refresh the page to try again.',
+          tokenRefreshLoop: 'Authentication loop detected. Reconnect to try again.',
         },
         banner: {
           retrying: 'Retrying in {countdown}...',
+          reconnect: 'Reconnect',
         },
         listener: {
           toast: {
@@ -1028,6 +1047,8 @@ const baseTranslations = defineTranslations({
         resume: 'Resume upload',
         cancel: 'Cancel upload',
         reselect: 'Re-select file to resume',
+        uploadAnyway: 'Upload anyway',
+        openTrash: 'Open trash',
         badge: {
           uploading: 'Uploading',
           uploadingPercent: 'Uploading {percent}%',
@@ -1066,6 +1087,8 @@ const baseTranslations = defineTranslations({
           cancelledFile: 'Successfully cancelled upload of `{file}`.',
           cancelledFolder: 'Successfully cancelled upload of `{folder}` ({files}).',
           wrongFile: 'Selected file does not match `{file}`; pick the same file to resume.',
+          uploadingInOtherTab: '`{file}` is being uploaded in another tab.',
+          insufficientDisk: 'Not enough free disk space: {files} need {needed}, but only {free} is free.',
           cancelledAll: 'All uploads have been cancelled.',
           completedServer: 'Finished uploading {files} to `{server}`.',
           completedAssets: 'Finished uploading {files} to the admin assets.',
@@ -1135,6 +1158,8 @@ const baseTranslations = defineTranslations({
             backupDisk: 'Backup Disk',
             backupDiskPlaceholder: 'Backup Disk',
           },
+          skipHint:
+            'Skipping the location also skips the node and server steps, since both need a location. You can create them later in the admin area.',
           button: {
             create: 'Create & Continue',
           },
@@ -1151,6 +1176,7 @@ const baseTranslations = defineTranslations({
           error: {
             noLocations: 'Something went wrong. No locations were found.',
           },
+          skipHint: 'Skipping the node also skips the server step, since a server needs a node to run on.',
           button: {
             create: 'Create & Continue',
           },
@@ -1165,6 +1191,7 @@ const baseTranslations = defineTranslations({
               'Your browser could not reach the node. Check the (public) URL, TLS certificate and firewall. Websockets and downloads depend on this connection.',
           },
           successMessage: 'The connection to your node was successfully verified. You may now continue.',
+          skipHint: 'Skipping verification goes straight to the end of the setup, so no server will be created.',
           configurationDescription: 'Place this into the configuration file at `{file}` or run:',
           button: {
             verify: 'Verify Connection',
@@ -1178,6 +1205,8 @@ const baseTranslations = defineTranslations({
             applicationUrl: 'Application URL',
             registration: 'Enable Registration',
             registrationDescription: 'Allow new users to register their own account.',
+            registrationDescriptionNoCaptcha:
+              'Allow new users to register their own account. No captcha is configured yet, so set one up in the admin settings after setup to keep bots out.',
             securityKeys: 'Enable Security Keys',
             securityKeysDescription:
               'Allow users to sign in with passkeys and hardware security keys, scoped to {rpId}. You can change this later in the admin settings.',
@@ -1206,6 +1235,8 @@ const baseTranslations = defineTranslations({
               nest: 'Generic',
             },
           },
+          skipHint:
+            'Without an egg repository you can still set up a location and node, but you will not be able to create a server at the end of this setup.',
         },
         server: {
           title: 'Server',
@@ -1223,9 +1254,12 @@ const baseTranslations = defineTranslations({
           },
           error: {
             noNodes: 'Something went wrong. No nodes were found.',
+            noEggRepositories:
+              'No egg repositories were imported, so there are no eggs to create a server from. Import one in the Egg Repositories step, or skip this step and create a server later in the admin area.',
           },
           button: {
             create: 'Create & Continue',
+            importRepositories: 'Import Egg Repositories',
           },
         },
         finished: {
@@ -1265,7 +1299,11 @@ const baseTranslations = defineTranslations({
           error: {
             usernameRequired: 'Please enter a username',
             registrationDisabled: 'No matching Account could be found and registration is currently disabled.',
-            userAlreadyExists: 'An account with this username or email already exists.',
+            userAlreadyExists:
+              'An account with this username or email already exists. Sign in another way first, then connect this provider under Account → OAuth Links.',
+            oauthFailed: 'Signing in with the provider failed ({code}). Please try again.',
+            accountPasswordLoginDisabled:
+              'Password sign-in is turned off for this account, sign in with a security key or one of the options below instead.',
             securityKeyRequired:
               'This account requires two-factor authentication, sign in with a security key instead.',
             passwordLoginDisabled:
@@ -1323,6 +1361,7 @@ const baseTranslations = defineTranslations({
                 signIn: 'Sign In',
                 forgotPassword: 'Forgot Password',
               },
+              providerHint: 'Signed up with a provider? Use it to sign in instead.',
             },
             totp: {
               title: 'Two-Factor Authentication',
@@ -1395,6 +1434,7 @@ const baseTranslations = defineTranslations({
           },
           button: {
             reset: 'Reset Password',
+            requestNewLink: 'Request a New Link',
           },
           toast: {
             success: 'Password has been reset.',
@@ -1435,6 +1475,9 @@ const baseTranslations = defineTranslations({
                 },
                 button: {
                   createGroup: 'Create Group',
+                },
+                tooltip: {
+                  limitReached: 'You are limited to {max} server groups.',
                 },
                 modal: {
                   createServerGroup: {
@@ -1523,7 +1566,9 @@ const baseTranslations = defineTranslations({
             requireTwoFactor: {
               title: 'Two-Factor Authentication Required',
               description:
-                'Two-Factor Authentication is required on your account. Please set it up below to continue using the panel.',
+                'Two-Factor Authentication is required on your account. Set up one of the following methods to continue using the panel: {methods}.',
+              descriptionNoMethods:
+                'Two-Factor Authentication is required on your account, but none of the accepted methods are currently available. Please contact an administrator.',
             },
             verifyEmail: {
               title: 'Email Verification Required',
@@ -1608,6 +1653,9 @@ const baseTranslations = defineTranslations({
               none: 'No second factor is set up on your account yet.',
               requirementMet: 'Your account meets the two-factor requirement.',
               requirementUnmet: 'Your account does not meet the two-factor requirement yet.',
+              notAccepted: 'This method does not count towards the two-factor requirement.',
+              lastAcceptedMethod:
+                'This is your only method that counts towards the required two-factor authentication. Once it is removed you can only use the Account page until you set up another accepted method.',
               enum: {
                 twoFactorMethod: {
                   totp: 'Authenticator App',
@@ -1619,6 +1667,10 @@ const baseTranslations = defineTranslations({
             emailTwoFactor: {
               toast: {
                 disabled: 'Email two-factor disabled successfully.',
+              },
+              tooltip: {
+                unavailable:
+                  'Email two-factor is unavailable because this panel cannot send the code email right now. Please contact an administrator.',
               },
               modal: {
                 enable: {
@@ -1693,6 +1745,10 @@ const baseTranslations = defineTranslations({
             secureContextRequired: 'A secure context (HTTPS) is required to use security keys.',
             limitReached: 'You are limited to {max} security keys.',
             disabled: 'Security keys have been disabled by an administrator.',
+            lastKeyPasswordLoginOff:
+              'This is your last security key and password login is turned off. Re-enable password login on the Account page before removing it.',
+            lastKeyPasswordLoginDisabled:
+              'This is your last security key and password login is disabled on this instance. Removing it would lock you out.',
           },
           alert: {
             disabled:
@@ -1777,6 +1833,7 @@ const baseTranslations = defineTranslations({
             importedNone: 'No shortcuts were changed.',
             importErrors: 'Ignored {unknown} and {invalid}.',
             resetAll: 'All shortcuts reset to defaults.',
+            conflict: 'This key combination is also used by: {shortcuts}.',
           },
           general: {
             title: 'General',
@@ -1954,6 +2011,20 @@ const baseTranslations = defineTranslations({
               providerName: 'Provider Name',
             },
           },
+          alert: {
+            lastLoginMethod: {
+              title: 'OAuth Is Your Only Way to Sign In',
+              description:
+                'Your account has no password or security key, so at least one OAuth link has to stay. {passwordLink} to be able to remove it.',
+              passwordLink: 'Set a password on your account',
+            },
+          },
+          tooltip: {
+            lastLoginMethod: 'This is your last way to sign in. Set a password on your account before removing it.',
+            notManageable: 'This provider does not allow removing the connection yourself. Contact an administrator.',
+            notLinkable: 'An administrator has turned off connecting to this provider from this page.',
+            nothingToConnect: 'There are no other providers you can connect to.',
+          },
           modal: {
             deleteOAuthLinks: {
               title: 'Confirm OAuth Link Deletion',
@@ -1961,6 +2032,8 @@ const baseTranslations = defineTranslations({
               alert: {
                 skipped:
                   '{oauthLinks} will be skipped. Links to providers that do not allow unlinking cannot be removed.',
+                keptLast:
+                  'One link will be kept, it is your last way to sign in. Set a password on your account to remove it.',
               },
             },
             deleteOAuthLink: {
@@ -2054,6 +2127,10 @@ const baseTranslations = defineTranslations({
               adminPermissions:
                 'This API key requests **admin permissions**. Anyone in possession of this key will be able to perform administrative actions on this panel in your name. Only continue if you absolutely trust the requesting application.',
               callbackUrl: 'After creation, the new API key will be sent to **{url}**.',
+              limitReached:
+                'You already have the maximum of **{max}** API keys. Delete one under API Keys before creating a new one.',
+              droppedPermissions:
+                'The application also asked for these permissions, which are unknown or not available to your account and will not be granted: {permissions}',
             },
             noPermissions: 'This API key will not have any permissions.',
             keyCreated: 'Your new API key has been created. Make sure to copy it now, as it will not be shown again.',
@@ -2275,9 +2352,18 @@ const baseTranslations = defineTranslations({
                   twoFactorAcceptedMethods: 'Accepted Two-Factor Methods',
                   twoFactorAcceptedMethodsDescription:
                     'Which enrolled factors count towards the two-factor requirement. Email is off by default: password resets also go through email, so it is not independent of the password.',
+                  twoFactorAcceptedMethodsNoneAvailable:
+                    'At least one accepted method must be available, otherwise users who require two-factor can never satisfy it.',
                   emailVerificationRequired: 'Require Email Verification',
                   emailVerificationRequiredDescription:
                     'New users must confirm their email address before they can use the panel. Requires a configured mail transport.',
+                  emailTwoFactorEnabledNoMail:
+                    'No mail transport is configured, so login codes cannot be sent. Configure one on the Mail tab first.',
+                  emailVerificationRequiredNoMail:
+                    'No mail transport is configured, so verification emails cannot be sent. Configure one on the Mail tab first.',
+                  emailRequiresMail: 'This needs a mail transport, turn it off or configure one on the Mail tab.',
+                  registrationEnabledNoPasswordLogin:
+                    'Local registration uses passwords, so it does not work while password login is disabled.',
                   telemetryEnabled: 'Enable Telemetry',
                   telemetryEnabledDescription:
                     'Allow Calagopus to collect limited and anonymous usage data to help improve the application.',
@@ -2285,6 +2371,11 @@ const baseTranslations = defineTranslations({
                   passwordLoginEnabled: 'Enable Password Login',
                   passwordLoginEnabledDescription:
                     'Let users sign in with a username and password. Turning this off leaves OAuth providers and security keys as the only way in, and also stops local registration, password resets and SFTP password authentication.',
+                },
+                alert: {
+                  noMail:
+                    'Email two-factor and email verification need a mail transport. Turn them off or configure one on the {link}.',
+                  noMailLink: 'Mail tab',
                 },
                 section: {
                   general: 'General',
@@ -2298,6 +2389,11 @@ const baseTranslations = defineTranslations({
                     totp: 'Authenticator App (TOTP)',
                     securityKey: 'Security Key',
                     email: 'Email',
+                  },
+                  twoFactorMethodUnavailable: {
+                    securityKey: 'Security Key (WebAuthn is disabled)',
+                    email: 'Email (Email Two-Factor is off)',
+                    emailNoMail: 'Email (no mail transport is configured)',
                   },
                   twoFactorRequirement: {
                     admins: 'Admins',
@@ -2320,12 +2416,22 @@ const baseTranslations = defineTranslations({
                   enableRegistration: {
                     title: 'Confirm Enabling Registration',
                     content:
-                      'Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel. If you do not have a captcha configured, this may be a mistake.',
+                      'Are you sure you want to enable registration? Enabling registration allows anyone to create an account on this panel.',
+                    noCaptcha: 'No captcha is configured, so bots can sign up freely. Configure one on the {link}.',
+                    noCaptchaLink: 'Captcha tab',
                   },
                   disablePasswordLogin: {
                     title: 'Confirm Disabling Password Login',
                     content:
                       'Are you sure you want to disable password login? Everyone will need an OAuth provider or a security key to sign in, and local registration, password resets and SFTP password authentication will stop working. Make sure you can still sign in yourself before continuing.',
+                    yourOptions: 'Your other ways to sign in:',
+                    oauthLink: 'OAuth: {provider}',
+                    securityKey: 'Security key',
+                    checking: 'Checking your sign-in options...',
+                    checkFailed: 'Could not check your sign-in options, make sure you can still sign in yourself.',
+                    noProviders: 'No OAuth provider is enabled. Enable one before disabling password login.',
+                    noOptions:
+                      'You have no link to an enabled OAuth provider and no security key, so you would be locked out. Link an OAuth account or add a security key first.',
                   },
                   telemetryPreview: {
                     title: 'Telemetry Preview',
@@ -2441,6 +2547,11 @@ const baseTranslations = defineTranslations({
                 tooltip: {
                   noProvider: 'Save an email provider before sending a test email.',
                 },
+                alert: {
+                  noneInUse:
+                    'Email two-factor or email verification is turned on, so the provider cannot be set to None. Turn them off on the {link} first.',
+                  noneInUseLink: 'Application tab',
+                },
                 modal: {
                   sendTestEmail: {
                     title: 'Send Test Email',
@@ -2479,6 +2590,10 @@ const baseTranslations = defineTranslations({
                   variablesBefore: 'Text fragments are referenced with',
                   variablesAfter:
                     'and are translated per language in the Variables section, so a template only needs one layout for every language a user can pick.',
+                  disabledTwoFactor:
+                    'Email two-factor is turned on. With this template disabled, users can no longer receive login codes and email stops working as a two-factor method.',
+                  disabledVerification:
+                    'Email verification is required. With this template disabled, new users cannot receive a verification email and stay locked out of the panel.',
                 },
                 variables: {
                   title: 'Variables',
@@ -2563,6 +2678,8 @@ const baseTranslations = defineTranslations({
                   enabled: 'Enable Security Keys',
                   enabledDescription:
                     'Allow users to register and sign in with security keys. Existing keys are kept and remain visible, but cannot be used to sign in while this is off.',
+                  enabledLocked:
+                    'Security keys are the only accepted two-factor method that is available. Accept another method in the application settings before turning this off.',
                   allowDiscoverable: 'Allow Usernameless Login',
                   allowDiscoverableDescription:
                     'Let users store passkeys on their device and pick one from a list instead of typing a username.',
@@ -2997,6 +3114,9 @@ const baseTranslations = defineTranslations({
               page: {
                 tooltip: {
                   cannotImpersonateSelf: 'You cannot impersonate yourself.',
+                  passwordResetPasswordLoginDisabled: 'Password login is disabled, so there is no password to reset.',
+                  passwordResetNoMail: 'No mail transport is configured, so the email cannot be sent.',
+                  passwordResetTemplateDisabled: 'The password reset email template is disabled.',
                 },
                 button: {
                   sendPasswordResetEmail: 'Send Password Reset Email',
@@ -3063,12 +3183,18 @@ const baseTranslations = defineTranslations({
                   added: 'OAuth Link added.',
                   removed: 'OAuth Link removed.',
                 },
+                tooltip: {
+                  rootOnly: 'Only administrators can link OAuth identities to other accounts.',
+                },
                 modal: {
                   add: {
                     title: 'Add OAuth Link',
                     form: {
                       oauthProvider: 'OAuth Provider',
                     },
+                    noProviders: 'No OAuth providers exist yet.',
+                    noProvidersCreate: 'No OAuth providers exist yet. {link} first.',
+                    createProvider: 'Create an OAuth provider',
                   },
                   delete: {
                     title: 'Confirm OAuth Link Deletion',
@@ -3098,6 +3224,10 @@ const baseTranslations = defineTranslations({
                   delete: {
                     title: 'Confirm Location Deletion',
                   },
+                },
+                tooltip: {
+                  deleteBlocked:
+                    '{count} nodes are still in this location. Move or delete them first (see the Nodes tab).',
                 },
                 titleCreate: 'Create Location',
                 titleUpdate: 'Update Location',
@@ -3235,6 +3365,8 @@ const baseTranslations = defineTranslations({
                   updateAvailable: '{version} (Update Available)',
                   latestVersionUnknown: '{version} (Latest Version Unknown)',
                   useWingsProxyUrl: 'Use Wings Proxy URL',
+                  deleteBlocked:
+                    '{count} servers still use this node. Delete or transfer them first (see the Servers tab).',
                 },
                 form: {
                   urlDescription: 'Used for internal communication with the node.',
@@ -3421,6 +3553,13 @@ const baseTranslations = defineTranslations({
                     ipAlias: 'IP Alias',
                   },
                 },
+                alert: {
+                  noneAvailable: 'This node has no free allocations.',
+                  noneAvailableCreate: 'This node has no free allocations. Create some to assign them here.',
+                },
+                button: {
+                  createAllocations: 'Create Allocations',
+                },
                 modal: {
                   create: {
                     title: 'Create Node Allocations',
@@ -3433,6 +3572,13 @@ const baseTranslations = defineTranslations({
                   },
                   update: {
                     title: 'Update Node Allocations',
+                    form: {
+                      ipAliasUnchanged: 'Left unchanged unless you edit it.',
+                    },
+                    alert: {
+                      ipAppliesToAll:
+                        'This IP is applied to all {allocations}, including any that currently use a different IP.',
+                    },
                     button: {
                       update: 'Update {count}',
                     },
@@ -3608,6 +3754,13 @@ const baseTranslations = defineTranslations({
                     toast: {
                       started: '{servers} transfer started.',
                     },
+                    tooltip: {
+                      aioNotSupported: 'Transfers to the All-In-One node are not supported.',
+                    },
+                    alert: {
+                      eggConfigRequired:
+                        'Servers whose Egg has no matching configuration make the request fail. Servers handled before the failing one keep transferring, the rest are not transferred.',
+                    },
                     confirm: {
                       title: 'Confirm Server Transfers',
                       content:
@@ -3632,6 +3785,9 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm Power Action',
                     content: 'Are you sure you want to **{action}** {servers}?',
                   },
+                },
+                tooltip: {
+                  searchActive: 'Clear the search first, this action applies to every server on the node.',
                 },
               },
             },
@@ -3960,6 +4116,9 @@ const baseTranslations = defineTranslations({
                   pinnedCpusTooltip: 'By index, e.g. 0, 1, 2. Leave empty to allow all cores.',
                   predefinedDockerImages: 'Predefined Docker Images',
                   predefinedDockerImagesPlaceholder: 'No predefined image selected',
+                  nodeUnreachable: 'unreachable',
+                  nodeUnreachableDescription:
+                    'This node could not be reached. Creating the server will fail unless the node comes back online.',
                   startupCommandCustom: 'Custom',
                   predefinedStartupCommands: 'Predefined Startup Commands',
                   labels: 'Container Labels',
@@ -4142,6 +4301,10 @@ const baseTranslations = defineTranslations({
                   toast: {
                     started: 'Server transfer started.',
                   },
+                  tooltip: {
+                    alreadyTransferring: 'This server is already being transferred.',
+                    busy: 'This server is installing or restoring a backup and cannot be transferred right now.',
+                  },
                   modal: {
                     title: 'Server Transfer',
                     form: {
@@ -4235,6 +4398,10 @@ const baseTranslations = defineTranslations({
               page: {
                 titleCreate: 'Create Nest',
                 titleUpdate: 'Update Nest',
+                tooltip: {
+                  deleteBlocked:
+                    '{count} servers still use eggs in this nest. Delete them or change their egg first (see the Servers tab of each egg).',
+                },
                 modal: {
                   delete: {
                     title: 'Confirm Nest Deletion',
@@ -4298,6 +4465,10 @@ const baseTranslations = defineTranslations({
                     page: {
                       titleCreate: 'Create Egg',
                       titleUpdate: 'Update Egg',
+                      tooltip: {
+                        deleteBlocked:
+                          '{count} servers still use this egg. Delete them or change their egg first (see the Servers tab).',
+                      },
                       card: {
                         startupConfiguration: 'Startup Configuration',
                         stopConfiguration: 'Stop Configuration',
@@ -5160,6 +5331,10 @@ const baseTranslations = defineTranslations({
               page: {
                 titleCreate: 'Create OAuth Provider',
                 titleUpdate: 'Update OAuth Provider',
+                tooltip: {
+                  rootOnly:
+                    'Only administrators can change how this provider identifies users, how they sign in with it or who may link accounts to it.',
+                },
                 card: {
                   redirectUrl: {
                     title: 'Redirect URL',
@@ -5806,6 +5981,9 @@ const baseTranslations = defineTranslations({
                     content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
                 },
+                tooltip: {
+                  noReadPermission: 'You need permission to view eggs to add one.',
+                },
               },
             },
             nodes: {
@@ -5824,6 +6002,9 @@ const baseTranslations = defineTranslations({
                     title: 'Confirm Device Node Removal',
                     content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
+                },
+                tooltip: {
+                  noReadPermission: 'You need permission to view nodes to add one.',
                 },
               },
             },
@@ -5856,6 +6037,8 @@ const baseTranslations = defineTranslations({
                 form: {
                   requireTwoFactor: 'Require Two Factor',
                   requireTwoFactorDescription: 'Require users with this role to use two factor authentication.',
+                  requireTwoFactorLocked:
+                    'None of the accepted two-factor methods are available, so users with this role could never satisfy it. Fix the accepted methods in the application settings first.',
                   serverPermissions: 'Server Permissions',
                   adminPermissions: 'Admin Permissions',
                 },
@@ -5891,6 +6074,8 @@ const baseTranslations = defineTranslations({
           title: 'Console',
           input: {
             placeholder: 'Type a command...',
+            placeholderOffline: 'Start the server to send commands.',
+            placeholderDisconnected: 'Waiting for the console connection...',
             ariaLabel: 'Console command input.',
             prefixPlaceholder: 'Prefix, e.g. "say "',
           },
@@ -5979,6 +6164,8 @@ const baseTranslations = defineTranslations({
               content: 'This server is currently running an unsupported version of Java and cannot be started.',
               contentDetails:
                 'Please select a supported Docker image from the list below to continue starting the server.',
+              contentCustomImage:
+                'The Docker image for this server was set by an administrator and cannot be changed here. Contact an administrator to switch to a supported Java version.',
               toast: {
                 updated: 'Docker image updated successfully.',
               },
@@ -6096,6 +6283,10 @@ const baseTranslations = defineTranslations({
           editorNotFound: {
             title: 'Not Found',
             content: 'Editor not found.',
+          },
+          sqlite: {
+            serverRunning:
+              'The server is not offline and may hold this database open. Changes can fail with "database is locked" or be overwritten by the server. Stop it before writing.',
           },
           view: {
             list: 'List',
@@ -6276,6 +6467,9 @@ const baseTranslations = defineTranslations({
           dropzone: {
             title: 'Drop files or folders here to upload',
             subtitle: 'Release to start uploading',
+            readOnly: 'This directory is read-only',
+            noPermission: 'You do not have permission to upload files',
+            blockedSubtitle: 'Dropped files will not be uploaded',
           },
           settings: {
             clickOnce: 'Click once to open file or folder',
@@ -6332,7 +6526,8 @@ const baseTranslations = defineTranslations({
             permissionsCouldNotBeRestored: 'Permissions could not be restored.',
             fileSaved: 'File has been saved.',
             collabSaveTimeout: 'The file could not be saved, the daemon did not respond in time.',
-            fileTooLargeToOpen: 'This file is too large to open in the file manager.',
+            fileTooLargeToOpen:
+              'This file is larger than the {limit} file manager limit. Download it to view it locally.',
           },
           tooltip: {
             settings: 'Settings',
@@ -6375,6 +6570,9 @@ const baseTranslations = defineTranslations({
             subtitle: 'Deleted files are kept for {retention} before they are removed permanently.',
             subtitleDisabled:
               'The trash is disabled for this server. Existing entries stay until they are restored or deleted.',
+            button: {
+              trashSettings: 'Trash Settings',
+            },
             table: {
               columns: {
                 originalLocation: 'Original Location',
@@ -6489,6 +6687,8 @@ const baseTranslations = defineTranslations({
               addFromGroup: 'Add servers from a group',
               browsingOn: 'Browsing {server}, the chosen path is used on every destination server.',
               noCreatePermission: 'You do not have permission to create files on {servers}.',
+              unavailableServers:
+                '{servers} cannot receive files right now because they are suspended, installing, restoring a backup or being transferred. Remove them to continue.',
               createdAs: 'These files will be created on {servers} under ',
             },
             fileFingerprints: {
@@ -6512,6 +6712,8 @@ const baseTranslations = defineTranslations({
             },
             createFile: {
               title: 'Create File',
+              overwriteWarning: '{file} already exists. Submit again to overwrite it.',
+              overwrite: 'Overwrite',
             },
             details: {
               title: 'File Details',
@@ -6631,6 +6833,8 @@ const baseTranslations = defineTranslations({
               },
               createdAs: 'This file will be created as ',
               pull: 'Pull',
+              insufficientDisk:
+                'This file is {size}, but only {free} of disk space is free. The pull may fail part way.',
             },
             sftpDetails: {
               title: 'SFTP Details',
@@ -6658,6 +6862,7 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             limitReached: 'This server is limited to {max} databases.',
+            locked: 'This database is locked. Unlock it first.',
           },
           table: {
             columns: {
@@ -6667,6 +6872,12 @@ const baseTranslations = defineTranslations({
           button: {
             rotatePassword: 'Rotate Password',
             createFirstDatabase: 'Create Database',
+            lock: 'Lock',
+            unlock: 'Unlock',
+          },
+          toast: {
+            locked: 'Database locked.',
+            unlocked: 'Database unlocked.',
           },
           form: {
             databaseName: 'Database Name',
@@ -6854,6 +7065,8 @@ const baseTranslations = defineTranslations({
             },
             tooltip: {
               limitReached: 'This server is limited to {max} managed databases.',
+              locked: 'This managed database is locked. Unlock it in Edit first.',
+              offline: 'The managed database must be running.',
             },
             view: {
               tabs: {
@@ -7038,6 +7251,10 @@ const baseTranslations = defineTranslations({
                 offline: 'The managed database must be running to take a backup.',
                 restoring: 'A backup is currently being restored into this managed database.',
               },
+              notRunning: {
+                restore: 'This managed database is {state}. It must be running to restore a backup into it.',
+                backup: 'This managed database is {state}. It must be running to take a backup.',
+              },
               toast: {
                 restoring: 'Restoring backup into the managed database...',
                 restoreCompleted: 'Managed database backup restore completed successfully.',
@@ -7052,6 +7269,7 @@ const baseTranslations = defineTranslations({
                   content:
                     'This will import **{backup}** into **{name}**. Existing tables and collections carried by the dump are replaced, and power actions are blocked until the restore finishes.',
                   targetInstance: 'Target Managed Database',
+                  noInstances: 'This server has no {engine} managed database to restore into.',
                 },
               },
             },
@@ -7334,6 +7552,11 @@ const baseTranslations = defineTranslations({
             triggersList: 'Triggers',
             triggerNumber: 'Trigger {number}',
             actionType: 'Action Type',
+            stepUnavailable: {
+              noBackups: 'Unavailable: this server is not allowed any backups.',
+              noInstances: 'Unavailable: this server has no managed databases.',
+              noInstanceAccess: 'Unavailable: you cannot view managed databases.',
+            },
             conditionType: 'Condition Type',
             serverState: 'Server State',
             comparator: 'Comparator',
@@ -7973,6 +8196,10 @@ const baseTranslations = defineTranslations({
                 userMustBeCreatedByAdmin:
                   'No account uses this email. Ask an administrator to create their account first, then you can add them.',
               },
+              alert: {
+                existingAccountRequired:
+                  'New accounts are not created automatically on this panel. The email must belong to an existing account, so the person needs to sign in once (or have an administrator create their account) before you can add them.',
+              },
               form: {
                 emailPlaceholder: 'Enter the email that this subuser should be saved as.',
                 permissions: 'Permissions',
@@ -8013,6 +8240,8 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             limitReached: 'This server is limited to {max} backups.',
+            evicts: 'This server is at its limit of {max} backups. Creating one deletes {name} to make room.',
+            groupLimitReached: 'This server is limited to {max} backup groups.',
           },
           table: {
             columns: {
@@ -8063,6 +8292,7 @@ const baseTranslations = defineTranslations({
             },
             restoreBackup: {
               title: 'Restore Backup',
+              noStartupMetadata: 'This backup has no saved startup configuration.',
             },
             exportBackup: {
               title: 'Export Backup to Files',
@@ -8134,8 +8364,17 @@ const baseTranslations = defineTranslations({
           allocations: {
             title: 'Allocations',
           },
+          empty: {
+            title: 'No Allocations',
+            description:
+              'This server has no allocations yet. Add one to get an address and port players can connect to.',
+            descriptionAdminOnly:
+              'This server has no allocations. Allocations on this server are assigned by an administrator, so ask them if you need one.',
+          },
           tooltip: {
             limitReached: 'This server is limited to {max} allocations.',
+            selfAssignDisabled: 'Allocations on this server are assigned by an administrator.',
+            primaryLocked: 'This server needs a primary allocation. Set another allocation as primary first.',
           },
           table: {
             columns: {
@@ -8411,10 +8650,16 @@ const baseTranslations = defineTranslations({
             'The Docker image used to run this server. This can be changed to use a different image.',
           dockerImageDescriptionCustom:
             'The Docker image used to run this server. This has been set by an administrator and cannot be changed.',
+          startupCommandNoPermission: 'You do not have permission to change the startup command.',
+          startupCommandLocked:
+            'Custom startup commands are not allowed for this egg. Pick one of the predefined commands, or contact an administrator.',
           toast: {
             startupCommandUpdated: 'Startup command updated.',
             dockerImageUpdated: 'Docker image updated.',
             variablesUpdated: 'Variables updated.',
+          },
+          validation: {
+            required: 'This variable is required.',
           },
           modal: {
             unsavedChanges: {
@@ -8427,6 +8672,11 @@ const baseTranslations = defineTranslations({
         },
         mounts: {
           title: 'Mounts',
+          empty: {
+            title: 'No Mounts',
+            description:
+              'No mounts are available for this server. Mounts are set up by an administrator, so ask them if you need access to one.',
+          },
           table: {
             columns: {
               mounted: 'Mounted',
@@ -8462,6 +8712,11 @@ const baseTranslations = defineTranslations({
         },
         devices: {
           title: 'Devices',
+          empty: {
+            title: 'No Devices',
+            description:
+              'No devices are available for this server. Devices are set up by an administrator, so ask them if you need access to one.',
+          },
           table: {
             columns: {
               attached: 'Attached',
@@ -8550,6 +8805,14 @@ const baseTranslations = defineTranslations({
               title: 'Reinstall Server',
               button: 'Reinstall',
               startOnCompletion: 'Start the server after the reinstall has finished',
+              latestBackup: 'Latest backup:',
+              noBackups: 'This server has no backups yet.',
+              backupFirst: 'Create a backup first',
+              backupFirstDescription: 'The reinstall starts once the backup has finished.',
+              waitingForBackup: 'Waiting for the backup to finish…',
+              backupFailed: 'The backup failed, so the server was not reinstalled.',
+              truncateWarning:
+                'Every file of this server is deleted before the installation script runs. This cannot be undone.',
               toast: {
                 reinstalling: 'Reinstalling server...',
               },

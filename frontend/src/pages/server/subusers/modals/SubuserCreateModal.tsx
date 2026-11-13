@@ -1,3 +1,5 @@
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
@@ -7,6 +9,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import createSubuser from '@/api/server/subusers/createSubuser.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import Captcha, { useCaptcha } from '@/elements/captcha/Captcha.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -28,6 +31,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const passwordLoginEnabled = useGlobalStore((state) => state.settings.app.passwordLoginEnabled);
   const queryClient = useQueryClient();
 
   const grantablePermissions = server.permissions.includes('*') ? undefined : server.permissions;
@@ -92,6 +96,12 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
       onSubmit={handleSubmit}
     >
       <Stack>
+        {!passwordLoginEnabled && (
+          <Alert color='blue' icon={<FontAwesomeIcon icon={faCircleInfo} />}>
+            {t('pages.server.subusers.modal.createSubuser.alert.existingAccountRequired', {})}
+          </Alert>
+        )}
+
         <TextInput
           withAsterisk
           label={t('common.form.email', {})}

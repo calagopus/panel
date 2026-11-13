@@ -9,6 +9,17 @@ import { getFormId } from './useFormEngine.ts';
 // Multiple FormEngine instances can share one <form>, submits it once regardless of how many are mounted.
 const handledSaveEvents = new WeakSet<KeyboardEvent>();
 
+function resolveSaveTarget(): HTMLFormElement | null | undefined {
+  const focusedForm = document.activeElement?.closest('form');
+  if (focusedForm) return focusedForm;
+
+  const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+  const topmostDialog = dialogs[dialogs.length - 1];
+  if (topmostDialog) return topmostDialog.querySelector('form');
+
+  return undefined;
+}
+
 export interface FormEngineProps<T extends Record<string, unknown>> {
   form: UseFormReturnType<T>;
   fields: FieldDef<T>[];
@@ -28,6 +39,8 @@ export function FormEngine<T extends Record<string, unknown>>({ form, fields, id
       if (handledSaveEvents.has(event)) return;
       const formEl = containerRef.current?.closest('form');
       if (!formEl) return;
+      const target = resolveSaveTarget();
+      if (target !== undefined && target !== formEl) return;
       handledSaveEvents.add(event);
       formEl.requestSubmit();
     },

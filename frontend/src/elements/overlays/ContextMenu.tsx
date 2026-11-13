@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 
 export interface ContextMenuActionItem {
   type: 'action';
@@ -23,6 +24,7 @@ export interface ContextMenuActionItem {
   rightSection?: ReactNode;
   hidden?: boolean;
   disabled?: boolean;
+  tooltip?: string;
   loading?: boolean;
   onClick?: (e: MouseEvent) => void | Promise<unknown>;
   color?: 'gray' | 'red';
@@ -56,6 +58,15 @@ interface ContextMenuContextType {
 
 const ContextMenuContext = createContext<ContextMenuContextType | undefined>(undefined);
 const ContextMenuLoadingContext = createContext(false);
+
+const ConditionalMenuTooltip = ({ label, children }: { label?: string; children: ReactNode }) =>
+  label ? (
+    <Tooltip label={label} position='left' multiline maw={280} innerClassName='w-full'>
+      {children}
+    </Tooltip>
+  ) : (
+    <>{children}</>
+  );
 
 const itemIcon = (item: Omit<ContextMenuActionItem, 'items'>) =>
   item.loading ? <Spinner size={14} /> : item.icon ? <FontAwesomeIcon icon={item.icon} /> : undefined;
@@ -191,23 +202,24 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
                   </Menu.Sub.Dropdown>
                 </Menu.Sub>
               ) : (
-                <Menu.Item
-                  key={idx}
-                  leftSection={itemIcon(item)}
-                  rightSection={item.rightSection}
-                  color={item.color === 'red' ? 'red' : undefined}
-                  disabled={item.disabled || item.loading}
-                  onClick={(e) => {
-                    if (!e.isTrusted) return;
+                <ConditionalMenuTooltip key={idx} label={item.tooltip}>
+                  <Menu.Item
+                    leftSection={itemIcon(item)}
+                    rightSection={item.rightSection}
+                    color={item.color === 'red' ? 'red' : undefined}
+                    disabled={item.disabled || item.loading}
+                    onClick={(e) => {
+                      if (!e.isTrusted) return;
 
-                    if (item.onClick) {
-                      item.onClick(e);
-                      hideMenu();
-                    }
-                  }}
-                >
-                  {item.label}
-                </Menu.Item>
+                      if (item.onClick) {
+                        item.onClick(e);
+                        hideMenu();
+                      }
+                    }}
+                  >
+                    {item.label}
+                  </Menu.Item>
+                </ConditionalMenuTooltip>
               ),
             )}
         </Menu.Dropdown>

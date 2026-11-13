@@ -20,6 +20,8 @@ export default function NodeMountAddModal({ node, ...props }: ModalProps & { nod
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.mounts', {})}
+      createAction={{ to: '/admin/mounts/new', permission: 'mounts.create' }}
       title={t('pages.admin.nodes.tabs.mounts.page.modal.add.title', {})}
       label={t('common.form.mount', {})}
       data={mounts.items.map((mount) => ({ label: mount.name, value: mount.uuid }))}

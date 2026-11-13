@@ -1,6 +1,6 @@
 import { faLayerGroup, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ComponentProps, memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentProps, memo, startTransition, useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getServerGroups from '@/api/me/servers/groups/getServerGroups.ts';
@@ -11,14 +11,16 @@ import { DndBoard, DndSortableList, SortableItem } from '@/elements/dnd/DragAndD
 import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import ErrorState from '@/elements/feedback/ErrorState.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
-import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { userServerGroupSchema } from '@/lib/schemas/user.ts';
+import { useSelectKeyHeld } from '@/plugins/selection/useSelectKeyHeld.ts';
 import { useBulkPowerActions } from '@/plugins/server/useBulkPowerActions.ts';
 import { SERVER_GROUPS_CONTAINER_ID, useServerGroupsDnd } from '@/plugins/server/useServerGroupsDnd.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useUserStore } from '@/stores/user.ts';
 import BulkActionBar from './BulkActionBar.tsx';
 import DashboardHomeTitle from './DashboardHomeTitle.tsx';
@@ -33,13 +35,14 @@ export default function DashboardHomeGrouped() {
   const { t } = useTranslations();
   const serverGroups = useUserStore((state) => state.serverGroups);
   const setServerGroups = useUserStore((state) => state.setServerGroups);
+  const maxServerGroupCount = useGlobalStore((state) => state.settings.user.maxServerGroupCount);
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [openModal, setOpenModal] = useState<'create' | null>(null);
-  const sKeyPressedRef = useRef(false);
+  const sKeyPressedRef = useSelectKeyHeld();
 
   const { handleBulkPowerAction, bulkActionLoading } = useBulkPowerActions();
 
@@ -61,31 +64,6 @@ export default function DashboardHomeGrouped() {
   };
 
   useEffect(loadGroups, [addToast, setServerGroups]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (eventKeyMatches(e, 's')) {
-        const target = e.target as HTMLElement;
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
-          sKeyPressedRef.current = true;
-        }
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (eventKeyMatches(e, 's')) {
-        sKeyPressedRef.current = false;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
 
   const handleServerSelectionChange = useCallback((server: z.infer<typeof serverSchema>, selected: boolean) => {
     setSelectedServers((prev) => {
@@ -165,6 +143,24 @@ export default function DashboardHomeGrouped() {
     ...dndHandlers
   } = useServerGroupsDnd({ onGroupsReorder });
 
+  const atGroupLimit = serverGroups.length >= maxServerGroupCount;
+
+  const createGroupButton = (
+    <ConditionalTooltip
+      enabled={atGroupLimit}
+      label={t('pages.account.home.tabs.groupedServers.page.tooltip.limitReached', { max: maxServerGroupCount })}
+    >
+      <Button
+        onClick={() => setOpenModal('create')}
+        disabled={atGroupLimit}
+        color='blue'
+        leftSection={<FontAwesomeIcon icon={faPlus} />}
+      >
+        {t('pages.account.home.tabs.groupedServers.page.button.createGroup', {})}
+      </Button>
+    </ConditionalTooltip>
+  );
+
   return (
     <AccountContentContainer
       title={t('pages.account.home.title', {})}
@@ -191,9 +187,7 @@ export default function DashboardHomeGrouped() {
           title={t('pages.account.home.tabs.groupedServers.page.empty.title', {})}
           description={t('pages.account.home.tabs.groupedServers.page.empty.description', {})}
         >
-          <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('pages.account.home.tabs.groupedServers.page.button.createGroup', {})}
-          </Button>
+          {createGroupButton}
         </EmptyState>
       ) : (
         <DndBoard
@@ -257,13 +251,7 @@ export default function DashboardHomeGrouped() {
         </DndBoard>
       )}
 
-      {serverGroups.length > 0 && (
-        <div className='flex justify-center mt-4'>
-          <Button onClick={() => setOpenModal('create')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('pages.account.home.tabs.groupedServers.page.button.createGroup', {})}
-          </Button>
-        </div>
-      )}
+      {serverGroups.length > 0 && <div className='flex justify-center mt-4'>{createGroupButton}</div>}
     </AccountContentContainer>
   );
 }

@@ -1,4 +1,4 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faNetworkWired, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -9,6 +9,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
@@ -37,6 +38,7 @@ export default function ServerNetwork() {
     error,
     search,
     setSearch,
+    debouncedSearch,
     setPage,
     setPerPage,
     refetch,
@@ -57,6 +59,8 @@ export default function ServerNetwork() {
   } = useTableSelection({ items: allocations?.data, shortcuts: canDelete });
 
   const [adding, setAdding] = useState(false);
+  const selfAssignEnabled = !!server.eggConfiguration?.allocationSelfAssignEnabled;
+  const atLimit = (allocations?.total ?? 0) >= server.featureLimits.allocations;
 
   const doAdd = () => {
     setAdding(true);
@@ -87,11 +91,15 @@ export default function ServerNetwork() {
       contentRight={
         <ServerCan action='allocations.create'>
           <ConditionalTooltip
-            enabled={(allocations?.total ?? 0) >= server.featureLimits.allocations}
-            label={t('pages.server.network.tooltip.limitReached', { max: server.featureLimits.allocations })}
+            enabled={!selfAssignEnabled || atLimit}
+            label={
+              !selfAssignEnabled
+                ? t('pages.server.network.tooltip.selfAssignDisabled', {})
+                : t('pages.server.network.tooltip.limitReached', { max: server.featureLimits.allocations })
+            }
           >
             <Button
-              disabled={!allocations || allocations.total >= server.featureLimits.allocations}
+              disabled={!allocations || !selfAssignEnabled || atLimit}
               loading={adding}
               onClick={doAdd}
               color='blue'
@@ -136,6 +144,20 @@ export default function ServerNetwork() {
           onPageSelect={setPage}
           onPerPageSelect={setPerPage}
           error={error}
+          empty={
+            debouncedSearch ? undefined : (
+              <EmptyState
+                flush
+                icon={faNetworkWired}
+                title={t('pages.server.network.empty.title', {})}
+                description={
+                  selfAssignEnabled
+                    ? t('pages.server.network.empty.description', {})
+                    : t('pages.server.network.empty.descriptionAdminOnly', {})
+                }
+              />
+            )
+          }
         >
           {allocations?.data.map((allocation) => (
             <SelectionArea.Selectable key={allocation.uuid} item={allocation}>

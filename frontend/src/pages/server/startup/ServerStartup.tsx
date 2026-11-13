@@ -28,7 +28,9 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { trackActivity } from '@/stores/activity.ts';
 import { useGlobalStore } from '@/stores/global.ts';
-import { useServerStore } from '@/stores/server.ts';
+import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
+
+const CUSTOM_COMMAND = '__custom__';
 
 export default function ServerStartup() {
   const { t } = useTranslations();
@@ -43,21 +45,24 @@ export default function ServerStartup() {
       updateVariable: state.updateVariable,
     })),
   );
+  const serverStoreApi = useServerStoreApi();
   const canModifyVariables = useServerCan('startup.update');
   const canModifyStartupCommand = useServerCan('startup.command');
   const canModifyDockerImage = useServerCan('startup.docker-image');
 
   const [command, setCommand] = useState(server.startup);
+  const [customCommandSelected, setCustomCommandSelected] = useState(false);
   const [dockerImage, setDockerImage] = useState(server.image);
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [variablesLoading, setVariablesLoading] = useState(true);
   const [variablesError, setVariablesError] = useState<unknown>(null);
+  const [variableErrors, setVariableErrors] = useState<Record<string, string>>({});
   const blocker = useBlocker(Object.keys(values).length > 0);
 
   const setDebouncedCommand = useMemo(
     () =>
-      debounce((command: string) => {
+      debounce((command: string, revertOnError: boolean) => {
         updateCommand(server.uuid, command)
           .then(() => {
             addToast(t('pages.server.startup.toast.startupCommandUpdated', {}), 'success');
@@ -65,6 +70,9 @@ export default function ServerStartup() {
           })
           .catch((msg) => {
             addToast(httpErrorToHuman(msg), 'error');
+            if (revertOnError) {
+              setCommand(serverStoreApi.getState().server.startup);
+            }
           });
       }, 500),
     [server.uuid, t, addToast, updateServer],
@@ -82,9 +90,11 @@ export default function ServerStartup() {
 
   useEffect(loadVariables, []);
 
+  const isPredefinedCommand = (value: string) => Object.values(server.egg.startupCommands).includes(value);
+
   useEffect(() => {
     if (command !== server.startup) {
-      setDebouncedCommand(command);
+      setDebouncedCommand(command, isPredefinedCommand(command));
     }
   }, [command]);
 
@@ -97,11 +107,28 @@ export default function ServerStartup() {
         })
         .catch((msg) => {
           addToast(httpErrorToHuman(msg), 'error');
+          setDockerImage(server.image);
         });
     }
   }, [dockerImage]);
 
   const doUpdate = () => {
+    const missing: Record<string, string> = {};
+    for (const variable of variables) {
+      if (
+        variable.envVariable in values &&
+        variable.rules.includes('required') &&
+        values[variable.envVariable].trim() === ''
+      ) {
+        missing[variable.envVariable] = t('pages.server.startup.validation.required', {});
+      }
+    }
+
+    setVariableErrors(missing);
+    if (Object.keys(missing).length > 0) {
+      return;
+    }
+
     setLoading(true);
     updateVariables(
       server.uuid,
@@ -119,7 +146,14 @@ export default function ServerStartup() {
         setValues({});
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        const message = httpErrorToHuman(msg);
+        const separator = message.indexOf(': ');
+        const envVariable = separator > 0 ? message.slice(0, separator) : '';
+
+        if (variables.some((variable) => variable.envVariable === envVariable)) {
+          setVariableErrors({ [envVariable]: message.slice(separator + 2) });
+        }
+        addToast(message, 'error');
       })
       .finally(() => setLoading(false));
   };
@@ -166,7 +200,7 @@ export default function ServerStartup() {
                 ...((!server.eggConfiguration?.startupAllowCustomCommand &&
                   Object.values(server.egg.startupCommands).every((value) => value !== command)) ||
                 server.eggConfiguration?.startupAllowCustomCommand
-                  ? [{ label: t('common.custom', {}), value: '' }]
+                  ? [{ label: t('common.custom', {}), value: CUSTOM_COMMAND }]
                   : []),
                 ...Object.entries(server.egg.startupCommands).map(([key, value]) => ({
                   value,
@@ -178,8 +212,16 @@ export default function ServerStartup() {
                 (!server.eggConfiguration?.startupAllowCustomCommand &&
                   Object.values(server.egg.startupCommands).every((value) => value !== command))
               }
-              value={Object.values(server.egg.startupCommands).find((value) => value === command) || ''}
-              onChange={(value) => setCommand(value ?? '')}
+              value={customCommandSelected || !isPredefinedCommand(command) ? CUSTOM_COMMAND : command}
+              onChange={(value) => {
+                if (!value || value === CUSTOM_COMMAND) {
+                  setCustomCommandSelected(true);
+                  return;
+                }
+
+                setCustomCommandSelected(false);
+                setCommand(value);
+              }}
               mb='sm'
             />
           )}
@@ -189,6 +231,13 @@ export default function ServerStartup() {
             value={command}
             onChange={(e) => setCommand(e.target.value)}
             readOnly={!canModifyStartupCommand || !server.eggConfiguration?.startupAllowCustomCommand}
+            description={
+              !canModifyStartupCommand
+                ? t('pages.server.startup.startupCommandNoPermission', {})
+                : !server.eggConfiguration?.startupAllowCustomCommand
+                  ? t('pages.server.startup.startupCommandLocked', {})
+                  : undefined
+            }
             autosize
           />
         </TitleCard>
@@ -251,7 +300,15 @@ export default function ServerStartup() {
               loading={loading}
               disabled={!canModifyVariables}
               value={values[variable.envVariable] ?? variable.value ?? variable.defaultValue ?? ''}
-              setValue={(value) => setValues((prev) => ({ ...prev, [variable.envVariable]: value }))}
+              error={variableErrors[variable.envVariable]}
+              setValue={(value) => {
+                setValues((prev) => ({ ...prev, [variable.envVariable]: value }));
+                setVariableErrors((prev) => {
+                  const next = { ...prev };
+                  delete next[variable.envVariable];
+                  return next;
+                });
+              }}
             />
           ))}
       </div>

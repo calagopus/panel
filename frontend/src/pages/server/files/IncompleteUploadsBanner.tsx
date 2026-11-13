@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Group from '@/elements/layout/Group.tsx';
+import { safeSessionStorageGet, safeSessionStorageSet } from '@/lib/safeStorage.ts';
 import useHasIncompleteUploads from '@/pages/server/files/hooks/useHasIncompleteUploads.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerStore } from '@/stores/fileManager.ts';
@@ -15,14 +16,14 @@ export default function IncompleteUploadsBanner() {
   const serverUuid = useFileManagerStore((state) => state.externals.serverUuid);
   const doOpenModal = useFileManagerStore((state) => state.doOpenModal);
   const hasIncompleteUploads = useHasIncompleteUploads();
-  const [dismissed, setDismissed] = useState(() => sessionStorage.getItem(dismissedStorageKey(serverUuid)) === 'true');
+  const [dismissed, setDismissed] = useState(() => safeSessionStorageGet(dismissedStorageKey(serverUuid)) === 'true');
 
-  useEffect(() => setDismissed(sessionStorage.getItem(dismissedStorageKey(serverUuid)) === 'true'), [serverUuid]);
+  useEffect(() => setDismissed(safeSessionStorageGet(dismissedStorageKey(serverUuid)) === 'true'), [serverUuid]);
 
   if (!hasIncompleteUploads || dismissed) return null;
 
   const handleDismiss = () => {
-    sessionStorage.setItem(dismissedStorageKey(serverUuid), 'true');
+    safeSessionStorageSet(dismissedStorageKey(serverUuid), 'true');
     setDismissed(true);
   };
 

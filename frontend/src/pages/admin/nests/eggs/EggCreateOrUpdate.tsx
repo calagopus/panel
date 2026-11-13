@@ -7,6 +7,7 @@ import { ChangeEvent, useState } from 'react';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import getEggRepositories from '@/api/admin/egg-repositories/getEggRepositories.ts';
+import getEggCounts from '@/api/admin/eggs/getEggCounts.ts';
 import createEgg from '@/api/admin/nests/eggs/createEgg.ts';
 import deleteEgg from '@/api/admin/nests/eggs/deleteEgg.ts';
 import exportEgg from '@/api/admin/nests/eggs/exportEgg.ts';
@@ -28,6 +29,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { toPterodactylEgg } from '@/lib/domain/pterodactylEgg.ts';
 import { downloadTextFile } from '@/lib/download/download.ts';
 import { parseStructuredDocument } from '@/lib/parseStructuredDocument.ts';
@@ -39,6 +41,7 @@ import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -116,6 +119,14 @@ export default function EggCreateOrUpdate({
     defaultSearchValue: contextEgg?.eggRepositoryEgg?.exportedEgg.name,
     deps: [selectedEggRepositoryUuid],
   });
+
+  const { data: eggCounts } = useResource({
+    queryKey: queryKeys.admin.eggs.counts(),
+    queryFn: getEggCounts,
+    enabled: !!contextEgg,
+    silent: true,
+  });
+  const eggServers = contextEgg ? (eggCounts?.[contextEgg.uuid]?.nestEggServers ?? 0) : 0;
 
   const doExport = (format: 'calagopus' | 'pterodactyl', fileType: 'json' | 'yaml') => {
     if (!contextEgg) return;
@@ -409,9 +420,16 @@ export default function EggCreateOrUpdate({
           )}
           {contextEgg && (
             <AdminCan action='eggs.delete' cantDelete>
-              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                {t('common.button.delete', {})}
-              </Button>
+              <ConditionalTooltip
+                enabled={eggServers > 0}
+                label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.tooltip.deleteBlocked', {
+                  count: String(eggServers),
+                })}
+              >
+                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading} disabled={eggServers > 0}>
+                  {t('common.button.delete', {})}
+                </Button>
+              </ConditionalTooltip>
             </AdminCan>
           )}
         </Group>

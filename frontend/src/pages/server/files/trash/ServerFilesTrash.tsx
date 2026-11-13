@@ -1,4 +1,4 @@
-import { faArrowLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faGear, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -98,6 +98,17 @@ export default function ServerFilesTrash() {
           >
             {t('pages.server.files.button.backToFiles', {})}
           </Button>
+          {server.trash.retention === null && (
+            <ServerCan action='settings.trash'>
+              <Button
+                variant='default'
+                onClick={() => navigate(`/server/${server.uuidShort}/settings`)}
+                leftSection={<FontAwesomeIcon icon={faGear} />}
+              >
+                {t('pages.server.files.trash.button.trashSettings', {})}
+              </Button>
+            </ServerCan>
+          )}
           {(entries?.total ?? 0) > 0 && (
             <ServerCan action='files.delete'>
               <Button color='red' onClick={() => setEmptying(true)} leftSection={<FontAwesomeIcon icon={faTrashCan} />}>

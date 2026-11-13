@@ -17,6 +17,7 @@ import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ResourceDuplicateModal from '@/elements/modals/ResourceDuplicateModal.tsx';
+import { hasAvailableTwoFactorMethod } from '@/lib/auth/twoFactor.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
@@ -34,6 +35,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
   const { addToast } = useToast();
   const availablePermissions = useGlobalStore((state) => state.availablePermissions);
   const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
@@ -62,7 +64,12 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       .finally(() => setPermissionsLoading(false));
   }, []);
 
-  const fields = useRoleFormFields(availablePermissions);
+  const twoFactorUnsatisfiable = !hasAvailableTwoFactorMethod(settings.app.twoFactorAcceptedMethods, {
+    webauthnEnabled: settings.webauthn.enabled,
+    emailTwoFactorEnabled: settings.app.emailTwoFactorEnabled,
+  });
+
+  const fields = useRoleFormFields(availablePermissions, twoFactorUnsatisfiable && !form.values.requireTwoFactor);
 
   return (
     <AdminContentContainer

@@ -40,6 +40,7 @@ interface UseFileCollabOptions {
   engine: 'monaco' | 'pierre';
   filePath: string;
   restoreContent?: string;
+  restoreOnlyIfClean?: boolean;
   onRestoreContent?: () => void;
   onActivated: (dirty: boolean) => void;
   onSaved: (payload: CollabSavedPayload) => void;
@@ -56,6 +57,7 @@ export default function useFileCollab({
   engine,
   filePath,
   restoreContent,
+  restoreOnlyIfClean = false,
   onRestoreContent,
   onActivated,
   onSaved,
@@ -84,12 +86,23 @@ export default function useFileCollab({
   const pierreChangeHandlerRef = useRef<((event: PierreFileChangeEvent) => void) | null>(null);
   const pierreSelectionHandlerRef = useRef<((selection: PierreLocalSelection | null) => void) | null>(null);
   const restoreContentRef = useRef(restoreContent);
+  const restoreOnlyIfCleanRef = useRef(restoreOnlyIfClean);
   const onRestoreContentRef = useRef(onRestoreContent);
+  const liveSocketRef = useRef<typeof socketInstance>(null);
+  const sendUpdateRef = useRef<((update: Uint8Array) => void) | null>(null);
+  const preservedRef = useRef<{
+    path: string;
+    editor: NonNullable<typeof editor>;
+    engine: 'monaco' | 'pierre';
+    sessionKey: string | null;
+    epoch: string | null;
+  } | null>(null);
 
   const callbacksRef = useRef({ onActivated, onSaved, onConflict, onError });
   useEffect(() => {
     callbacksRef.current = { onActivated, onSaved, onConflict, onError };
     onRestoreContentRef.current = onRestoreContent;
+    restoreOnlyIfCleanRef.current = restoreOnlyIfClean;
   });
 
   useEffect(() => {
@@ -112,7 +125,18 @@ export default function useFileCollab({
     setConflict(null);
   }, []);
 
+  useEffect(() => () => destroySession(), [destroySession]);
+
   useEffect(() => {
+    const preserved = preservedRef.current;
+    if (
+      preserved &&
+      (!enabled || preserved.path !== filePath || preserved.editor !== editor || preserved.engine !== engine)
+    ) {
+      preservedRef.current = null;
+      destroySession();
+    }
+
     if (!enabled || !socketConnected || !socketInstance || !editor || !filePath) {
       return;
     }
@@ -121,9 +145,11 @@ export default function useFileCollab({
     const path = filePath;
     editorSequence += 1;
     const editorId = String(editorSequence);
+    const resumed = preservedRef.current;
+    preservedRef.current = null;
 
-    let sessionKey: string | null = null;
-    let syncedEpoch: string | null = null;
+    let sessionKey: string | null = resumed?.sessionKey ?? null;
+    let syncedEpoch: string | null = resumed?.epoch ?? null;
     const matchesSession = (eventPath: string) => {
       const normalized = normalizePath(eventPath);
       return normalized === normalizePath(path) || normalized === sessionKey;
@@ -176,6 +202,14 @@ export default function useFileCollab({
         // daemon's reconciler clears within a second
         sendUpdate(Y.encodeStateAsUpdate(existing, binaryArg(stateVector)));
 
+        if (awarenessRef.current) {
+          socket.send(SocketRequest.FILE_COLLAB_AWARENESS, [
+            path,
+            encodeAwarenessUpdate(awarenessRef.current, [existing.clientID]),
+          ]);
+        }
+        setActive(true);
+
         // onActivated is deliberately not called here: the session was already active, and
         // it resets the editor's saved-content baseline, which would report unsaved edits
         // as saved
@@ -202,7 +236,7 @@ export default function useFileCollab({
 
       doc.on('update', (update: Uint8Array, origin: unknown) => {
         if (origin === 'remote') return;
-        sendUpdate(update);
+        sendUpdateRef.current?.(update);
       });
 
       for (const [updatePath, update] of pendingUpdates) {
@@ -212,7 +246,7 @@ export default function useFileCollab({
       if (restoreContentRef.current !== undefined) {
         const restored = model?.getValue() ?? (editor as PierreEditorHandle).getValue();
         restoreContentRef.current = undefined;
-        if (text.toString() !== restored) {
+        if (!(restoreOnlyIfCleanRef.current && dirty) && text.toString() !== restored) {
           doc.transact(() => {
             text.delete(0, text.length);
             text.insert(0, restored);
@@ -238,7 +272,10 @@ export default function useFileCollab({
           ({ added, updated, removed }: { added: number[]; updated: number[]; removed: number[] }, origin: unknown) => {
             if (origin === 'remote') return;
             const changed = added.concat(updated, removed);
-            socket.send(SocketRequest.FILE_COLLAB_AWARENESS, [path, encodeAwarenessUpdate(awareness, changed)]);
+            liveSocketRef.current?.send(SocketRequest.FILE_COLLAB_AWARENESS, [
+              path,
+              encodeAwarenessUpdate(awareness, changed),
+            ]);
           },
         );
 
@@ -259,7 +296,10 @@ export default function useFileCollab({
           ({ added, updated, removed }: { added: number[]; updated: number[]; removed: number[] }, origin: unknown) => {
             if (origin === 'remote') return;
             const changed = added.concat(updated, removed);
-            socket.send(SocketRequest.FILE_COLLAB_AWARENESS, [path, encodeAwarenessUpdate(awareness, changed)]);
+            liveSocketRef.current?.send(SocketRequest.FILE_COLLAB_AWARENESS, [
+              path,
+              encodeAwarenessUpdate(awareness, changed),
+            ]);
           },
         );
 
@@ -388,10 +428,14 @@ export default function useFileCollab({
     socket.addListener(SocketEvent.FILE_COLLAB_CONFLICT, onConflictEvent);
     socket.addListener(SocketEvent.FILE_COLLAB_ERROR, onErrorEvent);
 
+    liveSocketRef.current = socket;
+    sendUpdateRef.current = sendUpdate;
     subscribedRef.current = true;
     socket.send(SocketRequest.FILE_COLLAB_SUBSCRIBE, [path, editorId]);
 
     return () => {
+      liveSocketRef.current = null;
+      sendUpdateRef.current = null;
       socket.removeListener('auth success', onAuthSuccess);
       socket.removeListener('jwt error', onAuthGap);
       socket.removeListener('token expired', onAuthGap);
@@ -403,7 +447,12 @@ export default function useFileCollab({
       socket.removeListener(SocketEvent.FILE_COLLAB_CONFLICT, onConflictEvent);
       socket.removeListener(SocketEvent.FILE_COLLAB_ERROR, onErrorEvent);
 
-      destroySession();
+      if (docRef.current) {
+        preservedRef.current = { path, editor, engine, sessionKey, epoch: syncedEpoch };
+        setActive(false);
+        setParticipants([]);
+        setConflict(null);
+      }
 
       if (subscribedRef.current) {
         socket.send(SocketRequest.FILE_COLLAB_UNSUBSCRIBE, [path, editorId]);

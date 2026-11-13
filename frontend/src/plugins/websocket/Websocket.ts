@@ -39,6 +39,8 @@ export interface SocketError {
   closeCode?: number;
   /** The raw close reason string from the WebSocket, if available. */
   closeReason?: string;
+  /** Manually restarts the connection, offered for errors that are not recovered automatically. */
+  retry?: () => void;
 }
 
 const MSGPACK_PROBE = 'msgpack-probe';

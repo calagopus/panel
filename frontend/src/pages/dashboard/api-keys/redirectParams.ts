@@ -43,6 +43,20 @@ export function parseRequestedPermissions(
   };
 }
 
+export function getDroppedPermissions(searchParams: URLSearchParams, accepted: PermissionSets): string[] {
+  const kept = new Set([...accepted.userPermissions, ...accepted.serverPermissions, ...accepted.adminPermissions]);
+
+  return Array.from(
+    new Set(
+      ['user_permissions', 'server_permissions', 'admin_permissions'].flatMap((param) =>
+        (searchParams.get(param)?.split(',') ?? [])
+          .map((perm) => perm.trim())
+          .filter((perm) => perm && !kept.has(perm)),
+      ),
+    ),
+  ).sort();
+}
+
 export function parseCallbackUrl(searchParams: URLSearchParams): URL | null {
   const raw = searchParams.get('callback_url');
   if (!raw) return null;

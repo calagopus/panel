@@ -28,6 +28,7 @@ import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import Tabs from '@/elements/layout/Tabs.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import EstimatedTimeArrival from '@/elements/time/EstimatedTimeArrival.tsx';
@@ -465,37 +466,52 @@ export default function DatabaseInstanceView() {
                   {instance.type === 'redis' && (
                     <>
                       <ServerCan action='database-instances.export'>
-                        <Button
-                          onClick={() => setOpenModal('export')}
-                          color='gray'
-                          disabled={offline}
-                          leftSection={<FontAwesomeIcon icon={faDownload} />}
+                        <ConditionalTooltip
+                          enabled={offline}
+                          label={t('pages.server.databases.instance.tooltip.offline', {})}
                         >
-                          {t('common.button.export', {})}
-                        </Button>
+                          <Button
+                            onClick={() => setOpenModal('export')}
+                            color='gray'
+                            disabled={offline}
+                            leftSection={<FontAwesomeIcon icon={faDownload} />}
+                          >
+                            {t('common.button.export', {})}
+                          </Button>
+                        </ConditionalTooltip>
                       </ServerCan>
                       <ServerCan action='database-instances.import'>
-                        <Button
-                          onClick={() => setOpenModal('import')}
-                          color='gray'
-                          disabled={offline}
-                          leftSection={<FontAwesomeIcon icon={faUpload} />}
+                        <ConditionalTooltip
+                          enabled={offline}
+                          label={t('pages.server.databases.instance.tooltip.offline', {})}
                         >
-                          {t('common.button.import', {})}
-                        </Button>
+                          <Button
+                            onClick={() => setOpenModal('import')}
+                            color='gray'
+                            disabled={offline}
+                            leftSection={<FontAwesomeIcon icon={faUpload} />}
+                          >
+                            {t('common.button.import', {})}
+                          </Button>
+                        </ConditionalTooltip>
                       </ServerCan>
                     </>
                   )}
                   {instance.updateAvailable && (
                     <ServerCan action='database-instances.apply-update'>
-                      <Button
-                        onClick={() => setOpenModal('applyUpdate')}
-                        color='yellow'
-                        disabled={instance.isLocked}
-                        leftSection={<FontAwesomeIcon icon={faArrowsRotate} />}
+                      <ConditionalTooltip
+                        enabled={instance.isLocked}
+                        label={t('pages.server.databases.instance.tooltip.locked', {})}
                       >
-                        {t('pages.server.databases.instance.button.applyUpdate', {})}
-                      </Button>
+                        <Button
+                          onClick={() => setOpenModal('applyUpdate')}
+                          color='yellow'
+                          disabled={instance.isLocked}
+                          leftSection={<FontAwesomeIcon icon={faArrowsRotate} />}
+                        >
+                          {t('pages.server.databases.instance.button.applyUpdate', {})}
+                        </Button>
+                      </ConditionalTooltip>
                     </ServerCan>
                   )}
                   <ServerCan action='database-instances.update'>
@@ -508,14 +524,19 @@ export default function DatabaseInstanceView() {
                     </Button>
                   </ServerCan>
                   <ServerCan action='database-instances.delete'>
-                    <Button
-                      onClick={() => setOpenModal('delete')}
-                      color='red'
-                      disabled={instance.isLocked}
-                      leftSection={<FontAwesomeIcon icon={faTrash} />}
+                    <ConditionalTooltip
+                      enabled={instance.isLocked}
+                      label={t('pages.server.databases.instance.tooltip.locked', {})}
                     >
-                      {t('common.button.delete', {})}
-                    </Button>
+                      <Button
+                        onClick={() => setOpenModal('delete')}
+                        color='red'
+                        disabled={instance.isLocked}
+                        leftSection={<FontAwesomeIcon icon={faTrash} />}
+                      >
+                        {t('common.button.delete', {})}
+                      </Button>
+                    </ConditionalTooltip>
                   </ServerCan>
                 </Group>
               </Group>

@@ -1,4 +1,7 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { z } from 'zod';
 import getAssets from '@/api/admin/assets/getAssets.ts';
 import updateApplicationSettings from '@/api/admin/settings/updateApplicationSettings.ts';
@@ -7,9 +10,11 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import { AdvancedModeToggle, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { hasAvailableTwoFactorMethod, TwoFactorAvailability } from '@/lib/auth/twoFactor.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { storageAssetSchema } from '@/lib/schemas/admin/assets.ts';
 import { adminSettingsApplicationSchema } from '@/lib/schemas/admin/settings.ts';
@@ -28,6 +33,7 @@ import {
   applicationToFormValues,
   useApplicationFormFields,
 } from './applicationFormValues.tsx';
+import DisablePasswordLoginModal from './DisablePasswordLoginModal.tsx';
 import TelemetryPreviewModal from './TelemetryPreviewModal.tsx';
 
 type AppFormValues = z.infer<typeof adminSettingsApplicationSchema>;
@@ -36,6 +42,9 @@ export default function ApplicationContainer() {
   const { addToast } = useToast();
   const { t, tReact } = useTranslations();
   const app = useAdminStore((state) => state.app);
+  const webauthnEnabled = useAdminStore((state) => state.webauthn.enabled);
+  const mailMode = useAdminStore((state) => state.mailMode);
+  const captchaProvider = useAdminStore((state) => state.captchaProvider);
   const languages = useGlobalStore((state) => state.languages);
 
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -76,6 +85,15 @@ export default function ApplicationContainer() {
       .finally(() => setPreviewLoading(false));
   };
 
+  const twoFactorAvailability: TwoFactorAvailability = {
+    webauthnEnabled,
+    emailTwoFactorEnabled: form.values.emailTwoFactorEnabled,
+    mailConfigured: mailMode.type !== 'none',
+  };
+  const twoFactorLockout = !hasAvailableTwoFactorMethod(form.values.twoFactorAcceptedMethods, twoFactorAvailability);
+  const emailNeedsMail =
+    mailMode.type === 'none' && (form.values.emailTwoFactorEnabled || form.values.emailVerificationRequired);
+
   const fields = useApplicationFormFields({
     languages,
     assetUrls: assets.items.map((a) => a.url),
@@ -85,6 +103,12 @@ export default function ApplicationContainer() {
       checked ? setOpenModal('enableRegistration') : form.setFieldValue('registrationEnabled', false),
     onPasswordLoginToggle: (checked) =>
       checked ? form.setFieldValue('passwordLoginEnabled', true) : setOpenModal('disablePasswordLogin'),
+    twoFactorAvailability,
+    selectedTwoFactorMethods: form.values.twoFactorAcceptedMethods,
+    values: form.values,
+    twoFactorAcceptedMethodsError: twoFactorLockout
+      ? t('pages.admin.settings.tabs.application.page.form.twoFactorAcceptedMethodsNoneAvailable', {})
+      : undefined,
   });
 
   return (
@@ -121,25 +145,48 @@ export default function ApplicationContainer() {
         }}
       >
         {tReact('pages.admin.settings.tabs.application.page.modal.enableRegistration.content', {})}
+        {captchaProvider.type === 'none' && (
+          <Alert color='yellow' mt='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            {tReact('pages.admin.settings.tabs.application.page.modal.enableRegistration.noCaptcha', {
+              link: (
+                <Link to='/admin/settings/captcha' className='text-(--mantine-color-anchor) hover:underline'>
+                  {t('pages.admin.settings.tabs.application.page.modal.enableRegistration.noCaptchaLink', {})}
+                </Link>
+              ),
+            })}
+          </Alert>
+        )}
       </ConfirmationModal>
-      <ConfirmationModal
+      <DisablePasswordLoginModal
         opened={openModal === 'disablePasswordLogin'}
         onClose={() => setOpenModal(null)}
-        title={t('pages.admin.settings.tabs.application.page.modal.disablePasswordLogin.title', {})}
-        confirm={t('common.button.disable', {})}
         onConfirmed={() => {
           form.setFieldValue('passwordLoginEnabled', false);
           setOpenModal(null);
         }}
-      >
-        {tReact('pages.admin.settings.tabs.application.page.modal.disablePasswordLogin.content', {})}
-      </ConfirmationModal>
+      />
 
-      <form onSubmit={form.onSubmit(submit)}>
+      {emailNeedsMail && (
+        <Alert color='red' mb='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          {tReact('pages.admin.settings.tabs.application.page.alert.noMail', {
+            link: (
+              <Link to='/admin/settings/mail' className='text-(--mantine-color-anchor) hover:underline'>
+                {t('pages.admin.settings.tabs.application.page.alert.noMailLink', {})}
+              </Link>
+            ),
+          })}
+        </Alert>
+      )}
+
+      <form
+        onSubmit={form.onSubmit(() => {
+          if (!twoFactorLockout && !emailNeedsMail) submit();
+        })}
+      >
         <FormEngine form={form} fields={fields} />
 
         <Group mt='md'>
-          <SettingsSaveButton loading={loading} disabled={!form.isValid()} />
+          <SettingsSaveButton loading={loading} disabled={!form.isValid() || twoFactorLockout || emailNeedsMail} />
           <AdminCan action='stats.read'>
             <Button variant='outline' loading={previewLoading} onClick={doPreviewTelemetry}>
               {t('pages.admin.settings.tabs.application.page.button.previewTelemetry', {})}

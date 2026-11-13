@@ -43,6 +43,7 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const linesRef = useRef(lines);
   const pendingLines = useRef<string[]>([]);
   const flushFrame = useRef(0);
+  const loadRequest = useRef(0);
 
   useEffect(() => {
     if (lines >= 1) {
@@ -62,9 +63,11 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   const logs = useMemo(() => (logFiles ? [...logFiles].reverse() : []), [logFiles]);
 
   useEffect(() => {
+    loadRequest.current++;
     setContent('');
     setLoadVersion((version) => version + 1);
     setLoaded(false);
+    setLoading(false);
   }, [selectedLog]);
 
   useEffect(() => {
@@ -146,18 +149,25 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
 
   const loadLogs = useCallback(
     (log: NodeLogFile, linesValue: number) => {
+      const request = ++loadRequest.current;
       setLoading(true);
 
       getNodeLog(node.uuid, log.name, linesValue)
         .then((data) => {
+          if (request !== loadRequest.current) return;
+
           setContent(stripAnsi(data));
           setLoaded(true);
           setLoadVersion((version) => version + 1);
         })
         .catch((msg) => {
+          if (request !== loadRequest.current) return;
+
           addToast(httpErrorToHuman(msg), 'error');
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (request === loadRequest.current) setLoading(false);
+        });
     },
     [node.uuid, addToast],
   );
@@ -169,6 +179,8 @@ export default function AdminNodeLogs({ node }: { node: z.infer<typeof adminNode
   };
 
   const debouncedLoadLogs = useMemo(() => debounce(loadLogs, 500), [loadLogs]);
+
+  useEffect(() => () => debouncedLoadLogs.clear(), [selectedLog, debouncedLoadLogs]);
 
   useEffect(() => {
     if (!selectedLog || !loaded || lines < 1) return;

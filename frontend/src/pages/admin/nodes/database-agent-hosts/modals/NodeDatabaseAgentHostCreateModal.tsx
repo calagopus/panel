@@ -68,6 +68,9 @@ export default function NodeDatabaseAgentHostCreateModal({
           onSearchChange={databaseAgentHosts.setSearch}
           infiniteScroll={databaseAgentHosts.infiniteScroll}
           loading={databaseAgentHosts.loading}
+          nothingFoundMessage={
+            databaseAgentHosts.search ? undefined : t('elements.resourceSelectModal.empty.databaseAgentHosts', {})
+          }
         />
 
         <ModalFooter>

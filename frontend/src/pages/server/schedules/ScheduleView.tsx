@@ -11,6 +11,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
+import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getSchedule from '@/api/server/schedules/getSchedule.ts';
@@ -38,7 +39,7 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { trackActivity } from '@/stores/activity.ts';
-import { useServerStore } from '@/stores/server.ts';
+import { useServerStore, useServerStoreApi } from '@/stores/server.ts';
 import ScheduleConditionBuilder from './forms/ScheduleConditionBuilder.tsx';
 import ScheduleCreateOrUpdateModal from './modals/ScheduleCreateOrUpdateModal.tsx';
 import DetailCard from './renderers/DetailCard.tsx';
@@ -63,10 +64,12 @@ export default function ScheduleView() {
     })),
   );
 
+  const serverStoreApi = useServerStoreApi();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [date, setDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [conditionsDirty, setConditionsDirty] = useState(false);
+  const [conditionDraft, setConditionDraft] = useState<z.infer<typeof serverScheduleConditionSchema> | null>(null);
+  const conditionsDirty = conditionDraft !== null;
   const canUpdate = useServerCan('schedules.update');
   const blocker = useBlocker(conditionsDirty);
 
@@ -99,6 +102,7 @@ export default function ScheduleView() {
   };
 
   useEffect(load, [params.id]);
+  useEffect(() => setConditionDraft(null), [params.id]);
 
   const doTriggerSchedule = (skipCondition: boolean) => {
     if (params.id) {
@@ -117,10 +121,15 @@ export default function ScheduleView() {
     if (params.id) {
       setLoading(true);
 
-      updateSchedule(server.uuid, params.id, { condition: schedule!.condition })
+      const condition = conditionDraft ?? schedule!.condition;
+      const scheduleUuid = params.id;
+
+      updateSchedule(server.uuid, scheduleUuid, { condition })
         .then(() => {
           addToast(t('pages.server.schedules.toast.updated', {}), 'success');
-          setConditionsDirty(false);
+          const current = serverStoreApi.getState().schedule;
+          if (current?.uuid === scheduleUuid) setSchedule({ ...current, condition });
+          setConditionDraft(null);
         })
         .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
         .finally(() => setLoading(false));
@@ -138,7 +147,8 @@ export default function ScheduleView() {
   }
 
   const indents = stepIndents(scheduleSteps);
-  const variableIssues = analyzeScheduleVariables(schedule, scheduleSteps);
+  const condition = conditionDraft ?? schedule.condition;
+  const variableIssues = analyzeScheduleVariables({ ...schedule, condition }, scheduleSteps);
 
   return (
     <ServerContentContainer title={t('pages.server.schedules.title', {})} hideTitleComponent>
@@ -291,13 +301,7 @@ export default function ScheduleView() {
               {t('pages.server.schedules.view.sections.preConditions', {})}
             </Title>
 
-            <ScheduleConditionBuilder
-              condition={schedule.condition}
-              onChange={(condition) => {
-                setSchedule({ ...schedule, condition });
-                setConditionsDirty(true);
-              }}
-            />
+            <ScheduleConditionBuilder condition={condition} onChange={setConditionDraft} />
 
             {variableIssues.condition.length > 0 && (
               <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow' mt='md'>
@@ -309,7 +313,7 @@ export default function ScheduleView() {
               <div className='flex flex-row mt-4'>
                 <Button
                   loading={loading}
-                  disabled={!conditionsDirty || !serverScheduleConditionSchema.safeParse(schedule.condition).success}
+                  disabled={!conditionsDirty || !serverScheduleConditionSchema.safeParse(condition).success}
                   onClick={doUpdate}
                 >
                   {t('common.button.update', {})}

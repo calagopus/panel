@@ -26,6 +26,7 @@ import {
   resumeDetachedUpload,
   resumeUpload,
   setUploadManagerExternals,
+  uploadFolderKey,
 } from '@/lib/files/uploadManager.ts';
 import { bytesProgressString } from '@/lib/format/size.ts';
 import { useUploadProgressToasts } from '@/plugins/toast/useUploadProgressToasts.ts';
@@ -116,10 +117,9 @@ export default function UploadsCard() {
       group.totalSize += item.size;
       group.uploadedSize += item.uploaded;
 
-      const parts = item.filePath.split('/');
-      if (parts.length < 2) return;
+      const folder = uploadFolderKey(item);
+      if (folder === null) return;
 
-      const folder = parts[0];
       const prev = group.folders.get(folder) ?? {
         totalSize: 0,
         uploadedSize: 0,

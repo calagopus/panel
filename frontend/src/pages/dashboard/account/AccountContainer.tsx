@@ -50,7 +50,7 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
         language: user.language,
       });
     }
-  }, [user]);
+  }, [user?.username, user?.nameFirst, user?.nameLast, user?.language]);
 
   const doUpdate = () => {
     setLoading(true);

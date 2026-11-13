@@ -1,6 +1,6 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
@@ -19,9 +19,9 @@ import Divider from '@/elements/layout/Divider.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { eventKeyMatches } from '@/lib/quickActions/shortcuts.ts';
 import { serverPowerAction, serverSchema } from '@/lib/schemas/server/server.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useSelectKeyHeld } from '@/plugins/selection/useSelectKeyHeld.ts';
 import { useBulkPowerActions } from '@/plugins/server/useBulkPowerActions.ts';
 import { useServerListShowOthers } from '@/plugins/server/useServerListShowOthers.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -39,7 +39,7 @@ export default function DashboardHomeAll() {
   const { addToast } = useToast();
 
   const [selectedServers, setSelectedServers] = useState(new ObjectSet<z.infer<typeof serverSchema>, 'uuid'>('uuid'));
-  const sKeyPressedRef = useRef(false);
+  const sKeyPressedRef = useSelectKeyHeld();
 
   const { handleBulkPowerAction, bulkActionLoading } = useBulkPowerActions();
 
@@ -52,31 +52,6 @@ export default function DashboardHomeAll() {
         addToast(httpErrorToHuman(msg), 'error');
       });
   }, [addToast, setServerGroups]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (eventKeyMatches(e, 's')) {
-        const target = e.target as HTMLElement;
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
-          sKeyPressedRef.current = true;
-        }
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (eventKeyMatches(e, 's')) {
-        sKeyPressedRef.current = false;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
 
   const {
     data: servers,

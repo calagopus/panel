@@ -12,7 +12,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { join } from 'pathe';
+import { basename, join } from 'pathe';
 import { memo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -99,7 +99,7 @@ function FileActionBar() {
 
     const files = actingFiles.values().map((f) => ({
       from: join(actingFilesSource!, f.name),
-      to: join(browsingDirectory, f.name),
+      to: join(browsingDirectory, basename(f.name)),
       source: f,
     }));
 
@@ -172,7 +172,7 @@ function FileActionBar() {
       root: '/',
       files: actingFiles.values().map((f) => ({
         from: join(actingFilesSource!, f.name),
-        to: join(browsingDirectory, f.name),
+        to: join(browsingDirectory, basename(f.name)),
       })),
     })
       .then(({ renamed }) => {

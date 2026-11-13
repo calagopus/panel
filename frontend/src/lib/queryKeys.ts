@@ -238,6 +238,8 @@ const admin = {
     proxies: () => ['admin', 'health', 'proxies'] as const,
   },
 
+  settings: () => ['admin', 'settings'] as const,
+
   emailTemplates: {
     all: () => ['admin', 'emailTemplates'] as const,
     detail: (identifier: string) => ['admin', 'emailTemplates', { identifier }] as const,
@@ -302,6 +304,8 @@ const server = (serverUuid: string) => ({
           'column-types',
         ] as const,
       users: (instanceUuid: string) => ['server', serverUuid, 'databases', 'instances', instanceUuid, 'users'] as const,
+      resources: (instanceUuid: string) =>
+        ['server', serverUuid, 'databases', 'instances', instanceUuid, 'resources'] as const,
     },
   },
   files: {

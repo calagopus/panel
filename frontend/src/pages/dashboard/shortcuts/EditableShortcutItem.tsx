@@ -20,14 +20,23 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 import KbdKey from '@/elements/typography/KbdKey.tsx';
 import Text from '@/elements/typography/Text.tsx';
-import { disableShortcut, resetShortcut, setShortcutBinding } from '@/lib/quickActions/shortcutOverrides.ts';
+import { getShortcutDefinitions } from '@/lib/quickActions/coreShortcuts.tsx';
+import {
+  disableShortcut,
+  getShortcutOverrides,
+  resetShortcut,
+  setShortcutBinding,
+} from '@/lib/quickActions/shortcutOverrides.ts';
 import {
   bindingFromEvent,
+  bindingsEqual,
+  effectiveBinding,
   ModifierKey,
   ShortcutBinding,
   ShortcutDefinition,
   shortcutDescription,
 } from '@/lib/quickActions/shortcuts.ts';
+import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 const ARROW_ICONS: Record<string, IconDefinition> = {
@@ -94,6 +103,7 @@ export default function EditableShortcutItem({
   hideBorder,
 }: EditableShortcutItemProps) {
   const { t } = useTranslations();
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (!recording) return;
@@ -110,13 +120,27 @@ export default function EditableShortcutItem({
       const next = bindingFromEvent(event);
       if (!next) return;
 
-      setShortcutBinding(definition.id, next);
+      if (bindingsEqual(next, definition.defaultBinding)) resetShortcut(definition.id);
+      else setShortcutBinding(definition.id, next);
       setRecordingId(null);
+
+      const overrides = getShortcutOverrides();
+      const conflicts = getShortcutDefinitions().filter(
+        (other) => other.id !== definition.id && bindingsEqual(effectiveBinding(other, overrides), next),
+      );
+      if (conflicts.length > 0) {
+        addToast(
+          t('pages.account.shortcuts.toast.conflict', {
+            shortcuts: conflicts.map((other) => shortcutDescription(other)).join(', '),
+          }),
+          'warning',
+        );
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [recording, definition.id, setRecordingId]);
+  }, [recording, definition, setRecordingId, addToast, t]);
 
   return (
     <Flex

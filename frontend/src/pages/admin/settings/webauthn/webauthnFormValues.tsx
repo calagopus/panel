@@ -16,7 +16,7 @@ export const webauthnEmptyFormValues: WebauthnFormValues = {
 
 export const webauthnToFormValues = (webauthn: WebauthnFormValues): Partial<WebauthnFormValues> => ({ ...webauthn });
 
-export function useWebauthnFormFields(): FieldDef<WebauthnFormValues>[] {
+export function useWebauthnFormFields({ disableLocked }: { disableLocked: boolean }): FieldDef<WebauthnFormValues>[] {
   const { t } = useTranslations();
 
   return [
@@ -24,7 +24,10 @@ export function useWebauthnFormFields(): FieldDef<WebauthnFormValues>[] {
       type: 'switch',
       name: 'enabled',
       label: t('pages.admin.settings.tabs.webauthn.page.form.enabled', {}),
-      description: t('pages.admin.settings.tabs.webauthn.page.form.enabledDescription', {}),
+      description: disableLocked
+        ? t('pages.admin.settings.tabs.webauthn.page.form.enabledLocked', {})
+        : t('pages.admin.settings.tabs.webauthn.page.form.enabledDescription', {}),
+      props: { disabled: disableLocked },
     },
     {
       type: 'switch',

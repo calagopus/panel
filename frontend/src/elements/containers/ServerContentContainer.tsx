@@ -13,6 +13,7 @@ import Notification from '@/elements/feedback/Notification.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { bytesProgressString } from '@/lib/format/size.ts';
+import { SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -76,6 +77,9 @@ function ServerContentContainer(props: Props) {
     transferProgressFiles,
     backupRestoreFiles,
     installProgress,
+    state,
+    socketInstance,
+    socketConnected,
   } = useServerStore(
     useShallow((state) => ({
       server: state.server,
@@ -89,6 +93,9 @@ function ServerContentContainer(props: Props) {
       transferProgressFiles: state.transferProgressFiles,
       backupRestoreFiles: state.backupRestoreFiles,
       installProgress: state.installProgress,
+      state: state.state,
+      socketInstance: state.socketInstance,
+      socketConnected: state.socketConnected,
     })),
   );
   const { user } = useAuth();
@@ -247,7 +254,22 @@ function ServerContentContainer(props: Props) {
         </div>
       ) : pendingRestart ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
-          <Notification color='yellow'>{t('pages.server.console.notification.pendingRestart', {})}</Notification>
+          <Notification color='yellow'>
+            <div className='flex flex-col md:flex-row md:items-center justify-between gap-2'>
+              <span>{t('pages.server.console.notification.pendingRestart', {})}</span>
+              <ServerCan action='control.restart'>
+                <Button
+                  className='min-w-fit'
+                  variant='subtle'
+                  color='yellow'
+                  disabled={!socketConnected || !state || server.isSuspended}
+                  onClick={() => socketInstance?.send(SocketRequest.SET_STATE, 'restart')}
+                >
+                  {t('common.enum.serverPowerAction.restart', {})}
+                </Button>
+              </ServerCan>
+            </div>
+          </Notification>
         </div>
       ) : null}
 

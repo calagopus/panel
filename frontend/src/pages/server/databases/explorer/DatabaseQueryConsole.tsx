@@ -106,8 +106,11 @@ export default function DatabaseQueryConsole({ draftRef }: { draftRef: RefObject
               editor.onDidChangeModelContent(() => {
                 draftRef.current = editor.getValue();
               });
-              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-                runRef.current();
+              editor.addAction({
+                id: 'calagopus.database.runQuery',
+                label: 'Run Query',
+                keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+                run: () => runRef.current(),
               });
             }}
           />

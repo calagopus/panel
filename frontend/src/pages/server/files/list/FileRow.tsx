@@ -55,7 +55,7 @@ function FileRowCheckbox({
 
 export interface FileRowProps {
   file: z.infer<typeof serverDirectoryEntrySchema>;
-  handleOpen: (openMode: FileOpenMode) => void;
+  handleOpen: (openMode: FileOpenMode, file?: z.infer<typeof serverDirectoryEntrySchema>) => void;
   openMassMenu: (x: number, y: number) => void;
   clickOnce: boolean;
   preferPhysicalSize: boolean;
@@ -145,7 +145,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
 
     clickTimer.current = setTimeout(() => {
       if (clickCount.current >= 2 && canOpenFile) {
-        handleOpen(openMode);
+        handleOpen(openMode, file);
       }
 
       clickCount.current = 0;
@@ -202,7 +202,7 @@ const FileRow = forwardRef<HTMLTableRowElement, FileRowProps>(function FileRow(
           onClick={(e) => {
             e.preventDefault();
             if (clickOnce && canOpenFile) {
-              handleOpen(openMode);
+              handleOpen(openMode, file);
             } else {
               handleClick(e);
             }

@@ -18,7 +18,7 @@ export default function MountAddEggModal({
   const { addToast } = useToast();
 
   const [eggs, setEggs] = useState<Awaited<ReturnType<typeof getAllEggs>>>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!props.opened) {
@@ -35,13 +35,17 @@ export default function MountAddEggModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.eggs', {})}
+      createAction={{ to: '/admin/nests', permission: 'eggs.create' }}
       title={t('pages.admin.mounts.tabs.eggs.page.modal.add.title', {})}
       label={t('pages.admin.mounts.tabs.eggs.page.modal.add.form.egg', {})}
       loading={loading}
-      data={eggs.map((group) => ({
-        group: group.nest.name,
-        items: group.eggs.map((egg) => ({ label: egg.name, value: egg.uuid })),
-      }))}
+      data={eggs
+        .filter((group) => group.eggs.length > 0)
+        .map((group) => ({
+          group: group.nest.name,
+          items: group.eggs.map((egg) => ({ label: egg.name, value: egg.uuid })),
+        }))}
       addedToast={t('pages.admin.mounts.tabs.eggs.page.toast.added', {})}
       invalidateKeys={[queryKeys.admin.mountAssignments.all()]}
       onConfirm={(eggUuid) => {

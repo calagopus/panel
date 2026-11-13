@@ -12,6 +12,7 @@ import Table, { Pagination, tableSelectionHeader } from '@/elements/data-display
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -27,6 +28,7 @@ import BackupGroupCard from './BackupGroupCard.tsx';
 import { BackupColumns } from './columns.ts';
 import BackupGroupDeleteModal from './modals/BackupGroupDeleteModal.tsx';
 import BackupGroupEditModal from './modals/BackupGroupEditModal.tsx';
+import { useBackupCreateGate } from './useBackupCreateGate.ts';
 import { useBackupSelection } from './useBackupSelection.ts';
 
 export default function BackupGroupItem({
@@ -83,6 +85,17 @@ export default function BackupGroupItem({
   });
 
   const allLocked = group.usableBackups > 0 && group.usableUnlockedBackups === 0;
+
+  const createGate = useBackupCreateGate(canCreateBackup && backups.total === 0);
+  const createDisabled = !createGate.countKnown || createGate.blocked;
+  const createTooltip = createGate.blocked
+    ? t('pages.server.backups.tooltip.limitReached', { max: server.featureLimits.backups })
+    : createGate.atLimit && createGate.expendable
+      ? t('pages.server.backups.tooltip.evicts', {
+          max: server.featureLimits.backups,
+          name: createGate.expendable.name,
+        })
+      : '';
 
   return (
     <>
@@ -153,9 +166,17 @@ export default function BackupGroupItem({
               {t('pages.server.backupGroups.noBackups', {})}
             </span>
             {canCreateBackup && (
-              <Button variant='light' color='gray' size='compact-xs' onClick={() => setOpenModal('createBackup')}>
-                {t('pages.server.backupGroups.button.createInGroup', {})}
-              </Button>
+              <ConditionalTooltip enabled={!!createTooltip} label={createTooltip}>
+                <Button
+                  variant='light'
+                  color='gray'
+                  size='compact-xs'
+                  disabled={createDisabled}
+                  onClick={() => setOpenModal('createBackup')}
+                >
+                  {t('pages.server.backupGroups.button.createInGroup', {})}
+                </Button>
+              </ConditionalTooltip>
             )}
           </div>
         ) : (

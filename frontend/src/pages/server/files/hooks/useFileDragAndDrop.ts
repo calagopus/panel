@@ -103,11 +103,6 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
   );
 
   useEffect(() => {
-    if (!enabled) {
-      resetDragState();
-      return;
-    }
-
     const scheduleDragReset = () => {
       if (dragResetTimerRef.current !== null) window.clearTimeout(dragResetTimerRef.current);
       dragResetTimerRef.current = window.setTimeout(resetDragState, 750);
@@ -138,6 +133,7 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
       e.preventDefault();
       e.stopPropagation();
 
+      if (!enabled && e.dataTransfer) e.dataTransfer.dropEffect = 'none';
       if (dataTransferHasFiles(e.dataTransfer)) scheduleDragReset();
     };
 
@@ -169,5 +165,5 @@ export function useFileDragAndDrop({ onDrop, enabled = true }: UseFileDragAndDro
     };
   }, [enabled, handleDrop, resetDragState]);
 
-  return { isDragging: enabled && isDragging };
+  return { isDragging };
 }

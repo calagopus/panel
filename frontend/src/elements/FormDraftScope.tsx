@@ -10,18 +10,20 @@ import {
   isWithinFormDraftScope,
 } from '@/stores/formDrafts.ts';
 
+const hasUnsavedDrafts = (state: FormDraftStore) =>
+  Object.keys(state.drafts).length > 0 || Object.values(state.dirty).some(Boolean);
+
 function FormDraftBlocker({ store }: { store: StoreApi<FormDraftStore> }) {
   const { t } = useTranslations();
 
-  const hasUnsaved = useStore(
-    store,
-    (state) => Object.keys(state.drafts).length > 0 || Object.values(state.dirty).some(Boolean),
-  );
+  const hasUnsaved = useStore(store, hasUnsavedDrafts);
 
   const blocker = useBlocker(
     hasUnsaved,
     false,
-    (transition) => !isWithinFormDraftScope(store.getState().baseUrl, transition.location.pathname),
+    (transition) =>
+      hasUnsavedDrafts(store.getState()) &&
+      !isWithinFormDraftScope(store.getState().baseUrl, transition.location.pathname),
   );
 
   return (

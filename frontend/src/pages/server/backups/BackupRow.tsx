@@ -40,6 +40,7 @@ import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { applyBackupUpdate } from '@/pages/server/backups/backupCache.ts';
 import DatabaseInstanceBackupRestoreModal from '@/pages/server/databases/instances/modals/DatabaseInstanceBackupRestoreModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
+import { structuredArg } from '@/plugins/websocket/args.ts';
 import { SocketEvent } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -93,29 +94,45 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
       });
   };
 
-  const waitForBackupDeleted = (uuid: string) =>
-    new Promise<boolean>((resolve) => {
-      if (!socketInstance) {
-        resolve(false);
-        return;
+  const listenForBackupDeleted = (uuid: string) => {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let finish: (outcome: 'deleted' | 'failed' | 'pending') => void = () => {};
+
+    const listener = (eventUuid: string, data: unknown) => {
+      if (eventUuid !== uuid) return;
+
+      let successful = true;
+      try {
+        successful = structuredArg<{ successful: boolean }>(data).successful !== false;
+      } catch {
+        // an unreadable payload still means wings is done with it
       }
 
-      let timeout: ReturnType<typeof setTimeout>;
-      const listener = (eventUuid: string) => {
-        if (eventUuid !== uuid) return;
+      finish(successful ? 'deleted' : 'failed');
+    };
 
+    const result = new Promise<'deleted' | 'failed' | 'pending'>((resolve) => {
+      finish = (outcome) => {
         clearTimeout(timeout);
-        socketInstance.removeListener(SocketEvent.BACKUP_DELETED, listener);
-        resolve(true);
+        socketInstance?.removeListener(SocketEvent.BACKUP_DELETED, listener);
+        resolve(outcome);
       };
-
-      timeout = setTimeout(() => {
-        socketInstance.removeListener(SocketEvent.BACKUP_DELETED, listener);
-        resolve(false);
-      }, 1000);
-
-      socketInstance.addListener(SocketEvent.BACKUP_DELETED, listener);
     });
+
+    if (socketInstance) {
+      socketInstance.addListener(SocketEvent.BACKUP_DELETED, listener);
+    } else {
+      finish('pending');
+    }
+
+    return {
+      cancel: () => finish('pending'),
+      wait: () => {
+        timeout = setTimeout(() => finish('pending'), 1000);
+        return result;
+      },
+    };
+  };
 
   const doSetLocked = (locked: boolean) =>
     updateBackup(server.uuid, backup.uuid, { name: backup.name, locked, backupGroupUuid: backup.backupGroupUuid })
@@ -131,19 +148,22 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
       });
 
   const doDelete = async () => {
+    const deletion = listenForBackupDeleted(backup.uuid);
+
     try {
       await deleteBackup(server.uuid, backup.uuid);
     } catch (msg) {
+      deletion.cancel();
       addToast(httpErrorToHuman(msg), 'error');
       return;
     }
 
     setOpenModal(null);
 
-    const deleted = await waitForBackupDeleted(backup.uuid);
-    if (deleted) {
+    const outcome = await deletion.wait();
+    if (outcome === 'deleted') {
       addToast(t('pages.server.backups.modal.deleteBackup.toast.deleted', {}), 'success');
-    } else {
+    } else if (outcome === 'pending') {
       addToast(t('pages.server.backups.modal.deleteBackup.toast.started', {}), 'success');
       updateStoreBackup(backup.uuid, { deletionStatus: 'deleting' });
     }
@@ -260,7 +280,12 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
             type: 'action',
             icon: faRotateLeft,
             label: t('common.button.restore', {}),
-            hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
+            hidden:
+              !backup.completed ||
+              isFailed ||
+              isDeleting ||
+              isDeleteFailed ||
+              (backup.kind !== 'server' && !canReadDatabaseInstances),
             onClick: () => setOpenModal(backup.kind === 'server' ? 'restore' : 'restoreDatabase'),
             color: 'gray',
             canAccess: useServerCan('backups.restore'),

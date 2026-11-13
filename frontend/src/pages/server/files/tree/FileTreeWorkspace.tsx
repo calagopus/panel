@@ -13,6 +13,7 @@ import {
 } from '@/lib/files/fileRenames.ts';
 import { isOpenableFile } from '@/lib/files/files.ts';
 import { removeUserSetting, setUserSettingLocal, useUserSetting } from '@/lib/userSettings.ts';
+import { useFileTooLargeToast } from '@/pages/server/files/hooks/useFileTooLargeToast.ts';
 import FileTree from '@/pages/server/files/tree/FileTree.tsx';
 import { TreeDirectoryCapabilities, TreeSelectionItem } from '@/pages/server/files/tree/fileTreeData.ts';
 import {
@@ -44,7 +45,6 @@ import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useContainerAutoHeight } from '@/plugins/viewport/useContainerAutoHeight.ts';
 import { usePageBreakpoint } from '@/plugins/viewport/usePageBreakpoint.ts';
 import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
-import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -75,7 +75,7 @@ export default function FileTreeWorkspace({
 }: FileTreeWorkspaceProps) {
   const { t } = useTranslations();
   const wide = usePageBreakpoint('md');
-  const { addToast } = useToast();
+  const showFileTooLarge = useFileTooLargeToast();
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const server = useServerStore((state) => state.server);
@@ -98,6 +98,7 @@ export default function FileTreeWorkspace({
   );
   const draftContentsRef = useRef(new Map<string, string>());
   const renameDraftsRef = useRef(new Map<string, string>());
+  const collabDraftTabIdsRef = useRef(new Set<string>());
   const workspaceStateRef = useRef(workspace);
   const dirtyTabIdsRef = useRef(dirtyTabIds);
   const [revealRequest, setRevealRequest] = useState<{ path: string }>();
@@ -209,6 +210,7 @@ export default function FileTreeWorkspace({
         renameDraftsRef.current = new Map(
           Array.from(renameDraftsRef.current, ([id, content]) => [remapId(id), content]),
         );
+        collabDraftTabIdsRef.current = new Set(Array.from(collabDraftTabIdsRef.current, remapId));
         for (const id of renamed.ids.values()) {
           const content = draftContentsRef.current.get(id);
           if (content !== undefined) renameDraftsRef.current.set(id, content);
@@ -297,13 +299,16 @@ export default function FileTreeWorkspace({
   }, [activeSelection, store]);
 
   const handleDraftChange = useCallback(
-    (tabId: string, content: string | null) => {
+    (tabId: string, content: string | null, collab = false) => {
       if (content === null) {
         draftContentsRef.current.delete(tabId);
         renameDraftsRef.current.delete(tabId);
+        collabDraftTabIdsRef.current.delete(tabId);
       } else {
         if (!draftContentsRef.current.has(tabId)) keepTabOpen(tabId);
         draftContentsRef.current.set(tabId, content);
+        if (collab) collabDraftTabIdsRef.current.add(tabId);
+        else collabDraftTabIdsRef.current.delete(tabId);
       }
     },
     [keepTabOpen],
@@ -444,6 +449,7 @@ export default function FileTreeWorkspace({
         removeFileDraft(server.uuid, getFileTreeEditorDraftPath(tab));
         draftContentsRef.current.delete(id);
         renameDraftsRef.current.delete(id);
+        collabDraftTabIdsRef.current.delete(id);
       }
       setWorkspace((current) => closeFileTreeWorkspaceTabs(current, closing));
       setDirtyTabIds((current) => new Set([...current].filter((id) => !closing.has(id))));
@@ -501,7 +507,7 @@ export default function FileTreeWorkspace({
 
       if (!openMode.openable) {
         if (openMode.reason === 'tooLarge') {
-          addToast(t('pages.server.files.toast.fileTooLargeToOpen', {}), 'warning');
+          showFileTooLarge(item.parent, item.entry);
         }
         return;
       }
@@ -527,7 +533,7 @@ export default function FileTreeWorkspace({
           }),
       });
     },
-    [addToast, canReadContent, navigate, server, setSearchParams, store, t],
+    [showFileTooLarge, canReadContent, navigate, server, setSearchParams, store],
   );
 
   const openFile = useCallback(
@@ -704,6 +710,7 @@ export default function FileTreeWorkspace({
                           active={visible && pane.id === workspace.activePaneId}
                           selection={tab}
                           draftContent={draftContentsRef.current.get(tabId)}
+                          draftFromCollab={collabDraftTabIdsRef.current.has(tabId)}
                           restoreContent={renameDraftsRef.current.get(tabId)}
                           onRestoreContent={handleRenameDraftRestored}
                           onClose={requestCloseTab}

@@ -7,16 +7,21 @@ import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/data-display/Table.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { adminUserOAuthLinkTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import UserOAuthLinkAddModal from './modals/UserOAuthLinkAddModal.tsx';
 import UserOAuthLinkRow from './UserOAuthLinkRow.tsx';
 
 export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof adminFullUserSchema> }) {
   const { t } = useTranslations();
+  const { user: currentUser } = useAuth();
+
+  const canLink = !!currentUser?.admin || currentUser?.uuid === user.uuid;
   const [openModal, setOpenModal] = useState<'add' | null>(null);
 
   const {
@@ -42,9 +47,19 @@ export default function AdminUserOAuthLinks({ user }: { user: z.infer<typeof adm
       registryProps={{ user }}
       contentRight={
         <AdminCan action='oauth-providers.read'>
-          <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('common.button.add', {})}
-          </Button>
+          <ConditionalTooltip
+            enabled={!canLink}
+            label={t('pages.admin.users.tabs.oauthLinks.page.tooltip.rootOnly', {})}
+          >
+            <Button
+              onClick={() => setOpenModal('add')}
+              color='blue'
+              disabled={!canLink}
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+            >
+              {t('common.button.add', {})}
+            </Button>
+          </ConditionalTooltip>
         </AdminCan>
       }
     >

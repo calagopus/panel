@@ -10,9 +10,12 @@ import Select from '@/elements/input/Select.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
+import DatabaseInstancePowerNotice from '@/pages/server/databases/instances/DatabaseInstancePowerNotice.tsx';
+import { useDatabaseInstancePowerState } from '@/pages/server/databases/instances/useDatabaseInstancePowerState.ts';
 import useInvalidateServerCache from '@/pages/server/hooks/useInvalidateServerCache.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
@@ -61,7 +64,14 @@ export default function DatabaseInstanceBackupRestoreModal({ backup, ...props }:
 
     return databaseInstances;
   }, [instances.items, backup.databaseType, databaseInstance]);
-  const canRestore = canReadInstances && !!databaseInstance && !resource.loading && !loading;
+  const power = useDatabaseInstancePowerState(databaseInstance?.uuid, props.opened && canReadInstances);
+  const canRestore =
+    canReadInstances &&
+    !!databaseInstance &&
+    !resource.loading &&
+    !loading &&
+    !power.loading &&
+    (power.state === null || power.state === 'running');
 
   useEffect(() => {
     if (props.opened) {
@@ -118,7 +128,16 @@ export default function DatabaseInstanceBackupRestoreModal({ backup, ...props }:
           loading={instances.loading || resource.loading}
           disabled={loading}
           onChange={setDatabaseInstanceUuid}
+          nothingFoundMessage={
+            !instances.search && backup.databaseType
+              ? t('pages.server.databases.instance.backups.modal.restoreBackup.noInstances', {
+                  engine: databaseAgentTypeLabelMapping[backup.databaseType],
+                })
+              : undefined
+          }
         />
+
+        {databaseInstance && <DatabaseInstancePowerNotice power={power} action='restore' />}
 
         {databaseInstance && (
           <Text size='sm'>

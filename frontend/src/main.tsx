@@ -85,6 +85,7 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
   preloadRouterForPath(window.location.pathname);
 
   let disabled: string[] = [];
+  let settingsLoaded = false;
 
   const icons = getIcons()
     .then((icons) => useGlobalStore.getState().setIcons(icons))
@@ -96,6 +97,7 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
     disabled = settings.disabledExtensions;
     useGlobalStore.getState().setSettings(settings);
     useGlobalStore.getState().setTimeOffset(Date.now() - new Date(settings.time).getTime());
+    settingsLoaded = true;
   } catch (err) {
     console.error('Failed to load settings, assuming no extensions are disabled:', err);
   }
@@ -116,6 +118,7 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
     <App
       theme={mergeThemeOverrides(baseTheme, window.extensionContext.getMantineTheme())}
       cssVariablesResolver={window.extensionContext.getMantineCssResolver()}
+      settingsLoaded={settingsLoaded}
     />,
   );
 })();

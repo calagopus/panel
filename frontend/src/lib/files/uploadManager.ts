@@ -1,3 +1,4 @@
+import { faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { QueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { basename, dirname, join } from 'pathe';
@@ -21,12 +22,14 @@ import {
   UploadConflictResolutions,
 } from '@/lib/files/uploadConflicts.ts';
 import { uploadPathOf } from '@/lib/files/uploadPaths.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverFileOperationSchema } from '@/lib/schemas/server/files.ts';
-import { PendingToast, ToastAction, ToastType } from '@/providers/contexts/toastContext.ts';
+import { AddToastOptions, PendingToast, ToastAction, ToastType } from '@/providers/contexts/toastContext.ts';
 import { getTranslations } from '@/providers/contexts/translationContext.ts';
 import { readUserSettingField } from '@/stores/fileManager.ts';
 import {
+  isPersistedUploadOwnedElsewhere,
   loadPersistedUploads,
   PersistedResumableUpload,
   persistUpload,
@@ -43,7 +46,7 @@ export interface UploadResult {
 
 interface UploadManagerExternals {
   queryClient: QueryClient;
-  addToast: (message: ReactNode, type?: ToastType, actions?: ToastAction[]) => void;
+  addToast: (message: ReactNode, type?: ToastType, actions?: ToastAction[], options?: AddToastOptions) => void;
   addPendingToast: (message: ReactNode) => PendingToast;
   onUploadsComplete: (destination: UploadDestination, fileCount: number) => void;
 }
@@ -118,6 +121,21 @@ export function registerUploadRefresh(scope: string, fn: () => void): () => void
   };
 }
 
+export interface UploadDiskSpace {
+  freeBytes: number;
+  openTrash?: () => void;
+}
+
+const diskSpaceProviders = new Map<string, () => UploadDiskSpace | null>();
+
+export function registerUploadDiskSpace(scope: string, fn: () => UploadDiskSpace | null): () => void {
+  diskSpaceProviders.set(scope, fn);
+
+  return () => {
+    if (diskSpaceProviders.get(scope) === fn) diskSpaceProviders.delete(scope);
+  };
+}
+
 const handlers: {
   [K in UploadDestination['type']]: DestinationHandler<Extract<UploadDestination, { type: K }>>;
 } = {
@@ -189,6 +207,11 @@ function folderCountKey(scope: string, folder: string): string {
   return `${scope}\n${folder}`;
 }
 
+export function uploadFolderKey(item: Pick<UploadItem, 'filePath' | 'destination'>): string | null {
+  const slash = item.filePath.indexOf('/');
+  return slash === -1 ? null : join(item.destination.directory, item.filePath.slice(0, slash));
+}
+
 export function getFolderFileCount(scope: string, folder: string): number {
   return folderFileCounts.get(folderCountKey(scope, folder)) ?? 0;
 }
@@ -199,8 +222,12 @@ function setUploads(updater: (prev: Map<string, UploadItem>) => Map<string, Uplo
   if (next !== prev) useUploadsStore.setState({ uploads: next });
 }
 
+function isOwnedByOtherTab(item: UploadItem): boolean {
+  return !!item.resumable && !!item.remotePath && isPersistedUploadOwnedElsewhere(item.destination, item.remotePath);
+}
+
 function unpersistItem(item: UploadItem | undefined): void {
-  if (item?.resumable && item.remotePath) {
+  if (item?.resumable && item.remotePath && !isOwnedByOtherTab(item)) {
     unpersistUpload(item.destination, item.remotePath);
   }
 }
@@ -408,8 +435,9 @@ function settleBatches(): void {
   const foldersBeingRemoved = new Set<string>();
   keysToRemove.forEach((key) => {
     const file = uploads.get(key);
-    if (file && file.filePath.includes('/')) {
-      foldersBeingRemoved.add(folderCountKey(uploadScopeKey(file.destination), file.filePath.split('/')[0]));
+    const folderKey = file ? uploadFolderKey(file) : null;
+    if (file && folderKey !== null) {
+      foldersBeingRemoved.add(folderCountKey(uploadScopeKey(file.destination), folderKey));
     }
   });
 
@@ -419,7 +447,8 @@ function settleBatches(): void {
   foldersBeingRemoved.forEach((countKey) => {
     let hasRemainingFiles = false;
     for (const file of remainingFiles.values()) {
-      if (folderCountKey(uploadScopeKey(file.destination), file.filePath.split('/')[0]) === countKey) {
+      const folderKey = uploadFolderKey(file);
+      if (folderKey !== null && folderCountKey(uploadScopeKey(file.destination), folderKey) === countKey) {
         hasRemainingFiles = true;
         break;
       }
@@ -818,6 +847,12 @@ export function resumeDetachedUpload(key: string, file: File): boolean {
     return false;
   }
 
+  if (isOwnedByOtherTab(entry)) {
+    const { t } = getTranslations();
+    addToastSafely(t('elements.fileUpload.toast.uploadingInOtherTab', { file: entry.filePath }).md(), 'error');
+    return false;
+  }
+
   const controller = new AbortController();
   controllers.set(key, controller);
 
@@ -867,7 +902,7 @@ export function hydratePersistedUploads(): void {
   });
 }
 
-function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: Set<string>): void {
+function clearFailedEntries(scope: string, folderKeys: Set<string>, filePaths: Set<string>): void {
   const keysToRemove: string[] = [];
   const removedPerFolder = new Map<string, number>();
   const affectedBatches = new Set<string>();
@@ -875,8 +910,10 @@ function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: 
   useUploadsStore.getState().uploads.forEach((file, key) => {
     if (file.status !== 'error' || uploadScopeKey(file.destination) !== scope) return;
 
-    const folder = file.filePath.includes('/') ? file.filePath.split('/')[0] : null;
-    if (folder !== null ? !folderNames.has(folder) : !fileNames.has(file.filePath)) return;
+    const folder = uploadFolderKey(file);
+    if (folder !== null ? !folderKeys.has(folder) : !filePaths.has(join(file.destination.directory, file.filePath))) {
+      return;
+    }
 
     keysToRemove.push(key);
     affectedBatches.add(file.batchId);
@@ -914,12 +951,55 @@ function clearFailedEntries(scope: string, folderNames: Set<string>, fileNames: 
   });
 }
 
+function remainingUploadBytes(scope: string): number {
+  let bytes = 0;
+  useUploadsStore.getState().uploads.forEach((item) => {
+    if (uploadScopeKey(item.destination) !== scope || item.status === 'completed' || item.status === 'error') return;
+    bytes += Math.max(0, item.size - item.uploaded);
+  });
+  return bytes;
+}
+
 export async function uploadFiles(destination: UploadDestination, selected: File[]): Promise<void> {
   if (selected.length === 0) return;
 
   const files = await resolveUploadConflicts(destination, selected);
   if (files.length === 0) return;
 
+  const scope = uploadScopeKey(destination);
+  const space = diskSpaceProviders.get(scope)?.();
+  const needed = files.reduce((sum, file) => sum + file.size, 0);
+
+  if (externals && space && needed + remainingUploadBytes(scope) > space.freeBytes) {
+    const { t, tItem } = getTranslations();
+    const actions: ToastAction[] = [
+      {
+        name: t('elements.fileUpload.uploadAnyway', {}),
+        icon: faUpload,
+        onClick: () => startUploads(destination, files),
+      },
+    ];
+    if (space.openTrash) {
+      actions.push({ name: t('elements.fileUpload.openTrash', {}), icon: faTrash, onClick: space.openTrash });
+    }
+
+    externals.addToast(
+      t('elements.fileUpload.toast.insufficientDisk', {
+        files: tItem('file', files.length),
+        needed: bytesToString(needed),
+        free: bytesToString(Math.max(0, space.freeBytes)),
+      }),
+      'warning',
+      actions,
+      { persistent: true },
+    );
+    return;
+  }
+
+  await startUploads(destination, files);
+}
+
+async function startUploads(destination: UploadDestination, files: File[]): Promise<void> {
   const scope = uploadScopeKey(destination);
   const splittingEnabled = destination.type === 'server';
   const splitThreshold = requestBudget(destination);
@@ -940,18 +1020,23 @@ export async function uploadFiles(destination: UploadDestination, selected: File
     (isFolder ? folderFiles : individualFiles).push({ file, index: idx });
   });
 
+  const folderKeyOf = (file: File) => uploadFolderKey({ filePath: uploadPathOf(file), destination })!;
+
   const folderBatchIds = new Map<string, string>();
   const folderCounts = new Map<string, number>();
   for (const { file } of folderFiles) {
-    const path = uploadPathOf(file);
-    const folder = path.split('/')[0];
+    const folder = folderKeyOf(file);
     if (!folderBatchIds.has(folder)) {
       folderBatchIds.set(folder, `${scope}/folder-${folder}-${Date.now()}`);
     }
     folderCounts.set(folder, (folderCounts.get(folder) ?? 0) + 1);
   }
 
-  clearFailedEntries(scope, new Set(folderCounts.keys()), new Set(individualFiles.map(({ file }) => file.name)));
+  clearFailedEntries(
+    scope,
+    new Set(folderCounts.keys()),
+    new Set(individualFiles.map(({ file }) => join(destination.directory, uploadPathOf(file)))),
+  );
 
   folderCounts.forEach((count, folder) => {
     const countKey = folderCountKey(scope, folder);
@@ -966,8 +1051,9 @@ export async function uploadFiles(destination: UploadDestination, selected: File
 
     for (const { file, index } of individualFiles) {
       const key = `file-${index}`;
+      const path = uploadPathOf(file);
       next.set(key, {
-        filePath: file.name,
+        filePath: path,
         progress: 0,
         size: file.size,
         uploaded: 0,
@@ -975,14 +1061,13 @@ export async function uploadFiles(destination: UploadDestination, selected: File
         status: 'pending',
         retryAttempt: 0,
         destination,
-        ...resumableFields(file, file.name),
+        ...resumableFields(file, path),
       });
     }
 
     for (const { file, index } of folderFiles) {
       const path = uploadPathOf(file);
-      const folder = path.split('/')[0];
-      const batchId = folderBatchIds.get(folder)!;
+      const batchId = folderBatchIds.get(folderKeyOf(file))!;
       next.set(`file-${index}`, {
         filePath: path,
         progress: 0,
@@ -1033,8 +1118,7 @@ export async function uploadFiles(destination: UploadDestination, selected: File
 
   const folderGroups = new Map<string, Array<{ file: File; index: number }>>();
   for (const entry of folderFiles) {
-    const path = uploadPathOf(entry.file);
-    const folder = path.split('/')[0];
+    const folder = folderKeyOf(entry.file);
     if (!folderGroups.has(folder)) folderGroups.set(folder, []);
     folderGroups.get(folder)!.push(entry);
   }
@@ -1045,11 +1129,15 @@ export async function uploadFiles(destination: UploadDestination, selected: File
 
     const resumableSemaphore = new Semaphore(FILE_CONCURRENCY);
     for (const entry of entries.filter((e) => isResumable(e.file))) {
+      const fileController = new AbortController();
+      controllers.set(`file-${entry.index}`, fileController);
+      controller.signal.addEventListener('abort', () => fileController.abort(), { once: true });
+
       promises.push(
         resumableSemaphore.acquire().then(async () => {
           try {
-            if (controller.signal.aborted) return;
-            await uploadResumableFile(destination, entry.file, entry.index, batchId, controller);
+            if (fileController.signal.aborted) return;
+            await uploadResumableFile(destination, entry.file, entry.index, batchId, fileController);
           } finally {
             resumableSemaphore.release();
           }
@@ -1107,7 +1195,7 @@ function discardStagedUploads(items: (UploadItem | undefined)[]): void {
   >();
 
   for (const item of items) {
-    if (!item || !hasStagedUpload(item)) continue;
+    if (!item || !hasStagedUpload(item) || isOwnedByOtherTab(item)) continue;
 
     const scope = uploadScopeKey(item.destination);
     const remotePath = item.remotePath ?? item.filePath;
@@ -1180,15 +1268,15 @@ export function cancelFileUpload(fileKey: string): void {
   settleBatches();
 }
 
-export function cancelFolderUpload(scope: string, folderName: string): void {
-  folderFileCounts.delete(folderCountKey(scope, folderName));
+export function cancelFolderUpload(scope: string, folderKey: string): void {
+  folderFileCounts.delete(folderCountKey(scope, folderKey));
 
   const keysToRemove: string[] = [];
   const batchIds = new Set<string>();
   let cancelledCount = 0;
 
   useUploadsStore.getState().uploads.forEach((file, key) => {
-    if (uploadScopeKey(file.destination) === scope && file.filePath.split('/')[0] === folderName) {
+    if (uploadScopeKey(file.destination) === scope && uploadFolderKey(file) === folderKey) {
       keysToRemove.push(key);
       batchIds.add(file.batchId);
       if (file.status !== 'error') cancelledCount++;
@@ -1203,7 +1291,11 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
     failureToastedBatches.delete(batchId);
     settledErrorBatches.delete(batchId);
   });
-  keysToRemove.forEach((key) => pendingProgress.delete(key));
+  keysToRemove.forEach((key) => {
+    controllers.get(key)?.abort();
+    controllers.delete(key);
+    pendingProgress.delete(key);
+  });
 
   const cancelled: (UploadItem | undefined)[] = [];
   setUploads((prev) => {
@@ -1223,7 +1315,7 @@ export function cancelFolderUpload(scope: string, folderName: string): void {
     const { t, tItem } = getTranslations();
     externals?.addToast(
       t('elements.fileUpload.toast.cancelledFolder', {
-        folder: folderName,
+        folder: folderKey,
         files: tItem('file', cancelledCount),
       }).md(),
       'success',

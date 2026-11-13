@@ -40,9 +40,11 @@ const MAX_RETRIES = 10;
 export default function App({
   theme,
   cssVariablesResolver,
+  settingsLoaded,
 }: {
   theme: MantineThemeOverride;
   cssVariablesResolver: CSSVariablesResolver | null;
+  settingsLoaded: boolean;
 }) {
   const { settings, setSettings, setLanguages, setTimeOffset, setAnnouncements } = useGlobalStore(
     useShallow((state) => ({
@@ -55,20 +57,21 @@ export default function App({
   );
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
+  const settingsFresh = useRef(settingsLoaded);
 
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
 
     const loadData = () => {
-      const loadSettings =
-        Object.keys(useGlobalStore.getState().settings).length > 0 ? Promise.resolve(null) : getSettings();
+      const loadSettings = settingsFresh.current ? Promise.resolve(null) : getSettings();
 
       Promise.all([loadSettings, getLanguages()])
         .then(([settings, languages]) => {
           if (cancelled) return;
 
           if (settings) {
+            settingsFresh.current = true;
             setSettings(settings);
             setTimeOffset(Date.now() - new Date(settings.time).getTime());
           }

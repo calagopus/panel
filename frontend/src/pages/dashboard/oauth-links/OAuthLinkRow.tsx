@@ -17,11 +17,12 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 interface OAuthLinkRowProps {
   oauthLink: z.infer<typeof userOAuthLinkSchema>;
   isSelected?: boolean;
+  isLastLoginMethod?: boolean;
   onSelectionChange?: (selected: boolean, range?: boolean) => void;
 }
 
 const OAuthLinkRow = forwardRef<HTMLTableRowElement, OAuthLinkRowProps>(function OAuthLinkRow(
-  { oauthLink, isSelected = false, onSelectionChange },
+  { oauthLink, isSelected = false, isLastLoginMethod = false, onSelectionChange },
   ref,
 ) {
   const { t } = useTranslations();
@@ -61,7 +62,12 @@ const OAuthLinkRow = forwardRef<HTMLTableRowElement, OAuthLinkRowProps>(function
           {
             type: 'action',
             icon: faTrash,
-            disabled: !oauthLink.oauthProvider.userManageable,
+            disabled: !oauthLink.oauthProvider.userManageable || isLastLoginMethod,
+            tooltip: !oauthLink.oauthProvider.userManageable
+              ? t('pages.account.oauthLinks.tooltip.notManageable', {})
+              : isLastLoginMethod
+                ? t('pages.account.oauthLinks.tooltip.lastLoginMethod', {})
+                : undefined,
             label: t('common.button.remove', {}),
             onClick: () => setOpenModal('delete'),
             color: 'red',

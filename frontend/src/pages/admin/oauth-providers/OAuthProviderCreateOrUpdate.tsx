@@ -27,6 +27,7 @@ import {
 } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -47,6 +48,8 @@ export default function OAuthProviderCreateOrUpdate({
   const { addToast } = useToast();
   const { t } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
+  const { user } = useAuth();
+  const isRootAdmin = !!user?.admin;
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | 'discover' | null>(null);
@@ -89,7 +92,10 @@ export default function OAuthProviderCreateOrUpdate({
     addToast(t('pages.admin.oAuthProviders.tabs.general.page.toast.exported', {}), 'success');
   };
 
-  const { fieldsTop, fieldsMain } = useOAuthProviderFormFields();
+  const { fieldsTop, fieldsMain } = useOAuthProviderFormFields({
+    lockIdentity: !isRootAdmin && !!contextOAuthProvider,
+    lockApiLinkable: !isRootAdmin,
+  });
 
   return (
     <AdminContentContainer

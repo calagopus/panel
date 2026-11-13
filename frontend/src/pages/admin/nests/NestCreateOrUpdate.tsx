@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import createNest from '@/api/admin/nests/createNest.ts';
 import deleteNest from '@/api/admin/nests/deleteNest.ts';
+import getNestCounts from '@/api/admin/nests/getNestCounts.ts';
 import updateNest from '@/api/admin/nests/updateNest.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -10,9 +11,11 @@ import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Switch from '@/elements/input/Switch.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNestSchema, adminNestUpdateSchema } from '@/lib/schemas/admin/nests.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { nestEmptyFormValues, nestToFormValues, useNestFormFields } from './nestFormValues.tsx';
@@ -40,6 +43,14 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
   });
 
   useHydrateForm(form, contextNest, nestToFormValues);
+
+  const { data: counts } = useResource({
+    queryKey: queryKeys.admin.nests.counts(),
+    queryFn: getNestCounts,
+    enabled: !!contextNest,
+    silent: true,
+  });
+  const nestServers = contextNest ? (counts?.[contextNest.uuid]?.nestServers ?? 0) : 0;
 
   const fields = useNestFormFields();
 
@@ -87,9 +98,14 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
           </AdminCan>
           {contextNest && (
             <AdminCan action='nests.delete' cantDelete>
-              <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                {t('common.button.delete', {})}
-              </Button>
+              <ConditionalTooltip
+                enabled={nestServers > 0}
+                label={t('pages.admin.nests.tabs.general.page.tooltip.deleteBlocked', { count: String(nestServers) })}
+              >
+                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading} disabled={nestServers > 0}>
+                  {t('common.button.delete', {})}
+                </Button>
+              </ConditionalTooltip>
             </AdminCan>
           )}
         </Group>

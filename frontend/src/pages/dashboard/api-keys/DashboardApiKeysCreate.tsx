@@ -7,11 +7,13 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import getPermissions from '@/api/getPermissions.ts';
 import createApiKey from '@/api/me/api-keys/createApiKey.ts';
+import getApiKeys from '@/api/me/api-keys/getApiKeys.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
+import ErrorState from '@/elements/feedback/ErrorState.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -19,7 +21,11 @@ import Stack from '@/elements/layout/Stack.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { userApiKeySchema } from '@/lib/schemas/user/apiKeys.ts';
-import { parseCallbackUrl, parseRequestedPermissions } from '@/pages/dashboard/api-keys/redirectParams.ts';
+import {
+  getDroppedPermissions,
+  parseCallbackUrl,
+  parseRequestedPermissions,
+} from '@/pages/dashboard/api-keys/redirectParams.ts';
 import RequestedPermissions from '@/pages/dashboard/api-keys/RequestedPermissions.tsx';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -33,10 +39,14 @@ export default function DashboardApiKeysCreate() {
   const { user } = useAuth();
   const availablePermissions = useGlobalStore((state) => state.availablePermissions);
   const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const maxApiKeyCount = useGlobalStore((state) => state.settings.user.maxApiKeyCount);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [permissionsLoaded, setPermissionsLoaded] = useState(false);
+  const [permissionsError, setPermissionsError] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const [apiKeyCount, setApiKeyCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
 
@@ -48,22 +58,41 @@ export default function DashboardApiKeysCreate() {
     validate: zod4Resolver(userApiKeySchema.pick({ name: true })),
   });
 
-  useEffect(() => {
+  const loadPermissions = () => {
+    setRetrying(true);
+
     getPermissions()
       .then((res) => {
         setAvailablePermissions(res);
+        setPermissionsError(null);
         setPermissionsLoaded(true);
       })
       .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      });
+        setPermissionsError(httpErrorToHuman(err));
+      })
+      .finally(() => setRetrying(false));
+  };
+
+  useEffect(() => {
+    loadPermissions();
+
+    getApiKeys(1, undefined, 1)
+      .then((keys) => setApiKeyCount(keys.total))
+      .catch(() => setApiKeyCount(null));
   }, []);
+
+  const atLimit = apiKeyCount !== null && apiKeyCount >= maxApiKeyCount;
 
   const callbackUrl = useMemo(() => parseCallbackUrl(searchParams), [searchParams]);
 
   const requestedPermissions = useMemo(
     () => parseRequestedPermissions(searchParams, availablePermissions, !!user?.admin),
     [searchParams, availablePermissions, user],
+  );
+
+  const droppedPermissions = useMemo(
+    () => (permissionsLoaded ? getDroppedPermissions(searchParams, requestedPermissions) : []),
+    [permissionsLoaded, searchParams, requestedPermissions],
   );
 
   const doCreate = () => {
@@ -97,7 +126,9 @@ export default function DashboardApiKeysCreate() {
       title={t('pages.account.apiKeys.create.title', {})}
       subtitle={t('pages.account.apiKeys.create.subtitle', {})}
     >
-      {!permissionsLoaded ? (
+      {permissionsError && !permissionsLoaded ? (
+        <ErrorState error={permissionsError} onRetry={loadPermissions} retrying={retrying} />
+      ) : !permissionsLoaded ? (
         <Spinner.Centered />
       ) : createdKey ? (
         <Card>
@@ -114,6 +145,18 @@ export default function DashboardApiKeysCreate() {
       ) : (
         <form onSubmit={form.onSubmit(doCreate)}>
           <Stack>
+            {atLimit && (
+              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                {t('pages.account.apiKeys.create.alert.limitReached', { max: maxApiKeyCount }).md()}
+              </Alert>
+            )}
+            {droppedPermissions.length > 0 && (
+              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                {t('pages.account.apiKeys.create.alert.droppedPermissions', {
+                  permissions: droppedPermissions.join(', '),
+                })}
+              </Alert>
+            )}
             {requestedPermissions.adminPermissions.length > 0 && (
               <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
                 {t('pages.account.apiKeys.create.alert.adminPermissions', {}).md()}
@@ -157,7 +200,7 @@ export default function DashboardApiKeysCreate() {
               )}
 
             <Group>
-              <Button type='submit' disabled={!form.isValid()} loading={loading}>
+              <Button type='submit' disabled={!form.isValid() || atLimit} loading={loading}>
                 {t('common.button.create', {})}
               </Button>
               <Button variant='default' onClick={() => navigate('/account/api-keys')}>

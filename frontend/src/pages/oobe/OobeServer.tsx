@@ -1,8 +1,9 @@
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getEggRepositoryEggs from '@/api/admin/egg-repositories/eggs/getEggRepositoryEggs.ts';
 import installEgg from '@/api/admin/egg-repositories/eggs/installEgg.ts';
@@ -13,6 +14,7 @@ import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import AlertError from '@/elements/alerts/AlertError.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Card from '@/elements/data-display/Card.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -26,6 +28,7 @@ import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { to } from '@/lib/routes.ts';
 import { adminEggRepositoryEggSchema } from '@/lib/schemas/admin/eggRepositories.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
@@ -40,6 +43,7 @@ import { OobeComponentProps } from '@/routers/OobeRouter.tsx';
 export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }: OobeComponentProps) {
   const { t } = useTranslations();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -49,6 +53,11 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
 
   const node = data.nodes[0] ?? null;
   const existingServer = data.servers[0] ?? null;
+  const missingRequirement = !node
+    ? t('pages.oobe.server.error.noNodes', {})
+    : data.eggRepositories.length === 0
+      ? t('pages.oobe.server.error.noEggRepositories', {})
+      : null;
 
   const [selectedEggRepositoryUuid, setSelectedEggRepositoryUuid] = useState<string | null>(null);
   const [selectedEgg, setSelectedEgg] = useState<z.infer<typeof adminEggRepositoryEggSchema> | null>(null);
@@ -93,12 +102,6 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
     ...liveValidation,
     validate: zod4Resolver(oobeServerSchema),
   });
-
-  useEffect(() => {
-    if (!data.isLoading && data.eggRepositories.length === 0) {
-      skipFrom('server');
-    }
-  }, [data.isLoading]);
 
   useEffect(() => {
     if (!selectedEgg) return;
@@ -198,6 +201,22 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
               </Text>
             </Stack>
           </Card>
+        ) : missingRequirement ? (
+          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            <Stack gap='sm' align='flex-start'>
+              {missingRequirement}
+              {node && (
+                <Button
+                  size='compact-sm'
+                  variant='light'
+                  color='yellow'
+                  onClick={() => navigate(to('/repositories', '/oobe'))}
+                >
+                  {t('pages.oobe.server.button.importRepositories', {})}
+                </Button>
+              )}
+            </Stack>
+          </Alert>
         ) : (
           <Stack gap='sm'>
             <Card>
@@ -420,7 +439,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
           )}
           {existingServer ? (
             <Button onClick={() => onNext()}>{t('common.button.continue', {})}</Button>
-          ) : (
+          ) : missingRequirement ? null : (
             <Button
               type='submit'
               disabled={!selectedEgg || !form.isValid() || (needsNest && !form.getValues().nestName)}

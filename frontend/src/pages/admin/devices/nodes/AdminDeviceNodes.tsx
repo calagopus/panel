@@ -11,6 +11,7 @@ import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import Table from '@/elements/data-display/Table.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
 import { removePaginatedItems } from '@/lib/queryCache.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -96,6 +97,7 @@ function DeviceNodeRow({
 export default function AdminDeviceNodes({ device }: { device: z.infer<typeof adminDeviceSchema> }) {
   const { t } = useTranslations();
   const [openModal, setOpenModal] = useState<'add' | null>(null);
+  const canRead = useAdminCan('nodes.read');
 
   const {
     data: deviceNodes,
@@ -121,9 +123,19 @@ export default function AdminDeviceNodes({ device }: { device: z.infer<typeof ad
       registryProps={{ device }}
       contentRight={
         <AdminCan action='nodes.devices'>
-          <Button onClick={() => setOpenModal('add')} color='blue' leftSection={<FontAwesomeIcon icon={faPlus} />}>
-            {t('common.button.add', {})}
-          </Button>
+          <ConditionalTooltip
+            enabled={!canRead}
+            label={t('pages.admin.devices.tabs.nodes.page.tooltip.noReadPermission', {})}
+          >
+            <Button
+              onClick={() => setOpenModal('add')}
+              color='blue'
+              disabled={!canRead}
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+            >
+              {t('common.button.add', {})}
+            </Button>
+          </ConditionalTooltip>
         </AdminCan>
       }
     >

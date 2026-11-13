@@ -10,7 +10,7 @@ import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
-import { adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
+import { adminLocationSchema, adminLocationUpdateSchema } from '@/lib/schemas/admin/locations.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -21,7 +21,8 @@ import { locationEmptyFormValues, useLocationFormFields } from '../locationFormV
 interface LocationCreateOrUpdateModalProps {
   opened: boolean;
   onClose: () => void;
-  onLocationCreated: () => void;
+  onLocationCreated: (location: z.infer<typeof adminLocationSchema>) => void;
+  showNoLocationsNotice?: boolean;
 }
 
 type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
@@ -30,6 +31,7 @@ export default function LocationCreateOrUpdateModal({
   opened,
   onClose,
   onLocationCreated,
+  showNoLocationsNotice = true,
 }: LocationCreateOrUpdateModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
@@ -42,12 +44,12 @@ export default function LocationCreateOrUpdateModal({
     initialValues: locationEmptyFormValues,
     onClose,
     onSubmit: async (values) => {
-      await createLocation(adminLocationUpdateSchema.parse(values));
+      const location = await createLocation(adminLocationUpdateSchema.parse(values));
       addToast(
         t('elements.resource.tooltip.created', { resource: t('pages.admin.locations.resourceName', {}) }),
         'success',
       );
-      onLocationCreated();
+      onLocationCreated(location);
     },
   });
 
@@ -71,9 +73,11 @@ export default function LocationCreateOrUpdateModal({
       size='lg'
     >
       <Stack gap='md'>
-        <Text size='sm' c='dimmed'>
-          {t('pages.admin.nodes.tabs.general.page.alert.noLocations', {})}
-        </Text>
+        {showNoLocationsNotice && (
+          <Text size='sm' c='dimmed'>
+            {t('pages.admin.nodes.tabs.general.page.alert.noLocations', {})}
+          </Text>
+        )}
 
         <FormEngine form={form} fields={fields} />
 

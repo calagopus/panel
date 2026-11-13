@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { getRelativeFileTreeTabId } from '@/pages/server/files/tree/fileTreeEditor.ts';
 import { matchesShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useCurrentWindow } from '@/providers/CurrentWindowProvider.tsx';
 
 interface FileTreeEditorShortcutsOptions {
   tabIds: string[];
@@ -15,13 +16,22 @@ export default function useFileTreeEditorShortcuts({
   onClose,
   onSelect,
 }: FileTreeEditorShortcutsOptions) {
+  const { id: windowId } = useCurrentWindow();
+
   useEffect(() => {
+    const isFocusedWindow = () => {
+      const owner = document.activeElement?.closest('[id^="window_"][id$="_inner"]');
+      return owner ? owner.id === `window_${windowId}_inner` : windowId === null;
+    };
+
     const selectRelative = (offset: number) => {
       const tabId = getRelativeFileTreeTabId(tabIds, activeTabId, offset);
       if (tabId) onSelect(tabId);
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
+      if (!isFocusedWindow()) return;
+
       if (matchesShortcut(event, 'files.closeEditorTab')) {
         if (!activeTabId) return;
 
@@ -51,5 +61,5 @@ export default function useFileTreeEditorShortcuts({
 
     window.addEventListener('keydown', onKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', onKeyDown, { capture: true });
-  }, [activeTabId, onClose, onSelect, tabIds]);
+  }, [activeTabId, onClose, onSelect, tabIds, windowId]);
 }

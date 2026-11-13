@@ -18,6 +18,7 @@ import { authResetPasswordSchema } from '@/lib/schemas/auth.ts';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import AuthWrapper from './AuthWrapper.tsx';
 
 export default function ResetPassword() {
@@ -25,6 +26,7 @@ export default function ResetPassword() {
   const { t } = useTranslations();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const passwordLoginEnabled = useGlobalStore((state) => state.settings.app.passwordLoginEnabled);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -110,6 +112,11 @@ export default function ResetPassword() {
               <Button type='submit' loading={loading} disabled={!token || !form.isValid()} size='md' fullWidth>
                 {t('pages.auth.resetPassword.button.reset', {})}
               </Button>
+              {error && passwordLoginEnabled && (
+                <Button variant='light' onClick={() => navigate('/auth/forgot-password')} size='md' fullWidth>
+                  {t('pages.auth.resetPassword.button.requestNewLink', {})}
+                </Button>
+              )}
             </Stack>
           </form>
         </Card>

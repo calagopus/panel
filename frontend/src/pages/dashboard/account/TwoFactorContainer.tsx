@@ -6,6 +6,7 @@ import Badge from '@/elements/data-display/Badge.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
+import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -14,22 +15,22 @@ import { useGlobalStore } from '@/stores/global.ts';
 import EmailTwoFactorToggleButton from './actions/EmailTwoFactorToggleButton.tsx';
 import TwoFactorDisableButton from './actions/TwoFactorDisableButton.tsx';
 import TwoFactorSetupButton from './actions/TwoFactorSetupButton.tsx';
+import { useTwoFactorRequirement } from './useTwoFactorRequirement.ts';
 
 export default function TwoFactorContainer() {
   const { t, tReact } = useTranslations();
   const { user } = useAuth();
   const navigate = useNavigate();
   const settings = useGlobalStore((state) => state.settings);
+  const { methodLabel, isAccepted } = useTwoFactorRequirement();
 
   const methods = user!.twoFactorMethods;
-  const emailOffered = settings.app.emailTwoFactorEnabled || user!.emailTwoFactorEnabled;
+  const locked = user!.requireTwoFactor && !user!.twoFactorSatisfied;
 
-  const methodLabel = (method: (typeof methods)[number]) =>
-    method === 'totp'
-      ? t('pages.account.account.containers.twoFactor.enum.twoFactorMethod.totp', {})
-      : method === 'security_key'
-        ? t('pages.account.account.containers.twoFactor.enum.twoFactorMethod.securityKey', {})
-        : t('pages.account.account.containers.twoFactor.enum.twoFactorMethod.email', {});
+  const offerTotp = user!.totpEnabled || !locked || isAccepted('totp');
+  const offerEmail =
+    user!.emailTwoFactorEnabled || (settings.app.emailTwoFactorEnabled && (!locked || isAccepted('email')));
+  const offerSecurityKeys = methods.includes('security_key') || !locked || isAccepted('security_key');
 
   return (
     <TitleCard
@@ -42,11 +43,17 @@ export default function TwoFactorContainer() {
           t('pages.account.account.containers.twoFactor.none', {}).md()
         ) : (
           <Group gap='xs'>
-            {methods.map((method) => (
-              <Badge key={method} color='green'>
-                {methodLabel(method)}
-              </Badge>
-            ))}
+            {methods.map((method) =>
+              user!.requireTwoFactor && !isAccepted(method) ? (
+                <Tooltip key={method} label={t('pages.account.account.containers.twoFactor.notAccepted', {})}>
+                  <Badge color='gray'>{methodLabel(method)}</Badge>
+                </Tooltip>
+              ) : (
+                <Badge key={method} color='green'>
+                  {methodLabel(method)}
+                </Badge>
+              ),
+            )}
           </Group>
         )}
 
@@ -67,11 +74,13 @@ export default function TwoFactorContainer() {
         )}
 
         <Group className='mt-auto' gap='xs'>
-          {user!.totpEnabled ? <TwoFactorDisableButton /> : <TwoFactorSetupButton />}
-          {emailOffered && <EmailTwoFactorToggleButton />}
-          <Button variant='light' onClick={() => navigate('/account/security-keys')}>
-            {t('pages.account.account.containers.twoFactor.button.securityKeys', {})}
-          </Button>
+          {offerTotp && (user!.totpEnabled ? <TwoFactorDisableButton /> : <TwoFactorSetupButton />)}
+          {offerEmail && <EmailTwoFactorToggleButton />}
+          {offerSecurityKeys && (
+            <Button variant='light' onClick={() => navigate('/account/security-keys')}>
+              {t('pages.account.account.containers.twoFactor.button.securityKeys', {})}
+            </Button>
+          )}
         </Group>
       </Stack>
     </TitleCard>

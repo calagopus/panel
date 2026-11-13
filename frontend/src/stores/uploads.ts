@@ -61,9 +61,17 @@ export interface PersistedResumableUpload {
   remotePath: string;
   localName: string;
   size: number;
+  owner?: string;
+  heartbeat?: number;
 }
 
 const PERSIST_KEY = 'resumable-uploads';
+const TAB_ID =
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random()}`;
+const HEARTBEAT_MS = 5_000;
+const OWNER_TTL_MS = 20_000;
 
 export function persistedUploadId(destination: UploadDestination, remotePath: string): string {
   return `${uploadScopeKey(destination)}\n${destination.directory}\n${remotePath}`;
@@ -99,15 +107,60 @@ function writePersisted(map: Map<string, PersistedResumableUpload>): void {
   }
 }
 
-export function loadPersistedUploads(): PersistedResumableUpload[] {
-  return Array.from(readPersisted().values());
+function isOwnedElsewhere(entry: PersistedResumableUpload): boolean {
+  return !!entry.owner && entry.owner !== TAB_ID && Date.now() - (entry.heartbeat ?? 0) < OWNER_TTL_MS;
 }
 
-export function persistUpload(entry: PersistedResumableUpload): void {
-  const map = readPersisted();
-  map.set(persistedUploadId(entry.destination, entry.remotePath), entry);
-  writePersisted(map);
+export function loadPersistedUploads(): PersistedResumableUpload[] {
+  return Array.from(readPersisted().values()).filter((entry) => !isOwnedElsewhere(entry));
 }
+
+export function isPersistedUploadOwnedElsewhere(destination: UploadDestination, remotePath: string): boolean {
+  const entry = readPersisted().get(persistedUploadId(destination, remotePath));
+  return !!entry && isOwnedElsewhere(entry);
+}
+
+let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+
+function ensureHeartbeat(): void {
+  if (heartbeatTimer !== null) return;
+
+  heartbeatTimer = setInterval(() => {
+    const map = readPersisted();
+    const now = Date.now();
+    let owned = false;
+    map.forEach((entry) => {
+      if (entry.owner !== TAB_ID) return;
+      entry.heartbeat = now;
+      owned = true;
+    });
+
+    if (owned) {
+      writePersisted(map);
+    } else if (heartbeatTimer !== null) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  }, HEARTBEAT_MS);
+}
+
+export function persistUpload(entry: Omit<PersistedResumableUpload, 'owner' | 'heartbeat'>): void {
+  const map = readPersisted();
+  map.set(persistedUploadId(entry.destination, entry.remotePath), { ...entry, owner: TAB_ID, heartbeat: Date.now() });
+  writePersisted(map);
+  ensureHeartbeat();
+}
+
+window.addEventListener('pagehide', () => {
+  const map = readPersisted();
+  let changed = false;
+  map.forEach((entry) => {
+    if (entry.owner !== TAB_ID) return;
+    entry.heartbeat = 0;
+    changed = true;
+  });
+  if (changed) writePersisted(map);
+});
 
 export function unpersistUpload(destination: UploadDestination, remotePath: string): void {
   const map = readPersisted();

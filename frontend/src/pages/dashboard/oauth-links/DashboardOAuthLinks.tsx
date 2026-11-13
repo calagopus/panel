@@ -1,6 +1,7 @@
-import { faChevronDown, faFingerprint } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faFingerprint, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getOAuthLinkProviders from '@/api/me/oauth-links/getOAuthLinkProviders.ts';
 import getOAuthLinks from '@/api/me/oauth-links/getOAuthLinks.ts';
@@ -8,7 +9,10 @@ import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import Anchor from '@/elements/typography/Anchor.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { oAuthProviderSchema } from '@/lib/schemas/generic.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
@@ -16,9 +20,11 @@ import { useTableSelection } from '@/plugins/selection/useTableSelection.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import OAuthLinkActionBar from './OAuthLinkActionBar.tsx';
 import OAuthLinkRow from './OAuthLinkRow.tsx';
+import { useOAuthLinkRemoval } from './useOAuthLinkRemoval.ts';
 
 export default function DashboardOAuthLinks() {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
+  const navigate = useNavigate();
   const [oAuthProviders, setOAuthProviders] = useState<z.infer<typeof oAuthProviderSchema>[]>([]);
 
   useEffect(() => {
@@ -48,47 +54,82 @@ export default function DashboardOAuthLinks() {
     selectionAreaProps,
   } = useTableSelection({ items: oauthLinks?.data });
 
+  const { isLastLoginMethod } = useOAuthLinkRemoval(oauthLinks?.total ?? 0);
+
+  const connectableProviders = oAuthProviders.filter(
+    (p) => p.userManageable && !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid),
+  );
+
   return (
     <AccountContentContainer
       title={t('pages.account.oauthLinks.title', {})}
       contentRight={
         <ContextMenu
-          items={oAuthProviders
-            .filter((p) => p.userManageable && !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid))
-            .map(
-              (oauthProvider) =>
-                ({
-                  type: 'action',
-                  icon: faFingerprint,
-                  label: t('pages.account.oauthLinks.button.connectTo', { provider: oauthProvider.name }),
-                  onClick: () => window.location.replace(`/api/auth/oauth/redirect/${oauthProvider.uuid}`),
-                  disabled: !oauthProvider.linkViewable,
-                  color: 'gray',
-                }) as const,
-            )}
+          items={connectableProviders.map(
+            (oauthProvider) =>
+              ({
+                type: 'action',
+                icon: faFingerprint,
+                label: t('pages.account.oauthLinks.button.connectTo', { provider: oauthProvider.name }),
+                onClick: () => window.location.replace(`/api/auth/oauth/redirect/${oauthProvider.uuid}`),
+                disabled: !oauthProvider.linkViewable,
+                tooltip: !oauthProvider.linkViewable
+                  ? t('pages.account.oauthLinks.tooltip.notLinkable', {})
+                  : undefined,
+                color: 'gray',
+              }) as const,
+          )}
         >
           {({ openMenu }) => (
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                const rect = e.currentTarget.getBoundingClientRect();
-                openMenu(rect.left, rect.bottom);
-              }}
-              disabled={
-                !oAuthProviders.filter((p) => !oauthLinks?.data.some((l) => l.oauthProvider.uuid === p.uuid)).length
-              }
-              color='blue'
-              rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+            <ConditionalTooltip
+              enabled={connectableProviders.length === 0}
+              label={t('pages.account.oauthLinks.tooltip.nothingToConnect', {})}
             >
-              {t('pages.account.oauthLinks.button.connect', {})}
-            </Button>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  openMenu(rect.left, rect.bottom);
+                }}
+                disabled={connectableProviders.length === 0}
+                color='blue'
+                rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+              >
+                {t('pages.account.oauthLinks.button.connect', {})}
+              </Button>
+            </ConditionalTooltip>
           )}
         </ContextMenu>
       }
       registry={window.extensionContext.extensionRegistry.pages.dashboard.oauthLinks.container}
     >
+      {isLastLoginMethod && (
+        <Alert
+          icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
+          title={t('pages.account.oauthLinks.alert.lastLoginMethod.title', {})}
+          color='yellow'
+          mb='md'
+        >
+          {tReact('pages.account.oauthLinks.alert.lastLoginMethod.description', {
+            passwordLink: (
+              <Anchor
+                href='/account'
+                inherit
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/account');
+                }}
+              >
+                {t('pages.account.oauthLinks.alert.lastLoginMethod.passwordLink', {})}
+              </Anchor>
+            ),
+          })}
+        </Alert>
+      )}
+
       <OAuthLinkActionBar
         selectedOAuthLinks={selectedOAuthLinks}
+        totalOAuthLinks={oauthLinks?.total ?? 0}
         clearSelection={clearSelection}
         onFinished={refetch}
       />
@@ -120,6 +161,7 @@ export default function DashboardOAuthLinks() {
                   oauthLink={link}
                   ref={innerRef as Ref<HTMLTableRowElement>}
                   isSelected={selectedOAuthLinks.has(link.uuid)}
+                  isLastLoginMethod={isLastLoginMethod}
                   onSelectionChange={(selected, range) => toggleOAuthLink(link, selected, range)}
                 />
               )}

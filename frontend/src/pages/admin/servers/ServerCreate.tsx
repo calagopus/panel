@@ -46,6 +46,8 @@ import { fullUserSchema } from '@/lib/schemas/user.ts';
 import EggRepositoryCatalogModal, {
   EggRepositoryCatalogInstallResult,
 } from '@/pages/admin/egg-repositories/eggs/modals/EggRepositoryCatalogModal.tsx';
+import NoAvailableAllocationsAlert from '@/pages/admin/nodes/allocations/NoAvailableAllocationsAlert.tsx';
+import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -73,12 +75,24 @@ export default function ServerCreate() {
     schema: adminServerCreateSchema.unwrap(),
     mode: 'uncontrolled',
     initialValues: serverCreateEmptyFormValues,
-    onValuesChange: () => setIsValid(form.isValid()),
+    onValuesChange: () => {
+      setIsValid(form.isValid());
+      syncDraft();
+    },
   });
+  const syncDraft = useFormDraft(form, 'create');
+  const staying = useRef(false);
 
   const { loading, doCreateOrUpdate } = useResourceForm<ServerCreateFormValues, AdminServer>({
     form,
-    createFn: () => createServer(form.getTransformedValues()),
+    createFn: () =>
+      createServer(form.getTransformedValues()).then((server) => {
+        if (!staying.current) {
+          form.setInitialValues(form.getValues());
+          syncDraft();
+        }
+        return server;
+      }),
     doUpdate: false,
     basePath: '/admin/servers',
     resourceName: t('pages.admin.servers.resourceName', {}),
@@ -90,7 +104,7 @@ export default function ServerCreate() {
       setConfirmStay(stay);
       setOpenModal('confirm-no-allocation');
     } else {
-      doCreateOrUpdate(stay);
+      doCreate(stay);
     }
   };
 
@@ -191,6 +205,25 @@ export default function ServerCreate() {
     deps: [selectedNodeUuid],
     canRequest: canReadNodes && canReadNodeAllocations,
   });
+  const noAvailableAllocations =
+    !!selectedNodeUuid &&
+    canReadNodes &&
+    canReadNodeAllocations &&
+    !availablePrimaryAllocations.loading &&
+    availablePrimaryAllocations.items.length === 0 &&
+    !availablePrimaryAllocations.search;
+
+  const doCreate = (stay: boolean) => {
+    staying.current = stay;
+    doCreateOrUpdate(
+      stay,
+      queryKeys.admin.servers.all(),
+      ...(selectedNodeUuid
+        ? [queryKeys.admin.nodes.allocations(selectedNodeUuid), queryKeys.admin.nodes.servers(selectedNodeUuid)]
+        : []),
+    );
+  };
+
   const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
     queryKey: queryKeys.admin.backupConfigurations.all(),
     fetcher: (page, search) => getBackupConfigurations(page, search),
@@ -253,7 +286,7 @@ export default function ServerCreate() {
         confirm={t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.button.confirm', {})}
         onConfirmed={() => {
           setOpenModal(null);
-          doCreateOrUpdate(confirmStay);
+          doCreate(confirmStay);
         }}
       >
         {t('pages.admin.servers.tabs.general.page.modal.confirmNoAllocation.content', {})}
@@ -322,6 +355,7 @@ export default function ServerCreate() {
               title={t('pages.admin.servers.tabs.general.page.card.allocations', {})}
               icon={<FontAwesomeIcon icon={faNetworkWired} />}
             >
+              {noAvailableAllocations && <NoAvailableAllocationsAlert className='mb-4' nodeUuid={selectedNodeUuid} />}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Select
                   label={t('common.form.primaryAllocation', {})}

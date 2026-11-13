@@ -1,11 +1,15 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { z } from 'zod';
 import updateEmailSettings from '@/api/admin/settings/updateEmailSettings.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
@@ -25,8 +29,9 @@ import EmailSendTestModal from './EmailSendTestModal.tsx';
 type EmailValues = z.infer<typeof adminSettingsEmailSchema>;
 
 export default function EmailContainer() {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const mailMode = useAdminStore((state) => state.mailMode);
+  const mailInUse = useAdminStore((state) => state.app.emailTwoFactorEnabled || state.app.emailVerificationRequired);
 
   const [testModalOpen, setTestModalOpen] = useState(false);
 
@@ -48,12 +53,28 @@ export default function EmailContainer() {
   });
 
   const variants = useEmailModeVariants();
+  const noneBlocked = mailInUse && form.values.type === 'none';
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.mail.page.title', {})} titleOrder={2}>
       <EmailSendTestModal opened={testModalOpen} onClose={() => setTestModalOpen(false)} />
 
-      <form onSubmit={form.onSubmit(submit)}>
+      <form
+        onSubmit={form.onSubmit(() => {
+          if (!noneBlocked) submit();
+        })}
+      >
+        {noneBlocked && (
+          <Alert color='red' mb='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            {tReact('pages.admin.settings.tabs.mail.page.alert.noneInUse', {
+              link: (
+                <Link to='/admin/settings' className='text-(--mantine-color-anchor) hover:underline'>
+                  {t('pages.admin.settings.tabs.mail.page.alert.noneInUseLink', {})}
+                </Link>
+              ),
+            })}
+          </Alert>
+        )}
         <Select
           label={t('common.form.provider', {})}
           data={mappingToSelectData(mailModeTypeLabelMapping)}
@@ -64,7 +85,7 @@ export default function EmailContainer() {
         <DiscriminatedSettingsForm form={form} discriminant='type' variants={variants} />
 
         <Group mt='md'>
-          <SettingsSaveButton loading={loading} disabled={!form.isValid()} />
+          <SettingsSaveButton loading={loading} disabled={!form.isValid() || noneBlocked} />
           <AdminCan action='settings.read'>
             <ConditionalTooltip
               enabled={mailMode.type === 'none'}

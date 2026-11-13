@@ -21,6 +21,8 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import accountRoutes from '@/routers/routes/accountRoutes.ts';
 import { useGlobalStore } from '@/stores/global.ts';
 
+const ALWAYS_ROUTED_ACCOUNT_PATHS = ['/', '/security-keys'];
+
 export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
   const { t, language } = useTranslations();
   const { user } = useAuth();
@@ -90,7 +92,7 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
                     end
                     icon={faServer}
                     name={t('pages.account.home.title', {})}
-                    activeMatches={['/grouped']}
+                    activeMatches={['/grouped', '/all']}
                   />
                   {isAdmin(user) && (
                     <Sidebar.Link to='/admin' end icon={faGraduationCap} name={t('pages.account.admin.title', {})} />
@@ -163,20 +165,17 @@ export default function DashboardRouter({ isNormal }: { isNormal: boolean }) {
 
               <Suspense fallback={<Spinner.Centered />}>
                 <Routes>
-                  {startOnGroupedServers ? (
-                    <>
-                      <Route path='' element={<DashboardHomeGrouped />} />
-                      <Route path='/all' element={<DashboardHomeAll />} />
-                    </>
-                  ) : (
-                    <>
-                      <Route path='' element={<DashboardHomeAll />} />
-                      <Route path='/grouped' element={<DashboardHomeGrouped />} />
-                    </>
-                  )}
+                  <Route path='' element={startOnGroupedServers ? <DashboardHomeGrouped /> : <DashboardHomeAll />} />
+                  <Route path='/all' element={<DashboardHomeAll />} />
+                  <Route path='/grouped' element={<DashboardHomeGrouped />} />
                   {allAccountRoutes
                     .filter((route) => !route.filter || route.filter())
-                    .filter((route) => !accessibleRoutePaths || accessibleRoutePaths.has(route.path))
+                    .filter(
+                      (route) =>
+                        !accessibleRoutePaths ||
+                        accessibleRoutePaths.has(route.path) ||
+                        ALWAYS_ROUTED_ACCOUNT_PATHS.includes(route.path),
+                    )
                     .map(({ path, element: Element }) => (
                       <Route key={path} path={`/account/${path}`.replace('//', '/')} element={<Element />} />
                     ))}

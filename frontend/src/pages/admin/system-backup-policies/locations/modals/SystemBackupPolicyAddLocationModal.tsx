@@ -24,6 +24,8 @@ export default function SystemBackupPolicyAddLocationModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.locations', {})}
+      createAction={{ to: '/admin/locations/new', permission: 'locations.create' }}
       title={t('pages.admin.systemBackupPolicies.tabs.locations.page.modal.add.title', {})}
       label={t('common.form.location', {})}
       data={locations.items.map((location) => ({ label: location.name, value: location.uuid }))}

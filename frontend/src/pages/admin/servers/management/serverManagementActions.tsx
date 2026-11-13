@@ -26,6 +26,7 @@ export interface ServerManagementAction {
   cardTitle: string;
   cardContent: string;
   cardButtonLabel: string;
+  disabledReason?: string;
 }
 
 export function useServerManagementActions(server: AdminServer): ServerManagementAction[] {
@@ -33,6 +34,12 @@ export function useServerManagementActions(server: AdminServer): ServerManagemen
   const canTransfer = useAdminCan(['servers.transfer', 'nodes.read'], false);
   const canUpdate = useAdminCan('servers.update');
   const canDelete = useAdminCan('servers.delete');
+
+  const transferBlockedReason = server.isTransferring
+    ? t(`${mgmt}.transfer.tooltip.alreadyTransferring`, {})
+    : server.status === 'installing' || server.status === 'restoring_backup'
+      ? t(`${mgmt}.transfer.tooltip.busy`, {})
+      : undefined;
 
   const actions: (ServerManagementAction | false)[] = [
     canTransfer && {
@@ -47,6 +54,7 @@ export function useServerManagementActions(server: AdminServer): ServerManagemen
       cardTitle: t(`${mgmt}.transfer.title`, {}),
       cardContent: t(`${mgmt}.transfer.content`, {}),
       cardButtonLabel: t('common.button.transfer', {}),
+      disabledReason: transferBlockedReason,
     },
     canUpdate &&
       !server.isSuspended && {

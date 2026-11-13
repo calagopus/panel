@@ -44,8 +44,13 @@ export interface PendingToast {
   settle: (message?: ReactNode, type?: ToastType) => void;
 }
 
+export interface AddToastOptions {
+  onDismissed?: () => void;
+  persistent?: boolean;
+}
+
 export interface AddToast {
-  (message: ReactNode, type?: ToastType, actions?: ToastAction[]): number;
+  (message: ReactNode, type?: ToastType, actions?: ToastAction[], options?: AddToastOptions): number;
   (message: ReactNode, actions: ToastAction[]): number;
 }
 

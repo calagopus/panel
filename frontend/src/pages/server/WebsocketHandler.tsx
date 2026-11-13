@@ -57,6 +57,7 @@ export default function WebsocketHandler() {
         recoverable: false,
         reconnectAttempt: 0,
         nextRetryMs: null,
+        retry: reconnect,
       });
       return;
     }
@@ -96,6 +97,9 @@ export default function WebsocketHandler() {
 
         socket.on('auth success', () => {
           setSocketConnectionState(true);
+          if (serverStoreApi.getState().socketError?.type === SocketErrorType.AUTH_FAILED) {
+            setSocketError(null);
+          }
           tokenRefreshFailuresRef.current = 0;
           expiryFailureCountedRef.current = false;
         });
@@ -126,7 +130,10 @@ export default function WebsocketHandler() {
         });
 
         socket.on('SOCKET_MESSAGE', () => {
-          setSocketError(null);
+          const errorType = serverStoreApi.getState().socketError?.type;
+          if (errorType === SocketErrorType.CONNECTION_LOST || errorType === SocketErrorType.CONNECTION_FAILED) {
+            setSocketError(null);
+          }
         });
 
         socket.on('status', (status) => setState(status));
@@ -179,11 +186,31 @@ export default function WebsocketHandler() {
           recoverable: false,
           reconnectAttempt: 0,
           nextRetryMs: null,
+          retry: reconnect,
         });
       })
       .finally(() => {
         connectingRef.current = false;
       });
+  };
+
+  const reconnect = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+      setSocketInstance(null);
+    }
+    setSocketConnectionState(false);
+    setSocketError(null);
+    connectingRef.current = false;
+    updatingTokenRef.current = false;
+    tokenRefreshFailuresRef.current = 0;
+    expiryFailureCountedRef.current = false;
+
+    const currentUuid = uuidRef.current;
+    if (currentUuid && !serverStoreApi.getState().server.nodeMaintenanceEnabled) {
+      connect(currentUuid);
+    }
   };
 
   useEffect(() => {

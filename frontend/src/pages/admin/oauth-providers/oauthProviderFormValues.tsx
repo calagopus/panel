@@ -2,6 +2,7 @@ import { faFingerprint } from '@fortawesome/free-solid-svg-icons';
 import { z } from 'zod';
 import { type FieldDef } from '@/elements/form-engine/index.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
+import TagsInput from '@/elements/input/TagsInput.tsx';
 import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { adminOAuthProviderSchema, adminOAuthProviderUpdateSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -68,11 +69,18 @@ export const oauthProviderToFormValues = (
   pkce: provider.pkce,
 });
 
-export function useOAuthProviderFormFields(): {
+export function useOAuthProviderFormFields({
+  lockIdentity = false,
+  lockApiLinkable = false,
+}: { lockIdentity?: boolean; lockApiLinkable?: boolean } = {}): {
   fieldsTop: FieldDef<OAuthFormValues>[];
   fieldsMain: FieldDef<OAuthFormValues>[];
 } {
   const { t } = useTranslations();
+
+  const rootOnlyTooltip = t('pages.admin.oAuthProviders.tabs.general.page.tooltip.rootOnly', {});
+  const identity = lockIdentity ? { tooltip: rootOnlyTooltip } : {};
+  const identityProps = lockIdentity ? { disabled: true } : {};
 
   const fieldsTop: FieldDef<OAuthFormValues>[] = [
     {
@@ -91,7 +99,8 @@ export function useOAuthProviderFormFields(): {
       name: 'clientId',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.clientId', {}),
       required: true,
-      props: ignorePasswordManagerProps,
+      props: { ...ignorePasswordManagerProps, ...identityProps },
+      ...identity,
     },
     {
       type: 'password',
@@ -104,32 +113,44 @@ export function useOAuthProviderFormFields(): {
       name: 'authUrl',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.authUrl', {}),
       required: true,
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'text',
       name: 'tokenUrl',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.tokenUrl', {}),
       required: true,
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'text',
       name: 'infoUrl',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrl', {}),
       required: true,
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'custom',
       name: 'infoUrls',
       colSpan: 'full',
       render: (f) => (
-        <MultiKeyValueInput
-          label={t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrls', {})}
-          description={t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrlsDescription', {})}
-          options={f.getValues().infoUrls ?? {}}
-          onChange={(infoUrls) => f.setFieldValue('infoUrls', infoUrls)}
-          placeholderKey='member'
-          placeholderValue='https://discord.com/api/users/@me/guilds/123456789012345678/member'
-        />
+        <fieldset disabled={lockIdentity} className='contents'>
+          <MultiKeyValueInput
+            label={t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrls', {})}
+            description={
+              lockIdentity
+                ? rootOnlyTooltip
+                : t('pages.admin.oAuthProviders.tabs.general.page.form.infoUrlsDescription', {})
+            }
+            options={f.getValues().infoUrls ?? {}}
+            onChange={(infoUrls) => f.setFieldValue('infoUrls', infoUrls)}
+            placeholderKey='member'
+            placeholderValue='https://discord.com/api/users/@me/guilds/123456789012345678/member'
+          />
+        </fieldset>
       ),
     },
     {
@@ -144,18 +165,35 @@ export function useOAuthProviderFormFields(): {
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.pkce', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.pkceDescription', {}),
     },
-    {
-      type: 'tags',
-      name: 'scopes',
-      label: t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {}),
-      description: t('pages.admin.oAuthProviders.tabs.general.page.form.scopesDescription', {}),
-    },
+    lockIdentity
+      ? {
+          type: 'custom',
+          name: 'scopes',
+          render: (f) => (
+            <fieldset disabled className='contents'>
+              <TagsInput
+                label={t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {})}
+                description={rootOnlyTooltip}
+                value={f.getValues().scopes}
+                onChange={() => {}}
+              />
+            </fieldset>
+          ),
+        }
+      : {
+          type: 'tags',
+          name: 'scopes',
+          label: t('pages.admin.oAuthProviders.tabs.general.page.form.scopes', {}),
+          description: t('pages.admin.oAuthProviders.tabs.general.page.form.scopesDescription', {}),
+        },
     {
       type: 'text',
       name: 'identifierPath',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPath', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.identifierPathDescription', {}),
       required: true,
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'text',
@@ -202,12 +240,16 @@ export function useOAuthProviderFormFields(): {
       type: 'switch',
       name: 'loginOnly',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginOnly', {}),
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'switch',
       name: 'loginBypassTwoFactor',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypassTwoFactor', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.loginBypassTwoFactorDescription', {}),
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'switch',
@@ -220,12 +262,15 @@ export function useOAuthProviderFormFields(): {
       name: 'apiLinkable',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.apiLinkable', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.apiLinkableDescription', {}),
+      ...(lockIdentity || lockApiLinkable ? { props: { disabled: true }, tooltip: rootOnlyTooltip } : {}),
     },
     {
       type: 'switch',
       name: 'userManageable',
       label: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageable', {}),
       description: t('pages.admin.oAuthProviders.tabs.general.page.form.userManageableDescription', {}),
+      props: identityProps,
+      ...identity,
     },
     {
       type: 'switch',

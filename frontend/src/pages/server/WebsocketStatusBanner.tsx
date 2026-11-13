@@ -1,6 +1,7 @@
 import { faExclamationTriangle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
+import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import { formatMilliseconds } from '@/lib/format/time.ts';
 import { SocketErrorType } from '@/plugins/websocket/Websocket.ts';
@@ -10,6 +11,7 @@ import { useServerStore } from '@/stores/server.ts';
 export default function WebsocketStatusBanner() {
   const { t } = useTranslations();
   const socketError = useServerStore((state) => state.socketError);
+  const setSocketError = useServerStore((state) => state.setSocketError);
   const serverIsTransferring = useServerStore((state) => state.server.isTransferring);
   const [countdown, setCountdown] = useState<number | null>(null);
 
@@ -84,8 +86,17 @@ export default function WebsocketStatusBanner() {
       icon={<FontAwesomeIcon icon={isRecoverable ? faExclamationTriangle : faTimesCircle} />}
       color={isRecoverable ? 'yellow' : 'red'}
       className='mt-2 mx-6'
+      withCloseButton={socketError.type === SocketErrorType.DAEMON_ERROR}
+      onClose={() => setSocketError(null)}
     >
-      {message}
+      <div className='flex flex-wrap items-center justify-between gap-2'>
+        <span>{message}</span>
+        {socketError.retry && (
+          <Button size='xs' color='red' variant='light' onClick={socketError.retry}>
+            {t('elements.serverWebsocket.banner.reconnect', {})}
+          </Button>
+        )}
+      </div>
     </Alert>
   );
 }

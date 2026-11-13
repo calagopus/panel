@@ -6,13 +6,15 @@ import getNodes from '@/api/admin/nodes/getNodes.ts';
 import postTransfers, { transferAllocationMode } from '@/api/admin/nodes/servers/postTransfers.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import { MAX_TRANSFER_MULTIPLEX_CHANNELS } from '@/lib/domain/node.ts';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
+import { MAX_TRANSFER_MULTIPLEX_CHANNELS, NODE_AIO_UUID } from '@/lib/domain/node.ts';
 import { compressionLevelLabelMapping, mappingToSelectData, transferArchiveFormatLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
@@ -109,6 +111,11 @@ export default function ServersTransferModal({
           <Select
             withAsterisk
             label={t('common.form.node', {})}
+            description={
+              nodes.items.some((node) => node.uuid === NODE_AIO_UUID)
+                ? t('pages.admin.nodes.tabs.servers.page.modal.transfer.tooltip.aioNotSupported', {})
+                : undefined
+            }
             value={selectedNodeUuid || ''}
             onChange={(value) => setSelectedNodeUuid(value)}
             data={nodes.items
@@ -116,6 +123,7 @@ export default function ServersTransferModal({
               .map((node) => ({
                 label: node.name,
                 value: node.uuid,
+                disabled: node.uuid === NODE_AIO_UUID,
               }))}
             searchable
             searchValue={nodes.search}
@@ -163,6 +171,12 @@ export default function ServersTransferModal({
             ]}
           />
 
+          {(allocationMode === 'egg_config_deployment' || allocationMode === 'egg_config_self_assign_range') && (
+            <Alert color='yellow'>
+              {t('pages.admin.nodes.tabs.servers.page.modal.transfer.alert.eggConfigRequired', {})}
+            </Alert>
+          )}
+
           <Switch
             label={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.transferBackups', {})}
             description={t('pages.admin.nodes.tabs.servers.page.modal.transfer.form.transferBackupsDescription', {})}
@@ -209,9 +223,18 @@ export default function ServersTransferModal({
         </Stack>
 
         <ModalFooter>
-          <Button color='blue' onClick={() => setOpenModal('confirm')} disabled={!selectedNodeUuid}>
-            {t('common.button.transfer', {})}
-          </Button>
+          <ConditionalTooltip
+            enabled={selectedNodeUuid === NODE_AIO_UUID}
+            label={t('pages.admin.nodes.tabs.servers.page.modal.transfer.tooltip.aioNotSupported', {})}
+          >
+            <Button
+              color='blue'
+              onClick={() => setOpenModal('confirm')}
+              disabled={!selectedNodeUuid || selectedNodeUuid === NODE_AIO_UUID}
+            >
+              {t('common.button.transfer', {})}
+            </Button>
+          </ConditionalTooltip>
           <Button variant='default' onClick={props.onClose}>
             {t('common.button.cancel', {})}
           </Button>

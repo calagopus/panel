@@ -27,6 +27,7 @@ export default function BackupRestoreModal({ backup, ...props }: Props) {
   const [truncateDirectory, setTruncateDirectory] = useState(false);
   const [restoreStartup, setRestoreStartup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const hasStartupMetadata = Object.keys(backup.metadata).length > 0;
 
   const doRestore = () => {
     setLoading(true);
@@ -59,7 +60,10 @@ export default function BackupRestoreModal({ backup, ...props }: Props) {
           label={t('common.form.restoreStartup', {})}
           name='restoreStartup'
           checked={restoreStartup}
-          disabled={Object.keys(backup.metadata).length === 0}
+          disabled={!hasStartupMetadata}
+          description={
+            hasStartupMetadata ? undefined : t('pages.server.backups.modal.restoreBackup.noStartupMetadata', {})
+          }
           onChange={(e) => setRestoreStartup(e.target.checked)}
         />
       </Stack>

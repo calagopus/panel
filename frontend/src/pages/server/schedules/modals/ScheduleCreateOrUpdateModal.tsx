@@ -2,7 +2,7 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import createSchedule from '@/api/server/schedules/createSchedule.ts';
@@ -33,7 +33,7 @@ import { TriggerExtraForm, TriggerInlineForm } from '../triggers/TriggerForm.tsx
 
 type Props = ModalProps & {
   propSchedule?: z.infer<typeof serverScheduleSchema>;
-  onScheduleUpdate?: (schedule: z.infer<typeof serverScheduleUpdateSchema>) => void;
+  onScheduleUpdate?: (schedule: Omit<z.infer<typeof serverScheduleUpdateSchema>, 'condition'>) => void;
 };
 
 export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUpdate, ...props }: Props) {
@@ -59,9 +59,10 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
     onClose: props.onClose,
     onSubmit: async (values) => {
       if (propSchedule?.uuid) {
-        await updateSchedule(server.uuid, propSchedule.uuid, values);
+        const { condition: _condition, ...settings } = values;
+        await updateSchedule(server.uuid, propSchedule.uuid, settings);
         addToast(t('pages.server.schedules.toast.updated', {}), 'success');
-        onScheduleUpdate?.(values);
+        onScheduleUpdate?.(settings);
       } else {
         const schedule = await createSchedule(server.uuid, values);
         addToast(t('pages.server.schedules.toast.created', {}), 'success');
@@ -70,6 +71,16 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
       }
     },
   });
+
+  const nextTriggerKey = useRef(0);
+  const newTriggerKey = () => `trigger-${nextTriggerKey.current++}`;
+  const [triggerKeys, setTriggerKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (props.opened) {
+      setTriggerKeys((propSchedule?.triggers ?? []).map(() => newTriggerKey()));
+    }
+  }, [props.opened]);
 
   useEffect(() => {
     if (propSchedule && props.opened) {
@@ -87,10 +98,12 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
 
   const removeTrigger = (index: number) => {
     form.removeListItem('triggers', index);
+    setTriggerKeys((keys) => keys.filter((_, i) => i !== index));
   };
 
   const addTrigger = () => {
     form.insertListItem('triggers', scheduleTriggerDefaultMapping.cron);
+    setTriggerKeys((keys) => [...keys, newTriggerKey()]);
   };
 
   return (
@@ -121,7 +134,7 @@ export default function ScheduleCreateOrUpdateModal({ propSchedule, onScheduleUp
             {t('pages.server.schedules.form.triggersList', {})}
           </Title>
           {form.values.triggers.map((_, index) => (
-            <div key={`trigger-${index}`} className='flex flex-col'>
+            <div key={triggerKeys[index] ?? `trigger-index-${index}`} className='flex flex-col'>
               {index !== 0 && <Divider my='sm' />}
 
               <div className='flex flex-row items-end space-x-2 mb-2'>

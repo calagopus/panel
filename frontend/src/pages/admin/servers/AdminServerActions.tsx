@@ -38,15 +38,17 @@ export default function AdminServerActions({ server }: { server: AdminServer }) 
       adminPermission: 'servers.read',
       perform: () => navigate(`/server/${server.uuidShort}`),
     },
-    ...actions.map((action) => ({
-      id: `admin.servers.${action.id}`,
-      category: CORE_QUICK_ACTION_CATEGORIES.page,
-      label: () => action.paletteLabel,
-      keywords: action.paletteKeywords,
-      icon: <FontAwesomeIcon icon={action.icon} />,
-      danger: action.danger || undefined,
-      perform: () => doOpenModal(action.modal),
-    })),
+    ...actions
+      .filter((action) => !action.disabledReason)
+      .map((action) => ({
+        id: `admin.servers.${action.id}`,
+        category: CORE_QUICK_ACTION_CATEGORIES.page,
+        label: () => action.paletteLabel,
+        keywords: action.paletteKeywords,
+        icon: <FontAwesomeIcon icon={action.icon} />,
+        danger: action.danger || undefined,
+        perform: () => doOpenModal(action.modal),
+      })),
   ]);
 
   return (

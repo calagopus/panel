@@ -8,6 +8,7 @@ import axios, {
   RawAxiosResponseHeaders,
 } from 'axios';
 import { API_REQUEST_CANCELLED_CODE, ApiRequestEvent, ApiResponseEvent, globalTranslationHandle } from 'shared';
+import { safeSessionStorageGet, safeSessionStorageRemove, safeSessionStorageSet } from '@/lib/safeStorage.ts';
 import { getTranslations } from '@/providers/contexts/translationContext.ts';
 import { getGlobalStore } from '@/stores/global.ts';
 
@@ -89,9 +90,19 @@ axiosInstance.interceptors.response.use(
 
     return event.data;
   },
-  (error) => {
+  async (error) => {
     if (error.response) {
       captureServerName(error.response.headers);
+
+      // With `responseType: 'blob'` the error body is a Blob
+      if (error.response.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          error.response.data = text ? JSON.parse(text) : null;
+        } catch {
+          // not JSON, keep the blob
+        }
+      }
     }
 
     if (
@@ -109,7 +120,7 @@ axiosInstance.interceptors.response.use(
 const IMPERSONATED_USER_KEY = 'impersonated_user';
 
 export function getImpersonatedUser(): string | null {
-  return sessionStorage.getItem(IMPERSONATED_USER_KEY);
+  return safeSessionStorageGet(IMPERSONATED_USER_KEY);
 }
 
 /**
@@ -120,10 +131,10 @@ export function getImpersonatedUser(): string | null {
  */
 export function setImpersonatedUser(uuid: string | null) {
   if (uuid) {
-    sessionStorage.setItem(IMPERSONATED_USER_KEY, uuid);
+    safeSessionStorageSet(IMPERSONATED_USER_KEY, uuid);
     axiosInstance.defaults.headers.common['Calagopus-User'] = uuid;
   } else {
-    sessionStorage.removeItem(IMPERSONATED_USER_KEY);
+    safeSessionStorageRemove(IMPERSONATED_USER_KEY);
     delete axiosInstance.defaults.headers.common['Calagopus-User'];
   }
 }

@@ -1,5 +1,5 @@
 import { ModalProps } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import getAvailableNodeAllocations from '@/api/admin/nodes/allocations/getAvailableNodeAllocations.ts';
@@ -78,6 +78,26 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
     canRequest: props.opened,
   });
 
+  const transferableBackups = backups.items.filter((backup) => !backup.isShared);
+
+  useEffect(() => {
+    if (props.opened) return;
+
+    setOpenModal(null);
+    setSelectedNodeUuid(null);
+    setSelectedPrimaryAllocationUuid(null);
+    setSelectedAllocationUuids([]);
+    setSelectedBackupsUuids([]);
+    setDeleteSourceBackups(false);
+    setArchiveFormat('tar_zstd');
+    setCompressionLevel('good_speed');
+    setMultiplexChannels(0);
+    nodes.setSearch('');
+    availablePrimaryAllocations.setSearch('');
+    availableAllocations.setSearch('');
+    backups.setSearch('');
+  }, [props.opened]);
+
   const closeAll = () => {
     props.onClose();
     setOpenModal(null);
@@ -115,7 +135,7 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
         confirm={t('common.button.transfer', {})}
         onConfirmed={doTransfer}
       >
-        {selectedBackupUuids.length < backups.items.length && (
+        {transferableBackups.some((backup) => !selectedBackupUuids.includes(backup.uuid)) && (
           <Alert color='yellow' mb='md'>
             {t('pages.admin.servers.tabs.management.page.transfer.modal.confirm.alert.notAllBackupsSelected', {})}
           </Alert>
@@ -138,7 +158,15 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             label={t('common.table.columns.node', {})}
             placeholder={t('common.table.columns.node', {})}
             value={selectedNodeUuid || ''}
-            onChange={(value) => setSelectedNodeUuid(value)}
+            onChange={(value) => {
+              if (value !== selectedNodeUuid) {
+                setSelectedPrimaryAllocationUuid(null);
+                setSelectedAllocationUuids([]);
+                availablePrimaryAllocations.setSearch('');
+                availableAllocations.setSearch('');
+              }
+              setSelectedNodeUuid(value);
+            }}
             data={nodes.items
               .filter((node) => node.uuid !== server.node.uuid)
               .map((node) => ({
@@ -198,12 +226,10 @@ export default function ServerTransferModal({ server, ...props }: ModalProps & {
             placeholder={t('pages.admin.servers.tabs.management.page.transfer.modal.form.backupsToTransfer', {})}
             value={selectedBackupUuids}
             onChange={(value) => setSelectedBackupsUuids(value)}
-            data={backups.items
-              .filter((backup) => !backup.isShared)
-              .map((backup) => ({
-                label: backup.name,
-                value: backup.uuid,
-              }))}
+            data={transferableBackups.map((backup) => ({
+              label: backup.name,
+              value: backup.uuid,
+            }))}
             searchable
             searchValue={backups.search}
             onSearchChange={backups.setSearch}

@@ -26,6 +26,7 @@ export type ZodFieldShape = Record<string, ZodType>;
 export interface FieldOption {
   value: string;
   label: LazyString;
+  disabled?: boolean;
 }
 
 export type ColSpan = 'full' | 1;

@@ -49,7 +49,13 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
   const displayAllocation = useRedactedAddress(`${allocation.ipAlias ?? allocation.ip}:${allocation.port}`);
   const [notes, setNotes] = useState(allocation.notes ?? '');
   const canUpdate = useServerCan('allocations.update');
-  const canUnsetPrimary = !server.eggConfiguration?.allocationSelfAssignRequirePrimary;
+
+  const primaryLocked =
+    !server.eggConfiguration ||
+    server.eggConfiguration.allocationSelfAssignRequirePrimary ||
+    !server.eggConfiguration.allocationSelfAssignEnabled;
+  const canUnsetPrimary = !primaryLocked;
+  const removeBlocked = allocation.isPrimary && primaryLocked;
 
   const patchAllocations = (
     patch: (item: z.infer<typeof serverAllocationSchema>) => z.infer<typeof serverAllocationSchema>,
@@ -112,6 +118,9 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
           (item: z.infer<typeof serverAllocationSchema>) => item.uuid === allocation.uuid,
         );
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).network.all() });
+        if (server.allocation?.uuid === allocation.uuid) {
+          updateServer({ allocation: null });
+        }
         addToast(t('pages.server.network.toast.removed', {}), 'success');
         setOpenModal(null);
       })
@@ -151,6 +160,7 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
             label: t('common.button.unsetPrimary', {}),
             hidden: !allocation.isPrimary,
             disabled: !canUnsetPrimary,
+            tooltip: !canUnsetPrimary ? t('pages.server.network.tooltip.primaryLocked', {}) : undefined,
             onClick: doUnsetPrimary,
             color: 'red',
             canAccess: canUpdate,
@@ -159,6 +169,8 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
             type: 'action',
             icon: faTrash,
             label: t('common.button.remove', {}),
+            disabled: removeBlocked,
+            tooltip: removeBlocked ? t('pages.server.network.tooltip.primaryLocked', {}) : undefined,
             onClick: () => setOpenModal('remove'),
             color: 'red',
             canAccess: useServerCan('allocations.delete'),

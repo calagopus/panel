@@ -9,12 +9,13 @@ import {
   TableTrProps,
 } from '@mantine/core';
 import classNames from 'classnames';
-import { forwardRef, ReactNode, useEffect, useState } from 'react';
+import { forwardRef, ReactNode, useEffect, useRef, useState } from 'react';
 import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import ErrorState from '@/elements/feedback/ErrorState.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import Select from '@/elements/input/Select.tsx';
+import { isOverlayKeyEvent } from '@/lib/dom/overlayFocus.ts';
 import { type LazyString, resolveString } from '@/lib/lazy.ts';
 import { matchesShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { TABLE_PER_PAGE_OPTIONS } from '@/plugins/resource/useTablePerPage.ts';
@@ -116,6 +117,7 @@ export function Pagination<T>({
   const { t } = useTranslations();
 
   const [pendingPage, setPendingPage] = useState<number | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const totalPages = data.total === 0 ? 0 : Math.ceil(data.total / data.perPage);
   const currentPage = pendingPage ?? data.page;
@@ -144,7 +146,7 @@ export function Pagination<T>({
         target.tagName === 'SELECT' ||
         target.isContentEditable;
 
-      if (isInputFocused) return;
+      if (isInputFocused || isOverlayKeyEvent(event, rootRef.current)) return;
 
       if (matchesShortcut(event, 'table.firstPage')) {
         event.preventDefault();
@@ -176,7 +178,7 @@ export function Pagination<T>({
   const withPerPage = !!onPerPageSelect && data.total > TABLE_PER_PAGE_OPTIONS[0];
 
   return isFirstPage && isLastPage && !withPerPage ? null : (
-    <Group justify='space-between' hidden={rangeEnd === 0} {...props}>
+    <Group ref={rootRef} justify='space-between' hidden={rangeEnd === 0} {...props}>
       <p className='text-sm leading-5 text-(--mantine-color-dimmed)'>
         {t('common.table.pagination.results', {
           start: rangeStart,

@@ -2,6 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
 import getRoles from '@/api/admin/roles/getRoles.ts';
+import getEmailTemplate from '@/api/admin/settings/email-templates/getEmailTemplate.ts';
+import getSettings from '@/api/admin/settings/getSettings.ts';
 import createUser from '@/api/admin/users/createUser.ts';
 import deleteUser from '@/api/admin/users/deleteUser.ts';
 import disableUserTwoFactor from '@/api/admin/users/disableUserTwoFactor.ts';
@@ -21,6 +23,7 @@ import { adminFullUserSchema, adminUserUpdateSchema } from '@/lib/schemas/admin/
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -39,6 +42,8 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
   const { t } = useTranslations();
   const queryClient = useQueryClient();
   const canReadRoles = useAdminCan('roles.read');
+  const canReadSettings = useAdminCan('settings.read');
+  const canReadEmailTemplates = useAdminCan('email-templates.read');
   const isRootAdmin = !!user?.admin;
   const editingOtherUser = !!contextUser && contextUser.uuid !== user?.uuid;
 
@@ -80,6 +85,26 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
     defaultSearchValue: contextUser?.role?.name,
     canRequest: canReadRoles,
   });
+
+  const { data: adminSettings } = useResource({
+    queryKey: queryKeys.admin.settings(),
+    queryFn: getSettings,
+    enabled: !!contextUser && canReadSettings,
+    silent: true,
+  });
+  const { data: passwordResetTemplate } = useResource({
+    queryKey: queryKeys.admin.emailTemplates.detail('password_reset'),
+    queryFn: () => getEmailTemplate('password_reset'),
+    enabled: !!contextUser && canReadEmailTemplates,
+    silent: true,
+  });
+  const passwordResetUnavailableReason = !settings.app.passwordLoginEnabled
+    ? t('pages.admin.users.tabs.general.page.tooltip.passwordResetPasswordLoginDisabled', {})
+    : adminSettings?.mailMode.type === 'none'
+      ? t('pages.admin.users.tabs.general.page.tooltip.passwordResetNoMail', {})
+      : passwordResetTemplate?.enabled === false
+        ? t('pages.admin.users.tabs.general.page.tooltip.passwordResetTemplateDisabled', {})
+        : null;
 
   const doDisableTwoFactor = async () => {
     if (!contextUser) {
@@ -241,14 +266,17 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
                 </Button>
               </AdminCan>
               <AdminCan action='users.email'>
-                <Button
-                  color='blue'
-                  variant='outline'
-                  onClick={() => setOpenModal('send_password_reset_email')}
-                  loading={loading}
-                >
-                  {t('pages.admin.users.tabs.general.page.button.sendPasswordResetEmail', {})}
-                </Button>
+                <ConditionalTooltip enabled={!!passwordResetUnavailableReason} label={passwordResetUnavailableReason}>
+                  <Button
+                    color='blue'
+                    variant='outline'
+                    onClick={() => setOpenModal('send_password_reset_email')}
+                    loading={loading}
+                    disabled={!!passwordResetUnavailableReason}
+                  >
+                    {t('pages.admin.users.tabs.general.page.button.sendPasswordResetEmail', {})}
+                  </Button>
+                </ConditionalTooltip>
               </AdminCan>
               <AdminCan action='users.email'>
                 <Button

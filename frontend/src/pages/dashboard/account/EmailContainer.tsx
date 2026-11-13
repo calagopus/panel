@@ -50,7 +50,7 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
         email: user.email,
       });
     }
-  }, [user]);
+  }, [user?.email]);
 
   const doUpdate = () => {
     if (!user) return;

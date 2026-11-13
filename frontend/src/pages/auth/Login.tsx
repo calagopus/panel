@@ -85,6 +85,9 @@ export default function Login() {
         case 'security_key_required':
           setError(t('pages.auth.login.error.securityKeyRequired', {}));
           break;
+        default:
+          setError(t('pages.auth.login.error.oauthFailed', { code: error }));
+          break;
       }
 
       searchParams.delete('error');
@@ -230,10 +233,27 @@ export default function Login() {
         doLogin(response.user);
       }
     } catch (err) {
-      setError(httpErrorToHuman(err));
+      const message = httpErrorToHuman(err);
+      if (message === 'password login is disabled for this account') {
+        setError(t('pages.auth.login.error.accountPasswordLoginDisabled', {}));
+        if (passkeyUuid) setStep('passkey');
+      } else {
+        setError(message);
+      }
     }
     setLoading(false);
   };
+
+  const oAuthButtons =
+    oAuthProviders.length > 3 ? (
+      <Button variant='light' onClick={() => navigate('/auth/login/oauth')} size='md' fullWidth>
+        {t('pages.auth.login.step.username.button.oauthLogin', {})}
+      </Button>
+    ) : (
+      oAuthProviders.map((oAuthProvider) => (
+        <OAuthProviderButton key={oAuthProvider.uuid} oAuthProvider={oAuthProvider} />
+      ))
+    );
 
   return (
     <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.login.container}>
@@ -330,25 +350,7 @@ export default function Login() {
                     </Button>
                   )}
 
-                  {oAuthProviders.length > 3 ? (
-                    <Button
-                      variant='light'
-                      disabled={!oAuthProviders.length}
-                      onClick={() => navigate('/auth/login/oauth')}
-                      size='md'
-                      fullWidth
-                    >
-                      {t('pages.auth.login.step.username.button.oauthLogin', {})}
-                    </Button>
-                  ) : (
-                    oAuthProviders.length > 0 && (
-                      <>
-                        {oAuthProviders.map((oAuthProvider) => (
-                          <OAuthProviderButton key={oAuthProvider.uuid} oAuthProvider={oAuthProvider} />
-                        ))}
-                      </>
-                    )
-                  )}
+                  {oAuthButtons}
                   {settings.app.registrationEnabled && settings.app.passwordLoginEnabled && (
                     <NavLink to='/auth/register' className='text-(--mantine-color-dimmed) flex gap-1 items-center'>
                       {t('pages.auth.login.step.username.link.notRegistered', {})}{' '}
@@ -441,6 +443,16 @@ export default function Login() {
                   <Button variant='light' onClick={() => setStep('username')} size='md' fullWidth>
                     {t('common.button.back', {})}
                   </Button>
+
+                  {oAuthProviders.length > 0 && (
+                    <>
+                      <Divider label={t('common.divider.or', {})} labelPosition='center' />
+                      <Text c='dimmed' size='sm'>
+                        {t('pages.auth.login.step.password.providerHint', {})}
+                      </Text>
+                      {oAuthButtons}
+                    </>
+                  )}
                 </Stack>
               </form>
             </Card>

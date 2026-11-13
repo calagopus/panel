@@ -78,7 +78,13 @@ export default function ConsoleCommandInput({
             inputValueRef.current = value;
             setInputValue(value);
           }}
-          placeholder={t('pages.server.console.input.placeholder', {})}
+          placeholder={
+            !socketConnected
+              ? t('pages.server.console.input.placeholderDisconnected', {})
+              : state === 'offline'
+                ? t('pages.server.console.input.placeholderOffline', {})
+                : t('pages.server.console.input.placeholder', {})
+          }
           aria-label={t('pages.server.console.input.ariaLabel', {})}
           disabled={disabled}
           onKeyDown={onKeyDown}

@@ -13,6 +13,7 @@ import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationSchema } from '@/lib/schemas/admin/nodes.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
+import NoAvailableAllocationsAlert from '@/pages/admin/nodes/allocations/NoAvailableAllocationsAlert.tsx';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -40,26 +41,40 @@ export default function ServerAllocationAddModal({ server, ...props }: ModalProp
   const doAdd = async () => {
     setLoading(true);
 
-    try {
-      await Promise.all(
-        selectedAllocationUuids.map((allocationUuid) => createServerAllocation(server.uuid, { allocationUuid })),
-      );
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
-      addToast(
-        t('pages.admin.servers.tabs.allocations.page.toast.added', { count: selectedAllocationUuids.length }),
-        'success',
-      );
+    const results = await Promise.allSettled(
+      selectedAllocationUuids.map((allocationUuid) => createServerAllocation(server.uuid, { allocationUuid })),
+    );
+    const failed = selectedAllocationUuids.filter((_, i) => results[i].status === 'rejected');
+    const added = selectedAllocationUuids.length - failed.length;
+
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.detail(server.uuid) }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) }),
+    ]);
+
+    if (added > 0) {
+      addToast(t('pages.admin.servers.tabs.allocations.page.toast.added', { count: added }), 'success');
+    }
+
+    const firstFailure = results.find((result) => result.status === 'rejected');
+    if (firstFailure) {
+      addToast(httpErrorToHuman(firstFailure.reason), 'error');
+      setSelectedAllocationUuids(failed);
+    } else {
       props.onClose();
-    } catch (msg) {
-      addToast(httpErrorToHuman(msg), 'error');
     }
     setLoading(false);
   };
 
+  const noAvailableAllocations =
+    !availableAllocations.loading && availableAllocations.items.length === 0 && !availableAllocations.search;
+
   return (
     <Modal title={t('pages.admin.servers.tabs.allocations.page.modal.add.title', {})} {...props}>
       <Stack>
+        {props.opened && noAvailableAllocations && <NoAvailableAllocationsAlert nodeUuid={server.node.uuid} />}
+
         <MultiSelect
           withAsterisk
           label={t('pages.admin.servers.tabs.allocations.page.modal.add.form.allocations', {})}

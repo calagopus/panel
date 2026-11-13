@@ -92,14 +92,18 @@ export function clearFileDrafts(): void {
 
 export function purgeExpiredDrafts(): void {
   const now = Date.now();
-  for (let i = localStorage.length - 1; i >= 0; i--) {
-    const key = localStorage.key(i);
-    if (!key?.startsWith(DRAFT_KEY_PREFIX)) continue;
-    try {
-      const draft: FileDraft = JSON.parse(localStorage.getItem(key)!);
-      if (now - draft.savedAt > DRAFT_TTL_MS) localStorage.removeItem(key);
-    } catch {
-      localStorage.removeItem(key);
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith(DRAFT_KEY_PREFIX)) continue;
+      try {
+        const draft: FileDraft = JSON.parse(localStorage.getItem(key)!);
+        if (now - draft.savedAt > DRAFT_TTL_MS) localStorage.removeItem(key);
+      } catch {
+        localStorage.removeItem(key);
+      }
     }
+  } catch {
+    // storage blocked, nothing to purge
   }
 }

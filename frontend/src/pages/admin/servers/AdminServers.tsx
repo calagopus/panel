@@ -9,6 +9,7 @@ import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import FormDraftScope from '@/elements/FormDraftScope.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
@@ -137,7 +138,14 @@ export default function AdminServers() {
       <Route path='/' element={<ServersContainer />} />
       <Route path='/:id/*' element={<ServerView />} />
       <Route element={<AdminPermissionGuard permission='servers.create' />}>
-        <Route path='/new' element={<ServerCreate />} />
+        <Route
+          path='/new'
+          element={
+            <FormDraftScope baseUrl='/admin/servers/new'>
+              <ServerCreate />
+            </FormDraftScope>
+          }
+        />
       </Route>
     </Routes>
   );

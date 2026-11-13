@@ -13,13 +13,16 @@ import { ObjectSet } from '@/lib/objectSet.ts';
 import { userOAuthLinkSchema } from '@/lib/schemas/user/oAuth.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useOAuthLinkRemoval } from './useOAuthLinkRemoval.ts';
 
 export default function OAuthLinkActionBar({
   selectedOAuthLinks,
+  totalOAuthLinks,
   clearSelection,
   onFinished,
 }: {
   selectedOAuthLinks: ObjectSet<z.infer<typeof userOAuthLinkSchema>, 'uuid'>;
+  totalOAuthLinks: number;
   clearSelection: () => void;
   onFinished: () => void;
 }) {
@@ -28,8 +31,12 @@ export default function OAuthLinkActionBar({
 
   const [confirming, setConfirming] = useState(false);
 
-  const removable = selectedOAuthLinks.values().filter((oauthLink) => oauthLink.oauthProvider.userManageable);
-  const skipped = selectedOAuthLinks.size - removable.length;
+  const { removableCount } = useOAuthLinkRemoval(totalOAuthLinks);
+
+  const manageable = selectedOAuthLinks.values().filter((oauthLink) => oauthLink.oauthProvider.userManageable);
+  const removable = manageable.slice(0, removableCount);
+  const keptLast = removable.length < manageable.length;
+  const skipped = selectedOAuthLinks.size - manageable.length;
 
   const finish = () => {
     clearSelection();
@@ -68,6 +75,12 @@ export default function OAuthLinkActionBar({
               {t('pages.account.oauthLinks.modal.deleteOAuthLinks.alert.skipped', {
                 oauthLinks: tItem('oauthLink', skipped),
               })}
+            </Alert>
+          )}
+
+          {keptLast && (
+            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+              {t('pages.account.oauthLinks.modal.deleteOAuthLinks.alert.keptLast', {})}
             </Alert>
           )}
         </Stack>

@@ -26,7 +26,12 @@ export default function YamlEditor({ onSave, onMount, options, ...props }: YamlE
       language='yaml'
       options={{ ...DEFAULT_OPTIONS, ...options }}
       onMount={(editor, monaco) => {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSaveRef.current?.());
+        editor.addAction({
+          id: 'calagopus.yaml.save',
+          label: 'Save',
+          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+          run: () => onSaveRef.current?.(),
+        });
         onMount?.(editor, monaco);
       }}
       {...props}

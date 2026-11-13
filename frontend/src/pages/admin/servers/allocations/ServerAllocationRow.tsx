@@ -39,6 +39,8 @@ export default function ServerAllocationRow({
 
   const invalidateAllocations = () =>
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.allocations(server.uuid) });
+  const invalidateServer = () =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.servers.detail(server.uuid) });
   const patchAllocations = (
     patch: (item: z.infer<typeof serverAllocationSchema>) => z.infer<typeof serverAllocationSchema>,
   ) => patchPaginatedItems(queryClient, queryKeys.admin.servers.allocations(server.uuid), patch);
@@ -70,6 +72,7 @@ export default function ServerAllocationRow({
               ? { ...item, isPrimary: false }
               : item,
         );
+        invalidateServer();
         addToast(
           t(
             next
@@ -93,6 +96,7 @@ export default function ServerAllocationRow({
           (item: z.infer<typeof serverAllocationSchema>) => item.uuid === allocation.uuid,
         );
         await invalidateAllocations();
+        invalidateServer();
         await queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(server.node.uuid) });
         setOpenModal(null);
         addToast(t('pages.admin.servers.tabs.allocations.page.toast.removed', {}), 'success');

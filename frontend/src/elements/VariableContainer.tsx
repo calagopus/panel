@@ -21,6 +21,7 @@ interface Props {
   disabled?: boolean;
   value: string;
   setValue: (value: string) => void;
+  error?: string;
 }
 
 export default function VariableContainer({
@@ -30,6 +31,7 @@ export default function VariableContainer({
   disabled = false,
   value,
   setValue,
+  error,
 }: Props) {
   const { t, language } = useTranslations();
 
@@ -61,6 +63,7 @@ export default function VariableContainer({
                 )
               }
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
+              error={error}
               label={variable.name}
             />
           ) : variable.rules.some((rule) => rule.startsWith('in:')) ? (
@@ -75,6 +78,7 @@ export default function VariableContainer({
               value={value}
               onChange={(value) => setValue(value ?? '')}
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
+              error={error}
             />
           ) : variable.rules.includes('integer') ||
             variable.rules.includes('int') ||
@@ -87,6 +91,7 @@ export default function VariableContainer({
               value={value}
               onChange={(value) => setValue(String(value))}
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
+              error={error}
             />
           ) : variable.isSecret ? (
             <PasswordInput
@@ -96,6 +101,7 @@ export default function VariableContainer({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
+              error={error}
             />
           ) : (
             <TextInput
@@ -106,6 +112,7 @@ export default function VariableContainer({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
+              error={error}
               rightSection={
                 <Tooltip label={t('common.tooltip.resetToDefault', {})}>
                   <ActionIcon

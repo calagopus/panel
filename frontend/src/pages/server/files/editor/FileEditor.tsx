@@ -295,7 +295,7 @@ function FileEditorComponent() {
 
   const saveShortcutRef = useRef(() => void 0);
 
-  // PierreEditor has no built-in save keybinding (unlike Monaco's editor.addCommand),
+  // PierreEditor has no built-in save keybinding (unlike Monaco's editor.addAction),
   // so bind it at the window level while it's the active engine on an editable action.
   useEffect(() => {
     if (editorEngine !== 'pierre' || (params.action !== 'new' && params.action !== 'edit')) return;
@@ -522,6 +522,7 @@ function FileEditorComponent() {
         onRevertClick={() => setRevertConfirm(true)}
         onHistoryClick={() => setRevisionsOpen(true)}
         fileName={fileName}
+        writable={writable}
         saving={saving}
         onSave={() => saveFile()}
         onCreateClick={() => setNameModalOpen(true)}
@@ -607,6 +608,7 @@ function FileEditorComponent() {
       ) : (
         <div ref={contentWrapRef} className='flex flex-col relative'>
           <FileNameModal
+            directory={browsingDirectory}
             onFileName={(name: string) => saveFile(name)}
             opened={nameModalOpen}
             onClose={() => setNameModalOpen(false)}

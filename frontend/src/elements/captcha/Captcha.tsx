@@ -1,10 +1,15 @@
 import type HCaptcha from '@hcaptcha/react-hcaptcha';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import type ReCAPTCHA from 'react-google-recaptcha';
+import { faExclamationTriangle, faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useComputedColorScheme } from '@mantine/core';
 import { lazy, Suspense, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { CapRef } from '@/elements/captcha/Cap.tsx';
 import type { FriendlyCaptchaRef } from '@/elements/captcha/FriendlyCaptcha.tsx';
+import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 const Cap = lazy(() => import('@/elements/captcha/Cap.tsx'));
@@ -12,6 +17,8 @@ const FriendlyCaptcha = lazy(() => import('@/elements/captcha/FriendlyCaptcha.ts
 const HCaptchaWidget = lazy(() => import('@hcaptcha/react-hcaptcha'));
 const ReCAPTCHAWidget = lazy(() => import('react-google-recaptcha'));
 const Turnstile = lazy(() => import('@marsidev/react-turnstile').then((module) => ({ default: module.Turnstile })));
+
+const WIDGET_LOAD_TIMEOUT_MS = 15_000;
 
 export interface CaptchaRef {
   getToken: () => Promise<string | null>;
@@ -33,6 +40,7 @@ export function useCaptcha() {
 }
 
 const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
+  const { t } = useTranslations();
   const colorScheme = useComputedColorScheme('dark');
   const captchaProvider = useGlobalStore((state) => state.settings.captchaProvider);
   const isRecaptchaV3 = captchaProvider.type === 'recaptcha' && captchaProvider.v3;
@@ -44,8 +52,20 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
   const friendlyCaptchaRef = useRef<FriendlyCaptchaRef>(null);
   const capRef = useRef<CapRef>(null);
 
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [widgetLoaded, setWidgetLoaded] = useState(false);
+
   const setValid = useCallback(() => onValidChange?.(true), [onValidChange]);
   const setInvalid = useCallback(() => onValidChange?.(false), [onValidChange]);
+  const setErrored = useCallback(() => {
+    onValidChange?.(false);
+    setFailed(true);
+  }, [onValidChange]);
+  const markLoaded = useCallback(() => {
+    setWidgetLoaded(true);
+    setFailed(false);
+  }, []);
 
   useEffect(() => {
     if (!hasWidget) setValid();
@@ -55,9 +75,34 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
       script.id = 'recaptcha-v3-script';
       script.src = `https://www.google.com/recaptcha/api.js?render=${captchaProvider.siteKey}`;
       script.async = true;
+      script.onerror = () => {
+        script.remove();
+        setErrored();
+      };
       document.head.appendChild(script);
     }
-  }, [captchaProvider, hasWidget, isRecaptchaV3, setValid]);
+  }, [captchaProvider, hasWidget, isRecaptchaV3, setValid, setErrored, attempt]);
+
+  const watchesLoad =
+    captchaProvider.type === 'turnstile' || captchaProvider.type === 'hcaptcha' || captchaProvider.type === 'recaptcha';
+
+  useEffect(() => {
+    if (!hasWidget || !watchesLoad || widgetLoaded || failed) return;
+
+    const timeout = setTimeout(setErrored, WIDGET_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [hasWidget, watchesLoad, widgetLoaded, failed, setErrored, attempt, colorScheme]);
+
+  const retry = () => {
+    setFailed(false);
+    setWidgetLoaded(false);
+    setAttempt((a) => a + 1);
+  };
+
+  useEffect(() => {
+    if (hasWidget) setInvalid();
+    setWidgetLoaded(false);
+  }, [colorScheme, captchaProvider.type, hasWidget, setInvalid]);
 
   const resetWidget = useCallback(() => {
     switch (captchaProvider.type) {
@@ -137,10 +182,30 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
     [captchaProvider, hasWidget, isRecaptchaV3, setInvalid, resetWidget],
   );
 
-  if (!hasWidget) return null;
+  const failedAlert = failed && (
+    <Alert
+      color='red'
+      icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+      title={t('common.alert.error', {})}
+      className='w-full'
+    >
+      <div className='flex flex-col gap-2 items-start'>
+        {t('elements.captcha.loadFailed', {})}
+        <Button variant='default' size='xs' leftSection={<FontAwesomeIcon icon={faRotateRight} />} onClick={retry}>
+          {t('common.button.retry', {})}
+        </Button>
+      </div>
+    </Alert>
+  );
+
+  if (!hasWidget) return failedAlert || null;
 
   return (
-    <div key={`${captchaProvider.type}-${colorScheme}`} className='flex w-full items-center justify-center'>
+    <div
+      key={`${captchaProvider.type}-${colorScheme}-${attempt}`}
+      className='flex flex-col gap-2 w-full items-center justify-center'
+    >
+      {failedAlert}
       <Suspense>
         {captchaProvider.type === 'cap' && (
           <Cap
@@ -150,7 +215,7 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
             theme={colorScheme}
             onComplete={setValid}
             onExpire={setInvalid}
-            onError={setInvalid}
+            onError={setErrored}
           />
         )}
 
@@ -159,9 +224,11 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
             ref={turnstileRef}
             siteKey={captchaProvider.siteKey}
             options={{ size: 'flexible', theme: colorScheme }}
+            scriptOptions={{ onError: setErrored }}
+            onWidgetLoad={markLoaded}
             onSuccess={setValid}
             onExpire={setInvalid}
-            onError={setInvalid}
+            onError={setErrored}
           />
         )}
 
@@ -170,9 +237,10 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
             ref={recaptchaRef}
             sitekey={captchaProvider.siteKey}
             theme={colorScheme}
+            asyncScriptOnLoad={markLoaded}
             onChange={setValid}
             onExpired={setInvalid}
-            onErrored={setInvalid}
+            onErrored={setErrored}
           />
         )}
 
@@ -181,9 +249,10 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
             ref={hcaptchaRef}
             sitekey={captchaProvider.siteKey}
             theme={colorScheme}
+            onLoad={markLoaded}
             onVerify={setValid}
             onExpire={setInvalid}
-            onError={setInvalid}
+            onError={setErrored}
             onChalExpired={setInvalid}
           />
         )}
@@ -195,7 +264,7 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
             theme={colorScheme}
             onComplete={setValid}
             onExpire={setInvalid}
-            onError={setInvalid}
+            onError={setErrored}
           />
         )}
       </Suspense>

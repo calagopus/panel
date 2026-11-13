@@ -6,7 +6,9 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import { userSecurityKeySchema } from '@/lib/schemas/user/securityKeys.ts';
+import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useGlobalStore } from '@/stores/global.ts';
 import SecurityKeyDeleteModal from './modals/SecurityKeyDeleteModal.tsx';
 import SecurityKeyEditModal from './modals/SecurityKeyEditModal.tsx';
 
@@ -18,6 +20,17 @@ export default function SecurityKeyRow({
   total: number;
 }) {
   const { t } = useTranslations();
+  const { user } = useAuth();
+  const passwordLoginEnabled = useGlobalStore((state) => state.settings.app.passwordLoginEnabled);
+
+  const deleteBlockedReason =
+    total <= 1
+      ? !passwordLoginEnabled
+        ? t('pages.account.securityKeys.tooltip.lastKeyPasswordLoginDisabled', {})
+        : user?.passwordLoginDisabled
+          ? t('pages.account.securityKeys.tooltip.lastKeyPasswordLoginOff', {})
+          : null
+      : null;
 
   const [openModal, setOpenModal] = useState<'edit' | 'delete' | null>(null);
 
@@ -50,6 +63,8 @@ export default function SecurityKeyRow({
             icon: faTrash,
             label: t('common.button.delete', {}),
             onClick: () => setOpenModal('delete'),
+            disabled: !!deleteBlockedReason,
+            tooltip: deleteBlockedReason ?? undefined,
             color: 'red',
           },
         ]}

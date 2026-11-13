@@ -16,6 +16,7 @@ import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { backupDiskLabelMapping } from '@/lib/enums.ts';
 import {
@@ -37,6 +38,7 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
   const { t, language } = useTranslations();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [createdBackupConfigUuid, setCreatedBackupConfigUuid] = useState<string | null>(null);
 
   const existingLocation = data.locations[0];
   const existingBackupConfig = existingLocation?.backupConfiguration;
@@ -135,23 +137,19 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
             : null,
       };
 
-      if (isEdit) {
-        await updateBackupConfiguration(existingBackupConfig!.uuid, {
+      let backupConfigUuid: string;
+      if (existingBackupConfig) {
+        await updateBackupConfiguration(existingBackupConfig.uuid, {
           name: form.values.backupName,
-          description: existingBackupConfig!.description,
-          maintenanceEnabled: existingBackupConfig!.maintenanceEnabled,
-          shared: existingBackupConfig!.shared,
+          description: existingBackupConfig.description,
+          maintenanceEnabled: existingBackupConfig.maintenanceEnabled,
+          shared: existingBackupConfig.shared,
           backupDisk: form.values.backupDisk,
           backupConfigs,
         });
-        await updateLocation(existingLocation.uuid, {
-          name: form.values.locationName,
-          description: existingLocation.description,
-          flag: form.values.locationFlag,
-          backupConfigurationUuid: existingBackupConfig!.uuid,
-        });
+        backupConfigUuid = existingBackupConfig.uuid;
       } else {
-        const backupConfig = await createBackupConfiguration({
+        const backupConfigData = {
           name: form.values.backupName,
           description: null,
           maintenanceEnabled: false,
@@ -162,12 +160,31 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
             form.values.backupDisk === 'kopia',
           backupDisk: form.values.backupDisk,
           backupConfigs,
+        };
+
+        if (createdBackupConfigUuid) {
+          await updateBackupConfiguration(createdBackupConfigUuid, backupConfigData);
+          backupConfigUuid = createdBackupConfigUuid;
+        } else {
+          const backupConfig = await createBackupConfiguration(backupConfigData);
+          setCreatedBackupConfigUuid(backupConfig.uuid);
+          backupConfigUuid = backupConfig.uuid;
+        }
+      }
+
+      if (isEdit) {
+        await updateLocation(existingLocation.uuid, {
+          name: form.values.locationName,
+          description: existingLocation.description,
+          flag: form.values.locationFlag,
+          backupConfigurationUuid: backupConfigUuid,
         });
+      } else {
         await createLocation({
           name: form.values.locationName,
           description: null,
           flag: form.values.locationFlag,
-          backupConfigurationUuid: backupConfig.uuid,
+          backupConfigurationUuid: backupConfigUuid,
         });
       }
 
@@ -251,6 +268,11 @@ export default function OobeLocation({ onNext, onBack, canGoBack, skipFrom, data
           </div>
 
           <Group justify='flex-end'>
+            {!isEdit && (
+              <Text size='xs' c='dimmed' className='flex-1' miw={200}>
+                {t('pages.oobe.location.skipHint', {})}
+              </Text>
+            )}
             {canGoBack && (
               <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
                 Back

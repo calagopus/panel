@@ -38,7 +38,7 @@ function getByPath(obj: Record<string, unknown>, path: string): unknown {
 }
 
 function resolveOptions(options: FieldOption[]) {
-  return options.map((o) => ({ value: o.value, label: resolveString(o.label) }));
+  return options.map((o) => ({ value: o.value, label: resolveString(o.label), disabled: o.disabled }));
 }
 
 function fieldLabel<T extends Record<string, unknown>>(field: FieldDef<T>): ReactNode {

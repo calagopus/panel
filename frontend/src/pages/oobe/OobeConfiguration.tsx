@@ -50,6 +50,7 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [captchaConfigured, setCaptchaConfigured] = useState(false);
 
   const form = useForm<z.infer<typeof oobeConfigurationSchema>>({
     initialValues: {
@@ -68,6 +69,7 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
 
     getSettings()
       .then((settings) => {
+        setCaptchaConfigured(settings.captchaProvider.type !== 'none');
         form.setValues({
           applicationName: settings.app.name,
           applicationLanguage: settings.app.language,
@@ -176,7 +178,11 @@ export default function OobeConfiguration({ onNext }: OobeComponentProps) {
               <Stack>
                 <Switch
                   label={t('pages.oobe.configuration.form.registration', {})}
-                  description={t('pages.oobe.configuration.form.registrationDescription', {})}
+                  description={
+                    form.values.applicationRegistration && !captchaConfigured
+                      ? t('pages.oobe.configuration.form.registrationDescriptionNoCaptcha', {})
+                      : t('pages.oobe.configuration.form.registrationDescription', {})
+                  }
                   {...form.getInputProps('applicationRegistration', { type: 'checkbox' })}
                 />
                 {webauthn && (

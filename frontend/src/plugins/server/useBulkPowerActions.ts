@@ -11,6 +11,11 @@ export function useBulkPowerActions() {
   const [bulkActionLoading, setBulkActionLoading] = useState<z.infer<typeof serverPowerAction> | null>(null);
 
   const handleBulkPowerAction = async (serverUuids: string[], action: z.infer<typeof serverPowerAction>) => {
+    if (serverUuids.length === 0) {
+      addToast(t('common.bulkActions.nothingToDo', {}), 'info');
+      return;
+    }
+
     setBulkActionLoading(action);
 
     const results = await Promise.allSettled(serverUuids.map((uuid) => sendPowerAction(uuid, action)));

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import Alert from '@/elements/feedback/Alert.tsx';
 import { announcementTypeColorMapping, announcementTypeIconMapping } from '@/lib/enums.ts';
+import { safeLocalStorageGet, safeLocalStorageRemove, safeLocalStorageSet } from '@/lib/safeStorage.ts';
 import { announcementSchema } from '@/lib/schemas/announcements.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -15,23 +16,23 @@ function storageKey(uuid: string) {
 function checkDismissed(announcement: Announcement): boolean {
   if (!announcement.dismissible) return false;
 
-  const stored = localStorage.getItem(storageKey(announcement.uuid));
+  const stored = safeLocalStorageGet(storageKey(announcement.uuid));
   if (stored === null) return false;
 
   if (announcement.dismissibleEnd === null) {
     if (stored === 'null') return true;
-    localStorage.removeItem(storageKey(announcement.uuid));
+    safeLocalStorageRemove(storageKey(announcement.uuid));
     return false;
   }
 
   const end = new Date(announcement.dismissibleEnd);
   if (end <= new Date()) {
-    localStorage.removeItem(storageKey(announcement.uuid));
+    safeLocalStorageRemove(storageKey(announcement.uuid));
     return false;
   }
 
   if (stored !== announcement.dismissibleEnd) {
-    localStorage.removeItem(storageKey(announcement.uuid));
+    safeLocalStorageRemove(storageKey(announcement.uuid));
     return false;
   }
 
@@ -52,7 +53,7 @@ export default function DismissibleAnnouncementAlert({ announcement }: { announc
 
   const handleDismiss = () => {
     const value = announcement.dismissibleEnd === null ? 'null' : announcement.dismissibleEnd;
-    localStorage.setItem(storageKey(announcement.uuid), value);
+    safeLocalStorageSet(storageKey(announcement.uuid), value);
     setDismissed(true);
   };
 

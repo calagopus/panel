@@ -25,6 +25,8 @@ export default function EggMountAddModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.mounts', {})}
+      createAction={{ to: '/admin/mounts/new', permission: 'mounts.create' }}
       title={t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.modal.add.title', {})}
       label={t('common.form.mount', {})}
       data={mounts.items.map((mount) => ({ label: mount.name, value: mount.uuid }))}

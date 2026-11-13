@@ -4,7 +4,9 @@ import { MonacoDiffEditor } from '@/elements/editors/MonacoEditor.tsx';
 import { PierreDiffEditor } from '@/elements/editors/PierreEditor.tsx';
 import { fileModelUri } from '@/lib/editor/fileModelUri.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import { addEditorSaveAction } from './addEditorSaveAction.ts';
 
 interface FileRevisionDiffEditorProps {
   original: string;
@@ -29,6 +31,7 @@ export default function FileRevisionDiffEditor({
   onSave,
   onMount,
 }: FileRevisionDiffEditorProps) {
+  const { t } = useTranslations();
   const { engine, fontSize, minimap, wordWrap } = useFileManager(
     useShallow((state) => ({
       engine: state.editorEngine,
@@ -93,7 +96,7 @@ export default function FileRevisionDiffEditor({
           modifiedEditor.onDidChangeModelContent(() => {
             if (!callbacks.current.readOnly) callbacks.current.onChange(modifiedEditor.getValue());
           });
-          modifiedEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+          addEditorSaveAction(modifiedEditor, monaco, t('common.button.save', {}), () => {
             if (!callbacks.current.readOnly) callbacks.current.onSave();
           });
         }

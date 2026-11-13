@@ -4,6 +4,7 @@ import { z } from 'zod';
 import updateNodeAllocations from '@/api/admin/nodes/allocations/updateNodeAllocations.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import NodeAllocationIpInput from '@/elements/input/NodeAllocationIpInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -36,6 +37,11 @@ export default function NodeAllocationsUpdateModal({
 }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
+
+  const distinctIpCount = useMemo(
+    () => new Set(selectedNodeAllocations.values().map((allocation) => allocation.ip)).size,
+    [selectedNodeAllocations],
+  );
 
   const mostCommonIp = useMemo(() => {
     const ipCounts = new Map<string, number>();
@@ -91,6 +97,7 @@ export default function NodeAllocationsUpdateModal({
 
   const [ip, setIp] = useState('');
   const [ipAlias, setIpAlias] = useState('');
+  const [ipAliasEdited, setIpAliasEdited] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -99,6 +106,7 @@ export default function NodeAllocationsUpdateModal({
 
   useEffect(() => {
     setIpAlias(mostCommonIpAlias);
+    setIpAliasEdited(false);
   }, [mostCommonIpAlias, props.opened]);
 
   const doUpdate = (e: FormEvent<HTMLFormElement>) => {
@@ -107,7 +115,7 @@ export default function NodeAllocationsUpdateModal({
 
     updateNodeAllocations(node.uuid, selector, {
       ip,
-      ipAlias: ipAlias || null,
+      ...(ipAliasEdited ? { ipAlias: ipAlias || null } : {}),
     })
       .then(({ updated, skipped }) => {
         if (skipped > 0) {
@@ -145,6 +153,14 @@ export default function NodeAllocationsUpdateModal({
       onSubmit={doUpdate}
     >
       <Stack>
+        {(selectedNodeAllocations.size === 0 || distinctIpCount > 1) && (
+          <Alert color='yellow'>
+            {t('pages.admin.nodes.tabs.allocations.page.modal.update.alert.ipAppliesToAll', {
+              allocations: tItem('allocation', affectedCount),
+            })}
+          </Alert>
+        )}
+
         <NodeAllocationIpInput
           withAsterisk
           nodeUuid={node.uuid}
@@ -156,7 +172,15 @@ export default function NodeAllocationsUpdateModal({
         <TextInput
           label={t('pages.admin.nodes.tabs.allocations.page.form.ipAlias', {})}
           value={ipAlias}
-          onChange={(e) => setIpAlias(e.target.value)}
+          description={
+            ipAliasEdited
+              ? undefined
+              : t('pages.admin.nodes.tabs.allocations.page.modal.update.form.ipAliasUnchanged', {})
+          }
+          onChange={(e) => {
+            setIpAlias(e.target.value);
+            setIpAliasEdited(true);
+          }}
         />
 
         <ModalFooter>

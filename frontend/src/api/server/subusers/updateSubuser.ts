@@ -6,10 +6,8 @@ import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 export default async (
   uuid: string,
   userUuid: string,
-  data: z.infer<typeof serverSubuserUpdateSchema>,
+  data: Partial<z.infer<typeof serverSubuserUpdateSchema>>,
 ): Promise<void> => {
-  await axiosInstance.patch(
-    `/api/client/servers/${uuid}/subusers/${userUuid}`,
-    serializeForApi(serverSubuserUpdateSchema, data),
-  );
+  const schema = serverSubuserUpdateSchema.partial();
+  await axiosInstance.patch(`/api/client/servers/${uuid}/subusers/${userUuid}`, serializeForApi(schema, data));
 };

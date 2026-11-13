@@ -78,6 +78,7 @@ function FileTree({
   const scrollToRowRef = useRef<((index: number) => void) | null>(null);
   const activeServerRef = useRef(server.uuid);
   const loadingDirectoriesRef = useRef(new Set<string>());
+  const pendingDirectoryLoadsRef = useRef(new Map<string, number>());
   const directoriesRef = useRef<Record<string, DirectoryState>>({});
   const expandedDirectoriesRef = useRef(new Set<string>());
   const selectedPathsRef = useRef(new Set<string>());
@@ -196,11 +197,15 @@ function FileTree({
     };
   }, [clearDropTarget]);
 
-  const loadPage = useCallback(
+  const loadPage: (directory: string, page: number) => Promise<void> = useCallback(
     async (directory: string, page: number) => {
       const requestServerUuid = server.uuid;
       const loadingKey = `${requestServerUuid}:${directory}`;
-      if (loadingDirectoriesRef.current.has(loadingKey)) return;
+      if (loadingDirectoriesRef.current.has(loadingKey)) {
+        const pending = pendingDirectoryLoadsRef.current.get(loadingKey);
+        pendingDirectoryLoadsRef.current.set(loadingKey, pending === undefined ? page : Math.min(pending, page));
+        return;
+      }
 
       const lastPage = page === 1 ? Math.max(1, directoriesRef.current[directory]?.page ?? 1) : page;
       loadingDirectoriesRef.current.add(loadingKey);
@@ -271,6 +276,12 @@ function FileTree({
         }
       } finally {
         loadingDirectoriesRef.current.delete(loadingKey);
+
+        const pendingPage = pendingDirectoryLoadsRef.current.get(loadingKey);
+        if (pendingPage !== undefined) {
+          pendingDirectoryLoadsRef.current.delete(loadingKey);
+          if (activeServerRef.current === requestServerUuid) void loadPage(directory, pendingPage);
+        }
       }
     },
     [server.uuid, addToast, store],
@@ -279,6 +290,7 @@ function FileTree({
   useEffect(() => {
     activeServerRef.current = server.uuid;
     loadingDirectoriesRef.current.clear();
+    pendingDirectoryLoadsRef.current.clear();
     setDirectories({});
     setExpandedDirectories(new Set());
     selectedPathsRef.current = new Set();

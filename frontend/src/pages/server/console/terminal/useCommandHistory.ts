@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage.ts';
 
 export function useCommandHistory(serverUuid: string) {
   const [history, setHistory] = useState<string[]>([]);
@@ -7,7 +8,7 @@ export function useCommandHistory(serverUuid: string) {
   const HISTORY_STORAGE_KEY = `terminal_command_history_${serverUuid}`;
 
   useEffect(() => {
-    const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+    const savedHistory = safeLocalStorageGet(HISTORY_STORAGE_KEY);
     if (savedHistory) {
       try {
         const parsed = JSON.parse(savedHistory);
@@ -19,7 +20,7 @@ export function useCommandHistory(serverUuid: string) {
   }, [HISTORY_STORAGE_KEY]);
 
   useEffect(() => {
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+    safeLocalStorageSet(HISTORY_STORAGE_KEY, JSON.stringify(history));
   }, [history, HISTORY_STORAGE_KEY]);
 
   const navigatePrevious = useCallback(() => {

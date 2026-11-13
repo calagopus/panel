@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getImpersonatedUser } from '@/api/axios.ts';
 import getUserSettings from '@/api/me/settings/getUserSettings.ts';
 import updateUserSettings, { updateUserSettingsKeepalive } from '@/api/me/settings/updateUserSettings.ts';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage.ts';
 import { UserSettingsMap, UserSettingValue, userSettingsMapSchema } from '@/lib/schemas/user/settings.ts';
 import { UserSettingsStore, useUserSettingsStore } from '@/stores/userSettings.ts';
 
@@ -52,8 +53,8 @@ function persistReplica() {
   if (!isPersistable()) return;
 
   const { userUuid, synced, local } = useUserSettingsStore.getState();
-  localStorage.setItem(`${REPLICA_KEY_PREFIX}${userUuid}`, JSON.stringify(synced));
-  localStorage.setItem(`${LOCAL_KEY_PREFIX}${userUuid}`, JSON.stringify(local));
+  safeLocalStorageSet(`${REPLICA_KEY_PREFIX}${userUuid}`, JSON.stringify(synced));
+  safeLocalStorageSet(`${LOCAL_KEY_PREFIX}${userUuid}`, JSON.stringify(local));
 }
 
 function schedulePersistReplica() {
@@ -82,12 +83,16 @@ function scheduleFlush(delay: number = FLUSH_DEBOUNCE_MS) {
 }
 
 async function runFlush(changes: Record<string, UserSettingValue | null>) {
+  const userUuid = useUserSettingsStore.getState().userUuid;
+
   try {
     await updateUserSettings(changes);
   } catch (error) {
     const status = isAxiosError(error) ? error.response?.status : undefined;
     if (status !== undefined && status >= 400 && status < 500 && status !== 429) {
       console.error('Server rejected user settings update', error);
+    } else if (useUserSettingsStore.getState().userUuid !== userUuid) {
+      console.error('Dropped user settings update after the user changed', error);
     } else {
       pendingChanges = { ...changes, ...pendingChanges };
       scheduleFlush(FLUSH_RETRY_MS);
@@ -150,7 +155,7 @@ export async function loadUserSettings(userUuid: string) {
   }
   useUserSettingsStore.setState({ userUuid });
 
-  if (!getImpersonatedUser()) localStorage.setItem(LAST_USER_KEY, userUuid);
+  if (!getImpersonatedUser()) safeLocalStorageSet(LAST_USER_KEY, userUuid);
 
   try {
     const serverSettings = await getUserSettings();
@@ -412,6 +417,14 @@ const LEGACY_PREFIX_IMPORTS: {
 function importLegacyUserSettings() {
   if (!isPersistable()) return;
 
+  try {
+    importLegacyUserSettingsUnsafe();
+  } catch (error) {
+    console.error('Failed to import legacy user settings', error);
+  }
+}
+
+function importLegacyUserSettingsUnsafe() {
   const { synced, local } = useUserSettingsStore.getState();
   const syncedImports: Record<string, UserSettingValue> = {};
   const localImports: Record<string, UserSettingValue> = {};
@@ -505,4 +518,8 @@ window.addEventListener('pagehide', () => {
   updateUserSettingsKeepalive(changes);
 });
 
-hydrateFromReplica(localStorage.getItem(LAST_USER_KEY));
+export function getLastUserUuid(): string | null {
+  return safeLocalStorageGet(LAST_USER_KEY);
+}
+
+hydrateFromReplica(getLastUserUuid());

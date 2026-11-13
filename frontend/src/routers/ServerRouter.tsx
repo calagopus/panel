@@ -147,7 +147,10 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
   useEffect(() => {
     if (params.id && params.id !== ':id') {
+      let stale = false;
+
       setLoading(true);
+      resetState();
 
       if (!params['*']) {
         import('@/pages/server/console/ServerConsole.tsx').catch(() => undefined);
@@ -155,13 +158,21 @@ export default function ServerRouter({ isNormal }: { isNormal: boolean }) {
 
       trackActivity(getServer(params.id))
         .then((data) => {
+          if (stale) return;
           setSocketInstance(null);
           setServer(data);
         })
         .catch((error) => {
+          if (stale) return;
           addToast(httpErrorToHuman(error), 'error');
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (!stale) setLoading(false);
+        });
+
+      return () => {
+        stale = true;
+      };
     }
   }, [params.id]);
 

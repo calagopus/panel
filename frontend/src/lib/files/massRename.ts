@@ -64,7 +64,26 @@ function applyCase(value: string, mode: RenameCase): string {
   }
 }
 
+function splitParent(name: string): { parent: string; basename: string } {
+  const lastSlash = name.lastIndexOf('/');
+
+  return lastSlash === -1
+    ? { parent: '', basename: name }
+    : { parent: name.slice(0, lastSlash + 1), basename: name.slice(lastSlash + 1) };
+}
+
 function computeNewName(
+  entry: RenameEntry,
+  options: MassRenameOptions,
+  index: number,
+): { newName: string; invalidRegex: boolean } {
+  const { parent, basename } = splitParent(entry.name);
+  const { newName, invalidRegex } = computeNewBasename({ ...entry, name: basename }, options, index);
+
+  return { newName: invalidRegex ? entry.name : `${parent}${newName}`, invalidRegex };
+}
+
+function computeNewBasename(
   entry: RenameEntry,
   options: MassRenameOptions,
   index: number,
@@ -135,7 +154,7 @@ export function buildRenamePreview(
       status = 'invalidRegex';
     } else if (newName === entry.name) {
       status = 'unchanged';
-    } else if (!isValidName(newName)) {
+    } else if (!isValidName(newName.slice(splitParent(entry.name).parent.length))) {
       status = 'invalid';
     } else {
       status = 'renamed';

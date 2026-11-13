@@ -1,5 +1,6 @@
 import { ModalProps } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { FormEvent, useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -13,6 +14,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import { resolvePorts } from '@/lib/network/ip.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminNodeAllocationsSchema, adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -22,9 +24,10 @@ export default function NodeAllocationsCreateModal({
   node,
   loadAllocations,
   ...props
-}: ModalProps & { node: z.infer<typeof adminNodeSchema>; loadAllocations: () => void }) {
+}: ModalProps & { node: Pick<z.infer<typeof adminNodeSchema>, 'uuid'>; loadAllocations?: () => void }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const [resolvedPorts, setResolvedPorts] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
@@ -67,7 +70,9 @@ export default function NodeAllocationsCreateModal({
         );
 
         props.onClose();
-        loadAllocations();
+        form.reset();
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.allocations(node.uuid) });
+        loadAllocations?.();
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

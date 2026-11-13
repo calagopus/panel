@@ -7,10 +7,15 @@ import {
   useRef,
   useState,
 } from 'react';
+import { isOverlayActive } from '@/lib/dom/overlayFocus.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { selectionRange } from '@/plugins/selection/selectionRange.ts';
 import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
+
+const unlessOverlay = (action: () => void) => (event: KeyboardEvent) => {
+  if (!isOverlayActive(event.target)) action();
+};
 
 interface UseTableSelectionOptions<T, K extends string> {
   items?: readonly T[];
@@ -137,8 +142,8 @@ export function useTableSelection<T extends object, const K extends string = 'uu
   useKeyboardShortcuts({
     enabled: shortcuts,
     shortcuts: [
-      { id: 'table.selectAll', callback: selectAll },
-      { id: 'table.deselectAll', callback: clear },
+      { id: 'table.selectAll', callback: unlessOverlay(selectAll) },
+      { id: 'table.deselectAll', callback: unlessOverlay(clear) },
     ],
     deps: [selectAll, clear],
   });

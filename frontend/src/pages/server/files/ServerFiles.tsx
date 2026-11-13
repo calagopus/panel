@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { FileOpenMode } from 'shared/src/registries/pages/server/files';
+import { z } from 'zod';
 import type { FileTreeWorkspaceHandle } from '@/pages/server/files/tree/FileTreeWorkspace.tsx';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
@@ -32,9 +33,12 @@ import Title from '@/elements/typography/Title.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
 import { isVirtualRoot } from '@/lib/files/virtualRoot.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage.ts';
+import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import { useDuplicateFile } from '@/pages/server/files/hooks/useDuplicateFile.ts';
 import { useFileBrowserQuickActions } from '@/pages/server/files/hooks/useFileBrowserQuickActions.tsx';
+import { useFileTooLargeToast } from '@/pages/server/files/hooks/useFileTooLargeToast.ts';
 import useFileUploadSocket from '@/pages/server/files/hooks/useFileUploadSocket.ts';
 import IncompleteUploadsBanner from '@/pages/server/files/IncompleteUploadsBanner.tsx';
 import FileActionBar from '@/pages/server/files/list/FileActionBar.tsx';
@@ -67,7 +71,6 @@ import { useSelectionArea } from '@/plugins/selection/useSelectionArea.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { usePageBreakpoint } from '@/plugins/viewport/usePageBreakpoint.ts';
 import { FileManagerProvider } from '@/providers/FileManagerProvider.tsx';
-import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
 import { useServerStore } from '@/stores/server.ts';
@@ -79,7 +82,7 @@ const VIRTUALIZER_OVERSCAN = 15;
 function FileBrowser() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
-  const { addToast } = useToast();
+  const showFileTooLarge = useFileTooLargeToast();
   const duplicateFile = useDuplicateFile();
   const [_, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -143,14 +146,17 @@ function FileBrowser() {
   );
 
   const openFile = useCallback(
-    (openMode: FileOpenMode) => {
+    (openMode: FileOpenMode, file?: z.infer<typeof serverDirectoryEntrySchema>) => {
       if (!openMode.openable && openMode.reason === 'tooLarge') {
-        addToast(t('pages.server.files.toast.fileTooLargeToOpen', {}), 'warning');
+        if (file) {
+          const state = store.getState();
+          showFileTooLarge(state.searchInfo?.root ?? state.browsingDirectory, file);
+        }
         return;
       }
       handleOpen(openMode);
     },
-    [handleOpen, addToast, t],
+    [handleOpen, showFileTooLarge, store],
   );
 
   useEffect(() => {
@@ -229,10 +235,11 @@ function FileBrowser() {
       {
         id: 'files.moveUpDirectory',
         callback: () => {
-          if (store.getState().searchInfo) return;
+          const state = store.getState();
+          if (state.searchInfo || isVirtualRoot(state.browsingDirectory)) return;
 
           setSearchParams({
-            directory: join(store.getState().browsingDirectory, '..'),
+            directory: join(state.browsingDirectory, '..'),
           });
         },
       },
@@ -263,7 +270,8 @@ function FileBrowser() {
         callback: () => {
           const state = store.getState();
           if (state.selectedFiles.size === 1 && state.openModal === null) {
-            openFile(isOpenableFile(state.selectedFiles.values()[0], state));
+            const file = state.selectedFiles.values()[0];
+            openFile(isOpenableFile(file, state), file);
           }
         },
       },
@@ -464,12 +472,12 @@ const FILE_MANAGER_VIEW_STORAGE_KEY = 'file_manager_view';
 const fileTreeVisibilityStorageKey = (serverUuid: string) => `file_manager_tree_visible:${serverUuid}`;
 
 const getStoredFileManagerView = (): FileManagerView => {
-  const stored = localStorage.getItem(FILE_MANAGER_VIEW_STORAGE_KEY);
+  const stored = safeLocalStorageGet(FILE_MANAGER_VIEW_STORAGE_KEY);
   return stored === 'tree' || stored === 'editor' ? 'tree' : 'list';
 };
 
 const getStoredFileTreeVisibility = (serverUuid: string) =>
-  localStorage.getItem(fileTreeVisibilityStorageKey(serverUuid)) !== 'false';
+  safeLocalStorageGet(fileTreeVisibilityStorageKey(serverUuid)) !== 'false';
 
 function ServerFilesComponent() {
   const { t } = useTranslations();
@@ -502,7 +510,7 @@ function ServerFilesComponent() {
 
     if (value === 'tree') setTreeInitialDirectory(browsingDirectory);
     else setSearchParams({ directory: browsingDirectory });
-    localStorage.setItem(FILE_MANAGER_VIEW_STORAGE_KEY, value);
+    safeLocalStorageSet(FILE_MANAGER_VIEW_STORAGE_KEY, value);
     setView(value);
   };
 
@@ -514,7 +522,7 @@ function ServerFilesComponent() {
 
   const toggleFileTree = () => {
     setFileTreeVisible((visible) => {
-      localStorage.setItem(fileTreeVisibilityStorageKey(serverUuid), String(!visible));
+      safeLocalStorageSet(fileTreeVisibilityStorageKey(serverUuid), String(!visible));
       return !visible;
     });
   };

@@ -47,8 +47,13 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
       validate: zod4Resolver(serverSubuserUpdateSchema),
       onClose: props.onClose,
       onSubmit: async (values) => {
+        const permissions = Array.from(values.permissions);
+        const permissionsChanged =
+          permissions.length !== subuser.permissions.length ||
+          permissions.some((permission) => !subuser.permissions.includes(permission));
+
         await updateSubuser(server.uuid, subuser.user.uuid, {
-          permissions: Array.from(values.permissions),
+          permissions: permissionsChanged ? permissions : undefined,
           ignoredFiles: appendInheritedIgnoredFiles(values.ignoredFiles, server.ignoredFiles),
         });
         queryClient.invalidateQueries({ queryKey: queryKeys.server(server.uuid).subusers.all() });

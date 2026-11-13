@@ -94,6 +94,7 @@ export default function useServerBackupSocket() {
   });
 
   useWebsocketEvent(SocketEvent.BACKUP_RESTORE_STARTED, () => {
+    setBackupRestoreProgress(0, 0, 0);
     updateServer({ status: 'restoring_backup' });
   });
 
@@ -111,6 +112,7 @@ export default function useServerBackupSocket() {
   useWebsocketEvent(SocketEvent.BACKUP_RESTORE_COMPLETED, (successful) => {
     const failed = successful === 'false';
 
+    setBackupRestoreProgress(0, 0, 0);
     updateServer({ status: failed ? 'backup_restore_failed' : null });
 
     addToast(

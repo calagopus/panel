@@ -1,21 +1,25 @@
 import { ModalProps } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { z } from 'zod';
 import getOAuthProviders from '@/api/admin/oauth-providers/getOAuthProviders.ts';
 import createUserOAuthLink from '@/api/admin/users/oauthLinks/createUserOAuthLink.ts';
 import TextInput from '@/elements/input/TextInput.tsx';
 import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function UserOAuthLinkAddModal({
   user,
   ...props
 }: ModalProps & { user: z.infer<typeof adminFullUserSchema> }) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
+  const canCreateProvider = useAdminCan('oauth-providers.create');
 
   const [identifier, setIdentifier] = useState('');
 
@@ -29,6 +33,8 @@ export default function UserOAuthLinkAddModal({
       setIdentifier('');
     }
   }, [props.opened]);
+
+  const noProviders = !oauthProviders.loading && !oauthProviders.search && oauthProviders.items.length === 0;
 
   return (
     <ResourceSelectModal
@@ -45,6 +51,19 @@ export default function UserOAuthLinkAddModal({
       invalidateKeys={[queryKeys.admin.users.oauthLinks(user.uuid)]}
       onConfirm={(oauthProviderUuid) => createUserOAuthLink(user.uuid, oauthProviderUuid, identifier)}
     >
+      {noProviders && (
+        <Text size='sm' c='dimmed'>
+          {canCreateProvider
+            ? tReact('pages.admin.users.tabs.oauthLinks.page.modal.add.noProvidersCreate', {
+                link: (
+                  <Link to='/admin/oauth-providers/new' className='text-(--mantine-color-anchor) hover:underline'>
+                    {t('pages.admin.users.tabs.oauthLinks.page.modal.add.createProvider', {})}
+                  </Link>
+                ),
+              })
+            : t('pages.admin.users.tabs.oauthLinks.page.modal.add.noProviders', {})}
+        </Text>
+      )}
       <TextInput
         withAsterisk
         label={t('common.form.identifier', {})}

@@ -5,6 +5,7 @@ import {
   cancelFolderUpload,
   getFolderFileCount,
   uploadFiles,
+  uploadFolderKey,
 } from '@/lib/files/uploadManager.ts';
 import {
   AggregatedUploadProgress,
@@ -36,10 +37,9 @@ export function useUploader(scope: string, getDestination: () => UploadDestinati
     const map = new Map<string, AggregatedUploadProgress>();
 
     uploadingFiles.forEach((file) => {
-      const parts = file.filePath.split('/');
-      if (parts.length < 2) return;
+      const folder = uploadFolderKey(file);
+      if (folder === null) return;
 
-      const folder = parts[0];
       const prev = map.get(folder) ?? {
         totalSize: 0,
         uploadedSize: 0,

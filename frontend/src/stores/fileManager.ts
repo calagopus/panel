@@ -52,6 +52,8 @@ export type ModalType =
   | 'trashRestoreConflict'
   | null;
 
+const DIRECTORY_INDEPENDENT_MODALS = new Set<ModalType>(['search', 'largestDirectories', 'incompleteUploads', 'sftp']);
+
 export interface SearchInfo {
   query?: string;
   root: string;
@@ -367,11 +369,13 @@ export const createFileManagerStore = (
           if (state.browsingDirectory === directory) return state;
 
           selectionAnchor = null;
+          const closeModal = state.openModal !== null && !DIRECTORY_INDEPENDENT_MODALS.has(state.openModal);
           return {
             browsingDirectory: directory,
             selectedFiles: new ObjectSet('name'),
             searchInfo: null,
             searchGeneration: state.searchGeneration + 1,
+            ...(closeModal ? { openModal: null, modalDirectoryEntries: [] } : {}),
           };
         }),
       setBrowsingContext: ({ directory, primary, writable, fast }) =>
@@ -604,6 +608,10 @@ export const createFileManagerStore = (
 
         if (get().externals.serverUuid !== serverUuid) return;
 
+        // The tree view keeps its own directory state outside the query cache.
+        const normalizedDirectory = join('/', directory);
+        directoryRefreshListeners.forEach((listener) => listener([normalizedDirectory]));
+
         startTransition(() => {
           queryClient.setQueriesData<InfiniteData<DirectoryResponse>>(
             {
@@ -666,7 +674,7 @@ export const createFileManagerStore = (
         set((state) => ({
           actingMode: mode,
           actingFiles: new ObjectSet('name', files),
-          actingFilesSource: state.browsingDirectory,
+          actingFilesSource: state.searchInfo?.root ?? state.browsingDirectory,
         })),
       clearActingFiles: () =>
         set({

@@ -1,8 +1,10 @@
+import { faFolderTree } from '@fortawesome/free-solid-svg-icons';
 import { Ref } from 'react';
 import getMounts from '@/api/server/mounts/getMounts.ts';
 import ServerContentContainer from '@/elements/containers/ServerContentContainer.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import EmptyState from '@/elements/feedback/EmptyState.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import ServerDevices from '@/pages/server/devices/ServerDevices.tsx';
 import MountActionBar from '@/pages/server/mounts/MountActionBar.tsx';
@@ -25,9 +27,14 @@ export default function ServerMounts() {
     data: mounts,
     loading,
     error,
+    search,
+    setSearch,
+    debouncedSearch,
+    setPage,
+    setPerPage,
   } = useSearchablePaginatedTable({
     queryKey: queryKeys.server(server.uuid).mounts.all(),
-    fetcher: () => getMounts(server.uuid),
+    fetcher: (page, search, perPage) => getMounts(server.uuid, page, search, perPage),
     canRequest: canReadMounts,
     backgroundRefetch: true,
   });
@@ -48,6 +55,8 @@ export default function ServerMounts() {
   return (
     <ServerContentContainer
       title={t('pages.server.mounts.title', {})}
+      search={search}
+      setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.server.mounts.container}
     >
       <MountsSubNavigation />
@@ -75,7 +84,19 @@ export default function ServerMounts() {
           ]}
           loading={loading}
           pagination={mounts}
+          onPageSelect={setPage}
+          onPerPageSelect={setPerPage}
           error={error}
+          empty={
+            debouncedSearch ? undefined : (
+              <EmptyState
+                flush
+                icon={faFolderTree}
+                title={t('pages.server.mounts.empty.title', {})}
+                description={t('pages.server.mounts.empty.description', {})}
+              />
+            )
+          }
         >
           {mounts?.data.map((mount) => (
             <SelectionArea.Selectable key={mount.uuid} item={mount}>

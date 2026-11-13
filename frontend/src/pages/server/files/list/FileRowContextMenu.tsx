@@ -37,6 +37,7 @@ import {
   resumeDetachedUpload,
   resumeUpload,
 } from '@/lib/files/uploadManager.ts';
+import { bytesToString } from '@/lib/format/size.ts';
 import { openPopup, openUrl } from '@/lib/network/url.ts';
 import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
@@ -51,6 +52,7 @@ import { useWindows } from '@/providers/contexts/windowContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import RouterRoutes from '@/RouterRoutes.tsx';
 import { useFileManagerApi, useFileManagerStore } from '@/stores/fileManager.ts';
+import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 const finePointer = matchMedia('(pointer: fine)');
@@ -101,6 +103,7 @@ export default function FileRowContextMenu({
   const store = useFileManagerApi();
   const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
   const browsingWritableDirectory = useFileManagerStore((state) => state.browsingWritableDirectory);
+  const maxFileManagerViewSize = useGlobalStore((state) => state.settings.server.maxFileManagerViewSize);
   const canReadContent = useServerCan('files.read-content');
   const canCreate = useServerCan('files.create');
   const canUpdate = useServerCan('files.update');
@@ -155,6 +158,11 @@ export default function FileRowContextMenu({
       </MemoryRouter>,
     );
   };
+
+  const tooLarge = !openMode.openable && openMode.reason === 'tooLarge';
+  const tooLargeTooltip = tooLarge
+    ? t('pages.server.files.toast.fileTooLargeToOpen', { limit: bytesToString(maxFileManagerViewSize) })
+    : undefined;
 
   const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
     prepareFileManager();
@@ -212,35 +220,41 @@ export default function FileRowContextMenu({
               type: 'action',
               icon: faArrowUpRightFromSquare,
               label: t('pages.server.files.button.open', {}),
-              hidden: !openMode.openable || !!upload,
+              hidden: (!openMode.openable && !tooLarge) || !!upload,
+              disabled: tooLarge,
+              tooltip: tooLargeTooltip,
               onClick: onOpen,
-              items: [
-                {
-                  type: 'action',
-                  icon: faWindowRestore,
-                  label: t('pages.server.files.button.openInVirtualWindow', {}),
-                  onClick: openInVirtualWindow,
-                },
-                {
-                  type: 'action',
-                  icon: faWindowMaximize,
-                  label: t('pages.server.files.button.openInPopup', {}),
-                  onClick: openInPopup,
-                },
-                {
-                  type: 'action',
-                  icon: faArrowUpRightFromSquare,
-                  label: t('pages.server.files.button.openInNewTab', {}),
-                  onClick: openInNewTab,
-                },
-              ],
+              items: tooLarge
+                ? []
+                : [
+                    {
+                      type: 'action',
+                      icon: faWindowRestore,
+                      label: t('pages.server.files.button.openInVirtualWindow', {}),
+                      onClick: openInVirtualWindow,
+                    },
+                    {
+                      type: 'action',
+                      icon: faWindowMaximize,
+                      label: t('pages.server.files.button.openInPopup', {}),
+                      onClick: openInPopup,
+                    },
+                    {
+                      type: 'action',
+                      icon: faArrowUpRightFromSquare,
+                      label: t('pages.server.files.button.openInNewTab', {}),
+                      onClick: openInNewTab,
+                    },
+                  ],
               canAccess: canReadContent,
             }
           : {
               type: 'action',
               icon: faArrowUpRightFromSquare,
               label: t('pages.server.files.button.openInNewTab', {}),
-              hidden: !openMode.openable || !!upload,
+              hidden: (!openMode.openable && !tooLarge) || !!upload,
+              disabled: tooLarge,
+              tooltip: tooLargeTooltip,
               onClick: openInNewTab,
               canAccess: canReadContent,
             },

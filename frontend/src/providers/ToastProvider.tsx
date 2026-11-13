@@ -11,6 +11,7 @@ import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
 import { useToastPosition } from '@/plugins/toast/useToastPosition.ts';
 import {
+  AddToastOptions,
   PendingToast,
   ProgressToastOptions,
   pendingToastDelay,
@@ -114,6 +115,7 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastsRef = useRef<Toast[]>([]);
   const toastId = useRef(1);
+  const dismissedCallbacks = useRef(new Map<number, () => void>());
 
   const setToastList = useCallback((update: (prev: Toast[]) => Toast[]) => {
     const next = update(toastsRef.current);
@@ -134,6 +136,10 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
       if (event.cancelled) return;
 
       setToastList((prev) => prev.filter((t) => t.id !== id));
+
+      const onDismissed = dismissedCallbacks.current.get(id);
+      dismissedCallbacks.current.delete(id);
+      onDismissed?.();
     },
     [setToastList],
   );
@@ -155,14 +161,22 @@ const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   );
 
   const addToast = useCallback(
-    (message: ReactNode, typeOrActions?: ToastType | ToastAction[], maybeActions?: ToastAction[]) => {
+    (
+      message: ReactNode,
+      typeOrActions?: ToastType | ToastAction[],
+      maybeActions?: ToastAction[],
+      options?: AddToastOptions,
+    ) => {
       const type = Array.isArray(typeOrActions) ? 'success' : (typeOrActions ?? 'success');
       const actions = Array.isArray(typeOrActions) ? typeOrActions : maybeActions;
 
       const { id, shown } = showToast('toast', { message, type, actions, withCloseButton: true });
 
       if (shown) {
-        setTimeout(() => dismissToastWithReason(id, 'timeout'), toastTimeout);
+        if (options?.onDismissed) dismissedCallbacks.current.set(id, options.onDismissed);
+        if (!options?.persistent) setTimeout(() => dismissToastWithReason(id, 'timeout'), toastTimeout);
+      } else {
+        options?.onDismissed?.();
       }
 
       return id;

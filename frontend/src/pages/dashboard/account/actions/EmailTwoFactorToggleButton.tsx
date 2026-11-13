@@ -1,4 +1,4 @@
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useModalsStack } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -10,11 +10,13 @@ import disableEmailTwoFactor from '@/api/me/account/disableEmailTwoFactor.ts';
 import enableEmailTwoFactor from '@/api/me/account/enableEmailTwoFactor.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import { withTwoFactorMethod } from '@/lib/auth/twoFactor.ts';
@@ -25,12 +27,14 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import { useTwoFactorRequirement } from '../useTwoFactorRequirement.ts';
 
 export default function EmailTwoFactorToggleButton() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
   const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
+  const { isLastAcceptedMethod } = useTwoFactorRequirement();
 
   const enabled = Boolean(user?.emailTwoFactorEnabled);
 
@@ -38,6 +42,7 @@ export default function EmailTwoFactorToggleButton() {
 
   const [loading, setLoading] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  const [unavailable, setUnavailable] = useState(false);
 
   const form = useForm<z.infer<typeof dashboardEmailTwoFactorToggleSchema>>({
     initialValues: {
@@ -73,7 +78,15 @@ export default function EmailTwoFactorToggleButton() {
         stageStack.open('recovery');
       })
       .catch((msg) => {
-        addToast(httpErrorToHuman(msg), 'error');
+        const message = httpErrorToHuman(msg);
+        if (message === 'email two-factor authentication is not available') {
+          setUnavailable(true);
+          stageStack.closeAll();
+          addToast(t('pages.account.account.containers.emailTwoFactor.tooltip.unavailable', {}), 'error');
+          return;
+        }
+
+        addToast(message, 'error');
       })
       .finally(() => setLoading(false));
   };
@@ -126,6 +139,12 @@ export default function EmailTwoFactorToggleButton() {
                     email: user?.email ?? '',
                   }).md()}
             </Text>
+
+            {enabled && isLastAcceptedMethod('email') && (
+              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
+              </Alert>
+            )}
 
             {user?.hasPassword && (
               <PasswordInput
@@ -188,11 +207,20 @@ export default function EmailTwoFactorToggleButton() {
         </Modal>
       </Modal.Stack>
 
-      <Button color={enabled ? 'red' : undefined} onClick={() => stageStack.open('toggle')}>
-        {enabled
-          ? t('pages.account.account.containers.twoFactor.button.disableEmail', {})
-          : t('pages.account.account.containers.twoFactor.button.enableEmail', {})}
-      </Button>
+      <ConditionalTooltip
+        enabled={!enabled && unavailable}
+        label={t('pages.account.account.containers.emailTwoFactor.tooltip.unavailable', {})}
+      >
+        <Button
+          color={enabled ? 'red' : undefined}
+          disabled={!enabled && unavailable}
+          onClick={() => stageStack.open('toggle')}
+        >
+          {enabled
+            ? t('pages.account.account.containers.twoFactor.button.disableEmail', {})
+            : t('pages.account.account.containers.twoFactor.button.enableEmail', {})}
+        </Button>
+      </ConditionalTooltip>
     </>
   );
 }

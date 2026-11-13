@@ -1,8 +1,10 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { z } from 'zod';
+import getDatabaseInstances from '@/api/server/databases/instances/getDatabaseInstances.ts';
 import createScheduleStep from '@/api/server/schedules/steps/createScheduleStep.ts';
 import updateScheduleStep from '@/api/server/schedules/steps/updateScheduleStep.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -22,6 +24,7 @@ import {
   scheduleStepLabelMapping,
   scheduleStepSelectionOrder,
 } from '@/lib/enums.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import {
   serverScheduleSchema,
   serverScheduleStepActionSchema,
@@ -29,6 +32,7 @@ import {
   serverScheduleStepUpdateSchema,
 } from '@/lib/schemas/server/schedules.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
@@ -132,6 +136,29 @@ export default function StepCreateOrUpdateModal({
     }
   }, [props.opened]);
 
+  const canReadInstances = useServerCan('database-instances.read');
+  const { data: instancePage } = useQuery({
+    queryKey: [...queryKeys.server(server.uuid).databases.instances.all(), 'any'],
+    queryFn: () => getDatabaseInstances(server.uuid, 1, undefined, 1),
+    enabled: props.opened && canReadInstances,
+  });
+
+  type StepType = z.infer<typeof serverScheduleStepActionSchema>['type'];
+  const databaseStepReason = !canReadInstances
+    ? t('pages.server.schedules.form.stepUnavailable.noInstanceAccess', {})
+    : instancePage && instancePage.total === 0
+      ? t('pages.server.schedules.form.stepUnavailable.noInstances', {})
+      : null;
+  const noBackupsReason =
+    server.featureLimits.backups === 0 ? t('pages.server.schedules.form.stepUnavailable.noBackups', {}) : null;
+  const unavailableReasons: Partial<Record<StepType, string | null>> = {
+    create_backup: noBackupsReason,
+    create_database_backup: noBackupsReason ?? databaseStepReason,
+    restore_database_backup: databaseStepReason,
+    delete_database_backup: databaseStepReason,
+    move_database_backup: databaseStepReason,
+  };
+
   const editedStepUuid = propStep?.uuid ?? '';
   const variableIssues =
     analyzeScheduleVariables(schedule, [
@@ -163,13 +190,15 @@ export default function StepCreateOrUpdateModal({
               .map((value) => ({
                 value,
                 label: scheduleStepLabelMapping[value](),
+                disabled: !!unavailableReasons[value] && value !== form.values.action.type,
               })),
           }))}
           renderOption={({ option }) => (
             <Stack gap={0}>
               <Text size='sm'>{option.label}</Text>
-              <Text size='xs' c='dimmed'>
-                {scheduleStepDescriptionMapping[option.value as keyof typeof scheduleStepDescriptionMapping]()}
+              <Text size='xs' c={unavailableReasons[option.value as StepType] ? 'yellow' : 'dimmed'}>
+                {unavailableReasons[option.value as StepType] ??
+                  scheduleStepDescriptionMapping[option.value as keyof typeof scheduleStepDescriptionMapping]()}
               </Text>
             </Stack>
           )}
@@ -249,6 +278,12 @@ export default function StepCreateOrUpdateModal({
           <StepHttpRequest form={form} />
         ) : (
           <Text c='dimmed'>{t('pages.server.schedules.form.actionType', {})}</Text>
+        )}
+
+        {unavailableReasons[form.values.action.type] && (
+          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+            {unavailableReasons[form.values.action.type]}
+          </Alert>
         )}
 
         {variableIssues.length > 0 && (

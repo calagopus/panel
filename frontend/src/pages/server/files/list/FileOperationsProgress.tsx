@@ -99,150 +99,154 @@ function FileOperationsProgress() {
   if (!hasOperations) return null;
 
   return (
-    <Popover position='bottom-start' shadow='md'>
-      <Popover.Target>
-        <UnstyledButton>
-          <RingProgress
-            size={50}
-            indeterminate={indeterminate}
-            sections={[
-              {
-                value: averageOperationProgress,
-                color: hasErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue',
-              },
-            ]}
-            roundCaps
-            thickness={4}
-            label={
-              <Text
-                c={hasErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue'}
-                fw={700}
-                ta='center'
-                size='xs'
-              >
-                {indeterminate ? fileOperations.size + uploadingFiles.size : `${averageOperationProgress.toFixed(0)}%`}
-              </Text>
-            }
-          />
-        </UnstyledButton>
-      </Popover.Target>
-      <Popover.Dropdown className='md:min-w-xl max-w-screen max-h-96 overflow-y-auto'>
-        <ExtensionSlot
-          components={
-            window.extensionContext.extensionRegistry.pages.server.files.fileOperationsProgress.prependedComponents
-          }
-          name='files-operationProgress-prepended'
-        />
+    <>
+      <ConfirmationModal
+        title={t('elements.fileUpload.cancelAllUploads', {})}
+        opened={openModal === 'cancelUploads'}
+        onClose={() => setOpenModal(null)}
+        onConfirmed={() => {
+          setOpenModal(null);
+          cancelAllUploads();
+        }}
+        confirm={t('elements.fileUpload.cancelAllUploads', {})}
+        zIndex={1000}
+      >
+        {t('elements.fileUpload.modal.cancelAllUploads.content', {})}
+      </ConfirmationModal>
 
-        {isRateLimited && (
-          <Text size='xs' c='orange' mb='sm'>
-            {t('elements.fileUpload.rateLimited', {})}
-          </Text>
-        )}
+      <ConfirmationModal
+        title={t('pages.server.files.operations.cancelAllOperations', {})}
+        opened={openModal === 'cancelOperations'}
+        onClose={() => setOpenModal(null)}
+        onConfirmed={() => {
+          setOpenModal(null);
+          cancelAllOperations();
+        }}
+        confirm={t('pages.server.files.operations.cancelAllOperations', {})}
+        zIndex={1000}
+      >
+        {t('pages.server.files.modal.cancelAllOperations.content', {})}
+      </ConfirmationModal>
 
-        <ConfirmationModal
-          title={t('elements.fileUpload.cancelAllUploads', {})}
-          opened={openModal === 'cancelUploads'}
-          onClose={() => setOpenModal(null)}
-          onConfirmed={() => {
-            setOpenModal(null);
-            cancelAllUploads();
-          }}
-          confirm={t('elements.fileUpload.cancelAllUploads', {})}
-          zIndex={1000}
-        >
-          {t('elements.fileUpload.modal.cancelAllUploads.content', {})}
-        </ConfirmationModal>
-
-        <ConfirmationModal
-          title={t('pages.server.files.operations.cancelAllOperations', {})}
-          opened={openModal === 'cancelOperations'}
-          onClose={() => setOpenModal(null)}
-          onConfirmed={() => {
-            setOpenModal(null);
-            cancelAllOperations();
-          }}
-          confirm={t('pages.server.files.operations.cancelAllOperations', {})}
-          zIndex={1000}
-        >
-          {t('pages.server.files.modal.cancelAllOperations.content', {})}
-        </ConfirmationModal>
-
-        <div className='flex gap-2 mb-3'>
-          {uploadingFiles.size > 0 && (
-            <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelUploads')}>
-              {t('elements.fileUpload.cancelAllUploads', {})}
-            </Button>
-          )}
-          {fileOperations.size > 0 && canUpdate && (
-            <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelOperations')}>
-              {t('pages.server.files.operations.cancelAllOperations', {})}
-            </Button>
-          )}
-        </div>
-
-        {Array.from(aggregatedUploadProgress).map(([folderName, info]) => (
-          <UploadFolderRow
-            key={folderName}
-            folderName={folderName}
-            info={info}
-            isRateLimited={isRateLimited}
-            onCancel={() => cancelFolderUpload(folderName)}
-          />
-        ))}
-
-        {Array.from(uploadingFiles).map(([key, file]) => {
-          if (aggregatedUploadProgress.size > 0 && file.filePath.includes('/')) {
-            return null;
-          }
-
-          return (
-            <UploadFileRow
-              key={key}
-              fileKey={key}
-              file={file}
-              isRateLimited={isRateLimited}
-              onCancel={() => cancelFileUpload(key)}
-              onReselect={() => {
-                reselectKeyRef.current = key;
-                reselectInputRef.current?.click();
-              }}
+      <Popover position='bottom-start' shadow='md'>
+        <Popover.Target>
+          <UnstyledButton>
+            <RingProgress
+              size={50}
+              indeterminate={indeterminate}
+              sections={[
+                {
+                  value: averageOperationProgress,
+                  color: hasErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue',
+                },
+              ]}
+              roundCaps
+              thickness={4}
+              label={
+                <Text
+                  c={hasErrors ? 'red' : isRateLimited ? 'orange' : uploadingFiles.size > 0 ? 'green' : 'blue'}
+                  fw={700}
+                  ta='center'
+                  size='xs'
+                >
+                  {indeterminate
+                    ? fileOperations.size + uploadingFiles.size
+                    : `${averageOperationProgress.toFixed(0)}%`}
+                </Text>
+              }
             />
-          );
-        })}
-
-        {Array.from(fileOperations).map(([uuid, operation]) => (
-          <FileOperationRow
-            key={uuid}
-            uuid={uuid}
-            operation={operation}
-            failedAt={failedFileOperations.get(uuid)}
-            onCancel={doCancelOperation}
-            onRemove={removeFileOperation}
+          </UnstyledButton>
+        </Popover.Target>
+        <Popover.Dropdown className='md:min-w-xl max-w-screen max-h-96 overflow-y-auto'>
+          <ExtensionSlot
+            components={
+              window.extensionContext.extensionRegistry.pages.server.files.fileOperationsProgress.prependedComponents
+            }
+            name='files-operationProgress-prepended'
           />
-        ))}
 
-        <ExtensionSlot
-          components={
-            window.extensionContext.extensionRegistry.pages.server.files.fileOperationsProgress.appendedComponents
-          }
-          name='files-operationProgress-appended'
-        />
+          {isRateLimited && (
+            <Text size='xs' c='orange' mb='sm'>
+              {t('elements.fileUpload.rateLimited', {})}
+            </Text>
+          )}
 
-        <input
-          ref={reselectInputRef}
-          type='file'
-          className='hidden'
-          onChange={(event) => {
-            const key = reselectKeyRef.current;
-            const file = event.target.files?.[0];
-            reselectKeyRef.current = null;
-            event.target.value = '';
-            if (key && file) resumeDetachedUpload(key, file);
-          }}
-        />
-      </Popover.Dropdown>
-    </Popover>
+          <div className='flex gap-2 mb-3'>
+            {uploadingFiles.size > 0 && (
+              <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelUploads')}>
+                {t('elements.fileUpload.cancelAllUploads', {})}
+              </Button>
+            )}
+            {fileOperations.size > 0 && canUpdate && (
+              <Button size='xs' variant='subtle' color='red' onClick={() => setOpenModal('cancelOperations')}>
+                {t('pages.server.files.operations.cancelAllOperations', {})}
+              </Button>
+            )}
+          </div>
+
+          {Array.from(aggregatedUploadProgress).map(([folderName, info]) => (
+            <UploadFolderRow
+              key={folderName}
+              folderName={folderName}
+              info={info}
+              isRateLimited={isRateLimited}
+              onCancel={() => cancelFolderUpload(folderName)}
+            />
+          ))}
+
+          {Array.from(uploadingFiles).map(([key, file]) => {
+            if (aggregatedUploadProgress.size > 0 && file.filePath.includes('/')) {
+              return null;
+            }
+
+            return (
+              <UploadFileRow
+                key={key}
+                fileKey={key}
+                file={file}
+                isRateLimited={isRateLimited}
+                onCancel={() => cancelFileUpload(key)}
+                onReselect={() => {
+                  reselectKeyRef.current = key;
+                  reselectInputRef.current?.click();
+                }}
+              />
+            );
+          })}
+
+          {Array.from(fileOperations).map(([uuid, operation]) => (
+            <FileOperationRow
+              key={uuid}
+              uuid={uuid}
+              operation={operation}
+              failedAt={failedFileOperations.get(uuid)}
+              onCancel={doCancelOperation}
+              onRemove={removeFileOperation}
+            />
+          ))}
+
+          <ExtensionSlot
+            components={
+              window.extensionContext.extensionRegistry.pages.server.files.fileOperationsProgress.appendedComponents
+            }
+            name='files-operationProgress-appended'
+          />
+
+          <input
+            ref={reselectInputRef}
+            type='file'
+            className='hidden'
+            onChange={(event) => {
+              const key = reselectKeyRef.current;
+              const file = event.target.files?.[0];
+              reselectKeyRef.current = null;
+              event.target.value = '';
+              if (key && file) resumeDetachedUpload(key, file);
+            }}
+          />
+        </Popover.Dropdown>
+      </Popover>
+    </>
   );
 }
 

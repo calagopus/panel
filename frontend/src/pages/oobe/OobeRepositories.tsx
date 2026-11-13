@@ -173,6 +173,9 @@ export default function OobeRepositories({ onNext, onBack, canGoBack, skipFrom, 
         </Stack>
 
         <Group justify='flex-end'>
+          <Text size='xs' c='dimmed' className='flex-1' miw={200}>
+            {t('pages.oobe.eggRepositories.skipHint', {})}
+          </Text>
           {canGoBack && (
             <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
               Back

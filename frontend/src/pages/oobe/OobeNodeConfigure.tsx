@@ -13,6 +13,7 @@ import Alert from '@/elements/feedback/Alert.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import Code from '@/elements/typography/Code.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { handleCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import {
@@ -176,6 +177,9 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
       </div>
 
       <Group justify='flex-end'>
+        <Text size='xs' c='dimmed' className='flex-1' miw={200}>
+          {t('pages.oobe.nodeConfiguration.skipHint', {})}
+        </Text>
         {canGoBack && (
           <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
             Back

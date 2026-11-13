@@ -20,9 +20,13 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-interface DndEggVariable extends z.infer<typeof adminEggVariableSchema>, DndItem {
+type EggVariableItem = z.infer<typeof adminEggVariableSchema> & { clientId?: string };
+
+interface DndEggVariable extends EggVariableItem, DndItem {
   id: string;
 }
+
+let nextClientId = 0;
 
 const MemoizedEggVariableContainer = memo(EggVariableContainer);
 
@@ -40,7 +44,7 @@ export default function AdminEggVariables({
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
-  const [eggVariables, setEggVariables] = useState<z.infer<typeof adminEggVariableSchema>[]>([]);
+  const [eggVariables, setEggVariables] = useState<EggVariableItem[]>([]);
 
   const loadVariables = () => {
     setLoading(true);
@@ -60,7 +64,8 @@ export default function AdminEggVariables({
   useEffect(loadVariables, []);
 
   const addVariable = () => {
-    const newVariable: z.infer<typeof adminEggVariableSchema> = {
+    const newVariable: EggVariableItem = {
+      clientId: `new-${++nextClientId}`,
       uuid: '',
       name: '',
       nameTranslations: {},
@@ -83,7 +88,7 @@ export default function AdminEggVariables({
   const sortedEggVariables = useMemo(() => [...eggVariables].sort((a, b) => a.order - b.order), [eggVariables]);
 
   const dndEggVariables: DndEggVariable[] = useMemo(
-    () => sortedEggVariables.map((variable) => ({ ...variable, id: variable.uuid })),
+    () => sortedEggVariables.map((variable) => ({ ...variable, id: variable.uuid || variable.clientId || '' })),
     [sortedEggVariables],
   );
 
@@ -139,7 +144,7 @@ export default function AdminEggVariables({
               await updateEggVariableOrder(
                 contextNest.uuid,
                 contextEgg.uuid,
-                reorderedVariables.map((s) => s.uuid),
+                reorderedVariables.filter((s) => s.uuid).map((s) => s.uuid),
               ).catch((error) => {
                 addToast(httpErrorToHuman(error), 'error');
                 setEggVariables(eggVariables);
@@ -163,14 +168,14 @@ export default function AdminEggVariables({
         >
           {(items) => (
             <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4'>
-              {items.map((variable, index) => (
+              {items.map((variable) => (
                 <SortableItem
                   key={variable.id}
                   id={variable.id}
                   disabled={!canUpdate}
                   renderItem={({ dragHandleProps }) => (
                     <MemoizedEggVariableContainer
-                      key={variable.uuid ?? index}
+                      key={variable.id}
                       contextNest={contextNest}
                       contextEgg={contextEgg}
                       contextVariable={variable}

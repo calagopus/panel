@@ -24,6 +24,8 @@ export default function SystemBackupPolicyAddDatabaseAgentHostModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.databaseAgentHosts', {})}
+      createAction={{ to: '/admin/database-agent-hosts/new', permission: 'database-agent-hosts.create' }}
       title={t('pages.admin.systemBackupPolicies.tabs.databaseAgentHosts.page.modal.add.title', {})}
       label={t('common.form.databaseAgentHost', {})}
       data={databaseAgentHosts.items.map((host) => ({ label: host.name, value: host.uuid }))}

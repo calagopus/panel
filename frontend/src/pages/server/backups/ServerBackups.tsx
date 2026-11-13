@@ -15,7 +15,6 @@ import {
 import { z } from 'zod';
 import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
 import getBackups from '@/api/server/backups/getBackups.ts';
-import getBackupUsage from '@/api/server/backups/getBackupUsage.ts';
 import getBackupGroups from '@/api/server/backups/groups/getBackupGroups.ts';
 import updateBackupGroupsOrder from '@/api/server/backups/groups/updateBackupGroupsOrder.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -49,6 +48,7 @@ import BackupsSubNavigation from './BackupsSubNavigation.tsx';
 import { getBackupColumns } from './columns.ts';
 import BackupCreateModal from './modals/BackupCreateModal.tsx';
 import BackupGroupCreateModal from './modals/BackupGroupCreateModal.tsx';
+import { useBackupCreateGate } from './useBackupCreateGate.ts';
 import { useBackupSelection } from './useBackupSelection.ts';
 
 interface DndBackupGroup extends z.infer<typeof serverBackupGroupSchema>, DndItem {
@@ -138,10 +138,7 @@ export default function ServerBackups({
     enabled: (showGroups || showGroupLabels) && canReadGroups,
   });
 
-  const { data: usage, isError: usageFailed } = useQuery({
-    queryKey: queryKeys.server(server.uuid).backups.usage(),
-    queryFn: () => getBackupUsage(server.uuid),
-  });
+  const { usage, usageFailed, expendable } = useBackupCreateGate();
 
   const canSelect = useServerCan(['backups.update', 'backups.delete']);
   const [expandedGroups] = useUserSetting('server::backup_groups_expanded', expandedMapSchema, EMPTY_EXPANDED_MAP);
@@ -215,15 +212,20 @@ export default function ServerBackups({
   // the section list is filtered to one kind, so its fallback understates the shared limit
   const usageUnknown = !usage && variant === 'section';
   const countKnown = usage !== undefined || usageFailed;
-  const createDisabled = !countKnown || atBackupLimit || usageUnknown || createBlockedReason !== null;
-  const createTooltip = atBackupLimit
-    ? t(
-        variant === 'page'
-          ? 'pages.server.backups.tooltip.limitReached'
-          : 'pages.server.databases.instance.backups.tooltip.limitReached',
-        { max: server.featureLimits.backups },
-      )
-    : (createBlockedReason ?? '');
+  const blockedByLimit = atBackupLimit && !expendable;
+  const createDisabled = !countKnown || blockedByLimit || usageUnknown || createBlockedReason !== null;
+  const createTooltip =
+    createBlockedReason ??
+    (blockedByLimit
+      ? t(
+          variant === 'page'
+            ? 'pages.server.backups.tooltip.limitReached'
+            : 'pages.server.databases.instance.backups.tooltip.limitReached',
+          { max: server.featureLimits.backups },
+        )
+      : atBackupLimit && expendable
+        ? t('pages.server.backups.tooltip.evicts', { max: server.featureLimits.backups, name: expendable.name })
+        : '');
 
   const groupsSettled = !canReadGroups || groups !== undefined;
   const isEmpty =
@@ -234,7 +236,8 @@ export default function ServerBackups({
     !error &&
     !debouncedSearch &&
     totalBackupCount === 0;
-  const showCreateGroup = showGroups && canCreateGroup && sortedGroups.length < maxBackupGroupCount;
+  const showCreateGroup = showGroups && canCreateGroup;
+  const groupLimitReached = sortedGroups.length >= maxBackupGroupCount;
   const canReorderGroups = canUpdateGroups && sortedGroups.length > 1;
 
   const subtitle =
@@ -257,7 +260,7 @@ export default function ServerBackups({
 
   const createControl =
     canCreateBackup && !showCreateGroup ? (
-      <ConditionalTooltip enabled={createDisabled && !!createTooltip} label={createTooltip}>
+      <ConditionalTooltip enabled={!!createTooltip} label={createTooltip}>
         <Button
           disabled={createDisabled}
           onClick={() => setOpenModal('createBackup')}
@@ -277,6 +280,7 @@ export default function ServerBackups({
               label: t('pages.server.backups.button.createBackup', {}),
               onClick: () => setOpenModal('createBackup'),
               disabled: createDisabled,
+              tooltip: createTooltip || undefined,
               color: 'gray',
               canAccess: canCreateBackup,
             },
@@ -285,6 +289,10 @@ export default function ServerBackups({
               icon: faLayerGroup,
               label: t('pages.server.backups.button.createGroup', {}),
               onClick: () => setOpenModal('createGroup'),
+              disabled: groupLimitReached,
+              tooltip: groupLimitReached
+                ? t('pages.server.backups.tooltip.groupLimitReached', { max: maxBackupGroupCount })
+                : undefined,
               color: 'gray',
               canAccess: showCreateGroup,
             },

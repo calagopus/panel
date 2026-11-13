@@ -1,3 +1,5 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -32,6 +34,7 @@ import { useUnsavedChanges } from '@/plugins/form/useFormDraft.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import { useAdminStore } from '@/stores/admin.tsx';
 import EmailVariablesSection from './EmailVariablesSection.tsx';
 
 const templateFormSchema = z.object({
@@ -43,6 +46,8 @@ export default function EmailTemplatesContainer() {
   const { addToast } = useToast();
   const { t, tReact } = useTranslations();
   const queryClient = useQueryClient();
+  const emailTwoFactorEnabled = useAdminStore((state) => state.app.emailTwoFactorEnabled);
+  const emailVerificationRequired = useAdminStore((state) => state.app.emailVerificationRequired);
 
   const [selectedIdentifier, setSelectedIdentifier] = useState<string | null>(null);
   const [editorContent, setEditorContent] = useState<string>('');
@@ -118,6 +123,13 @@ export default function EmailTemplatesContainer() {
   const isContentDirty =
     template !== undefined && editorContent !== '' && editorContent !== (template.content ?? template.defaultContent);
 
+  const dependentFeature =
+    selectedIdentifier === 'two_factor_code' && emailTwoFactorEnabled
+      ? t('pages.admin.settings.tabs.mailTemplates.page.alert.disabledTwoFactor', {})
+      : selectedIdentifier === 'email_verification' && emailVerificationRequired
+        ? t('pages.admin.settings.tabs.mailTemplates.page.alert.disabledVerification', {})
+        : null;
+
   const blocker = useUnsavedChanges('mailTemplates', isContentDirty || form.isDirty());
 
   const doSave = () => {
@@ -126,9 +138,11 @@ export default function EmailTemplatesContainer() {
     setSaving(true);
 
     const payload: { content?: string | null; subject?: string | null; enabled?: boolean } = {
-      subject: form.values.subject,
       enabled: form.values.enabled,
     };
+    if (form.isDirty('subject')) {
+      payload.subject = form.values.subject === template.defaultSubject ? null : form.values.subject;
+    }
     if (isContentDirty) payload.content = editorContent;
 
     updateEmailTemplate(selectedIdentifier, payload)
@@ -327,6 +341,11 @@ export default function EmailTemplatesContainer() {
                         {...form.getInputProps('enabled', { type: 'checkbox' })}
                       />
                     </Group>
+                    {!form.values.enabled && dependentFeature && (
+                      <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                        {dependentFeature}
+                      </Alert>
+                    )}
                   </Stack>
 
                   <Divider />

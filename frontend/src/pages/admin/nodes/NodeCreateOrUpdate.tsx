@@ -9,6 +9,7 @@ import getLocations from '@/api/admin/locations/getLocations.ts';
 import createNodeAllocations from '@/api/admin/nodes/allocations/createNodeAllocations.ts';
 import createNode from '@/api/admin/nodes/createNode.ts';
 import deleteNode from '@/api/admin/nodes/deleteNode.ts';
+import getNodeCapacities from '@/api/admin/nodes/getNodeCapacities.ts';
 import pairNode from '@/api/admin/nodes/pairNode.ts';
 import resetNodeToken from '@/api/admin/nodes/resetNodeToken.ts';
 import updateNode from '@/api/admin/nodes/updateNode.ts';
@@ -25,6 +26,7 @@ import Group from '@/elements/layout/Group.tsx';
 import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { isNodeAIO } from '@/lib/domain/node.ts';
 import { resolvePorts } from '@/lib/network/ip.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
@@ -37,6 +39,7 @@ import NodePairingConnect, { NodePairingTarget } from '@/pages/admin/nodes/pairi
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useNodeOnlineWait } from '@/plugins/nodes/useNodeOnlineWait.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useResource } from '@/plugins/resource/useResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -104,6 +107,14 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
     fetcher: (page, search) => getBackupConfigurations(page, search),
     defaultSearchValue: contextNode?.backupConfiguration?.name,
   });
+
+  const { data: capacities } = useResource({
+    queryKey: queryKeys.admin.nodes.capacities(),
+    queryFn: getNodeCapacities,
+    enabled: !!contextNode,
+    silent: true,
+  });
+  const nodeServers = contextNode ? (capacities?.[contextNode.uuid]?.servers ?? 0) : 0;
 
   const doResetToken = () => {
     if (!contextNode) return;
@@ -306,9 +317,21 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
                 </Button>
               </AdminCan>
               <AdminCan action='nodes.delete' cantDelete>
-                <Button color='red' onClick={() => setOpenModal('delete')} loading={loading}>
-                  {t('common.button.delete', {})}
-                </Button>
+                <ConditionalTooltip
+                  enabled={nodeServers > 0}
+                  label={t('pages.admin.nodes.tabs.general.page.tooltip.deleteBlocked', {
+                    count: String(nodeServers),
+                  })}
+                >
+                  <Button
+                    color='red'
+                    onClick={() => setOpenModal('delete')}
+                    loading={loading}
+                    disabled={nodeServers > 0}
+                  >
+                    {t('common.button.delete', {})}
+                  </Button>
+                </ConditionalTooltip>
               </AdminCan>
             </>
           )}

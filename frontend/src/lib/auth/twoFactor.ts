@@ -19,3 +19,30 @@ export function withTwoFactorMethod(
     twoFactorSatisfied: acceptedMethods.some((m) => twoFactorMethods.includes(m)),
   };
 }
+
+export interface TwoFactorAvailability {
+  webauthnEnabled: boolean;
+  emailTwoFactorEnabled: boolean;
+  mailConfigured?: boolean;
+}
+
+export function isTwoFactorMethodAvailable(
+  method: z.infer<typeof twoFactorMethod>,
+  availability: TwoFactorAvailability,
+): boolean {
+  switch (method) {
+    case 'totp':
+      return true;
+    case 'security_key':
+      return availability.webauthnEnabled;
+    case 'email':
+      return availability.emailTwoFactorEnabled && availability.mailConfigured !== false;
+  }
+}
+
+export function hasAvailableTwoFactorMethod(
+  acceptedMethods: z.infer<typeof twoFactorMethod>[],
+  availability: TwoFactorAvailability,
+): boolean {
+  return acceptedMethods.some((method) => isTwoFactorMethodAvailable(method, availability));
+}

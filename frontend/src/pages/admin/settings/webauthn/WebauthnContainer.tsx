@@ -5,6 +5,7 @@ import AdminSubContentContainer from '@/elements/containers/AdminSubContentConta
 import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { hasAvailableTwoFactorMethod } from '@/lib/auth/twoFactor.ts';
 import { isIP } from '@/lib/network/ip.ts';
 import { adminSettingsWebauthnSchema } from '@/lib/schemas/admin/settings.ts';
 import { useFormDraft } from '@/plugins/form/useFormDraft.ts';
@@ -22,6 +23,8 @@ export default function WebauthnContainer() {
   const { addToast } = useToast();
   const { t } = useTranslations();
   const webauthn = useAdminStore((state) => state.webauthn);
+  const app = useAdminStore((state) => state.app);
+  const mailMode = useAdminStore((state) => state.mailMode);
 
   const form = useFormEngine<WebauthnFormValues>('admin.settings.webauthn', {
     schema: adminSettingsWebauthnSchema,
@@ -52,7 +55,15 @@ export default function WebauthnContainer() {
     });
   };
 
-  const fields = useWebauthnFormFields();
+  const twoFactorLockedOn =
+    form.values.enabled &&
+    !hasAvailableTwoFactorMethod(app.twoFactorAcceptedMethods, {
+      webauthnEnabled: false,
+      emailTwoFactorEnabled: app.emailTwoFactorEnabled,
+      mailConfigured: mailMode.type !== 'none',
+    });
+
+  const fields = useWebauthnFormFields({ disableLocked: twoFactorLockedOn });
 
   return (
     <AdminSubContentContainer title={t('pages.admin.settings.tabs.webauthn.page.title', {})} titleOrder={2}>

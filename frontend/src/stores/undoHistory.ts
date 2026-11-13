@@ -39,6 +39,10 @@ export function pushUndoEntry(scope: string, undo: () => void | Promise<void>): 
   return id;
 }
 
+export function removeUndoEntry(id: number): void {
+  takeUndoEntry((entry) => entry.id === id);
+}
+
 function takeUndoEntry(match: (entry: UndoEntry) => boolean): UndoEntry | null {
   const current = useUndoHistoryStore.getState().entries;
   const now = Date.now();

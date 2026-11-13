@@ -23,6 +23,8 @@ export default function MountAddNodeModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.nodes', {})}
+      createAction={{ to: '/admin/nodes/new', permission: 'nodes.create' }}
       title={t('pages.admin.mounts.tabs.nodes.page.modal.add.title', {})}
       label={t('common.form.node', {})}
       data={nodes.items.map((node) => ({ label: node.name, value: node.uuid }))}

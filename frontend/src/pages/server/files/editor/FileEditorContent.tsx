@@ -13,7 +13,9 @@ import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco
 import { type OnMount } from '@/lib/editor/monacoLoader.ts';
 import useEditorFontSizeZoom from '@/pages/server/files/hooks/useEditorFontSizeZoom.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
+import { addEditorSaveAction } from './addEditorSaveAction.ts';
 import { FileAudioPreview, FileImagePreview } from './FileMediaPreview.tsx';
 
 type FileEditorAction = (typeof window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions)[number];
@@ -63,6 +65,7 @@ export default function FileEditorContent({
   pierreEditorRef,
   saveShortcutRef,
 }: FileEditorContentProps) {
+  const { t } = useTranslations();
   const instanceId = useId();
   const serverUuid = useServerStore((state) => state.server.uuid);
   const modelPath = fileModelUri(serverUuid, context?.path ?? fileName, instanceId);
@@ -141,9 +144,7 @@ export default function FileEditorContent({
             editor.onDidChangeModelContent(() => {
               handleContentChange(editor.getValue());
             });
-            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-              saveShortcutRef.current();
-            });
+            addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveShortcutRef.current());
             registerTomlLanguage(monaco);
             registerHoconLanguage(monaco);
           }}

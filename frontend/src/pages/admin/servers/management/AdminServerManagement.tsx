@@ -6,6 +6,7 @@ import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
+import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useServerManagementActions } from '@/pages/admin/servers/management/serverManagementActions.tsx';
 import TrashCard from '@/pages/admin/servers/management/TrashCard.tsx';
@@ -48,9 +49,15 @@ export default function AdminServerManagement({ server }: { server: AdminServer 
             <Stack h='100%'>
               {action.cardContent}
               <Group mt='auto'>
-                <Button color={action.color} onClick={() => doOpenModal(action.modal)}>
-                  {action.cardButtonLabel}
-                </Button>
+                <ConditionalTooltip enabled={!!action.disabledReason} label={action.disabledReason}>
+                  <Button
+                    color={action.color}
+                    disabled={!!action.disabledReason}
+                    onClick={() => doOpenModal(action.modal)}
+                  >
+                    {action.cardButtonLabel}
+                  </Button>
+                </ConditionalTooltip>
               </Group>
             </Stack>
           </TitleCard>

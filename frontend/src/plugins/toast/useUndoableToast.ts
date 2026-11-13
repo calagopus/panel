@@ -2,7 +2,7 @@ import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { ReactNode } from 'react';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { pushUndoEntry, runUndoEntry } from '@/stores/undoHistory.ts';
+import { pushUndoEntry, removeUndoEntry, runUndoEntry } from '@/stores/undoHistory.ts';
 
 export function useUndoableToast(scope: string) {
   const { t } = useTranslations();
@@ -11,19 +11,33 @@ export function useUndoableToast(scope: string) {
   return (message: ReactNode, undo: (() => void | Promise<void>) | null): number => {
     if (!undo) return addToast(message, 'success');
 
-    let toastId = 0;
-    const entryId = pushUndoEntry(scope, () => {
-      updateToast(toastId, { progress: null, actions: [] });
-      return Promise.resolve(undo()).finally(() => dismissToast(toastId));
-    });
+    let entryId: number | null = null;
+    let dismissed = false;
 
-    toastId = addToast(message, [
+    const toastId = addToast(
+      message,
+      'success',
+      [
+        {
+          name: t('common.button.undo', {}),
+          icon: faArrowLeftLong,
+          onClick: () => (entryId === null ? undefined : runUndoEntry(entryId)),
+        },
+      ],
       {
-        name: t('common.button.undo', {}),
-        icon: faArrowLeftLong,
-        onClick: () => runUndoEntry(entryId),
+        onDismissed: () => {
+          dismissed = true;
+          if (entryId !== null) removeUndoEntry(entryId);
+        },
       },
-    ]);
+    );
+
+    if (!dismissed) {
+      entryId = pushUndoEntry(scope, () => {
+        updateToast(toastId, { progress: null, actions: [] });
+        return Promise.resolve(undo()).finally(() => dismissToast(toastId));
+      });
+    }
 
     return toastId;
   };

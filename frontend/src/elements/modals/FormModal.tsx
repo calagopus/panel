@@ -12,7 +12,14 @@ type FormModalProps = Omit<ModalProps, 'children' | 'onSubmit'> & {
 export default function FormModal({ onSubmit, isDirty = false, loading = false, children, ...props }: FormModalProps) {
   return (
     <Modal {...props} closeOnEscape={!isDirty && !loading}>
-      <form onSubmit={onSubmit}>{children}</form>
+      <form
+        onSubmit={(e) => {
+          e.stopPropagation();
+          onSubmit(e);
+        }}
+      >
+        {children}
+      </form>
     </Modal>
   );
 }

@@ -1,3 +1,5 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { FormEvent, useEffect, useState } from 'react';
@@ -5,6 +7,7 @@ import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import disableTwoFactor from '@/api/me/account/disableTwoFactor.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import HiddenUsernameInput from '@/elements/input/HiddenUsernameInput.tsx';
 import PasswordInput from '@/elements/input/PasswordInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -19,12 +22,14 @@ import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
+import { useTwoFactorRequirement } from '../useTwoFactorRequirement.ts';
 
 export default function TwoFactorDisableButton() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user, setUser } = useAuth();
   const twoFactorAcceptedMethods = useGlobalStore((state) => state.settings.app.twoFactorAcceptedMethods);
+  const { isLastAcceptedMethod } = useTwoFactorRequirement();
 
   const [openModal, setOpenModal] = useState<'disable' | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,6 +87,12 @@ export default function TwoFactorDisableButton() {
         <Stack>
           <HiddenUsernameInput username={user?.username ?? ''} />
           <Text>{t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.description', {}).md()}</Text>
+
+          {isLastAcceptedMethod('totp') && (
+            <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
+            </Alert>
+          )}
 
           <TextInput
             withAsterisk

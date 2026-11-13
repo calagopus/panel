@@ -6,17 +6,22 @@ import createBackup from '@/api/server/backups/createBackup.ts';
 import getBackupGroups from '@/api/server/backups/groups/getBackupGroups.ts';
 import getDatabaseInstances from '@/api/server/databases/instances/getDatabaseInstances.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import Alert from '@/elements/feedback/Alert.tsx';
 import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import { generateBackupName } from '@/lib/domain/server.ts';
 import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupCreateSchema } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceSchema } from '@/lib/schemas/server/databaseInstances.ts';
+import { useBackupCreateGate } from '@/pages/server/backups/useBackupCreateGate.ts';
+import DatabaseInstancePowerNotice from '@/pages/server/databases/instances/DatabaseInstancePowerNotice.tsx';
+import { useDatabaseInstancePowerState } from '@/pages/server/databases/instances/useDatabaseInstancePowerState.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -82,6 +87,10 @@ export default function BackupCreateModal({
 
   const sourceKindLocked = !!createDefaults?.databaseInstanceUuid;
   const isDatabase = form.values.databaseInstanceUuid !== null;
+  const noInstances = !instances.loading && !instances.search && instances.items.length === 0;
+  const power = useDatabaseInstancePowerState(form.values.databaseInstanceUuid, props.opened && canReadInstances);
+  const instanceNotRunning = isDatabase && power.state !== null && power.state !== 'running';
+  const createGate = useBackupCreateGate(props.opened);
 
   return (
     <FormModal
@@ -97,7 +106,7 @@ export default function BackupCreateModal({
 
         {canReadInstances && (
           <>
-            {!sourceKindLocked && (
+            {!sourceKindLocked && (!noInstances || isDatabase) && (
               <Select
                 label={t('pages.server.backups.modal.createBackup.source', {})}
                 data={[
@@ -126,6 +135,8 @@ export default function BackupCreateModal({
                 onChange={(value) => form.setFieldValue('databaseInstanceUuid', value ?? '')}
               />
             )}
+
+            {isDatabase && <DatabaseInstancePowerNotice power={power} action='backup' />}
           </>
         )}
 
@@ -153,11 +164,25 @@ export default function BackupCreateModal({
           />
         )}
 
+        {createGate.atLimit && createGate.expendable && (
+          <Alert color='yellow'>
+            <Text size='sm'>
+              {t('pages.server.backups.tooltip.evicts', {
+                max: server.featureLimits.backups,
+                name: createGate.expendable.name,
+              })}
+            </Text>
+          </Alert>
+        )}
+
         <ModalFooter>
           <Button
             type='submit'
             loading={loading}
-            disabled={!form.isValid() || (isDatabase && !form.values.databaseInstanceUuid)}
+            disabled={
+              !form.isValid() ||
+              (isDatabase && (!form.values.databaseInstanceUuid || power.loading || instanceNotRunning))
+            }
           >
             {t('common.button.create', {})}
           </Button>

@@ -24,6 +24,8 @@ export default function LocationDatabaseHostCreateModal({
   return (
     <ResourceSelectModal
       {...props}
+      nothingFoundMessage={t('elements.resourceSelectModal.empty.databaseHosts', {})}
+      createAction={{ to: '/admin/database-hosts/new', permission: 'database-hosts.create' }}
       title={t('pages.admin.locations.tabs.databaseHosts.page.modal.create.title', {})}
       label={t('common.form.databaseHost', {})}
       data={Object.values(groupDatabaseHostsByType(databaseHosts.items))}

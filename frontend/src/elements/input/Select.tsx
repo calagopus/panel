@@ -3,6 +3,7 @@ import {
   getOptionsLockup,
   getParsedComboboxData,
   Select as MantineSelect,
+  OptionsFilter,
   SelectProps as MantineSelectProps,
 } from '@mantine/core';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,6 +11,8 @@ import { makeComponentHookable } from 'shared';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import { InfiniteScroll, useInfiniteScrollOptions } from '@/elements/input/infiniteScrollOptions.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+
+const passthroughFilter: OptionsFilter = ({ options }) => options;
 
 export interface SelectProps extends MantineSelectProps {
   infiniteScroll?: InfiniteScroll;
@@ -34,7 +37,12 @@ const Select = forwardRef<HTMLInputElement, SelectProps>(
     ref,
   ) => {
     const { t } = useTranslations();
-    const infiniteOptions = useInfiniteScrollOptions({ infiniteScroll, data, filter, renderOption });
+    const infiniteOptions = useInfiniteScrollOptions({
+      infiniteScroll,
+      data,
+      filter: filter ?? (onSearchChange ? passthroughFilter : undefined),
+      renderOption,
+    });
 
     const optionsLockup = useMemo(() => getOptionsLockup(getParsedComboboxData(data)), [data]);
     const lastSelected = useRef<ComboboxItem | null>(null);

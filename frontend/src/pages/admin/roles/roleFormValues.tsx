@@ -27,6 +27,7 @@ export const roleToFormValues = (role: z.infer<typeof roleSchema>): Partial<Role
 
 export function useRoleFormFields(
   availablePermissions: z.infer<typeof apiPermissionsSchema>,
+  requireTwoFactorLocked: boolean,
 ): FieldDef<RoleFormValues>[] {
   const { t } = useTranslations();
 
@@ -52,7 +53,10 @@ export function useRoleFormFields(
       type: 'switch',
       name: 'requireTwoFactor',
       label: t('pages.admin.roles.tabs.general.page.form.requireTwoFactor', {}),
-      description: t('pages.admin.roles.tabs.general.page.form.requireTwoFactorDescription', {}),
+      description: requireTwoFactorLocked
+        ? t('pages.admin.roles.tabs.general.page.form.requireTwoFactorLocked', {})
+        : t('pages.admin.roles.tabs.general.page.form.requireTwoFactorDescription', {}),
+      props: { disabled: requireTwoFactorLocked },
     },
     permissionField('serverPermissions', t('pages.admin.roles.tabs.general.page.form.serverPermissions', {})),
     permissionField('adminPermissions', t('pages.admin.roles.tabs.general.page.form.adminPermissions', {})),

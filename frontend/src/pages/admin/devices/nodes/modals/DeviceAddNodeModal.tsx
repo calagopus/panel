@@ -7,6 +7,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function DeviceAddNodeModal({
@@ -18,6 +19,7 @@ export default function DeviceAddNodeModal({
   const nodes = useInfiniteSearchableResource<z.infer<typeof adminNodeSchema>>({
     queryKey: queryKeys.admin.nodes.all(),
     fetcher: (page, search) => getNodes(page, search),
+    canRequest: useAdminCan('nodes.read'),
   });
 
   return (

@@ -7,6 +7,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import ResourceSelectModal from '@/elements/modals/ResourceSelectModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDeviceSchema } from '@/lib/schemas/admin/devices.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -16,12 +17,13 @@ export default function DeviceAddEggModal({
 }: ModalProps & { device: z.infer<typeof adminDeviceSchema> }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
+  const canReadEggs = useAdminCan('eggs.read');
 
   const [eggs, setEggs] = useState<Awaited<ReturnType<typeof getAllEggs>>>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!props.opened) {
+    if (!props.opened || !canReadEggs) {
       return;
     }
 
@@ -30,7 +32,7 @@ export default function DeviceAddEggModal({
       .then(setEggs)
       .catch((msg) => addToast(httpErrorToHuman(msg), 'error'))
       .finally(() => setLoading(false));
-  }, [props.opened]);
+  }, [props.opened, canReadEggs]);
 
   return (
     <ResourceSelectModal

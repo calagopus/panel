@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import { type FieldDef } from '@/elements/form-engine/index.ts';
+import Select from '@/elements/input/Select.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import UrlMissingPortAlert from '@/elements/UrlMissingPortAlert.tsx';
@@ -11,6 +12,7 @@ import { getUrlConnectPort, withUrlPort } from '@/lib/network/url.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNodeSchema, adminNodeUpdateSchema } from '@/lib/schemas/admin/nodes.ts';
+import LocationCreateField from '@/pages/admin/locations/LocationCreateField.tsx';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -68,18 +70,31 @@ export function useNodeFormFields({
   return [
     { type: 'text', name: 'name', label: t('common.form.name', {}), required: true },
     {
-      type: 'select',
+      type: 'custom',
       name: 'locationUuid',
-      label: t('common.table.columns.location', {}),
-      required: true,
-      options: locations.items.map((l) => ({ label: l.name, value: l.uuid })),
-      props: {
-        searchable: true,
-        searchValue: locations.search,
-        onSearchChange: locations.setSearch,
-        infiniteScroll: locations.infiniteScroll,
-        loading: locations.loading,
-      },
+      render: (f) => (
+        <div className='flex flex-col gap-1'>
+          <Select
+            withAsterisk
+            label={t('common.table.columns.location', {})}
+            data={locations.items.map((l) => ({ label: l.name, value: l.uuid }))}
+            searchable
+            searchValue={locations.search}
+            onSearchChange={locations.setSearch}
+            infiniteScroll={locations.infiniteScroll}
+            loading={locations.loading}
+            key={f.key('locationUuid')}
+            {...f.getInputProps('locationUuid')}
+          />
+          <LocationCreateField
+            onCreated={(location) => {
+              locations.invalidate();
+              locations.setSearch(location.name);
+              f.setFieldValue('locationUuid', location.uuid);
+            }}
+          />
+        </div>
+      ),
     },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
     {

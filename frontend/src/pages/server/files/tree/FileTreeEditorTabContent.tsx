@@ -29,6 +29,7 @@ import { fileModelUri } from '@/lib/editor/fileModelUri.ts';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco.ts';
 import { readFileDraft, removeFileDraft } from '@/lib/files/fileDrafts.ts';
 import FileRevisionsDrawer from '@/pages/server/files/drawers/FileRevisionsDrawer.tsx';
+import { addEditorSaveAction } from '@/pages/server/files/editor/addEditorSaveAction.ts';
 import FileEditorSettings from '@/pages/server/files/editor/FileEditorSettings.tsx';
 import FileImageViewerSettings from '@/pages/server/files/editor/FileImageViewerSettings.tsx';
 import { FileAudioPreview, FileImagePreview } from '@/pages/server/files/editor/FileMediaPreview.tsx';
@@ -62,12 +63,13 @@ interface FileTreeEditorTabContentProps {
   active: boolean;
   selection: FileTreeEditorSelection;
   draftContent?: string;
+  draftFromCollab?: boolean;
   restoreContent?: string;
   onRestoreContent: (tabId: string) => void;
   onClose: (paneId: string, tabId: string) => void;
   onMissing: (tabId: string) => void;
   onDirtyChange: (tabId: string, dirty: boolean) => void;
-  onDraftChange: (tabId: string, content: string | null) => void;
+  onDraftChange: (tabId: string, content: string | null, collab?: boolean) => void;
   onCreateFile: (tabId: string, name: string) => Promise<void>;
 }
 
@@ -80,6 +82,7 @@ export default function FileTreeEditorTabContent({
   active,
   selection,
   draftContent,
+  draftFromCollab,
   restoreContent,
   onRestoreContent,
   onClose,
@@ -122,6 +125,7 @@ export default function FileTreeEditorTabContent({
   const mountedRef = useRef(true);
   const instanceId = useId();
   const initialDraftContentRef = useRef(draftContent);
+  const initialDraftFromCollabRef = useRef(draftFromCollab ?? false);
   const pierreEditorRef = useRef<PierreEditorHandle | null>(null);
   const focusEditorRef = useRef<(() => void) | null>(null);
   const wasVisibleRef = useRef(visible);
@@ -142,7 +146,7 @@ export default function FileTreeEditorTabContent({
   const modelPath = fileModelUri(server.uuid, filePath, instanceId);
   useFileDraftPersistence(server.uuid, draftPath, dirty);
   const publishDraft = (value: string, changed: boolean) => {
-    onDraftChange(tabId, changed ? value : null);
+    onDraftChange(tabId, changed ? value : null, collabActiveRef.current);
     persistDraft(draftPath, value, { dirty: changed, preserve: pendingDraft !== null });
   };
   const editorContext = {
@@ -178,6 +182,8 @@ export default function FileTreeEditorTabContent({
     filePath,
     restoreContent:
       canUpdate && writable ? (restoreContent ?? initialDraftContentRef.current ?? restoreOnConnect) : undefined,
+    restoreOnlyIfClean:
+      restoreContent === undefined && initialDraftContentRef.current !== undefined && initialDraftFromCollabRef.current,
     onRestoreContent: () => {
       setRestoreOnConnect(undefined);
       onRestoreContent(tabId);
@@ -287,7 +293,7 @@ export default function FileTreeEditorTabContent({
       })
       .catch((error) => {
         if (cancelled) return;
-        const draft = initialDraftContentRef.current;
+        const draft = initialDraftContentRef.current ?? readFileDraft(server.uuid, draftPath)?.content;
         if (error instanceof AxiosError && error.response?.status === 404 && draft !== undefined) {
           contentRef.current = draft;
           setContent(draft);
@@ -380,7 +386,7 @@ export default function FileTreeEditorTabContent({
       addToast(t('pages.server.files.toast.fileSaved', {}), 'success');
     } catch (error) {
       if (!mountedRef.current) return;
-      reportFileError(error);
+      addToast(httpErrorToHuman(error), 'error');
     }
     setSaving(false);
   };
@@ -399,7 +405,7 @@ export default function FileTreeEditorTabContent({
       .then((text) => setConflictDiskContent(text))
       .catch((error) => {
         setConflictDiffOpen(false);
-        reportFileError(error);
+        addToast(httpErrorToHuman(error), 'error');
       });
   };
 
@@ -680,7 +686,7 @@ export default function FileTreeEditorTabContent({
               onMount={(editor, monaco) => {
                 focusEditorRef.current = () => editor.focus();
                 collab.attachEditor(editor);
-                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveRef.current());
+                addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveRef.current());
                 registerTomlLanguage(monaco);
                 registerHoconLanguage(monaco);
               }}
@@ -703,6 +709,7 @@ export default function FileTreeEditorTabContent({
       />
 
       <FileNameModal
+        directory={selection.directory}
         opened={nameModalOpen}
         onClose={() => setNameModalOpen(false)}
         onFileName={async (name) => {

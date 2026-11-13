@@ -1,8 +1,10 @@
 import { UseFormReturnType } from '@mantine/form';
+import { useQueries } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
 import getNodeBandwidth from '@/api/admin/nodes/getNodeBandwidth.ts';
+import getNodeSystemDirect from '@/api/admin/nodes/system/getNodeSystemDirect.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
@@ -426,6 +428,8 @@ interface ServerAssignmentOptions<T extends ServerEggAssignmentFormValues> {
   setSelectedNestUuid: (uuid: string | null) => void;
   eggNests?: Map<string, z.infer<typeof adminNestSchema>>;
   onEggInstallClick?: () => void;
+  unreachableNodeUuids?: Set<string>;
+  nodeUuid?: string;
 }
 
 /// Groups the egg options by nest so a cross-nest egg search still shows where each egg lives.
@@ -467,14 +471,25 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
     setSelectedNestUuid,
     eggNests,
     onEggInstallClick,
+    unreachableNodeUuids,
+    nodeUuid,
   } = opts;
 
   const nodeField: FieldDef<T> = {
     type: 'select',
     name: 'nodeUuid',
     label: t('common.form.node', {}),
+    description:
+      nodeUuid && unreachableNodeUuids?.has(nodeUuid)
+        ? t('pages.admin.servers.tabs.general.page.form.nodeUnreachableDescription', {})
+        : undefined,
     required: true,
-    options: (nodes?.items ?? []).map((node) => ({ label: node.name, value: node.uuid })),
+    options: (nodes?.items ?? []).map((node) => ({
+      label: unreachableNodeUuids?.has(node.uuid)
+        ? `${node.name} (${t('pages.admin.servers.tabs.general.page.form.nodeUnreachable', {})})`
+        : node.name,
+      value: node.uuid,
+    })),
     props: {
       searchable: true,
       searchValue: nodes?.search,
@@ -716,6 +731,25 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
     silent: true,
   });
 
+  const nodeItems = mode === 'create' ? (nodes?.items ?? []) : [];
+  const unreachableNodeUuidList = useQueries({
+    queries: nodeItems.map((node) => ({
+      queryKey: [...queryKeys.admin.nodes.systemDirect(node.uuid), node.publicUrl ?? node.url],
+      queryFn: () => getNodeSystemDirect(node),
+      enabled: !!canReadNodes,
+      retry: false,
+    })),
+    combine: (results) =>
+      results
+        .map((result, i) => (result.isError ? nodeItems[i]?.uuid : null))
+        .filter(Boolean)
+        .join(','),
+  });
+  const unreachableNodeUuids = useMemo(
+    () => new Set(unreachableNodeUuidList ? unreachableNodeUuidList.split(',') : []),
+    [unreachableNodeUuidList],
+  );
+
   const basicInfoFields = useMemo(() => buildBasicInfoFields<T>(t), [t]);
   const featureLimitsFields = useMemo(() => buildFeatureLimitsFields<T>(t), [t]);
   const resourceLimitsFields = useMemo(
@@ -742,6 +776,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
         setSelectedNestUuid,
         eggNests,
         onEggInstallClick,
+        unreachableNodeUuids,
+        nodeUuid,
       }),
     [
       t,
@@ -761,6 +797,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
       setSelectedNestUuid,
       eggNests,
       onEggInstallClick,
+      unreachableNodeUuids,
+      nodeUuid,
     ],
   );
 

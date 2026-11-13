@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { hashKey, keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'debounce';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
@@ -97,6 +97,13 @@ export function useSearchablePaginatedTable<T>({
       updateDebouncedSearch(search);
     }
   }, [search]);
+
+  const filterKey = hashKey([debouncedSearch, ...deps]);
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey);
+  if (lastFilterKey !== filterKey) {
+    setLastFilterKey(filterKey);
+    if (page !== 1) setPage(1);
+  }
 
   const { data, isFetching, isPlaceholderData, error, refetch } = useQuery({
     queryKey: paginatedTableQueryKey([...queryKey, ...deps], page, debouncedSearch, perPage),

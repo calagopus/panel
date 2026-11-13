@@ -1,7 +1,7 @@
 import { faEye, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getHttpStatus, httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -52,28 +52,45 @@ export default function ResourceLookupModal<T>({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<T | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const requestId = useRef(0);
 
   const reset = () => {
+    requestId.current++;
+    setLoading(false);
     setResult(null);
     setNotFound(false);
   };
 
+  useEffect(() => {
+    if (!props.opened) {
+      setIdentifier('');
+      reset();
+    }
+  }, [props.opened]);
+
   const doSearch = () => {
     if (!identifier.trim()) return;
 
-    setLoading(true);
     reset();
+    setLoading(true);
+    const id = requestId.current;
 
     lookup(identifier.trim())
-      .then((found) => setResult(found))
+      .then((found) => {
+        if (id === requestId.current) setResult(found);
+      })
       .catch((err) => {
+        if (id !== requestId.current) return;
+
         if (getHttpStatus(err) === 404) {
           setNotFound(true);
         } else {
           addToast(httpErrorToHuman(err), 'error');
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (id === requestId.current) setLoading(false);
+      });
   };
 
   const handleClose = () => {

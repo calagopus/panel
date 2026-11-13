@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
+import { isTwoFactorMethodAvailable, TwoFactorAvailability } from '@/lib/auth/twoFactor.ts';
 import { adminSettingsApplicationSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -33,6 +34,10 @@ interface ApplicationFormFieldsOptions {
   onTelemetryToggle: (checked: boolean) => void;
   onRegistrationToggle: (checked: boolean) => void;
   onPasswordLoginToggle: (checked: boolean) => void;
+  twoFactorAvailability: TwoFactorAvailability;
+  selectedTwoFactorMethods: ApplicationFormValues['twoFactorAcceptedMethods'];
+  values: Pick<ApplicationFormValues, 'emailTwoFactorEnabled' | 'emailVerificationRequired' | 'passwordLoginEnabled'>;
+  twoFactorAcceptedMethodsError?: string;
 }
 
 export function useApplicationFormFields({
@@ -41,8 +46,21 @@ export function useApplicationFormFields({
   onTelemetryToggle,
   onRegistrationToggle,
   onPasswordLoginToggle,
+  twoFactorAvailability,
+  selectedTwoFactorMethods,
+  values,
+  twoFactorAcceptedMethodsError,
 }: ApplicationFormFieldsOptions): FieldDef<ApplicationFormValues>[] {
   const { t } = useTranslations();
+
+  const unselectable = (method: ApplicationFormValues['twoFactorAcceptedMethods'][number]) =>
+    !selectedTwoFactorMethods.includes(method);
+
+  const noMail = twoFactorAvailability.mailConfigured === false;
+  const mailSwitchProps = (enabled: boolean) => ({
+    disabled: noMail && !enabled,
+    error: noMail && enabled ? t('pages.admin.settings.tabs.application.page.form.emailRequiresMail', {}) : undefined,
+  });
 
   return [
     {
@@ -132,29 +150,54 @@ export function useApplicationFormFields({
       description: t('pages.admin.settings.tabs.application.page.form.twoFactorAcceptedMethodsDescription', {}),
       options: [
         { label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.totp', {}), value: 'totp' },
-        {
-          label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.securityKey', {}),
-          value: 'security_key',
-        },
-        { label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.email', {}), value: 'email' },
+        isTwoFactorMethodAvailable('security_key', twoFactorAvailability)
+          ? {
+              label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.securityKey', {}),
+              value: 'security_key',
+            }
+          : {
+              label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethodUnavailable.securityKey', {}),
+              value: 'security_key',
+              disabled: unselectable('security_key'),
+            },
+        isTwoFactorMethodAvailable('email', twoFactorAvailability)
+          ? { label: t('pages.admin.settings.tabs.application.page.enum.twoFactorMethod.email', {}), value: 'email' }
+          : {
+              label:
+                twoFactorAvailability.mailConfigured === false
+                  ? t('pages.admin.settings.tabs.application.page.enum.twoFactorMethodUnavailable.emailNoMail', {})
+                  : t('pages.admin.settings.tabs.application.page.enum.twoFactorMethodUnavailable.email', {}),
+              value: 'email',
+              disabled: unselectable('email'),
+            },
       ],
+      props: { error: twoFactorAcceptedMethodsError },
     },
     {
       type: 'switch',
       name: 'emailTwoFactorEnabled',
       label: t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabled', {}),
-      description: t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabledDescription', {}),
+      description: noMail
+        ? t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabledNoMail', {})
+        : t('pages.admin.settings.tabs.application.page.form.emailTwoFactorEnabledDescription', {}),
+      props: mailSwitchProps(values.emailTwoFactorEnabled),
     },
     {
       type: 'switch',
       name: 'emailVerificationRequired',
       label: t('pages.admin.settings.tabs.application.page.form.emailVerificationRequired', {}),
-      description: t('pages.admin.settings.tabs.application.page.form.emailVerificationRequiredDescription', {}),
+      description: noMail
+        ? t('pages.admin.settings.tabs.application.page.form.emailVerificationRequiredNoMail', {})
+        : t('pages.admin.settings.tabs.application.page.form.emailVerificationRequiredDescription', {}),
+      props: mailSwitchProps(values.emailVerificationRequired),
     },
     {
       type: 'switch',
       name: 'registrationEnabled',
       label: t('pages.admin.settings.tabs.application.page.form.registrationEnabled', {}),
+      description: values.passwordLoginEnabled
+        ? undefined
+        : t('pages.admin.settings.tabs.application.page.form.registrationEnabledNoPasswordLogin', {}),
       props: {
         name: 'registrationEnabled',
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => onRegistrationToggle(e.target.checked),

@@ -27,6 +27,7 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
+import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { isNodeAIO, WINGS_DEFAULT_PORT } from '@/lib/domain/node.ts';
 import { resolvePorts } from '@/lib/network/ip.ts';
@@ -87,6 +88,8 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
     setResolvedPorts(resolved);
   }, [allocationsForm.values.ports]);
 
+  const showAllocationsForm = data.allocations.length === 0;
+
   const onSubmit = async (values: z.infer<typeof oobeNodeSchema>) => {
     setLoading(true);
 
@@ -111,7 +114,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
 
         nodeIsAIO = isNodeAIO(existingNode);
 
-        if (nodeIsAIO && allocationsForm.values.ip && resolvedPorts.length > 0) {
+        if (showAllocationsForm && allocationsForm.values.ip && resolvedPorts.length > 0) {
           await createNodeAllocations(existingNode.uuid, {
             ip: allocationsForm.values.ip,
             ipAlias: null,
@@ -151,7 +154,6 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
     setLoading(false);
   };
 
-  const showAllocationsForm = (!isEdit || (existingNode && isNodeAIO(existingNode))) && data.allocations.length === 0;
   const isFormValid = form.isValid() && !!locationUuid && (!showAllocationsForm || allocationsForm.isValid());
 
   return (
@@ -277,6 +279,11 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
           </div>
 
           <Group justify='flex-end'>
+            {!isEdit && (
+              <Text size='xs' c='dimmed' className='flex-1' miw={200}>
+                {t('pages.oobe.node.skipHint', {})}
+              </Text>
+            )}
             {canGoBack && (
               <Button variant='subtle' onClick={onBack} leftSection={<FontAwesomeIcon icon={faChevronLeft} />}>
                 Back
