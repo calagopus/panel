@@ -347,9 +347,7 @@
           "connectionClosed": "Anslutningen till servern stängdes. Försöker återansluta...",
           "connectionRetry": "Anslutningen bruten. Försöker igen (försök {attempt})...",
           "authFailed": "Autentiseringen misslyckades. Försöker uppdatera inloggningsuppgifterna... ({error})",
-          "authRefreshFailed": "Det gick inte att uppdatera inloggningsuppgifterna. Uppdatera sidan för att försöka igen.",
-          "permissionRevoked": "Anslutningen stängd: din åtkomst till den här servern har återkallats.",
-          "tokenRefreshLoop": "Autentiseringsslinga upptäckt. Uppdatera sidan för att försöka igen."
+          "permissionRevoked": "Anslutningen stängd: din åtkomst till den här servern har återkallats."
         },
         "banner": {
           "retrying": "Försöker igen om {countdown}..."
@@ -560,8 +558,7 @@
         "login": {
           "error": {
             "usernameRequired": "Vänligen ange ett användarnamn",
-            "registrationDisabled": "Inget matchande konto kunde hittas och registreringen är för närvarande inaktiverad.",
-            "userAlreadyExists": "Ett konto med detta användarnamn eller denna e-postadress finns redan."
+            "registrationDisabled": "Inget matchande konto kunde hittas och registreringen är för närvarande inaktiverad."
           },
           "passkey": {
             "error": {
@@ -729,8 +726,7 @@
           "title": "Konto",
           "alert": {
             "requireTwoFactor": {
-              "title": "Tvåfaktorsautentisering krävs",
-              "description": "Tvåfaktorsautentisering krävs på ditt konto. Vänligen konfigurera det nedan för att fortsätta använda panelen."
+              "title": "Tvåfaktorsautentisering krävs"
             }
           },
           "containers": {

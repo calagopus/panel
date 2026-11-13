@@ -275,8 +275,7 @@
           "title": "Cont",
           "alert": {
             "requireTwoFactor": {
-              "title": "Autentificare cu doi factori necesară",
-              "description": "Autentificarea cu doi factori este necesară pentru contul tău. Te rugăm să o configurezi mai jos pentru a continua să folosești panoul."
+              "title": "Autentificare cu doi factori necesară"
             }
           },
           "containers": {
