@@ -16,11 +16,16 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{ user: z.infer<typeof adminFullUserSchema> }>();
+  /** @since 1.1.1 */
   public servers: ServersRegistry = new ServersRegistry();
+  /** @since 1.1.1 */
   public oauthLinks: OAuthLinksRegistry = new OAuthLinksRegistry();
+  /** @since 1.1.1 */
   public activity: ActivityRegistry = new ActivityRegistry();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (registry: SubNavigationRegistry<{ user: z.infer<typeof adminFullUserSchema> }>) => unknown,
   ): this {
@@ -28,16 +33,19 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterServers(callback: (registry: ServersRegistry) => unknown): this {
     callback(this.servers);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterOAuthLinks(callback: (registry: OAuthLinksRegistry) => unknown): this {
     callback(this.oauthLinks);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterActivity(callback: (registry: ActivityRegistry) => unknown): this {
     callback(this.activity);
     return this;

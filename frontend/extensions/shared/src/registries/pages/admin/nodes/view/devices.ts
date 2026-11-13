@@ -14,12 +14,15 @@ export class DevicesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.3 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.2.3 */
   public contextMenu: ContextMenuRegistry<{
     node: z.infer<typeof adminNodeSchema>;
     device: z.infer<typeof adminNodeDeviceSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.2.3 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -27,6 +30,7 @@ export class DevicesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.3 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

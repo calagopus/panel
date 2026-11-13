@@ -12,11 +12,14 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{
     databaseAgentTemplate: z.infer<typeof adminDatabaseAgentTemplateSchema>;
   }>();
+  /** @since 1.1.1 */
   public instances: InstancesRegistry = new InstancesRegistry();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (
       registry: SubNavigationRegistry<{ databaseAgentTemplate: z.infer<typeof adminDatabaseAgentTemplateSchema> }>,
@@ -26,6 +29,7 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterInstances(callback: (registry: InstancesRegistry) => unknown): this {
     callback(this.instances);
     return this;

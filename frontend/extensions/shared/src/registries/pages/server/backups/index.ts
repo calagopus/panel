@@ -18,28 +18,40 @@ export class BackupsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.2.3 */
   public actionBar: ComponentListRegistry = new ComponentListRegistry();
+  /** @since 1.1.4 */
   public subNavigation: SubNavigationRegistry = new SubNavigationRegistry();
+  /** @since 1.0.0 */
   public backupContextMenu: ContextMenuRegistry<{ backup: z.infer<typeof serverBackupSchema> }> =
     new ContextMenuRegistry();
+  /**
+   * Backups created by admin system backup policies.
+   * @since 1.1.4
+   */
   public system: SystemRegistry = new SystemRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.2.3 */
   public enterActionBar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.actionBar);
     return this;
   }
 
+  /** @since 1.1.4 */
   public enterSubNavigation(callback: (registry: SubNavigationRegistry) => unknown): this {
     callback(this.subNavigation);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterBackupContextMenu(
     callback: (registry: ContextMenuRegistry<{ backup: z.infer<typeof serverBackupSchema> }>) => unknown,
   ): this {
@@ -47,6 +59,7 @@ export class BackupsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.4 */
   public enterSystem(callback: (registry: SystemRegistry) => unknown): this {
     callback(this.system);
     return this;

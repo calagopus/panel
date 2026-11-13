@@ -12,8 +12,10 @@ export class ServersRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.4 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
 
+  /** @since 1.1.4 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {

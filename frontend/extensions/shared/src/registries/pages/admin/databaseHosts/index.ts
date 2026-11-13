@@ -10,14 +10,18 @@ export class DatabaseHostsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public view: ViewRegistry = new ViewRegistry();
 
+  /** @since 1.1.1 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterView(callback: (registry: ViewRegistry) => unknown): this {
     callback(this.view);
     return this;

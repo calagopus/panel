@@ -14,10 +14,14 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{ oauthProvider: z.infer<typeof adminOAuthProviderSchema> }>();
+  /** @since 1.1.1 */
   public mappings: MappingsRegistry = new MappingsRegistry();
+  /** @since 1.1.1 */
   public users: UsersRegistry = new UsersRegistry();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (registry: SubNavigationRegistry<{ oauthProvider: z.infer<typeof adminOAuthProviderSchema> }>) => unknown,
   ): this {
@@ -25,11 +29,13 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterMappings(callback: (registry: MappingsRegistry) => unknown): this {
     callback(this.mappings);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterUsers(callback: (registry: UsersRegistry) => unknown): this {
     callback(this.users);
     return this;

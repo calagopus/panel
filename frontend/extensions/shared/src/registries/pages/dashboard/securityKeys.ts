@@ -12,15 +12,19 @@ export class SecurityKeysRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.0.0 */
   public securityKeyContextMenu: ContextMenuRegistry<{ securityKey: z.infer<typeof userSecurityKeySchema> }> =
     new ContextMenuRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterSecurityKeyContextMenu(
     callback: (registry: ContextMenuRegistry<{ securityKey: z.infer<typeof userSecurityKeySchema> }>) => unknown,
   ): this {

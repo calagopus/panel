@@ -125,105 +125,184 @@ export class FilesRegistry implements Registry {
     return this;
   }
 
+  /**
+   * Container of the file list.
+   * @since 1.0.0
+   */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /**
+   * Container of the full page file editor.
+   * @since 1.0.0
+   */
   public editorContainer: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /**
+   * Rendered around the new and upload buttons above the file list.
+   * @since 1.0.0
+   */
   public fileToolbar: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered in the toolbar of the sidebar file tree.
+   * @since 1.2.0
+   */
   public fileTreeToolbar: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered in the floating bar shown while files are selected.
+   * @since 1.0.0
+   */
   public fileActionBar: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered inside the file operations and uploads progress popover.
+   * @since 1.0.0
+   */
   public fileOperationsProgress: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered in the file manager settings popover.
+   * @since 1.0.0
+   */
   public fileSettings: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered in the editor settings popover, unless the editor action replaces it.
+   * @since 1.0.0
+   */
   public fileEditorSettings: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered in the image viewer settings popover, unless the editor action replaces it.
+   * @since 1.0.0
+   */
   public fileImageViewerSettings: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Items of the "New" dropdown in the toolbar and the file tree.
+   * @since 1.0.0
+   */
   public newFileContextMenu: ContextMenuRegistry = new ContextMenuRegistry();
+  /**
+   * Context menu of a single file.
+   * @since 1.0.0
+   */
   public fileContextMenu: ContextMenuRegistry<FileContextMenuProps> = new ContextMenuRegistry();
+  /**
+   * Context menu shown when multiple files are selected.
+   * @since 1.0.0
+   */
   public fileMassContextMenu: ContextMenuRegistry = new ContextMenuRegistry();
+  /** @since 1.2.6 */
   public trash: TrashRegistry = new TrashRegistry();
+  /** @since 1.2.8 */
   public diskUsageBar: DiskUsageBarRegistry = new DiskUsageBarRegistry();
 
+  /** @since 1.0.0 */
   public fileIconHandlers: FileIconHandler[] = [];
+  /** @since 1.0.2 */
   public fileOpenableHandlers: FileOpenableHandler[] = [];
+  /** @since 1.0.2 */
   public fileEditorActions: FileEditorAction[] = [];
 
+  /**
+   * Handlers run in order before the stock icons, the first truthy return wins.
+   * @since 1.0.0
+   */
   public addFileIconHandler(handler: FileIconHandler): this {
     this.fileIconHandlers.push(handler);
     return this;
   }
 
+  /**
+   * Handlers run in order before the stock checks, the first `openable: true` wins, `openable: false` falls through.
+   * @since 1.0.2
+   */
   public addFileOpenableHandler(handler: FileOpenableHandler): this {
     this.fileOpenableHandlers.push(handler);
     return this;
   }
 
+  /**
+   * Picked when its `name` matches the editor action, e.g. from `handleFileOpen(file, action)`.
+   * @since 1.0.2
+   */
   public addFileEditorAction(action: FileEditorAction): this {
     this.fileEditorActions.push(action);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterEditorContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.editorContainer);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileToolbar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileToolbar);
     return this;
   }
 
+  /** @since 1.2.0 */
   public enterFileTreeToolbar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileTreeToolbar);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileActionBar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileActionBar);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileOperationsProgress(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileOperationsProgress);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileSettings(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileSettings);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileEditorSettings(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileEditorSettings);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileImageViewerSettings(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.fileImageViewerSettings);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterNewFileContextMenu(callback: (registry: ContextMenuRegistry) => unknown): this {
     callback(this.newFileContextMenu);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterFileContextMenu(callback: (registry: ContextMenuRegistry<FileContextMenuProps>) => unknown): this {
     callback(this.fileContextMenu);
     return this;
   }
 
+  /** @since 1.2.3 */
   public enterFileMassContextMenu(callback: (registry: ContextMenuRegistry) => unknown): this {
     callback(this.fileMassContextMenu);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterTrash(callback: (registry: TrashRegistry) => unknown): this {
     callback(this.trash);
     return this;
   }
 
+  /** @since 1.2.8 */
   public enterDiskUsageBar(callback: (registry: DiskUsageBarRegistry) => unknown): this {
     callback(this.diskUsageBar);
     return this;

@@ -51,24 +51,36 @@ export class ServerWebsocketEventRegistry implements Registry {
     return this;
   }
 
+  /**
+   * Incoming frames, protocol events skip handlers, cancelling drops the frame before any listener.
+   * @since 1.2.6
+   */
   public messageHandlers: EventHandlerList<ServerWebsocketMessageEvent> = new EventHandlerList();
+  /**
+   * Outgoing frames, protocol events skip handlers, cancelling keeps the frame from being sent.
+   * @since 1.2.6
+   */
   public sendHandlers: EventHandlerList<ServerWebsocketSendEvent> = new EventHandlerList();
 
+  /** @since 1.2.6 */
   public addMessageHandler(handler: EventHandler<ServerWebsocketMessageEvent>, options?: EventHandlerOptions): this {
     this.messageHandlers.addHandler(handler, options);
     return this;
   }
 
+  /** @since 1.2.6 */
   public removeMessageHandler(handler: EventHandler<ServerWebsocketMessageEvent>): this {
     this.messageHandlers.removeHandler(handler);
     return this;
   }
 
+  /** @since 1.2.6 */
   public addSendHandler(handler: EventHandler<ServerWebsocketSendEvent>, options?: EventHandlerOptions): this {
     this.sendHandlers.addHandler(handler, options);
     return this;
   }
 
+  /** @since 1.2.6 */
   public removeSendHandler(handler: EventHandler<ServerWebsocketSendEvent>): this {
     this.sendHandlers.removeHandler(handler);
     return this;

@@ -14,10 +14,14 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{ databaseHost: z.infer<typeof adminDatabaseHostSchema> }>();
+  /** @since 1.2.7 */
   public overview: OverviewRegistry = new OverviewRegistry();
+  /** @since 1.1.1 */
   public databases: DatabasesRegistry = new DatabasesRegistry();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (registry: SubNavigationRegistry<{ databaseHost: z.infer<typeof adminDatabaseHostSchema> }>) => unknown,
   ): this {
@@ -25,11 +29,13 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.7 */
   public enterOverview(callback: (registry: OverviewRegistry) => unknown): this {
     callback(this.overview);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterDatabases(callback: (registry: DatabasesRegistry) => unknown): this {
     callback(this.databases);
     return this;

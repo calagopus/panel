@@ -32,14 +32,24 @@ export class DiskUsageBarRegistry implements Registry {
     return this;
   }
 
+  /**
+   * Mutate the sections in place, after the stock files and trash sections exist.
+   * @since 1.2.8
+   */
   public sectionInterceptors: SectionInterceptor[] = [];
+  /**
+   * Called as React hooks in the bar, each returns an interceptor that runs after `sectionInterceptors`.
+   * @since 1.2.8
+   */
   public sectionHooks: SectionHook[] = [];
 
+  /** @since 1.2.8 */
   public addSectionInterceptor(interceptor: SectionInterceptor): this {
     this.sectionInterceptors.push(interceptor);
     return this;
   }
 
+  /** @since 1.2.8 */
   public addSectionHook(hook: SectionHook): this {
     this.sectionHooks.push(hook);
     return this;

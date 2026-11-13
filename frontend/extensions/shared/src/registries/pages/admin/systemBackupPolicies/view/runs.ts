@@ -21,9 +21,12 @@ export class RunsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.9 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.2.9 */
   public contextMenu: ContextMenuRegistry<ContextMenuProps> = new ContextMenuRegistry();
 
+  /** @since 1.2.9 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -31,6 +34,7 @@ export class RunsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.9 */
   public enterContextMenu(callback: (registry: ContextMenuRegistry<ContextMenuProps>) => unknown): this {
     callback(this.contextMenu);
     return this;

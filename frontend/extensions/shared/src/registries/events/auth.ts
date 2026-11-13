@@ -30,24 +30,30 @@ export class AuthEventRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.6 */
   public logoutHandlers: EventHandlerList<AuthLogoutEvent> = new EventHandlerList();
+  /** @since 1.2.6 */
   public impersonateHandlers: EventHandlerList<AuthImpersonateEvent> = new EventHandlerList();
 
+  /** @since 1.2.6 */
   public addLogoutHandler(handler: EventHandler<AuthLogoutEvent>, options?: EventHandlerOptions): this {
     this.logoutHandlers.addHandler(handler, options);
     return this;
   }
 
+  /** @since 1.2.6 */
   public removeLogoutHandler(handler: EventHandler<AuthLogoutEvent>): this {
     this.logoutHandlers.removeHandler(handler);
     return this;
   }
 
+  /** @since 1.2.6 */
   public addImpersonateHandler(handler: EventHandler<AuthImpersonateEvent>, options?: EventHandlerOptions): this {
     this.impersonateHandlers.addHandler(handler, options);
     return this;
   }
 
+  /** @since 1.2.6 */
   public removeImpersonateHandler(handler: EventHandler<AuthImpersonateEvent>): this {
     this.impersonateHandlers.removeHandler(handler);
     return this;

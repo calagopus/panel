@@ -8,8 +8,10 @@ export class UpdatesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public cards: ComponentListRegistry = new ComponentListRegistry();
 
+  /** @since 1.1.1 */
   public enterCards(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.cards);
     return this;

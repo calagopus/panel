@@ -10,14 +10,18 @@ export class DevicesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.3 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.2.3 */
   public actionBar: ComponentListRegistry = new ComponentListRegistry();
 
+  /** @since 1.2.3 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.2.3 */
   public enterActionBar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.actionBar);
     return this;

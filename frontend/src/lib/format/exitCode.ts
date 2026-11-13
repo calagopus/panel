@@ -12,7 +12,6 @@ const SIGNALS: Record<number, string> = {
   15: 'SIGTERM',
 };
 
-/** Name of the signal a shell-style exit code (128 + signal number) reports, or `null` for a regular exit. */
 export function exitCodeSignal(exitCode: number): string | null {
   return exitCode > 128 ? (SIGNALS[exitCode - 128] ?? null) : null;
 }

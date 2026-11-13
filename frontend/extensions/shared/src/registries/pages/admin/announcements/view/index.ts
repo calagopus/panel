@@ -10,8 +10,10 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{ announcement: z.infer<typeof adminAnnouncementSchema> }>();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (registry: SubNavigationRegistry<{ announcement: z.infer<typeof adminAnnouncementSchema> }>) => unknown,
   ): this {

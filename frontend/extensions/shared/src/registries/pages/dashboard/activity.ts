@@ -8,8 +8,10 @@ export class ActivityRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;

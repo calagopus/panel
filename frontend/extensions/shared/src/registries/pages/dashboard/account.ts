@@ -11,14 +11,21 @@ export class AccountRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /**
+   * Cards in the account page grid, blurred while two factor activation is required.
+   * @since 1.0.0
+   */
   public accountContainers: ComponentListRegistry<AccountCardProps> = new ComponentListRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterAccountContainers(callback: (registry: ComponentListRegistry<AccountCardProps>) => unknown): this {
     callback(this.accountContainers);
     return this;

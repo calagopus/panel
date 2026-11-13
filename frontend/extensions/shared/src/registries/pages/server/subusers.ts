@@ -14,21 +14,27 @@ export class SubusersRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.2.3 */
   public actionBar: ComponentListRegistry = new ComponentListRegistry();
+  /** @since 1.0.0 */
   public subuserContextMenu: ContextMenuRegistry<{ subuser: z.infer<typeof serverSubuserSchema> }> =
     new ContextMenuRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.2.3 */
   public enterActionBar(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.actionBar);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterSubuserContextMenu(
     callback: (registry: ContextMenuRegistry<{ subuser: z.infer<typeof serverSubuserSchema> }>) => unknown,
   ): this {

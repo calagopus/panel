@@ -9,14 +9,18 @@ export class ComponentListRegistry<Props = {}> implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public prependedComponents: FC<Props>[] = [];
+  /** @since 1.0.0 */
   public appendedComponents: FC<Props>[] = [];
 
+  /** @since 1.0.0 */
   public prependComponent(component: FC<Props>): this {
     this.prependedComponents.push(component);
     return this;
   }
 
+  /** @since 1.0.0 */
   public appendComponent(component: FC<Props>): this {
     this.appendedComponents.push(component);
     return this;

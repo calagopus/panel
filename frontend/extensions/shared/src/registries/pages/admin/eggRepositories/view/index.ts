@@ -12,9 +12,12 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subNavigation = new SubNavigationRegistry<{ eggRepository: z.infer<typeof adminEggRepositorySchema> }>();
+  /** @since 1.1.1 */
   public eggs: EggsRegistry = new EggsRegistry();
 
+  /** @since 1.1.1 */
   public enterSubNavigation(
     callback: (registry: SubNavigationRegistry<{ eggRepository: z.infer<typeof adminEggRepositorySchema> }>) => unknown,
   ): this {
@@ -22,6 +25,7 @@ export class ViewRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterEggs(callback: (registry: EggsRegistry) => unknown): this {
     callback(this.eggs);
     return this;

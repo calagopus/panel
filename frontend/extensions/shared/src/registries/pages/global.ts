@@ -9,14 +9,24 @@ export class GlobalRegistry implements Registry {
     return this;
   }
 
+  /**
+   * Rendered around the routes inside the auth and store providers, can mount more than once at a time.
+   * @since 1.0.0
+   */
   public prependedComponents: FC[] = [];
+  /**
+   * Rendered around the routes inside the auth and store providers, can mount more than once at a time.
+   * @since 1.0.0
+   */
   public appendedComponents: FC[] = [];
 
+  /** @since 1.0.0 */
   public prependComponent(component: FC): this {
     this.prependedComponents.push(component);
     return this;
   }
 
+  /** @since 1.0.0 */
   public appendComponent(component: FC): this {
     this.appendedComponents.push(component);
     return this;

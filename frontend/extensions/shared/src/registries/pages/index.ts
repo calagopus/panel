@@ -16,32 +16,42 @@ export class PageRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public global: GlobalRegistry = new GlobalRegistry();
+  /** @since 1.1.1 */
   public auth: AuthRegistry = new AuthRegistry();
+  /** @since 1.0.0 */
   public dashboard: DashboardRegistry = new DashboardRegistry();
+  /** @since 1.0.0 */
   public server: ServerRegistry = new ServerRegistry();
+  /** @since 1.0.3 */
   public admin: AdminRegistry = new AdminRegistry();
 
+  /** @since 1.0.0 */
   public enterGlobal(callback: (registry: GlobalRegistry) => unknown): this {
     callback(this.global);
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterAuth(callback: (registry: AuthRegistry) => unknown): this {
     callback(this.auth);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterDashboard(callback: (registry: DashboardRegistry) => unknown): this {
     callback(this.dashboard);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterServer(callback: (registry: ServerRegistry) => unknown): this {
     callback(this.server);
     return this;
   }
 
+  /** @since 1.0.3 */
   public enterAdmin(callback: (registry: AdminRegistry) => unknown): this {
     callback(this.admin);
     return this;

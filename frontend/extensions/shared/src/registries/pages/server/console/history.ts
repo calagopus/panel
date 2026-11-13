@@ -52,27 +52,47 @@ export class ResourceHistoryRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.9 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
-  /** Rendered next to the range controls. */
+  /**
+   * Rendered next to the range controls.
+   * @since 1.2.9
+   */
   public headerComponents: ComponentListRegistry<ResourceHistoryProps> = new ComponentListRegistry();
 
+  /** @since 1.2.9 */
   public rangeInterceptors: RangeInterceptor[] = [];
+  /**
+   * The stat row above the charts.
+   * @since 1.2.9
+   */
   public summaryCards: ResourceHistoryItem[] = [];
+  /** @since 1.2.9 */
   public summaryCardInterceptors: ItemInterceptor[] = [];
+  /**
+   * The charts below the stat row.
+   * @since 1.2.9
+   */
   public blocks: ResourceHistoryItem[] = [];
+  /** @since 1.2.9 */
   public blockInterceptors: ItemInterceptor[] = [];
 
+  /** @since 1.2.9 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.2.9 */
   public enterHeaderComponents(callback: (registry: ComponentListRegistry<ResourceHistoryProps>) => unknown): this {
     callback(this.headerComponents);
     return this;
   }
 
-  /** Adds a selectable range after the stock ones (1h, 6h, 24h, 7d, 30d, 1y). */
+  /**
+   * Adds a selectable range after the stock ones (1h, 6h, 24h, 7d, 30d, 1y).
+   * @since 1.2.9
+   */
   public addRange(range: ResourceHistoryRange): this {
     this.rangeInterceptors.push((ranges) => {
       ranges.push(range);
@@ -80,31 +100,46 @@ export class ResourceHistoryRegistry implements Registry {
     return this;
   }
 
-  /** Mutates the selectable ranges in place, e.g. to remove, reorder or retune the stock ones. */
+  /**
+   * Mutates the selectable ranges in place, e.g. to remove, reorder or retune the stock ones.
+   * @since 1.2.9
+   */
   public addRangeInterceptor(interceptor: RangeInterceptor): this {
     this.rangeInterceptors.push(interceptor);
     return this;
   }
 
-  /** Adds a card after the stock summary cards (uptime, cpu, memory, network, disk). */
+  /**
+   * Adds a card after the stock summary cards (uptime, cpu, memory, network, disk).
+   * @since 1.2.9
+   */
   public addSummaryCard(card: ResourceHistoryItem): this {
     this.summaryCards.push(card);
     return this;
   }
 
-  /** Mutates the summary cards in place before rendering, stock and extension cards alike. */
+  /**
+   * Mutates the summary cards in place before rendering, stock and extension cards alike.
+   * @since 1.2.9
+   */
   public addSummaryCardInterceptor(interceptor: ItemInterceptor): this {
     this.summaryCardInterceptors.push(interceptor);
     return this;
   }
 
-  /** Adds a chart block after the stock ones (states, cpu, memory, network, disk). */
+  /**
+   * Adds a chart block after the stock ones (states, cpu, memory, network, disk).
+   * @since 1.2.9
+   */
   public addBlock(block: ResourceHistoryItem): this {
     this.blocks.push(block);
     return this;
   }
 
-  /** Mutates the chart blocks in place before rendering, stock and extension blocks alike. */
+  /**
+   * Mutates the chart blocks in place before rendering, stock and extension blocks alike.
+   * @since 1.2.9
+   */
   public addBlockInterceptor(interceptor: ItemInterceptor): this {
     this.blockInterceptors.push(interceptor);
     return this;

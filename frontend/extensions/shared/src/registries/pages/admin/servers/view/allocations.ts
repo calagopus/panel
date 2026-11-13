@@ -15,12 +15,15 @@ export class AllocationsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.3 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.0.3 */
   public contextMenu: ContextMenuRegistry<{
     server: z.infer<typeof adminServerSchema>;
     allocation: z.infer<typeof serverAllocationSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.0.3 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -28,6 +31,7 @@ export class AllocationsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.3 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

@@ -10,8 +10,13 @@ export class SubNavigationRegistry<Props = {}> implements Registry {
     return this;
   }
 
+  /**
+   * Mutate the items in place before they are filtered and rendered.
+   * @since 1.0.3
+   */
   public itemInterceptors: ItemInterceptor<Props>[] = [];
 
+  /** @since 1.0.3 */
   public addItemInterceptor(interceptor: ItemInterceptor<Props>): this {
     this.itemInterceptors.push(interceptor);
     return this;

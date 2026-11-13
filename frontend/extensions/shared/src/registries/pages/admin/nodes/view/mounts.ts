@@ -14,12 +14,15 @@ export class MountsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public contextMenu: ContextMenuRegistry<{
     node: z.infer<typeof adminNodeSchema>;
     mount: z.infer<typeof adminNodeMountSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.1.1 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -27,6 +30,7 @@ export class MountsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

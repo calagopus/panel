@@ -8,8 +8,10 @@ export class SystemRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.4 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
 
+  /** @since 1.1.4 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;

@@ -12,15 +12,22 @@ export class FirewallRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /**
+   * `position` is the index of the rule in the ordered rule list.
+   * @since 1.2.0
+   */
   public ruleContextMenu: ContextMenuRegistry<{ rule: z.infer<typeof serverFirewallRuleSchema>; position: number }> =
     new ContextMenuRegistry();
 
+  /** @since 1.2.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.2.0 */
   public enterRuleContextMenu(
     callback: (
       registry: ContextMenuRegistry<{ rule: z.infer<typeof serverFirewallRuleSchema>; position: number }>,

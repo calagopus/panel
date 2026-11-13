@@ -1,35 +1,43 @@
 {
 	"languages": {
 		"TypeScript": {
-			"language_servers": ["tsgo", "biome"],
-			"formatter": {
-				"language_server": {
-					"name": "biome"
+			"language_servers": ["tsgo", "oxlint", "oxfmt"],
+			"formatter": [
+				{
+					"code_action": "source.fixAll.oxc"
+				},
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
 				}
-			},
-			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
-			}
+			]
 		},
 		"TSX": {
-			"language_servers": ["tsgo", "biome"],
-			"formatter": {
-				"language_server": {
-					"name": "biome"
+			"language_servers": ["tsgo", "oxlint", "oxfmt"],
+			"formatter": [
+				{
+					"code_action": "source.fixAll.oxc"
+				},
+				{
+					"language_server": {
+						"name": "oxfmt"
+					}
 				}
-			},
-			"code_actions_on_format": {
-				"source.fixAll.biome": true,
-				"source.organizeImports.biome": true
-			}
+			]
 		}
 	},
 	"lsp": {
-		"biome": {
-			"settings": {
-				"require_config_file": true,
-				"config_path": "frontend/biome.json"
+		"oxlint": {
+			"binary": {
+				"path": "node",
+				"arguments": ["frontend/node_modules/oxlint/bin/oxlint", "--lsp"]
+			}
+		},
+		"oxfmt": {
+			"binary": {
+				"path": "node",
+				"arguments": ["frontend/node_modules/oxfmt/bin/oxfmt", "--lsp"]
 			}
 		}
 	}

@@ -14,9 +14,15 @@ export class ManagementRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.3 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /**
+   * Cards in the management tab grid.
+   * @since 1.0.3
+   */
   public managementContainers: ComponentListRegistry<PageProps> = new ComponentListRegistry();
 
+  /** @since 1.0.3 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -24,6 +30,7 @@ export class ManagementRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.3 */
   public enterManagementContainers(callback: (registry: ComponentListRegistry<PageProps>) => unknown): this {
     callback(this.managementContainers);
     return this;

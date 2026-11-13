@@ -15,12 +15,15 @@ export class BackupsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public contextMenu: ContextMenuRegistry<{
     node: z.infer<typeof adminNodeSchema>;
     backup: z.infer<typeof adminServerBackupSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.1.1 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -28,6 +31,7 @@ export class BackupsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

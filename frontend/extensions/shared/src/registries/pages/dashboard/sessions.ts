@@ -12,15 +12,19 @@ export class SessionsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /** @since 1.0.0 */
   public sessionContextMenu: ContextMenuRegistry<{ session: z.infer<typeof userSessionSchema> }> =
     new ContextMenuRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterSessionContextMenu(
     callback: (registry: ContextMenuRegistry<{ session: z.infer<typeof userSessionSchema> }>) => unknown,
   ): this {

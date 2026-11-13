@@ -18,38 +18,50 @@ export class EventRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.6 */
   public toast: ToastEventRegistry = new ToastEventRegistry();
+  /** @since 1.2.6 */
   public serverWebsocket: ServerWebsocketEventRegistry = new ServerWebsocketEventRegistry();
+  /** @since 1.2.6 */
   public api: ApiEventRegistry = new ApiEventRegistry();
+  /** @since 1.2.6 */
   public auth: AuthEventRegistry = new AuthEventRegistry();
+  /** @since 1.2.6 */
   public clipboard: ClipboardEventRegistry = new ClipboardEventRegistry();
+  /** @since 1.2.6 */
   public quickActions: QuickActionEventRegistry = new QuickActionEventRegistry();
 
+  /** @since 1.2.6 */
   public enterToast(callback: (registry: ToastEventRegistry) => unknown): this {
     callback(this.toast);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterServerWebsocket(callback: (registry: ServerWebsocketEventRegistry) => unknown): this {
     callback(this.serverWebsocket);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterApi(callback: (registry: ApiEventRegistry) => unknown): this {
     callback(this.api);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterAuth(callback: (registry: AuthEventRegistry) => unknown): this {
     callback(this.auth);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterClipboard(callback: (registry: ClipboardEventRegistry) => unknown): this {
     callback(this.clipboard);
     return this;
   }
 
+  /** @since 1.2.6 */
   public enterQuickActions(callback: (registry: QuickActionEventRegistry) => unknown): this {
     callback(this.quickActions);
     return this;

@@ -10,14 +10,21 @@ export class KeyboardShortcutsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.0.0 */
   public container: ContainerRegistry<ContainerProps> = new ContainerRegistry();
+  /**
+   * Sections in the two column keyboard shortcuts layout.
+   * @since 1.0.0
+   */
   public shortcutSections: ComponentListRegistry = new ComponentListRegistry();
 
+  /** @since 1.0.0 */
   public enterContainer(callback: (registry: ContainerRegistry<ContainerProps>) => unknown): this {
     callback(this.container);
     return this;
   }
 
+  /** @since 1.0.0 */
   public enterShortcutSections(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.shortcutSections);
     return this;

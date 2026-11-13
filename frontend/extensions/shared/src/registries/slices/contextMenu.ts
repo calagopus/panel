@@ -12,14 +12,24 @@ export class ContextMenuRegistry<Props = {}> implements Registry {
     return this;
   }
 
+  /**
+   * Rendered next to the menu with the final items, for items needing hooks or state like a modal.
+   * @since 1.0.3
+   */
   public componentItemInterceptors: ComponentItemInterceptor<Props>[] = [];
+  /**
+   * Mutate the items in place before the menu is built.
+   * @since 1.0.0
+   */
   public itemInterceptors: ItemInterceptor<Props>[] = [];
 
+  /** @since 1.0.3 */
   public addComponentItemInterceptor(interceptor: ComponentItemInterceptor<Props>): this {
     this.componentItemInterceptors.push(interceptor);
     return this;
   }
 
+  /** @since 1.0.0 */
   public addItemInterceptor(interceptor: ItemInterceptor<Props>): this {
     this.itemInterceptors.push(interceptor);
     return this;

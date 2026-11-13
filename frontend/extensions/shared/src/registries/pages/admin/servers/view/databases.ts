@@ -20,17 +20,28 @@ export class DatabasesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /**
+   * Sub container of the database agent instances list, `subContainer` is the classic databases list.
+   * @since 1.1.1
+   */
   public instancesSubContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public contextMenu: ContextMenuRegistry<{
     server: z.infer<typeof adminServerSchema>;
     database: z.infer<typeof adminServerServerDatabaseSchema>;
   }> = new ContextMenuRegistry();
+  /**
+   * Context menu of a database agent instance row.
+   * @since 1.1.1
+   */
   public instanceContextMenu: ContextMenuRegistry<{
     server: z.infer<typeof adminServerSchema>;
     databaseAgent: z.infer<typeof adminServerServerDatabaseAgentSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.1.1 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -38,6 +49,7 @@ export class DatabasesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterInstancesSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -45,6 +57,7 @@ export class DatabasesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{
@@ -57,6 +70,7 @@ export class DatabasesRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterInstanceContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

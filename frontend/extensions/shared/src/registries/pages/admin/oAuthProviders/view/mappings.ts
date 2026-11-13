@@ -14,12 +14,15 @@ export class MappingsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public contextMenu: ContextMenuRegistry<{
     oauthProvider: z.infer<typeof adminOAuthProviderSchema>;
     mapping: z.infer<typeof adminOAuthProviderMappingSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.1.1 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -27,6 +30,7 @@ export class MappingsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

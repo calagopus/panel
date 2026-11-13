@@ -11,12 +11,6 @@ import { useRedactAddresses } from '@/plugins/privacy/useRedactAddresses.ts';
 import '@xterm/xterm/css/xterm.css';
 import '@/lib/editor/xterm.css';
 
-/**
- * Read-only xterm that renders `lines` with their ANSI styling. When the new array keeps the old first and
- * last line in place only the appended lines are written, any other change rewrites the terminal.
- *
- * `xterm` handlers run once when the terminal is created, with the props given at that time.
- */
 export default function LogTerminal<P = {}>({
   lines,
   xterm,

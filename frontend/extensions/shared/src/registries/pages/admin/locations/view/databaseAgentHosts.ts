@@ -14,12 +14,15 @@ export class DatabaseAgentHostsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.1.1 */
   public contextMenu: ContextMenuRegistry<{
     location: z.infer<typeof adminLocationSchema>;
     databaseAgentHost: z.infer<typeof adminLocationDatabaseAgentHostSchema>;
   }> = new ContextMenuRegistry();
 
+  /** @since 1.1.1 */
   public enterSubContainer(
     callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
   ): this {
@@ -27,6 +30,7 @@ export class DatabaseAgentHostsRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.1.1 */
   public enterContextMenu(
     callback: (
       registry: ContextMenuRegistry<{

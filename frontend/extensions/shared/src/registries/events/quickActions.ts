@@ -20,13 +20,16 @@ export class QuickActionEventRegistry implements Registry {
     return this;
   }
 
+  /** @since 1.2.6 */
   public selectHandlers: EventHandlerList<QuickActionSelectEvent> = new EventHandlerList();
 
+  /** @since 1.2.6 */
   public addSelectHandler(handler: EventHandler<QuickActionSelectEvent>, options?: EventHandlerOptions): this {
     this.selectHandlers.addHandler(handler, options);
     return this;
   }
 
+  /** @since 1.2.6 */
   public removeSelectHandler(handler: EventHandler<QuickActionSelectEvent>): this {
     this.selectHandlers.removeHandler(handler);
     return this;

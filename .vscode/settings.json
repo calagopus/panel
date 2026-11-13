@@ -1,3 +1,11 @@
 {
-  "js/ts.experimental.useTsgo": true
+  "js/ts.experimental.useTsgo": true,
+  "oxc.path.oxlint": "frontend/node_modules/oxlint/bin/oxlint",
+  "oxc.path.oxfmt": "frontend/node_modules/oxfmt/bin/oxfmt",
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  }
 }
