@@ -931,9 +931,7 @@
           "connectionClosed": "A conexão com o servidor foi encerrada. Tentando reconectar...",
           "connectionRetry": "Conexão perdida. Tentar novamente (tentativa {attempt})...",
           "authFailed": "Falha de autenticação. Tentando atualizar credenciais... ({error})",
-          "authRefreshFailed": "Falha ao atualizar as credenciais. Por favor, atualize a página para tentar novamente.",
-          "permissionRevoked": "Conexão fechada: seu acesso a este servidor foi revogado.",
-          "tokenRefreshLoop": "Loop de autenticação detectado. Por favor, atualize a página para tentar novamente."
+          "permissionRevoked": "Conexão fechada: seu acesso a este servidor foi revogado."
         },
         "banner": {
           "retrying": "Tentando novamente em {countdown}..."
@@ -1159,7 +1157,6 @@
           "error": {
             "usernameRequired": "Por favor, digite um nome de usuário",
             "registrationDisabled": "Nenhuma conta correspondente foi encontrada e o registro está desativado no momento.",
-            "userAlreadyExists": "Já existe uma conta com este nome de usuário ou e-mail.",
             "securityKeyRequired": "Esta conta requer autenticação de dois fatores, faça o login com uma chave de segurança.",
             "passwordLoginDisabled": "O login com senha está desativado neste painel, use uma das opções abaixo."
           },
