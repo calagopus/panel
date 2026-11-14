@@ -8,6 +8,8 @@ import Switch from '@/elements/input/Switch.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { asSinglePage, useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useServerSelectShowOthers } from '@/plugins/server/useServerSelectShowOthers.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerSelectItem {
@@ -48,7 +50,9 @@ export default function ServerSelect<T extends ServerSelectItem = z.infer<typeof
 }: Props<T>) {
   const { t } = useTranslations();
 
-  const [showOthers, setShowOthers] = useState(false);
+  const canReadAllServers = useAdminCan('servers.read');
+  const [storedShowOthers, setShowOthers] = useServerSelectShowOthers();
+  const showOthers = !!withOthersSwitch && canReadAllServers && storedShowOthers;
   const [lastSelected, setLastSelected] = useState<T | null>(null);
 
   const servers = useInfiniteSearchableResource<T>({

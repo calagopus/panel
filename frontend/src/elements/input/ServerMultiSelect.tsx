@@ -1,5 +1,4 @@
 import { ComboboxData, Input, MultiSelectProps } from '@mantine/core';
-import { useState } from 'react';
 import { z } from 'zod';
 import getServers from '@/api/server/getServers.ts';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -8,6 +7,8 @@ import Switch from '@/elements/input/Switch.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { asSinglePage, useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useServerSelectShowOthers } from '@/plugins/server/useServerSelectShowOthers.ts';
+import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface ServerSelectItem {
@@ -46,7 +47,9 @@ export default function ServerMultiSelect<T extends ServerSelectItem = z.infer<t
 }: Props<T>) {
   const { t } = useTranslations();
 
-  const [showOthers, setShowOthers] = useState(false);
+  const canReadAllServers = useAdminCan('servers.read');
+  const [storedShowOthers, setShowOthers] = useServerSelectShowOthers();
+  const showOthers = !!withOthersSwitch && canReadAllServers && storedShowOthers;
 
   const servers = useInfiniteSearchableResource<T>({
     queryKey: [...queryKey, { showOthers }],
