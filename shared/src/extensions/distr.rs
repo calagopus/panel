@@ -380,7 +380,7 @@ impl ExtensionDistrFile {
     }
 
     pub fn extract_backend(&mut self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         let mut i = 0;
         while let Ok(mut entry) = self.zip.by_index(i) {
@@ -419,7 +419,7 @@ impl ExtensionDistrFile {
     }
 
     pub fn extract_frontend(&mut self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         let mut i = 0;
         while let Ok(mut entry) = self.zip.by_index(i) {
@@ -457,7 +457,7 @@ impl ExtensionDistrFile {
     }
 
     pub fn extract_migrations(&mut self, path: impl AsRef<Path>) -> Result<(), anyhow::Error> {
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         let mut i = 0;
         while let Ok(mut entry) = self.zip.by_index(i) {
@@ -690,12 +690,12 @@ pub struct SlimExtensionDistrFile {
 
 impl SlimExtensionDistrFile {
     pub fn parse_from_directory(path: impl AsRef<Path>) -> Result<Vec<Self>, anyhow::Error> {
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
         let mut results = Vec::new();
 
         let mut dir = filesystem.read_dir("backend-extensions")?;
-        while let Some(Ok((is_dir, name))) = dir.next_entry() {
-            if !is_dir || name == "internal-list" {
+        while let Some(Ok((file_type, name))) = dir.next_entry() {
+            if !file_type.is_dir() || name == "internal-list" {
                 continue;
             }
 
@@ -703,6 +703,7 @@ impl SlimExtensionDistrFile {
                 Path::new("backend-extensions")
                     .join(&name)
                     .join("Metadata.toml"),
+                usize::MAX,
             )?;
             let metadata_toml: MetadataToml = toml::from_str(&metadata_toml)?;
 
@@ -710,6 +711,7 @@ impl SlimExtensionDistrFile {
                 Path::new("backend-extensions")
                     .join(&name)
                     .join("Cargo.toml"),
+                usize::MAX,
             )?;
             let cargo_toml: CargoToml = toml::from_str(&cargo_toml)?;
 
@@ -717,6 +719,7 @@ impl SlimExtensionDistrFile {
                 Path::new("frontend/extensions")
                     .join(&name)
                     .join("package.json"),
+                usize::MAX,
             )?;
             let package_json: PackageJson = serde_json::from_str(&package_json)?;
 
@@ -755,10 +758,10 @@ impl ExtensionDistrFileBuilder {
             ));
         }
 
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         let metadata_toml = filesystem
-            .read_to_string("Metadata.toml")
+            .read_to_string("Metadata.toml", usize::MAX)
             .context("Failed to read Metadata.toml from backend extension directory.")?;
         self.zip
             .start_file("Metadata.toml", FileOptions::<()>::default())?;
@@ -782,9 +785,9 @@ impl ExtensionDistrFileBuilder {
         let ignored = &[ignore_builder.build()?];
 
         let mut walker = filesystem.walk_dir(path)?.with_ignored(ignored);
-        while let Some(Ok((_, name))) = walker.next_entry() {
-            let metadata = filesystem.metadata(&name)?;
-            let virtual_path = Path::new("backend").join(&name);
+        while let Some(Ok(entry)) = walker.next_entry() {
+            let metadata = filesystem.metadata(&entry.path)?;
+            let virtual_path = Path::new("backend").join(&entry.path);
             let virtual_path = virtual_path.to_string_lossy();
             // zip entry names use forward slashes, but Windows joins with `\`
             #[cfg(windows)]
@@ -797,7 +800,7 @@ impl ExtensionDistrFileBuilder {
             } else if metadata.is_file() {
                 self.zip.start_file(&*virtual_path, options)?;
 
-                let mut reader = filesystem.open(&name)?;
+                let mut reader = filesystem.open(&entry.path)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
             }
         }
@@ -814,7 +817,7 @@ impl ExtensionDistrFileBuilder {
             ));
         }
 
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         self.zip.add_directory(
             "frontend",
@@ -836,9 +839,9 @@ impl ExtensionDistrFileBuilder {
         let ignored = &[ignore_builder.build()?];
 
         let mut walker = filesystem.walk_dir(path)?.with_ignored(ignored);
-        while let Some(Ok((_, name))) = walker.next_entry() {
-            let metadata = filesystem.metadata(&name)?;
-            let virtual_path = Path::new("frontend").join(&name);
+        while let Some(Ok(entry)) = walker.next_entry() {
+            let metadata = filesystem.metadata(&entry.path)?;
+            let virtual_path = Path::new("frontend").join(&entry.path);
             let virtual_path = virtual_path.to_string_lossy();
             // zip entry names use forward slashes, but Windows joins with `\`
             #[cfg(windows)]
@@ -851,7 +854,7 @@ impl ExtensionDistrFileBuilder {
             } else if metadata.is_file() {
                 self.zip.start_file(&*virtual_path, options)?;
 
-                let mut reader = filesystem.open(&name)?;
+                let mut reader = filesystem.open(&entry.path)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
             }
         }
@@ -868,7 +871,7 @@ impl ExtensionDistrFileBuilder {
             ));
         }
 
-        let filesystem = crate::cap::CapFilesystem::new(path.as_ref().to_path_buf())?;
+        let filesystem = crate::cap::CapFilesystem::new_sync(path.as_ref())?;
 
         self.zip.add_directory(
             "migrations",
@@ -882,9 +885,9 @@ impl ExtensionDistrFileBuilder {
         let ignored = &[ignore_builder.build()?];
 
         let mut walker = filesystem.walk_dir(path)?.with_ignored(ignored);
-        while let Some(Ok((_, name))) = walker.next_entry() {
-            let metadata = filesystem.metadata(&name)?;
-            let virtual_path = Path::new("migrations").join(&name);
+        while let Some(Ok(entry)) = walker.next_entry() {
+            let metadata = filesystem.metadata(&entry.path)?;
+            let virtual_path = Path::new("migrations").join(&entry.path);
             let virtual_path = virtual_path.to_string_lossy();
             // zip entry names use forward slashes, but Windows joins with `\`
             #[cfg(windows)]
@@ -897,7 +900,7 @@ impl ExtensionDistrFileBuilder {
             } else if metadata.is_file() {
                 self.zip.start_file(&*virtual_path, options)?;
 
-                let mut reader = filesystem.open(&name)?;
+                let mut reader = filesystem.open(&entry.path)?;
                 std::io::copy(&mut reader, &mut self.zip)?;
             }
         }

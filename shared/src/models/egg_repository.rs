@@ -12,7 +12,7 @@ use sqlx::{Row, postgres::PgRow};
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     io::Read,
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
@@ -485,7 +485,7 @@ impl EggRepository {
                 let mut banner_files: HashMap<PathBuf, Option<String>> = HashMap::new();
                 let mut new_banners: HashMap<String, Vec<u8>> = HashMap::new();
                 let temp_dir = tempfile::tempdir()?;
-                let filesystem = crate::cap::CapFilesystem::new(temp_dir.path().to_path_buf())?;
+                let filesystem = crate::cap::CapFilesystem::new_sync(temp_dir.path())?;
 
                 let mut prepare_fetch = gix::clone::PrepareFetch::new(
                     url.clone(),
@@ -511,7 +511,9 @@ impl EggRepository {
                 );
 
                 let mut walker = filesystem.walk_dir(".")?;
-                while let Some(Ok((is_dir, entry))) = walker.next_entry() {
+                while let Some(Ok(entry)) = walker.next_entry() {
+                    let is_dir = entry.file_type().is_dir();
+                    let entry = Path::new(".").join(&entry.path);
                     if is_dir
                         || !matches!(
                             entry.extension().and_then(|s| s.to_str()),
@@ -532,7 +534,9 @@ impl EggRepository {
                         continue;
                     }
 
-                    let file_content = match filesystem.read_to_string(&entry) {
+                    let file_content = match filesystem
+                        .read_to_string(&entry, super::nest_egg::NestEgg::MAX_EXPORTED_SIZE)
+                    {
                         Ok(content) => content,
                         Err(_) => continue,
                     };
@@ -560,8 +564,8 @@ impl EggRepository {
                     {
                         let mut dir = filesystem.read_dir(path)?;
 
-                        while let Some(Ok((is_dir, entry))) = dir.next_entry() {
-                            if is_dir {
+                        while let Some(Ok((file_type, entry))) = dir.next_entry() {
+                            if file_type.is_dir() {
                                 continue;
                             }
 
@@ -572,7 +576,7 @@ impl EggRepository {
                                 && filesystem
                                     .metadata(&path)
                                     .is_ok_and(|m| m.is_file() && m.len() <= 1024 * 1024)
-                                && let Ok(content) = filesystem.read_to_string(&path)
+                                && let Ok(content) = filesystem.read_to_string(&path, 1024 * 1024)
                             {
                                 readme = Some(content);
                             } else if banner.is_none() && is_banner_file_name(&entry) {

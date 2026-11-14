@@ -152,7 +152,7 @@ impl Storage {
         match &settings.storage_driver {
             super::settings::StorageDriver::Filesystem { path: base_path } => {
                 let base_filesystem =
-                    match crate::cap::CapFilesystem::async_new(base_path.into()).await {
+                    match crate::cap::CapFilesystem::new(Path::new(base_path)).await {
                         Ok(base_filesystem) => base_filesystem,
                         Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(()),
                         Err(err) => return Err(err.into()),
@@ -160,11 +160,9 @@ impl Storage {
                 drop(settings);
 
                 if let Err(err) = base_filesystem.async_remove_file(&path).await
-                    && err
-                        .downcast_ref::<std::io::Error>()
-                        .is_none_or(|e| e.kind() != std::io::ErrorKind::NotFound)
+                    && err.kind() != std::io::ErrorKind::NotFound
                 {
-                    return Err(err);
+                    return Err(err.into());
                 }
 
                 if let Some(parent) = Path::new(path).parent().map(|p| p.to_path_buf()) {
@@ -243,8 +241,7 @@ impl Storage {
             super::settings::StorageDriver::Filesystem { path: base_path } => {
                 tokio::fs::create_dir_all(base_path).await?;
 
-                let base_filesystem =
-                    crate::cap::CapFilesystem::async_new(base_path.into()).await?;
+                let base_filesystem = crate::cap::CapFilesystem::new(Path::new(base_path)).await?;
                 drop(settings);
 
                 if let Some(parent) = Path::new(path).parent() {
@@ -306,7 +303,7 @@ impl Storage {
                     Path::new(base_path).join(base).join(directory)
                 };
 
-                let base_filesystem = match crate::cap::CapFilesystem::async_new(dir_path).await {
+                let base_filesystem = match crate::cap::CapFilesystem::new(&dir_path).await {
                     Ok(base_filesystem) => base_filesystem,
                     Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
                         return Ok(crate::models::Pagination {
@@ -324,8 +321,8 @@ impl Storage {
                 let mut raw_dirs: Vec<String> = Vec::new();
                 let mut raw_files: Vec<String> = Vec::new();
 
-                while let Some(Ok((is_dir, name))) = dir_reader.next_entry().await {
-                    if is_dir {
+                while let Some(Ok((file_type, name))) = dir_reader.next_entry().await {
+                    if file_type.is_dir() {
                         raw_dirs.push(name);
                     } else {
                         raw_files.push(name);
@@ -524,7 +521,7 @@ impl Storage {
                     Path::new(base_path).join(base).join(directory)
                 };
 
-                let base_filesystem = match crate::cap::CapFilesystem::async_new(dir_path).await {
+                let base_filesystem = match crate::cap::CapFilesystem::new(&dir_path).await {
                     Ok(base_filesystem) => base_filesystem,
                     Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
                         return Ok(Vec::new());
@@ -536,20 +533,21 @@ impl Storage {
                 let storage_url_retriever = self.retrieve_urls().await?;
                 let mut walker = base_filesystem.async_walk_dir("").await?;
 
-                while let Some(Ok((is_dir, path))) = walker.next_entry().await {
+                while let Some(Ok(entry)) = walker.next_entry().await {
+                    let is_dir = entry.file_type().is_dir();
                     scanned += 1;
                     if scanned > SEARCH_SCAN_LIMIT {
                         break;
                     }
 
-                    let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                    let Some(name) = entry.path.file_name().and_then(|name| name.to_str()) else {
                         continue;
                     };
                     if !name.to_lowercase().contains(&search) {
                         continue;
                     }
 
-                    let relative = path.to_string_lossy();
+                    let relative = entry.path.to_string_lossy();
                     let full_name = if directory.is_empty() {
                         relative.to_compact_string()
                     } else {
@@ -559,7 +557,7 @@ impl Storage {
                     let (size, created) = if is_dir {
                         (0u64, chrono::DateTime::<chrono::Utc>::default())
                     } else {
-                        let metadata = match base_filesystem.async_metadata(&path).await {
+                        let metadata = match base_filesystem.async_metadata(&entry.path).await {
                             Ok(m) => m,
                             Err(_) => continue,
                         };

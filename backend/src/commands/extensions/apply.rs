@@ -251,12 +251,12 @@ impl shared::extensions::commands::CliCommand<ApplyArgs> for ApplyCommand {
                 }
 
                 let filesystem =
-                    shared::cap::CapFilesystem::async_new(PathBuf::from("frontend/dist")).await?;
+                    shared::cap::CapFilesystem::new(Path::new("frontend/dist")).await?;
                 let mut walker = filesystem.async_walk_dir("").await?;
                 let mut total_dist = 0;
 
-                while let Some(Ok((_, name))) = walker.next_entry().await {
-                    let metadata = filesystem.async_metadata(name).await?;
+                while let Some(Ok(entry)) = walker.next_entry().await {
+                    let metadata = filesystem.async_metadata(entry.path).await?;
 
                     if metadata.is_file() {
                         total_dist += metadata.len();

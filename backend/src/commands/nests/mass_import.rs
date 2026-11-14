@@ -3,7 +3,10 @@ use colored::Colorize;
 use compact_str::ToCompactString;
 use dialoguer::{Input, theme::ColorfulTheme};
 use shared::models::ByUuid;
-use std::{io::IsTerminal, path::PathBuf};
+use std::{
+    io::IsTerminal,
+    path::{Path, PathBuf},
+};
 
 #[derive(Args)]
 pub struct MassImportArgs {
@@ -87,7 +90,7 @@ impl shared::extensions::commands::CliCommand<MassImportArgs> for MassImportComm
                     nest.uuid.to_compact_string().cyan()
                 );
 
-                let filesystem = shared::cap::CapFilesystem::new(args.path.into())?;
+                let filesystem = shared::cap::CapFilesystem::new(Path::new(&args.path)).await?;
 
                 let handle_entry = async |entry: PathBuf| {
                     let metadata = match filesystem.async_metadata(&entry).await {
@@ -102,7 +105,13 @@ impl shared::extensions::commands::CliCommand<MassImportArgs> for MassImportComm
                         return Ok(());
                     }
 
-                    let file_content = match filesystem.async_read_to_string(&entry).await {
+                    let file_content = match filesystem
+                        .async_read_to_string(
+                            &entry,
+                            shared::models::nest_egg::NestEgg::MAX_EXPORTED_SIZE,
+                        )
+                        .await
+                    {
                         Ok(content) => content,
                         Err(_) => return Ok(()),
                     };
@@ -180,19 +189,19 @@ impl shared::extensions::commands::CliCommand<MassImportArgs> for MassImportComm
 
                 if args.recursive {
                     let mut walker = filesystem.async_walk_dir(".").await?;
-                    while let Some(Ok((is_dir, entry))) = walker.next_entry().await {
-                        if is_dir
+                    while let Some(Ok(entry)) = walker.next_entry().await {
+                        if entry.file_type().is_dir()
                             || !matches!(
-                                entry.extension().and_then(|s| s.to_str()),
+                                entry.path.extension().and_then(|s| s.to_str()),
                                 Some("json") | Some("yml") | Some("yaml")
                             )
                         {
                             continue;
                         }
 
-                        let entry_string = entry.to_string_lossy().to_compact_string();
+                        let entry_string = entry.path.to_string_lossy().to_compact_string();
 
-                        if let Err(err) = handle_entry(entry).await {
+                        if let Err(err) = handle_entry(entry.path).await {
                             eprintln!(
                                 "error while importing egg {}: {:?}",
                                 entry_string.cyan(),
@@ -207,10 +216,10 @@ impl shared::extensions::commands::CliCommand<MassImportArgs> for MassImportComm
                     }
                 } else {
                     let mut walker = filesystem.async_read_dir(".").await?;
-                    while let Some(Ok((is_dir, entry))) = walker.next_entry().await {
+                    while let Some(Ok((file_type, entry))) = walker.next_entry().await {
                         let entry = PathBuf::from(entry);
 
-                        if is_dir
+                        if file_type.is_dir()
                             || !matches!(
                                 entry.extension().and_then(|s| s.to_str()),
                                 Some("json") | Some("yml") | Some("yaml")

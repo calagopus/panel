@@ -130,7 +130,7 @@ impl StorageDriver {
     ) -> Option<Result<CapFilesystem, std::io::Error>> {
         match self {
             StorageDriver::Filesystem { path } => {
-                Some(CapFilesystem::async_new(Path::new(path).join(relative_path.as_ref())).await)
+                Some(CapFilesystem::new(&Path::new(path).join(relative_path.as_ref())).await)
             }
             _ => None,
         }
