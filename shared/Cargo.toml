@@ -39,6 +39,7 @@ serde = { workspace = true }
 serde_json_path = "0.7.2"
 serde_json = { workspace = true }
 serde_norway = { workspace = true }
+serde-saphyr = { workspace = true }
 rmp-serde = { workspace = true }
 quick-xml = { workspace = true }
 erased-serde = "0.4.10"

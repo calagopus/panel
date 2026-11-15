@@ -230,6 +230,22 @@ pub fn push_scope_or_star<'a>(
     }
 }
 
+/// serde-saphyr expands every alias into a full copy of its anchor, so a few hundred KB of
+/// aliases can materialize into many GB; YAML parsed by the panel never needs them.
+/// The remaining options keep alias-free YAML parsing identical to serde_norway.
+pub fn yaml_deserialize_options() -> serde_saphyr::Options {
+    serde_saphyr::options! {
+        alias_limits: serde_saphyr::alias_limits! {
+            max_alias_expansions_per_anchor: 0,
+        },
+        strict_booleans: true,
+        leading_zero_numbers_as_strings: true,
+        underscored_numbers_as_strings: true,
+        non_finite_float_policy: serde_saphyr::NonFiniteFloatPolicy::PassThrough,
+        duplicate_keys: serde_saphyr::DuplicateKeyPolicy::PassThrough,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

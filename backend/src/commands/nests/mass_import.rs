@@ -111,7 +111,10 @@ impl shared::extensions::commands::CliCommand<MassImportArgs> for MassImportComm
                                 Err(_) => return Ok(()),
                             }
                         } else {
-                            match serde_norway::from_str(&file_content) {
+                            match serde_saphyr::from_str_with_options(
+                                &file_content,
+                                shared::utils::yaml_deserialize_options(),
+                            ) {
                                 Ok(egg) => egg,
                                 Err(_) => return Ok(()),
                             }

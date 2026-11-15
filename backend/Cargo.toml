@@ -60,6 +60,7 @@ sysinfo = { workspace = true }
 serde_with = { workspace = true }
 minijinja = { workspace = true }
 serde_norway = { workspace = true }
+serde-saphyr = { workspace = true }
 hyper = "1.8.1"
 hyper-util = { version = "0.1", features = ["tokio"] }
 hex = { workspace = true }

@@ -407,7 +407,10 @@ impl EggRepository {
                                 Err(_) => continue,
                             }
                         } else {
-                            match serde_norway::from_str(&file_content) {
+                            match serde_saphyr::from_str_with_options(
+                                &file_content,
+                                crate::utils::yaml_deserialize_options(),
+                            ) {
                                 Ok(egg) => egg,
                                 Err(_) => continue,
                             }

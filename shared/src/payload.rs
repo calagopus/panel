@@ -32,6 +32,35 @@ static AVAILABLE_DESERIALIZERS: LazyLock<[mime::Mime; 4]> = LazyLock::new(|| {
     ]
 });
 
+const MAX_XML_NESTING_DEPTH: usize = 256;
+
+fn check_xml_nesting_depth(content: &[u8]) -> Result<(), anyhow::Error> {
+    let mut reader = quick_xml::Reader::from_reader(content);
+    let mut buffer = Vec::new();
+    let mut depth: usize = 0;
+
+    loop {
+        match reader.read_event_into(&mut buffer) {
+            Ok(quick_xml::events::Event::Start(_)) => {
+                depth += 1;
+
+                if depth > MAX_XML_NESTING_DEPTH {
+                    return Err(anyhow::anyhow!(
+                        "xml nesting exceeds the maximum depth of {MAX_XML_NESTING_DEPTH}"
+                    ));
+                }
+            }
+            Ok(quick_xml::events::Event::End(_)) => depth = depth.saturating_sub(1),
+            Ok(quick_xml::events::Event::Eof) | Err(_) => break,
+            _ => {}
+        }
+
+        buffer.clear();
+    }
+
+    Ok(())
+}
+
 /// A small axum payload extractor with content negotiation based on the `Accept` header.
 pub struct Payload<T: DeserializeOwned>(pub T);
 
@@ -67,6 +96,8 @@ impl<T: DeserializeOwned> Payload<T> {
                     bytes = Bytes::from_static(b"<root></root>");
                 }
 
+                check_xml_nesting_depth(bytes.as_ref())?;
+
                 let value =
                     quick_xml::de::from_reader(bytes.as_ref()).map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
@@ -76,7 +107,11 @@ impl<T: DeserializeOwned> Payload<T> {
                     bytes = Bytes::from_static(b"{}");
                 }
 
-                let value = serde_norway::from_slice(&bytes).map_err(anyhow::Error::from)?;
+                let value = serde_saphyr::from_slice_with_options(
+                    &bytes,
+                    crate::utils::yaml_deserialize_options(),
+                )
+                .map_err(anyhow::Error::from)?;
                 Ok(Payload(value))
             }
             _ => Err(PayloadRejection(anyhow::anyhow!(
@@ -144,5 +179,150 @@ where
             Err(_) => return Err(PayloadRejection(anyhow::anyhow!("failed to read body"))),
         };
         Self::from_bytes(content_type, bytes).map(Some)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn xml_nesting_within_the_limit_is_accepted() {
+        let body = "<a>".repeat(MAX_XML_NESTING_DEPTH);
+
+        assert!(check_xml_nesting_depth(body.as_bytes()).is_ok());
+    }
+
+    #[test]
+    fn xml_nesting_beyond_the_limit_is_rejected() {
+        let body = "<a>".repeat(MAX_XML_NESTING_DEPTH + 1);
+
+        assert!(check_xml_nesting_depth(body.as_bytes()).is_err());
+    }
+
+    #[test]
+    fn xml_siblings_do_not_accumulate_depth() {
+        let body = format!(
+            "<root>{}</root>",
+            "<a></a>".repeat(MAX_XML_NESTING_DEPTH * 4)
+        );
+
+        assert!(check_xml_nesting_depth(body.as_bytes()).is_ok());
+    }
+
+    #[test]
+    fn xml_payloads_within_the_limit_still_deserialize() {
+        let payload = match Payload::<serde_json::Value>::from_bytes(
+            mime::TEXT_XML,
+            Bytes::from_static(b"<root><nested><key>value</key></nested></root>"),
+        ) {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(payload.0["nested"]["key"]["$text"], "value");
+    }
+
+    #[test]
+    fn deeply_nested_xml_payloads_are_rejected_before_deserialization() {
+        let body = format!("<root>{}", "<a>".repeat(MAX_XML_NESTING_DEPTH + 1));
+
+        assert!(
+            Payload::<serde_json::Value>::from_bytes(mime::TEXT_XML, Bytes::from(body)).is_err()
+        );
+    }
+
+    // Payload::from_bytes (yaml)
+    fn yaml_payload(
+        body: impl Into<Bytes>,
+    ) -> Result<Payload<serde_json::Value>, PayloadRejection> {
+        Payload::from_bytes(
+            mime::Mime::from_str("application/yaml").unwrap(),
+            body.into(),
+        )
+    }
+
+    #[test]
+    fn yaml_payloads_deserialize() {
+        let payload = match yaml_payload("name: test\nnested:\n  list: [1, 2]\n  glob: \"*leaf\"\n")
+        {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(payload.0["name"], "test");
+        assert_eq!(payload.0["nested"]["list"], serde_json::json!([1, 2]));
+        assert_eq!(payload.0["nested"]["glob"], "*leaf");
+    }
+
+    #[test]
+    fn empty_yaml_body_deserializes_as_an_empty_object() {
+        let payload = match yaml_payload("") {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(payload.0, serde_json::json!({}));
+    }
+
+    #[test]
+    fn yaml_alias_expansion_is_rejected() {
+        let leaf = vec!["1"; 1000].join(",");
+        let aliases = vec!["*leaf"; 500].join(",");
+        let body = format!("seed: &leaf [{leaf}]\nx: [{aliases}]\n");
+
+        assert!(yaml_payload(body).is_err());
+    }
+
+    #[test]
+    fn yaml_merge_key_aliases_are_rejected() {
+        assert!(yaml_payload("base: &base\n  a: 1\nderived:\n  <<: *base\n  b: 2\n").is_err());
+    }
+
+    #[test]
+    fn unused_yaml_anchors_are_accepted() {
+        let payload = match yaml_payload("seed: &leaf [1, 2]\nother: 3\n") {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(payload.0["seed"], serde_json::json!([1, 2]));
+    }
+
+    #[test]
+    fn yaml_1_1_booleans_stay_strings() {
+        let payload = match yaml_payload("a: yes\nb: no\nc: on\nd: off\ne: y\nf: true\ng: false\n")
+        {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(
+            payload.0,
+            serde_json::json!({"a": "yes", "b": "no", "c": "on", "d": "off", "e": "y", "f": true, "g": false})
+        );
+    }
+
+    #[test]
+    fn yaml_leading_zero_and_underscored_numbers_stay_verbatim_strings() {
+        let payload = match yaml_payload("perm: 0644\nid: 007\ncount: 1_000\n") {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(
+            payload.0,
+            serde_json::json!({"perm": "0644", "id": "007", "count": "1_000"})
+        );
+    }
+
+    #[test]
+    fn yaml_duplicate_keys_keep_the_last_value() {
+        let payload = match yaml_payload("a: 1\nkeep: x\na: 2\n") {
+            Ok(payload) => payload,
+            Err(err) => panic!("payload rejected: {}", err.0),
+        };
+
+        assert_eq!(payload.0, serde_json::json!({"a": 2, "keep": "x"}));
     }
 }
