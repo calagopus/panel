@@ -804,8 +804,7 @@
         "login": {
           "error": {
             "usernameRequired": "Wpisz nazwę użytkownika",
-            "registrationDisabled": "Nie znaleziono pasującego konta, a rejestracja jest obecnie wyłączona.",
-            "userAlreadyExists": "Konto o tej nazwie użytkownika lub adresie e-mail już istnieje."
+            "registrationDisabled": "Nie znaleziono pasującego konta, a rejestracja jest obecnie wyłączona."
           },
           "passkey": {
             "error": {
@@ -1413,8 +1412,7 @@
                     "content": "Czy na pewno chcesz wyłączyć telemetrię? Telemetria pomaga nam ulepszyć Calagopus dostarczając anonimowe dane użytkowania. Wyłączenie telemetrii uniemożliwi wysyłanie jakichkolwiek danych."
                   },
                   "enableRegistration": {
-                    "title": "Potwierdź włączenie rejestracji",
-                    "content": "Czy na pewno chcesz włączyć rejestrację? Włączenie rejestracji pozwala każdemu utworzyć konto w tym panelu. Jeśli nie masz skonfigurowanej captchy, to może być błąd."
+                    "title": "Potwierdź włączenie rejestracji"
                   },
                   "telemetryPreview": {
                     "title": "Podgląd telemetrii"

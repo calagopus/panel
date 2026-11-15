@@ -629,9 +629,7 @@
           "connectionClosed": "La connexion au serveur a été fermée. Tentative de reconnexion...",
           "connectionRetry": "Connexion perdue. Nouvelle tentative (tentative {attempt})...",
           "authFailed": "Échec de l'authentification. Tentative d'actualisation des identifiants... ({error})",
-          "authRefreshFailed": "Échec de l'actualisation des identifiants. Veuillez actualiser la page pour réessayer.",
-          "permissionRevoked": "Connexion fermée : votre accès à ce serveur a été révoqué.",
-          "tokenRefreshLoop": "Boucle d'authentification détectée. Veuillez actualiser la page pour réessayer."
+          "permissionRevoked": "Connexion fermée : votre accès à ce serveur a été révoqué."
         },
         "banner": {
           "retrying": "Nouvelle tentative dans {countdown}..."
@@ -867,8 +865,7 @@
         "login": {
           "error": {
             "usernameRequired": "Veuillez entrer un nom d'utilisateur",
-            "registrationDisabled": "Aucun compte correspondant n'a été trouvé et l'inscription est actuellement désactivée.",
-            "userAlreadyExists": "Un compte avec ce nom d'utilisateur ou cette adresse e-mail existe déjà."
+            "registrationDisabled": "Aucun compte correspondant n'a été trouvé et l'inscription est actuellement désactivée."
           },
           "passkey": {
             "error": {
@@ -1080,8 +1077,7 @@
           "title": "Compte",
           "alert": {
             "requireTwoFactor": {
-              "title": "Authentification à deux facteurs requise",
-              "description": "L'authentification à deux facteurs est requise pour votre compte. Veuillez la mettre en place ci-dessus pour continuer à utiliser le panel."
+              "title": "Authentification à deux facteurs requise"
             },
             "frozen": {
               "title": "Compte gelé",
@@ -1577,8 +1573,7 @@
                     "content": "Êtes-vous sûr de vouloir désactiver la télémétrie ? La télémétrie nous aide à améliorer Calagopus en fournissant des données d'utilisation anonymes. La désactiver empêchera l'envoi de toute donnée."
                   },
                   "enableRegistration": {
-                    "title": "Confirmer l'activation de l'inscription",
-                    "content": "Êtes-vous sûr de vouloir activer l'inscription ? L'activer permet à n'importe qui de créer un compte sur ce panel. Si vous n'avez pas de captcha configuré, cela peut être une erreur."
+                    "title": "Confirmer l'activation de l'inscription"
                   },
                   "telemetryPreview": {
                     "title": "Aperçu de la télémétrie"

@@ -844,9 +844,7 @@
           "connectionClosed": "Forbindelsen til serveren blev lukket. Forsøger at genoprette forbindelsen...",
           "connectionRetry": "Forbindelsen blev afbrudt. Prøver igen (forsøg {attempt})...",
           "authFailed": "Godkendelse mislykkedes. Forsøger at forny loginoplysningerne... ({error})",
-          "authRefreshFailed": "Kunne ikke forny loginoplysningerne. Genindlæs siden for at prøve igen.",
-          "permissionRevoked": "Forbindelsen blev lukket: din adgang til denne server er blevet tilbagekaldt.",
-          "tokenRefreshLoop": "Godkendelsesloop registreret. Genindlæs siden for at prøve igen."
+          "permissionRevoked": "Forbindelsen blev lukket: din adgang til denne server er blevet tilbagekaldt."
         },
         "banner": {
           "retrying": "Prøver igen om {countdown}..."
@@ -1120,7 +1118,6 @@
           "error": {
             "usernameRequired": "Indtast et brugernavn",
             "registrationDisabled": "Der blev ikke fundet nogen matchende konto, og registrering er i øjeblikket deaktiveret.",
-            "userAlreadyExists": "Der findes allerede en konto med dette brugernavn eller denne e-mail.",
             "securityKeyRequired": "Denne konto kræver tofaktorgodkendelse. Log i stedet ind med en sikkerhedsnøgle."
           },
           "passkey": {
@@ -1346,8 +1343,7 @@
           "title": "Konto",
           "alert": {
             "requireTwoFactor": {
-              "title": "Tofaktorgodkendelse påkrævet",
-              "description": "Tofaktorgodkendelse er påkrævet på din konto. Sæt det op nedenfor for at fortsætte med at bruge panelet."
+              "title": "Tofaktorgodkendelse påkrævet"
             },
             "verifyEmail": {
               "title": "E-mailbekræftelse påkrævet",
@@ -1968,8 +1964,7 @@
                     "content": "Er du sikker på, at du vil deaktivere telemetri? Telemetri hjælper os med at forbedre Calagopus via anonyme brugsdata. Deaktiveres telemetri, bliver der ikke sendt nogen data."
                   },
                   "enableRegistration": {
-                    "title": "Bekræft aktivering af registrering",
-                    "content": "Er du sikker på, at du vil aktivere registrering? Når registrering er aktiveret, kan alle oprette en konto på dette panel. Hvis du ikke har konfigureret en captcha, er det muligvis en fejl."
+                    "title": "Bekræft aktivering af registrering"
                   },
                   "telemetryPreview": {
                     "title": "Forhåndsvisning af telemetri"
@@ -4970,8 +4965,7 @@
             "permissionsRestored": "Rettigheder gendannet.",
             "permissionsCouldNotBeRestored": "Rettighederne kunne ikke gendannes.",
             "fileSaved": "Filen er gemt.",
-            "collabSaveTimeout": "Filen kunne ikke gemmes. Daemonen svarede ikke i tide.",
-            "fileTooLargeToOpen": "Denne fil er for stor til at åbne i filhåndteringen."
+            "collabSaveTimeout": "Filen kunne ikke gemmes. Daemonen svarede ikke i tide."
           },
           "tooltip": {
             "settings": "Indstillinger",

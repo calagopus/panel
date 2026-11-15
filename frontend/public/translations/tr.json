@@ -411,9 +411,7 @@
           "connectionClosed": "Sunucu bağlantısı kesildi. Yeniden bağlanmaya çalışılıyor...",
           "connectionRetry": "Bağlantı koptu. Yeniden deneniyor (deneme {attempt})...",
           "authFailed": "Kimlik doğrulama başarısız. Kimlik bilgileri yenilenmeye çalışılıyor... ({error})",
-          "authRefreshFailed": "Kimlik bilgileri yenilenemedi. Yeniden denemek için lütfen sayfayı yenileyin.",
-          "permissionRevoked": "Bağlantı kapatıldı: bu sunucuya erişim yetkiniz iptal edildi.",
-          "tokenRefreshLoop": "Kimlik doğrulama döngüsü tespit edildi. Yeniden denemek için lütfen sayfayı yenileyin."
+          "permissionRevoked": "Bağlantı kapatıldı: bu sunucuya erişim yetkiniz iptal edildi."
         },
         "banner": {
           "retrying": "{countdown} içinde yeniden deneniyor..."
@@ -798,8 +796,7 @@
           "title": "Hesap",
           "alert": {
             "requireTwoFactor": {
-              "title": "İki Faktörlü Doğrulama Gerekli",
-              "description": "Hesabınızda İki Faktörlü Doğrulama gereklidir. Paneli kullanmaya devam etmek için lütfen aşağıdan kurulumu yapın."
+              "title": "İki Faktörlü Doğrulama Gerekli"
             }
           },
           "containers": {

@@ -528,7 +528,6 @@
         "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác.",
         "rule": {
           "invalidCharacters": "Chứa các ký tự không được phép sử dụng ở đây.",
-          "username": "Chỉ từ 3 đến 15 ký tự, bao gồm chữ cái, chữ số và dấu gạch dưới.",
           "databaseName": "Tối đa 31 ký tự, chỉ bao gồm chữ cái, chữ số và dấu gạch dưới.",
           "databaseInstanceIdentifier": "Từ 2 đến 23 ký tự, chỉ bao gồm chữ cái và chữ số.",
           "captchaSiteKey": "Chỉ chấp nhận chữ cái, chữ số, dấu gạch ngang và dấu gạch dưới.",
@@ -997,9 +996,7 @@
           "connectionClosed": "Kết nối đến máy chủ đã bị đóng. Đang cố gắng kết nối lại...",
           "connectionRetry": "Mất kết nối đang thử  lại ({attempt})...",
           "authFailed": "Xác thực thất bại. Đang cố gắng làm mới thông tin đăng nhập... ({error})",
-          "authRefreshFailed": "Không thể làm mới thông tin đăng nhập. Vui lòng làm mới trang để thử lại.",
-          "permissionRevoked": "Kết nối đã bị đóng: quyền truy cập vào máy chủ này đã bị thu hồi.",
-          "tokenRefreshLoop": "Đã phát hiện lỗi xác thực lặp lại. Vui lòng làm mới trang để thử lại."
+          "permissionRevoked": "Kết nối đã bị đóng: quyền truy cập vào máy chủ này đã bị thu hồi."
         },
         "banner": {
           "retrying": "Thử lại trong {countdown}..."
@@ -1293,7 +1290,6 @@
           "error": {
             "usernameRequired": "Vui lòng nhập tên người dùng của bạn.",
             "registrationDisabled": "Không tìm thấy tài khoản phù hợp và đăng ký hiện đang bị tắt.",
-            "userAlreadyExists": "Một tài khoản với tên người dùng hoặc email này đã tồn tại.",
             "securityKeyRequired": "Tài khoản này yêu cầu xác thực hai yếu tố; hãy đăng nhập bằng khóa bảo mật thay thế.",
             "passwordLoginDisabled": "Tính năng đăng nhập bằng mật khẩu đã bị tắt trên bảng này; thay vào đó, hãy sử dụng một trong các tùy chọn dưới đây."
           },
@@ -1536,8 +1532,7 @@
           "title": "Tài khoản",
           "alert": {
             "requireTwoFactor": {
-              "title": "Yêu cầu Xác thực Hai Lớp",
-              "description": "Để cải thiện bảo mật tài khoản của bạn, chúng tôi yêu cầu bạn kích hoạt xác thực hai lớp. Vui lòng thiết lập xác thực hai lớp để tiếp tục sử dụng tài khoản của bạn."
+              "title": "Yêu cầu Xác thực Hai Lớp"
             },
             "verifyEmail": {
               "title": "Yêu cầu xác minh email",
@@ -2237,8 +2232,7 @@
                     "content": "Bạn có chắc muốn tắt đo lường? Đo lường giúp chúng tôi cải thiện Calagopus bằng cách cung cấp dữ liệu sử dụng ẩn danh. Tắt đo lường sẽ ngăn mọi dữ liệu được gửi."
                   },
                   "enableRegistration": {
-                    "title": "Xác Nhận Bật Đăng Ký",
-                    "content": "Bạn có chắc muốn bật đăng ký? Bật đăng ký cho phép bất kỳ ai tạo tài khoản trên bảng điều khiển này. Nếu bạn chưa cấu hình captcha, đây có thể là một sai lầm."
+                    "title": "Xác Nhận Bật Đăng Ký"
                   },
                   "disablePasswordLogin": {
                     "title": "Xác nhận tắt tính năng đăng nhập bằng mật khẩu",
@@ -5637,8 +5631,7 @@
             "permissionsRestored": "Đã khôi phục quyền hạn.",
             "permissionsCouldNotBeRestored": "Đã khôi phục quyền hạn.",
             "fileSaved": "Tệp đã được lưu.",
-            "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời.",
-            "fileTooLargeToOpen": "Tệp này quá lớn để mở trong trình quản lý tệp."
+            "collabSaveTimeout": "Không thể lưu tệp, daemon không phản hồi kịp thời."
           },
           "tooltip": {
             "settings": "Cài đặt",

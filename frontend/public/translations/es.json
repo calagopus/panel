@@ -986,9 +986,7 @@
           "connectionClosed": "Se cerró la conexión con el servidor. Intentando reconectar...",
           "connectionRetry": "Conexión perdida. Reintentando (intento {attempt})...",
           "authFailed": "Falló la autenticación. Intentando actualizar credenciales... ({error})",
-          "authRefreshFailed": "No se pudieron actualizar las credenciales. Recarga la página para intentarlo de nuevo.",
-          "permissionRevoked": "Conexión cerrada: tu acceso a este servidor ha sido revocado.",
-          "tokenRefreshLoop": "Se detectó un bucle de autenticación. Recarga la página para intentarlo de nuevo."
+          "permissionRevoked": "Conexión cerrada: tu acceso a este servidor ha sido revocado."
         },
         "banner": {
           "retrying": "Reintentando en {countdown}..."
@@ -1279,7 +1277,6 @@
           "error": {
             "usernameRequired": "Introduce un usuario",
             "registrationDisabled": "No se ha encontrado ninguna cuenta coincidente y el registro está desactivado actualmente.",
-            "userAlreadyExists": "Ya existe una cuenta con este nombre de usuario o correo electrónico.",
             "securityKeyRequired": "Esta cuenta requiere autenticación de dos factores, inicia sesión con una clave de seguridad en su lugar.",
             "passwordLoginDisabled": "El inicio de sesión con contraseña está desactivado en este panel. Usa una de las opciones siguientes."
           },
@@ -1515,8 +1512,7 @@
           "title": "Cuenta",
           "alert": {
             "requireTwoFactor": {
-              "title": "Se requiere autenticación en dos factores",
-              "description": "Se requiere autenticación en dos factores en tu cuenta. Configúrala abajo para seguir usando el panel."
+              "title": "Se requiere autenticación en dos factores"
             },
             "verifyEmail": {
               "title": "Requiere verificación de correo electrónico",
@@ -2198,8 +2194,7 @@
                     "content": "¿Quieres desactivar la telemetría? La telemetría nos ayuda a mejorar Calagopus mediante datos de uso anónimos. Si desactivas la telemetría, no se enviará ningún dato."
                   },
                   "enableRegistration": {
-                    "title": "Confirmar la activación del registro",
-                    "content": "¿Quieres habilitar el registro? Al habilitarlo, cualquiera podrá crear una cuenta en este panel. Si no tienes un CAPTCHA configurado, puede que esto sea un error."
+                    "title": "Confirmar la activación del registro"
                   },
                   "disablePasswordLogin": {
                     "title": "Confirmar la desactivación del inicio de sesión con contraseña",
@@ -5675,8 +5670,7 @@
             "permissionsRestored": "Permisos restaurados.",
             "permissionsCouldNotBeRestored": "No se han podido restaurar los permisos.",
             "fileSaved": "El archivo se ha guardado.",
-            "collabSaveTimeout": "No se ha podido guardar el archivo porque el demonio no respondió a tiempo.",
-            "fileTooLargeToOpen": "Este archivo es demasiado grande para abrirlo en el gestor de archivos."
+            "collabSaveTimeout": "No se ha podido guardar el archivo porque el demonio no respondió a tiempo."
           },
           "tooltip": {
             "settings": "Configuración",

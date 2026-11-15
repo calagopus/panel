@@ -458,8 +458,7 @@
         "account": {
           "alert": {
             "requireTwoFactor": {
-              "title": "Autenticazione a due fattori richiesta",
-              "description": "L'autenticazione a due fattori è richiesta per il tuo account. Configurala qui sotto per continuare a utilizzare il pannello."
+              "title": "Autenticazione a due fattori richiesta"
             }
           },
           "containers": {

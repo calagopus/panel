@@ -471,9 +471,7 @@
           "connectionClosed": "Pripojenie k serveru bolo ukončené. Prebieha pokus o opätovné pripojenie...",
           "connectionRetry": "Spojenie sa stratilo. Opakuje sa pokus o pripojenie ({attempt}. pokus)...",
           "authFailed": "Autentifikácia zlyhala. Prebieha pokus o obnovenie poverení... ({error})",
-          "authRefreshFailed": "Obnovenie prihlasovacích údajov zlyhalo. Obnovte stránku a skúste to znova.",
-          "permissionRevoked": "Pripojenie zatvorené: váš prístup k tomuto serveru bol zrušený.",
-          "tokenRefreshLoop": "Bola zistená slučka overovania. Obnovte stránku a skúste to znova."
+          "permissionRevoked": "Pripojenie zatvorené: váš prístup k tomuto serveru bol zrušený."
         },
         "banner": {
           "retrying": "Ďalší pokus o {countdown}..."
@@ -692,8 +690,7 @@
         "login": {
           "error": {
             "usernameRequired": "Zadajte používateľské meno",
-            "registrationDisabled": "Nebol nájdený žiadny zodpovedajúci účet a registrácia je momentálne zakázaná.",
-            "userAlreadyExists": "Účet s týmto používateľským menom alebo e-mailom už existuje."
+            "registrationDisabled": "Nebol nájdený žiadny zodpovedajúci účet a registrácia je momentálne zakázaná."
           },
           "passkey": {
             "error": {
@@ -872,8 +869,7 @@
           "title": "Účet",
           "alert": {
             "requireTwoFactor": {
-              "title": "Vyžaduje sa dvojfaktorové overenie",
-              "description": "Na vašom účte sa vyžaduje dvojfaktorové overenie. Ak chcete panel naďalej používať, nastavte ho nižšie."
+              "title": "Vyžaduje sa dvojfaktorové overenie"
             },
             "frozen": {
               "title": "Účet zmrazený",
@@ -1356,8 +1352,7 @@
                     "content": "Naozaj chcete zakázať telemetriu? Telemetria nám pomáha zlepšovať Calagopus poskytovaním anonymných údajov o používaní. Vypnutím telemetrie zabránite odosielaniu akýchkoľvek údajov."
                   },
                   "enableRegistration": {
-                    "title": "Potvrdiť povolenie registrácie",
-                    "content": "Naozaj chcete povoliť registráciu? Povolenie registrácie umožní komukoľvek vytvoriť účet v tomto paneli. Ak nemáte nakonfigurovanú captchu, môže to byť bezpečnostné riziko."
+                    "title": "Potvrdiť povolenie registrácie"
                   },
                   "telemetryPreview": {
                     "title": "Ukážka telemetrie"
