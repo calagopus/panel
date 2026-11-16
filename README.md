@@ -7,7 +7,7 @@
 [![Rust](https://img.shields.io/badge/rust-stable-orange.svg?logo=rust)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/github/license/calagopus/panel?color=blue)](https://github.com/calagopus/panel/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/calagopus/panel?color=green)](https://github.com/calagopus/panel/issues)
-[![GitHub stars](https://img.shields.io/github/stars/calagopus/panel)](https://github.com/calagopus/panel/stargazers)
+![GitHub stars](https://img.shields.io/github/stars/calagopus/panel)
 [![Discord](https://img.shields.io/discord/1429911351777824892?label=discord&logo=discord&color=5865F2)](https://discord.gg/uSM8tvTxBV)
 [![Crowdin](https://img.shields.io/badge/translate-Crowdin-red?logo=crowdin)](https://crowdin.com/project/calagopus)
 
