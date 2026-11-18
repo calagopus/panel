@@ -361,7 +361,7 @@ impl ServerBackup {
             Some(backup_configuration) => backup_configuration,
             None => options
                 .server
-                .backup_configuration(&state.database)
+                .backup_configuration_for(&state.database, options.database_instance)
                 .await
                 .ok_or_else(|| {
                     crate::response::DisplayError::new(
@@ -1915,7 +1915,7 @@ impl CreatableModel for ServerBackup {
             Some(backup_configuration) => backup_configuration,
             None => options
                 .server
-                .backup_configuration(&state.database)
+                .backup_configuration_for(&state.database, options.database_instance)
                 .await
                 .ok_or_else(|| {
                     anyhow::Error::new(

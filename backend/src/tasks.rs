@@ -183,7 +183,11 @@ async fn dispatch_system_backup_target(
                 }
             }
         }
-        None => server.backup_configuration(&state.database).await,
+        None => {
+            server
+                .backup_configuration_for(&state.database, database_instance.as_ref())
+                .await
+        }
     };
     let Some(backup_configuration) = backup_configuration else {
         return SystemBackupTargetOutcome::Skipped(

@@ -4878,6 +4878,7 @@
                 "form": {
                   "typePublicHost": "Öffentlicher Host",
                   "typePublicPort": "Öffentlicher Port",
+                  "backupConfigurationPlaceholder": "Von Node/Standort erben",
                   "memoryDescription": "Der gesamte Arbeitsspeicher, der Datenbank-Instanzen auf diesem Host zur Verfügung steht.",
                   "diskDescription": "Der gesamte Speicherplatz, der Datenbank-Instanzen auf diesem Host zur Verfügung steht.",
                   "unlimitedTooltip": "0 setzt kein Limit."
@@ -5108,6 +5109,8 @@
                   "volumes": "Volumes",
                   "socketPath": "Socket-Pfad",
                   "socketPathDescription": "Der Unix-Socket-Dateipfad innerhalb des Datenbank-Containers, muss mit dem Ort übereinstimmen, an dem das konfigurierte Image seinen Socket tatsächlich erstellt.",
+                  "controlSocketPath": "Steuer-Socket-Pfad",
+                  "controlSocketPathDescription": "Ein optionaler zweiter Unix-Socket, den der Agent anstelle des Socket-Pfads für die Verwaltung nutzt, muss im selben Verzeichnis wie der Socket-Pfad liegen.",
                   "imageUid": "Image-UID",
                   "imageGid": "Image-GID",
                   "memoryDescription": "Das Speicherlimit des Datenbank-Containers.",
@@ -5499,6 +5502,12 @@
               "title": "Server",
               "page": {
                 "title": "Backup-Konfiguration Server"
+              }
+            },
+            "databaseAgentHosts": {
+              "title": "Datenbank-Agent-Hosts",
+              "page": {
+                "title": "Backup-Konfiguration Datenbank-Agent-Hosts"
               }
             }
           }
@@ -6662,7 +6671,7 @@
             "unsupported": {
               "title": "Nicht unterstützt",
               "content": "MongoDB-Datenbanken können nicht über das Panel erkundet werden.",
-              "instanceContent": "MongoDB- und Redis-Datenbank-Instanzen können nicht über das Panel erkundet werden."
+              "instanceContent": "MongoDB-, Redis- und ClickHouse-Datenbank-Instanzen können nicht über das Panel erkundet werden."
             },
             "notFound": "Diese Datenbank existiert auf der Instanz nicht.",
             "tabs": {

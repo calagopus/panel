@@ -153,6 +153,7 @@ export const databaseAgentTypeLabelMapping: Record<z.infer<typeof databaseAgentT
   mariadb: 'MariaDB',
   mongodb: 'MongoDB',
   redis: 'Redis',
+  clickhouse: 'ClickHouse',
 };
 
 export const serverDatabaseInstanceUserPermissionLabelMapping: Record<
@@ -169,6 +170,7 @@ export const databaseAgentTypeDefaultPortMapping: Record<z.infer<typeof database
   mariadb: 3306,
   mongodb: 27017,
   redis: 6379,
+  clickhouse: 9000,
 };
 
 export const databaseAgentTypeDumpExtensionMapping: Record<z.infer<typeof databaseAgentType>, string> = {
@@ -176,6 +178,7 @@ export const databaseAgentTypeDumpExtensionMapping: Record<z.infer<typeof databa
   mariadb: '.sql,.gz',
   mongodb: '.archive',
   redis: '.rdb',
+  clickhouse: '.zip',
 };
 
 export const announcementTypeLabelMapping: Record<z.infer<typeof announcementType>, () => string> = {

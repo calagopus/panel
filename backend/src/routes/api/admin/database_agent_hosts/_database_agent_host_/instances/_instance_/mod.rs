@@ -233,6 +233,7 @@ mod patch {
                     image_gid: None,
                     volumes: None,
                     socket_path: None,
+                    control_socket_path: None,
                     timezone: None,
                     env: data.env.is_some().then_some(spec.env),
                     cmd: None,

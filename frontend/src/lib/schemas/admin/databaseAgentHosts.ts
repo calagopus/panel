@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { nullableNumber, nullableString } from '@/lib/serialization/transformers.ts';
 import { hostnameSchema } from '../generic.ts';
 
@@ -10,6 +11,7 @@ export const adminDatabaseAgentHostTypeSettingsSchema = z.object({
 
 export const adminDatabaseAgentHostSchema = z.looseObject({
   uuid: z.string(),
+  backupConfiguration: z.lazy(() => adminBackupConfigurationSchema).nullable(),
   name: z.string().min(1).max(255),
   description: z.preprocess(nullableString, z.string().min(1).max(1024).nullable()),
   deploymentEnabled: z.boolean(),
@@ -22,6 +24,7 @@ export const adminDatabaseAgentHostSchema = z.looseObject({
     mariadb: adminDatabaseAgentHostTypeSettingsSchema,
     mongodb: adminDatabaseAgentHostTypeSettingsSchema,
     redis: adminDatabaseAgentHostTypeSettingsSchema,
+    clickhouse: adminDatabaseAgentHostTypeSettingsSchema,
   }),
   created: z.coerce.date(),
 });
@@ -58,17 +61,26 @@ export const adminDatabaseAgentHostCapacitiesSchema = z.record(
 );
 
 export const adminDatabaseAgentHostCreateSchema = z.lazy(() =>
-  adminDatabaseAgentHostSchema.omit({
-    uuid: true,
-    created: true,
-  }),
+  adminDatabaseAgentHostSchema
+    .omit({
+      uuid: true,
+      backupConfiguration: true,
+      created: true,
+    })
+    .extend({
+      backupConfigurationUuid: z.uuid().nullable(),
+    }),
 );
 
 export const adminDatabaseAgentHostUpdateSchema = z.lazy(() =>
   adminDatabaseAgentHostSchema
     .omit({
       uuid: true,
+      backupConfiguration: true,
       created: true,
+    })
+    .extend({
+      backupConfigurationUuid: z.uuid().nullable(),
     })
     .partial(),
 );

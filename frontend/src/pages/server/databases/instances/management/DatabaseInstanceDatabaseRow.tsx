@@ -131,7 +131,7 @@ export default function DatabaseInstanceDatabaseRow({
             type: 'action',
             icon: faTableList,
             label: t('pages.server.databases.explorer.button.open', {}),
-            hidden: instance.type === 'mongodb' || instance.type === 'redis',
+            hidden: instance.type === 'mongodb' || instance.type === 'redis' || instance.type === 'clickhouse',
             disabled: offline,
             onClick: () =>
               navigate(
@@ -162,6 +162,7 @@ export default function DatabaseInstanceDatabaseRow({
             type: 'action',
             icon: faCloudArrowDown,
             label: t('pages.server.databases.instance.databases.button.remoteImport', {}),
+            hidden: instance.type === 'clickhouse',
             disabled: offline,
             onClick: () => setOpenModal('remoteImport'),
             color: 'gray',

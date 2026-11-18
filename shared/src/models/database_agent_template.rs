@@ -51,6 +51,7 @@ pub struct DatabaseAgentTemplate {
     pub cmd: Option<Vec<compact_str::CompactString>>,
     pub volumes: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub socket_path: compact_str::CompactString,
+    pub control_socket_path: Option<compact_str::CompactString>,
 
     pub memory: i64,
     pub swap: i64,
@@ -133,6 +134,10 @@ impl BaseModel for DatabaseAgentTemplate {
                 compact_str::format_compact!("{prefix}socket_path"),
             ),
             (
+                "database_agent_templates.control_socket_path",
+                compact_str::format_compact!("{prefix}control_socket_path"),
+            ),
+            (
                 "database_agent_templates.memory",
                 compact_str::format_compact!("{prefix}memory"),
             ),
@@ -189,6 +194,8 @@ impl BaseModel for DatabaseAgentTemplate {
             )?,
             socket_path: row
                 .try_get(compact_str::format_compact!("{prefix}socket_path").as_str())?,
+            control_socket_path: row
+                .try_get(compact_str::format_compact!("{prefix}control_socket_path").as_str())?,
             memory: row.try_get(compact_str::format_compact!("{prefix}memory").as_str())?,
             swap: row.try_get(compact_str::format_compact!("{prefix}swap").as_str())?,
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
@@ -283,6 +290,7 @@ impl IntoAdminApiObject for DatabaseAgentTemplate {
                 cmd: self.cmd,
                 volumes: self.volumes,
                 socket_path: self.socket_path,
+                control_socket_path: self.control_socket_path,
                 memory: self.memory,
                 swap: self.swap,
                 disk: self.disk,
@@ -407,6 +415,9 @@ pub struct CreateDatabaseAgentTemplateOptions {
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub socket_path: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub control_socket_path: Option<compact_str::CompactString>,
 
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
@@ -460,6 +471,7 @@ impl CreatableModel for DatabaseAgentTemplate {
             .set("cmd", options.cmd.as_ref())
             .set("volumes", OrderedJson(&options.volumes))
             .set("socket_path", &options.socket_path)
+            .set("control_socket_path", &options.control_socket_path)
             .set("memory", options.memory)
             .set("swap", options.swap)
             .set("disk", options.disk)
@@ -519,6 +531,14 @@ pub struct UpdateDatabaseAgentTemplateOptions {
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub socket_path: Option<compact_str::CompactString>,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub control_socket_path: Option<Option<compact_str::CompactString>>,
 
     #[garde(range(min = 0))]
     #[schema(minimum = 0)]
@@ -574,6 +594,10 @@ impl UpdatableModel for DatabaseAgentTemplate {
                 .socket_path
                 .as_ref()
                 .is_some_and(|v| *v != self.socket_path)
+            || options
+                .control_socket_path
+                .as_ref()
+                .is_some_and(|v| *v != self.control_socket_path)
             || options.memory.is_some_and(|v| v != self.memory)
             || options.swap.is_some_and(|v| v != self.swap)
             || options.disk.is_some_and(|v| v != self.disk)
@@ -602,6 +626,10 @@ impl UpdatableModel for DatabaseAgentTemplate {
             .set("cmd", options.cmd.as_ref().map(|c| c.as_ref()))
             .set("volumes", options.volumes.as_ref().map(OrderedJson))
             .set("socket_path", options.socket_path.as_ref())
+            .set(
+                "control_socket_path",
+                options.control_socket_path.as_ref().map(|p| p.as_ref()),
+            )
             .set("memory", options.memory)
             .set("swap", options.swap)
             .set("disk", options.disk)
@@ -649,6 +677,9 @@ impl UpdatableModel for DatabaseAgentTemplate {
         }
         if let Some(socket_path) = options.socket_path {
             self.socket_path = socket_path;
+        }
+        if let Some(control_socket_path) = options.control_socket_path {
+            self.control_socket_path = control_socket_path;
         }
         if let Some(memory) = options.memory {
             self.memory = memory;
@@ -810,6 +841,7 @@ impl DuplicableModel for DatabaseAgentTemplate {
             .set("cmd", self.cmd.as_ref())
             .set("volumes", OrderedJson(&self.volumes))
             .set("socket_path", &self.socket_path)
+            .set("control_socket_path", &self.control_socket_path)
             .set("memory", self.memory)
             .set("swap", self.swap)
             .set("disk", self.disk)
@@ -856,6 +888,7 @@ pub struct AdminApiDatabaseAgentTemplate {
     pub cmd: Option<Vec<compact_str::CompactString>>,
     pub volumes: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub socket_path: compact_str::CompactString,
+    pub control_socket_path: Option<compact_str::CompactString>,
 
     pub memory: i64,
     pub swap: i64,

@@ -252,7 +252,9 @@ mod post {
 
         let backup_configuration = match &database_instance {
             Some(database_instance) => {
-                let backup_configuration = match server.backup_configuration(&state.database).await
+                let backup_configuration = match server
+                    .backup_configuration_for(&state.database, Some(database_instance))
+                    .await
                 {
                     Some(backup_configuration) => backup_configuration,
                     None => {

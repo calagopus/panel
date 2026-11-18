@@ -166,6 +166,7 @@ const admin = {
     detail: (uuid: string) => ['admin', 'backup-configurations', { uuid }] as const,
     locations: (uuid: string) => ['admin', 'backup-configurations', uuid, 'locations'] as const,
     nodes: (uuid: string) => ['admin', 'backup-configurations', uuid, 'nodes'] as const,
+    databaseAgentHosts: (uuid: string) => ['admin', 'backup-configurations', uuid, 'database-agent-hosts'] as const,
     servers: (uuid: string) => ['admin', 'backup-configurations', uuid, 'servers'] as const,
     stats: (uuid: string) => ['admin', 'backup-configurations', uuid, 'stats'] as const,
   },

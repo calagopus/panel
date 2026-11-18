@@ -5,16 +5,19 @@ import UrlMissingPortAlert from '@/elements/UrlMissingPortAlert.tsx';
 import { DATABASE_AGENT_DEFAULT_PORT } from '@/lib/domain/databaseAgentHost.ts';
 import { databaseAgentTypeDefaultPortMapping, databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { getUrlConnectPort, withUrlPort } from '@/lib/network/url.ts';
+import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import {
   adminDatabaseAgentHostSchema,
   adminDatabaseAgentHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseAgentHosts.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 type DatabaseAgentHostFormValues = z.infer<typeof adminDatabaseAgentHostUpdateSchema>;
 type DatabaseAgentTypeKey = keyof typeof databaseAgentTypeLabelMapping;
 
 export const databaseAgentHostEmptyFormValues: DatabaseAgentHostFormValues = {
+  backupConfigurationUuid: null,
   name: '',
   description: null,
   deploymentEnabled: true,
@@ -33,6 +36,7 @@ export const databaseAgentHostEmptyFormValues: DatabaseAgentHostFormValues = {
 export const databaseAgentHostToFormValues = (
   host: z.infer<typeof adminDatabaseAgentHostSchema>,
 ): Partial<DatabaseAgentHostFormValues> => ({
+  backupConfigurationUuid: host.backupConfiguration?.uuid ?? null,
   name: host.name,
   description: host.description,
   deploymentEnabled: host.deploymentEnabled,
@@ -48,8 +52,12 @@ const typeEnabled = (type: string) => (values: DatabaseAgentHostFormValues) =>
 
 export function useDatabaseAgentHostFormFields({
   urlValue,
+  backupConfigurations,
 }: {
   urlValue: string;
+  backupConfigurations: ReturnType<
+    typeof useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>
+  >;
 }): FieldDef<DatabaseAgentHostFormValues>[] {
   const { t } = useTranslations();
 
@@ -100,6 +108,22 @@ export function useDatabaseAgentHostFormFields({
       tooltip: t('pages.admin.databaseAgentHosts.tabs.general.page.form.unlimitedTooltip', {}),
       mode: 'mb',
       min: 0,
+    },
+    {
+      type: 'select',
+      name: 'backupConfigurationUuid',
+      label: t('common.form.backupConfiguration', {}),
+      options: backupConfigurations.items.map((b) => ({ label: b.name, value: b.uuid })),
+      props: {
+        placeholder: t('pages.admin.databaseAgentHosts.tabs.general.page.form.backupConfigurationPlaceholder', {}),
+        searchable: true,
+        searchValue: backupConfigurations.search,
+        onSearchChange: backupConfigurations.setSearch,
+        infiniteScroll: backupConfigurations.infiniteScroll,
+        allowDeselect: true,
+        clearable: true,
+        loading: backupConfigurations.loading,
+      },
     },
     { type: 'switch', name: 'deploymentEnabled', label: t('common.form.deploymentEnabled', {}) },
     { type: 'switch', name: 'maintenanceEnabled', label: t('common.form.maintenanceEnabled', {}) },

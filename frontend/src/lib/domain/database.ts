@@ -8,6 +8,7 @@ const jdbcSubprotocols: Record<z.infer<typeof databaseType> | z.infer<typeof dat
   mariadb: 'mariadb',
   mongodb: 'mongodb',
   redis: 'redis',
+  clickhouse: 'clickhouse',
 };
 
 export function groupDatabaseHostsByType<T extends { uuid: string; name: string; type: z.infer<typeof databaseType> }>(

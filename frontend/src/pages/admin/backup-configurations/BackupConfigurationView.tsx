@@ -1,10 +1,19 @@
-import { faArchive, faChartBar, faCog, faDesktop, faEarthAmerica, faServer } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArchive,
+  faChartBar,
+  faCog,
+  faDatabase,
+  faDesktop,
+  faEarthAmerica,
+  faServer,
+} from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getBackupConfiguration from '@/api/admin/backup-configurations/getBackupConfiguration.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
 import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import ResourceView from '@/elements/ResourceView.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import AdminBackupConfigurationDatabaseAgentHosts from '@/pages/admin/backup-configurations/database-agent-hosts/AdminBackupConfigurationDatabaseAgentHosts.tsx';
 import AdminBackupConfigurationLocations from '@/pages/admin/backup-configurations/locations/AdminBackupConfigurationLocations.tsx';
 import AdminBackupConfigurationNodes from '@/pages/admin/backup-configurations/nodes/AdminBackupConfigurationNodes.tsx';
 import AdminBackupConfigurationServers from '@/pages/admin/backup-configurations/servers/AdminBackupConfigurationServers.tsx';
@@ -75,6 +84,13 @@ export default function BackupConfigurationView() {
                 path: `/servers`,
                 permission: 'servers.read',
                 element: <AdminBackupConfigurationServers backupConfiguration={backupConfiguration} />,
+              },
+              {
+                name: t('pages.admin.backupConfigurations.tabs.databaseAgentHosts.title', {}),
+                icon: faDatabase,
+                path: `/database-agent-hosts`,
+                permission: 'database-agent-hosts.read',
+                element: <AdminBackupConfigurationDatabaseAgentHosts backupConfiguration={backupConfiguration} />,
               },
             ]}
           />

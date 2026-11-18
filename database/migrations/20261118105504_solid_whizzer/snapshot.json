@@ -1,0 +1,99 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "1b80b2ed-a364-4747-8e66-711c10d88def",
+  "prevIds": [
+    "3de6f9f7-eda2-4bbe-a9df-45df9d44dc95"
+  ],
+  "footprints": [
+    {
+      "statementType": "alter_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "database_agent_type"
+      ],
+      "writes": [
+        "s|enum|public.database_agent_type"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "database_agent_templates",
+        "control_socket_path"
+      ],
+      "writes": [
+        "s|col|public.database_agent_templates.control_socket_path",
+        "n|col|public.database_agent_templates.control_socket_path",
+        "e|col|public.database_agent_templates.control_socket_path"
+      ],
+      "reads": [
+        "n|tbl|public.database_agent_templates",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "alter_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "database_agent_hosts",
+        "types"
+      ],
+      "writes": [
+        "s|colprop|public.database_agent_hosts.types.default"
+      ],
+      "reads": [
+        "n|tbl|public.database_agent_hosts",
+        "n|sch|public",
+        "n|col|public.database_agent_hosts.types"
+      ],
+      "sqlHash": "1552913d4992856d"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "database_agent_templates",
+        "name": "control_socket_path",
+        "type": "varchar(1020)",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "enums\u0000[\"public\",\"database_agent_type\"]",
+      "set": {
+        "values": [
+          "POSTGRES",
+          "MARIADB",
+          "MONGODB",
+          "REDIS",
+          "CLICKHOUSE"
+        ]
+      }
+    },
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"database_agent_hosts\",\"types\"]",
+      "set": {
+        "default": "'{\"postgres\":{\"enabled\":true,\"public_host\":null,\"public_port\":null},\"mariadb\":{\"enabled\":true,\"public_host\":null,\"public_port\":null},\"mongodb\":{\"enabled\":true,\"public_host\":null,\"public_port\":null},\"redis\":{\"enabled\":true,\"public_host\":null,\"public_port\":null},\"clickhouse\":{\"enabled\":true,\"public_host\":null,\"public_port\":null}}'"
+      }
+    }
+  ]
+}

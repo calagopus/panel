@@ -15,6 +15,7 @@ export const adminDatabaseAgentTemplateSchema = z.looseObject({
   cmd: z.array(z.string()).nullable(),
   volumes: z.record(z.string(), z.string()),
   socketPath: z.string().min(1).max(255),
+  controlSocketPath: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
   memory: z.number().min(0),
   swap: z.number().min(-1),
   disk: z.number().min(0),

@@ -5032,6 +5032,7 @@ const baseTranslations = defineTranslations({
                 form: {
                   typePublicHost: 'Public Host',
                   typePublicPort: 'Public Port',
+                  backupConfigurationPlaceholder: 'Inherit from Node/Location',
                   memoryDescription: 'The total memory available for database instances on this host.',
                   diskDescription: 'The total disk available for database instances on this host.',
                   unlimitedTooltip: '0 will not set a limit.',
@@ -5270,6 +5271,9 @@ const baseTranslations = defineTranslations({
                   socketPath: 'Socket Path',
                   socketPathDescription:
                     'The unix socket file path inside the database container, must match where the configured image actually creates its socket.',
+                  controlSocketPath: 'Control Socket Path',
+                  controlSocketPathDescription:
+                    'An optional second unix socket the agent uses for administration instead of the socket path, must be in the same directory as the socket path.',
                   imageUid: 'Image UID',
                   imageGid: 'Image GID',
                   memoryDescription: 'The Memory limit of the database container.',
@@ -5696,6 +5700,12 @@ const baseTranslations = defineTranslations({
               title: 'Servers',
               page: {
                 title: 'Backup Configuration Servers',
+              },
+            },
+            databaseAgentHosts: {
+              title: 'Database Agent Hosts',
+              page: {
+                title: 'Backup Configuration Database Agent Hosts',
               },
             },
           },
@@ -6921,7 +6931,7 @@ const baseTranslations = defineTranslations({
             unsupported: {
               title: 'Not Supported',
               content: 'MongoDB databases cannot be explored from the panel.',
-              instanceContent: 'MongoDB and Redis database instances cannot be explored from the panel.',
+              instanceContent: 'MongoDB, Redis and ClickHouse database instances cannot be explored from the panel.',
             },
             notFound: 'This database does not exist on the instance.',
             tabs: {

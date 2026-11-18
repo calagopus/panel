@@ -60,6 +60,7 @@ pub struct ResolvedInstanceSpec {
     pub cmd: Option<Vec<compact_str::CompactString>>,
     pub volumes: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
     pub socket_path: Option<compact_str::CompactString>,
+    pub control_socket_path: Option<compact_str::CompactString>,
 
     pub memory: i64,
     pub swap: i64,
@@ -277,6 +278,7 @@ impl ServerDatabaseInstance {
             cmd: template.and_then(|t| t.cmd.clone()),
             volumes: template.map(|t| t.volumes.clone()),
             socket_path: template.map(|t| t.socket_path.clone()),
+            control_socket_path: template.and_then(|t| t.control_socket_path.clone()),
             memory: self.memory.or(template.map(|t| t.memory))?,
             swap: self.swap.or(template.map(|t| t.swap))?,
             disk: self.disk.or(template.map(|t| t.disk))?,

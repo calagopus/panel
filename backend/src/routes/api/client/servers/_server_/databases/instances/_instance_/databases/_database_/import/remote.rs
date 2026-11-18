@@ -70,6 +70,12 @@ mod post {
 
         permissions.has_server_permission("database-instances.import")?;
 
+        if database_instance.r#type == db_agent_api::DatabaseAgentType::Clickhouse {
+            return ApiResponse::error("remote imports are not supported for clickhouse")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         let client = database_instance
             .database_agent_host
             .api_client(&state.database)

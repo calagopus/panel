@@ -1749,7 +1749,24 @@ impl Server {
         &self,
         database: &crate::database::Database,
     ) -> Option<super::backup_configuration::BackupConfiguration> {
+        self.backup_configuration_for(database, None).await
+    }
+
+    /// Resolves server -> database agent host (database instance backups only) -> node -> location.
+    pub async fn backup_configuration_for(
+        &self,
+        database: &crate::database::Database,
+        database_instance: Option<&super::server_database_instance::ServerDatabaseInstance>,
+    ) -> Option<super::backup_configuration::BackupConfiguration> {
         if let Some(backup_configuration) = &self.backup_configuration
+            && let Ok(backup_configuration) = backup_configuration.fetch_cached(database).await
+        {
+            return Some(backup_configuration);
+        }
+
+        if let Some(database_instance) = database_instance
+            && let Some(backup_configuration) =
+                &database_instance.database_agent_host.backup_configuration
             && let Ok(backup_configuration) = backup_configuration.fetch_cached(database).await
         {
             return Some(backup_configuration);

@@ -38,6 +38,7 @@ export default function DatabaseInstanceDatabaseImportModal({ instance, database
   const [loading, setLoading] = useState(false);
 
   const requiresSourceDb = instance.type === 'mongodb';
+  const acceptsSourceDb = requiresSourceDb || instance.type === 'clickhouse';
 
   const handleClose = () => {
     if (loading) {
@@ -92,9 +93,9 @@ export default function DatabaseInstanceDatabaseImportModal({ instance, database
           clearable
         />
 
-        {requiresSourceDb && (
+        {acceptsSourceDb && (
           <TextInput
-            withAsterisk
+            withAsterisk={requiresSourceDb}
             label={t('pages.server.databases.instance.databases.modal.importDatabase.form.sourceDb', {})}
             description={t(
               'pages.server.databases.instance.databases.modal.importDatabase.form.sourceDbDescription',

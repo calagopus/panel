@@ -1,0 +1,3 @@
+ALTER TYPE "database_agent_type" ADD VALUE 'CLICKHOUSE';
+ALTER TABLE "database_agent_templates" ADD COLUMN "control_socket_path" varchar(1020);
+ALTER TABLE "database_agent_hosts" ALTER COLUMN "types" SET DEFAULT '{"postgres":{"enabled":true,"public_host":null,"public_port":null},"mariadb":{"enabled":true,"public_host":null,"public_port":null},"mongodb":{"enabled":true,"public_host":null,"public_port":null},"redis":{"enabled":true,"public_host":null,"public_port":null},"clickhouse":{"enabled":true,"public_host":null,"public_port":null}}';

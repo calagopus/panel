@@ -53,6 +53,8 @@ nestify::nest! {
         #[schema(inline)]
         pub socket_path: compact_str::CompactString,
         #[schema(inline)]
+        pub control_socket_path: Option<compact_str::CompactString>,
+        #[schema(inline)]
         pub timezone: Option<compact_str::CompactString>,
         #[schema(inline)]
         pub env: IndexMap<compact_str::CompactString, compact_str::CompactString>,
@@ -80,6 +82,12 @@ nestify::nest! {
 pub enum AppContainerType {
     #[serde(rename = "official")]
     Official,
+    #[serde(rename = "official_aio")]
+    OfficialAio,
+    #[serde(rename = "official_heavy")]
+    OfficialHeavy,
+    #[serde(rename = "official_heavy_aio")]
+    OfficialHeavyAio,
     #[serde(rename = "unknown")]
     Unknown,
     #[serde(rename = "none")]
@@ -168,6 +176,8 @@ pub enum DatabaseAgentType {
     Mongodb,
     #[serde(rename = "redis")]
     Redis,
+    #[serde(rename = "clickhouse")]
+    Clickhouse,
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
@@ -378,6 +388,8 @@ nestify::nest! {
         #[schema(inline)]
         pub socket_path: compact_str::CompactString,
         #[schema(inline)]
+        pub control_socket_path: Option<compact_str::CompactString>,
+        #[schema(inline)]
         pub timezone: Option<compact_str::CompactString>,
         #[schema(inline)]
         pub env: IndexMap<compact_str::CompactString, compact_str::CompactString>,
@@ -557,6 +569,8 @@ pub mod instances {
                 #[schema(inline)]
                 pub socket_path: compact_str::CompactString,
                 #[schema(inline)]
+                pub control_socket_path: Option<compact_str::CompactString>,
+                #[schema(inline)]
                 pub timezone: Option<compact_str::CompactString>,
                 #[schema(inline)]
                 pub env: IndexMap<compact_str::CompactString, compact_str::CompactString>,
@@ -643,6 +657,8 @@ pub mod instances_instance {
                 pub volumes: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
                 #[schema(inline)]
                 pub socket_path: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub control_socket_path: Option<compact_str::CompactString>,
                 #[schema(inline)]
                 pub timezone: Option<compact_str::CompactString>,
                 #[schema(inline)]
@@ -1604,6 +1620,8 @@ pub mod status {
                 pub mongodb: SubsystemStatus,
                 #[schema(inline)]
                 pub redis: SubsystemStatus,
+                #[schema(inline)]
+                pub clickhouse: SubsystemStatus,
             }
         }
 

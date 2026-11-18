@@ -104,6 +104,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => "mariadb",
             DatabaseAgentType::Mongodb => "mongodb",
             DatabaseAgentType::Redis => "redis",
+            DatabaseAgentType::Clickhouse => "clickhouse",
         }
     }
 
@@ -114,6 +115,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => "sql",
             DatabaseAgentType::Mongodb => "archive",
             DatabaseAgentType::Redis => "rdb",
+            DatabaseAgentType::Clickhouse => "zip",
         }
     }
 
@@ -124,6 +126,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => "sql.gz",
             DatabaseAgentType::Mongodb => "archive",
             DatabaseAgentType::Redis => "rdb",
+            DatabaseAgentType::Clickhouse => "zip",
         }
     }
 
@@ -134,6 +137,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => "application/gzip",
             DatabaseAgentType::Mongodb => "application/octet-stream",
             DatabaseAgentType::Redis => "application/octet-stream",
+            DatabaseAgentType::Clickhouse => "application/zip",
         }
     }
 
@@ -144,6 +148,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => 3306,
             DatabaseAgentType::Mongodb => 27017,
             DatabaseAgentType::Redis => 6379,
+            DatabaseAgentType::Clickhouse => 9000,
         }
     }
 
@@ -154,6 +159,7 @@ impl DatabaseAgentType {
             DatabaseAgentType::Mariadb => "MARIADB",
             DatabaseAgentType::Mongodb => "MONGODB",
             DatabaseAgentType::Redis => "REDIS",
+            DatabaseAgentType::Clickhouse => "CLICKHOUSE",
         }
     }
 }
@@ -196,6 +202,7 @@ impl<'r> sqlx::Decode<'r, sqlx::Postgres> for DatabaseAgentType {
                 "MARIADB" => DatabaseAgentType::Mariadb,
                 "MONGODB" => DatabaseAgentType::Mongodb,
                 "REDIS" => DatabaseAgentType::Redis,
+                "CLICKHOUSE" => DatabaseAgentType::Clickhouse,
                 other => return Err(format!("invalid database_agent_type: {other}").into()),
             },
         )

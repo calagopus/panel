@@ -235,6 +235,7 @@ mod post {
                         image_gid: template.image_gid as u32,
                         volumes: template.volumes.clone(),
                         socket_path: template.socket_path.clone(),
+                        control_socket_path: template.control_socket_path.clone(),
                         timezone: server.timezone.clone(),
                         env: template.env.clone(),
                         cmd: template.cmd.clone(),

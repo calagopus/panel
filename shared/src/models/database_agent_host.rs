@@ -1,10 +1,11 @@
 use crate::{
     crypt::EncryptedString,
-    models::{InsertQueryBuilder, UpdateQueryBuilder},
+    models::{InsertQueryBuilder, UpdateQueryBuilder, server_backup::BackupDisk},
     prelude::*,
 };
 use garde::Validate;
 use rand::distr::SampleString;
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
@@ -61,6 +62,9 @@ pub struct DatabaseAgentHostTypes {
     #[garde(dive)]
     #[serde(default)]
     pub redis: DatabaseAgentHostTypeSettings,
+    #[garde(dive)]
+    #[serde(default)]
+    pub clickhouse: DatabaseAgentHostTypeSettings,
 }
 
 impl DatabaseAgentHostTypes {
@@ -71,6 +75,7 @@ impl DatabaseAgentHostTypes {
             db_agent_api::DatabaseAgentType::Mariadb => &self.mariadb,
             db_agent_api::DatabaseAgentType::Mongodb => &self.mongodb,
             db_agent_api::DatabaseAgentType::Redis => &self.redis,
+            db_agent_api::DatabaseAgentType::Clickhouse => &self.clickhouse,
         }
     }
 }
@@ -78,6 +83,7 @@ impl DatabaseAgentHostTypes {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DatabaseAgentHost {
     pub uuid: uuid::Uuid,
+    pub backup_configuration: Option<Fetchable<super::backup_configuration::BackupConfiguration>>,
 
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,
@@ -121,6 +127,10 @@ impl BaseModel for DatabaseAgentHost {
             (
                 "database_agent_hosts.uuid",
                 compact_str::format_compact!("{prefix}uuid"),
+            ),
+            (
+                "database_agent_hosts.backup_configuration_uuid",
+                compact_str::format_compact!("{prefix}backup_configuration_uuid"),
             ),
             (
                 "database_agent_hosts.name",
@@ -171,6 +181,11 @@ impl BaseModel for DatabaseAgentHost {
 
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
+            backup_configuration:
+                super::backup_configuration::BackupConfiguration::get_fetchable_from_row(
+                    row,
+                    compact_str::format_compact!("{prefix}backup_configuration_uuid"),
+                ),
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
@@ -202,6 +217,25 @@ impl BaseModel for DatabaseAgentHost {
     }
 }
 
+fn validate_backup_configuration(
+    backup_configuration: &super::backup_configuration::BackupConfiguration,
+) -> Result<(), crate::database::DatabaseError> {
+    if matches!(
+        backup_configuration.backup_disk,
+        BackupDisk::Btrfs | BackupDisk::Zfs
+    ) {
+        return Err(anyhow::Error::new(
+            crate::response::DisplayError::new(
+                "database backups cannot be created on a btrfs or zfs backup configuration",
+            )
+            .with_status(StatusCode::EXPECTATION_FAILED),
+        )
+        .into());
+    }
+
+    Ok(())
+}
+
 impl DatabaseAgentHost {
     pub async fn all_with_pagination(
         database: &crate::database::Database,
@@ -224,6 +258,34 @@ impl DatabaseAgentHost {
             ),
             "database_agent_hosts.created, database_agent_hosts.uuid",
         )
+        .bind(search)
+        .fetch(database, page, per_page)
+        .await
+    }
+
+    pub async fn by_backup_configuration_uuid_with_pagination(
+        database: &crate::database::Database,
+        backup_configuration_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        super::PaginatedQueryBuilder::new(
+            Self::columns_sql(None),
+            format!(
+                r#"
+                FROM database_agent_hosts
+                WHERE database_agent_hosts.backup_configuration_uuid = $1 AND {search}
+                "#,
+                search = super::search_sql(
+                    2,
+                    &["database_agent_hosts.name"],
+                    &["database_agent_hosts.uuid"]
+                ),
+            ),
+            "database_agent_hosts.created, database_agent_hosts.uuid",
+        )
+        .bind(backup_configuration_uuid)
         .bind(search)
         .fetch(database, page, per_page)
         .await
@@ -467,9 +529,25 @@ impl IntoAdminApiObject for DatabaseAgentHost {
     ) -> Result<Self::AdminApiObject, crate::database::DatabaseError> {
         let api_object = AdminApiDatabaseAgentHost::init_hooks(&self, state).await?;
 
+        let backup_configuration = if let Some(backup_configuration) = self.backup_configuration {
+            if let Ok(backup_configuration) =
+                backup_configuration.fetch_cached(&state.database).await
+            {
+                backup_configuration
+                    .into_admin_api_object(state, ())
+                    .await
+                    .ok()
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         let api_object = finish_extendible!(
             AdminApiDatabaseAgentHost {
                 uuid: self.uuid,
+                backup_configuration,
                 name: self.name,
                 description: self.description,
                 deployment_enabled: self.deployment_enabled,
@@ -531,6 +609,8 @@ impl ByUuid for DatabaseAgentHost {
 
 #[derive(ToSchema, Deserialize, Validate)]
 pub struct CreateDatabaseAgentHostOptions {
+    #[garde(skip)]
+    pub backup_configuration_uuid: Option<uuid::Uuid>,
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub name: compact_str::CompactString,
@@ -578,6 +658,19 @@ impl CreatableModel for DatabaseAgentHost {
     ) -> Result<Self, crate::database::DatabaseError> {
         options.validate()?;
 
+        if let Some(backup_configuration_uuid) = &options.backup_configuration_uuid {
+            let backup_configuration =
+                super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
+                    &state.database,
+                    *backup_configuration_uuid,
+                )
+                .await?
+                .ok_or(crate::database::InvalidRelationError(
+                    "backup_configuration",
+                ))?;
+            validate_backup_configuration(&backup_configuration)?;
+        }
+
         let mut query_builder = InsertQueryBuilder::new("database_agent_hosts");
 
         Self::run_create_handlers(&mut options, &mut query_builder, state, transaction).await?;
@@ -585,6 +678,10 @@ impl CreatableModel for DatabaseAgentHost {
         let token = Self::generate_token();
 
         query_builder
+            .set(
+                "backup_configuration_uuid",
+                options.backup_configuration_uuid,
+            )
             .set("name", &options.name)
             .set("description", &options.description)
             .set("deployment_enabled", options.deployment_enabled)
@@ -613,6 +710,13 @@ impl CreatableModel for DatabaseAgentHost {
 
 #[derive(ToSchema, Serialize, Deserialize, Validate, Clone, Default)]
 pub struct UpdateDatabaseAgentHostOptions {
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[garde(skip)]
+    pub backup_configuration_uuid: Option<Option<uuid::Uuid>>,
     #[garde(length(chars, min = 1, max = 255))]
     #[schema(min_length = 1, max_length = 255)]
     pub name: Option<compact_str::CompactString>,
@@ -664,12 +768,44 @@ impl UpdatableModel for DatabaseAgentHost {
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
+        let backup_configuration =
+            if let Some(backup_configuration_uuid) = &options.backup_configuration_uuid {
+                match backup_configuration_uuid {
+                    Some(uuid) => {
+                        let backup_configuration =
+                        super::backup_configuration::BackupConfiguration::by_uuid_optional_cached(
+                            &state.database,
+                            *uuid,
+                        )
+                        .await?
+                        .ok_or(crate::database::InvalidRelationError(
+                            "backup_configuration",
+                        ))?;
+                        validate_backup_configuration(&backup_configuration)?;
+
+                        Some(Some(
+                            super::backup_configuration::BackupConfiguration::get_fetchable(*uuid),
+                        ))
+                    }
+                    None => Some(None),
+                }
+            } else {
+                None
+            };
+
         let mut query_builder = UpdateQueryBuilder::new("database_agent_hosts");
 
         self.run_update_handlers(&mut options, &mut query_builder, state, transaction)
             .await?;
 
         query_builder
+            .set(
+                "backup_configuration_uuid",
+                options
+                    .backup_configuration_uuid
+                    .as_ref()
+                    .map(|u| u.as_ref()),
+            )
             .set("name", options.name.as_ref())
             .set(
                 "description",
@@ -692,6 +828,9 @@ impl UpdatableModel for DatabaseAgentHost {
 
         query_builder.execute(&mut **transaction).await?;
 
+        if let Some(backup_configuration) = backup_configuration {
+            self.backup_configuration = backup_configuration;
+        }
         if let Some(name) = options.name {
             self.name = name;
         }
@@ -767,6 +906,7 @@ impl DeletableModel for DatabaseAgentHost {
 #[schema(title = "DatabaseAgentHost")]
 pub struct AdminApiDatabaseAgentHost {
     pub uuid: uuid::Uuid,
+    pub backup_configuration: Option<super::backup_configuration::AdminApiBackupConfiguration>,
 
     pub name: compact_str::CompactString,
     pub description: Option<compact_str::CompactString>,

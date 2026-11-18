@@ -50,7 +50,7 @@ export const bytea = customType<{
 });
 
 export const databaseTypeEnum = pgEnum('database_type', ['MYSQL', 'POSTGRES', 'MONGODB']);
-export const databaseAgentTypeEnum = pgEnum('database_agent_type', ['POSTGRES', 'MARIADB', 'MONGODB', 'REDIS']);
+export const databaseAgentTypeEnum = pgEnum('database_agent_type', ['POSTGRES', 'MARIADB', 'MONGODB', 'REDIS', 'CLICKHOUSE']);
 export const serverStatusEnum = pgEnum('server_status', [
   'INSTALLING',
   'INSTALL_FAILED',
@@ -1176,6 +1176,7 @@ export const databaseAgentHostsTable = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey()
       .notNull(),
+    backup_configuration_uuid: uuid().references(() => backupConfigurationsTable.uuid, { onDelete: 'set null' }),
     name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
     description: text(),
     deployment_enabled: boolean().default(false).notNull(),
@@ -1189,12 +1190,14 @@ export const databaseAgentHostsTable = pgTable(
         mariadb: { enabled: true, public_host: null, public_port: null },
         mongodb: { enabled: true, public_host: null, public_port: null },
         redis: { enabled: true, public_host: null, public_port: null },
+        clickhouse: { enabled: true, public_host: null, public_port: null },
       })
       .notNull(),
     token: bytea().notNull(),
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
+    index('database_agent_hosts_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     uniqueIndex('database_agent_hosts_name_idx').on(cols.name),
     uniqueIndex('database_agent_hosts_token_idx').on(cols.token),
   ],
@@ -1260,6 +1263,7 @@ export const databaseAgentTemplatesTable = pgTable(
     cmd: text().array(),
     volumes: json().notNull(),
     socket_path: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    control_socket_path: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }),
     memory: bigint({ mode: 'number' }).notNull(),
     swap: bigint({ mode: 'number' }).notNull(),
     disk: bigint({ mode: 'number' }).notNull(),

@@ -112,6 +112,7 @@ mod post {
                             image_gid: spec.image_gid.map(|gid| gid as u32),
                             volumes: spec.volumes,
                             socket_path: spec.socket_path,
+                            control_socket_path: spec.control_socket_path,
                             timezone,
                             env: Some(spec.env),
                             cmd: spec.cmd,

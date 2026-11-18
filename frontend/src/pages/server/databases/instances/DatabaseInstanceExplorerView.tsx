@@ -41,7 +41,7 @@ export default function DatabaseInstanceExplorerView() {
   return (
     <ResourceView resource={resource}>
       {(instance) =>
-        instance.type === 'mongodb' || instance.type === 'redis' ? (
+        instance.type === 'mongodb' || instance.type === 'redis' || instance.type === 'clickhouse' ? (
           <ScreenBlock
             title={t('pages.server.databases.explorer.unsupported.title', {})}
             content={t('pages.server.databases.explorer.unsupported.instanceContent', {})}

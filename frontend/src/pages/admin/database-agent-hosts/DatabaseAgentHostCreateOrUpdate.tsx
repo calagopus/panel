@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { z } from 'zod';
+import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
 import createDatabaseAgentHost from '@/api/admin/database-agent-hosts/createDatabaseAgentHost.ts';
 import deleteDatabaseAgentHost from '@/api/admin/database-agent-hosts/deleteDatabaseAgentHost.ts';
 import resetDatabaseAgentHostToken from '@/api/admin/database-agent-hosts/resetDatabaseAgentHostToken.ts';
@@ -13,12 +14,14 @@ import { FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
 import Group from '@/elements/layout/Group.tsx';
 import ForceDeleteModal from '@/elements/modals/ForceDeleteModal.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import {
   adminDatabaseAgentHostCreateSchema,
   adminDatabaseAgentHostSchema,
   adminDatabaseAgentHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseAgentHosts.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
+import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useHostAction } from '@/plugins/useHostAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -69,6 +72,12 @@ export default function DatabaseAgentHostCreateOrUpdate({
 
   useHydrateForm(form, contextDatabaseAgentHost, databaseAgentHostToFormValues);
 
+  const backupConfigurations = useInfiniteSearchableResource<z.infer<typeof adminBackupConfigurationSchema>>({
+    queryKey: queryKeys.admin.backupConfigurations.all(),
+    fetcher: (page, search) => getBackupConfigurations(page, search),
+    defaultSearchValue: contextDatabaseAgentHost?.backupConfiguration?.name,
+  });
+
   const runHostAction = useHostAction(contextDatabaseAgentHost?.uuid, setLoading);
 
   const doResetToken = () =>
@@ -86,7 +95,7 @@ export default function DatabaseAgentHostCreateOrUpdate({
 
   const urlValue = form.getValues().url ?? '';
 
-  const fields = useDatabaseAgentHostFormFields({ urlValue });
+  const fields = useDatabaseAgentHostFormFields({ urlValue, backupConfigurations });
 
   return (
     <AdminContentContainer

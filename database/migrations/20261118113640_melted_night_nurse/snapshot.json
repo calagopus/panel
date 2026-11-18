@@ -1,0 +1,134 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "f4a470d7-0698-4c2f-a16c-98acc1fafe26",
+  "prevIds": [
+    "1b80b2ed-a364-4747-8e66-711c10d88def"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "database_agent_hosts",
+        "backup_configuration_uuid"
+      ],
+      "writes": [
+        "s|col|public.database_agent_hosts.backup_configuration_uuid",
+        "n|col|public.database_agent_hosts.backup_configuration_uuid",
+        "e|col|public.database_agent_hosts.backup_configuration_uuid"
+      ],
+      "reads": [
+        "n|tbl|public.database_agent_hosts",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "database_agent_hosts",
+        "database_agent_hosts_backup_configuration_uuid_idx"
+      ],
+      "writes": [
+        "s|idx|public.database_agent_hosts_backup_configuration_uuid_idx",
+        "n|idx|public.database_agent_hosts_backup_configuration_uuid_idx",
+        "e|idx|public.database_agent_hosts_backup_configuration_uuid_idx",
+        "n|rel|public.database_agent_hosts_backup_configuration_uuid_idx"
+      ],
+      "reads": [
+        "n|tbl|public.database_agent_hosts",
+        "n|sch|public",
+        "n|col|public.database_agent_hosts.backup_configuration_uuid"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "database_agent_hosts"
+      ],
+      "writes": [
+        "s|fk|public.database_agent_hosts.database_agent_hosts_FCC43ncVhQU8_fkey",
+        "n|fk|public.database_agent_hosts.database_agent_hosts_FCC43ncVhQU8_fkey",
+        "e|fk|public.database_agent_hosts.database_agent_hosts_FCC43ncVhQU8_fkey",
+        "n|con|public.database_agent_hosts.database_agent_hosts_FCC43ncVhQU8_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.database_agent_hosts",
+        "n|sch|public",
+        "n|tbl|public.backup_configurations",
+        "n|sch|public",
+        "n|col|public.database_agent_hosts.backup_configuration_uuid",
+        "n|col|public.backup_configurations.uuid",
+        "e|uniqueness|public.backup_configurations.uuid"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "database_agent_hosts",
+        "name": "backup_configuration_uuid",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "database_agent_hosts",
+        "name": "database_agent_hosts_backup_configuration_uuid_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "backup_configuration_uuid",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "database_agent_hosts",
+        "name": "database_agent_hosts_FCC43ncVhQU8_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "backup_configuration_uuid"
+        ],
+        "schemaTo": "public",
+        "tableTo": "backup_configurations",
+        "columnsTo": [
+          "uuid"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    }
+  ]
+}
