@@ -31,6 +31,7 @@ export const adminEggRepositorySchema = z.looseObject({
   description: z.preprocess(nullableString, z.string().max(1024).nullable()),
   gitRepository: z.union([z.url({ protocol: /^(https?|ssh)$/ }), z.string().regex(/^[^/:]+:(?!\/\/).+$/)]),
   credentials: adminEggRepositoryCredentialsSchema,
+  sshHostKey: z.preprocess(nullableString, z.string().max(8192).nullable()),
   defaultNest: adminNestSchema.nullable(),
   autoSync: z.boolean(),
   lastSynced: z.coerce.date().nullable(),
@@ -70,6 +71,12 @@ export const adminEggRepositoryUpdateSchema = z.lazy(() =>
       defaultNestUuid: z.uuid().nullable(),
     }),
 );
+
+export const adminEggRepositorySshHostKeySchema = z.object({
+  algorithm: z.string(),
+  publicKey: z.string(),
+  fingerprint: z.string(),
+});
 
 export const adminEggRepositoryEggSchema = z.looseObject({
   uuid: z.string(),

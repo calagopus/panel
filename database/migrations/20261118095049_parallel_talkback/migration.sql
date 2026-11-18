@@ -1,0 +1,1 @@
+ALTER TABLE "egg_repositories" ADD COLUMN "ssh_host_key" text;

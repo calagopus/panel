@@ -103,7 +103,10 @@ mod get {
             .remove(&backup.0.uuid);
 
         ApiResponse::new_serialized(Response {
-            backup: backup.0.into_api_object(&state, retention_status).await?,
+            backup: backup
+                .0
+                .into_api_object(&state, (retention_status, None))
+                .await?,
         })
         .ok()
     }

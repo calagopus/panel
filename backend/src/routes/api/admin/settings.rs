@@ -49,6 +49,21 @@ mod put {
     };
     use utoipa::ToSchema;
 
+    fn identity_settings(settings: &shared::settings::AppSettings) -> impl PartialEq + use<> {
+        (
+            settings.mail_mode.clone(),
+            settings.storage_driver.clone(),
+            settings.app.url.clone(),
+            settings.app.additional_urls.clone(),
+            settings.app.two_factor_requirement,
+            settings.app.two_factor_accepted_methods.clone(),
+            settings.app.email_two_factor_enabled,
+            settings.app.password_login_enabled,
+            settings.webauthn.rp_id.clone(),
+            settings.webauthn.rp_origin.clone(),
+        )
+    }
+
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct PayloadApp {
         #[garde(length(chars, min = 1, max = 64))]
@@ -372,6 +387,7 @@ mod put {
         }
 
         let mut settings = state.settings.get_mut().await?;
+        let identity_settings_before = identity_settings(&settings);
 
         if let Some(storage_driver) = data.storage_driver {
             settings.storage_driver = storage_driver;
@@ -764,6 +780,16 @@ mod put {
                 "email two-factor and email verification require a mail transport to be configured",
             )
             .with_status(StatusCode::BAD_REQUEST)
+            .ok();
+        }
+
+        if !permissions.is_unrestricted_admin()
+            && identity_settings(&settings) != identity_settings_before
+        {
+            return ApiResponse::error(
+                "only administrators can change mail delivery, storage, panel urls, two-factor, password login or webauthn relying party settings",
+            )
+            .with_status(StatusCode::FORBIDDEN)
             .ok();
         }
 

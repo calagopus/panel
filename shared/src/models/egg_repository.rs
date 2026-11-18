@@ -115,6 +115,34 @@ fn same_origin(a: &str, b: &str) -> bool {
     }
 }
 
+fn normalize_ssh_host_key(
+    git_repository: &str,
+    ssh_host_key: Option<&str>,
+) -> Result<Option<compact_str::CompactString>, anyhow::Error> {
+    let is_ssh =
+        gix::url::parse(git_repository).is_ok_and(|url| url.scheme == gix::url::Scheme::Ssh);
+
+    match (is_ssh, ssh_host_key) {
+        (true, None) => Err(crate::response::DisplayError::new(
+            "ssh repositories need a host key, fetch it and confirm its fingerprint first",
+        )
+        .into()),
+        (false, _) => Ok(None),
+        (true, Some(ssh_host_key)) => Ok(Some(
+            crate::git::parse_ssh_host_key(ssh_host_key)?
+                .to_openssh()?
+                .into(),
+        )),
+    }
+}
+
+#[derive(ToSchema, Serialize)]
+pub struct SshHostKey {
+    pub algorithm: compact_str::CompactString,
+    pub public_key: compact_str::CompactString,
+    pub fingerprint: compact_str::CompactString,
+}
+
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum EggRepositoryCredentials {
@@ -301,6 +329,7 @@ pub struct EggRepository {
     pub description: Option<compact_str::CompactString>,
     pub git_repository: compact_str::CompactString,
     pub credentials: EggRepositoryCredentials,
+    pub ssh_host_key: Option<compact_str::CompactString>,
     pub default_nest: Option<Fetchable<super::nest::Nest>>,
     pub auto_sync: bool,
 
@@ -350,6 +379,10 @@ impl BaseModel for EggRepository {
                 compact_str::format_compact!("{prefix}credentials"),
             ),
             (
+                "egg_repositories.ssh_host_key",
+                compact_str::format_compact!("{prefix}ssh_host_key"),
+            ),
+            (
                 "egg_repositories.default_nest_uuid",
                 compact_str::format_compact!("{prefix}default_nest_uuid"),
             ),
@@ -382,6 +415,8 @@ impl BaseModel for EggRepository {
             credentials: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}credentials").as_str())?,
             )?,
+            ssh_host_key: row
+                .try_get(compact_str::format_compact!("{prefix}ssh_host_key").as_str())?,
             default_nest: row
                 .try_get::<Option<uuid::Uuid>, _>(
                     compact_str::format_compact!("{prefix}default_nest_uuid").as_str(),
@@ -405,6 +440,32 @@ impl BaseModel for EggRepository {
 }
 
 impl EggRepository {
+    pub async fn fetch_ssh_host_keys(
+        state: &crate::State,
+        git_repository: &str,
+    ) -> Result<Vec<SshHostKey>, anyhow::Error> {
+        let url = gix::url::parse(git_repository).map_err(|err| {
+            crate::response::DisplayError::new(format!("invalid git repository: {err}"))
+        })?;
+
+        let host_keys = crate::git::scan_ssh_host_keys(&state.env, &url)
+            .await
+            .map_err(|err| crate::response::DisplayError::new(format!("{err:#}")))?;
+
+        host_keys
+            .into_iter()
+            .map(|host_key| {
+                Ok(SshHostKey {
+                    algorithm: host_key.algorithm().as_str().into(),
+                    public_key: host_key.to_openssh()?.into(),
+                    fingerprint: host_key
+                        .fingerprint(russh::keys::HashAlg::Sha256)
+                        .to_compact_string(),
+                })
+            })
+            .collect()
+    }
+
     pub async fn all_with_pagination(
         database: &crate::database::Database,
         page: i64,
@@ -455,6 +516,18 @@ impl EggRepository {
         credentials.decrypt(&state.database).await?;
 
         let url = gix::url::parse(git_repository.as_str())?;
+        let ssh_host_key = match (&url.scheme, &self.ssh_host_key) {
+            (gix::url::Scheme::Ssh, None) => {
+                return Err(crate::response::DisplayError::new(
+                    "ssh repository has no host key set, fetch and confirm it in the repository settings",
+                )
+                .into());
+            }
+            (gix::url::Scheme::Ssh, Some(ssh_host_key)) => {
+                Some(crate::git::parse_ssh_host_key(ssh_host_key)?)
+            }
+            _ => None,
+        };
         crate::git::resolve_addresses(&state.env, &url).await?;
 
         let env = Arc::clone(&state.env);
@@ -496,8 +569,11 @@ impl EggRepository {
                         .config_overrides(["credential.helper=", "http.followRedirects=false"]),
                 )?
                 .configure_connection(
-                    crate::git::GitCredentials::from(credentials)
-                        .into_connection_configurator(env, url),
+                    crate::git::GitCredentials::from(credentials).into_connection_configurator(
+                        env,
+                        url,
+                        ssh_host_key,
+                    ),
                 );
 
                 let (mut prepare_checkout, _) = prepare_fetch
@@ -766,6 +842,7 @@ impl IntoAdminApiObject for EggRepository {
                 description: self.description,
                 git_repository: self.git_repository,
                 credentials: self.credentials,
+                ssh_host_key: self.ssh_host_key,
                 default_nest,
                 auto_sync: self.auto_sync,
                 last_synced: self.last_synced.map(|dt| dt.and_utc()),
@@ -792,6 +869,9 @@ pub struct CreateEggRepositoryOptions {
     pub git_repository: compact_str::CompactString,
     #[garde(dive)]
     pub credentials: Option<EggRepositoryCredentials>,
+    #[garde(inner(length(chars, max = 8192), custom(crate::git::validate_ssh_host_key)))]
+    #[schema(max_length = 8192)]
+    pub ssh_host_key: Option<compact_str::CompactString>,
     #[garde(skip)]
     pub default_nest_uuid: Option<uuid::Uuid>,
     #[garde(skip)]
@@ -829,6 +909,9 @@ impl CreatableModel for EggRepository {
         credentials.validate_key_material()?;
         credentials.encrypt(&state.database).await?;
 
+        let ssh_host_key =
+            normalize_ssh_host_key(&options.git_repository, options.ssh_host_key.as_deref())?;
+
         if let Some(default_nest_uuid) = options.default_nest_uuid {
             super::nest::Nest::by_uuid_optional_cached(&state.database, default_nest_uuid)
                 .await?
@@ -840,6 +923,7 @@ impl CreatableModel for EggRepository {
             .set("description", &options.description)
             .set("git_repository", &options.git_repository)
             .set("credentials", serde_json::to_value(&credentials)?)
+            .set("ssh_host_key", &ssh_host_key)
             .set("default_nest_uuid", options.default_nest_uuid)
             .set("auto_sync", options.auto_sync);
 
@@ -873,6 +957,14 @@ pub struct UpdateEggRepositoryOptions {
     pub git_repository: Option<compact_str::CompactString>,
     #[garde(dive)]
     pub credentials: Option<EggRepositoryCredentials>,
+    #[garde(inner(inner(length(chars, max = 8192), custom(crate::git::validate_ssh_host_key))))]
+    #[schema(max_length = 8192)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub ssh_host_key: Option<Option<compact_str::CompactString>>,
     #[garde(skip)]
     #[serde(
         default,
@@ -903,13 +995,17 @@ impl UpdatableModel for EggRepository {
     ) -> Result<(), crate::database::DatabaseError> {
         options.validate()?;
 
-        if options.credentials.is_none()
-            && options
-                .git_repository
-                .as_deref()
-                .is_some_and(|git_repository| !same_origin(git_repository, &self.git_repository))
+        if options
+            .git_repository
+            .as_deref()
+            .is_some_and(|git_repository| !same_origin(git_repository, &self.git_repository))
         {
-            options.credentials = Some(EggRepositoryCredentials::None);
+            if options.credentials.is_none() {
+                options.credentials = Some(EggRepositoryCredentials::None);
+            }
+            if options.ssh_host_key.is_none() {
+                options.ssh_host_key = Some(None);
+            }
         }
 
         let mut query_builder = UpdateQueryBuilder::new("egg_repositories");
@@ -931,6 +1027,18 @@ impl UpdatableModel for EggRepository {
             None => self.credentials.validate_scheme_for_url(git_repository)?,
         }
 
+        if options.git_repository.is_some()
+            || options.credentials.is_some()
+            || options.ssh_host_key.is_some()
+        {
+            let ssh_host_key = match &options.ssh_host_key {
+                Some(ssh_host_key) => ssh_host_key.as_deref(),
+                None => self.ssh_host_key.as_deref(),
+            };
+
+            options.ssh_host_key = Some(normalize_ssh_host_key(git_repository, ssh_host_key)?);
+        }
+
         if let Some(Some(default_nest_uuid)) = options.default_nest_uuid {
             super::nest::Nest::by_uuid_optional_cached(&state.database, default_nest_uuid)
                 .await?
@@ -944,6 +1052,10 @@ impl UpdatableModel for EggRepository {
                 options.description.as_ref().map(|d| d.as_ref()),
             )
             .set("git_repository", options.git_repository.as_ref())
+            .set(
+                "ssh_host_key",
+                options.ssh_host_key.as_ref().map(|k| k.as_ref()),
+            )
             .set(
                 "credentials",
                 options
@@ -972,6 +1084,9 @@ impl UpdatableModel for EggRepository {
         }
         if let Some(credentials) = options.credentials {
             self.credentials = credentials;
+        }
+        if let Some(ssh_host_key) = options.ssh_host_key {
+            self.ssh_host_key = ssh_host_key;
         }
         if let Some(default_nest_uuid) = options.default_nest_uuid {
             self.default_nest = default_nest_uuid.map(super::nest::Nest::get_fetchable);
@@ -1107,6 +1222,7 @@ pub struct AdminApiEggRepository {
     pub description: Option<compact_str::CompactString>,
     pub git_repository: compact_str::CompactString,
     pub credentials: EggRepositoryCredentials,
+    pub ssh_host_key: Option<compact_str::CompactString>,
     pub default_nest: Option<super::nest::AdminApiNest>,
     pub auto_sync: bool,
 

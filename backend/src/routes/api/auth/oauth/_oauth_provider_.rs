@@ -201,9 +201,17 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
             drop(settings);
 
             let http_client = |req: HttpRequest| {
-                let client = state.client.clone();
+                let env = state.env.clone();
                 async move {
-                    let response = client.execute(req.try_into()?).await?;
+                    let (parts, body) = req.into_parts();
+                    let url = parts.uri.to_string().parse().map_err(std::io::Error::other)?;
+                    let response = shared::net::outbound_request(&env, parts.method, url)
+                        .map_err(std::io::Error::other)?
+                        .headers(parts.headers)
+                        .body(body)
+                        .send()
+                        .await
+                        .map_err(std::io::Error::other)?;
                     let response = axum::http::Response::from(response);
                     let (parts, body) = response.into_parts();
 
@@ -211,7 +219,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                         .await
                         .unwrap_or_default();
 
-                    Ok::<_, reqwest::Error>(HttpResponse::from_parts(parts, data.into()))
+                    Ok::<_, std::io::Error>(HttpResponse::from_parts(parts, data.into()))
                 }
             };
 
@@ -259,7 +267,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                 let token = token_request.request_async(&http_client).await?;
 
                 let info = oauth_provider
-                    .fetch_info(&state.client, token.access_token().secret())
+                    .fetch_info(&state, token.access_token().secret())
                     .await?;
 
                 let identifier = oauth_provider.extract_identifier(&info.info)?;
@@ -323,7 +331,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
                 let token = token_request.request_async(&http_client).await?;
 
                 let info = oauth_provider
-                    .fetch_info(&state.client, token.access_token().secret())
+                    .fetch_info(&state, token.access_token().secret())
                     .await?;
 
                 let identifier = oauth_provider.extract_identifier(&info.info)?;

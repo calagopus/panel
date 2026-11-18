@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT server_backups.uuid, server_backups.database_instance_uuid IS NOT NULL AS \"database!\"\n                FROM server_backups\n                WHERE server_backups.server_uuid = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_backups",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "database!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "4351ac3e66d99e1fba4a1f66d4b23b60e739b097c6b159fde0356fbc63196a57"
+}

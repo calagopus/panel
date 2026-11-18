@@ -21,6 +21,7 @@ import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import CredentialPassword from './forms/CredentialPassword.tsx';
 import CredentialPrivateKey from './forms/CredentialPrivateKey.tsx';
+import SshHostKey from './forms/SshHostKey.tsx';
 
 type EggRepositoryFormValues = z.infer<typeof adminEggRepositoryUpdateSchema>;
 
@@ -67,6 +68,7 @@ export const eggRepositoryEmptyFormValues: EggRepositoryFormValues = {
   description: null,
   gitRepository: '',
   credentials: undefined,
+  sshHostKey: null,
   defaultNestUuid: null,
   autoSync: true,
 };
@@ -78,6 +80,7 @@ export const eggRepositoryToFormValues = (
   description: eggRepository.description,
   gitRepository: eggRepository.gitRepository,
   credentials: undefined,
+  sshHostKey: eggRepository.sshHostKey,
   defaultNestUuid: eggRepository.defaultNest?.uuid ?? null,
   autoSync: eggRepository.autoSync,
 });
@@ -95,6 +98,24 @@ export function useEggRepositoryFormFields(
       name: 'gitRepository',
       label: t('pages.admin.eggRepositories.tabs.general.page.form.gitRepository', {}),
       required: true,
+    },
+    {
+      type: 'custom',
+      name: 'sshHostKey',
+      colSpan: 'full',
+      render: (f) =>
+        repositoryOrigin(f.values.gitRepository)?.startsWith('ssh://') ? (
+          <SshHostKey
+            gitRepository={f.values.gitRepository}
+            originChanged={
+              !!contextEggRepository?.sshHostKey &&
+              f.values.sshHostKey === contextEggRepository.sshHostKey &&
+              repositoryOrigin(f.values.gitRepository) !== repositoryOrigin(contextEggRepository.gitRepository)
+            }
+            value={f.values.sshHostKey}
+            onChange={(sshHostKey) => f.setFieldValue('sshHostKey', sshHostKey)}
+          />
+        ) : null,
     },
     { type: 'textarea', name: 'description', label: t('common.form.description', {}), rows: 3, colSpan: 'full' },
     {

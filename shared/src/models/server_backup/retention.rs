@@ -367,7 +367,7 @@ fn forecast_retention(
             .map(|rule| {
                 let expiry = match rule {
                     BackupRetentionRule::Days => {
-                        Some(*created + chrono::Duration::days(retention.days as i64))
+                        created.checked_add_signed(chrono::Duration::days(retention.days as i64))
                     }
                     BackupRetentionRule::Count => count_occurrences
                         .get(retention.count as usize - index_of[uuid] - 1)

@@ -1,0 +1,48 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "3de6f9f7-eda2-4bbe-a9df-45df9d44dc95",
+  "prevIds": [
+    "030cc385-93e8-49d0-b8f0-5d4d5221292e",
+    "8a14b301-5971-4fbd-bedb-d3bd92416860"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "egg_repositories",
+        "ssh_host_key"
+      ],
+      "writes": [
+        "s|col|public.egg_repositories.ssh_host_key",
+        "n|col|public.egg_repositories.ssh_host_key",
+        "e|col|public.egg_repositories.ssh_host_key"
+      ],
+      "reads": [
+        "n|tbl|public.egg_repositories",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "egg_repositories",
+        "name": "ssh_host_key",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}

@@ -8,7 +8,7 @@ use compact_str::ToCompactString;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(ToSchema, Serialize, Deserialize, Clone, Copy)]
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum TwoFactorRequirement {
     Admins,

@@ -7,8 +7,9 @@ mod get {
     use shared::{
         ApiError, GetState,
         models::{
-            IntoApiObject, Pagination, PaginationParamsWithSearch, server::GetServer,
-            server_backup::ServerBackup, user::GetPermissionManager,
+            IntoApiObject, Pagination, PaginationParamsWithSearch,
+            nest_egg_variable::NestEggVariable, server::GetServer, server_backup::ServerBackup,
+            user::GetPermissionManager,
         },
         response::{ApiResponse, ApiResponseResult},
     };
@@ -68,6 +69,12 @@ mod get {
         )
         .await?;
 
+        let viewable_variables = NestEggVariable::user_viewable_env_variables_by_egg_uuid(
+            &state.database,
+            server.egg.uuid,
+        )
+        .await?;
+
         let retention_statuses =
             ServerBackup::retention_statuses(&state.database, &backups.data).await?;
 
@@ -75,7 +82,7 @@ mod get {
             backups: backups
                 .try_async_map(|backup| {
                     let retention_status = retention_statuses.get(&backup.uuid).cloned();
-                    backup.into_api_object(&state, retention_status)
+                    backup.into_api_object(&state, (retention_status, Some(&viewable_variables)))
                 })
                 .await?,
         })

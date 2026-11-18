@@ -4842,6 +4842,8 @@ const baseTranslations = defineTranslations({
                   password: 'Password or Access Token',
                   privateKey: 'Private Key',
                   passphrase: 'Passphrase',
+                  sshHostKey: 'SSH Host Key',
+                  sshHostKeyDescription: 'Syncing only connects to an ssh server presenting this public key.',
                   defaultNest: 'Default Nest',
                   defaultNestDescription:
                     'Eggs installed from this repository go into this nest unless another one is chosen.',
@@ -4858,6 +4860,8 @@ const baseTranslations = defineTranslations({
                 },
                 button: {
                   sync: 'Sync',
+                  fetchSshHostKeys: 'Fetch',
+                  useSshHostKey: 'Use Host Key',
                 },
                 toast: {
                   synced: 'Egg repository synchronised, found {eggs}.',
@@ -4865,10 +4869,17 @@ const baseTranslations = defineTranslations({
                 alert: {
                   credentialsCleared:
                     'Changing the scheme, host or port of the repository clears its stored credentials. Enter them again below if the new host needs them.',
+                  sshHostKeyOriginChanged:
+                    'This host key belongs to the previous host. Fetch the host keys of the new host and confirm one of them.',
                 },
                 modal: {
                   delete: {
                     title: 'Confirm Egg Repository Deletion',
+                  },
+                  sshHostKeys: {
+                    title: 'SSH Host Keys',
+                    description: 'Compare the fingerprint with the one your git host publishes before using a key.',
+                    empty: 'The ssh server did not present any host keys.',
                   },
                 },
               },

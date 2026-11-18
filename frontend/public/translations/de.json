@@ -4695,6 +4695,8 @@
                   "password": "Passwort oder Zugriffstoken",
                   "privateKey": "Privater Schlüssel",
                   "passphrase": "Passphrase",
+                  "sshHostKey": "SSH-Hostschlüssel",
+                  "sshHostKeyDescription": "Die Synchronisation verbindet sich nur mit einem SSH-Server, der diesen öffentlichen Schlüssel vorweist.",
                   "defaultNest": "Standard-Nest",
                   "defaultNestDescription": "Eggs aus diesem Repository werden in dieses Nest installiert, sofern kein anderes gewählt wird.",
                   "autoSync": "Automatische Synchronisation",
@@ -4708,17 +4710,25 @@
                   }
                 },
                 "button": {
-                  "sync": "Synchronisieren"
+                  "sync": "Synchronisieren",
+                  "fetchSshHostKeys": "Abrufen",
+                  "useSshHostKey": "Hostschlüssel verwenden"
                 },
                 "toast": {
                   "synced": "Egg Repository synchronisiert, {eggs} gefunden."
                 },
                 "alert": {
-                  "credentialsCleared": "Wenn Schema, Host oder Port des Repositorys geändert werden, werden die gespeicherten Zugangsdaten gelöscht. Gib sie unten erneut ein, falls der neue Host sie benötigt."
+                  "credentialsCleared": "Wenn Schema, Host oder Port des Repositorys geändert werden, werden die gespeicherten Zugangsdaten gelöscht. Gib sie unten erneut ein, falls der neue Host sie benötigt.",
+                  "sshHostKeyOriginChanged": "Dieser Hostschlüssel gehört zum vorherigen Host. Rufe die Hostschlüssel des neuen Hosts ab und bestätige einen davon."
                 },
                 "modal": {
                   "delete": {
                     "title": "Egg Repository Löschung bestätigen"
+                  },
+                  "sshHostKeys": {
+                    "title": "SSH-Hostschlüssel",
+                    "description": "Vergleiche den Fingerabdruck vor der Verwendung eines Schlüssels mit dem, den dein Git-Host veröffentlicht.",
+                    "empty": "Der SSH-Server hat keine Hostschlüssel vorgewiesen."
                   }
                 }
               }

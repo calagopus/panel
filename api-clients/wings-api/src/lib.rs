@@ -665,6 +665,8 @@ nestify::nest! {
         #[schema(inline)]
         pub backups: Vec<uuid::Uuid>,
         #[schema(inline)]
+        pub database_backups: Vec<uuid::Uuid>,
+        #[schema(inline)]
         pub schedules: Vec<Schedule>,
         #[schema(inline)]
         pub allocations: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationAllocations {

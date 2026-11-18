@@ -97,6 +97,7 @@ export default function OobeRepositories({ onNext, onBack, canGoBack, skipFrom, 
             name: repo.name,
             description: repo.description,
             gitRepository: repo.gitRepository,
+            sshHostKey: null,
             defaultNestUuid: nest.uuid,
             autoSync: true,
           });

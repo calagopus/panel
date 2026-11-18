@@ -1874,7 +1874,7 @@ impl Server {
             )
             .fetch_all(state.database.read()),
             sqlx::query!(
-                "SELECT server_backups.uuid
+                "SELECT server_backups.uuid, server_backups.database_instance_uuid IS NOT NULL AS \"database!\"
                 FROM server_backups
                 WHERE server_backups.server_uuid = $1",
                 self.uuid
@@ -1956,7 +1956,16 @@ impl Server {
                         })
                         .collect(),
                     labels: self.labels,
-                    backups: backups.into_iter().map(|b| b.uuid).collect(),
+                    backups: backups
+                        .iter()
+                        .filter(|b| !b.database)
+                        .map(|b| b.uuid)
+                        .collect(),
+                    database_backups: backups
+                        .iter()
+                        .filter(|b| b.database)
+                        .map(|b| b.uuid)
+                        .collect(),
                     schedules: schedules
                         .into_iter()
                         .map(|s| {

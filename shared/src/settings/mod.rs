@@ -90,7 +90,7 @@ impl RouteOrderItem {
     }
 }
 
-#[derive(ToSchema, Validate, Serialize, Deserialize, Clone, Copy)]
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone, Copy, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum TlsMode {
     None,
@@ -98,7 +98,7 @@ pub enum TlsMode {
     ImplicitTls,
 }
 
-#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum StorageDriver {
     Filesystem {
@@ -153,7 +153,7 @@ impl Censor for StorageDriver {
     }
 }
 
-#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum MailMode {
     None,

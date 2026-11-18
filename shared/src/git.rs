@@ -208,22 +208,43 @@ pub enum GitCredentials {
     },
 }
 
-struct AcceptAnyServerKey;
+struct PinnedServerKey(russh::keys::PublicKey);
 
-impl russh::client::Handler for AcceptAnyServerKey {
+impl russh::client::Handler for PinnedServerKey {
     type Error = russh::Error;
 
     async fn check_server_key(
         &mut self,
-        _server_public_key: &russh::keys::PublicKeyOrCertificate,
+        server_public_key: &russh::keys::PublicKeyOrCertificate,
     ) -> Result<bool, Self::Error> {
-        Ok(true)
+        Ok(matches!(
+            server_public_key,
+            russh::keys::PublicKeyOrCertificate::PublicKey { key, .. }
+                if key.key_data() == self.0.key_data()
+        ))
+    }
+}
+
+struct CaptureServerKey(Arc<parking_lot::Mutex<Option<russh::keys::PublicKey>>>);
+
+impl russh::client::Handler for CaptureServerKey {
+    type Error = russh::Error;
+
+    async fn check_server_key(
+        &mut self,
+        server_public_key: &russh::keys::PublicKeyOrCertificate,
+    ) -> Result<bool, Self::Error> {
+        if let russh::keys::PublicKeyOrCertificate::PublicKey { key, .. } = server_public_key {
+            *self.0.lock() = Some(key.clone());
+        }
+
+        Ok(false)
     }
 }
 
 struct SessionBound<T> {
     inner: T,
-    _session: russh::client::Handle<AcceptAnyServerKey>,
+    _session: russh::client::Handle<PinnedServerKey>,
 }
 
 impl<T: tokio::io::AsyncRead + Unpin> tokio::io::AsyncRead for SessionBound<T> {
@@ -261,6 +282,116 @@ pub async fn resolve_addresses(
     crate::net::resolve_allowed_addresses(env, host, port, "git").await
 }
 
+const SSH_CONNECT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(20);
+
+fn host_key_algorithms(algorithm: &russh::keys::Algorithm) -> Vec<russh::keys::Algorithm> {
+    match algorithm {
+        russh::keys::Algorithm::Rsa { .. } => vec![
+            russh::keys::Algorithm::Rsa {
+                hash: Some(russh::keys::HashAlg::Sha512),
+            },
+            russh::keys::Algorithm::Rsa {
+                hash: Some(russh::keys::HashAlg::Sha256),
+            },
+            russh::keys::Algorithm::Rsa { hash: None },
+        ],
+        algorithm => vec![algorithm.clone()],
+    }
+}
+
+fn ssh_client_config(host_key_algorithms: Vec<russh::keys::Algorithm>) -> russh::client::Config {
+    russh::client::Config {
+        keepalive_interval: Some(std::time::Duration::from_secs(30)),
+        preferred: russh::Preferred {
+            key: std::borrow::Cow::Owned(host_key_algorithms),
+            ..Default::default()
+        },
+        ..Default::default()
+    }
+}
+
+pub fn parse_ssh_host_key(host_key: &str) -> Result<russh::keys::PublicKey, anyhow::Error> {
+    let mut key = russh::keys::PublicKey::from_openssh(host_key.trim())?;
+    key.set_comment("");
+
+    Ok(key)
+}
+
+pub fn validate_ssh_host_key(host_key: &str, _context: &()) -> Result<(), garde::Error> {
+    match parse_ssh_host_key(host_key) {
+        Ok(_) => Ok(()),
+        Err(err) => Err(garde::Error::new(format!("Invalid ssh host key: {err}"))),
+    }
+}
+
+pub async fn scan_ssh_host_keys(
+    env: &Arc<crate::env::Env>,
+    url: &gix::Url,
+) -> Result<Vec<russh::keys::PublicKey>, anyhow::Error> {
+    if url.scheme != gix::url::Scheme::Ssh {
+        return Err(anyhow::anyhow!(
+            "host keys can only be fetched for ssh repository urls"
+        ));
+    }
+
+    let addresses = resolve_addresses(env, url).await?;
+
+    let families = [
+        russh::keys::Algorithm::Ed25519,
+        russh::keys::Algorithm::Ecdsa {
+            curve: russh::keys::EcdsaCurve::NistP256,
+        },
+        russh::keys::Algorithm::Ecdsa {
+            curve: russh::keys::EcdsaCurve::NistP384,
+        },
+        russh::keys::Algorithm::Ecdsa {
+            curve: russh::keys::EcdsaCurve::NistP521,
+        },
+        russh::keys::Algorithm::Rsa { hash: None },
+    ];
+
+    let scans = families.iter().map(|family| {
+        let addresses = addresses.clone();
+
+        async move {
+            let captured = Arc::new(parking_lot::Mutex::new(None));
+
+            let result = tokio::time::timeout(
+                SSH_CONNECT_TIMEOUT,
+                russh::client::connect(
+                    Arc::new(ssh_client_config(host_key_algorithms(family))),
+                    addresses.as_slice(),
+                    CaptureServerKey(Arc::clone(&captured)),
+                ),
+            )
+            .await;
+
+            match result {
+                Err(_) => Err(anyhow::anyhow!("timed out connecting to the ssh server")),
+                Ok(Ok(_))
+                | Ok(Err(russh::Error::UnknownKey))
+                | Ok(Err(russh::Error::NoCommonAlgo { .. })) => Ok(captured.lock().take()),
+                Ok(Err(err)) => Err(err.into()),
+            }
+        }
+    });
+
+    let mut host_keys = Vec::new();
+    let mut last_error = None;
+    for result in futures_util::future::join_all(scans).await {
+        match result {
+            Ok(Some(host_key)) => host_keys.push(host_key),
+            Ok(None) => {}
+            Err(err) => last_error = Some(err),
+        }
+    }
+
+    match (host_keys.is_empty(), last_error) {
+        (true, Some(err)) => Err(err),
+        _ => Ok(host_keys),
+    }
+}
+
 pub fn parse_private_key(
     private_key: &str,
     passphrase: Option<&str>,
@@ -295,19 +426,35 @@ async fn ssh_upload_pack(
     url: &gix::Url,
     username: &str,
     auth: SshAuth,
+    host_key: russh::keys::PublicKey,
 ) -> Result<BoxedTransport, anyhow::Error> {
     let path = String::from_utf8_lossy(&url.path).into_owned();
     let addresses = resolve_addresses(env, url).await?;
 
-    let mut session = russh::client::connect(
-        Arc::new(russh::client::Config {
-            keepalive_interval: Some(std::time::Duration::from_secs(30)),
-            ..Default::default()
-        }),
-        addresses.as_slice(),
-        AcceptAnyServerKey,
+    let config = ssh_client_config(host_key_algorithms(&host_key.algorithm()));
+    let mut session = match tokio::time::timeout(
+        SSH_CONNECT_TIMEOUT,
+        russh::client::connect(
+            Arc::new(config),
+            addresses.as_slice(),
+            PinnedServerKey(host_key),
+        ),
     )
-    .await?;
+    .await
+    {
+        Err(_) => return Err(anyhow::anyhow!("timed out connecting to the ssh server")),
+        Ok(Err(russh::Error::UnknownKey)) => {
+            return Err(anyhow::anyhow!(
+                "the ssh server presented a host key that does not match the configured host key"
+            ));
+        }
+        Ok(Err(russh::Error::NoCommonAlgo { .. })) => {
+            return Err(anyhow::anyhow!(
+                "the ssh server does not offer the configured host key type"
+            ));
+        }
+        Ok(result) => result?,
+    };
 
     let authenticated = match auth {
         SshAuth::Password(password) => {
@@ -372,6 +519,7 @@ impl GitCredentials {
         self,
         env: Arc<crate::env::Env>,
         url: gix::Url,
+        ssh_host_key: Option<russh::keys::PublicKey>,
     ) -> impl FnMut(&mut GitConnection<'_, '_, '_>) -> gix::Result + 'static {
         let over_ssh = url.scheme == gix::url::Scheme::Ssh;
 
@@ -421,8 +569,14 @@ impl GitCredentials {
                 ),
             };
 
+            let host_key = ssh_host_key.clone().ok_or_else(|| {
+                gix::Error::from_boxed(
+                    anyhow::anyhow!("ssh repositories need a configured host key").into(),
+                )
+            })?;
+
             let transport = tokio::runtime::Handle::current()
-                .block_on(ssh_upload_pack(&env, &url, username, auth))
+                .block_on(ssh_upload_pack(&env, &url, username, auth, host_key))
                 .map_err(|err| gix::Error::from_boxed(err.into()))?;
 
             *connection.transport_mut() = transport;

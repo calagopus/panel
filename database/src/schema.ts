@@ -981,6 +981,7 @@ export const eggRepositoriesTable = pgTable(
     description: text(),
     git_repository: text().notNull(),
     credentials: jsonb().default({ type: 'none' }).notNull(),
+    ssh_host_key: text(),
     default_nest_uuid: uuid().references(() => nestsTable.uuid, { onDelete: 'set null' }),
     auto_sync: boolean().default(true).notNull(),
     last_synced: timestamp(),

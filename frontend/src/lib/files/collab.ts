@@ -39,15 +39,19 @@ export function cursorColor(seed: number): string {
   return CURSOR_COLORS[Math.abs(seed) % CURSOR_COLORS.length];
 }
 
+function remoteCursorColor(color: unknown, clientId: number): string {
+  return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color) ? color : cursorColor(clientId);
+}
+
 export function updateCursorStyles(styleEl: HTMLStyleElement, awareness: Awareness): void {
   const rules: string[] = [];
 
   awareness.getStates().forEach((state, clientId) => {
     if (clientId === awareness.clientID) return;
 
-    const user = state.user as { name?: string; color?: string } | undefined;
-    const color = user?.color ?? cursorColor(clientId);
-    const name = (user?.name ?? '').replace(/["\\]/g, '');
+    const user = state.user as { name?: unknown; color?: unknown } | undefined;
+    const color = remoteCursorColor(user?.color, clientId);
+    const name = CSS.escape(typeof user?.name === 'string' ? user.name : '');
 
     rules.push(
       `.yRemoteSelection-${clientId} { background-color: ${color}44; }`,
@@ -101,13 +105,13 @@ export function resolveRemoteCursors(awareness: Awareness, doc: Y.Doc, ytext: Y.
       const headAbs = Y.createAbsolutePositionFromRelativePosition(selection.head, doc);
       if (!anchorAbs || !headAbs || anchorAbs.type !== ytext || headAbs.type !== ytext) return;
 
-      const user = state.user as { name?: string; color?: string } | undefined;
+      const user = state.user as { name?: unknown; color?: unknown } | undefined;
       cursors.push({
         clientId,
         anchor: anchorAbs.index,
         head: headAbs.index,
-        name: user?.name ?? 'unknown',
-        color: user?.color ?? cursorColor(clientId),
+        name: typeof user?.name === 'string' ? user.name : 'unknown',
+        color: remoteCursorColor(user?.color, clientId),
       });
     } catch {
       // A peer published a selection this document can't resolve; skip it.

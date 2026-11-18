@@ -14,6 +14,7 @@ mod get {
         ApiError, GetState,
         models::{
             IntoApiObject, Pagination, PaginationParamsWithSearch,
+            nest_egg_variable::NestEggVariable,
             server::GetServer,
             server_backup::{ServerBackup, ServerBackupFilter, ServerBackupKind},
             user::GetPermissionManager,
@@ -123,6 +124,12 @@ mod get {
             .await
         }?;
 
+        let viewable_variables = NestEggVariable::user_viewable_env_variables_by_egg_uuid(
+            &state.database,
+            server.egg.uuid,
+        )
+        .await?;
+
         let retention_statuses =
             ServerBackup::retention_statuses(&state.database, &backups.data).await?;
 
@@ -130,7 +137,7 @@ mod get {
             backups: backups
                 .try_async_map(|backup| {
                     let retention_status = retention_statuses.get(&backup.uuid).cloned();
-                    backup.into_api_object(&state, retention_status)
+                    backup.into_api_object(&state, (retention_status, Some(&viewable_variables)))
                 })
                 .await?,
         })
@@ -146,6 +153,7 @@ mod post {
         ApiError, GetState,
         models::{
             CreatableModel, IntoApiObject,
+            nest_egg_variable::NestEggVariable,
             server::{GetServer, GetServerActivityLogger},
             server_backup::{BackupDisk, ServerBackup, ServerBackupKind, retention::EvictionMode},
             server_backup_group::ServerBackupGroup,
@@ -446,8 +454,16 @@ mod post {
             }
         }
 
+        let viewable_variables = NestEggVariable::user_viewable_env_variables_by_egg_uuid(
+            &state.database,
+            server.egg.uuid,
+        )
+        .await?;
+
         ApiResponse::new_serialized(Response {
-            backup: backup.into_api_object(&state, None).await?,
+            backup: backup
+                .into_api_object(&state, (None, Some(&viewable_variables)))
+                .await?,
         })
         .ok()
     }

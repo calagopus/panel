@@ -62,7 +62,10 @@ mod get {
     use serde::Serialize;
     use shared::{
         ApiError, GetState,
-        models::{IntoApiObject, server_backup::ServerBackup, user::GetPermissionManager},
+        models::{
+            IntoApiObject, nest_egg_variable::NestEggVariable, server::GetServer,
+            server_backup::ServerBackup, user::GetPermissionManager,
+        },
         response::{ApiResponse, ApiResponseResult},
     };
     use utoipa::ToSchema;
@@ -91,16 +94,26 @@ mod get {
     pub async fn route(
         state: GetState,
         permissions: GetPermissionManager,
+        server: GetServer,
         backup: GetServerBackup,
     ) -> ApiResponseResult {
         permissions.has_server_permission("backups.read")?;
+
+        let viewable_variables = NestEggVariable::user_viewable_env_variables_by_egg_uuid(
+            &state.database,
+            server.egg.uuid,
+        )
+        .await?;
 
         let retention_status = ServerBackup::retention_statuses(&state.database, [&backup.0])
             .await?
             .remove(&backup.0.uuid);
 
         ApiResponse::new_serialized(Response {
-            backup: backup.0.into_api_object(&state, retention_status).await?,
+            backup: backup
+                .0
+                .into_api_object(&state, (retention_status, Some(&viewable_variables)))
+                .await?,
         })
         .ok()
     }

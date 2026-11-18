@@ -50,7 +50,7 @@ mod post {
     }
 
     #[derive(Serialize)]
-    struct FileTransferUploadJwt {
+    struct FileTransferUploadJwt<'a> {
         #[serde(flatten)]
         base: BasePayload,
 
@@ -58,6 +58,8 @@ mod post {
         root: compact_str::CompactString,
 
         destination_path: compact_str::CompactString,
+
+        ignored_files: &'a [compact_str::CompactString],
     }
 
     #[utoipa::path(post, path = "/", responses(
@@ -202,6 +204,10 @@ mod post {
                         server: server.uuid,
                         root: data.root.clone(),
                         destination_path: data.destination.clone(),
+                        ignored_files: destination_server
+                            .subuser_ignored_files
+                            .as_deref()
+                            .unwrap_or(&[]),
                     },
                 )
                 .await?;

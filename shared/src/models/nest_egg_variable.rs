@@ -6,7 +6,7 @@ use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashSet},
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
@@ -281,6 +281,24 @@ impl NestEggVariable {
         rows.into_iter()
             .map(|row| Self::map(None, &row))
             .try_collect_vec()
+    }
+
+    pub async fn user_viewable_env_variables_by_egg_uuid(
+        database: &crate::database::Database,
+        egg_uuid: uuid::Uuid,
+    ) -> Result<HashSet<compact_str::CompactString>, crate::database::DatabaseError> {
+        let env_variables: Vec<String> = sqlx::query_scalar(
+            r#"
+            SELECT nest_egg_variables.env_variable
+            FROM nest_egg_variables
+            WHERE nest_egg_variables.egg_uuid = $1 AND nest_egg_variables.user_viewable
+            "#,
+        )
+        .bind(egg_uuid)
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(env_variables.into_iter().map(Into::into).collect())
     }
 
     #[inline]
