@@ -1,0 +1,70 @@
+{
+  "account_created": {
+    "subject": "Felhasználó Létrehozva",
+    "greeting": "Hello",
+    "intro": "Ezt az e-mailt azért kapja, mert létrehoztak Önnek egy fiókot a<strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Kérlek kattints lent a gombra hogy biztonságosan beállíts egy jelszót és hozzáférj a fiókodhoz:",
+    "button": "Jelszó beállítása",
+    "note": "<strong>Megjegyzés:</strong> Biztonsági okokból ez a link <strong>20 perc múlva</strong> lejár.",
+    "footer": "Ha Ön nem kért ilyen fiókot, nyugodtan figyelmen kívül hagyhatja ezt az e-mailt."
+  },
+  "password_reset": {
+    "subject": "Jelszó Visszaállítása",
+    "intro": "Kérelmet kaptunk a fiókja jelszavának visszaállítására a <strong>{{ settings.app.name }}</strong>.",
+    "instruction": "Ha te kérted ezt a kérelmet, kérlek kattints a lenti gombra hogy megadj egy új jelszót:",
+    "button": "Jelszó Visszaállítása",
+    "note": "<strong>Megjegyzés:</strong> Ez a link lejár <strong> 20 perc múlva</strong>.",
+    "footer": "Ha nem kért jelszó-visszaállítást, kérjük, hagyja figyelmen kívül ezt az e-mailt. A jelszava változatlan marad, és fiókja biztonságban van."
+  },
+  "email_verification": {
+    "subject": "Hitelesítsd az email címed",
+    "intro": "Kérlek erősítsd meg <strong>{{ email }}</strong> hogy az ön tulajdonában van mielőtt befejezhetné a fiókja beállítását <strong>{{ settings.app.name }}</strong>.",
+    "button": "Email hitelesítése",
+    "note": "<strong>Megjegyzés:</strong> Ez a link <strong>24 óra múlva</strong> lejár.",
+    "footer": "Ha nem Ön hozta létre ezt a fiókot, illetve nem Ön kérte ezt a módosítást, kérjük, hagyja figyelmen kívül ezt az e-mailt. Semmi sem fog változni."
+  },
+  "two_factor_code": {
+    "subject": "A bejelentkezési kódod",
+    "intro": "Használd ezt a kódot hogy befejezd a belépést <strong>{{ settings.app.name }}</strong>.",
+    "note": "<strong>Megjegyzés:</strong> Ez a kód <strong>10 perc múlva</strong> lejár, és csak egyszer használható fel.",
+    "footer": "Ha nem próbált bejelentkezni, lehetséges, hogy valaki más is ismeri a jelszavát. Javasoljuk, hogy a lehető leghamarabb változtassa meg."
+  },
+  "session_created": {
+    "subject": "Új munkamenet létrehozva",
+    "intro": "Az öm fiókja bejelentkezett innen <strong>{{ settings.app.name }}</strong>.",
+    "ip_label": "IP Cím",
+    "device_label": "Eszköz",
+    "button": "Munkamenetek Átvizsgálása",
+    "note": "<strong>Megjegyzés:</strong> Ha ez Önre vonatkozik, nincs szükség semmilyen intézkedésre. A fiókbeállítások menüpontban visszavonhat minden olyan munkamenetet, amelyet nem ismer fel.",
+    "footer": "Ha nem te jelentkeztél be, akkor valaki más tudja a jelszavad. Erősen ajánljuk megváltoztatni minél hamarabb."
+  },
+  "connection_test": {
+    "subject": "Kapcsolatellenőrzés",
+    "intro": "Ezt az e-mailt azért kapja, mert a <strong>{{ settings.app.name }}</strong> rendszer egyik rendszergazdája tesztüzenetet kért a rendszer kimenő levelezési beállításainak ellenőrzése céljából.",
+    "success": "🎉 Sikerült! Az email csatlakozás működik.",
+    "footer": "Ez egy automatikus tesztüzenet az Ön alkalmazásából. Nincs szükség további intézkedésre."
+  },
+  "added_to_server": {
+    "subject": "Hozzáadva a Szerverhez",
+    "intro": "Ezt az e-mailt azért kapja, mert alfelhasználóként felvették a <strong>{{ server.name }}</strong> webhelyre.",
+    "instruction": "Kattintson az alábbi gombra a szerver eléréséhez:",
+    "button": "Hozzáférés a Szerverhez"
+  },
+  "removed_from_server": {
+    "subject": "Eltávolítva a Szerverről",
+    "intro": "Ezt az e-mailt azért kapja, mert eltávolították Önt alfelhasználóként a <strong>{{ server.name }}</strong> webhelyről.",
+    "footer": "Önnek nem kell semmit tennie. Ha úgy gondolja, hogy ez tévedés volt, kérjük, forduljon a szerver rendszergazdájához további információkért."
+  },
+  "server_installed": {
+    "subject": "Szerver Telepítve",
+    "intro": "Ezt az e-mailt azért kapod, mert a szervered, a <strong>{{ server.name }}</strong>, telepítése befejeződött.",
+    "instruction": "Kattintson az alábbi gombra a szerver eléréséhez:",
+    "button": "Hozzáférés a Szerverhez"
+  },
+  "server_restored": {
+    "subject": "A szerver helyreállítva",
+    "intro": "Ezt az e-mailt azért kapja, mert a szerverének, a <strong>{{ server.name }}</strong>-nek, befejeződött a biztonsági másolatból történő helyreállítása.",
+    "instruction": "Kattintson az alábbi gombra a szerver eléréséhez:",
+    "button": "Hozzáférés a Szerverhez"
+  }
+}
