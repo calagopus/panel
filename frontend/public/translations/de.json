@@ -529,6 +529,7 @@
         "device": "Gerät",
         "nest": "Nest",
         "nestCreateHint": "Keins gefunden? Erstelle ein neues Nest",
+        "locationCreateHint": "Nichts gefunden? Erstelle einen neuen Standort",
         "lines": "Zeilen",
         "databaseHost": "Datenbank-Host",
         "databaseAgentHost": "Datenbank-Agent-Host",
@@ -1026,6 +1027,18 @@
       "selectInput": {
         "noResults": "Keine Ergebnisse gefunden."
       },
+      "resourceSelectModal": {
+        "empty": {
+          "mounts": "Es gibt noch keine Mounts. Erstelle zuerst einen Mount und verknüpfe ihn dann hier.",
+          "nodes": "Es gibt noch keine Nodes. Erstelle zuerst eine Node und verknüpfe sie dann hier.",
+          "eggs": "Es gibt noch keine Eggs. Erstelle oder importiere zuerst ein Egg in einem Nest und verknüpfe es dann hier.",
+          "locations": "Es gibt noch keine Standorte. Erstelle zuerst einen Standort und verknüpfe ihn dann hier.",
+          "databaseHosts": "Es gibt noch keine Datenbank-Hosts. Erstelle zuerst einen Datenbank-Host und verknüpfe ihn dann hier.",
+          "databaseAgentHosts": "Es gibt noch keine Datenbank-Agent-Hosts. Erstelle zuerst einen und verknüpfe ihn dann hier.",
+          "serverMounts": "Für diesen Server sind keine Mounts verfügbar. Ein Mount wird erst angeboten, wenn er sowohl mit der Node dieses Servers als auch mit seinem Egg verknüpft ist. Verknüpfe ihn in den Tabs **Nodes** und **Eggs** des Mounts."
+        },
+        "manageMounts": "Mounts verwalten"
+      },
       "serverSelect": {
         "showOtherUsersServers": "Server anderer Benutzer anzeigen"
       },
@@ -1066,6 +1079,9 @@
             "title": "Aktivitätsdetails"
           }
         }
+      },
+      "captcha": {
+        "loadFailed": "Das Captcha konnte nicht geladen werden. Eine Browser-Erweiterung wie ein Werbeblocker blockiert es möglicherweise, deaktiviere sie für diese Seite und versuche es erneut."
       },
       "screenBlock": {
         "permissionDenied": {
@@ -1125,7 +1141,8 @@
           "tokenRefreshLoop": "Authentifizierungsschleife erkannt. Bitte lade die Seite neu, um es erneut zu versuchen."
         },
         "banner": {
-          "retrying": "Erneuter Versuch in {countdown}..."
+          "retrying": "Erneuter Versuch in {countdown}...",
+          "reconnect": "Neu verbinden"
         },
         "listener": {
           "toast": {
@@ -1194,6 +1211,8 @@
         "resume": "Upload fortsetzen",
         "cancel": "Upload abbrechen",
         "reselect": "Datei erneut auswählen, um fortzusetzen",
+        "uploadAnyway": "Trotzdem hochladen",
+        "openTrash": "Papierkorb öffnen",
         "badge": {
           "uploading": "Wird hochgeladen",
           "uploadingPercent": "Wird hochgeladen {percent}%",
@@ -1232,6 +1251,8 @@
           "cancelledFile": "Upload von `{file}` erfolgreich abgebrochen.",
           "cancelledFolder": "Upload von `{folder}` ({files}) erfolgreich abgebrochen.",
           "wrongFile": "Die ausgewählte Datei stimmt nicht mit `{file}` überein; wähle dieselbe Datei aus, um fortzusetzen.",
+          "uploadingInOtherTab": "`{file}` wird bereits in einem anderen Tab hochgeladen.",
+          "insufficientDisk": "Nicht genug freier Speicherplatz: {files} benötigen {needed}, aber nur {free} ist frei.",
           "cancelledAll": "Alle Uploads wurden abgebrochen.",
           "completedServer": "Upload von {files} nach `{server}` abgeschlossen.",
           "completedAssets": "Upload von {files} in die Admin-Assets abgeschlossen.",
@@ -1300,6 +1321,7 @@
             "backupDisk": "Backup Festplatte",
             "backupDiskPlaceholder": "Backup Festplatte"
           },
+          "skipHint": "Wenn du den Standort überspringst, werden auch die Schritte für Node und Server übersprungen, da beide einen Standort benötigen. Du kannst sie später im Admin-Bereich erstellen.",
           "button": {
             "create": "Erstellen & Weiter"
           }
@@ -1316,6 +1338,7 @@
           "error": {
             "noLocations": "Etwas ist schiefgelaufen. Es wurden keine Standorte gefunden."
           },
+          "skipHint": "Wenn du die Node überspringst, wird auch der Server-Schritt übersprungen, da ein Server eine Node zum Laufen benötigt.",
           "button": {
             "create": "Erstellen & Weiter"
           }
@@ -1328,6 +1351,7 @@
             "frontendConnectionError": "Dein Browser konnte die Node nicht erreichen. Prüfe die (öffentliche) URL, das TLS-Zertifikat und die Firewall. Websockets und Downloads hängen von dieser Verbindung ab."
           },
           "successMessage": "Die Verbindung zu deiner Node wurde erfolgreich verifiziert. Du kannst nun fortfahren.",
+          "skipHint": "Wenn du die Überprüfung überspringst, geht es direkt zum Ende der Einrichtung, es wird also kein Server erstellt.",
           "configurationDescription": "Füge dies in die Konfigurationsdatei unter `{file}` ein oder führe Folgendes aus:",
           "button": {
             "verify": "Verbindung verifizieren"
@@ -1341,6 +1365,7 @@
             "applicationUrl": "Anwendungs-URL",
             "registration": "Registrierung aktivieren",
             "registrationDescription": "Erlaube neuen Benutzern, ihren eigenen Account zu registrieren.",
+            "registrationDescriptionNoCaptcha": "Erlaube neuen Benutzern, sich selbst einen Account zu registrieren. Es ist noch kein Captcha konfiguriert, richte also nach der Einrichtung eines in den Admin-Einstellungen ein, um Bots fernzuhalten.",
             "securityKeys": "Sicherheitsschlüssel aktivieren",
             "securityKeysDescription": "Erlaube Benutzern, sich mit Passkeys und Hardware-Sicherheitsschlüsseln anzumelden, beschränkt auf {rpId}. Du kannst dies später in den Admin-Einstellungen ändern."
           },
@@ -1367,7 +1392,8 @@
               "description": "Eggs für generische Laufzeitumgebungen wie Node JS, Java und Rust.",
               "nest": "Allgemein"
             }
-          }
+          },
+          "skipHint": "Ohne Egg-Repository kannst du trotzdem einen Standort und eine Node einrichten, aber am Ende dieser Einrichtung keinen Server erstellen."
         },
         "server": {
           "title": "Server",
@@ -1382,10 +1408,12 @@
             "nestDescription": "Um dieses Egg zu verwenden, musst du ein Nest erstellen. Nester sind Sammlungen von Eggs. Gib ihm einen Namen:"
           },
           "error": {
-            "noNodes": "Etwas ist schiefgelaufen. Es wurden keine Nodes gefunden."
+            "noNodes": "Etwas ist schiefgelaufen. Es wurden keine Nodes gefunden.",
+            "noEggRepositories": "Es wurden keine Egg-Repositories importiert, daher gibt es keine Eggs, aus denen ein Server erstellt werden kann. Importiere eines im Schritt Egg-Repositories oder überspringe diesen Schritt und erstelle später einen Server im Admin-Bereich."
           },
           "button": {
-            "create": "Erstellen & Weiter"
+            "create": "Erstellen & Weiter",
+            "importRepositories": "Egg-Repositories importieren"
           }
         },
         "finished": {
@@ -1425,6 +1453,8 @@
             "usernameRequired": "Bitte gib einen Benutzernamen ein",
             "registrationDisabled": "Es konnte kein passender Account gefunden werden und die Registrierung ist derzeit deaktiviert.",
             "userAlreadyExists": "Ein Account mit diesem Benutzernamen oder dieser E-Mail existiert bereits.",
+            "oauthFailed": "Die Anmeldung über den Anbieter ist fehlgeschlagen ({code}). Bitte versuche es erneut.",
+            "accountPasswordLoginDisabled": "Die Passwort-Anmeldung ist für diesen Account deaktiviert, melde dich stattdessen mit einem Sicherheitsschlüssel oder einer der folgenden Optionen an.",
             "securityKeyRequired": "Dieser Account erfordert eine Zwei-Faktor-Authentifizierung, melde dich stattdessen mit einem Sicherheitsschlüssel an.",
             "passwordLoginDisabled": "Die Anmeldung mit Passwort ist in diesem Panel deaktiviert, nutze stattdessen eine der Optionen unten."
           },
@@ -1477,7 +1507,8 @@
               "button": {
                 "signIn": "Anmelden",
                 "forgotPassword": "Passwort vergessen"
-              }
+              },
+              "providerHint": "Über einen Anbieter registriert? Melde dich stattdessen damit an."
             },
             "totp": {
               "title": "Zwei-Faktor-Authentifizierung",
@@ -1549,7 +1580,8 @@
             "confirmPasswordPlaceholder": "Gib dein Passwort erneut ein"
           },
           "button": {
-            "reset": "Passwort zurücksetzen"
+            "reset": "Passwort zurücksetzen",
+            "requestNewLink": "Neuen Link anfordern"
           },
           "toast": {
             "success": "Passwort wurde zurückgesetzt."
@@ -1588,6 +1620,9 @@
                 },
                 "button": {
                   "createGroup": "Neue Gruppe"
+                },
+                "tooltip": {
+                  "limitReached": "Du bist auf {max} Servergruppen beschränkt."
                 },
                 "modal": {
                   "createServerGroup": {
@@ -1675,7 +1710,8 @@
           "alert": {
             "requireTwoFactor": {
               "title": "Zwei-Faktor-Authentifizierung erforderlich",
-              "description": "Zwei-Faktor-Authentifizierung ist für deinen Account erforderlich. Bitte richte sie unten ein, um das Panel weiter nutzen zu können."
+              "description": "Zwei-Faktor-Authentifizierung ist für deinen Account erforderlich. Richte eine der folgenden Methoden ein, um das Panel weiter nutzen zu können: {methods}.",
+              "descriptionNoMethods": "Zwei-Faktor-Authentifizierung ist für deinen Account erforderlich, aber keine der akzeptierten Methoden ist derzeit verfügbar. Bitte kontaktiere einen Administrator."
             },
             "verifyEmail": {
               "title": "E-Mail-Bestätigung erforderlich",
@@ -1754,6 +1790,8 @@
               "none": "Für dein Konto ist noch kein zweiter Faktor eingerichtet.",
               "requirementMet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung.",
               "requirementUnmet": "Dein Konto erfüllt die Zwei-Faktor-Anforderung noch nicht.",
+              "notAccepted": "Diese Methode zählt nicht für die Zwei-Faktor-Anforderung.",
+              "lastAcceptedMethod": "Dies ist deine einzige Methode, die für die erforderliche Zwei-Faktor-Authentifizierung zählt. Nach dem Entfernen kannst du nur noch die Account-Seite nutzen, bis du eine andere akzeptierte Methode einrichtest.",
               "enum": {
                 "twoFactorMethod": {
                   "totp": "Authenticator-App",
@@ -1765,6 +1803,9 @@
             "emailTwoFactor": {
               "toast": {
                 "disabled": "E-Mail-Zwei-Faktor erfolgreich deaktiviert."
+              },
+              "tooltip": {
+                "unavailable": "E-Mail-Zwei-Faktor ist nicht verfügbar, da dieses Panel die Code-E-Mail derzeit nicht senden kann. Bitte kontaktiere einen Administrator."
               },
               "modal": {
                 "enable": {
@@ -1836,7 +1877,9 @@
           "tooltip": {
             "secureContextRequired": "Ein sicherer Kontext (HTTPS) ist erforderlich, um Sicherheitsschlüssel zu verwenden.",
             "limitReached": "Du bist auf {max} Sicherheitsschlüssel limitiert.",
-            "disabled": "Sicherheitsschlüssel wurden von einem Administrator deaktiviert."
+            "disabled": "Sicherheitsschlüssel wurden von einem Administrator deaktiviert.",
+            "lastKeyPasswordLoginOff": "Dies ist dein letzter Sicherheitsschlüssel und die Passwort-Anmeldung ist deaktiviert. Aktiviere die Passwort-Anmeldung auf der Account-Seite wieder, bevor du ihn entfernst.",
+            "lastKeyPasswordLoginDisabled": "Dies ist dein letzter Sicherheitsschlüssel und die Passwort-Anmeldung ist auf dieser Instanz deaktiviert. Wenn du ihn entfernst, sperrst du dich aus."
           },
           "alert": {
             "disabled": "Sicherheitsschlüssel wurden von einem Administrator deaktiviert. Deine bestehenden Schlüssel werden unten aufgelistet und können weiterhin entfernt werden, sie können jedoch nicht zur Anmeldung verwendet werden und es können keine neuen Schlüssel erstellt werden."
@@ -1917,7 +1960,8 @@
             "imported": "{shortcuts} aktualisiert.",
             "importedNone": "Keine Tastenkürzel wurden geändert.",
             "importErrors": "{unknown} und {invalid} ignoriert.",
-            "resetAll": "Alle Tastenkürzel auf Standard zurückgesetzt."
+            "resetAll": "Alle Tastenkürzel auf Standard zurückgesetzt.",
+            "conflict": "Diese Tastenkombination wird auch verwendet von: {shortcuts}."
           },
           "general": {
             "title": "Allgemein",
@@ -2095,12 +2139,26 @@
               "providerName": "Anbieter Name"
             }
           },
+          "alert": {
+            "lastLoginMethod": {
+              "title": "OAuth ist deine einzige Anmeldemöglichkeit",
+              "description": "Dein Account hat weder ein Passwort noch einen Sicherheitsschlüssel, daher muss mindestens eine OAuth-Verknüpfung bestehen bleiben. {passwordLink}, um sie entfernen zu können.",
+              "passwordLink": "Lege ein Passwort für deinen Account fest"
+            }
+          },
+          "tooltip": {
+            "lastLoginMethod": "Dies ist deine letzte Anmeldemöglichkeit. Lege ein Passwort für deinen Account fest, bevor du sie entfernst.",
+            "notManageable": "Dieser Anbieter erlaubt es nicht, die Verbindung selbst zu entfernen. Kontaktiere einen Administrator.",
+            "notLinkable": "Ein Administrator hat das Verbinden mit diesem Anbieter über diese Seite deaktiviert.",
+            "nothingToConnect": "Es gibt keine weiteren Anbieter, mit denen du dich verbinden kannst."
+          },
           "modal": {
             "deleteOAuthLinks": {
               "title": "Löschen der OAuth-Verknüpfungen bestätigen",
               "content": "Bist du sicher, dass du **{oauthLinks}** aus deinem Konto löschen möchtest?",
               "alert": {
-                "skipped": "Übersprungen: {oauthLinks}. Verknüpfungen mit Anbietern, die das Trennen nicht erlauben, können nicht entfernt werden."
+                "skipped": "Übersprungen: {oauthLinks}. Verknüpfungen mit Anbietern, die das Trennen nicht erlauben, können nicht entfernt werden.",
+                "keptLast": "Eine Verknüpfung bleibt bestehen, da sie deine letzte Anmeldemöglichkeit ist. Lege ein Passwort für deinen Account fest, um sie zu entfernen."
               }
             },
             "deleteOAuthLink": {
@@ -2189,7 +2247,9 @@
             "subtitle": "Eine Anwendung fordert die Erstellung eines API-Schlüssels für deinen Account an.",
             "alert": {
               "adminPermissions": "Dieser API-Schlüssel fordert **Admin-Berechtigungen** an. Jeder, der diesen Schlüssel besitzt, kann in deinem Namen administrative Aktionen auf diesem Panel ausführen. Fahre nur fort, wenn du der anfragenden Anwendung absolut vertraust.",
-              "callbackUrl": "Nach der Erstellung wird der neue API-Schlüssel an **{url}** gesendet."
+              "callbackUrl": "Nach der Erstellung wird der neue API-Schlüssel an **{url}** gesendet.",
+              "limitReached": "Du hast bereits die maximale Anzahl von **{max}** API-Schlüsseln. Lösche einen unter API-Schlüssel, bevor du einen neuen erstellst.",
+              "droppedPermissions": "Die Anwendung hat außerdem diese Berechtigungen angefordert, die unbekannt oder für deinen Account nicht verfügbar sind und nicht gewährt werden: {permissions}"
             },
             "noPermissions": "Dieser API-Schlüssel wird keine Berechtigungen haben.",
             "keyCreated": "Dein neuer API-Schlüssel wurde erstellt. Kopiere ihn jetzt, da er nicht erneut angezeigt wird.",
@@ -2402,13 +2462,22 @@
                   "emailTwoFactorEnabledDescription": "Erlaubt Benutzern, einen einmaligen Anmeldecode per E-Mail zu erhalten. Erfordert einen konfigurierten Mail-Transport.",
                   "twoFactorAcceptedMethods": "Akzeptierte Zwei-Faktor-Methoden",
                   "twoFactorAcceptedMethodsDescription": "Welche eingerichteten Faktoren zur Zwei-Faktor-Anforderung zählen. E-Mail ist standardmäßig aus: Passwort-Zurücksetzungen laufen ebenfalls über E-Mail, sie ist also nicht unabhängig vom Passwort.",
+                  "twoFactorAcceptedMethodsNoneAvailable": "Mindestens eine akzeptierte Methode muss verfügbar sein, sonst können Benutzer, die Zwei-Faktor benötigen, die Anforderung nie erfüllen.",
                   "emailVerificationRequired": "E-Mail-Bestätigung erforderlich",
                   "emailVerificationRequiredDescription": "Neue Benutzer müssen ihre E-Mail-Adresse bestätigen, bevor sie das Panel nutzen können. Erfordert einen konfigurierten Mail-Transport.",
+                  "emailTwoFactorEnabledNoMail": "Es ist kein Mail-Transport konfiguriert, daher können keine Anmeldecodes gesendet werden. Konfiguriere zuerst einen im Tab E-Mail.",
+                  "emailVerificationRequiredNoMail": "Es ist kein Mail-Transport konfiguriert, daher können keine Bestätigungs-E-Mails gesendet werden. Konfiguriere zuerst einen im Tab E-Mail.",
+                  "emailRequiresMail": "Dies benötigt einen Mail-Transport, deaktiviere es oder konfiguriere einen im Tab E-Mail.",
+                  "registrationEnabledNoPasswordLogin": "Die lokale Registrierung verwendet Passwörter und funktioniert daher nicht, solange die Passwort-Anmeldung deaktiviert ist.",
                   "telemetryEnabled": "Telemetrie aktivieren",
                   "telemetryEnabledDescription": "Erlaube Calagopus, begrenzte und anonyme Nutzungsdaten zu sammeln, um die Anwendung zu verbessern.",
                   "registrationEnabled": "Registrierung aktivieren",
                   "passwordLoginEnabled": "Passwort-Anmeldung aktivieren",
                   "passwordLoginEnabledDescription": "Erlaube Benutzern, sich mit Benutzername und Passwort anzumelden. Wenn du dies deaktivierst, bleiben nur OAuth-Anbieter und Sicherheitsschlüssel als Zugang, und die lokale Registrierung, das Zurücksetzen von Passwörtern sowie die SFTP-Anmeldung mit Passwort werden ebenfalls gestoppt."
+                },
+                "alert": {
+                  "noMail": "E-Mail-Zwei-Faktor und E-Mail-Bestätigung benötigen einen Mail-Transport. Deaktiviere sie oder konfiguriere einen im {link}.",
+                  "noMailLink": "Tab E-Mail"
                 },
                 "section": {
                   "general": "Allgemein",
@@ -2422,6 +2491,11 @@
                     "totp": "Authenticator-App (TOTP)",
                     "securityKey": "Sicherheitsschlüssel",
                     "email": "E-Mail"
+                  },
+                  "twoFactorMethodUnavailable": {
+                    "securityKey": "Sicherheitsschlüssel (WebAuthn ist deaktiviert)",
+                    "email": "E-Mail (E-Mail-Zwei-Faktor ist deaktiviert)",
+                    "emailNoMail": "E-Mail (kein Mail-Transport konfiguriert)"
                   },
                   "twoFactorRequirement": {
                     "admins": "Admins",
@@ -2442,11 +2516,20 @@
                   },
                   "enableRegistration": {
                     "title": "Registrierungs-Aktivierung bestätigen",
-                    "content": "Bist du sicher, dass du die Registrierung aktivieren möchtest? Das Aktivieren der Registrierung erlaubt es jedem, ein Konto in diesem Panel zu erstellen. Wenn du keine Captcha konfiguriert hast, könnte dies ein Fehler sein."
+                    "content": "Bist du sicher, dass du die Registrierung aktivieren möchtest? Das Aktivieren der Registrierung erlaubt es jedem, ein Konto in diesem Panel zu erstellen. Wenn du keine Captcha konfiguriert hast, könnte dies ein Fehler sein.",
+                    "noCaptcha": "Es ist kein Captcha konfiguriert, daher können sich Bots ungehindert registrieren. Konfiguriere eines im {link}.",
+                    "noCaptchaLink": "Tab Captcha"
                   },
                   "disablePasswordLogin": {
                     "title": "Deaktivierung der Passwort-Anmeldung bestätigen",
-                    "content": "Bist du sicher, dass du die Passwort-Anmeldung deaktivieren möchtest? Alle benötigen dann einen OAuth-Anbieter oder einen Sicherheitsschlüssel, um sich anzumelden, und die lokale Registrierung, das Zurücksetzen von Passwörtern sowie die SFTP-Anmeldung mit Passwort funktionieren nicht mehr. Stelle sicher, dass du dich selbst noch anmelden kannst, bevor du fortfährst."
+                    "content": "Bist du sicher, dass du die Passwort-Anmeldung deaktivieren möchtest? Alle benötigen dann einen OAuth-Anbieter oder einen Sicherheitsschlüssel, um sich anzumelden, und die lokale Registrierung, das Zurücksetzen von Passwörtern sowie die SFTP-Anmeldung mit Passwort funktionieren nicht mehr. Stelle sicher, dass du dich selbst noch anmelden kannst, bevor du fortfährst.",
+                    "yourOptions": "Deine anderen Anmeldemöglichkeiten:",
+                    "oauthLink": "OAuth: {provider}",
+                    "securityKey": "Sicherheitsschlüssel",
+                    "checking": "Deine Anmeldemöglichkeiten werden geprüft...",
+                    "checkFailed": "Deine Anmeldemöglichkeiten konnten nicht geprüft werden, stelle sicher, dass du dich selbst noch anmelden kannst.",
+                    "noProviders": "Es ist kein OAuth-Anbieter aktiviert. Aktiviere einen, bevor du die Passwort-Anmeldung deaktivierst.",
+                    "noOptions": "Du hast weder eine Verknüpfung zu einem aktivierten OAuth-Anbieter noch einen Sicherheitsschlüssel und würdest dich daher aussperren. Verknüpfe zuerst einen OAuth-Account oder füge einen Sicherheitsschlüssel hinzu."
                   },
                   "telemetryPreview": {
                     "title": "Telemetrie-Vorschau"
@@ -2560,6 +2643,10 @@
                 "tooltip": {
                   "noProvider": "Speichere einen E-Mail-Anbieter, bevor du eine Test-E-Mail sendest."
                 },
+                "alert": {
+                  "noneInUse": "E-Mail-Zwei-Faktor oder E-Mail-Bestätigung ist aktiviert, daher kann der Anbieter nicht auf Keiner gesetzt werden. Deaktiviere sie zuerst im {link}.",
+                  "noneInUseLink": "Tab Anwendung"
+                },
                 "modal": {
                   "sendTestEmail": {
                     "title": "Test-E-Mail senden",
@@ -2595,7 +2682,9 @@
                   "syntaxOr": "und",
                   "syntaxAfter": "werden unterstützt.",
                   "variablesBefore": "Textbausteine werden referenziert mit",
-                  "variablesAfter": "und im Abschnitt Variablen pro Sprache übersetzt, sodass eine Vorlage nur ein Layout für alle wählbaren Sprachen braucht."
+                  "variablesAfter": "und im Abschnitt Variablen pro Sprache übersetzt, sodass eine Vorlage nur ein Layout für alle wählbaren Sprachen braucht.",
+                  "disabledTwoFactor": "E-Mail-Zwei-Faktor ist aktiviert. Wenn diese Vorlage deaktiviert ist, können Benutzer keine Anmeldecodes mehr empfangen und E-Mail funktioniert nicht mehr als Zwei-Faktor-Methode.",
+                  "disabledVerification": "E-Mail-Bestätigung ist erforderlich. Wenn diese Vorlage deaktiviert ist, können neue Benutzer keine Bestätigungs-E-Mail empfangen und bleiben vom Panel ausgesperrt."
                 },
                 "variables": {
                   "title": "Variablen",
@@ -2674,6 +2763,7 @@
                 "form": {
                   "enabled": "Sicherheitsschlüssel aktivieren",
                   "enabledDescription": "Erlaube Benutzern, sich mit Sicherheitsschlüsseln zu registrieren und anzumelden. Bestehende Schlüssel bleiben erhalten und sichtbar, können aber zur Anmeldung nicht verwendet werden, solange dies deaktiviert ist.",
+                  "enabledLocked": "Sicherheitsschlüssel sind die einzige verfügbare akzeptierte Zwei-Faktor-Methode. Akzeptiere in den Anwendungseinstellungen eine andere Methode, bevor du dies deaktivierst.",
                   "allowDiscoverable": "Anmeldung ohne Benutzernamen erlauben",
                   "allowDiscoverableDescription": "Erlaube Benutzern, Passkeys auf ihrem Gerät zu speichern und einen aus einer Liste auszuwählen, statt einen Benutzernamen einzugeben.",
                   "rpId": "RP-Id",
@@ -3082,7 +3172,10 @@
             "general": {
               "page": {
                 "tooltip": {
-                  "cannotImpersonateSelf": "Du kannst dich nicht selbst impersonieren."
+                  "cannotImpersonateSelf": "Du kannst dich nicht selbst impersonieren.",
+                  "passwordResetPasswordLoginDisabled": "Die Passwort-Anmeldung ist deaktiviert, daher gibt es kein Passwort zum Zurücksetzen.",
+                  "passwordResetNoMail": "Es ist kein Mail-Transport konfiguriert, daher kann die E-Mail nicht gesendet werden.",
+                  "passwordResetTemplateDisabled": "Die E-Mail-Vorlage zum Zurücksetzen des Passworts ist deaktiviert."
                 },
                 "button": {
                   "sendPasswordResetEmail": "Passwort-Zurücksetzungs-E-Mail senden",
@@ -3148,12 +3241,18 @@
                   "added": "OAuth-Verknüpfung hinzugefügt.",
                   "removed": "OAuth-Verknüpfung entfernt."
                 },
+                "tooltip": {
+                  "rootOnly": "Nur Administratoren können OAuth-Identitäten mit anderen Accounts verknüpfen."
+                },
                 "modal": {
                   "add": {
                     "title": "OAuth-Verknüpfung hinzufügen",
                     "form": {
                       "oauthProvider": "OAuth-Anbieter"
-                    }
+                    },
+                    "noProviders": "Es gibt noch keine OAuth-Anbieter.",
+                    "noProvidersCreate": "Es gibt noch keine OAuth-Anbieter. {link}, um fortzufahren.",
+                    "createProvider": "Erstelle zuerst einen OAuth-Anbieter"
                   },
                   "delete": {
                     "title": "Löschung der OAuth-Verknüpfung bestätigen",
@@ -3183,6 +3282,9 @@
                   "delete": {
                     "title": "Löschen des Standorts bestätigen"
                   }
+                },
+                "tooltip": {
+                  "deleteBlocked": "In diesem Standort befinden sich noch {count} Nodes. Verschiebe oder lösche sie zuerst (siehe Tab Nodes)."
                 },
                 "titleCreate": "Standort erstellen",
                 "titleUpdate": "Standort aktualisieren"
@@ -3317,7 +3419,8 @@
                   "errorWhileFetchingVersion": "Fehler beim Abrufen der Version",
                   "updateAvailable": "{version} (Update verfügbar)",
                   "latestVersionUnknown": "{version} (Neueste Version unbekannt)",
-                  "useWingsProxyUrl": "Wings Proxy URL verwenden"
+                  "useWingsProxyUrl": "Wings Proxy URL verwenden",
+                  "deleteBlocked": "{count} Server verwenden diese Node noch. Lösche oder übertrage sie zuerst (siehe Tab Server)."
                 },
                 "form": {
                   "urlDescription": "Wird für die interne Kommunikation mit dem Node verwendet.",
@@ -3498,6 +3601,13 @@
                     "ipAlias": "IP Alias"
                   }
                 },
+                "alert": {
+                  "noneAvailable": "Diese Node hat keine freien Allocations.",
+                  "noneAvailableCreate": "Diese Node hat keine freien Allocations. Erstelle welche, um sie hier zuzuweisen."
+                },
+                "button": {
+                  "createAllocations": "Allocations erstellen"
+                },
                 "modal": {
                   "create": {
                     "title": "Node Allocations erstellen",
@@ -3510,6 +3620,12 @@
                   },
                   "update": {
                     "title": "Node Allocations aktualisieren",
+                    "form": {
+                      "ipAliasUnchanged": "Bleibt unverändert, solange du es nicht bearbeitest."
+                    },
+                    "alert": {
+                      "ipAppliesToAll": "Diese IP wird auf alle {allocations} angewendet, auch auf solche, die derzeit eine andere IP verwenden."
+                    },
                     "button": {
                       "update": "{count} aktualisieren"
                     },
@@ -3676,6 +3792,12 @@
                     "toast": {
                       "started": "Übertragung von {servers} gestartet."
                     },
+                    "tooltip": {
+                      "aioNotSupported": "Transfers zur All-In-One-Node werden nicht unterstützt."
+                    },
+                    "alert": {
+                      "eggConfigRequired": "Server, deren Egg keine passende Konfiguration hat, lassen die Anfrage fehlschlagen. Server, die vor dem fehlgeschlagenen verarbeitet wurden, werden weiter übertragen, die übrigen werden nicht übertragen."
+                    },
                     "confirm": {
                       "title": "Server-Übertragungen bestätigen",
                       "content": "Bist du sicher, dass du `{count}` Server von **{from}** zu **{to}** übertragen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
@@ -3695,6 +3817,9 @@
                     "title": "Energieaktion bestätigen",
                     "content": "Bist du sicher, dass du **{action}** für {servers} ausführen möchtest?"
                   }
+                },
+                "tooltip": {
+                  "searchActive": "Leere zuerst die Suche, diese Aktion gilt für jeden Server auf der Node."
                 }
               }
             },
@@ -4012,6 +4137,8 @@
                   "pinnedCpusTooltip": "Nach Index, z. B. 0, 1, 2. Leer lassen, um alle Kerne zuzulassen.",
                   "predefinedDockerImages": "Vordefinierte Docker-Images",
                   "predefinedDockerImagesPlaceholder": "Kein vordefiniertes Image ausgewählt",
+                  "nodeUnreachable": "nicht erreichbar",
+                  "nodeUnreachableDescription": "Diese Node konnte nicht erreicht werden. Das Erstellen des Servers schlägt fehl, solange die Node nicht wieder online ist.",
                   "startupCommandCustom": "Benutzerdefiniert",
                   "predefinedStartupCommands": "Vordefinierte Startbefehle",
                   "labels": "Container-Labels",
@@ -4190,6 +4317,10 @@
                   "toast": {
                     "started": "Server-Transfer gestartet."
                   },
+                  "tooltip": {
+                    "alreadyTransferring": "Dieser Server wird bereits übertragen.",
+                    "busy": "Dieser Server wird gerade installiert oder stellt ein Backup wieder her und kann derzeit nicht übertragen werden."
+                  },
                   "modal": {
                     "title": "Server-Transfer",
                     "form": {
@@ -4276,6 +4407,9 @@
               "page": {
                 "titleCreate": "Nest erstellen",
                 "titleUpdate": "Nest aktualisieren",
+                "tooltip": {
+                  "deleteBlocked": "{count} Server verwenden noch Eggs in diesem Nest. Lösche sie oder ändere zuerst ihr Egg (siehe Tab Server des jeweiligen Eggs)."
+                },
                 "modal": {
                   "delete": {
                     "title": "Löschen des Nests bestätigen",
@@ -4339,6 +4473,9 @@
                     "page": {
                       "titleCreate": "Egg erstellen",
                       "titleUpdate": "Egg aktualisieren",
+                      "tooltip": {
+                        "deleteBlocked": "{count} Server verwenden dieses Egg noch. Lösche sie oder ändere zuerst ihr Egg (siehe Tab Server)."
+                      },
                       "card": {
                         "startupConfiguration": "Startkonfiguration",
                         "stopConfiguration": "Stopp-Konfiguration",
@@ -5180,6 +5317,9 @@
               "page": {
                 "titleCreate": "OAuth-Anbieter erstellen",
                 "titleUpdate": "OAuth-Anbieter aktualisieren",
+                "tooltip": {
+                  "rootOnly": "Nur Administratoren können ändern, wie dieser Anbieter Benutzer identifiziert, wie sie sich damit anmelden oder wer Accounts damit verknüpfen darf."
+                },
                 "card": {
                   "redirectUrl": {
                     "title": "Weiterleitungs-URL",
@@ -5796,6 +5936,9 @@
                     "title": "Entfernen des Geräte-Eggs bestätigen",
                     "content": "Bist du sicher, dass du das Gerät **{device}** von **{name}** entfernen möchtest?"
                   }
+                },
+                "tooltip": {
+                  "noReadPermission": "Du benötigst die Berechtigung zum Anzeigen von Eggs, um eines hinzuzufügen."
                 }
               }
             },
@@ -5815,6 +5958,9 @@
                     "title": "Entfernen des Geräte-Nodes bestätigen",
                     "content": "Bist du sicher, dass du das Gerät **{device}** von **{name}** entfernen möchtest?"
                   }
+                },
+                "tooltip": {
+                  "noReadPermission": "Du benötigst die Berechtigung zum Anzeigen von Nodes, um eine hinzuzufügen."
                 }
               }
             },
@@ -5846,6 +5992,7 @@
                 "form": {
                   "requireTwoFactor": "Zwei-Faktor erforderlich",
                   "requireTwoFactorDescription": "Benutzer mit dieser Rolle müssen die Zwei-Faktor-Authentifizierung verwenden.",
+                  "requireTwoFactorLocked": "Keine der akzeptierten Zwei-Faktor-Methoden ist verfügbar, daher könnten Benutzer mit dieser Rolle die Anforderung nie erfüllen. Korrigiere zuerst die akzeptierten Methoden in den Anwendungseinstellungen.",
                   "serverPermissions": "Server-Berechtigungen",
                   "adminPermissions": "Admin-Berechtigungen"
                 },
@@ -5881,6 +6028,8 @@
           "title": "Konsole",
           "input": {
             "placeholder": "Gib einen Befehl ein...",
+            "placeholderOffline": "Starte den Server, um Befehle zu senden.",
+            "placeholderDisconnected": "Warte auf die Verbindung zur Konsole...",
             "ariaLabel": "Konsolenbefehl Eingabe.",
             "prefixPlaceholder": "Präfix, z. B. \"say \""
           },
@@ -5963,6 +6112,7 @@
               "title": "Nicht unterstützte Java-Version",
               "content": "Dieser Server verwendet derzeit eine nicht unterstützte Java-Version und kann nicht gestartet werden.",
               "contentDetails": "Bitte wähle ein unterstütztes Docker-Image aus der folgenden Liste, um den Server zu starten.",
+              "contentCustomImage": "Das Docker-Image dieses Servers wurde von einem Administrator festgelegt und kann hier nicht geändert werden. Kontaktiere einen Administrator, um zu einer unterstützten Java-Version zu wechseln.",
               "toast": {
                 "updated": "Docker-Image erfolgreich aktualisiert."
               },
@@ -6078,6 +6228,9 @@
           "editorNotFound": {
             "title": "Nicht gefunden",
             "content": "Editor nicht gefunden."
+          },
+          "sqlite": {
+            "serverRunning": "Der Server ist nicht offline und hält diese Datenbank möglicherweise geöffnet. Änderungen können mit \"database is locked\" fehlschlagen oder vom Server überschrieben werden. Stoppe ihn, bevor du schreibst."
           },
           "view": {
             "list": "Liste",
@@ -6257,7 +6410,10 @@
           },
           "dropzone": {
             "title": "Dateien hier ablegen, um sie hochzuladen",
-            "subtitle": "Loslassen, um den Upload zu starten"
+            "subtitle": "Loslassen, um den Upload zu starten",
+            "readOnly": "Dieses Verzeichnis ist schreibgeschützt",
+            "noPermission": "Du hast keine Berechtigung, Dateien hochzuladen",
+            "blockedSubtitle": "Abgelegte Dateien werden nicht hochgeladen"
           },
           "settings": {
             "clickOnce": "Klicke einmal auf eine Datei oder ein Verzeichnis, um es zu öffnen",
@@ -6314,7 +6470,7 @@
             "permissionsCouldNotBeRestored": "Berechtigungen konnten nicht wiederhergestellt werden.",
             "fileSaved": "Datei wurde gespeichert.",
             "collabSaveTimeout": "Die Datei konnte nicht gespeichert werden, der Daemon hat nicht rechtzeitig geantwortet.",
-            "fileTooLargeToOpen": "Diese Datei ist zu groß, um sie im Dateimanager zu öffnen."
+            "fileTooLargeToOpen": "Diese Datei überschreitet das Limit des Dateimanagers von {limit}. Lade sie herunter, um sie lokal anzusehen."
           },
           "tooltip": {
             "settings": "Einstellungen",
@@ -6356,6 +6512,9 @@
             "title": "Papierkorb",
             "subtitle": "Gelöschte Dateien werden {retention} lang aufbewahrt, bevor sie endgültig entfernt werden.",
             "subtitleDisabled": "Der Papierkorb ist für diesen Server deaktiviert. Vorhandene Einträge bleiben erhalten, bis sie wiederhergestellt oder gelöscht werden.",
+            "button": {
+              "trashSettings": "Papierkorb-Einstellungen"
+            },
             "table": {
               "columns": {
                 "originalLocation": "Ursprünglicher Ort",
@@ -6464,6 +6623,7 @@
               "addFromGroup": "Server aus einer Gruppe hinzufügen",
               "browsingOn": "Durchsuche {server}, der gewählte Pfad wird auf jedem Zielserver verwendet.",
               "noCreatePermission": "Du hast keine Berechtigung, Dateien auf {servers} zu erstellen.",
+              "unavailableServers": "{servers} können derzeit keine Dateien empfangen, da sie gesperrt sind, installiert werden, ein Backup wiederherstellen oder übertragen werden. Entferne sie, um fortzufahren.",
               "createdAs": "Diese Dateien werden auf {servers} erstellt unter "
             },
             "fileFingerprints": {
@@ -6486,7 +6646,9 @@
               "permanent": "Endgültig löschen, statt in den Papierkorb zu verschieben"
             },
             "createFile": {
-              "title": "Datei erstellen"
+              "title": "Datei erstellen",
+              "overwriteWarning": "{file} existiert bereits. Sende erneut ab, um sie zu überschreiben.",
+              "overwrite": "Überschreiben"
             },
             "details": {
               "title": "Dateidetails",
@@ -6605,7 +6767,8 @@
                 "query": "Abfragen"
               },
               "createdAs": "Diese Datei wird erstellt als ",
-              "pull": "Herunterladen"
+              "pull": "Herunterladen",
+              "insufficientDisk": "Diese Datei ist {size} groß, aber nur {free} Speicherplatz ist frei. Der Pull kann unterwegs fehlschlagen."
             },
             "sftpDetails": {
               "title": "SFTP-Details",
@@ -6629,7 +6792,8 @@
             "descriptionUnavailable": "Dieser Server hat keine Datenbank, in der er Daten ablegen kann. Ihm wurde kein Datenbank-Host zur Verfügung gestellt, daher kann noch keine erstellt werden."
           },
           "tooltip": {
-            "limitReached": "Dieser Server ist auf {max} Datenbanken limitiert."
+            "limitReached": "Dieser Server ist auf {max} Datenbanken limitiert.",
+            "locked": "Diese Datenbank ist gesperrt. Entsperre sie zuerst."
           },
           "table": {
             "columns": {
@@ -6638,7 +6802,13 @@
           },
           "button": {
             "rotatePassword": "Passwort rotieren",
-            "createFirstDatabase": "Datenbank erstellen"
+            "createFirstDatabase": "Datenbank erstellen",
+            "lock": "Sperren",
+            "unlock": "Entsperren"
+          },
+          "toast": {
+            "locked": "Datenbank gesperrt.",
+            "unlocked": "Datenbank entsperrt."
           },
           "form": {
             "databaseName": "Datenbank Name"
@@ -6819,7 +6989,9 @@
               "createFirstInstance": "Verwaltete Datenbank erstellen"
             },
             "tooltip": {
-              "limitReached": "Dieser Server ist auf {max} verwaltete Datenbanken limitiert."
+              "limitReached": "Dieser Server ist auf {max} verwaltete Datenbanken limitiert.",
+              "locked": "Diese verwaltete Datenbank ist gesperrt. Entsperre sie zuerst unter Bearbeiten.",
+              "offline": "Die verwaltete Datenbank muss laufen."
             },
             "view": {
               "tabs": {
@@ -6999,6 +7171,10 @@
                 "offline": "Die verwaltete Datenbank muss laufen, um ein Backup zu erstellen.",
                 "restoring": "In diese verwaltete Datenbank wird gerade ein Backup wiederhergestellt."
               },
+              "notRunning": {
+                "restore": "Diese verwaltete Datenbank ist {state}. Sie muss laufen, um ein Backup in sie wiederherzustellen.",
+                "backup": "Diese verwaltete Datenbank ist {state}. Sie muss laufen, um ein Backup zu erstellen."
+              },
               "toast": {
                 "restoring": "Backup wird in die verwaltete Datenbank wiederhergestellt...",
                 "restoreCompleted": "Wiederherstellung des Datenbank-Backups erfolgreich abgeschlossen.",
@@ -7011,7 +7187,8 @@
                 "restoreBackup": {
                   "title": "Datenbank-Backup wiederherstellen",
                   "content": "Dadurch wird **{backup}** in **{name}** importiert. Vorhandene Tabellen und Collections aus dem Dump werden ersetzt, und Power-Aktionen sind bis zum Abschluss der Wiederherstellung gesperrt.",
-                  "targetInstance": "Ziel-Datenbank"
+                  "targetInstance": "Ziel-Datenbank",
+                  "noInstances": "Dieser Server hat keine verwaltete {engine}-Datenbank, in die wiederhergestellt werden kann."
                 }
               }
             },
@@ -7282,6 +7459,11 @@
             "triggersList": "Auslöser",
             "triggerNumber": "Auslöser {number}",
             "actionType": "Aktionstyp",
+            "stepUnavailable": {
+              "noBackups": "Nicht verfügbar: Dieser Server darf keine Backups haben.",
+              "noInstances": "Nicht verfügbar: Dieser Server hat keine verwalteten Datenbanken.",
+              "noInstanceAccess": "Nicht verfügbar: Du kannst keine verwalteten Datenbanken anzeigen."
+            },
             "conditionType": "Bedingungstyp",
             "serverState": "Server-Status",
             "comparator": "Vergleichsoperator",
@@ -7907,6 +8089,9 @@
                 "userMustSignIn": "Kein Konto verwendet diese E-Mail. Die Person muss sich zuerst einmal mit einem Konto mit genau dieser E-Mail im Panel anmelden, danach kannst du sie hinzufügen.",
                 "userMustBeCreatedByAdmin": "Kein Konto verwendet diese E-Mail. Bitte einen Administrator, zuerst ein Konto anzulegen, danach kannst du die Person hinzufügen."
               },
+              "alert": {
+                "existingAccountRequired": "Auf diesem Panel werden neue Accounts nicht automatisch erstellt. Die E-Mail-Adresse muss zu einem bestehenden Account gehören, die Person muss sich also einmal anmelden (oder ein Administrator erstellt ihren Account), bevor du sie hinzufügen kannst."
+              },
               "form": {
                 "emailPlaceholder": "Gib die E-Mail ein, unter der dieser Subuser gespeichert werden soll.",
                 "permissions": "Berechtigungen",
@@ -7943,7 +8128,9 @@
             "descriptionReadOnly": "Es gibt nichts, worauf dieser Server zurückgesetzt werden kann, wenn etwas schiefgeht."
           },
           "tooltip": {
-            "limitReached": "Dieser Server ist auf {max} Backups limitiert."
+            "limitReached": "Dieser Server ist auf {max} Backups limitiert.",
+            "evicts": "Dieser Server hat sein Limit von {max} Backups erreicht. Beim Erstellen eines neuen wird {name} gelöscht, um Platz zu schaffen.",
+            "groupLimitReached": "Dieser Server ist auf {max} Backup-Gruppen beschränkt."
           },
           "table": {
             "columns": {
@@ -7993,7 +8180,8 @@
               }
             },
             "restoreBackup": {
-              "title": "Backup wiederherstellen"
+              "title": "Backup wiederherstellen",
+              "noStartupMetadata": "Dieses Backup hat keine gespeicherte Startkonfiguration."
             },
             "exportBackup": {
               "title": "Backup in Dateien exportieren"
@@ -8061,8 +8249,15 @@
           "allocations": {
             "title": "Allocations"
           },
+          "empty": {
+            "title": "Keine Allocations",
+            "description": "Dieser Server hat noch keine Allocations. Füge eine hinzu, um eine Adresse und einen Port zu erhalten, mit denen sich Spieler verbinden können.",
+            "descriptionAdminOnly": "Dieser Server hat keine Allocations. Allocations auf diesem Server werden von einem Administrator zugewiesen, frage also dort nach, wenn du eine benötigst."
+          },
           "tooltip": {
-            "limitReached": "Dieser Server ist auf {max} Allocations limitiert."
+            "limitReached": "Dieser Server ist auf {max} Allocations limitiert.",
+            "selfAssignDisabled": "Allocations auf diesem Server werden von einem Administrator zugewiesen.",
+            "primaryLocked": "Dieser Server benötigt eine primäre Allocation. Lege zuerst eine andere Allocation als primär fest."
           },
           "table": {
             "columns": {
@@ -8315,10 +8510,15 @@
           "variables": "Variablen",
           "dockerImageDescription": "Das Docker Image, das verwendet wird, um diesen Server auszuführen. Dies kann geändert werden, um ein anderes Image zu verwenden.",
           "dockerImageDescriptionCustom": "Das Docker Image, das verwendet wird, um diesen Server auszuführen. Dies wurde von einem Administrator festgelegt und kann nicht geändert werden.",
+          "startupCommandNoPermission": "Du hast keine Berechtigung, den Startbefehl zu ändern.",
+          "startupCommandLocked": "Benutzerdefinierte Startbefehle sind für dieses Egg nicht erlaubt. Wähle einen der vordefinierten Befehle oder kontaktiere einen Administrator.",
           "toast": {
             "startupCommandUpdated": "Startbefehl aktualisiert.",
             "dockerImageUpdated": "Docker Image aktualisiert.",
             "variablesUpdated": "Variablen aktualisiert."
+          },
+          "validation": {
+            "required": "Diese Variable ist erforderlich."
           },
           "modal": {
             "unsavedChanges": {
@@ -8330,6 +8530,10 @@
         },
         "mounts": {
           "title": "Mounts",
+          "empty": {
+            "title": "Keine Mounts",
+            "description": "Für diesen Server sind keine Mounts verfügbar. Mounts werden von einem Administrator eingerichtet, frage also dort nach, wenn du Zugriff auf einen benötigst."
+          },
           "table": {
             "columns": {
               "mounted": "Eingebunden"
@@ -8365,6 +8569,10 @@
         },
         "devices": {
           "title": "Geräte",
+          "empty": {
+            "title": "Keine Geräte",
+            "description": "Für diesen Server sind keine Geräte verfügbar. Geräte werden von einem Administrator eingerichtet, frage also dort nach, wenn du Zugriff auf eines benötigst."
+          },
           "table": {
             "columns": {
               "attached": "Eingebunden"
@@ -8452,6 +8660,13 @@
               "title": "Server neu installieren",
               "button": "Neu installieren",
               "startOnCompletion": "Server nach Abschluss der Neuinstallation starten",
+              "latestBackup": "Neuestes Backup:",
+              "noBackups": "Dieser Server hat noch keine Backups.",
+              "backupFirst": "Zuerst ein Backup erstellen",
+              "backupFirstDescription": "Die Neuinstallation startet, sobald das Backup abgeschlossen ist.",
+              "waitingForBackup": "Warte auf den Abschluss des Backups…",
+              "backupFailed": "Das Backup ist fehlgeschlagen, daher wurde der Server nicht neu installiert.",
+              "truncateWarning": "Alle Dateien dieses Servers werden gelöscht, bevor das Installationsskript ausgeführt wird. Dies kann nicht rückgängig gemacht werden.",
               "toast": {
                 "reinstalling": "Server wird neu installiert..."
               }
