@@ -52,7 +52,7 @@ base64 = { workspace = true }
 sqlx = { workspace = true }
 mongodb = { workspace = true }
 webauthn-rs = { workspace = true }
-jsonwebtoken = { version = "11.0.0", features = ["aws_lc_rs"] }
+jsonwebtoken = { version = "12.0.0", features = ["aws_lc_rs"] }
 async-trait = { workspace = true }
 chrono = { workspace = true }
 chrono-tz = { workspace = true }

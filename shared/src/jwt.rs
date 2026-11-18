@@ -60,12 +60,12 @@ pub struct Jwt {
 }
 
 impl Jwt {
-    pub fn new(env: &crate::env::Env) -> Self {
+    pub fn new(env: &crate::env::Env) -> Result<Self, jsonwebtoken::errors::Error> {
         let secret = env.app_encryption_key.as_bytes();
-        Self {
-            encoding_key: EncodingKey::from_secret(secret),
-            decoding_key: DecodingKey::from_secret(secret),
-        }
+        Ok(Self {
+            encoding_key: EncodingKey::from_secret(secret)?,
+            decoding_key: DecodingKey::from_secret(secret)?,
+        })
     }
 
     #[inline]
@@ -92,7 +92,7 @@ impl Jwt {
         key: &[u8],
         payload: &T,
     ) -> Result<String, jsonwebtoken::errors::Error> {
-        let encoding_key = EncodingKey::from_secret(key);
+        let encoding_key = EncodingKey::from_secret(key)?;
         jsonwebtoken::encode(&Header::new(Algorithm::HS256), payload, &encoding_key)
     }
 }

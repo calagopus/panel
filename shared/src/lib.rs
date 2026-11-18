@@ -214,7 +214,7 @@ impl AppState {
             }
         };
 
-        let jwt = Arc::new(jwt::Jwt::new(&env));
+        let jwt = Arc::new(jwt::Jwt::new(&env).context("failed to initialize JWT")?);
         let ntp = ntp::Ntp::new();
         let cache = cache::Cache::new(&env).await;
         let database = Arc::new(database::Database::new(&env, cache.clone()).await);

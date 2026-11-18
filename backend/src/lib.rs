@@ -604,7 +604,7 @@ pub async fn handle_startup() -> Result<
             }),
     ));
 
-    let jwt = Arc::new(shared::jwt::Jwt::new(&env));
+    let jwt = Arc::new(shared::jwt::Jwt::new(&env).context("failed to initialize JWT")?);
     let ntp = shared::ntp::Ntp::new();
     let cache = shared::cache::Cache::new(&env).await;
     let database = Arc::new(shared::database::Database::new(&env, cache.clone()).await);
