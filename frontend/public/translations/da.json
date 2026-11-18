@@ -5238,8 +5238,7 @@
             },
             "unsupported": {
               "title": "Ikke understøttet",
-              "content": "MongoDB-databaser kan ikke udforskes fra panelet.",
-              "instanceContent": "MongoDB- og Redis-databaseinstanser kan ikke udforskes fra panelet."
+              "content": "MongoDB-databaser kan ikke udforskes fra panelet."
             },
             "notFound": "Denne database findes ikke på instansen.",
             "tabs": {

@@ -5954,8 +5954,7 @@
             },
             "unsupported": {
               "title": "Không được hỗ trợ",
-              "content": "Không thể duyệt các cơ sở dữ liệu MongoDB từ bảng điều khiển.",
-              "instanceContent": "Không thể khám phá các instance cơ sở dữ liệu MongoDB và Redis từ bảng điều khiển."
+              "content": "Không thể duyệt các cơ sở dữ liệu MongoDB từ bảng điều khiển."
             },
             "notFound": "Cơ sở dữ liệu này không tồn tại trên instance.",
             "tabs": {

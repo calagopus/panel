@@ -6221,8 +6221,7 @@
             },
             "unsupported": {
               "title": "サポートされていません",
-              "content": "MongoDBデータベースはパネルから閲覧できません。",
-              "instanceContent": "MongoDBおよびRedisデータベースインスタンスはパネルから閲覧できません。"
+              "content": "MongoDBデータベースはパネルから閲覧できません。"
             },
             "notFound": "このデータベースはインスタンス上に存在しません。",
             "tabs": {

@@ -1,0 +1,801 @@
+{
+  "items": {
+    "byte": {
+      "zero": "{count} Bájt",
+      "one": "{count} Bájt",
+      "two": "{count} Bájt",
+      "few": "{count} Bájt",
+      "many": "{count} Bájt",
+      "other": "{count} Bájt"
+    },
+    "user": {
+      "zero": "{count} Felhasználó",
+      "one": "{count} Felhasználó",
+      "two": "{count} Felhasználó",
+      "few": "{count} Felhasználó",
+      "many": "{count} Felhasználó",
+      "other": "{count} Felhasználó"
+    },
+    "file": {
+      "zero": "{count} Fájl",
+      "one": "{count} Fájl",
+      "two": "{count} Fájl",
+      "few": "{count} Fájl",
+      "many": "{count} Fájl",
+      "other": "{count} Fájl"
+    },
+    "directory": {
+      "zero": "{count} Mappa",
+      "one": "{count} Mappa",
+      "two": "{count} Mappa",
+      "few": "{count} Mappa",
+      "many": "{count} Mappa",
+      "other": "{count} Mappa"
+    },
+    "server": {
+      "zero": "{count} Szerver",
+      "one": "{count} Szerver",
+      "two": "{count} Szerver",
+      "few": "{count} Szerver",
+      "many": "{count} Szerver",
+      "other": "{count} Szerver"
+    },
+    "sshKey": {
+      "zero": "{count} SSH Kulcs",
+      "one": "{count} SSH Kulcs",
+      "two": "{count} SSH Kulcs",
+      "few": "{count} SSH Kulcs",
+      "many": "{count} SSH Kulcs",
+      "other": "{count} SSH Kulcs"
+    },
+    "asset": {
+      "zero": "{count} Eszköz",
+      "one": "{count} Eszköz",
+      "two": "{count} Eszköz",
+      "few": "{count} Eszköz",
+      "many": "{count} Eszköz",
+      "other": "{count} Eszköz"
+    },
+    "node": {
+      "zero": "{count} Csomópont",
+      "one": "{count} Csomópont",
+      "two": "{count} Csomópont",
+      "few": "{count} Csomópont",
+      "many": "{count} Csomópont",
+      "other": "{count} Csomópont"
+    },
+    "databaseAgentHost": {
+      "zero": "{count} Adatbázis Ügynök Gazdagép",
+      "one": "{count} Adatbázis Ügynök Gazdagép",
+      "two": "{count} Adatbázis Ügynök Gazdagép",
+      "few": "{count} Adatbázis Ügynök Gazdagép",
+      "many": "{count} Adatbázis Ügynök Gazdagép",
+      "other": "{count} Adatbázis Ügynök Gazdagép"
+    },
+    "allocation": {
+      "zero": "{count} Csomópont Kiosztás",
+      "one": "{count} Csomópont Kiosztás",
+      "two": "{count} Csomópont Kiosztás",
+      "few": "{count} Csomópont Kiosztás",
+      "many": "{count} Csomópont Kiosztás",
+      "other": "{count} Csomópont Kiosztás"
+    },
+    "egg": {
+      "zero": "{count} Egg",
+      "two": "{count} Egg",
+      "few": "{count} Egg",
+      "many": "{count} Egg",
+      "other": "{count} Egg"
+    },
+    "instance": {
+      "zero": "{count} Példány",
+      "one": "{count} Példány",
+      "two": "{count} Példány",
+      "few": "{count} Példány",
+      "many": "{count} Példány",
+      "other": "{count} Példány"
+    },
+    "shortcut": {
+      "zero": "{count} Gyorsbillentyű",
+      "one": "{count} Gyorsbillentyű",
+      "two": "{count} Gyorsbillentyű",
+      "few": "{count} Gyorsbillentyű",
+      "many": "{count} Gyorsbillentyű",
+      "other": "{count} Gyorsbillentyű"
+    },
+    "line": {
+      "zero": "{count} Sor",
+      "one": "{count} Sor",
+      "two": "{count} Sor",
+      "few": "{count} Sor",
+      "many": "{count} Sor",
+      "other": "{count} Sor"
+    },
+    "header": {
+      "zero": "{count} Fejléc",
+      "one": "{count} Fejléc",
+      "two": "{count} Fejléc",
+      "few": "{count} Fejléc",
+      "many": "{count} Fejléc",
+      "other": "{count} Fejléc"
+    },
+    "backup": {
+      "zero": "{count} Biztonsági Mentés",
+      "one": "{count} Biztonsági Mentés",
+      "two": "{count} Biztonsági Mentés",
+      "few": "{count} Biztonsági Mentés",
+      "many": "{count} Biztonsági Mentés",
+      "other": "{count} Biztonsági Mentés"
+    },
+    "row": {
+      "zero": "{count} Oszlop",
+      "one": "{count} Oszlop",
+      "two": "{count} Oszlop",
+      "few": "{count} Oszlop",
+      "many": "{count} Oszlop",
+      "other": "{count} Oszlop"
+    },
+    "change": {
+      "zero": "{count} Változás",
+      "one": "{count} Változás",
+      "two": "{count} Változás",
+      "few": "{count} Változás",
+      "many": "{count} Változás",
+      "other": "{count} Változás"
+    },
+    "session": {
+      "zero": "{count} Munkamenet",
+      "one": "{count} Munkamenet",
+      "two": "{count} Munkamenet",
+      "few": "{count} Munkamenet",
+      "many": "{count} Munkamenet",
+      "other": "{count} Munkamenet"
+    },
+    "serverAllocation": {
+      "zero": "{count} Kiosztás",
+      "one": "{count} Kiosztás",
+      "two": "{count} Kiosztás",
+      "few": "{count} Kiosztás",
+      "many": "{count} Kiosztás",
+      "other": "{count} Kiosztás"
+    },
+    "database": {
+      "zero": "{count} Adatbázis",
+      "one": "{count} Adatbázis",
+      "two": "{count} Adatbázis",
+      "few": "{count} Adatbázis",
+      "many": "{count} Adatbázis",
+      "other": "{count} Adatbázis"
+    },
+    "databaseInstance": {
+      "zero": "{count} Kezelt Adatbázis",
+      "one": "{count} Kezelt Adatbázis",
+      "two": "{count} Kezelt Adatbázis",
+      "few": "{count} Kezelt Adatbázis",
+      "many": "{count} Kezelt Adatbázis",
+      "other": "{count} Kezelt Adatbázis"
+    },
+    "schedule": {
+      "zero": "{count} Ütemezés",
+      "one": "{count} Ütemezés",
+      "two": "{count} Ütemezés",
+      "few": "{count} Ütemezés",
+      "many": "{count} Ütemezés",
+      "other": "{count} Ütemezés"
+    },
+    "subuser": {
+      "zero": "{count} Alfelhasználó",
+      "one": "{count} Alfelhasználó",
+      "two": "{count} Alfelhasználó",
+      "few": "{count} Alfelhasználó",
+      "many": "{count} Alfelhasználó",
+      "other": "{count} Alfelhasználó"
+    },
+    "mount": {
+      "zero": "{count} Csatolás",
+      "one": "{count} Csatolás",
+      "two": "{count} Csatolás",
+      "few": "{count} Csatolás",
+      "many": "{count} Csatolás",
+      "other": "{count} Csatolás"
+    },
+    "device": {
+      "zero": "{count} Eszköz",
+      "one": "{count} Eszköz",
+      "two": "{count} Eszköz",
+      "few": "{count} Eszköz",
+      "many": "{count} Eszköz",
+      "other": "{count} Eszköz"
+    },
+    "apiKey": {
+      "zero": "{count} API Kulcs",
+      "one": "{count} API Kulcs",
+      "two": "{count} API Kulcs",
+      "few": "{count} API Kulcs",
+      "many": "{count} API Kulcs",
+      "other": "{count} API Kulcs"
+    },
+    "oauthLink": {
+      "zero": "{count} Összekötött Fiók",
+      "one": "{count} Összekötött Fiók",
+      "two": "{count} Összekötött Fiók",
+      "few": "{count} Összekötött Fiók",
+      "many": "{count} Összekötött Fiók",
+      "other": "{count} Összekötött Fiók"
+    },
+    "commandSnippet": {
+      "zero": "{count} Parancs Részlet",
+      "one": "{count} Parancs Részlet",
+      "two": "{count} Parancs Részlet",
+      "few": "{count} Parancs Részlet",
+      "many": "{count} Parancs Részlet",
+      "other": "{count} Parancs Részlet"
+    }
+  },
+  "translations": {
+    "common": {
+      "button": {
+        "create": "Létrehozás",
+        "add": "Hozzáadás",
+        "retry": "Újra",
+        "addDefaultPort": ":{port} Hozzáadása",
+        "save": "Mentés",
+        "saveAndStay": "Mentés & Maradás",
+        "edit": "Szerkesztés",
+        "duplicate": "Duplikálás",
+        "delete": "Törlés",
+        "remove": "Eltávolítás",
+        "enable": "Engedélyezés",
+        "disable": "Letiltás",
+        "disableTwoFactor": "Kétlépcsős Azonosítás Letiltása",
+        "verify": "Hitelesítés",
+        "update": "Frissítés",
+        "upgrade": "Frissítés",
+        "close": "Bezárás",
+        "copy": "Másolás",
+        "cancel": "Megszakítás",
+        "continue": "Folytatás",
+        "skip": "Kihagyás",
+        "okay": "Oké",
+        "back": "Vissza",
+        "next": "Következzö",
+        "install": "Telepítés",
+        "selectAll": "Összes Kiválasztása",
+        "deselectAll": "Összes Kiválasztás Törlése",
+        "restore": "Visszaállítás",
+        "discard": "Elvetés",
+        "download": "Letöltés",
+        "downloadAs": "Letöltés {format} Formátumban",
+        "export": "Exportálás",
+        "exportAs": "Exportálás {format} Formátumban",
+        "recreate": "Újra Létrehozás",
+        "move": "Áthelyezés",
+        "transfer": "Átvitel",
+        "reattach": "Újracsatolás",
+        "reassign": "Újra Hozzárendelés",
+        "detach": "Leválasztás",
+        "send": "Küldés",
+        "reset": "Visszaállítás",
+        "view": "Megtekintés",
+        "import": "Importálás",
+        "details": "Részletek",
+        "loadLogs": "Logok Betöltése",
+        "sendTestEmail": "Teszt Email Küldése",
+        "test": "Teszt",
+        "setPrimary": "Elsődleges Ként Állítás",
+        "unsetPrimary": "Elsődleges Ként Állítás Törlése",
+        "leavePage": "Oldal Elhagyása",
+        "viewDocumentation": "Dokumentáció Megtekintése",
+        "undo": "Visszavonás",
+        "clearUserFilter": "Felhasználó Szűrő Törlése",
+        "deleteFailedBackups": "{count} Törlése Sikertelen",
+        "retryFailedDeletions": "{count} Sikertelen Törlési Kísérlet Ismétlése"
+      },
+      "alert": {
+        "error": "Hiba",
+        "warning": "Figyelmeztetés",
+        "success": "Sikerült",
+        "clockOffset": "A rendszer órája több mint 5 másodperccel eltér a szerver órájától. Ez problémákat okozhat a jelszóval történő hitelesítés és a kétfaktoros hitelesítés során. Ha problémák merülnek fel, kérjük, szinkronizálja az óráját. Jelenlegi eltérés: {offset} másodperc(ek).",
+        "passwordAuthUnavailable": "A jelszavad nem fog működni ehhez a kapcsolathoz. Helyette használj SSH-kulcsot; ezt a fiókod „SSH-kulcsok” oldalán adhatod hozzá."
+      },
+      "divider": {
+        "or": "Vagy"
+      },
+      "input": {
+        "search": "Keresés..."
+      },
+      "elements": {
+        "jsonInput": {
+          "enum": {
+            "type": {
+              "string": "Karaktersorozat",
+              "number": "Szám",
+              "boolean": "Boole-érték",
+              "object": "Tárgy",
+              "array": "Tömb"
+            }
+          },
+          "textMode": "Szöveg",
+          "invalidJson": "Érvénytelen JSON"
+        },
+        "tagsInput": {
+          "copyAll": "Összes másolása",
+          "pasteReplace": "Beillesztés (Csere)"
+        },
+        "serverFileInput": {
+          "notFound": "Még nem létezik ilyen nevű fájl.",
+          "isDirectory": "Ez egy könyvtár, nem pedig egy fájl."
+        },
+        "nodeAllocationIpInput": {
+          "anyAddress": "Minden cím",
+          "nodeInterfaces": "Csomópont Inferfészek",
+          "inUse": "Használatban"
+        },
+        "ignoredFilesInput": {
+          "onePatternPerLine": "Soronként egy minta.",
+          "countMatches": "Találatok Száma",
+          "matches": "{count} találat",
+          "noMatches": "Nincs találat",
+          "exception": "Kivétel",
+          "invalid": "Érvénytelen minta",
+          "unavailable": "Nem elérhető darabszám",
+          "tooManyPatterns": "{max} mintánál több esetén az egyezés nem kerül automatikusan figyelembevételre.",
+          "unanchoredException": "A(z) `{pattern}` bármilyen mélységben illeszkedik. Csak a gyökérkönyvtárban való illesztéshez használd a(z) `{anchored}` mintát."
+        },
+        "cronInput": {
+          "segments": {
+            "second": "Másodperc",
+            "minute": "Perc",
+            "hour": "Óra",
+            "day": "Nap",
+            "month": "Hónap",
+            "weekday": "Hétköznap"
+          },
+          "nextRun": "A következő futtatás ekkor van: {timestamp}."
+        },
+        "iconInput": {
+          "defaultIcon": "Alapértelmezett ikon",
+          "searchPlaceholder": "Ikonok keresése…",
+          "noResults": "A keresésnek nem felel meg egyetlen ikon sem.",
+          "moreResults": "Az első {count} találat jelenik meg; a továbbiak megtekintéséhez szűkítse le a keresést.",
+          "button": {
+            "reset": "Alapértelmezett ikon használata"
+          }
+        },
+        "trashRetention": {
+          "days": "napok"
+        },
+        "trashSettings": {
+          "default": "Alapértelmezett panel: {summary}",
+          "summary": {
+            "disabled": "Kikapcsolva"
+          }
+        },
+        "backupRetention": {
+          "count": "Naprakészen",
+          "days": "Minden napon belül tartsa",
+          "daily": "Napi megtartása",
+          "weekly": "Heti megtartása",
+          "monthly": "Havi megtartása",
+          "yearly": "Évi megtartása",
+          "status": {
+            "locked": "Zárva",
+            "keptBy": "Készítette: {rules}.",
+            "forecastDescription": "A törlés ideje a biztonsági mentési ütemterv alapján becsült érték.",
+            "lockedDescription": "A lezárt biztonsági másolatokat a megőrzési szabályok soha nem távolítják el.",
+            "indefiniteDescription": "Nincs érvényben semmilyen megőrzési szabály.",
+            "expiredDescription": "Ezt a biztonsági másolatot már egyetlen szabály sem tartja meg. A következő megőrzési futtatás során törlésre kerül.",
+            "failedDescription": "A sikertelen biztonsági mentések 24 óra elteltével törlődnek.",
+            "expires": "Törölve Ekkor: {timestamp}",
+            "expiresUnknown": "Nincs törlési előrejelzés"
+          }
+        }
+      },
+      "modal": {
+        "duplicate": {
+          "title": "{resource} Duplikálása"
+        },
+        "unsavedChanges": {
+          "title": "Nem Mentett Módosítások",
+          "content": "Vannak mentetlen módosításai. Biztosan el akarja hagyni ezt az oldalt? Ha elhagyja, a módosításai elvesznek."
+        },
+        "delete": {
+          "content": "Biztosan törölni szeretnéd **{name}**-t?"
+        },
+        "deleteFailedBackups": {
+          "title": "Sikertelen Biztonsági Mentés Törlésének Megerősítése",
+          "content": "Biztosan törölni szeretné a(z) `{count}` sikertelen biztonsági másolatot? A zárolt biztonsági másolatok és azok, amelyek konfigurációja karbantartás alatt áll, megmaradnak. A törlés háttérben fut, és eltarthat egy ideig, mire befejeződik.",
+          "alert": {
+            "forceWarning": "A kényszerű törlés akkor is eltávolítja ezeket a biztonsági másolatokat, ha azok konfigurációja hiányzik, vagy a távoli tároló nem érhető el. Előfordulhat, hogy maguk a biztonsági másolatfájlok nem kerülnek teljes mértékben eltávolításra, így elhagyott adatok maradhatnak hátra."
+          }
+        },
+        "retryFailedDeletions": {
+          "title": "Törlés Sikertelenségének Megerősítése Újrapróbálás",
+          "content": "Biztosan újra meg akarja próbálni a törlésüket a(z) `{count}` olyan biztonsági másolatnak, amelyek törlése sikertelen volt? Azok a biztonsági másolatok, amelyek konfigurációja karbantartás alatt áll, kihagyásra kerülnek. A törlés háttérben fut, és befejezése egy ideig eltarthat."
+        }
+      },
+      "toast": {
+        "duplicated": "{resource} duplikálva.",
+        "preparingDownload": "Letöltés előkészítése...",
+        "downloadFailed": "A letöltés nem indult el.",
+        "importing": "{file} importálása...",
+        "failedBackupDeletionStarted": "{count} sikertelen biztonsági mentés törlése háttérben.",
+        "failedDeletionRetryStarted": "A háttérben újra megpróbálja a {count} sikertelen biztonsági mentés-törlést.",
+        "requestBlockedByExtension": "Ezt a kérést egy bővítmény blokkolta."
+      },
+      "settingScope": {
+        "account": "Szinkronizálás a Fiókkal",
+        "device": "Csak Ez Az Eszköz",
+        "useAccountValue": "Számlaérték Használata",
+        "saveToAccount": "Ezt Az Értéket Mentsd El a Fiókomban",
+        "stateAccount": "Fiók",
+        "stateDevice": "Ez Az Eszköz",
+        "tooltip": {
+          "account": "Ez a beállítás szinkronizálva van a fiókoddal.",
+          "device": "Ez a beállítás kizárólag ezen az eszközön kerül felülírásra."
+        },
+        "toast": {
+          "saved": "A beállítások elmentésre kerültek a fiókodba.",
+          "saveFailed": "Nem sikerült elmenteni ezt a beállítást a fiókodba."
+        }
+      },
+      "tooltip": {
+        "resetToDefault": "Alapértelmezett beállítások visszaállítása",
+        "edit": "Szerkesztés",
+        "delete": "Törlés",
+        "remove": "Eltávolítás",
+        "primary": "Elsődleges",
+        "backupOnDifferentNode": "Ez a biztonsági másolat a szervertől eltérő csomóponton található. Az Client API-ból nem tekinthető meg."
+      },
+      "form": {
+        "force": "Mindenképpen végrehajtani szeretné ezt a törlést?",
+        "name": "Név",
+        "icon": "Ikon",
+        "newName": "Új Név",
+        "description": "Leírás",
+        "author": "Szerző",
+        "type": "Típus",
+        "password": "Jelszó",
+        "username": "Felhasználónév",
+        "usernameOrEmail": "Felhasználónév/Email",
+        "server": "Szerver",
+        "servers": "Szerverek",
+        "path": "Útvonal",
+        "provider": "Szolgáltató",
+        "command": "Parancs",
+        "fromAddress": "Erről a Címről",
+        "fromName": "Erről a Névről",
+        "siteKey": "Oldal Kulcs",
+        "secretKey": "Titkos Kulcs",
+        "apiKey": "API Kulcs",
+        "accessKey": "Hozzáférési Kulcs",
+        "bucket": "Vödör",
+        "region": "Régió",
+        "endpoint": "Végpont",
+        "publicUrl": "Nyilvános URL",
+        "firstName": "Vezetéknév",
+        "lastName": "Keresztnév",
+        "language": "Nyelv",
+        "identifier": "Bejelentkezés",
+        "enabled": "Bekapcsolva",
+        "disabled": "Kikapcsolva",
+        "title": "Cím",
+        "content": "Tartalom",
+        "backupConfiguration": "Biztonsági mentés beállításai",
+        "fileName": "Fájl Neve",
+        "dockerImage": "Docker Kép",
+        "memory": "Memória",
+        "disk": "Tárhely",
+        "serverName": "Szerver Neve",
+        "startupCommand": "Indítási Parancs",
+        "archiveName": "Az archívum neve",
+        "archiveFormat": "Az archívum formátuma",
+        "compressionLevel": "Tömörítési szint",
+        "multiplexChannels": "Multiplex csatornák",
+        "location": "Helyszín",
+        "primaryAllocation": "Elsődleges Kiosztás",
+        "additionalAllocations": "További Kiosztások",
+        "externalId": "Külső ID",
+        "mount": "Csatolás",
+        "device": "Eszköz",
+        "nest": "Fészek",
+        "nestCreateHint": "Nem találsz ilyet? Hozz létre egy új nest-et",
+        "locationCreateHint": "Nem találsz ilyet? Hozz létre egy új helyszínt",
+        "lines": "Sor",
+        "databaseHost": "Adatbázis Host",
+        "databaseAgentHost": "Adatbázis Ügynök Host",
+        "databaseInstance": "Adatbázis Példány",
+        "timezone": "Időzóna",
+        "timezoneSystem": "Rendszer",
+        "protocol": "Protokol",
+        "powerAction": "Energiagazdálkodási Művelet",
+        "destination": "Cél",
+        "destinationDirectory": "Cél Mappa",
+        "directoryName": "Mappa Neve",
+        "symlinkName": "Szimbolikus Link Név",
+        "symlinkTarget": "Szimbolikus Link Cél",
+        "locked": "Zárolt",
+        "portRanges": "Port Tartomány",
+        "portRangesPlaceholder": "Port Tartomány (pl. 3000-4000)",
+        "currentPassword": "Jelenlegi Jelszó",
+        "confirmPassword": "Jelenlegi Jelszó",
+        "passwordRequired": "Jelszó kötelező",
+        "authenticationCode": "Hitelesítő Kód",
+        "restoreStartup": "Állítsa vissza az indítási parancsot, a rendszerképet és a változókat ebből a biztonsági másolatból.",
+        "lineContains": "Sor Tartalom",
+        "filePath": "Fájl Útvonal",
+        "envVariable": "Környezeti Változó",
+        "value": "Érték",
+        "eggs": "Egg-ek",
+        "ignoredFiles": "Ignorált Fájlok",
+        "previewIgnoredFiles": "Ignorált fájlok előnézete",
+        "yourControlPanelPassword": "Kezelő Panel Jelszavad",
+        "deploymentEnabled": "Telepítés Engedélyezve",
+        "maintenanceEnabled": "Karbantartás Engedélyezve",
+        "source": "Forrás",
+        "target": "Cél",
+        "replaceWith": "Csere Erre",
+        "caseInsensitive": "Kis- És Nagybetűtől Független",
+        "truncateDirectory": "Törölni szeretné a szerver összes fájlját, mielőtt végrehajtja ezt a műveletet? Ez a művelet visszafordíthatatlan.",
+        "rule": {
+          "invalidCharacters": "Olyan karaktereket tartalmaz, amelyek itt nem megengedettek.",
+          "username": "3–48 karakter, kizárólag betűk, számok és aláhúzójelek.",
+          "databaseName": "Legfeljebb 31 karakter, kizárólag betűk, számok és aláhúzójelek.",
+          "databaseInstanceIdentifier": "2–23 karakter, kizárólag betűk és számok.",
+          "captchaSiteKey": "Kizárólag betűk, számok, kötőjelek és aláhúzójelek.",
+          "variableName": "Kisbetűvel kezdődik, majd legfeljebb 63 kisbetű, szám vagy aláhúzójel következik.",
+          "hexColor": "Egy hexadecimális színkód, például #1c7ed6.",
+          "devicePermissions": "Az r (olvasás), w (írás) és m (mknod) bármely kombinációja.",
+          "percentage": "0 és 100 közötti százalékos érték."
+        }
+      },
+      "table": {
+        "selectRow": "Oszlop kiválasztása",
+        "pagination": {
+          "perPage": "{count} / oldal"
+        },
+        "columns": {
+          "name": "Név",
+          "author": "Szerző",
+          "type": "Típus",
+          "title": "Cím",
+          "enabled": "Engedélyezve",
+          "description": "Leírás",
+          "username": "Felhasználónév",
+          "size": "Méret",
+          "lastUsed": "Utoljára Használva",
+          "created": "Létrehozva",
+          "updated": "Frissítve",
+          "actor": "Végrehajtó",
+          "event": "Esemény",
+          "when": "Ekkor",
+          "command": "Parancs",
+          "location": "Helyszín",
+          "node": "Csomópont",
+          "owner": "Tulajdonos",
+          "added": "Hozzáadva",
+          "backupConfiguration": "Biztonsági Mentés Konfiguráció",
+          "status": "Státusz",
+          "allocation": "Kiosztás",
+          "notes": "Jegyzetek",
+          "source": "Forrás",
+          "target": "Cél",
+          "files": "Fájlok",
+          "server": "Szerver",
+          "address": "Cím",
+          "eggs": "Egg-ek",
+          "nodes": "Csomópontok",
+          "servers": "Szerverek",
+          "users": "Felhasználók",
+          "databases": "Adatbázisok",
+          "template": "Sablon",
+          "version": "Verzió"
+        }
+      },
+      "bulkActions": {
+        "success": "{action} művelet {items} elemre sikeresen végrehajtva.",
+        "partial": "{action} művelet sikeresen végrehajtva {successfulItems}. {failedItems} sikertelen volt.",
+        "successWithSkipped": "{action} művelet {items} elemre sikeresen végrehajtva. {skippedItems} elem kihagyva.",
+        "nothingToDo": "Ezzel a művelettel a kijelölésen semmi sem módosítható.",
+        "verb": {
+          "deleted": "törölt",
+          "removed": "eltávolítva",
+          "triggered": "triggerelve",
+          "locked": "zárolva",
+          "unlocked": "feoldva",
+          "moved": "áthelyezve",
+          "enabled": "engedélyezve",
+          "disabled": "letiltva",
+          "attached": "csatolva",
+          "detached": "leválasztva",
+          "started": "elindítva",
+          "stopped": "leállítva",
+          "restarted": "újraindítva",
+          "killed": "kilőve"
+        }
+      },
+      "tabs": {
+        "general": "Általános"
+      },
+      "stat": {
+        "cpuLoad": "CPU Használat",
+        "memoryUsage": "Memróia Használat",
+        "memoryLoad": "Memróia Használat",
+        "diskUsage": "Tárhelyhasználat",
+        "network": "Hálózat",
+        "inbound": "Bejövő",
+        "outbound": "Kimenő",
+        "uptime": "Üzemidő",
+        "resources": "Erőforrások"
+      },
+      "badge": {
+        "active": "Aktív",
+        "inactive": "Inaktív",
+        "enabled": "Bekapcsolva",
+        "disabled": "Kikapcsolva",
+        "successful": "Sikeres",
+        "failed": "Sikertelen",
+        "installed": "Telepítve",
+        "updateAvailable": "Frissítés elérhető",
+        "systemBackup": "Rendszer",
+        "restarting": "Újraindítás"
+      },
+      "label": {
+        "page": "{page}. oldal",
+        "emptyDirectory": "Ez a könyvtár üres",
+        "ignored": "Figyelmen kívül hagyva"
+      },
+      "databaseAgentHost": {
+        "deployment": {
+          "memoryUsage": "Memória: {used} / {limit}"
+        }
+      },
+      "server": {
+        "state": {
+          "suspended": "Felfüggesztve",
+          "installing": "Telepítés",
+          "installFailed": "Sikertelen Telepítés",
+          "backupRestoreFailed": "Sikertelen helyreállítás"
+        }
+      },
+      "systemBackupPolicyRun": {
+        "state": {
+          "running": "Fut",
+          "cancelling": "Lemondás",
+          "cancelled": "Lemondva",
+          "succeeded": "Sikerült",
+          "partiallySucceeded": "Részben Sikerült",
+          "failed": "Sikertelen",
+          "nothingToBackUp": "Nincsen Semmi Amit Lehetne Biztonsági Mentésbe Tenni"
+        }
+      },
+      "systemBackupPolicyRunTarget": {
+        "state": {
+          "pending": "Függőben",
+          "running": "Folyamatban",
+          "successful": "Sikeres",
+          "failed": "Sikertelen",
+          "skipped": "Kihagyva"
+        }
+      },
+      "enum": {
+        "userToastPosition": {
+          "topLeft": "Bal Fent",
+          "topCenter": "Középen Fent",
+          "topRight": "Jobb Fent",
+          "bottomLeft": "Bal Lent",
+          "bottomCenter": "Középen Lent",
+          "bottomRight": "Jobb Lent"
+        },
+        "serverState": {
+          "unknown": "Ismeretlen",
+          "running": "Folyamatban",
+          "starting": "Indulás",
+          "stopping": "Leállítás"
+        },
+        "serverPowerAction": {
+          "start": "Indítás",
+          "stop": "Leállítás",
+          "restart": "Újraindítás",
+          "kill": "Kilövés"
+        },
+        "serverBackupStatus": {
+          "starting": "Indulás",
+          "finished": "Befejezett",
+          "failed": "Sikertelen"
+        },
+        "backupRetentionRule": {
+          "count": "Legújabb",
+          "days": "Legutóbbi",
+          "daily": "Napi",
+          "weekly": "Heti",
+          "monthly": "Havi",
+          "yearly": "Éves"
+        },
+        "serverBackupKind": {
+          "server": "Szerver",
+          "databaseInstance": "Adatbázis"
+        },
+        "systemBackupPolicyRunTargetStatus": {
+          "pending": "Függőben",
+          "dispatched": "Elküldve",
+          "skipped": "Kihagyva",
+          "failed": "Sikertelen"
+        },
+        "systemBackupPolicyRunTargetReason": {
+          "nodeMaintenance": "Csomópont karbantartás alatt van",
+          "backupConfigurationMaintenance": "Biztonsági mentés konfiguráció karbantartás közben",
+          "databaseAgentHostMaintenance": "Az adatbázis ügynök gazdagép karbantartás alatt áll",
+          "databaseInstanceStopped": "Adatbázis példány nem fut",
+          "serverBusy": "Szerver elfoglalt (telepítés, visszaállítás vagy átvitel)",
+          "metadataFailed": "Nem sikerült összegyűjteni a biztonsági másolat metaadatait",
+          "noBackupConfiguration": "Nincs biztonsági mentési beállítás",
+          "unsupportedBackupDisk": "A biztonsági mentési beállítások nem támogatják az adatbázisok biztonsági mentését",
+          "targetRemoved": "A biztonsági mentés elkészítése előtt eltávolították",
+          "createFailed": "A biztonsági másolat létrehozása nem sikerült",
+          "policyDisabled": "A szabályzat hatályon kívül helyezve"
+        },
+        "serverFirewallRuleAction": {
+          "allow": "Engedélyezés",
+          "deny": "Elutasítás"
+        },
+        "connectionStatus": {
+          "connected": "Csatlakozva",
+          "connecting": "Csatlakozás..."
+        },
+        "serverAutoStartBehavior": {
+          "always": "Mindig",
+          "unlessStopped": "Amíg nincs leállítva",
+          "never": "Soha"
+        },
+        "bulkActionServerAction": {
+          "started": "Elindítva",
+          "stopped": "Leállítva",
+          "restarted": "Újraindítva",
+          "killed": "Kilőve",
+          "suspended": "Felfüggesztve",
+          "unsuspended": "Nincs felfüggesztve",
+          "deleted": "Törölve"
+        },
+        "compressionLevel": {
+          "bestSpeed": "Legjobb Sebesség",
+          "goodSpeed": "Jó Sebesség"
+        }
+      },
+      "unlimited": "Végtelen",
+      "readOnly": "Csak Olvasás",
+      "never": "Soha",
+      "none": "Semmi",
+      "unknown": "Ismeretlen",
+      "yes": "Igen",
+      "no": "Nem"
+    },
+    "elements": {
+      "copyOnClick": {
+        "toast": {
+          "copied": "Vágólapra másolva.",
+          "failed": "A vágólapra történő másolás nem sikerült."
+        }
+      },
+      "sidebar": {
+        "button": {
+          "logout": "Kijelentkezés",
+          "theme": "Téma",
+          "themeDark": "Sötét",
+          "themeLight": "Világos"
+        },
+        "modal": {
+          "logout": {
+            "title": "Kijelentkezés",
+            "content": "Biztosan Ki Akarsz Jelentkezni?"
+          }
+        }
+      },
+      "quickActions": {
+        "category": {
+          "navigation": "Navigáció"
+        }
+      }
+    }
+  }
+}
