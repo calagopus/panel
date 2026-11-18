@@ -6014,8 +6014,7 @@
             },
             "unsupported": {
               "title": "No soportado",
-              "content": "Las bases de datos de MongoDB no pueden ser exploradas desde el panel.",
-              "instanceContent": "Las bases de datos de MongoDB y Redis no se pueden explorar desde el panel."
+              "content": "Las bases de datos de MongoDB no pueden ser exploradas desde el panel."
             },
             "notFound": "Esta base de datos no existe en la instancia.",
             "tabs": {

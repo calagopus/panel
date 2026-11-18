@@ -4819,8 +4819,7 @@
             },
             "unsupported": {
               "title": "不支援",
-              "content": "無法從面板瀏覽 MongoDB 資料庫。",
-              "instanceContent": "無法從面板瀏覽 MongoDB 及 Redis 資料庫執行個體。"
+              "content": "無法從面板瀏覽 MongoDB 資料庫。"
             },
             "notFound": "此資料庫在該執行個體上不存在。",
             "tabs": {
