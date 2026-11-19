@@ -97,6 +97,9 @@ mod post {
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
+        #[garde(length(chars, min = 1, max = 255))]
+        #[schema(min_length = 1, max_length = 255)]
+        name: Option<compact_str::CompactString>,
         #[garde(dive, custom(OAuthProviderMappingMatcher::validate_nesting))]
         matcher: OAuthProviderMappingMatcher,
         #[garde(dive)]
@@ -146,6 +149,7 @@ mod post {
 
         let options = CreateOAuthProviderMappingOptions {
             oauth_provider_uuid: oauth_provider.uuid,
+            name: data.name,
             matcher: data.matcher,
             mapping: data.mapping,
         };
@@ -157,6 +161,7 @@ mod post {
                 serde_json::json!({
                     "uuid": oauth_mapping.uuid,
                     "oauth_provider_uuid": oauth_provider.uuid,
+                    "name": oauth_mapping.name,
                     "matcher": oauth_mapping.matcher,
                     "mapping": oauth_mapping.mapping,
                 }),

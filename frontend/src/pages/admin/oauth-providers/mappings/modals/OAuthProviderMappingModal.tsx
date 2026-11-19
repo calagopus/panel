@@ -9,7 +9,9 @@ import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import Switch from '@/elements/input/Switch.tsx';
+import TextInput from '@/elements/input/TextInput.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
+import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -99,19 +101,23 @@ export default function OAuthProviderMappingModal({
       onSubmit={handleSubmit}
     >
       <Stack>
-        <Select
-          withAsterisk
-          label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.mappingType', {})}
-          allowDeselect={false}
-          data={[
-            { label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.role', {}), value: 'role' },
-            {
-              label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {}),
-              value: 'server_subuser',
-            },
-          ]}
-          {...form.getInputProps('type')}
-        />
+        <Group grow>
+          <TextInput label={t('common.form.name', {})} {...form.getInputProps('name')} />
+
+          <Select
+            withAsterisk
+            label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.mappingType', {})}
+            allowDeselect={false}
+            data={[
+              { label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.role', {}), value: 'role' },
+              {
+                label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {}),
+                value: 'server_subuser',
+              },
+            ]}
+            {...form.getInputProps('type')}
+          />
+        </Group>
 
         {form.values.type === 'role' ? (
           <Select

@@ -530,6 +530,7 @@ export const adminOAuthProviderMappingsTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [
     t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
     t('common.table.columns.type', {}),
     t('common.table.columns.target', {}),
     t('pages.admin.oAuthProviders.tabs.mappings.page.table.columns.matcher', {}),

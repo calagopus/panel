@@ -1589,14 +1589,14 @@ impl DuplicableModel for OAuthProvider {
             .await?;
         let mut oauth_provider = Self::map(None, &row)?;
 
-        sqlx::query!(
-            "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, matcher, mapping)
-            SELECT $1, oauth_provider_mappings.matcher, oauth_provider_mappings.mapping
+        sqlx::query(
+            "INSERT INTO oauth_provider_mappings (oauth_provider_uuid, name, matcher, mapping)
+            SELECT $1, oauth_provider_mappings.name, oauth_provider_mappings.matcher, oauth_provider_mappings.mapping
             FROM oauth_provider_mappings
             WHERE oauth_provider_mappings.oauth_provider_uuid = $2",
-            oauth_provider.uuid,
-            self.uuid,
         )
+        .bind(oauth_provider.uuid)
+        .bind(self.uuid)
         .execute(&mut **transaction)
         .await?;
 

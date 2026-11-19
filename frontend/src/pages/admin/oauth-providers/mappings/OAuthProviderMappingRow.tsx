@@ -96,6 +96,8 @@ export default function OAuthProviderMappingRow({
               <Code>{mapping.uuid}</Code>
             </TableData>
 
+            <TableData>{mapping.name ?? t('common.na', {})}</TableData>
+
             <TableData>
               <Badge className='w-max!' color={mapping.mapping.type === 'role' ? 'blue' : 'grape'}>
                 {mapping.mapping.type === 'role'

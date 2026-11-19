@@ -179,12 +179,14 @@ export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', 
 
 export const adminOAuthProviderMappingSchema = z.looseObject({
   uuid: z.string(),
+  name: z.string().nullable(),
   matcher: adminOAuthProviderMappingMatcherSchema,
   mapping: adminOAuthProviderMappingTypeSchema,
   created: z.coerce.date(),
 });
 
 export const adminOAuthProviderMappingCreateSchema = z.object({
+  name: z.string().max(255).nullable(),
   matcher: adminOAuthProviderMappingMatcherSchema,
   mapping: adminOAuthProviderMappingTypeSchema,
 });

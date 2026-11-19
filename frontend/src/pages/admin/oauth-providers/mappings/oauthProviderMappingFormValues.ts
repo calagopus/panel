@@ -8,6 +8,7 @@ import {
 export type OAuthProviderMappingType = 'role' | 'server_subuser';
 
 export type OAuthProviderMappingFormValues = {
+  name: string;
   matcher: AdminOAuthProviderMappingMatcher;
   type: OAuthProviderMappingType;
   roleUuid: string;
@@ -18,6 +19,7 @@ export type OAuthProviderMappingFormValues = {
 };
 
 export const oauthProviderMappingEmptyFormValues: OAuthProviderMappingFormValues = {
+  name: '',
   matcher: { type: 'none' },
   type: 'role',
   roleUuid: '',
@@ -30,6 +32,7 @@ export const oauthProviderMappingEmptyFormValues: OAuthProviderMappingFormValues
 export const oauthProviderMappingToFormValues = (
   mapping: z.infer<typeof adminOAuthProviderMappingSchema>,
 ): OAuthProviderMappingFormValues => ({
+  name: mapping.name ?? '',
   matcher: mapping.matcher,
   type: mapping.mapping.type,
   roleUuid: mapping.mapping.type === 'role' ? mapping.mapping.roleUuid : '',
@@ -42,6 +45,7 @@ export const oauthProviderMappingToFormValues = (
 export const oauthProviderMappingFormValuesToPayload = (
   values: OAuthProviderMappingFormValues,
 ): z.infer<typeof adminOAuthProviderMappingCreateSchema> => ({
+  name: values.name || null,
   matcher: values.matcher,
   mapping:
     values.type === 'role'

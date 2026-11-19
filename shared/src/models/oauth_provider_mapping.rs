@@ -331,6 +331,7 @@ pub struct OAuthProviderMapping {
     pub uuid: uuid::Uuid,
     pub oauth_provider: Fetchable<super::oauth_provider::OAuthProvider>,
 
+    pub name: Option<compact_str::CompactString>,
     pub matcher: OAuthProviderMappingMatcher,
     pub mapping: OAuthProviderMappingType,
 
@@ -367,6 +368,10 @@ impl BaseModel for OAuthProviderMapping {
                 compact_str::format_compact!("{prefix}oauth_provider_uuid"),
             ),
             (
+                "oauth_provider_mappings.name",
+                compact_str::format_compact!("{prefix}name"),
+            ),
+            (
                 "oauth_provider_mappings.matcher",
                 compact_str::format_compact!("{prefix}matcher"),
             ),
@@ -390,6 +395,7 @@ impl BaseModel for OAuthProviderMapping {
             oauth_provider: super::oauth_provider::OAuthProvider::get_fetchable(
                 row.try_get(compact_str::format_compact!("{prefix}oauth_provider_uuid").as_str())?,
             ),
+            name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             matcher: serde_json::from_value(
                 row.try_get(compact_str::format_compact!("{prefix}matcher").as_str())?,
             )?,
@@ -713,6 +719,7 @@ impl IntoAdminApiObject for OAuthProviderMapping {
         let api_object = finish_extendible!(
             AdminApiOAuthProviderMapping {
                 uuid: self.uuid,
+                name: self.name,
                 matcher: self.matcher,
                 mapping: self.mapping,
                 created: self.created.and_utc(),
@@ -730,6 +737,9 @@ pub struct CreateOAuthProviderMappingOptions {
     #[garde(skip)]
     pub oauth_provider_uuid: uuid::Uuid,
 
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub name: Option<compact_str::CompactString>,
     #[garde(dive, custom(OAuthProviderMappingMatcher::validate_nesting))]
     pub matcher: OAuthProviderMappingMatcher,
     #[garde(dive)]
@@ -768,6 +778,7 @@ impl CreatableModel for OAuthProviderMapping {
 
         query_builder
             .set("oauth_provider_uuid", options.oauth_provider_uuid)
+            .set("name", &options.name)
             .set("matcher", serde_json::to_value(&options.matcher)?)
             .set("mapping", serde_json::to_value(&options.mapping)?);
 
@@ -785,6 +796,14 @@ impl CreatableModel for OAuthProviderMapping {
 
 #[derive(ToSchema, Serialize, Deserialize, Validate, Default)]
 pub struct UpdateOAuthProviderMappingOptions {
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub name: Option<Option<compact_str::CompactString>>,
     #[garde(dive, custom(OAuthProviderMappingMatcher::validate_optional_nesting))]
     pub matcher: Option<OAuthProviderMappingMatcher>,
     #[garde(dive)]
@@ -827,12 +846,16 @@ impl UpdatableModel for OAuthProviderMapping {
             .transpose()?;
 
         query_builder
+            .set("name", options.name.as_ref())
             .set("matcher", matcher)
             .set("mapping", mapping)
             .where_eq("uuid", self.uuid);
 
         query_builder.execute(&mut **transaction).await?;
 
+        if let Some(name) = options.name {
+            self.name = name;
+        }
         if let Some(matcher) = options.matcher {
             self.matcher = matcher;
         }
@@ -891,6 +914,7 @@ impl DeletableModel for OAuthProviderMapping {
 pub struct AdminApiOAuthProviderMapping {
     pub uuid: uuid::Uuid,
 
+    pub name: Option<compact_str::CompactString>,
     pub matcher: OAuthProviderMappingMatcher,
     pub mapping: OAuthProviderMappingType,
 

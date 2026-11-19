@@ -1,0 +1,1 @@
+ALTER TABLE "oauth_provider_mappings" ADD COLUMN "name" varchar(1020);
