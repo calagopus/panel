@@ -973,7 +973,6 @@ dependencies = [
  "database-migrator",
  "db-agent-api",
  "dialoguer",
- "dotenvy",
  "futures-util",
  "garde",
  "hex",

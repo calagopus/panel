@@ -75,10 +75,7 @@ impl TagGroups {
 }
 
 fn env_var(key: &str) -> Option<String> {
-    std::env::var(key)
-        .ok()
-        .map(|value| value.trim_matches('"').to_string())
-        .filter(|value| !value.is_empty() && value != "null")
+    super::source_env::var(key).filter(|value| !value.is_empty() && value != "null")
 }
 
 fn mail_from_env() -> Option<SourceMail> {

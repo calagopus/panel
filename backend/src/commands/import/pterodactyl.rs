@@ -40,12 +40,11 @@ impl shared::extensions::commands::CliCommand<PterodactylArgs> for PterodactylCo
     }
 }
 
-/// Builds the backup configuration both panels describe through environment variables.
 pub(super) fn backup_config_from_env() -> SourceBackupConfig {
-    let disk = match std::env::var("APP_BACKUP_DRIVER").as_deref() {
-        Ok("btrfs") => BackupDisk::Btrfs,
-        Ok("zfs") => BackupDisk::Zfs,
-        Ok("s3") => BackupDisk::S3,
+    let disk = match super::source_env::var("APP_BACKUP_DRIVER").as_deref() {
+        Some("btrfs") => BackupDisk::Btrfs,
+        Some("zfs") => BackupDisk::Zfs,
+        Some("s3") => BackupDisk::S3,
         _ => BackupDisk::Local,
     };
 
@@ -55,30 +54,34 @@ pub(super) fn backup_config_from_env() -> SourceBackupConfig {
         disk,
         s3: (disk == BackupDisk::S3).then(|| {
             shared::models::backup_configuration::BackupConfigsS3 {
-                region: std::env::var("AWS_DEFAULT_REGION")
+                region: super::source_env::var("AWS_DEFAULT_REGION")
                     .unwrap_or_default()
                     .into(),
-                access_key: std::env::var("AWS_ACCESS_KEY_ID")
+                access_key: super::source_env::var("AWS_ACCESS_KEY_ID")
                     .unwrap_or_default()
                     .into(),
-                secret_key: std::env::var("AWS_SECRET_ACCESS_KEY")
+                secret_key: super::source_env::var("AWS_SECRET_ACCESS_KEY")
                     .unwrap_or_default()
                     .into(),
-                bucket: std::env::var("AWS_BACKUPS_BUCKET")
+                bucket: super::source_env::var("AWS_BACKUPS_BUCKET")
                     .unwrap_or_default()
                     .into(),
-                endpoint: std::env::var("AWS_ENDPOINT").unwrap_or_default().into(),
-                path_style: std::env::var("AWS_USE_PATH_STYLE_ENDPOINT")
-                    .map(|v| v == "true")
-                    .unwrap_or_default(),
+                endpoint: super::source_env::var("AWS_ENDPOINT")
+                    .unwrap_or_default()
+                    .into(),
+                path_style: super::source_env::var("AWS_USE_PATH_STYLE_ENDPOINT")
+                    .is_some_and(|v| is_laravel_true(&v)),
                 compression_type: wings_api::CompressionType::Gz,
-                part_size: std::env::var("BACKUP_MAX_PART_SIZE")
-                    .ok()
+                part_size: super::source_env::var("BACKUP_MAX_PART_SIZE")
                     .and_then(|v| v.parse::<u64>().ok())
                     .unwrap_or(1024 * 1024 * 1024),
             }
         }),
     }
+}
+
+fn is_laravel_true(value: &str) -> bool {
+    value.eq_ignore_ascii_case("true") || value.eq_ignore_ascii_case("(true)")
 }
 
 /// Pterodactyl 2.x built-in game tags, in the order it resolves an egg's game by.
@@ -350,7 +353,9 @@ pub(super) async fn read_egg_variables(
             // Pelican stores a JSON list, Pterodactyl a pipe-separated string
             let rules = serde_json::from_str::<Vec<CompactString>>(&rules)
                 .map(rejoin_split_regex_rules)
-                .unwrap_or_else(|_| rules.split('|').map(CompactString::from).collect());
+                .unwrap_or_else(|_| {
+                    rejoin_split_regex_rules(rules.split('|').map(CompactString::from).collect())
+                });
 
             Ok(SourceEggVariable {
                 id: source_i64(row, "id")?,

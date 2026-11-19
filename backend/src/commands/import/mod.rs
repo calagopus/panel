@@ -18,6 +18,7 @@ mod issues;
 mod model;
 mod pelican;
 mod pterodactyl;
+mod source_env;
 mod validate;
 mod write;
 
@@ -36,58 +37,50 @@ pub(super) async fn connect_source_database_any(
 ) -> Result<SourcePool, anyhow::Error> {
     sqlx::any::install_default_drivers();
 
-    let connection = std::env::var("DB_CONNECTION")
-        .unwrap_or_else(|_| "mysql".to_string())
-        .trim_matches('"')
+    let connection = source_env::var("DB_CONNECTION")
+        .unwrap_or_else(|| "mysql".to_string())
         .to_ascii_lowercase();
 
     let database_url = match connection.as_str() {
         "mysql" | "mariadb" => {
             let source_database_host =
-                std::env::var("DB_HOST").context("failed to read source environment DB_HOST")?;
-            let source_database_port = std::env::var("DB_PORT")
-                .unwrap_or_else(|_| "3306".to_string())
+                source_env::var("DB_HOST").context("failed to read source environment DB_HOST")?;
+            let source_database_port = source_env::var("DB_PORT")
+                .unwrap_or_else(|| "3306".to_string())
                 .parse::<u16>()
                 .context("failed to parse source environment DB_PORT")?;
-            let source_database_database = std::env::var("DB_DATABASE")
+            let source_database_database = source_env::var("DB_DATABASE")
                 .context("failed to read source environment DB_DATABASE")?;
-            let source_database_username = std::env::var("DB_USERNAME")
+            let source_database_username = source_env::var("DB_USERNAME")
                 .context("failed to read source environment DB_USERNAME")?;
-            let source_database_password = std::env::var("DB_PASSWORD")
+            let source_database_password = source_env::var("DB_PASSWORD")
                 .context("failed to read source environment DB_PASSWORD")?;
 
             let mut url = reqwest::Url::parse("mysql://localhost")
                 .context("failed to construct source mysql database url")?;
-            url.set_host(Some(source_database_host.trim_matches('"')))
+            url.set_host(Some(&source_database_host))
                 .context("failed to set source mysql database host")?;
             url.set_port(Some(source_database_port))
                 .map_err(|_| anyhow::anyhow!("failed to set source mysql database port"))?;
-            url.set_username(&urlencoding::encode(
-                source_database_username.trim_matches('"'),
-            ))
-            .map_err(|_| anyhow::anyhow!("failed to set source mysql database username"))?;
-            url.set_password(Some(&urlencoding::encode(
-                source_database_password.trim_matches('"'),
-            )))
-            .map_err(|_| anyhow::anyhow!("failed to set source mysql database password"))?;
-            url.set_path(&urlencoding::encode(
-                source_database_database.trim_matches('"'),
-            ));
+            url.set_username(&urlencoding::encode(&source_database_username))
+                .map_err(|_| anyhow::anyhow!("failed to set source mysql database username"))?;
+            url.set_password(Some(&urlencoding::encode(&source_database_password)))
+                .map_err(|_| anyhow::anyhow!("failed to set source mysql database password"))?;
+            url.set_path(&urlencoding::encode(&source_database_database));
             url.to_string()
         }
         "sqlite" | "sqlite3" => {
-            let source_database_database = std::env::var("DB_DATABASE")
+            let source_database_database = source_env::var("DB_DATABASE")
                 .context("failed to read source environment DB_DATABASE")?;
-            let source_database_database = source_database_database.trim_matches('"');
 
-            match source_database_database {
+            match source_database_database.as_str() {
                 ":memory:" | "file::memory:" => {
                     return Err(anyhow::anyhow!(
                         "refusing to import from an in-memory sqlite database"
                     ));
                 }
                 _ => {
-                    let source_database_database = Path::new(source_database_database);
+                    let source_database_database = Path::new(&source_database_database);
                     let source_database_database: PathBuf =
                         if source_database_database.is_absolute() {
                             source_database_database.to_path_buf()
@@ -98,41 +91,38 @@ pub(super) async fn connect_source_database_any(
                                 .join(source_database_database)
                         };
 
-                    format!("sqlite://{}", source_database_database.to_string_lossy())
+                    let path = urlencoding::encode(&source_database_database.to_string_lossy())
+                        .replace("%2F", "/");
+
+                    format!("sqlite://{path}")
                 }
             }
         }
         "pgsql" | "postgres" | "postgresql" => {
             let source_database_host =
-                std::env::var("DB_HOST").context("failed to read source environment DB_HOST")?;
-            let source_database_port = std::env::var("DB_PORT")
-                .unwrap_or_else(|_| "5432".to_string())
+                source_env::var("DB_HOST").context("failed to read source environment DB_HOST")?;
+            let source_database_port = source_env::var("DB_PORT")
+                .unwrap_or_else(|| "5432".to_string())
                 .parse::<u16>()
                 .context("failed to parse source environment DB_PORT")?;
-            let source_database_database = std::env::var("DB_DATABASE")
+            let source_database_database = source_env::var("DB_DATABASE")
                 .context("failed to read source environment DB_DATABASE")?;
-            let source_database_username = std::env::var("DB_USERNAME")
+            let source_database_username = source_env::var("DB_USERNAME")
                 .context("failed to read source environment DB_USERNAME")?;
-            let source_database_password = std::env::var("DB_PASSWORD")
+            let source_database_password = source_env::var("DB_PASSWORD")
                 .context("failed to read source environment DB_PASSWORD")?;
 
             let mut url = reqwest::Url::parse("postgres://localhost")
                 .context("failed to construct source postgres database url")?;
-            url.set_host(Some(source_database_host.trim_matches('"')))
+            url.set_host(Some(&source_database_host))
                 .context("failed to set source postgres database host")?;
             url.set_port(Some(source_database_port))
                 .map_err(|_| anyhow::anyhow!("failed to set source postgres database port"))?;
-            url.set_username(&urlencoding::encode(
-                source_database_username.trim_matches('"'),
-            ))
-            .map_err(|_| anyhow::anyhow!("failed to set source postgres database username"))?;
-            url.set_password(Some(&urlencoding::encode(
-                source_database_password.trim_matches('"'),
-            )))
-            .map_err(|_| anyhow::anyhow!("failed to set source postgres database password"))?;
-            url.set_path(&urlencoding::encode(
-                source_database_database.trim_matches('"'),
-            ));
+            url.set_username(&urlencoding::encode(&source_database_username))
+                .map_err(|_| anyhow::anyhow!("failed to set source postgres database username"))?;
+            url.set_password(Some(&urlencoding::encode(&source_database_password)))
+                .map_err(|_| anyhow::anyhow!("failed to set source postgres database password"))?;
+            url.set_path(&urlencoding::encode(&source_database_database));
             url.to_string()
         }
         _ => {
@@ -193,48 +183,36 @@ fn source_bool(row: &SourceRow, column: &str) -> Result<bool, anyhow::Error> {
 fn extract_php_serialized_string(
     serialized_data: &str,
 ) -> Result<compact_str::CompactString, anyhow::Error> {
-    if !serialized_data.starts_with("s:") {
+    let Some(rest) = serialized_data.strip_prefix("s:") else {
         return Ok(serialized_data.into());
-    }
-
-    let first_colon = match serialized_data.find(':') {
-        Some(pos) => pos,
-        None => return Err(anyhow::anyhow!("invalid PHP serialized string format")),
     };
 
-    let second_colon_start = first_colon + 1;
-    let second_colon = match serialized_data[second_colon_start..].find(':') {
-        Some(pos) => second_colon_start + pos,
-        None => return Err(anyhow::anyhow!("invalid PHP serialized string format")),
-    };
+    let (length, rest) = rest
+        .split_once(':')
+        .ok_or_else(|| anyhow::anyhow!("invalid PHP serialized string format"))?;
+    let length: usize = length.parse()?;
 
-    let length_str = &serialized_data[first_colon + 1..second_colon];
-    let length: usize = length_str.parse()?;
+    let rest = rest.strip_prefix('"').ok_or_else(|| {
+        anyhow::anyhow!("invalid PHP serialized string format, missing opening quote")
+    })?;
 
-    if serialized_data.len() <= second_colon + 1
-        || &serialized_data[second_colon + 1..second_colon + 2] != "\""
-    {
-        return Err(anyhow::anyhow!(
-            "invalid PHP serialized string format, missing opening quote"
-        ));
-    }
-
-    let content_start = second_colon + 2;
-    let expected_end = content_start + length;
-
-    if serialized_data.len() < expected_end + 2 {
+    if rest.len() < 2 || length > rest.len() - 2 {
         return Err(anyhow::anyhow!(
             "invalid PHP serialized string format, string is truncated"
         ));
     }
 
-    if &serialized_data[expected_end..expected_end + 2] != "\";" {
+    let content = rest.get(..length).ok_or_else(|| {
+        anyhow::anyhow!("invalid PHP serialized string format, length splits a character")
+    })?;
+
+    if rest.get(length..length + 2) != Some("\";") {
         return Err(anyhow::anyhow!(
             "invalid PHP serialized string format, missing closing quote or semicolon"
         ));
     }
 
-    Ok(serialized_data[content_start..expected_end].into())
+    Ok(content.into())
 }
 
 fn decrypt_laravel_value(
@@ -319,9 +297,8 @@ fn convert_der_public_key(
 #[inline]
 pub(crate) fn is_sqlite_source() -> bool {
     matches!(
-        std::env::var("DB_CONNECTION")
-            .unwrap_or_else(|_| "mysql".to_string())
-            .trim_matches('"')
+        source_env::var("DB_CONNECTION")
+            .unwrap_or_else(|| "mysql".to_string())
             .to_ascii_lowercase()
             .as_str(),
         "sqlite" | "sqlite3"
@@ -331,9 +308,8 @@ pub(crate) fn is_sqlite_source() -> bool {
 #[inline]
 pub(crate) fn is_postgres_source() -> bool {
     matches!(
-        std::env::var("DB_CONNECTION")
-            .unwrap_or_else(|_| "mysql".to_string())
-            .trim_matches('"')
+        source_env::var("DB_CONNECTION")
+            .unwrap_or_else(|| "mysql".to_string())
             .to_ascii_lowercase()
             .as_str(),
         "pgsql" | "postgres" | "postgresql"
@@ -684,7 +660,7 @@ pub(super) async fn run(
         return Ok(1);
     };
 
-    if let Err(err) = dotenvy::from_path(environment) {
+    if let Err(err) = source_env::load(Path::new(environment)) {
         eprintln!(
             "{}: {:#?}",
             format!("failed to read {name} environment file").red(),
@@ -693,19 +669,18 @@ pub(super) async fn run(
         return Ok(1);
     }
 
-    let app_url = match std::env::var("APP_URL") {
-        Ok(value) => value,
-        Err(err) => {
+    let app_url = match source_env::var("APP_URL") {
+        Some(value) => value,
+        None => {
             eprintln!(
-                "{}: {:#?}",
-                format!("failed to read {name} environment APP_URL").red(),
-                err
+                "{}",
+                format!("failed to read {name} environment APP_URL").red()
             );
             return Ok(1);
         }
     };
-    let app_key = match std::env::var("APP_KEY") {
-        Ok(value) => {
+    let app_key = match source_env::var("APP_KEY") {
+        Some(value) => {
             let bytes = if let Some(encoded) = value.strip_prefix("base64:") {
                 match BASE64_ENGINE.decode(encoded) {
                     Ok(bytes) => bytes,
@@ -733,11 +708,10 @@ pub(super) async fn run(
 
             bytes
         }
-        Err(err) => {
+        None => {
             eprintln!(
-                "{}: {:#?}",
-                format!("failed to read {name} environment APP_KEY").red(),
-                err
+                "{}",
+                format!("failed to read {name} environment APP_KEY").red()
             );
             return Ok(1);
         }
@@ -760,10 +734,7 @@ pub(super) async fn run(
         prefix: if is_sqlite_source() {
             String::new()
         } else {
-            std::env::var("DB_PREFIX")
-                .unwrap_or_default()
-                .trim_matches('"')
-                .to_string()
+            source_env::var("DB_PREFIX").unwrap_or_default()
         },
     };
 
@@ -914,4 +885,48 @@ pub fn commands(cli: CliCommandGroupBuilder) -> CliCommandGroupBuilder {
         "Imports data from a Pelican panel.",
         pelican::PelicanCommand,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // extract_php_serialized_string
+    #[test]
+    fn unwraps_content_counted_in_bytes() {
+        assert_eq!(extract_php_serialized_string(r#"s:2:"é";"#).unwrap(), "é");
+        assert_eq!(
+            extract_php_serialized_string(r#"s:4:"a";b";"#).unwrap(),
+            "a\";b"
+        );
+    }
+
+    #[test]
+    fn returns_unserialized_input_unchanged() {
+        assert_eq!(
+            extract_php_serialized_string("plain value").unwrap(),
+            "plain value"
+        );
+    }
+
+    #[test]
+    fn malformed_input_errors_without_panicking() {
+        let huge = format!(r#"s:{}:"a";"#, usize::MAX);
+
+        for input in [
+            r#"s:1:"é";"#,
+            huge.as_str(),
+            r#"s:1"a";"#,
+            r#"s:x:"a";"#,
+            r#"s:1:a";"#,
+            r#"s:5:"ab"#,
+            r#"s:1:"a"#,
+            r#"s:1:é";"#,
+        ] {
+            assert!(
+                extract_php_serialized_string(input).is_err(),
+                "{input:?} should be rejected"
+            );
+        }
+    }
 }

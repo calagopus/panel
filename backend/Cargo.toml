@@ -50,7 +50,6 @@ webauthn-rs = { workspace = true }
 webauthn-rs-proto = { workspace = true }
 base64 = { workspace = true }
 aws-sdk-s3 = { workspace = true }
-dotenvy = { workspace = true }
 oauth2 = { workspace = true }
 human_bytes = "0.4.3"
 which = "8.0.0"
