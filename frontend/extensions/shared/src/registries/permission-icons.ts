@@ -1,22 +1,22 @@
-import type { ReactNode } from 'react';
 import { Registry } from 'shared';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 
 export class PermissionIconRegistry implements Registry {
   /**
    * Keyed by permission group, the part before the dot. Used for API keys.
    * @since 1.0.0
    */
-  public userPermissionIcons: Record<string, ReactNode> = {};
+  public userPermissionIcons: Record<string, IconLike> = {};
   /**
    * Keyed by permission group, the part before the dot.
    * @since 1.0.0
    */
-  public adminPermissionIcons: Record<string, ReactNode> = {};
+  public adminPermissionIcons: Record<string, IconLike> = {};
   /**
    * Keyed by permission group, the part before the dot.
    * @since 1.0.0
    */
-  public serverPermissionIcons: Record<string, ReactNode> = {};
+  public serverPermissionIcons: Record<string, IconLike> = {};
 
   public mergeFrom(other: this): this {
     for (const [k, v] of Object.entries(other.userPermissionIcons)) {
@@ -33,21 +33,21 @@ export class PermissionIconRegistry implements Registry {
   }
 
   /** @since 1.0.0 */
-  public addUserPermissionIcon(group: string, icon: ReactNode): this {
+  public addUserPermissionIcon(group: string, icon: IconLike): this {
     this.userPermissionIcons[group] = icon;
 
     return this;
   }
 
   /** @since 1.0.0 */
-  public addAdminPermissionIcon(group: string, icon: ReactNode): this {
+  public addAdminPermissionIcon(group: string, icon: IconLike): this {
     this.adminPermissionIcons[group] = icon;
 
     return this;
   }
 
   /** @since 1.0.0 */
-  public addServerPermissionIcon(group: string, icon: ReactNode): this {
+  public addServerPermissionIcon(group: string, icon: IconLike): this {
     this.serverPermissionIcons[group] = icon;
 
     return this;

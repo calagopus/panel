@@ -5,6 +5,7 @@ import { Extension } from 'shared';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import PreviewCard from '@/elements/data-display/PreviewCard.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
@@ -67,7 +68,7 @@ export default function ExtensionCard({
   const header = (
     <div className='mb-3 flex items-start gap-3'>
       <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--mantine-color-default-hover) text-(--mantine-color-dimmed)'>
-        {extension?.cardIcon ?? <FontAwesomeIcon icon={faPuzzlePiece} className='text-sm' />}
+        <Icon icon={extension?.cardIcon ?? faPuzzlePiece} className='text-sm' />
       </div>
       <div className='min-w-0 flex-1'>
         <h3 className='text-md font-medium leading-tight'>

@@ -1,7 +1,9 @@
 import type { HookableComponentBase } from 'shared';
 import { faCircle, faPalette, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { type CSSVariablesResolver, type MantineThemeOverride } from '@mantine/core';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { LazyString } from '@/lib/lazy.ts';
+import { addIconReplacement } from '@/lib/iconReplacements.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type ThemeScheme = 'light' | 'dark';
@@ -27,6 +29,11 @@ export class ThemeVariantScope {
     return this;
   }
 
+  public replaceIcon(original: IconDefinition, replacement: IconLike): this {
+    this.disposers.push(addIconReplacement(original, replacement));
+    return this;
+  }
+
   public onExit(cleanup: () => void): this {
     this.disposers.push(cleanup);
     return this;
@@ -46,7 +53,7 @@ export class ThemeVariantScope {
 export interface ThemeVariantDefinition {
   id: string;
   label: LazyString;
-  icon?: IconDefinition;
+  icon?: IconLike;
   schemes: ThemeScheme[];
   mantineTheme?: MantineThemeOverride;
   cssVariablesResolver?: CSSVariablesResolver;

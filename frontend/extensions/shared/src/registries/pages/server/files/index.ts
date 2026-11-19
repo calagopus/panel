@@ -1,9 +1,9 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import React from 'react';
 import { NavigateFunction, SetURLSearchParams } from 'react-router';
 import { ContainerRegistry, Registry } from 'shared';
 import { z } from 'zod';
 import type { Props as ContainerProps } from '@/elements/containers/ServerContentContainer.tsx';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
 import { serverSchema } from '@/lib/schemas/server/server.ts';
 import { FileManagerContextType } from '@/providers/contexts/fileManagerContext.ts';
@@ -88,7 +88,7 @@ type FileEditorActionContent =
 type FileIconHandler = (
   file: z.infer<typeof serverDirectoryEntrySchema>,
   fileManagerContext: FileManagerContextType,
-) => IconDefinition | undefined;
+) => IconLike | undefined;
 type FileOpenableHandler = (
   file: z.infer<typeof serverDirectoryEntrySchema>,
   fileManagerContext: FileManagerContextType,

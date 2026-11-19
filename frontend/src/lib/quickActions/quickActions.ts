@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { LazyString } from '@/lib/lazy.ts';
 
 export type QuickActionScope = 'dashboard' | 'server' | 'admin';
@@ -6,7 +7,7 @@ export type QuickActionScope = 'dashboard' | 'server' | 'admin';
 export interface QuickActionCategory {
   id: string;
   label: LazyString;
-  icon?: ReactNode;
+  icon?: IconLike;
   /** Lower sorts first; categories without one fall back to alphabetical order by label. */
   order?: number;
 }
@@ -20,7 +21,7 @@ export interface QuickActionItem {
   content?: ReactNode;
   path?: string;
   keywords?: string[];
-  icon?: ReactNode;
+  icon?: IconLike;
   danger?: boolean;
   onSelect: () => void;
 }
@@ -45,7 +46,7 @@ export interface QuickActionDefinition {
   content?: ReactNode;
   path?: string;
   keywords?: string[];
-  icon?: ReactNode;
+  icon?: IconLike;
   scopes?: QuickActionScope[];
   permission?: string | string[];
   adminPermission?: string | true;

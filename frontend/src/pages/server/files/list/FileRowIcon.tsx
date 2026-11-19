@@ -7,12 +7,11 @@ import {
   faFolderPlus,
   faFolderTree,
   faImage,
-  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { memo } from 'react';
 import { z } from 'zod';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import {
   isListenableAudio,
@@ -30,7 +29,7 @@ function getFileIcon(
   fileManagerContext: FileManagerStore,
   openable?: boolean,
   archive?: boolean,
-): IconDefinition {
+): IconLike {
   for (const handler of window.extensionContext.extensionRegistry.pages.server.files.fileIconHandlers) {
     const icon = handler(file, fileManagerContext);
     if (icon) {
@@ -78,14 +77,14 @@ function FileRowIcon({
   const store = useFileManagerApi();
   const isDirectory = directory || file?.directory;
   const iconColor = isDirectory ? 'text-(--mantine-color-yellow-5)' : 'text-(--mantine-color-dimmed)';
-  const iconDefinition = file ? getFileIcon(file, store.getState(), openable, archive) : directory ? faFolder : faFile;
+  const icon = file ? getFileIcon(file, store.getState(), openable, archive) : directory ? faFolder : faFile;
 
   if (!file?.virtual) {
     return (
-      <FontAwesomeIcon
+      <Icon
         data-file-manager-icon={isDirectory ? 'folder' : 'file'}
         className={classNames(iconColor, className)}
-        icon={iconDefinition}
+        icon={icon}
       />
     );
   }
@@ -93,11 +92,7 @@ function FileRowIcon({
   return (
     <Tooltip label={t('pages.server.files.tooltip.virtual', {})}>
       <span className={classNames('relative inline-flex', className)}>
-        <FontAwesomeIcon
-          data-file-manager-icon={isDirectory ? 'folder' : 'file'}
-          className={iconColor}
-          icon={iconDefinition}
-        />
+        <Icon data-file-manager-icon={isDirectory ? 'folder' : 'file'} className={iconColor} icon={icon} />
         <span className='absolute -top-1 -right-1 h-1.5 w-1.5 rounded-full bg-(--mantine-color-blue-5) ring-1 ring-(--mantine-color-body)' />
       </span>
     </Tooltip>

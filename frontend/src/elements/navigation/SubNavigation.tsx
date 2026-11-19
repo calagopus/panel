@@ -1,10 +1,9 @@
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tabs } from '@mantine/core';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { HookableComponentBase, makeComponentHookable } from 'shared';
 import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import { type LazyString, resolveString } from '@/lib/lazy.ts';
 import { pageNavigationCategoryId } from '@/lib/quickActions/coreQuickActions.tsx';
 import { to } from '@/lib/routes.ts';
@@ -14,7 +13,7 @@ import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
 
 interface BaseItemProp {
   name: LazyString;
-  icon: IconDefinition;
+  icon: IconLike;
   hidden?: boolean;
   permission?: string;
   end?: boolean;
@@ -71,7 +70,7 @@ function useSubNavigationQuickActions(baseUrl: string, items: ItemProp[], enable
         category: pageNavigationCategoryId(depth),
         label: item.name,
         path: path.startsWith(base) ? path.slice(base.length) || '/' : path,
-        icon: <FontAwesomeIcon icon={item.icon} />,
+        icon: item.icon,
         perform: () => navigate(path),
       };
     }),
@@ -82,11 +81,7 @@ function useSubNavigationQuickActions(baseUrl: string, items: ItemProp[], enable
 function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp }) {
   return (
     <NavLink key={resolveString(item.name)} to={itemPath(baseUrl, item)} end={item.end ?? true}>
-      <Tabs.Tab
-        key={resolveString(item.name)}
-        value={resolveString(item.name)}
-        leftSection={<FontAwesomeIcon icon={item.icon} />}
-      >
+      <Tabs.Tab key={resolveString(item.name)} value={resolveString(item.name)} leftSection={<Icon icon={item.icon} />}>
         {resolveString(item.name)}
       </Tabs.Tab>
     </NavLink>

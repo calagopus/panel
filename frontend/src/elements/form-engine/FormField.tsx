@@ -4,6 +4,7 @@ import { UseFormReturnType } from '@mantine/form';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import Autocomplete from '@/elements/input/Autocomplete.tsx';
 import Checkbox from '@/elements/input/Checkbox.tsx';
 import DateTimePicker from '@/elements/input/DateTimePicker.tsx';
@@ -370,7 +371,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
       return (
         <div className={colSpanClass}>
           <CollapsibleSection
-            icon={field.icon}
+            icon={<Icon icon={field.icon} />}
             title={resolveString(field.title)}
             enabled={enabled}
             onToggle={(next) => {

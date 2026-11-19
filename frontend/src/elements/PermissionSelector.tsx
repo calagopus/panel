@@ -6,6 +6,7 @@ import { z } from 'zod';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import Card from '@/elements/data-display/Card.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { handleRawPasteFromClipboard } from '@/lib/clipboard/paste.ts';
 import { permissionCategoryIconMapping } from '@/lib/enums.ts';
@@ -235,9 +236,12 @@ export default function PermissionSelector({
               <Card key={category}>
                 <div className='flex items-center justify-between gap-1'>
                   <div className='flex items-center gap-3'>
-                    {permissionIcons[permissionIconMap[permissionsMapType]][category] ?? (
-                      <FontAwesomeIcon icon={permissionCategoryIconMapping[category]} />
-                    )}
+                    <Icon
+                      icon={
+                        permissionIcons[permissionIconMap[permissionsMapType]][category] ??
+                        permissionCategoryIconMapping[category]
+                      }
+                    />
                     <div>
                       <Title order={5} className='uppercase'>
                         {category.replaceAll('-', ' ')}

@@ -14,6 +14,7 @@ import { extensionOverrides } from './vite-plugins/extension-overrides.ts';
 import { extensionVariables } from './vite-plugins/extension-variables.ts';
 import { fontAwesomeIcons } from './vite-plugins/fontawesome-icons.ts';
 import { iconManifest } from './vite-plugins/icon-manifest.ts';
+import { iconReplacements } from './vite-plugins/icon-replacements.ts';
 import { precompressAssets } from './vite-plugins/precompress.ts';
 import { themeBoot } from './vite-plugins/theme-boot.ts';
 import { translationsPlugin } from './vite-plugins/translations.ts';
@@ -54,6 +55,7 @@ export default defineConfig({
     countryFlags(),
     fontAwesomeIcons(),
     iconManifest(),
+    iconReplacements(),
     bootSpinner(),
     themeBoot(),
     extensionVariables(),

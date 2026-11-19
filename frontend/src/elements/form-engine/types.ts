@@ -14,6 +14,7 @@ import {
 import { DateTimePickerProps } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { MultiSelectProps as WrappedMultiSelectProps } from '@/elements/input/MultiSelect.tsx';
 import type { SelectProps as WrappedSelectProps } from '@/elements/input/Select.tsx';
 import { LazyString } from '@/lib/lazy.ts';
@@ -173,7 +174,7 @@ export type SectionNullableDefault = Record<string, unknown> | (() => Record<str
 export interface SectionFieldDef<T extends Record<string, unknown>> {
   type: 'section';
   name: string;
-  icon: ReactNode;
+  icon: IconLike;
   title: LazyString;
   nullableDefault?: SectionNullableDefault;
   advanced?: boolean;

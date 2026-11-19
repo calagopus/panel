@@ -1,6 +1,7 @@
 import { CSSVariablesResolver, createTheme, type MantineThemeOverride } from '@mantine/core';
 import { merge } from 'object-deep-merge';
 import { ExtensionRegistry } from 'shared';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 
 class ExtensionSkip {
   protected static readonly __skip = 0xdeadbeeeeef;
@@ -100,7 +101,7 @@ export class Extension {
   // This is the component added to the hover preview of your extension card, it is mounted every time the preview opens
   public cardPreviewComponent: React.FC | null = null;
   // This overrides the icon element shown in your extension row in the admin extensions page
-  public cardIcon: React.ReactNode = null;
+  public cardIcon: IconLike | null = null;
 
   // Reads a variable your backend extension added to index.html through `initialize_index_html`
   public getIndexVariable<T = unknown>(name: string): T | undefined {

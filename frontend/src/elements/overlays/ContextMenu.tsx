@@ -1,4 +1,4 @@
-import { faEllipsis, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Menu, MenuProps } from '@mantine/core';
 import {
@@ -14,12 +14,13 @@ import {
   useState,
 } from 'react';
 import { ContextMenuRegistry } from 'shared/src/registries/slices/contextMenu';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 
 export interface ContextMenuActionItem {
   type: 'action';
-  icon?: IconDefinition;
+  icon?: IconLike;
   label: string;
   rightSection?: ReactNode;
   hidden?: boolean;
@@ -69,7 +70,7 @@ const ConditionalMenuTooltip = ({ label, children }: { label?: string; children:
   );
 
 const itemIcon = (item: Omit<ContextMenuActionItem, 'items'>) =>
-  item.loading ? <Spinner size={14} /> : item.icon ? <FontAwesomeIcon icon={item.icon} /> : undefined;
+  item.loading ? <Spinner size={14} /> : item.icon ? <Icon icon={item.icon} /> : undefined;
 
 export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<ContextMenuState>({

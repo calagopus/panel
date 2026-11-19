@@ -1,4 +1,3 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faMagnifyingGlass, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Input, SimpleGrid } from '@mantine/core';
@@ -9,6 +8,7 @@ import { makeComponentHookable } from 'shared';
 import { iconManifestUrl } from 'virtual:icon-manifest';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -30,7 +30,7 @@ interface IconInputProps {
   description?: string;
   value: string | null | undefined;
   onChange: (value: string | null) => void;
-  fallback?: IconDefinition;
+  fallback?: IconLike;
   size?: 'xs' | 'sm' | 'md';
   disabled?: boolean;
   error?: ReactNode;
@@ -105,7 +105,7 @@ function IconInput({ label, description, value, onChange, fallback, size = 'sm',
                 onClick={() => setOpened((o) => !o)}
                 style={{ flexShrink: 0 }}
               >
-                {current && <FontAwesomeIcon icon={current} style={{ opacity: selected ? 1 : 0.6 }} />}
+                {current && <Icon icon={current} style={{ opacity: selected ? 1 : 0.6 }} />}
               </ActionIcon>
             </Tooltip>
           </Popover.Target>

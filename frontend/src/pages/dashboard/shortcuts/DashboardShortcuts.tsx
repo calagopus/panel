@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode, useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Flex from '@/elements/layout/Flex.tsx';
@@ -49,8 +50,7 @@ export default function DashboardShortcuts() {
   };
 
   const categoryLabel = (id: string) => resolveString(categories[id]?.label) ?? id;
-  const categoryIcon = (id: string): ReactNode =>
-    categories[id]?.icon ?? <FontAwesomeIcon icon={faKeyboard} size='sm' />;
+  const categoryIcon = (id: string): ReactNode => <Icon icon={categories[id]?.icon ?? faKeyboard} size='sm' />;
 
   const groupedMap = new Map<string, ShortcutDefinition[]>();
   for (const definition of definitions) {

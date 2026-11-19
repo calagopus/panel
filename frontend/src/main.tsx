@@ -5,6 +5,7 @@ import getIcons from '@/api/getIcons.ts';
 import getSettings from '@/api/getSettings.ts';
 import App from '@/App.tsx';
 import { SpinnerLoader } from '@/elements/feedback/Spinner.tsx';
+import { registerIconReplacements } from '@/lib/iconReplacements.ts';
 import { preloadRouterForPath } from '@/routers/routerImports.ts';
 import { registerAssetReloadHandler } from '@/stores/assetReload.ts';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -115,6 +116,7 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
     extensions.filter((extension) => !disabled.includes(extension.packageName)),
   );
 
+  registerIconReplacements();
   registerThemeVariant();
 
   createRoot(root!).render(

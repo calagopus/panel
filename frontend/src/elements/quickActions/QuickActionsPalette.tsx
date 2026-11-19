@@ -2,12 +2,13 @@ import type { AdminRouteDefinition, RouteDefinition, ServerRouteDefinition } fro
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Combobox, useCombobox } from '@mantine/core';
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { QuickActionSelectEvent } from 'shared';
 import { z } from 'zod';
 import type { QuickActionCategory, QuickActionItem, QuickActionScope } from '@/lib/quickActions/quickActions.ts';
 import getServers from '@/api/server/getServers.ts';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import { Modal } from '@/elements/modals/Modal.tsx';
@@ -231,7 +232,7 @@ function Palette() {
             category: CORE_QUICK_ACTION_CATEGORIES.navigation,
             label: resolveString(route.name)!,
             path,
-            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            icon: route.icon,
             onSelect: () => {
               setOpen(false);
               navigate(path);
@@ -261,7 +262,7 @@ function Palette() {
             category: CORE_QUICK_ACTION_CATEGORIES.navigation,
             label: resolveString(route.name)!,
             path,
-            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            icon: route.icon,
             onSelect: () => {
               setOpen(false);
               navigate(path);
@@ -288,7 +289,7 @@ function Palette() {
             category: CORE_QUICK_ACTION_CATEGORIES.navigation,
             label: resolveString(route.name)!,
             path,
-            icon: route.icon ? <FontAwesomeIcon icon={route.icon} /> : undefined,
+            icon: route.icon,
             onSelect: () => {
               setOpen(false);
               navigate(path);
@@ -349,7 +350,7 @@ function Palette() {
   );
 
   const categoryLabel = useCallback((id: string) => resolveString(categories[id]?.label) ?? id, [categories]);
-  const categoryIconOf = useCallback((id: string): ReactNode => categories[id]?.icon, [categories]);
+  const categoryIconOf = useCallback((id: string): IconLike | undefined => categories[id]?.icon, [categories]);
 
   const { grouped, flatItems, flatItemIndex } = useMemo(() => {
     const byCategory = new Map<string, QuickActionItem[]>();
@@ -450,7 +451,7 @@ function Palette() {
                   key={group.id}
                   label={
                     <Group gap={6} wrap='nowrap'>
-                      {group.icon}
+                      {group.icon && <Icon icon={group.icon} />}
                       {/* Stacked groups sharing a heading - a page's nested tab bars - only name the first. */}
                       {grouped[index - 1]?.label !== group.label && <span>{group.label}</span>}
                     </Group>
@@ -470,7 +471,7 @@ function Palette() {
                         mod={item.danger ? { danger: true } : undefined}
                       >
                         <Group gap='sm' wrap='nowrap'>
-                          {item.icon}
+                          {item.icon && <Icon icon={item.icon} />}
                           <div className='flex flex-col min-w-0'>
                             <Text size='sm' c='inherit'>
                               {item.label}

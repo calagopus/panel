@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import { type LazyString, resolveString } from '@/lib/lazy.ts';
 
 export type ModifierKey = 'ctrl' | 'meta' | 'shift' | 'alt' | 'ctrlOrMeta';
@@ -11,7 +11,7 @@ export interface ShortcutBinding {
 export interface ShortcutCategory {
   id: string;
   label: LazyString;
-  icon?: ReactNode;
+  icon?: IconLike;
 }
 
 export interface ShortcutDefinition {

@@ -1,5 +1,5 @@
-import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { FC } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { LazyString } from '@/lib/lazy.ts';
 
 export interface GlobalRouteDefinition {
@@ -12,7 +12,7 @@ export interface GlobalRouteDefinition {
 
 export interface RouteDefinition extends GlobalRouteDefinition {
   name: LazyString | undefined;
-  icon?: IconDefinition;
+  icon?: IconLike;
   activeMatches?: string[];
 }
 

@@ -12,7 +12,6 @@ import {
   faSun,
   faUserCog,
   faWindowRestore,
-  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Text, Title, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
@@ -21,11 +20,13 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import { flushSync } from 'react-dom';
 import { MemoryRouter, matchPath, NavLink, useLocation, useNavigate } from 'react-router';
 import { makeComponentHookable } from 'shared';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import CloseButton from '@/elements/buttons/CloseButton.tsx';
 import Avatar from '@/elements/data-display/Avatar.tsx';
 import Card from '@/elements/data-display/Card.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import MantineDivider from '@/elements/layout/Divider.tsx';
 import ContextMenu, { ContextMenuItem } from '@/elements/overlays/ContextMenu.tsx';
 import Drawer from '@/elements/overlays/Drawer.tsx';
@@ -145,7 +146,7 @@ function Sidebar({ children, header, footer }: SidebarProps) {
 type LinkProps = {
   to: string;
   end?: boolean;
-  icon?: IconDefinition;
+  icon?: IconLike;
   customIcon?: string | null;
   name?: string;
   title?: string;
@@ -233,7 +234,7 @@ function Link({ to, end, icon, customIcon, name, title = name, className, active
                 fullWidth
                 styles={{ label: { width: '100%' } }}
               >
-                {resolvedIcon && <FontAwesomeIcon icon={resolvedIcon} className='mr-2' />} {name}
+                {resolvedIcon && <Icon icon={resolvedIcon} className='mr-2' />} {name}
               </Button>
             );
           }}
