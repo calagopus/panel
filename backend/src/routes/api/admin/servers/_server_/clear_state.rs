@@ -58,6 +58,8 @@ mod post {
                 .execute(&mut *transaction)
             )?;
 
+            Server::clear_destination_variables(&mut *transaction, server.uuid).await?;
+
             sqlx::query!(
                 "DELETE FROM server_allocations
                 WHERE server_allocations.uuid = ANY($1)",

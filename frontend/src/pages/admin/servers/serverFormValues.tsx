@@ -8,12 +8,19 @@ import getNodeSystemDirect from '@/api/admin/nodes/system/getNodeSystemDirect.ts
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
+import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
+import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
-import { AdminServer, AdminServerCreate, AdminServerUpdate } from '@/lib/schemas/admin/servers.ts';
+import {
+  AdminServer,
+  AdminServerCreateForm,
+  AdminServerDeploy,
+  AdminServerUpdate,
+} from '@/lib/schemas/admin/servers.ts';
 import { fullUserSchema } from '@/lib/schemas/user.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
 import { useResource } from '@/plugins/resource/useResource.ts';
@@ -22,7 +29,7 @@ import EggInstallField from './EggInstallField.tsx';
 import OwnerCreateField from './OwnerCreateField.tsx';
 
 type TFunc = ReturnType<typeof useTranslations>['t'];
-type ServerCreateFormValues = AdminServerCreate;
+type ServerCreateFormValues = AdminServerCreateForm;
 type ServerUpdateFormValues = AdminServerUpdate;
 type SearchableResource<T> = ReturnType<typeof useInfiniteSearchableResource<T>>;
 type EggsResource = Pick<
@@ -71,6 +78,14 @@ export const serverCreateEmptyFormValues: ServerCreateFormValues = {
   allocationUuid: null,
   allocationUuids: [],
   variables: [],
+  deployment: null,
+};
+
+export const serverDeploymentDefaultValues: AdminServerDeploy['deployment'] = {
+  locationUuids: [],
+  allowOverallocation: false,
+  suspensionPenalty: 0.5,
+  randomness: 0.5,
 };
 
 export const serverUpdateEmptyFormValues: ServerUpdateFormValues = {
@@ -430,6 +445,8 @@ interface ServerAssignmentOptions<T extends ServerEggAssignmentFormValues> {
   onEggInstallClick?: () => void;
   unreachableNodeUuids?: Set<string>;
   nodeUuid?: string;
+  locations?: SearchableResource<z.infer<typeof adminLocationSchema>>;
+  deploying?: boolean;
 }
 
 /// Groups the egg options by nest so a cross-nest egg search still shows where each egg lives.
@@ -473,7 +490,70 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
     onEggInstallClick,
     unreachableNodeUuids,
     nodeUuid,
+    locations,
+    deploying,
   } = opts;
+
+  const deploymentModeField: FieldDef<T> = {
+    type: 'custom',
+    name: '_deploymentMode',
+    colSpan: 'full',
+    advanced: true,
+    render: (f) => (
+      <SegmentedControl
+        fullWidth
+        data={[
+          { label: t('pages.admin.servers.tabs.general.page.form.deploymentModeNode', {}), value: 'node' },
+          { label: t('pages.admin.servers.tabs.general.page.form.deploymentModeAutomatic', {}), value: 'automatic' },
+        ]}
+        value={deploying ? 'automatic' : 'node'}
+        onChange={(value) =>
+          f.setFieldValue('deployment', (value === 'automatic' ? serverDeploymentDefaultValues : null) as never)
+        }
+      />
+    ),
+  };
+
+  const deploymentFields: FieldDef<T>[] = [
+    {
+      type: 'multiselect',
+      name: 'deployment.locationUuids',
+      label: t('pages.admin.servers.tabs.general.page.form.deploymentLocations', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.deploymentLocationsDescription', {}),
+      required: true,
+      options: (locations?.items ?? []).map((location) => ({ label: location.name, value: location.uuid })),
+      props: {
+        searchable: true,
+        searchValue: locations?.search,
+        onSearchChange: locations?.setSearch,
+        infiniteScroll: locations?.infiniteScroll,
+        filter: ({ options }) => options,
+        loading: locations?.loading,
+      },
+    },
+    {
+      type: 'switch',
+      name: 'deployment.allowOverallocation',
+      label: t('pages.admin.servers.tabs.general.page.form.deploymentAllowOverallocation', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.deploymentAllowOverallocationDescription', {}),
+    },
+    {
+      type: 'number',
+      name: 'deployment.suspensionPenalty',
+      label: t('pages.admin.servers.tabs.general.page.form.deploymentSuspensionPenalty', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.deploymentSuspensionPenaltyDescription', {}),
+      advanced: true,
+      props: { min: 0, max: 1, step: 0.1, decimalScale: 2 },
+    },
+    {
+      type: 'number',
+      name: 'deployment.randomness',
+      label: t('pages.admin.servers.tabs.general.page.form.deploymentRandomness', {}),
+      description: t('pages.admin.servers.tabs.general.page.form.deploymentRandomnessDescription', {}),
+      advanced: true,
+      props: { min: 0, max: 1, step: 0.1, decimalScale: 2 },
+    },
+  ];
 
   const nodeField: FieldDef<T> = {
     type: 'select',
@@ -577,7 +657,14 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
   };
 
   return mode === 'create'
-    ? [nodeField, ownerField, nestField, eggField, backupConfigField]
+    ? [
+        deploymentModeField,
+        ...(deploying ? deploymentFields : [nodeField]),
+        ownerField,
+        nestField,
+        eggField,
+        backupConfigField,
+      ]
     : [ownerField, backupConfigField, nestField, eggField];
 }
 
@@ -699,6 +786,8 @@ export interface ServerFormFieldsOptions<T extends ServerEggAssignmentFormValues
   nodeUuid: string;
   eggNests?: Map<string, z.infer<typeof adminNestSchema>>;
   onEggInstallClick?: () => void;
+  locations?: SearchableResource<z.infer<typeof adminLocationSchema>>;
+  deploying?: boolean;
 }
 
 export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opts: ServerFormFieldsOptions<T>) {
@@ -722,6 +811,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
     nodeUuid,
     eggNests,
     onEggInstallClick,
+    locations,
+    deploying,
   } = opts;
 
   const { data: bandwidth } = useResource({
@@ -778,6 +869,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
         onEggInstallClick,
         unreachableNodeUuids,
         nodeUuid,
+        locations,
+        deploying,
       }),
     [
       t,
@@ -799,6 +892,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
       onEggInstallClick,
       unreachableNodeUuids,
       nodeUuid,
+      locations,
+      deploying,
     ],
   );
 

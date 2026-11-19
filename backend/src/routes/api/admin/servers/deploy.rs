@@ -159,42 +159,6 @@ mod post {
 
         let variables = NestEggVariable::all_by_egg_uuid(&state.database, data.egg_uuid).await?;
 
-        let mut validator_variables = HashMap::new();
-        validator_variables.reserve(variables.len());
-
-        for variable in variables.iter() {
-            validator_variables.insert(
-                variable.env_variable.as_str(),
-                (
-                    variable.rules.as_slice(),
-                    if let Some(value) = data
-                        .variables
-                        .iter()
-                        .find(|v| v.env_variable == variable.env_variable)
-                    {
-                        value.value.as_str()
-                    } else {
-                        variable.default_value.as_ref().map_or("", |v| v.as_str())
-                    },
-                ),
-            );
-        }
-
-        let validator = match rule_validator::Validator::new(validator_variables) {
-            Ok(validator) => validator,
-            Err(error) => {
-                return ApiResponse::error(&error)
-                    .with_status(StatusCode::BAD_REQUEST)
-                    .ok();
-            }
-        };
-
-        if let Err(error) = validator.validate() {
-            return ApiResponse::error(&error)
-                .with_status(StatusCode::BAD_REQUEST)
-                .ok();
-        }
-
         let nodes = Node::by_location_uuids_most_eligible(
             &state.database,
             &data.deployment.location_uuids,
@@ -216,12 +180,6 @@ mod post {
             Vec::new()
         };
 
-        let mut deployment_variables = HashMap::new();
-
-        let mut allocation_uuid = data.allocation_uuid;
-        let mut allocation_uuids = data.allocation_uuids;
-        let mut allocation_error: Option<String> = None;
-
         let candidates = nodes
             .into_iter()
             .map(|node| {
@@ -240,137 +198,196 @@ mod post {
             })
             .collect::<Vec<_>>();
 
-        let mut node_uuid = None;
-        for (node, allocations) in &candidates {
-            let Some(allocations) = allocations
-                .as_ref()
-                .filter(|_| allocation_uuid.is_none() || allocation_uuids.is_none())
-            else {
-                node_uuid = Some(node.uuid);
-                break;
-            };
+        let mut attempts = 0;
 
-            let (deployment_allocation_uuid, deployment_allocation_uuids) =
-                match NodeAllocation::get_from_deployment(
-                    &state,
-                    allocations,
-                    node,
-                    &mut deployment_variables,
-                )
-                .await
-                {
-                    Ok(result) => result,
-                    Err(shared::database::DatabaseError::Any(err)) => {
-                        allocation_error = Some(err.to_string());
-                        continue;
-                    }
-                    Err(err) => return ApiResponse::from(err).ok(),
+        let (server, node_uuid, allocation_uuid, allocation_uuids) = loop {
+            let mut deployment_variables = HashMap::new();
+
+            let mut allocation_uuid = data.allocation_uuid;
+            let mut allocation_uuids = data.allocation_uuids.clone();
+            let mut allocation_error: Option<String> = None;
+
+            let mut node_uuid = None;
+            for (node, allocations) in &candidates {
+                let Some(allocations) = allocations
+                    .as_ref()
+                    .filter(|_| allocation_uuid.is_none() || allocation_uuids.is_none())
+                else {
+                    node_uuid = Some(node.uuid);
+                    break;
                 };
 
-            if deployment_allocation_uuids.len() != allocations.additional.len() {
-                allocation_error = Some(format!(
-                    "a node could only satisfy {} of the {} required additional allocations",
-                    deployment_allocation_uuids.len(),
-                    allocations.additional.len()
-                ));
-                continue;
+                let (deployment_allocation_uuid, deployment_allocation_uuids) =
+                    match NodeAllocation::get_from_deployment(
+                        &state,
+                        allocations,
+                        node,
+                        &mut deployment_variables,
+                        None,
+                    )
+                    .await
+                    {
+                        Ok(result) => result,
+                        Err(shared::database::DatabaseError::Any(err)) => {
+                            allocation_error = Some(err.to_string());
+                            continue;
+                        }
+                        Err(err) => return ApiResponse::from(err).ok(),
+                    };
+
+                if deployment_allocation_uuids.len() != allocations.additional.len() {
+                    allocation_error = Some(format!(
+                        "a node could only satisfy {} of the {} required additional allocations",
+                        deployment_allocation_uuids.len(),
+                        allocations.additional.len()
+                    ));
+                    continue;
+                }
+
+                if allocation_uuid.is_none() {
+                    allocation_uuid = deployment_allocation_uuid;
+                }
+                if allocation_uuids.is_none() {
+                    allocation_uuids = Some(deployment_allocation_uuids);
+                }
+
+                node_uuid = Some(node.uuid);
+                break;
             }
 
-            if allocation_uuid.is_none() {
-                allocation_uuid = deployment_allocation_uuid;
-            }
-            if allocation_uuids.is_none() {
-                allocation_uuids = Some(deployment_allocation_uuids);
-            }
-
-            node_uuid = Some(node.uuid);
-            break;
-        }
-
-        let Some(node_uuid) = node_uuid else {
-            let reason = match Node::find_deployment_blocker(
-                &state.database,
-                &data.deployment.location_uuids,
-                data.limits,
-                data.deployment.allow_overallocation,
-                data.deployment.suspension_penalty,
-            )
-            .await?
-            {
-                Some(blocker) => blocker.message().to_string(),
-                None => allocation_error
-                    .unwrap_or_else(|| "no eligible node found for server deployment".to_string()),
-            };
-
-            return ApiResponse::error(format!("could not deploy server: {reason}"))
-                .with_status(StatusCode::BAD_REQUEST)
-                .ok();
-        };
-
-        let mut server_variables = HashMap::new();
-        server_variables.reserve(variables.len());
-
-        for data_variable in &data.variables {
-            let variable_uuid = match variables
-                .iter()
-                .find(|v| v.env_variable == data_variable.env_variable)
-            {
-                Some(variable) => variable.uuid,
-                None => continue,
-            };
-
-            server_variables.insert(variable_uuid, data_variable.value.clone().into());
-        }
-
-        for (deployment_variable, deployment_value) in deployment_variables {
-            let variable_uuid = match variables
-                .iter()
-                .find(|v| v.env_variable == deployment_variable)
-                .map(|v| v.uuid)
-            {
-                Some(uuid) => uuid,
-                None => continue,
-            };
-
-            server_variables.insert(variable_uuid, deployment_value);
-        }
-
-        let allocation_uuids = allocation_uuids.unwrap_or_default();
-
-        let options = CreateServerOptions {
-            node_uuid,
-            owner_uuid: data.owner_uuid,
-            egg_uuid: data.egg_uuid,
-            backup_configuration_uuid: data.backup_configuration_uuid,
-            allocation_uuid,
-            allocation_uuids: allocation_uuids.clone(),
-            start_on_completion: data.start_on_completion,
-            skip_installer: data.skip_installer,
-            external_id: data.external_id,
-            name: data.name,
-            description: data.description,
-            limits: data.limits,
-            pinned_cpus: data.pinned_cpus,
-            startup: data.startup,
-            image: data.image,
-            labels: data.labels,
-            timezone: data.timezone,
-            trash: data.trash,
-            hugepages_passthrough_enabled: data.hugepages_passthrough_enabled,
-            kvm_passthrough_enabled: data.kvm_passthrough_enabled,
-            feature_limits: data.feature_limits.clone(),
-            variables: server_variables,
-        };
-        let server = match Server::create(&state, options).await {
-            Ok(server) => server,
-            Err(err) if err.is_unique_violation() => {
-                return ApiResponse::error(
-                    "server with allocation(s) or external id already exists",
+            let Some(node_uuid) = node_uuid else {
+                let reason = match Node::find_deployment_blocker(
+                    &state.database,
+                    &data.deployment.location_uuids,
+                    data.limits,
+                    data.deployment.allow_overallocation,
+                    data.deployment.suspension_penalty,
                 )
-                .with_status(StatusCode::CONFLICT)
-                .ok();
+                .await?
+                {
+                    Some(blocker) => blocker.message().to_string(),
+                    None => allocation_error.unwrap_or_else(|| {
+                        "no eligible node found for server deployment".to_string()
+                    }),
+                };
+
+                return ApiResponse::error(format!("could not deploy server: {reason}"))
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
+            };
+
+            let mut validator_variables = HashMap::new();
+            validator_variables.reserve(variables.len());
+
+            for variable in variables.iter() {
+                let value =
+                    if let Some(value) = deployment_variables.get(variable.env_variable.as_str()) {
+                        value.as_str()
+                    } else if let Some(value) = data
+                        .variables
+                        .iter()
+                        .find(|v| v.env_variable == variable.env_variable)
+                    {
+                        value.value.as_str()
+                    } else {
+                        variable.default_value.as_ref().map_or("", |v| v.as_str())
+                    };
+
+                validator_variables.insert(
+                    variable.env_variable.as_str(),
+                    (variable.rules.as_slice(), value),
+                );
             }
-            Err(err) => return ApiResponse::from(err).ok(),
+
+            let validator = match rule_validator::Validator::new(validator_variables) {
+                Ok(validator) => validator,
+                Err(error) => {
+                    return ApiResponse::error(&error)
+                        .with_status(StatusCode::BAD_REQUEST)
+                        .ok();
+                }
+            };
+
+            if let Err(error) = validator.validate() {
+                return ApiResponse::error(&error)
+                    .with_status(StatusCode::BAD_REQUEST)
+                    .ok();
+            }
+
+            let mut server_variables = HashMap::new();
+            server_variables.reserve(variables.len());
+
+            for data_variable in &data.variables {
+                let variable_uuid = match variables
+                    .iter()
+                    .find(|v| v.env_variable == data_variable.env_variable)
+                {
+                    Some(variable) => variable.uuid,
+                    None => continue,
+                };
+
+                server_variables.insert(variable_uuid, data_variable.value.clone().into());
+            }
+
+            for (deployment_variable, deployment_value) in deployment_variables {
+                let variable_uuid = match variables
+                    .iter()
+                    .find(|v| v.env_variable == deployment_variable)
+                    .map(|v| v.uuid)
+                {
+                    Some(uuid) => uuid,
+                    None => continue,
+                };
+
+                server_variables.insert(variable_uuid, deployment_value);
+            }
+
+            let allocation_uuids = allocation_uuids.unwrap_or_default();
+
+            let options = CreateServerOptions {
+                node_uuid,
+                owner_uuid: data.owner_uuid,
+                egg_uuid: data.egg_uuid,
+                backup_configuration_uuid: data.backup_configuration_uuid,
+                allocation_uuid,
+                allocation_uuids: allocation_uuids.clone(),
+                start_on_completion: data.start_on_completion,
+                skip_installer: data.skip_installer,
+                external_id: data.external_id.clone(),
+                name: data.name.clone(),
+                description: data.description.clone(),
+                limits: data.limits,
+                pinned_cpus: data.pinned_cpus.clone(),
+                startup: data.startup.clone(),
+                image: data.image.clone(),
+                labels: data.labels.clone(),
+                timezone: data.timezone,
+                trash: data.trash,
+                hugepages_passthrough_enabled: data.hugepages_passthrough_enabled,
+                kvm_passthrough_enabled: data.kvm_passthrough_enabled,
+                feature_limits: data.feature_limits.clone(),
+                variables: server_variables,
+            };
+            match Server::create(&state, options).await {
+                Ok(server) => break (server, node_uuid, allocation_uuid, allocation_uuids),
+                Err(err)
+                    if attempts < 3
+                        && err.is_unique_constraint_violation(
+                            "server_allocations_allocation_uuid_idx",
+                        ) =>
+                {
+                    attempts += 1;
+                    continue;
+                }
+                Err(err) if err.is_unique_violation() => {
+                    return ApiResponse::error(
+                        "server with allocation(s) or external id already exists",
+                    )
+                    .with_status(StatusCode::CONFLICT)
+                    .ok();
+                }
+                Err(err) => return ApiResponse::from(err).ok(),
+            }
         };
 
         activity_logger

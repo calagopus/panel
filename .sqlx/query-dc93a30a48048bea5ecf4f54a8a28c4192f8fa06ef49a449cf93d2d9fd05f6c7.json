@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO server_allocations (server_uuid, allocation_uuid)\n                    SELECT $1, UNNEST($2::uuid[])\n                    ON CONFLICT DO NOTHING\n                    RETURNING uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_allocations",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "dc93a30a48048bea5ecf4f54a8a28c4192f8fa06ef49a449cf93d2d9fd05f6c7"
+}

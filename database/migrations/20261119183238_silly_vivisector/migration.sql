@@ -1,0 +1,1 @@
+ALTER TABLE "servers" ADD COLUMN "destination_variables" jsonb;

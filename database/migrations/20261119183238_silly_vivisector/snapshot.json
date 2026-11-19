@@ -1,0 +1,47 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "501bb2be-427d-4fd1-8425-234c9aca4ef5",
+  "prevIds": [
+    "f4a470d7-0698-4c2f-a16c-98acc1fafe26"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "servers",
+        "destination_variables"
+      ],
+      "writes": [
+        "s|col|public.servers.destination_variables",
+        "n|col|public.servers.destination_variables",
+        "e|col|public.servers.destination_variables"
+      ],
+      "reads": [
+        "n|tbl|public.servers",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "servers",
+        "name": "destination_variables",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}

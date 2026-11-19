@@ -108,6 +108,7 @@ mod post {
 
             let mut allocation_uuid = None;
             let mut allocation_uuids = Vec::new();
+            let mut destination_variables = HashMap::new();
 
             match data.allocation_mode {
                 MassTransferAllocationMode::None => {}
@@ -127,6 +128,7 @@ mod post {
                                 &allocations.deployment,
                                 &destination_node,
                                 &mut deployment_variables,
+                                None,
                             )
                             .await
                             {
@@ -157,13 +159,7 @@ mod post {
                                     None => continue,
                                 };
 
-                                ServerVariable::create(
-                                    &state.database,
-                                    server.uuid,
-                                    variable_uuid,
-                                    &variable_value,
-                                )
-                                .await?;
+                                destination_variables.insert(variable_uuid, variable_value);
                             }
                         }
 
@@ -243,6 +239,7 @@ mod post {
                                     u16::MAX,
                                     missing,
                                     &used,
+                                    None,
                                 )
                                 .await
                                 {
@@ -255,6 +252,7 @@ mod post {
                                             u16::MAX,
                                             missing,
                                             &used,
+                                            None,
                                         )
                                         .await?
                                     }
@@ -267,6 +265,7 @@ mod post {
                                         u16::MAX,
                                         missing,
                                         &used,
+                                        None,
                                     )
                                     .await?
                                 }
@@ -334,6 +333,7 @@ mod post {
                             end_port,
                             required_allocation_count,
                             &NodeAllocation::used_by_node_any_ip(&state, &destination_node).await?,
+                            None,
                         )
                         .await?;
 
@@ -355,6 +355,7 @@ mod post {
                         destination_node: destination_node.clone(),
                         allocation_uuid,
                         allocation_uuids,
+                        variables: destination_variables,
                         backups,
                         delete_source_backups: data.delete_source_backups,
                         archive_format: data.archive_format,

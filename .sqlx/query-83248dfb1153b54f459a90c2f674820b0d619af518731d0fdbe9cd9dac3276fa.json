@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM server_allocations\n                WHERE server_allocations.server_uuid = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "83248dfb1153b54f459a90c2f674820b0d619af518731d0fdbe9cd9dac3276fa"
+}

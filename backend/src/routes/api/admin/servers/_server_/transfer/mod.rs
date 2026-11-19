@@ -85,6 +85,7 @@ mod post {
                     destination_node,
                     allocation_uuid: data.allocation_uuid,
                     allocation_uuids: data.allocation_uuids,
+                    variables: Default::default(),
                     backups: data.backups,
                     delete_source_backups: data.delete_source_backups,
                     archive_format: data.archive_format,

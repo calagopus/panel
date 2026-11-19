@@ -980,6 +980,7 @@
           "themeAuto": "Auto",
           "themeDark": "Dark",
           "themeLight": "Light",
+          "themeStandard": "Standard",
           "themePureBlack": "Pure Black",
           "redactAddresses": "Hide Addresses",
           "resetDeviceOverrides": "Reset Device Overrides ({count})"
@@ -4122,7 +4123,8 @@
                 },
                 "alert": {
                   "suspended": "This server is suspended.",
-                  "selectEggForVariables": "Please select an egg before you can configure variables."
+                  "selectEggForVariables": "Please select an egg before you can configure variables.",
+                  "deploymentAllocations": "Allocations are picked from the egg configuration of the node the server is deployed to. If that configuration doesn't define any, the server is created without allocations."
                 },
                 "badge": {
                   "serverSuspended": "Server Suspended"
@@ -4173,6 +4175,16 @@
                   "predefinedDockerImagesPlaceholder": "No predefined image selected",
                   "nodeUnreachable": "unreachable",
                   "nodeUnreachableDescription": "This node could not be reached. Creating the server will fail unless the node comes back online.",
+                  "deploymentModeNode": "Specific Node",
+                  "deploymentModeAutomatic": "Automatic Deployment",
+                  "deploymentLocations": "Locations",
+                  "deploymentLocationsDescription": "The server is deployed to the most suitable node in these locations that has deployment enabled.",
+                  "deploymentAllowOverallocation": "Allow Overallocation",
+                  "deploymentAllowOverallocationDescription": "Also consider nodes that would exceed their memory or disk limit with this server.",
+                  "deploymentSuspensionPenalty": "Suspension Penalty",
+                  "deploymentSuspensionPenaltyDescription": "How much the resources of suspended servers count towards node usage, from 0 to 1.",
+                  "deploymentRandomness": "Randomness",
+                  "deploymentRandomnessDescription": "How much randomness is mixed into the node choice, from 0 (always the least used node) to 1.",
                   "startupCommandCustom": "Custom",
                   "predefinedStartupCommands": "Predefined Startup Commands",
                   "labels": "Container Labels",
@@ -4214,14 +4226,22 @@
                 "form": {
                   "notesPlaceholder": "Notes"
                 },
+                "button": {
+                  "reassign": "Reassign"
+                },
                 "toast": {
                   "updated": "Allocation updated.",
                   "setPrimary": "Allocation set as primary.",
                   "unsetPrimary": "Allocation unset as primary.",
                   "removed": "Allocation removed.",
-                  "added": "{count} allocations added."
+                  "added": "{count} allocations added.",
+                  "reassigned": "Allocations reassigned."
                 },
                 "modal": {
+                  "reassign": {
+                    "title": "Confirm Allocation Reassignment",
+                    "content": "Are you sure you want to reassign the allocations of **{server}**? All current allocations are replaced with ones picked from the egg configuration, and variables bound to allocation ports are updated. The new ports apply on the next restart."
+                  },
                   "add": {
                     "title": "Add Server Allocations",
                     "form": {

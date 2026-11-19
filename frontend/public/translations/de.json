@@ -4123,7 +4123,8 @@
                 },
                 "alert": {
                   "suspended": "Dieser Server ist suspendiert.",
-                  "selectEggForVariables": "Bitte wähle ein Egg aus, bevor du Variablen konfigurieren kannst."
+                  "selectEggForVariables": "Bitte wähle ein Egg aus, bevor du Variablen konfigurieren kannst.",
+                  "deploymentAllocations": "Allocations werden aus der Egg-Konfiguration des Nodes gewählt, auf den der Server deployt wird. Definiert diese keine, wird der Server ohne Allocations erstellt."
                 },
                 "badge": {
                   "serverSuspended": "Server suspendiert"
@@ -4174,6 +4175,16 @@
                   "predefinedDockerImagesPlaceholder": "Kein vordefiniertes Image ausgewählt",
                   "nodeUnreachable": "nicht erreichbar",
                   "nodeUnreachableDescription": "Diese Node konnte nicht erreicht werden. Das Erstellen des Servers schlägt fehl, solange die Node nicht wieder online ist.",
+                  "deploymentModeNode": "Bestimmter Node",
+                  "deploymentModeAutomatic": "Automatisches Deployment",
+                  "deploymentLocations": "Standorte",
+                  "deploymentLocationsDescription": "Der Server wird auf den passendsten Node in diesen Standorten deployt, bei dem Deployment aktiviert ist.",
+                  "deploymentAllowOverallocation": "Überbelegung erlauben",
+                  "deploymentAllowOverallocationDescription": "Auch Nodes berücksichtigen, die mit diesem Server ihr Speicher- oder Festplattenlimit überschreiten würden.",
+                  "deploymentSuspensionPenalty": "Suspendierungsgewichtung",
+                  "deploymentSuspensionPenaltyDescription": "Wie stark die Ressourcen suspendierter Server zur Auslastung des Nodes zählen, von 0 bis 1.",
+                  "deploymentRandomness": "Zufälligkeit",
+                  "deploymentRandomnessDescription": "Wie viel Zufall in die Wahl des Nodes einfließt, von 0 (immer der am wenigsten ausgelastete Node) bis 1.",
                   "startupCommandCustom": "Benutzerdefiniert",
                   "predefinedStartupCommands": "Vordefinierte Startbefehle",
                   "labels": "Container-Labels",
@@ -4215,14 +4226,22 @@
                 "form": {
                   "notesPlaceholder": "Notizen"
                 },
+                "button": {
+                  "reassign": "Neu zuweisen"
+                },
                 "toast": {
                   "updated": "Allocation aktualisiert.",
                   "setPrimary": "Allocation als primär festgelegt.",
                   "unsetPrimary": "Allocation als primär entfernt.",
                   "removed": "Allocation entfernt.",
-                  "added": "{count} Allocations hinzugefügt."
+                  "added": "{count} Allocations hinzugefügt.",
+                  "reassigned": "Allocations neu zugewiesen."
                 },
                 "modal": {
+                  "reassign": {
+                    "title": "Neuzuweisung der Allocations bestätigen",
+                    "content": "Möchtest du die Allocations von **{server}** wirklich neu zuweisen? Alle aktuellen Allocations werden durch neue aus der Egg-Konfiguration ersetzt, und an Allocation-Ports gebundene Variablen werden aktualisiert. Die neuen Ports gelten ab dem nächsten Neustart."
+                  },
                   "add": {
                     "title": "Server Allocations hinzufügen",
                     "form": {

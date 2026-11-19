@@ -92,6 +92,8 @@ mod post {
             .execute(&mut *transaction)
         )?;
 
+        Server::apply_destination_variables(&mut transaction, server.uuid).await?;
+
         sqlx::query!(
             "UPDATE server_backups
             SET node_uuid = $3

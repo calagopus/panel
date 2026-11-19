@@ -106,6 +106,25 @@ export const adminServerCreateSchema = z.lazy(() =>
   }),
 );
 
+export const adminServerDeploymentSchema = z.object({
+  locationUuids: z.array(z.uuid()).min(1),
+  allowOverallocation: z.boolean(),
+  suspensionPenalty: z.number().min(0).max(1),
+  randomness: z.number().min(0).max(1),
+});
+
+export const adminServerCreateFormSchema = z.lazy(() =>
+  adminServerCreateSchema.unwrap().extend({
+    deployment: adminServerDeploymentSchema.nullable(),
+  }),
+);
+
+export const adminServerDeploySchema = z.lazy(() =>
+  adminServerCreateSchema.unwrap().omit({ nodeUuid: true, allocationUuid: true, allocationUuids: true }).extend({
+    deployment: adminServerDeploymentSchema,
+  }),
+);
+
 export const adminServerUpdateSchema = z.lazy(() =>
   adminServerBaseOmit.extend({
     ownerUuid: z.uuid(),
@@ -221,6 +240,8 @@ export type AdminServer = z.infer<typeof adminServerSchema>;
 export type AdminServerLimits = z.infer<typeof adminServerLimitsSchema>;
 export type AdminServerFeatureLimits = z.infer<typeof adminServerFeatureLimitsSchema>;
 export type AdminServerCreate = z.infer<typeof adminServerCreateSchema>;
+export type AdminServerCreateForm = z.infer<typeof adminServerCreateFormSchema>;
+export type AdminServerDeploy = z.infer<typeof adminServerDeploySchema>;
 export type AdminServerUpdate = z.infer<typeof adminServerUpdateSchema>;
 export type AdminServerBackup = z.infer<typeof adminServerBackupSchema>;
 export type AdminServerDatabase = z.infer<typeof adminServerDatabaseSchema>;

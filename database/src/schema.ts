@@ -1289,6 +1289,7 @@ export const serversTable = pgTable(
       .references(() => nodesTable.uuid)
       .notNull(),
     destination_node_uuid: uuid().references(() => nodesTable.uuid),
+    destination_variables: jsonb(),
     owner_uuid: uuid()
       .references(() => usersTable.uuid)
       .notNull(),

@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _allocation_;
+mod reassign;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -179,5 +180,6 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .nest("/{allocation}", _allocation_::router(state))
+        .nest("/reassign", reassign::router(state))
         .with_state(state.clone())
 }

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT server_allocations.allocation_uuid FROM server_allocations WHERE server_allocations.server_uuid = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "allocation_uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_allocations",
+            "name": "allocation_uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7cbdb55b732d9a8eeafa14162d8681cc682eede34f6bceaa75c902cd38e1c7aa"
+}

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO server_allocations (server_uuid, allocation_uuid)\n                        VALUES ($1, $2)\n                        ON CONFLICT DO NOTHING\n                        RETURNING uuid",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_allocations",
+            "name": "uuid"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "463b3e95757868e1ea798b479d9c48e330278af789e2ca59618d83aeb4ad75c3"
+}

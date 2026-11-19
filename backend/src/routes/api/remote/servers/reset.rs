@@ -121,6 +121,8 @@ mod post {
                             .execute(&mut *transaction)
                         )?;
 
+                        Server::clear_destination_variables(&mut *transaction, server.uuid).await?;
+
                         sqlx::query!(
                             r#"
                             DELETE FROM server_allocations
