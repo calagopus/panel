@@ -111,7 +111,7 @@ export function bootSpinner(): Plugin {
           tags: [
             {
               tag: 'style',
-              children: `:where(html){background-color:var(--mantine-color-body,#242424)}\n${css}`,
+              children: `:where(html){background-color:var(--mantine-color-body,#242424)}\n:where(html[data-mantine-color-scheme='light']){background-color:var(--mantine-color-body,#f0eff0)}\n:where(html[data-mantine-color-scheme='dark'][data-theme-variant='pure-black']){background-color:var(--mantine-color-body,#000)}\n${css}`,
               injectTo: 'head',
             },
           ],

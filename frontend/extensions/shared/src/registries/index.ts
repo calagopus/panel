@@ -7,6 +7,7 @@ import { PermissionIconRegistry } from './permission-icons.ts';
 import { QuickActionRegistry } from './quickActions.ts';
 import { RouteRegistry } from './routes.ts';
 import { ShortcutRegistry } from './shortcuts.ts';
+import { ThemeRegistry } from './themes.ts';
 
 export interface Registry {
   mergeFrom(other: this): this;
@@ -23,6 +24,7 @@ export class ExtensionRegistry implements Registry {
     this.forms.mergeFrom(other.forms);
     this.quickActions.mergeFrom(other.quickActions);
     this.events.mergeFrom(other.events);
+    this.themes.mergeFrom(other.themes);
 
     return this;
   }
@@ -48,6 +50,8 @@ export class ExtensionRegistry implements Registry {
   public quickActions: QuickActionRegistry = new QuickActionRegistry();
   /** @since 1.2.6 */
   public events: EventRegistry = new EventRegistry();
+  /** @since 1.2.11 */
+  public themes: ThemeRegistry = new ThemeRegistry();
 
   /** @since 1.0.0 */
   public enterPages(callback: (registry: PageRegistry) => unknown): this {
@@ -100,6 +104,12 @@ export class ExtensionRegistry implements Registry {
   /** @since 1.2.6 */
   public enterEvents(callback: (registry: EventRegistry) => unknown): this {
     callback(this.events);
+    return this;
+  }
+
+  /** @since 1.2.11 */
+  public enterThemes(callback: (registry: ThemeRegistry) => unknown): this {
+    callback(this.themes);
     return this;
   }
 }

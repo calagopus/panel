@@ -980,6 +980,8 @@
           "themeAuto": "Automatisch",
           "themeDark": "Dunkel",
           "themeLight": "Hell",
+          "themeStandard": "Standard",
+          "themePureBlack": "Reines Schwarz",
           "redactAddresses": "Adressen verbergen",
           "resetDeviceOverrides": "Geräte-Überschreibungen zurücksetzen ({count})"
         },

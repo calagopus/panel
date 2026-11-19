@@ -980,6 +980,7 @@
           "themeAuto": "Auto",
           "themeDark": "Dark",
           "themeLight": "Light",
+          "themePureBlack": "Pure Black",
           "redactAddresses": "Hide Addresses",
           "resetDeviceOverrides": "Reset Device Overrides ({count})"
         },

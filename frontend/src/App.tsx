@@ -1,8 +1,14 @@
-import { CSSVariablesResolver, MantineProvider, type MantineThemeOverride, Text } from '@mantine/core';
+import {
+  CSSVariablesResolver,
+  MantineProvider,
+  type MantineThemeOverride,
+  mergeThemeOverrides,
+  Text,
+} from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createBrowserHistory } from 'history';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import AssetReloadNotice from '@/elements/feedback/AssetReloadNotice.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
@@ -11,6 +17,7 @@ import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
 import ErrorBoundary from './elements/ErrorBoundary.tsx';
 import ExtensionSlot from './elements/ExtensionSlot.tsx';
+import { combineCssVariablesResolvers, getForcedColorScheme, getThemeVariant } from './lib/themeVariants.ts';
 import { HistoryContext } from './providers/contexts/historyContext.ts';
 import { CurrentWindowProvider } from './providers/CurrentWindowProvider.tsx';
 import { ToastProvider } from './providers/ToastProvider.tsx';
@@ -19,6 +26,7 @@ import { WindowProvider } from './providers/WindowProvider.tsx';
 import RouterRoutes from './RouterRoutes.tsx';
 import TransitionHistoryRouter from './routers/TransitionHistoryRouter.tsx';
 import { useGlobalStore } from './stores/global.ts';
+import { useThemeVariantStore } from './stores/themeVariant.ts';
 
 import '@mantine/core/styles.css';
 import '@gfazioli/mantine-window/styles.css';
@@ -55,6 +63,7 @@ export default function App({
       setAnnouncements: state.setAnnouncements,
     })),
   );
+  const activeThemeVariant = useThemeVariantStore((state) => state.activeVariant);
   const [loadWarning, setLoadWarning] = useState(false);
   const retryCount = useRef(0);
   const settingsFresh = useRef(settingsLoaded);
@@ -118,14 +127,24 @@ export default function App({
     }
   }, [settings?.app?.icon]);
 
+  const variantTheme = useMemo(() => {
+    const variant = getThemeVariant(activeThemeVariant);
+
+    return {
+      theme: variant?.mantineTheme ? mergeThemeOverrides(theme, variant.mantineTheme) : theme,
+      cssVariablesResolver: combineCssVariablesResolvers([cssVariablesResolver, variant?.cssVariablesResolver]),
+    };
+  }, [theme, cssVariablesResolver, activeThemeVariant]);
+
   return (
     <>
       {Object.keys(settings).length > 0 ? (
-        <ErrorBoundary theme={theme}>
+        <ErrorBoundary theme={variantTheme.theme}>
           <MantineProvider
-            theme={theme}
-            cssVariablesResolver={cssVariablesResolver || undefined}
+            theme={variantTheme.theme}
+            cssVariablesResolver={variantTheme.cssVariablesResolver}
             defaultColorScheme='dark'
+            forceColorScheme={getForcedColorScheme()}
             deduplicateInlineStyles
           >
             <QueryClientProvider client={queryClient}>
@@ -159,7 +178,13 @@ export default function App({
         </ErrorBoundary>
       ) : (
         <>
-          <MantineProvider theme={theme} defaultColorScheme='dark' deduplicateInlineStyles>
+          <MantineProvider
+            theme={variantTheme.theme}
+            cssVariablesResolver={variantTheme.cssVariablesResolver}
+            defaultColorScheme='dark'
+            forceColorScheme={getForcedColorScheme()}
+            deduplicateInlineStyles
+          >
             <Spinner.Centered />
             {loadWarning && (
               <Text size='sm' c='dimmed' ta='center'>

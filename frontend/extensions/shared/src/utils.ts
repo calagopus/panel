@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import React, { createElement, useSyncExternalStore } from 'react';
 import { z } from 'zod';
 
 export function createBeforeCallHook<Fn extends (...args: Parameters<Fn>) => ReturnType<Fn>>(
@@ -56,13 +56,22 @@ export function makeFunctionHookable<Fn extends (...args: unknown[]) => unknown>
   return hookableFunction;
 }
 
+type PropsInterceptor<P> = (props: P) => P;
+type RenderInterceptor<P> = (element: React.ReactElement<P>, props: P) => React.ReactElement<P>;
+
 export type HookableComponentBase<P> = {
-  addPropsInterceptor(interceptor: (props: P) => P): void;
-  addRenderInterceptor(interceptor: (element: React.ReactElement<P>, props: P) => React.ReactElement<P>): void;
-  replaceBaseComponent(newComponent: React.ComponentType<P>): void;
+  addPropsInterceptor(interceptor: PropsInterceptor<P>): () => void;
+  addRenderInterceptor(interceptor: RenderInterceptor<P>): () => void;
+  replaceBaseComponent(newComponent: React.ComponentType<P>): () => void;
 };
 
 export type HookableComponent<P extends object> = React.FC<P> & HookableComponentBase<P>;
+
+interface HookableState<P> {
+  base: React.ComponentType<P>;
+  props: PropsInterceptor<P>[];
+  render: RenderInterceptor<P>[];
+}
 
 export function makeComponentHookable<
   P extends object,
@@ -71,18 +80,32 @@ export function makeComponentHookable<
   Component: React.ComponentType<P>,
   additionalComponents?: AdditionalComponents,
 ): HookableComponent<P> & AdditionalComponents {
-  let BaseComponent = Component;
+  const listeners = new Set<() => void>();
+  const replacements: { component: React.ComponentType<P> }[] = [];
+  let state: HookableState<P> = { base: Component, props: [], render: [] };
 
-  const propsInterceptors: Array<(props: P) => P> = [];
-  const renderInterceptors: Array<(element: React.ReactElement<P>, props: P) => React.ReactElement<P>> = [];
+  const update = (next: Partial<HookableState<P>>) => {
+    state = { ...state, ...next };
+    for (const listener of listeners) {
+      listener();
+    }
+  };
+
+  const subscribe = (listener: () => void) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+  const getState = () => state;
 
   const HookableWrapper = (props: P) => {
+    const { base, props: propsInterceptors, render: renderInterceptors } = useSyncExternalStore(subscribe, getState);
+
     let modifiedProps = props;
     for (const interceptor of propsInterceptors) {
       modifiedProps = interceptor(modifiedProps);
     }
 
-    let element = createElement(BaseComponent, modifiedProps);
+    let element = createElement(base, modifiedProps);
 
     for (const interceptor of renderInterceptors) {
       element = interceptor(element, modifiedProps);
@@ -91,18 +114,32 @@ export function makeComponentHookable<
     return element;
   };
 
-  HookableWrapper.addPropsInterceptor = (interceptor: (props: P) => P) => {
-    propsInterceptors.push(interceptor);
+  HookableWrapper.addPropsInterceptor = (interceptor: PropsInterceptor<P>) => {
+    const entry: PropsInterceptor<P> = (props) => interceptor(props);
+    update({ props: [...state.props, entry] });
+
+    return () => update({ props: state.props.filter((other) => other !== entry) });
   };
 
-  HookableWrapper.addRenderInterceptor = (
-    interceptor: (element: React.ReactElement<P>, props: P) => React.ReactElement<P>,
-  ) => {
-    renderInterceptors.push(interceptor);
+  HookableWrapper.addRenderInterceptor = (interceptor: RenderInterceptor<P>) => {
+    const entry: RenderInterceptor<P> = (element, props) => interceptor(element, props);
+    update({ render: [...state.render, entry] });
+
+    return () => update({ render: state.render.filter((other) => other !== entry) });
   };
 
   HookableWrapper.replaceBaseComponent = (newComponent: React.ComponentType<P>) => {
-    BaseComponent = newComponent;
+    const token = { component: newComponent };
+    replacements.push(token);
+    update({ base: newComponent });
+
+    return () => {
+      const index = replacements.indexOf(token);
+      if (index === -1) return;
+
+      replacements.splice(index, 1);
+      update({ base: replacements.at(-1)?.component ?? Component });
+    };
   };
 
   if (additionalComponents) {

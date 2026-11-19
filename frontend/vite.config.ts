@@ -15,6 +15,7 @@ import { extensionVariables } from './vite-plugins/extension-variables.ts';
 import { fontAwesomeIcons } from './vite-plugins/fontawesome-icons.ts';
 import { iconManifest } from './vite-plugins/icon-manifest.ts';
 import { precompressAssets } from './vite-plugins/precompress.ts';
+import { themeBoot } from './vite-plugins/theme-boot.ts';
 import { translationsPlugin } from './vite-plugins/translations.ts';
 
 const usePrecompress = process.env.PRECOMPRESS === 'true';
@@ -54,6 +55,7 @@ export default defineConfig({
     fontAwesomeIcons(),
     iconManifest(),
     bootSpinner(),
+    themeBoot(),
     extensionVariables(),
     viteStaticCopy({
       targets: [

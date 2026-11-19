@@ -7,6 +7,7 @@ import {
   faEyeSlash,
   faGraduationCap,
   faMoon,
+  faPalette,
   faRotateLeft,
   faSun,
   faUserCog,
@@ -31,8 +32,15 @@ import Drawer from '@/elements/overlays/Drawer.tsx';
 import { useLogoutConfirmation } from '@/elements/useLogoutConfirmation.tsx';
 import { isAdmin } from '@/lib/auth/permissions.ts';
 import { useCustomIcon } from '@/lib/icons.ts';
+import { resolveString } from '@/lib/lazy.ts';
 import { openUrl } from '@/lib/network/url.ts';
 import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
+import {
+  DEFAULT_THEME_VARIANT,
+  getThemeVariant,
+  getThemeVariants,
+  ThemeVariantDefinition,
+} from '@/lib/themeVariants.ts';
 import { resetAllDeviceOverrides, useDeviceOverrideCount } from '@/lib/userSettings.ts';
 import { useRedactAddresses } from '@/plugins/privacy/useRedactAddresses.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
@@ -44,6 +52,7 @@ import { preloadRouterForPath } from '@/routers/routerImports.ts';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 import { useRelativePageStore } from '@/stores/relativePage.ts';
+import { setThemeVariant, useThemeVariantStore } from '@/stores/themeVariant.ts';
 
 const CloseMobileMenuContext = createContext<(() => void) | null>(null);
 
@@ -246,6 +255,7 @@ function Footer() {
   const computedColorScheme = useComputedColorScheme('dark');
   const deviceOverrideCount = useDeviceOverrideCount();
   const [redactAddresses, setRedactAddresses] = useRedactAddresses();
+  const themeVariant = useThemeVariantStore((state) => state.variant);
   const routeOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
 
   const { confirmLogout, logoutModal } = useLogoutConfirmation();
@@ -256,6 +266,9 @@ function Footer() {
   const accountHidden = suspended || accountRouteDisabled;
   const adminHidden = suspended || !user || !isAdmin(user);
 
+  const themeVariants = getThemeVariants();
+  const activeSchemes = (getThemeVariant(themeVariant) ?? getThemeVariant(DEFAULT_THEME_VARIANT)!).schemes;
+
   const changeTheme = async (event: React.MouseEvent, nextTheme: 'auto' | 'dark' | 'light') => {
     if (nextTheme === colorScheme) {
       return;
@@ -264,8 +277,33 @@ function Footer() {
     const nextComputed =
       nextTheme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : nextTheme;
 
-    if (nextComputed === computedColorScheme || !document.startViewTransition) {
+    if (nextComputed === computedColorScheme) {
       setColorScheme(nextTheme);
+      return;
+    }
+
+    animateThemeChange(event, () => setColorScheme(nextTheme));
+  };
+
+  const changeThemeVariant = (event: React.MouseEvent, variant: ThemeVariantDefinition) => {
+    if (variant.id === themeVariant) {
+      return;
+    }
+
+    const keepsScheme =
+      colorScheme === 'auto' ? variant.schemes.length > 1 : variant.schemes.includes(computedColorScheme);
+
+    animateThemeChange(event, () => {
+      setThemeVariant(variant.id);
+      if (!keepsScheme) {
+        setColorScheme(variant.schemes[0]);
+      }
+    });
+  };
+
+  const animateThemeChange = (event: React.MouseEvent, apply: () => void) => {
+    if (!document.startViewTransition) {
+      apply();
       return;
     }
 
@@ -275,9 +313,7 @@ function Footer() {
     const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
 
     const transition = document.startViewTransition(() => {
-      flushSync(() => {
-        setColorScheme(nextTheme);
-      });
+      flushSync(apply);
     });
 
     transition.ready.then(() => {
@@ -322,11 +358,25 @@ function Footer() {
         type: 'action' as const,
         icon: faCircleHalfStroke,
         label: t('elements.sidebar.button.theme', {}),
+        hidden: themeVariants.length < 2 && activeSchemes.length < 2,
         items: [
+          ...themeVariants.map((variant) => ({
+            type: 'action' as const,
+            icon: variant.icon ?? faPalette,
+            label: resolveString(variant.label),
+            rightSection: variant.id === themeVariant && <FontAwesomeIcon icon={faCheck} size='sm' />,
+            hidden: themeVariants.length < 2,
+            onClick: (e: React.MouseEvent) => changeThemeVariant(e, variant),
+          })),
+          {
+            type: 'divider' as const,
+            hidden: themeVariants.length < 2,
+          },
           {
             type: 'action' as const,
             icon: faCircleHalfStroke,
             label: t('elements.sidebar.button.themeAuto', {}),
+            hidden: activeSchemes.length < 2,
             rightSection: colorScheme === 'auto' && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'auto'),
           },
@@ -334,6 +384,7 @@ function Footer() {
             type: 'action' as const,
             icon: faMoon,
             label: t('elements.sidebar.button.themeDark', {}),
+            hidden: !activeSchemes.includes('dark'),
             rightSection: colorScheme === 'dark' && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'dark'),
           },
@@ -341,6 +392,7 @@ function Footer() {
             type: 'action' as const,
             icon: faSun,
             label: t('elements.sidebar.button.themeLight', {}),
+            hidden: !activeSchemes.includes('light'),
             rightSection: colorScheme === 'light' && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'light'),
           },
@@ -381,6 +433,8 @@ function Footer() {
       accountHidden,
       adminHidden,
       colorScheme,
+      computedColorScheme,
+      themeVariant,
       deviceOverrideCount,
       redactAddresses,
       setRedactAddresses,

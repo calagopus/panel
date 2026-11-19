@@ -807,6 +807,8 @@ const baseTranslations = defineTranslations({
           themeAuto: 'Auto',
           themeDark: 'Dark',
           themeLight: 'Light',
+          themeStandard: 'Standard',
+          themePureBlack: 'Pure Black',
           redactAddresses: 'Hide Addresses',
           resetDeviceOverrides: 'Reset Device Overrides ({count})',
         },

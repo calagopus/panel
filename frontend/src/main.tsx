@@ -8,6 +8,7 @@ import { SpinnerLoader } from '@/elements/feedback/Spinner.tsx';
 import { preloadRouterForPath } from '@/routers/routerImports.ts';
 import { registerAssetReloadHandler } from '@/stores/assetReload.ts';
 import { useGlobalStore } from '@/stores/global.ts';
+import { registerThemeVariant } from '@/stores/themeVariant.ts';
 
 import.meta.glob('../extensions/*/src/app.css', { eager: true });
 
@@ -113,6 +114,8 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
   window.extensionContext = new ExtensionContext(
     extensions.filter((extension) => !disabled.includes(extension.packageName)),
   );
+
+  registerThemeVariant();
 
   createRoot(root!).render(
     <App
