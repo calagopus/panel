@@ -1,14 +1,13 @@
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
 import Paper from '@/elements/layout/Paper.tsx';
 import Text from '@/elements/typography/Text.tsx';
 import Title from '@/elements/typography/Title.tsx';
 
 export interface EmptyStateProps {
-  icon: IconDefinition;
+  icon: IconLike;
   title: string;
   description: ReactNode;
   flush?: boolean;
@@ -19,7 +18,7 @@ function EmptyState({ icon, title, description, flush = false, children }: Empty
   const content = (
     <>
       <ThemeIcon size='xl' mb='md' color='gray'>
-        <FontAwesomeIcon icon={icon} />
+        <Icon icon={icon} />
       </ThemeIcon>
       <Title order={3} c='dimmed' mb='sm'>
         {title}

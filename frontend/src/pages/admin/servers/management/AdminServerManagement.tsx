@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -40,12 +39,7 @@ export default function AdminServerManagement({ server }: { server: AdminServer 
         </AdminCan>
 
         {actions.map((action) => (
-          <TitleCard
-            key={action.id}
-            title={action.cardTitle}
-            icon={<FontAwesomeIcon icon={action.icon} />}
-            className={action.orderClass}
-          >
+          <TitleCard key={action.id} title={action.cardTitle} icon={action.icon} className={action.orderClass}>
             <Stack h='100%'>
               {action.cardContent}
               <Group mt='auto'>

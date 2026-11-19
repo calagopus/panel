@@ -181,7 +181,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
 
       {showInitialSetup && !revealed ? (
         <Stack>
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             {t('pages.admin.nodes.tabs.configuration.page.alert.tokenWarning', {})}
           </Alert>
           <div>
@@ -196,7 +196,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
       ) : (
         <Stack gap='xl'>
           {isAIO && (
-            <Alert color='blue' icon={<FontAwesomeIcon icon={faInfoCircle} />}>
+            <Alert color='blue' icon={faInfoCircle}>
               {t('pages.admin.nodes.tabs.configuration.page.alert.integratedNode', {}).md()}
             </Alert>
           )}

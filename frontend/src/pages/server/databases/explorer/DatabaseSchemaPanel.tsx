@@ -66,7 +66,7 @@ export default function DatabaseSchemaPanel({
       </div>
       {truncated && (
         <div className='px-2 pb-2'>
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          <Alert color='yellow' icon={faTriangleExclamation}>
             {t('pages.server.databases.explorer.schema.truncated', { tables: tables.length })}
           </Alert>
         </div>

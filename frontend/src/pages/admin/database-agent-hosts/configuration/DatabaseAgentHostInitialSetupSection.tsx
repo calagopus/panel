@@ -75,7 +75,7 @@ export default function DatabaseAgentHostInitialSetupSection({
             />
           </div>
           {portMismatch && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mt='md'>
+            <Alert color='yellow' icon={faExclamationTriangle} mt='md'>
               {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.portMismatch', {
                 connectPort: String(connectPort),
                 apiPort: String(apiPort),
@@ -127,11 +127,7 @@ export default function DatabaseAgentHostInitialSetupSection({
               </Button>
               <Alert
                 color={verifyResult ? (verifyResult.ok ? 'green' : 'red') : 'gray'}
-                icon={
-                  <FontAwesomeIcon
-                    icon={verifyResult ? (verifyResult.ok ? faCheck : faExclamationTriangle) : faCircleQuestion}
-                  />
-                }
+                icon={verifyResult ? (verifyResult.ok ? faCheck : faExclamationTriangle) : faCircleQuestion}
                 title={t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.verifyTitle', {})}
                 className='w-full'
               >

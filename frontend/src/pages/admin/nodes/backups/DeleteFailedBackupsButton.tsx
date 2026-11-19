@@ -67,7 +67,7 @@ export default function DeleteFailedBackupsButton({
           />
 
           {force && (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='red' icon={faTriangleExclamation}>
               {t('common.modal.deleteFailedBackups.alert.forceWarning', {})}
             </Alert>
           )}

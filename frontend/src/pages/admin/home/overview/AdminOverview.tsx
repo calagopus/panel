@@ -102,10 +102,7 @@ export default function AdminOverview() {
           </Text>
         }
       >
-        <TitleCard
-          title={t('pages.admin.home.tabs.overview.page.card.systemOverview', {})}
-          icon={<FontAwesomeIcon icon={faStethoscope} />}
-        >
+        <TitleCard title={t('pages.admin.home.tabs.overview.page.card.systemOverview', {})} icon={faStethoscope}>
           <ResourceView resource={systemOverview}>
             {(overview) => {
               const container = containerTypeMeta(overview.containerType);
@@ -246,7 +243,7 @@ export default function AdminOverview() {
 
         <TitleCard
           title={t('pages.admin.home.tabs.overview.page.card.generalStatistics', {})}
-          icon={<FontAwesomeIcon icon={faChartBar} />}
+          icon={faChartBar}
           className='mt-4'
         >
           <ResourceView resource={generalStats}>
@@ -295,7 +292,7 @@ export default function AdminOverview() {
 
         <TitleCard
           title={t('pages.admin.home.tabs.overview.page.card.backupStatistics', {})}
-          icon={<FontAwesomeIcon icon={faArchive} />}
+          icon={faArchive}
           className='mt-4'
         >
           <ResourceView resource={backupStats}>{(stats) => <BackupStatsPanel stats={stats} />}</ResourceView>

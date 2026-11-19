@@ -76,12 +76,7 @@ export default function DashboardSecurityKeys() {
       <SecurityKeyCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
       {settings.webauthn?.enabled === false && (
-        <Alert
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-          color='yellow'
-          title={t('common.alert.warning', {})}
-          className='mb-4'
-        >
+        <Alert icon={faExclamationTriangle} color='yellow' title={t('common.alert.warning', {})} className='mb-4'>
           {t('pages.account.securityKeys.alert.disabled', {})}
         </Alert>
       )}

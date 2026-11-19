@@ -1,6 +1,5 @@
 import { faDocker } from '@fortawesome/free-brands-svg-icons';
 import { faPlay, faSliders } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'debounce';
 import { useEffect, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -188,11 +187,7 @@ export default function ServerStartup() {
       </ConfirmationModal>
 
       <div className='flex flex-col md:grid md:grid-cols-3 gap-4 mt-2.5'>
-        <TitleCard
-          title={t('common.form.startupCommand', {})}
-          icon={<FontAwesomeIcon icon={faPlay} />}
-          className='col-span-2'
-        >
+        <TitleCard title={t('common.form.startupCommand', {})} icon={faPlay} className='col-span-2'>
           {Object.keys(server.egg.startupCommands).length > 0 && (
             <Select
               label={t('pages.server.startup.predefinedStartupCommands', {})}
@@ -241,7 +236,7 @@ export default function ServerStartup() {
             autosize
           />
         </TitleCard>
-        <TitleCard title={t('common.form.dockerImage', {})} icon={<FontAwesomeIcon icon={faDocker} />}>
+        <TitleCard title={t('common.form.dockerImage', {})} icon={faDocker}>
           <Select
             withAsterisk
             value={dockerImage}

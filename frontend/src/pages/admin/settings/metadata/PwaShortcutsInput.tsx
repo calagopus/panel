@@ -21,7 +21,7 @@ export default function PwaShortcutsInput({ form }: { form: UseFormReturnType<Me
   return (
     <TitleCard
       title={t('pages.admin.settings.tabs.metadata.page.form.pwaShortcuts', {})}
-      icon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} />}
+      icon={faArrowUpRightFromSquare}
     >
       <Stack>
         <Text size='sm' c='dimmed'>

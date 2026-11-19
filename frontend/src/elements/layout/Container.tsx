@@ -1,5 +1,4 @@
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
 import Copyright from '@/elements/Copyright.tsx';
@@ -32,7 +31,7 @@ function Container({ children, isNormal }: LayoutProps) {
     >
       <div>
         {impersonating && (
-          <Alert icon={<FontAwesomeIcon icon={faUserCheck} />} color='yellow' className='mt-2 mx-4 lg:mx-6'>
+          <Alert icon={faUserCheck} color='yellow' className='mt-2 mx-4 lg:mx-6'>
             {t('elements.container.alert.impersonating', {})}
           </Alert>
         )}

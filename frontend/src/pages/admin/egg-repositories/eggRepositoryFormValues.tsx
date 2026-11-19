@@ -1,5 +1,4 @@
 import { faExclamationTriangle, faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
@@ -157,12 +156,12 @@ export function useEggRepositoryFormFields(
               !f.values.credentials &&
               origin !== null &&
               origin !== repositoryOrigin(contextEggRepository.gitRepository) && (
-                <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+                <Alert color='yellow' icon={faExclamationTriangle} mb='md'>
                   {t('pages.admin.eggRepositories.tabs.general.page.alert.credentialsCleared', {})}
                 </Alert>
               )}
             <CollapsibleSection
-              icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
+              icon={faUnlockKeyhole}
               enabled={!!f.values.credentials}
               onToggle={(enabled) =>
                 f.setValues({

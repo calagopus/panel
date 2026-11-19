@@ -1,5 +1,4 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -67,7 +66,7 @@ export default function BackupGroupCreateModal({ ...props }: ModalProps) {
         </BackupRetentionInput>
 
         {retentionDisabled && (
-          <Alert color='blue' icon={<FontAwesomeIcon icon={faCircleInfo} />}>
+          <Alert color='blue' icon={faCircleInfo}>
             {t('pages.server.backupGroups.form.noRetentionDescription', {})}
           </Alert>
         )}

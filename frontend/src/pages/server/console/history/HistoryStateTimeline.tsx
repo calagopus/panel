@@ -1,6 +1,5 @@
 import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
@@ -33,7 +32,7 @@ export default function HistoryStateTimeline({ timeframe, rows, summary, loading
 
   return (
     <ChartBlock
-      icon={<FontAwesomeIcon icon={faPowerOff} />}
+      icon={faPowerOff}
       title={t('pages.server.console.history.block.states', {})}
       value={
         summary.uptime === null

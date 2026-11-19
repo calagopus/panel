@@ -1,7 +1,6 @@
 import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
 import { faCloudDownload, faHardDrive, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ReactNode } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import ChartLegend from '@/elements/charts/ChartLegend.tsx';
 import HistoryChart from '@/elements/charts/HistoryChart.tsx';
@@ -20,7 +19,7 @@ function HistoryBlock({
   min,
   props: { timeframe, rows, loading, selectTimeframe },
 }: {
-  icon: ReactNode;
+  icon: IconLike;
   title: string;
   series: HistoryChartSeries[];
   format: (value: number) => string;
@@ -64,7 +63,7 @@ export function HistoryCpuBlock(props: ResourceHistoryProps) {
 
   return (
     <HistoryBlock
-      icon={<FontAwesomeIcon icon={faMicrochip} />}
+      icon={faMicrochip}
       title={t('common.stat.cpuLoad', {})}
       series={[
         { key: 'cpuAverage', label: t('pages.server.console.history.series.average', {}) },
@@ -83,7 +82,7 @@ export function HistoryMemoryBlock(props: ResourceHistoryProps) {
 
   return (
     <HistoryBlock
-      icon={<FontAwesomeIcon icon={faMemory} />}
+      icon={faMemory}
       title={t('common.stat.memoryLoad', {})}
       series={[
         { key: 'memoryAverage', label: t('pages.server.console.history.series.average', {}) },
@@ -103,7 +102,7 @@ export function HistoryNetworkBlock(props: ResourceHistoryProps) {
 
   return (
     <HistoryBlock
-      icon={<FontAwesomeIcon icon={faCloudDownload} />}
+      icon={faCloudDownload}
       title={t('common.stat.network', {})}
       series={[
         { key: 'networkTx', label: t('common.stat.outbound', {}) },
@@ -121,7 +120,7 @@ export function HistoryDiskBlock(props: ResourceHistoryProps) {
 
   return (
     <HistoryBlock
-      icon={<FontAwesomeIcon icon={faHardDrive} />}
+      icon={faHardDrive}
       title={t('common.stat.diskUsage', {})}
       series={[
         { key: 'disk', label: t('common.stat.diskUsage', {}) },

@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
@@ -29,7 +28,7 @@ export default function IncompleteUploadsBanner() {
 
   return (
     <Alert
-      icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
+      icon={faTriangleExclamation}
       color='yellow'
       title={t('pages.server.files.upload.banner.title', {})}
       onClose={handleDismiss}

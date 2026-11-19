@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { join } from 'pathe';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { createSearchParams, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
@@ -618,12 +617,7 @@ function FileEditorComponent() {
             <FileBreadcrumbs inFileEditor path={join(browsingDirectory, fileName)} />
           </div>
           {collab.active && collab.conflict && (
-            <Alert
-              mb='sm'
-              color='yellow'
-              className='mx-4 lg:mx-6'
-              icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
-            >
+            <Alert mb='sm' color='yellow' className='mx-4 lg:mx-6' icon={faTriangleExclamation}>
               <Group justify='space-between'>
                 <span>
                   {collab.conflict.deleted

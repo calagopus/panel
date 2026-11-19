@@ -126,7 +126,7 @@ export default function ServerStats() {
     <ChartSyncGroup>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
         <ChartBlock
-          icon={<FontAwesomeIcon icon={faMicrochip} />}
+          icon={faMicrochip}
           action={<HistoryLink />}
           title={t('common.stat.cpuLoad', {})}
           value={cpu.value}
@@ -136,7 +136,7 @@ export default function ServerStats() {
           <StreamChart {...cpu.props} />
         </ChartBlock>
         <ChartBlock
-          icon={<FontAwesomeIcon icon={faMemory} />}
+          icon={faMemory}
           action={<HistoryLink />}
           title={t('common.stat.memoryLoad', {})}
           value={memory.value}
@@ -146,7 +146,7 @@ export default function ServerStats() {
           <StreamChart {...memory.props} />
         </ChartBlock>
         <ChartBlock
-          icon={<FontAwesomeIcon icon={faCloudDownload} />}
+          icon={faCloudDownload}
           action={<HistoryLink />}
           title={t('common.stat.network', {})}
           legend={<ChartLegend {...network.legend} />}

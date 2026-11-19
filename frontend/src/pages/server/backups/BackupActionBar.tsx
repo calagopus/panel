@@ -118,7 +118,7 @@ export default function BackupActionBar({
           }).md()}
 
           {skippedDeletes > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.server.backups.modal.deleteBackups.alert.skipped', {
                 backups: tItem('backup', skippedDeletes),
               })}

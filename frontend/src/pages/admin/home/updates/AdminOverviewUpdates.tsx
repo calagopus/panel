@@ -128,10 +128,7 @@ export default function AdminOverviewUpdates() {
           name='updates-prepended'
         />
 
-        <TitleCard
-          title={t('pages.admin.home.tabs.updates.page.card.panelVersion', {})}
-          icon={<FontAwesomeIcon icon={faInfoCircle} />}
-        >
+        <TitleCard title={t('pages.admin.home.tabs.updates.page.card.panelVersion', {})} icon={faInfoCircle}>
           <div className='flex flex-col md:flex-row gap-2 justify-between'>
             <StatusLine status={panelUpdateAvailable ? 'warning' : 'ok'}>
               {t('pages.admin.home.tabs.updates.page.panelVersion', {
@@ -153,7 +150,7 @@ export default function AdminOverviewUpdates() {
 
         <TitleCard
           title={t('pages.admin.home.tabs.updates.page.card.versionHistory', {})}
-          icon={<FontAwesomeIcon icon={faClockRotateLeft} />}
+          icon={faClockRotateLeft}
           rightSection={
             <Select
               placeholder={t('pages.admin.home.tabs.updates.page.selectHistory', {})}
@@ -197,10 +194,7 @@ export default function AdminOverviewUpdates() {
           </ResourceView>
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.home.tabs.updates.page.card.outdatedExtensions', {})}
-          icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
-        >
+        <TitleCard title={t('pages.admin.home.tabs.updates.page.card.outdatedExtensions', {})} icon={faPuzzlePiece}>
           {!updateInformation ? (
             updateInformationError ? (
               <ErrorState error={updateInformationError} onRetry={loadUpdateInformation} />
@@ -253,7 +247,7 @@ export default function AdminOverviewUpdates() {
               )}
               {extensionUpdateErrors.length > 0 && (
                 <>
-                  <Alert className='my-4' color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                  <Alert className='my-4' color='red' icon={faExclamationTriangle}>
                     {t('pages.admin.home.tabs.updates.page.alert.extensionUpdateErrors', {})}
                   </Alert>
 
@@ -283,7 +277,7 @@ export default function AdminOverviewUpdates() {
         <AdminCan action='nodes.read'>
           <OutdatedResourceCard
             title={t('pages.admin.home.tabs.updates.page.card.outdatedNodes', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
+            icon={faServer}
             table={{
               loading,
               error,
@@ -308,7 +302,7 @@ export default function AdminOverviewUpdates() {
         <AdminCan action='database-agent-hosts.read'>
           <OutdatedResourceCard
             title={t('pages.admin.home.tabs.updates.page.card.outdatedDatabaseAgentHosts', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
+            icon={faServer}
             table={{
               loading: databaseAgentHostsLoading,
               error: databaseAgentHostsError,

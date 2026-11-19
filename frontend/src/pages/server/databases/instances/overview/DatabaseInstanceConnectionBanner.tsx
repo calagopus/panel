@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import Alert from '@/elements/feedback/Alert.tsx';
 import { formatMilliseconds } from '@/lib/format/time.ts';
@@ -50,7 +49,7 @@ export default function DatabaseInstanceConnectionBanner({
   }
 
   return (
-    <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+    <Alert icon={faExclamationTriangle} color='yellow'>
       {parts.join(' ')}
     </Alert>
   );

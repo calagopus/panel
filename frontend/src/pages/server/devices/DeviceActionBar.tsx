@@ -84,7 +84,7 @@ export default function DeviceActionBar({
           }).md()}
 
           {skippedDetaches > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.server.devices.modal.detachDevices.alert.skipped', {
                 devices: tItem('device', skippedDetaches),
               })}

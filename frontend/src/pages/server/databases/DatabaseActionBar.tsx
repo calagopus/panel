@@ -68,7 +68,7 @@ export default function DatabaseActionBar({
           }).md()}
 
           {skippedDeletes > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.server.databases.modal.deleteDatabases.alert.skipped', {
                 databases: tItem('database', skippedDeletes),
               })}

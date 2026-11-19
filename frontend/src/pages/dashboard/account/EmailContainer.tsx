@@ -1,5 +1,4 @@
 import { faAt } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import classNames from 'classnames';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -85,7 +84,7 @@ export default function EmailContainer({ requireTwoFactorActivation }: AccountCa
   return (
     <TitleCard
       title={t('pages.account.account.containers.email.title', {})}
-      icon={<FontAwesomeIcon icon={faAt} />}
+      icon={faAt}
       className={classNames('h-full order-20', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>

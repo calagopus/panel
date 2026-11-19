@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
@@ -149,7 +148,7 @@ export default function EggConfigurationCreateOrUpdate({
       )}
 
       {!eggsLoading && eggOptions.length === 0 && eggConfigurationMatcherUsesEggs(form.values.matcher) && (
-        <Alert color='yellow' mb='xs' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+        <Alert color='yellow' mb='xs' icon={faTriangleExclamation}>
           {t('pages.admin.eggConfigurations.tabs.general.page.form.eggsEmpty', {})}
         </Alert>
       )}

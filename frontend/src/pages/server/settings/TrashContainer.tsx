@@ -1,5 +1,4 @@
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
@@ -62,11 +61,7 @@ export default function TrashContainer() {
   if (!allowChangingTrashSettings) return null;
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.trash.title', {})}
-      icon={<FontAwesomeIcon icon={faTrashCan} />}
-      className='h-full order-50'
-    >
+    <TitleCard title={t('pages.server.settings.trash.title', {})} icon={faTrashCan} className='h-full order-50'>
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           <TrashSettingsInput

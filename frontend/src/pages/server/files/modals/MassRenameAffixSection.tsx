@@ -1,5 +1,4 @@
 import { faTag } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -24,7 +23,7 @@ export default function MassRenameAffixSection({
 
   return (
     <CollapsibleSection
-      icon={<FontAwesomeIcon icon={faTag} />}
+      icon={faTag}
       title={t('pages.server.files.modal.massRename.section.affixes', {})}
       enabled={enabled}
       onToggle={onToggle}

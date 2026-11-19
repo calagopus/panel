@@ -1,11 +1,11 @@
-import { faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { MantineColor, Popover } from '@mantine/core';
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import Card from '@/elements/data-display/Card.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
@@ -29,14 +29,14 @@ export default function StatCard({
   redact,
   loading,
 }: {
-  icon?: IconDefinition;
+  icon?: IconLike;
   label: string;
   value: ReactNode;
   order?: number;
   className?: string;
   copyOnClick?: boolean;
   popover?: ReactNode;
-  popoverIcon?: IconDefinition;
+  popoverIcon?: IconLike;
   limit?: string | null;
   details?: string | null;
   progress?: number | null;
@@ -54,7 +54,7 @@ export default function StatCard({
       <div className='flex flex-row items-center'>
         {icon && (
           <ThemeIcon size='xl' radius='md' color={color}>
-            <FontAwesomeIcon size='xl' icon={icon} />
+            <Icon size='xl' icon={icon} />
           </ThemeIcon>
         )}
         <div className={classNames('flex flex-col w-full min-w-0', icon && 'ml-4')}>
@@ -65,7 +65,7 @@ export default function StatCard({
               <Popover position='bottom' withArrow shadow='md'>
                 <Popover.Target>
                   <Button variant='transparent' size='compact-xs'>
-                    <FontAwesomeIcon size='lg' icon={popoverIcon} />
+                    <Icon size='lg' icon={popoverIcon} />
                   </Button>
                 </Popover.Target>
                 <Popover.Dropdown>{popover}</Popover.Dropdown>

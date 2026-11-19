@@ -3,10 +3,11 @@ import { Box, Group, Title } from '@mantine/core';
 import classNames from 'classnames';
 import { makeComponentHookable } from 'shared';
 import Card from '@/elements/data-display/Card.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 
 export interface TitleCardProps {
   title: string;
-  icon?: React.ReactNode;
+  icon?: IconLike;
   children: React.ReactNode;
   className?: string;
   titleClassName?: string;
@@ -54,7 +55,7 @@ function TitleCard({
               borderRadius: 6,
             }}
           >
-            {icon}
+            <Icon icon={icon} />
           </Box>
         )}
         <Title order={5} fw={600}>

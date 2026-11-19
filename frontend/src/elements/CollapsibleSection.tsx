@@ -2,10 +2,11 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Collapse, Text, UnstyledButton } from '@mantine/core';
 import { makeComponentHookable } from 'shared';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import ThemeIcon from '@/elements/data-display/ThemeIcon.tsx';
 
 interface CollapsibleSectionProps {
-  icon: React.ReactNode;
+  icon: IconLike;
   title: string;
   className?: string;
   enabled: boolean;
@@ -36,7 +37,7 @@ function CollapsibleSection({ icon, title, className, enabled, onToggle, childre
         }}
       >
         <ThemeIcon size={28} radius={6} variant='light' color={enabled ? 'blue' : 'gray'}>
-          {icon}
+          <Icon icon={icon} />
         </ThemeIcon>
         <Text size='sm' fw={500} c={enabled ? undefined : 'dimmed'} style={{ flex: 1, textAlign: 'left' }}>
           {title}

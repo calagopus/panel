@@ -1,16 +1,15 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faBan } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { MantineColor } from '@mantine/core';
 import classNames from 'classnames';
 import { forwardRef, ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 
 export interface BlockedOverlayProps {
   visible: boolean;
   title: ReactNode;
   description?: ReactNode;
-  icon?: IconDefinition;
+  icon?: IconLike;
   color?: MantineColor;
   className?: string;
 }
@@ -34,11 +33,7 @@ const BlockedOverlay = forwardRef<HTMLDivElement, BlockedOverlayProps>(
         }}
       >
         <div className='flex flex-row items-center gap-3 min-w-0 rounded-lg px-4 py-3 bg-(--mantine-color-default) border border-(--mantine-color-default-border) shadow-xl'>
-          <FontAwesomeIcon
-            icon={icon}
-            className='text-2xl shrink-0'
-            style={{ color: `var(--mantine-color-${color}-filled)` }}
-          />
+          <Icon icon={icon} className='text-2xl shrink-0' style={{ color: `var(--mantine-color-${color}-filled)` }} />
           <div className='flex flex-col min-w-0'>
             <div className='font-semibold leading-tight'>{title}</div>
             {description && (

@@ -1,5 +1,4 @@
 import { faCircleCheck, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
@@ -85,13 +84,13 @@ export default function BackupConfigurationTestModal({
 
         {result &&
           (result.successful ? (
-            <Alert color='green' icon={<FontAwesomeIcon icon={faCircleCheck} />}>
+            <Alert color='green' icon={faCircleCheck}>
               {t('pages.admin.backupConfigurations.tabs.general.page.modal.test.successful', {
                 duration: `${result.durationMs}ms`,
               })}
             </Alert>
           ) : (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='red' icon={faTriangleExclamation}>
               <Stack gap='xs'>
                 {t('pages.admin.backupConfigurations.tabs.general.page.modal.test.failed', {
                   duration: `${result.durationMs}ms`,

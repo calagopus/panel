@@ -1,5 +1,4 @@
 import { faCheck, faCircleQuestion, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import Alert from '@/elements/feedback/Alert.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -20,7 +19,7 @@ export default function VerifyStatusAlert({
   return (
     <Alert
       color={result ? (result.ok ? 'green' : 'red') : 'gray'}
-      icon={<FontAwesomeIcon icon={result ? (result.ok ? faCheck : faExclamationTriangle) : faCircleQuestion} />}
+      icon={result ? (result.ok ? faCheck : faExclamationTriangle) : faCircleQuestion}
       title={title}
     >
       {!result

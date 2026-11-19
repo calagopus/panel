@@ -103,7 +103,7 @@ export default function SshHostKey({
 
       <Stack gap='xs'>
         {originChanged && (
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             {t('pages.admin.eggRepositories.tabs.general.page.alert.sshHostKeyOriginChanged', {})}
           </Alert>
         )}

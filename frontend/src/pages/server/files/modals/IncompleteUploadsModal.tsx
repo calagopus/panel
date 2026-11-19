@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { join } from 'pathe';
 import Button from '@/elements/buttons/Button.tsx';
@@ -23,7 +22,7 @@ export default function IncompleteUploadsModal({ ...props }: ModalProps) {
         </Text>
       ) : (
         <>
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          <Alert color='yellow' icon={faTriangleExclamation}>
             {t('pages.server.files.modal.incompleteUploads.content', {
               files: tItem('file', uploads.length),
             })}

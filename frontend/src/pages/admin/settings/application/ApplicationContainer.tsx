@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { z } from 'zod';
@@ -146,7 +145,7 @@ export default function ApplicationContainer() {
       >
         {tReact('pages.admin.settings.tabs.application.page.modal.enableRegistration.content', {})}
         {captchaProvider.type === 'none' && (
-          <Alert color='yellow' mt='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' mt='md' icon={faExclamationTriangle}>
             {tReact('pages.admin.settings.tabs.application.page.modal.enableRegistration.noCaptcha', {
               link: (
                 <Link to='/admin/settings/captcha' className='text-(--mantine-color-anchor) hover:underline'>
@@ -167,7 +166,7 @@ export default function ApplicationContainer() {
       />
 
       {emailNeedsMail && (
-        <Alert color='red' mb='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+        <Alert color='red' mb='md' icon={faExclamationTriangle}>
           {tReact('pages.admin.settings.tabs.application.page.alert.noMail', {
             link: (
               <Link to='/admin/settings/mail' className='text-(--mantine-color-anchor) hover:underline'>

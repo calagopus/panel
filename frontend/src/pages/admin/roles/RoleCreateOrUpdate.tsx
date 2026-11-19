@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import createRole from '@/api/admin/roles/createRole.ts';
@@ -104,7 +103,7 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
       )}
 
       {form.getValues().adminPermissions.includes('users.impersonate') && (
-        <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+        <Alert color='yellow' icon={faExclamationTriangle} mb='md'>
           {t('pages.admin.roles.tabs.general.page.alert.impersonate', {}).md()}
         </Alert>
       )}

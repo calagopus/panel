@@ -10,7 +10,6 @@ import {
   faServer,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Text } from '@mantine/core';
 import InfoRow from '@/elements/admin/InfoRow.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -89,7 +88,7 @@ export default function ServerOverview({ server }: { server: Server }) {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
           <TitleCard
             title={t('pages.admin.servers.tabs.overview.page.card.owner', {})}
-            icon={<FontAwesomeIcon icon={faUser} />}
+            icon={faUser}
             rightSection={
               server.owner.admin ? (
                 <Badge color='blue' variant='light' size='sm' ml='auto'>
@@ -122,10 +121,7 @@ export default function ServerOverview({ server }: { server: Server }) {
             </Stack>
           </TitleCard>
 
-          <TitleCard
-            title={t('pages.admin.servers.tabs.overview.page.card.nodeAndLocation', {})}
-            icon={<FontAwesomeIcon icon={faNetworkWired} />}
-          >
+          <TitleCard title={t('pages.admin.servers.tabs.overview.page.card.nodeAndLocation', {})} icon={faNetworkWired}>
             <Stack gap={0}>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.node', {})}>
                 <TableLink to={`/admin/nodes/${server.node.uuid}`}>{server.node.name}</TableLink>
@@ -172,10 +168,7 @@ export default function ServerOverview({ server }: { server: Server }) {
           </TitleCard>
         </div>
 
-        <TitleCard
-          title={t('pages.admin.servers.tabs.overview.page.card.serverDetails', {})}
-          icon={<FontAwesomeIcon icon={faServer} />}
-        >
+        <TitleCard title={t('pages.admin.servers.tabs.overview.page.card.serverDetails', {})} icon={faServer}>
           <div className='grid grid-cols-1 md:grid-cols-2'>
             <Stack gap={0} className='md:pr-4 md:border-r md:border-(--mantine-color-default-border)'>
               <InfoRow label={t('pages.admin.servers.tabs.overview.page.label.uuid', {})}>
@@ -271,10 +264,7 @@ export default function ServerOverview({ server }: { server: Server }) {
           />
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.servers.tabs.overview.page.card.resourceLimits', {})}
-          icon={<FontAwesomeIcon icon={faMicrochip} />}
-        >
+        <TitleCard title={t('pages.admin.servers.tabs.overview.page.card.resourceLimits', {})} icon={faMicrochip}>
           <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3'>
             <StatCard
               label={t('common.stat.cpu', {})}
@@ -311,10 +301,7 @@ export default function ServerOverview({ server }: { server: Server }) {
           </div>
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.servers.tabs.overview.page.card.featureLimits', {})}
-          icon={<FontAwesomeIcon icon={faLayerGroup} />}
-        >
+        <TitleCard title={t('pages.admin.servers.tabs.overview.page.card.featureLimits', {})} icon={faLayerGroup}>
           <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3'>
             <StatCard
               label={t('pages.admin.servers.tabs.overview.page.label.allocations', {})}

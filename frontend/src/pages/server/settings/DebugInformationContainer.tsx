@@ -1,5 +1,4 @@
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CopyOnClick from '@/elements/CopyOnClick.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
@@ -14,7 +13,7 @@ export default function DebugInformationContainer() {
   return (
     <TitleCard
       title={t('pages.server.settings.debugInformation.title', {})}
-      icon={<FontAwesomeIcon icon={faInfoCircle} />}
+      icon={faInfoCircle}
       className='h-full order-10'
     >
       <Stack h='100%'>

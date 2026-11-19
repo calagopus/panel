@@ -1,6 +1,6 @@
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { createContext, MouseEvent as ReactMouseEvent, ReactNode, useContext } from 'react';
 import { z } from 'zod';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import { userToastPosition } from '@/lib/schemas/user.ts';
 
 export const toastTimeout = 7500;
@@ -10,7 +10,7 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 export interface ToastAction {
   name: string;
-  icon: IconDefinition;
+  icon: IconLike;
   disabled?: boolean;
   onClick: (e: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => void | Promise<void>;
 }

@@ -1,5 +1,4 @@
 import { faArrowsRotate, faClockRotateLeft, faFileCirclePlus, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -47,7 +46,7 @@ export default function useFileEditorQuickActions({
         id: 'files.editor.save',
         category: CORE_QUICK_ACTION_CATEGORIES.page,
         label: () => t('pages.server.files.quickAction.saveFile', {}),
-        icon: <FontAwesomeIcon icon={faFloppyDisk} />,
+        icon: faFloppyDisk,
         permission: collaborationActive ? 'files.update' : 'files.create',
         isVisible: () => action === 'edit' && !!fileName && writable && saveEnabled && !saving,
         perform: onSave,
@@ -56,7 +55,7 @@ export default function useFileEditorQuickActions({
         id: 'files.editor.create',
         category: CORE_QUICK_ACTION_CATEGORIES.page,
         label: () => t('pages.server.files.quickAction.createFile', {}),
-        icon: <FontAwesomeIcon icon={faFileCirclePlus} />,
+        icon: faFileCirclePlus,
         permission: 'files.create',
         isVisible: () => action === 'new' && writable && saveEnabled && !saving,
         perform: onCreate,
@@ -66,7 +65,7 @@ export default function useFileEditorQuickActions({
         category: CORE_QUICK_ACTION_CATEGORIES.page,
         label: () => t('pages.server.files.tooltip.fileHistory', {}),
         keywords: ['revisions', 'versions'],
-        icon: <FontAwesomeIcon icon={faClockRotateLeft} />,
+        icon: faClockRotateLeft,
         permission: 'files.read-content',
         isVisible: () => action === 'edit' && !!fileName && primary,
         perform: onShowRevisions,
@@ -76,7 +75,7 @@ export default function useFileEditorQuickActions({
         category: CORE_QUICK_ACTION_CATEGORIES.page,
         label: () => t('pages.server.files.tooltip.revertToDisk', {}),
         keywords: ['revert', 'discard'],
-        icon: <FontAwesomeIcon icon={faArrowsRotate} />,
+        icon: faArrowsRotate,
         permission: collaborationActive ? 'files.update' : 'files.read-content',
         isVisible: () => dirty && action === 'edit' && !!fileName && writable && !collaborationDeleted,
         perform: onRevert,

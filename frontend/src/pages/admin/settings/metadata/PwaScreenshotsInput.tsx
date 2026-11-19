@@ -27,10 +27,7 @@ export default function PwaScreenshotsInput({
   const { t } = useTranslations();
 
   return (
-    <TitleCard
-      title={t('pages.admin.settings.tabs.metadata.page.form.pwaScreenshots', {})}
-      icon={<FontAwesomeIcon icon={faImages} />}
-    >
+    <TitleCard title={t('pages.admin.settings.tabs.metadata.page.form.pwaScreenshots', {})} icon={faImages}>
       <Stack>
         <Text size='sm' c='dimmed'>
           {t('pages.admin.settings.tabs.metadata.page.form.pwaScreenshotsDescription', {})}

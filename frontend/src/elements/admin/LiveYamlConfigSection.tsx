@@ -1,5 +1,4 @@
 import { faExclamationTriangle, faLock } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
@@ -50,7 +49,7 @@ export default function LiveYamlConfigSection({
         </AdminCan>
       </Group>
       {error ? (
-        <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+        <Alert color='red' icon={faExclamationTriangle}>
           <Stack gap='xs'>
             {errorText}
             {errorExtra}
@@ -61,7 +60,7 @@ export default function LiveYamlConfigSection({
       ) : (
         <Stack>
           {lockedPaths.length > 0 && (
-            <Alert color='blue' icon={<FontAwesomeIcon icon={faLock} />}>
+            <Alert color='blue' icon={faLock}>
               <Stack gap='xs'>
                 {t('elements.lockedConfigPaths.notice', {})}
                 <div className='flex flex-wrap gap-1'>

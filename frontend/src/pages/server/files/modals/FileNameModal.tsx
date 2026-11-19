@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { basename, dirname, join } from 'pathe';
 import { useState } from 'react';
@@ -76,7 +75,7 @@ export default function FileNameModal({ onFileName, directory, ...props }: Props
       <TextInput withAsterisk label={t('common.form.fileName', {})} data-autofocus {...form.getInputProps('name')} />
 
       {overwriting && (
-        <Alert mt='sm' color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+        <Alert mt='sm' color='yellow' icon={faTriangleExclamation}>
           {t('pages.server.files.modal.createFile.overwriteWarning', { file: overwriteName })}
         </Alert>
       )}

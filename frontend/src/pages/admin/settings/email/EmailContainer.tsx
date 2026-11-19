@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
@@ -65,7 +64,7 @@ export default function EmailContainer() {
         })}
       >
         {noneBlocked && (
-          <Alert color='red' mb='md' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='red' mb='md' icon={faExclamationTriangle}>
             {tReact('pages.admin.settings.tabs.mail.page.alert.noneInUse', {
               link: (
                 <Link to='/admin/settings' className='text-(--mantine-color-anchor) hover:underline'>

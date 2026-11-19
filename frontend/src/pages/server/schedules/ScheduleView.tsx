@@ -245,13 +245,13 @@ export default function ScheduleView() {
 
         <div className='flex flex-col md:flex-row gap-2'>
           <DetailCard
-            icon={<FontAwesomeIcon icon={faClockRotateLeft} />}
+            icon={faClockRotateLeft}
             label={t('pages.server.schedules.table.columns.lastRun', {})}
             value={schedule.lastRun ? <FormattedTimestamp timestamp={schedule.lastRun} /> : t('common.never', {})}
             color='blue'
           />
           <DetailCard
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={faExclamationTriangle}
             label={t('pages.server.schedules.table.columns.lastFailure', {})}
             value={
               schedule.lastFailure ? <FormattedTimestamp timestamp={schedule.lastFailure} /> : t('common.never', {})
@@ -304,7 +304,7 @@ export default function ScheduleView() {
             <ScheduleConditionBuilder condition={condition} onChange={setConditionDraft} />
 
             {variableIssues.condition.length > 0 && (
-              <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow' mt='md'>
+              <Alert icon={faExclamationTriangle} color='yellow' mt='md'>
                 <VariableIssueList issues={variableIssues.condition} />
               </Alert>
             )}

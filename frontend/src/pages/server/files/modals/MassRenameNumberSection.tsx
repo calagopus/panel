@@ -1,5 +1,4 @@
 import { faHashtag } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -25,7 +24,7 @@ export default function MassRenameNumberSection({
 
   return (
     <CollapsibleSection
-      icon={<FontAwesomeIcon icon={faHashtag} />}
+      icon={faHashtag}
       title={t('pages.server.files.modal.massRename.section.numbering', {})}
       enabled={enabled}
       onToggle={onToggle}

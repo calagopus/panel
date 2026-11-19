@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -342,7 +341,7 @@ export default function EmailTemplatesContainer() {
                       />
                     </Group>
                     {!form.values.enabled && dependentFeature && (
-                      <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                      <Alert color='yellow' icon={faExclamationTriangle}>
                         {dependentFeature}
                       </Alert>
                     )}

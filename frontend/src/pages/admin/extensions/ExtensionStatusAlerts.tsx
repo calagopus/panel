@@ -37,7 +37,7 @@ export default function ExtensionStatusAlerts({
       {extensionStatus && !supervisor && (
         <Alert
           color='red'
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          icon={faExclamationTriangle}
           title={t('pages.admin.extensions.alert.supervisorUnreachable.title', {})}
           mb='md'
         >
@@ -48,7 +48,7 @@ export default function ExtensionStatusAlerts({
       {extensionStatus && supervisor && extensionStatus.runningPanelVersion !== supervisor.panelVersion && (
         <Alert
           color='yellow'
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          icon={faExclamationTriangle}
           title={t('pages.admin.extensions.alert.versionMismatch.title', {})}
           mb='md'
         >
@@ -62,7 +62,7 @@ export default function ExtensionStatusAlerts({
       {buildFailed && (
         <Alert
           color='red'
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          icon={faExclamationTriangle}
           title={t('pages.admin.extensions.alert.buildFailed.title', {})}
           mb='md'
         >
@@ -83,7 +83,7 @@ export default function ExtensionStatusAlerts({
       {Object.keys(startFailedExtensions).length > 0 && (
         <Alert
           color='red'
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          icon={faExclamationTriangle}
           title={t('pages.admin.extensions.alert.startFailed.title', {})}
           mb='md'
         >
@@ -102,7 +102,7 @@ export default function ExtensionStatusAlerts({
       {pendingRestart && (
         <Alert
           color='yellow'
-          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          icon={faExclamationTriangle}
           title={t('pages.admin.extensions.alert.pendingRestart.title', {})}
           mb='md'
         >

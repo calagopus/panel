@@ -62,11 +62,7 @@ export default function VerifyEmail() {
     <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.verifyEmail.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {error && (
-          <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-            color='red'
-            title={t('common.alert.error', {})}
-          >
+          <Alert icon={faExclamationTriangle} color='red' title={t('common.alert.error', {})}>
             {error}
           </Alert>
         )}

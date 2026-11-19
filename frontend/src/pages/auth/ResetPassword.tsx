@@ -66,7 +66,7 @@ export default function ResetPassword() {
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {error && (
           <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={faExclamationTriangle}
             color='red'
             title={t('common.alert.error', {})}
             onClose={() => setError('')}

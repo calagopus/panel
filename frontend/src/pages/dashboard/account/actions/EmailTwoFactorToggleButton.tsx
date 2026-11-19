@@ -141,7 +141,7 @@ export default function EmailTwoFactorToggleButton() {
             </Text>
 
             {enabled && isLastAcceptedMethod('email') && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
               </Alert>
             )}

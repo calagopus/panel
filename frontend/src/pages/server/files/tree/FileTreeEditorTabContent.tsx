@@ -552,12 +552,7 @@ export default function FileTreeEditorTabContent({
 
       <div ref={zoomRef} data-file-manager-editor-content className='flex min-h-0 w-full min-w-0 flex-1 flex-col'>
         {collab.active && collab.conflict && (
-          <Alert
-            color='yellow'
-            m='sm'
-            icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
-            data-file-manager-collaboration-conflict
-          >
+          <Alert color='yellow' m='sm' icon={faTriangleExclamation} data-file-manager-collaboration-conflict>
             <Group justify='space-between'>
               <span>
                 {collab.conflict.deleted

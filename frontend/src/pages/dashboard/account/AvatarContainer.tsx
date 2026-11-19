@@ -1,5 +1,4 @@
 import { faImage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { useRef, useState } from 'react';
@@ -59,7 +58,7 @@ export default function AvatarContainer({ requireTwoFactorActivation }: AccountC
   return (
     <TitleCard
       title={t('pages.account.account.containers.avatar.title', {})}
-      icon={<FontAwesomeIcon icon={faImage} />}
+      icon={faImage}
       className={classNames(
         'h-full order-60 md:col-span-2',
         requireTwoFactorActivation && 'blur-xs pointer-events-none select-none',

@@ -1,5 +1,4 @@
 import { faUserLock } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
@@ -93,7 +92,7 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
   return (
     <TitleCard
       title={t('pages.account.account.containers.password.title', {})}
-      icon={<FontAwesomeIcon icon={faUserLock} />}
+      icon={faUserLock}
       className={classNames('h-full order-10', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <ConfirmationModal

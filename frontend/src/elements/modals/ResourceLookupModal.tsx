@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import { getHttpStatus, httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
@@ -30,7 +31,7 @@ interface ResourceLookupModalProps<T> extends ModalProps {
     resultTitle: string;
     viewResult: string;
   };
-  resultIcon: ReactNode;
+  resultIcon: IconLike;
   lookup: (identifier: string) => Promise<T>;
   fields: (result: T) => ResourceLookupField[];
   href: (result: T) => string;
@@ -119,7 +120,7 @@ export default function ResourceLookupModal<T>({
           </Button>
         </Group>
 
-        {notFound && <Alert icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}>{labels.notFound}</Alert>}
+        {notFound && <Alert icon={faMagnifyingGlass}>{labels.notFound}</Alert>}
 
         {result && (
           <TitleCard title={labels.resultTitle} icon={resultIcon}>

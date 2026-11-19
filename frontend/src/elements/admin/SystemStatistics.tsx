@@ -1,6 +1,5 @@
 import { faCloudDownload, faDatabase, faMemory, faMicrochip, faUserLarge } from '@fortawesome/free-solid-svg-icons';
 import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo, useState } from 'react';
 import { z } from 'zod';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
@@ -97,7 +96,7 @@ export default function SystemStatistics({ wsPath, labels }: { wsPath: string; l
   return (
     <>
       <div className='mt-4'>
-        <TitleCard title={labels.resourcesCard} icon={<FontAwesomeIcon icon={faUserLarge} />}>
+        <TitleCard title={labels.resourcesCard} icon={faUserLarge}>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
             <Card>
               <div className='flex flex-col md:flex-row gap-4 md:items-center'>
@@ -177,24 +176,20 @@ export default function SystemStatistics({ wsPath, labels }: { wsPath: string; l
         </TitleCard>
       </div>
       <div className='mt-4'>
-        <TitleCard title={labels.graphsCard} icon={<FontAwesomeIcon icon={faChartBar} />}>
+        <TitleCard title={labels.graphsCard} icon={faChartBar}>
           <ChartSyncGroup>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <ChartBlock icon={<FontAwesomeIcon icon={faMicrochip} />} title={labels.cpuLoad} value={cpu.value}>
+              <ChartBlock icon={faMicrochip} title={labels.cpuLoad} value={cpu.value}>
                 <StreamChart {...cpu.props} />
               </ChartBlock>
-              <ChartBlock icon={<FontAwesomeIcon icon={faMemory} />} title={labels.memoryUsage} value={memory.value}>
+              <ChartBlock icon={faMemory} title={labels.memoryUsage} value={memory.value}>
                 <StreamChart {...memory.props} />
               </ChartBlock>
-              <ChartBlock
-                icon={<FontAwesomeIcon icon={faDatabase} />}
-                title={labels.diskIo}
-                legend={<ChartLegend {...disk.legend} />}
-              >
+              <ChartBlock icon={faDatabase} title={labels.diskIo} legend={<ChartLegend {...disk.legend} />}>
                 <StreamChart {...disk.props} />
               </ChartBlock>
               <ChartBlock
-                icon={<FontAwesomeIcon icon={faCloudDownload} />}
+                icon={faCloudDownload}
                 title={labels.networkTraffic}
                 legend={<ChartLegend {...network.legend} />}
               >

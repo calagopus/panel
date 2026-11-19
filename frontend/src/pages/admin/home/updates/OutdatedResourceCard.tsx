@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import Table, { TableHeaderProps } from '@/elements/data-display/Table.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import ErrorState from '@/elements/feedback/ErrorState.tsx';
@@ -28,7 +29,7 @@ export default function OutdatedResourceCard({
   children,
 }: {
   title: string;
-  icon: ReactNode;
+  icon: IconLike;
   table: OutdatedResourceTable;
   status: OutdatedResourceStatus;
   children: ReactNode;

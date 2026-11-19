@@ -4,9 +4,7 @@ import {
   faSatellite,
   faTrash,
   faTriangleExclamation,
-  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import clearServerState from '@/api/admin/servers/clearServerState.ts';
 import deleteServer from '@/api/admin/servers/deleteServer.ts';
@@ -15,6 +13,7 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -58,7 +57,7 @@ const ACTIONS = [
   },
 ] as const satisfies readonly {
   action: ServerAction;
-  icon: IconDefinition;
+  icon: IconLike;
   color?: string;
   permission: string;
   label: string;
@@ -205,7 +204,7 @@ export default function ServerActionBar({
           />
 
           {force && (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='red' icon={faTriangleExclamation}>
               {t('pages.admin.servers.bulkActions.modal.alert.forceWarning', {})}
             </Alert>
           )}
@@ -268,7 +267,7 @@ export default function ServerActionBar({
                   aria-label={t(label, {})}
                   px='sm'
                 >
-                  <FontAwesomeIcon icon={icon} />
+                  <Icon icon={icon} />
                 </Button>
               </Tooltip>
             </AdminCan>

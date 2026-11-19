@@ -1,5 +1,4 @@
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import getUserByExternalId from '@/api/admin/users/getUserByExternalId.ts';
 import ResourceLookupModal from '@/elements/modals/ResourceLookupModal.tsx';
@@ -21,7 +20,7 @@ export default function ExternalIdLookupModal(props: ModalProps) {
         resultTitle: t(`${tr}.modal.result.title`, {}),
         viewResult: t(`${tr}.modal.result.viewUser`, {}),
       }}
-      resultIcon={<FontAwesomeIcon icon={faUser} />}
+      resultIcon={faUser}
       lookup={(externalId) => getUserByExternalId(externalId)}
       fields={(user) => [
         { label: t(`${tr}.modal.result.username`, {}), value: user.username },

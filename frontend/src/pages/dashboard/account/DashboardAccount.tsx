@@ -1,5 +1,4 @@
 import { faEnvelopeCircleCheck, faLock, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import resendEmailVerification from '@/api/me/account/resendEmailVerification.ts';
@@ -51,19 +50,14 @@ export default function DashboardAccount() {
       registry={window.extensionContext.extensionRegistry.pages.dashboard.account.container}
     >
       {frozen && (
-        <Alert
-          icon={<FontAwesomeIcon icon={faLock} />}
-          title={t('pages.account.account.alert.frozen.title', {})}
-          color='red'
-          mb='md'
-        >
+        <Alert icon={faLock} title={t('pages.account.account.alert.frozen.title', {})} color='red' mb='md'>
           {t('pages.account.account.alert.frozen.description', {})}
         </Alert>
       )}
 
       {requireEmailVerification && !frozen && (
         <Alert
-          icon={<FontAwesomeIcon icon={faEnvelopeCircleCheck} />}
+          icon={faEnvelopeCircleCheck}
           title={t('pages.account.account.alert.verifyEmail.title', {})}
           color='red'
           mb='md'
@@ -79,7 +73,7 @@ export default function DashboardAccount() {
 
       {requireTwoFactorActivation && !frozen && (
         <Alert
-          icon={<FontAwesomeIcon icon={faShieldAlt} />}
+          icon={faShieldAlt}
           title={t('pages.account.account.alert.requireTwoFactor.title', {})}
           color='red'
           mb='md'

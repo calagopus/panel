@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useMemo, useState } from 'react';
@@ -146,24 +145,24 @@ export default function DashboardApiKeysCreate() {
         <form onSubmit={form.onSubmit(doCreate)}>
           <Stack>
             {atLimit && (
-              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='red' icon={faExclamationTriangle}>
                 {t('pages.account.apiKeys.create.alert.limitReached', { max: maxApiKeyCount }).md()}
               </Alert>
             )}
             {droppedPermissions.length > 0 && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 {t('pages.account.apiKeys.create.alert.droppedPermissions', {
                   permissions: droppedPermissions.join(', '),
                 })}
               </Alert>
             )}
             {requestedPermissions.adminPermissions.length > 0 && (
-              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='red' icon={faExclamationTriangle}>
                 {t('pages.account.apiKeys.create.alert.adminPermissions', {}).md()}
               </Alert>
             )}
             {callbackUrl && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 {t('pages.account.apiKeys.create.alert.callbackUrl', { url: callbackUrl.origin }).md()}
               </Alert>
             )}

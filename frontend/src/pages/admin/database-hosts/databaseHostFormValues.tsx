@@ -1,5 +1,4 @@
 import { faUnlockKeyhole } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UseFormReturnType } from '@mantine/form';
 import { z } from 'zod';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
@@ -78,7 +77,7 @@ export function useDatabaseHostFormFields(
       colSpan: 'full',
       render: (f) => (
         <CollapsibleSection
-          icon={<FontAwesomeIcon icon={faUnlockKeyhole} />}
+          icon={faUnlockKeyhole}
           enabled={!!f.values.credentials}
           onToggle={(enabled) =>
             f.setValues({

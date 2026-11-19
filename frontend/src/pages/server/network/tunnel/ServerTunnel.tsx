@@ -344,7 +344,7 @@ export default function ServerTunnel() {
 
           <Stack>
             {!view.supported && (
-              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='red' icon={faExclamationTriangle}>
                 {(view.tunnel
                   ? t('pages.server.tunnel.alert.nodeLeftNetwork', {})
                   : t('pages.server.tunnel.alert.nodeNotOnNetwork', {})

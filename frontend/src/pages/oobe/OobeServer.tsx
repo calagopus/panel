@@ -202,7 +202,7 @@ export default function OobeServer({ onNext, onBack, canGoBack, skipFrom, data }
             </Stack>
           </Card>
         ) : missingRequirement ? (
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             <Stack gap='sm' align='flex-start'>
               {missingRequirement}
               {node && (

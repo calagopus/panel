@@ -122,12 +122,7 @@ export default function TwoFactorSetupButton() {
           onSubmit={doEnable}
         >
           {Math.abs(timeOffset) > 5000 && (
-            <Alert
-              icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-              color='yellow'
-              className='mb-4'
-              title={t('common.alert.warning', {})}
-            >
+            <Alert icon={faExclamationTriangle} color='yellow' className='mb-4' title={t('common.alert.warning', {})}>
               {t('common.alert.clockOffset', {
                 offset: String(Math.round(timeOffset / 1000)),
               })}

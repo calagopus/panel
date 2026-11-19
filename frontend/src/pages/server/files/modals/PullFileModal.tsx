@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import classNames from 'classnames';
 import { resolve } from 'pathe';
@@ -114,7 +113,7 @@ export default function PullFileModal({ ...props }: ModalProps) {
       />
 
       {exceedsFreeSpace && (
-        <Alert color='yellow' className='mt-2' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+        <Alert color='yellow' className='mt-2' icon={faTriangleExclamation}>
           {t('pages.server.files.modal.pullFile.insufficientDisk', {
             size: bytesToString(queryResult?.fileSize ?? 0),
             free: bytesToString(Math.max(0, freeBytes ?? 0)),

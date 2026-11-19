@@ -1,5 +1,4 @@
 import { faSliders } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { z } from 'zod';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
@@ -24,7 +23,7 @@ export default function PreferencesContainer({ requireTwoFactorActivation }: Acc
   return (
     <TitleCard
       title={t('pages.account.account.containers.preferences.title', {})}
-      icon={<FontAwesomeIcon icon={faSliders} />}
+      icon={faSliders}
       className={classNames('h-full order-55', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <Stack>

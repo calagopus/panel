@@ -74,7 +74,7 @@ export default function OobeLogin({ onNext }: OobeComponentProps) {
     <Stack gap='md'>
       <Title order={2}>{t('pages.oobe.login.title', {})}</Title>
 
-      <Alert icon={<FontAwesomeIcon icon={faInfoCircle} />} color='blue' variant='light'>
+      <Alert icon={faInfoCircle} color='blue' variant='light'>
         {t('pages.oobe.login.alert', {})}
       </Alert>
 

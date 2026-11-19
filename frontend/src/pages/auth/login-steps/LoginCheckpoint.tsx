@@ -119,22 +119,14 @@ export default function LoginCheckpoint() {
     <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.checkpoint.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {Math.abs(timeOffset) > 5000 && (
-          <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-            color='yellow'
-            title={t('common.alert.warning', {})}
-          >
+          <Alert icon={faExclamationTriangle} color='yellow' title={t('common.alert.warning', {})}>
             {t('common.alert.clockOffset', {
               offset: String(Math.round(timeOffset / 1000)),
             })}
           </Alert>
         )}
         {![settings.app.url, ...settings.app.additionalUrls].includes(window.location.origin) && (
-          <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-            color='yellow'
-            title={t('common.alert.warning', {})}
-          >
+          <Alert icon={faExclamationTriangle} color='yellow' title={t('common.alert.warning', {})}>
             {t('pages.auth.alert.urlMismatch', {
               appUrl: settings.app.url,
               currentUrl: window.location.origin,
@@ -143,7 +135,7 @@ export default function LoginCheckpoint() {
         )}
         {error && (
           <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={faExclamationTriangle}
             color='red'
             title={t('common.alert.error', {})}
             onClose={() => setError('')}

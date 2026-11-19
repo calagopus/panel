@@ -130,7 +130,7 @@ export default function BackupRestic({ form, onRemove }: { form: ResticForm; onR
 
       <TitleCard
         title={t('pages.admin.backupConfigurations.tabs.general.page.restic.pruneJobs.title', {})}
-        icon={<FontAwesomeIcon icon={faBroom} />}
+        icon={faBroom}
         className='mt-2'
       >
         <Stack>

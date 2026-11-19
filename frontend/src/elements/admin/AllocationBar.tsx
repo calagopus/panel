@@ -4,6 +4,7 @@ import { MantineColor, Progress } from '@mantine/core';
 import { ReactNode } from 'react';
 import { z } from 'zod';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
 import NumberInput from '@/elements/input/NumberInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -93,7 +94,7 @@ export default function AllocationBar({
   totalSource,
 }: {
   label: string;
-  icon: ReactNode;
+  icon: IconLike;
   segments: AllocationSegment[];
   limit: number;
   formatValue: (value: number) => string;
@@ -136,7 +137,7 @@ export default function AllocationBar({
     <div className='flex flex-col gap-2'>
       <div className='flex flex-row flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
         <Text fw={500}>
-          {icon} {label}
+          <Icon icon={icon} /> {label}
         </Text>
         <div className='flex flex-row items-center gap-1'>
           <Text size='sm' c={overallocated ? 'red' : 'dimmed'}>

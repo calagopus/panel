@@ -348,7 +348,7 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
         )}
 
         {(blockIssues.unclosedIf || blockIssues.orphanBranch) && (
-          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+          <Alert icon={faExclamationTriangle} color='yellow'>
             <Stack gap={4}>
               {blockIssues.unclosedIf && <span>{t('pages.server.schedules.steps.warning.unclosedIf', {})}</span>}
               {blockIssues.orphanBranch && <span>{t('pages.server.schedules.steps.warning.orphanBranch', {})}</span>}

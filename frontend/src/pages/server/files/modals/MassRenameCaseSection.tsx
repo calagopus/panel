@@ -1,5 +1,4 @@
 import { faFont } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import Select from '@/elements/input/Select.tsx';
 import { MassRenameOptions, RenameCase } from '@/lib/files/massRename.ts';
@@ -20,7 +19,7 @@ export default function MassRenameCaseSection({
 
   return (
     <CollapsibleSection
-      icon={<FontAwesomeIcon icon={faFont} />}
+      icon={faFont}
       title={t('pages.server.files.modal.massRename.section.caseConversion', {})}
       enabled={enabled}
       onToggle={onToggle}

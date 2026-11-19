@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import getOAuthLinkProviders from '@/api/me/oauth-links/getOAuthLinkProviders.ts';
 import getOAuthLinks from '@/api/me/oauth-links/getOAuthLinks.ts';
@@ -67,13 +66,13 @@ export default function DisablePasswordLoginModal({ opened, onClose, onConfirmed
         {tReact('pages.admin.settings.tabs.application.page.modal.disablePasswordLogin.content', {})}
 
         {failed ? (
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             {t('pages.admin.settings.tabs.application.page.modal.disablePasswordLogin.checkFailed', {})}
           </Alert>
         ) : !options ? (
           t('pages.admin.settings.tabs.application.page.modal.disablePasswordLogin.checking', {})
         ) : blockReason ? (
-          <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='red' icon={faExclamationTriangle}>
             {blockReason}
           </Alert>
         ) : (

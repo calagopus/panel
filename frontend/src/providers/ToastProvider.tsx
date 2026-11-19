@@ -1,10 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { AnimatePresence, LazyMotion, m } from 'motion/react';
 import { FC, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { ToastDismissEvent, ToastDismissReason, ToastShowData, ToastShowEvent, ToastUpdateEvent } from 'shared';
 import { z } from 'zod';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
+import Icon from '@/elements/data-display/Icon.tsx';
 import Notification from '@/elements/feedback/Notification.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
@@ -57,7 +57,7 @@ const ToastActionButton: FC<{ action: ToastAction }> = ({ action }) => {
         disabled={action.disabled || triggered}
         onClick={onClick}
       >
-        <FontAwesomeIcon icon={action.icon} size='sm' />
+        <Icon icon={action.icon} size='sm' />
       </ActionIcon>
     </Tooltip>
   );

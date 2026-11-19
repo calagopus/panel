@@ -5,7 +5,6 @@ import {
   faExclamationTriangle,
   faServer,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import getDatabaseHostDatabaseSizes from '@/api/admin/database-hosts/getDatabaseHostDatabaseSizes.ts';
@@ -92,10 +91,7 @@ export default function DatabaseHostOverview({ databaseHost }: { databaseHost: D
 
       <Stack gap='md'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-          <TitleCard
-            title={t('pages.admin.databaseHosts.tabs.overview.page.card.hostDetails', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
-          >
+          <TitleCard title={t('pages.admin.databaseHosts.tabs.overview.page.card.hostDetails', {})} icon={faServer}>
             <Stack gap={0}>
               <InfoRow label={t('common.form.type', {})}>
                 <Text size='sm'>{databaseTypeLabelMapping[databaseHost.type]}</Text>
@@ -131,10 +127,7 @@ export default function DatabaseHostOverview({ databaseHost }: { databaseHost: D
             </Stack>
           </TitleCard>
 
-          <TitleCard
-            title={t('pages.admin.databaseHosts.tabs.overview.page.card.systemInfo', {})}
-            icon={<FontAwesomeIcon icon={faCircleInfo} />}
-          >
+          <TitleCard title={t('pages.admin.databaseHosts.tabs.overview.page.card.systemInfo', {})} icon={faCircleInfo}>
             <Stack gap={0}>
               <InfoRow label={t('pages.admin.databaseHosts.tabs.overview.page.label.version', {})}>
                 {versionError ? (
@@ -175,12 +168,9 @@ export default function DatabaseHostOverview({ databaseHost }: { databaseHost: D
           </TitleCard>
         </div>
 
-        <TitleCard
-          title={t('pages.admin.databaseHosts.tabs.overview.page.card.sizes', {})}
-          icon={<FontAwesomeIcon icon={faChartBar} />}
-        >
+        <TitleCard title={t('pages.admin.databaseHosts.tabs.overview.page.card.sizes', {})} icon={faChartBar}>
           {databaseHost.maintenanceEnabled ? (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            <Alert color='yellow' icon={faExclamationTriangle}>
               {t('pages.admin.databaseHosts.tabs.overview.page.alert.maintenance', {})}
             </Alert>
           ) : (
@@ -189,7 +179,7 @@ export default function DatabaseHostOverview({ databaseHost }: { databaseHost: D
                 <Stack gap='md'>
                   <AllocationBar
                     label={t('pages.admin.databaseHosts.tabs.overview.page.label.totalSize', {})}
-                    icon={<FontAwesomeIcon icon={faDatabase} />}
+                    icon={faDatabase}
                     segments={groupAllocationSegments(
                       databases,
                       (database) => database.size,

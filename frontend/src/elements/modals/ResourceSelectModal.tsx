@@ -122,7 +122,7 @@ export default function ResourceSelectModal({
         )}
 
         {showEmptyState && (
-          <Alert icon={<FontAwesomeIcon icon={faCircleInfo} />}>
+          <Alert icon={faCircleInfo}>
             <Stack gap='xs' align='flex-start'>
               {nothingFoundMessage}
               {createAction && (

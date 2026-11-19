@@ -247,7 +247,7 @@ export default function FileSearchModal({ treeView = false, ...props }: ModalPro
         <Collapse expanded={showAdvanced}>
           <Stack gap='xs'>
             <CollapsibleSection
-              icon={<FontAwesomeIcon icon={faFolder} />}
+              icon={faFolder}
               title={t('pages.server.files.modal.searchFiles.pathPatterns', {})}
               enabled={!!form.values.pathFilter}
               onToggle={(enabled) =>
@@ -297,7 +297,7 @@ export default function FileSearchModal({ treeView = false, ...props }: ModalPro
 
             {fastDirectory && (
               <CollapsibleSection
-                icon={<FontAwesomeIcon icon={faFileAlt} />}
+                icon={faFileAlt}
                 title={t('pages.server.files.modal.searchFiles.fileContent', {})}
                 enabled={!!form.values.contentFilter}
                 onToggle={(enabled) =>
@@ -346,7 +346,7 @@ export default function FileSearchModal({ treeView = false, ...props }: ModalPro
             )}
 
             <CollapsibleSection
-              icon={<FontAwesomeIcon icon={faHardDrive} />}
+              icon={faHardDrive}
               title={t('pages.server.files.modal.searchFiles.fileSize', {})}
               enabled={!!form.values.sizeFilter}
               onToggle={(enabled) =>

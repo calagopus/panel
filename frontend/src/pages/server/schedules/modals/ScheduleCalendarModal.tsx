@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { Schedule, ScheduleEventData, ScheduleViewLevel } from '@mantine/schedule';
 import { useMemo, useState } from 'react';
@@ -195,7 +194,7 @@ export default function ScheduleCalendarModal(props: ModalProps) {
       ) : (
         <>
           {truncated && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />} mb='md'>
+            <Alert color='yellow' icon={faTriangleExclamation} mb='md'>
               {t('pages.server.schedules.modal.calendar.truncatedWarning', {})}
             </Alert>
           )}

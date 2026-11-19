@@ -1,5 +1,4 @@
 import { faPlay, faRotateRight, faSkull, faStop } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -25,7 +24,7 @@ export default function ServerQuickActions() {
       id: 'server.start',
       category: power,
       label: () => t('common.enum.serverPowerAction.start', {}),
-      icon: <FontAwesomeIcon icon={faPlay} />,
+      icon: faPlay,
       permission: 'control.start',
       isVisible: () => serverState === 'offline',
       perform: () => socketInstance?.send(SocketRequest.SET_STATE, 'start'),
@@ -34,7 +33,7 @@ export default function ServerQuickActions() {
       id: 'server.stop',
       category: power,
       label: () => t('common.enum.serverPowerAction.stop', {}),
-      icon: <FontAwesomeIcon icon={faStop} />,
+      icon: faStop,
       permission: 'control.stop',
       isVisible: () => serverState !== 'offline' && serverState !== 'stopping',
       perform: () => socketInstance?.send(SocketRequest.SET_STATE, 'stop'),
@@ -43,7 +42,7 @@ export default function ServerQuickActions() {
       id: 'server.restart',
       category: power,
       label: () => t('common.enum.serverPowerAction.restart', {}),
-      icon: <FontAwesomeIcon icon={faRotateRight} />,
+      icon: faRotateRight,
       permission: 'control.restart',
       isVisible: () => serverState === 'running',
       perform: () => socketInstance?.send(SocketRequest.SET_STATE, 'restart'),
@@ -52,7 +51,7 @@ export default function ServerQuickActions() {
       id: 'server.kill',
       category: power,
       label: () => t('common.enum.serverPowerAction.kill', {}),
-      icon: <FontAwesomeIcon icon={faSkull} />,
+      icon: faSkull,
       danger: true,
       permission: 'control.stop',
       isVisible: () => serverState === 'stopping',

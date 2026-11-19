@@ -242,7 +242,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
             <TitleCard
               className='mt-4'
               title={t('pages.admin.nodes.pairing.section.allocations', {})}
-              icon={<FontAwesomeIcon icon={faNetworkWired} />}
+              icon={faNetworkWired}
             >
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <NodeAllocationIpInput
@@ -260,11 +260,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
               </div>
             </TitleCard>
 
-            <TitleCard
-              className='mt-4'
-              title={t('pages.admin.nodes.pairing.section.advanced', {})}
-              icon={<FontAwesomeIcon icon={faSliders} />}
-            >
+            <TitleCard className='mt-4' title={t('pages.admin.nodes.pairing.section.advanced', {})} icon={faSliders}>
               <TextInput
                 label={t('pages.admin.nodes.pairing.form.panelUrl', {})}
                 description={t('pages.admin.nodes.pairing.form.panelUrlDescription', {})}

@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -81,7 +80,7 @@ export default function SecurityKeyDeleteModal({ securityKey, total, ...props }:
         </Text>
 
         {total <= 1 && isLastAcceptedMethod('security_key') && (
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
           </Alert>
         )}

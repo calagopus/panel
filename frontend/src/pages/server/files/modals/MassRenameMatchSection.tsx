@@ -1,5 +1,4 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollapsibleSection from '@/elements/CollapsibleSection.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Group from '@/elements/layout/Group.tsx';
@@ -22,7 +21,7 @@ export default function MassRenameMatchSection({
 
   return (
     <CollapsibleSection
-      icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}
+      icon={faMagnifyingGlass}
       title={t('pages.server.files.modal.massRename.section.matchOptions', {})}
       enabled={enabled}
       onToggle={onToggle}

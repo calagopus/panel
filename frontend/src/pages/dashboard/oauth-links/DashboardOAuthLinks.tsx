@@ -105,7 +105,7 @@ export default function DashboardOAuthLinks() {
     >
       {isLastLoginMethod && (
         <Alert
-          icon={<FontAwesomeIcon icon={faTriangleExclamation} />}
+          icon={faTriangleExclamation}
           title={t('pages.account.oauthLinks.alert.lastLoginMethod.title', {})}
           color='yellow'
           mb='md'

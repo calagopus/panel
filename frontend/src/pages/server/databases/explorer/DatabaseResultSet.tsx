@@ -84,7 +84,7 @@ export default function DatabaseResultSet({
   const [active, setActive] = useState<CellPosition | null>(null);
 
   const truncatedAlert = result.truncated && (
-    <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+    <Alert color='yellow' icon={faTriangleExclamation}>
       {t('pages.server.databases.explorer.result.truncated', {})}
     </Alert>
   );

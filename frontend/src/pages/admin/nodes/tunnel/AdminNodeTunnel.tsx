@@ -137,27 +137,24 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
 
           <Stack>
             {data.status === null ? (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 {t('pages.admin.nodes.tabs.tunnel.page.alert.unreachable', {}).md()}
               </Alert>
             ) : (
               !data.status.supported && (
-                <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                <Alert color='red' icon={faExclamationTriangle}>
                   {t('pages.admin.nodes.tabs.tunnel.page.alert.notSupported', {}).md()}
                 </Alert>
               )
             )}
 
             {data.tunnel && !data.tunnel.certSha256 && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 {t('pages.admin.nodes.tabs.tunnel.page.alert.noCertificate', {}).md()}
               </Alert>
             )}
 
-            <TitleCard
-              title={t('pages.admin.nodes.tabs.tunnel.page.section.settings', {})}
-              icon={<FontAwesomeIcon icon={faShareNodes} />}
-            >
+            <TitleCard title={t('pages.admin.nodes.tabs.tunnel.page.section.settings', {})} icon={faShareNodes}>
               <Stack gap='md'>
                 <Text c='dimmed' size='sm'>
                   {t('pages.admin.nodes.tabs.tunnel.page.description', {}).md()}
@@ -203,10 +200,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
             </TitleCard>
 
             {data.tunnel && (
-              <TitleCard
-                title={t('pages.admin.nodes.tabs.tunnel.page.state.title', {})}
-                icon={<FontAwesomeIcon icon={faSignal} />}
-              >
+              <TitleCard title={t('pages.admin.nodes.tabs.tunnel.page.state.title', {})} icon={faSignal}>
                 <Stack gap={0}>
                   <InfoRow label={t('pages.admin.nodes.tabs.tunnel.page.state.daemon', {})}>
                     {data.status === null ? (

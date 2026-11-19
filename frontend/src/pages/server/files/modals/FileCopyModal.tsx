@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { join, resolve } from 'pathe';
@@ -198,7 +197,7 @@ export default function FileCopyModal({ file, ...props }: Props) {
       <FilePathPreview label={t('pages.server.files.modal.copyFile.createdAs', {})} path={previewPath} />
 
       {conflict && (
-        <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />} className='mt-3'>
+        <Alert color='yellow' icon={faTriangleExclamation} className='mt-3'>
           {t('pages.server.files.modal.copyFile.conflict', {})}
         </Alert>
       )}

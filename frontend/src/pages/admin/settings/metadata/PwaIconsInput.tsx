@@ -26,10 +26,7 @@ export default function PwaIconsInput({
   const { t } = useTranslations();
 
   return (
-    <TitleCard
-      title={t('pages.admin.settings.tabs.metadata.page.form.pwaIcons', {})}
-      icon={<FontAwesomeIcon icon={faIcons} />}
-    >
+    <TitleCard title={t('pages.admin.settings.tabs.metadata.page.form.pwaIcons', {})} icon={faIcons}>
       <Stack>
         <Text size='sm' c='dimmed'>
           {t('pages.admin.settings.tabs.metadata.page.form.pwaIconsDescription', {})}

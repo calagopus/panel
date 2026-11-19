@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -34,7 +33,7 @@ export default function LoginOAuth() {
       <Stack className='w-full'>
         {error && (
           <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={faExclamationTriangle}
             color='red'
             title={t('common.alert.error', {})}
             onClose={() => setError('')}

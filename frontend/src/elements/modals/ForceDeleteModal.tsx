@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { ReactNode } from 'react';
 import Alert from '@/elements/feedback/Alert.tsx';
@@ -61,7 +60,7 @@ export default function ForceDeleteModal({
         />
 
         {force && (
-          <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          <Alert color='red' icon={faTriangleExclamation}>
             {forceWarning}
           </Alert>
         )}

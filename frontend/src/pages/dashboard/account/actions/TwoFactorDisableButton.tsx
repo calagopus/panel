@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { FormEvent, useEffect, useState } from 'react';
@@ -89,7 +88,7 @@ export default function TwoFactorDisableButton() {
           <Text>{t('pages.account.account.containers.twoFactor.modal.disableTwoFactor.description', {}).md()}</Text>
 
           {isLastAcceptedMethod('totp') && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            <Alert color='yellow' icon={faExclamationTriangle}>
               {t('pages.account.account.containers.twoFactor.lastAcceptedMethod', {})}
             </Alert>
           )}

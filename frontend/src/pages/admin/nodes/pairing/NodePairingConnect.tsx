@@ -55,7 +55,7 @@ export default function NodePairingConnect({
     return (
       <TitleCard
         title={t('pages.admin.nodes.pairing.probe.title', { version: probe.version })}
-        icon={<FontAwesomeIcon icon={faServer} />}
+        icon={faServer}
         rightSection={
           <Button variant='default' size='xs' ml='auto' onClick={onReset}>
             {t('pages.admin.nodes.pairing.button.change', {})}
@@ -78,11 +78,11 @@ export default function NodePairingConnect({
 
         <Stack gap='xs' mt='md'>
           {probe.docker.available ? (
-            <Alert color='green' icon={<FontAwesomeIcon icon={faCheck} />}>
+            <Alert color='green' icon={faCheck}>
               {t('pages.admin.nodes.pairing.probe.dockerAvailable', { version: probe.docker.version ?? '' })}
             </Alert>
           ) : (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+            <Alert color='red' icon={faExclamationTriangle}>
               {t('pages.admin.nodes.pairing.probe.dockerUnavailable', {})}
             </Alert>
           )}
@@ -93,7 +93,7 @@ export default function NodePairingConnect({
   }
 
   return (
-    <TitleCard title={t('pages.admin.nodes.pairing.title', {})} icon={<FontAwesomeIcon icon={faPlug} />}>
+    <TitleCard title={t('pages.admin.nodes.pairing.title', {})} icon={faPlug}>
       <Text size='sm' c='dimmed' mb='sm'>
         {t('pages.admin.nodes.pairing.description', {}).md()}
       </Text>

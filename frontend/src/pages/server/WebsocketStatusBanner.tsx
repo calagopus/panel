@@ -1,5 +1,4 @@
 import { faExclamationTriangle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
@@ -83,7 +82,7 @@ export default function WebsocketStatusBanner() {
 
   return (
     <Alert
-      icon={<FontAwesomeIcon icon={isRecoverable ? faExclamationTriangle : faTimesCircle} />}
+      icon={isRecoverable ? faExclamationTriangle : faTimesCircle}
       color={isRecoverable ? 'yellow' : 'red'}
       className='mt-2 mx-6'
       withCloseButton={socketError.type === SocketErrorType.DAEMON_ERROR}

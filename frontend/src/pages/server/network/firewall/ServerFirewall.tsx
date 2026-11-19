@@ -284,19 +284,19 @@ export default function ServerFirewall() {
 
           <Stack>
             {data.supported === false && (
-              <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='red' icon={faExclamationTriangle}>
                 {t('pages.server.firewall.alert.notEnforced', {}).md()}
               </Alert>
             )}
 
             {data.supported === null && (
-              <Alert color='gray' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='gray' icon={faExclamationTriangle}>
                 {t('pages.server.firewall.alert.unknownEnforcement', {})}
               </Alert>
             )}
 
             {(dirty || defaultAllow || shadowed.length > 0 || unallocatedPorts.length > 0) && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 <Stack gap='xs'>
                   {dirty && <span>{t('pages.server.firewall.alert.unsaved', {})}</span>}
                   {defaultAllow && (

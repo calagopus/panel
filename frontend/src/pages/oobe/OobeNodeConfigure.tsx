@@ -129,12 +129,12 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
       <div className='w-full sm:max-w-2xl flex flex-col gap-4 sm:self-end'>
         {error && <AlertError error={error} setError={setError} />}
         {isVerified && !error && (
-          <Alert icon={<FontAwesomeIcon icon={faCheck} />} color='green' title={t('common.alert.success', {})}>
+          <Alert icon={faCheck} color='green' title={t('common.alert.success', {})}>
             {t('pages.oobe.nodeConfiguration.successMessage', {})}
           </Alert>
         )}
         {portMismatch && (
-          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+          <Alert icon={faExclamationTriangle} color='yellow'>
             {t('pages.admin.nodes.tabs.configuration.page.alert.portMismatch', {
               connectPort: String(connectPort),
               apiPort: String(apiPort),

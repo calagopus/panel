@@ -1,5 +1,4 @@
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
@@ -47,11 +46,7 @@ export default function AutostartContainer() {
   };
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.autostart.title', {})}
-      icon={<FontAwesomeIcon icon={faPlay} />}
-      className='h-full order-30'
-    >
+    <TitleCard title={t('pages.server.settings.autostart.title', {})} icon={faPlay} className='h-full order-30'>
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           <Select

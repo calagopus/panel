@@ -147,7 +147,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
           <TitleCard
             title={t('pages.admin.databaseAgentHosts.tabs.overview.page.card.hostDetails', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
+            icon={faServer}
           >
             <Stack gap={0}>
               <InfoRow label={t('common.form.url', {})}>
@@ -182,7 +182,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
 
           <TitleCard
             title={t('pages.admin.databaseAgentHosts.tabs.overview.page.card.systemInfo', {})}
-            icon={<FontAwesomeIcon icon={faCircleInfo} />}
+            icon={faCircleInfo}
           >
             {error ? (
               <Stack gap={0}>
@@ -261,7 +261,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
 
         <TitleCard
           title={t('pages.admin.databaseAgentHosts.tabs.overview.page.card.resources', {})}
-          icon={<FontAwesomeIcon icon={faChartPie} />}
+          icon={faChartPie}
           rightSection={
             <Badge color='gray' variant='light' ml='auto' loading={!capacityResource.data && !capacityResource.error}>
               <FontAwesomeIcon icon={faServer} className='mr-1.5' />
@@ -275,7 +275,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <CapacityCard
                   label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.memory', {})}
-                  icon={<FontAwesomeIcon icon={faMemory} />}
+                  icon={faMemory}
                   allocated={capacity.allocated.memory}
                   limit={capacity.limits.memory}
                   noLimitLabel={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.noLimit', {})}
@@ -293,7 +293,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                 />
                 <CapacityCard
                   label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.disk', {})}
-                  icon={<FontAwesomeIcon icon={faHardDrive} />}
+                  icon={faHardDrive}
                   allocated={capacity.allocated.disk}
                   limit={capacity.limits.disk}
                   noLimitLabel={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.noLimit', {})}
@@ -309,7 +309,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                 />
                 <CapacityCard
                   label={t('common.stat.cpu', {})}
-                  icon={<FontAwesomeIcon icon={faMicrochip} />}
+                  icon={faMicrochip}
                   allocated={capacity.allocated.cpu}
                   limit={0}
                   noLimitLabel={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.noLimit', {})}
@@ -323,10 +323,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
           </ResourceView>
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.databaseAgentHosts.tabs.overview.page.card.breakdown', {})}
-          icon={<FontAwesomeIcon icon={faChartBar} />}
-        >
+        <TitleCard title={t('pages.admin.databaseAgentHosts.tabs.overview.page.card.breakdown', {})} icon={faChartBar}>
           <ResourceView resource={capacityResource}>
             {(capacity) => {
               const formatSize = (value: number) => bytesToString(mbToBytes(value));
@@ -338,7 +335,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                 <Stack gap='lg'>
                   <AllocationBar
                     label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.memory', {})}
-                    icon={<FontAwesomeIcon icon={faMemory} />}
+                    icon={faMemory}
                     segments={instanceSegments(capacity.instances, (instance) => instance.memory)}
                     limit={capacity.limits.memory}
                     formatValue={formatSize}
@@ -354,7 +351,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                   />
                   <AllocationBar
                     label={t('pages.admin.databaseAgentHosts.tabs.overview.page.label.disk', {})}
-                    icon={<FontAwesomeIcon icon={faHardDrive} />}
+                    icon={faHardDrive}
                     segments={instanceSegments(capacity.instances, (instance) => instance.disk)}
                     limit={capacity.limits.disk}
                     formatValue={formatSize}
@@ -370,7 +367,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                   />
                   <AllocationBar
                     label={t('common.stat.cpu', {})}
-                    icon={<FontAwesomeIcon icon={faMicrochip} />}
+                    icon={faMicrochip}
                     segments={instanceSegments(capacity.instances, (instance) => instance.cpu)}
                     limit={0}
                     formatValue={(value) => `${value}%`}

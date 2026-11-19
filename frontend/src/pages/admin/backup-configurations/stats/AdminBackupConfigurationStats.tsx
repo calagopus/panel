@@ -1,5 +1,4 @@
 import { faArchive } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
 import getBackupConfigurationStats from '@/api/admin/backup-configurations/getBackupConfigurationStats.ts';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
@@ -34,7 +33,7 @@ export default function AdminBackupConfigurationStats({
         {(stats) => (
           <TitleCard
             title={t('pages.admin.backupConfigurations.tabs.stats.page.card.title', {})}
-            icon={<FontAwesomeIcon icon={faArchive} />}
+            icon={faArchive}
             className='mt-4'
           >
             <BackupStatsPanel stats={stats} />

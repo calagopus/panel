@@ -71,7 +71,7 @@ export default function OAuthLinkActionBar({
           }).md()}
 
           {skipped > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.account.oauthLinks.modal.deleteOAuthLinks.alert.skipped', {
                 oauthLinks: tItem('oauthLink', skipped),
               })}
@@ -79,7 +79,7 @@ export default function OAuthLinkActionBar({
           )}
 
           {keptLast && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.account.oauthLinks.modal.deleteOAuthLinks.alert.keptLast', {})}
             </Alert>
           )}

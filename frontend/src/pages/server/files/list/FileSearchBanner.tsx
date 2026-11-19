@@ -1,4 +1,3 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faBan,
   faFileAlt,
@@ -14,6 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
@@ -22,7 +22,7 @@ import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface SearchChip {
-  icon: IconDefinition;
+  icon: IconLike;
   label?: string;
   value: string;
   tooltip?: string;
@@ -115,7 +115,7 @@ export default function FileSearchBanner({ resetEntries }: { resetEntries: () =>
 
   return (
     <Alert
-      icon={<FontAwesomeIcon icon={empty ? faFilter : faSearch} />}
+      icon={empty ? faFilter : faSearch}
       color={empty ? 'yellow' : 'blue'}
       title={
         empty
@@ -136,7 +136,7 @@ export default function FileSearchBanner({ resetEntries }: { resetEntries: () =>
               tt='none'
               className='w-max! max-w-full'
               leftSection={
-                <FontAwesomeIcon
+                <Icon
                   icon={icon}
                   className={empty ? 'text-(--mantine-color-yellow-6)' : 'text-(--mantine-color-blue-6)'}
                 />

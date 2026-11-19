@@ -29,7 +29,7 @@ export default function AssetUpload({
       id: 'assets.uploadFiles',
       category: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => t('pages.admin.assets.quickAction.uploadFiles', {}),
-      icon: <FontAwesomeIcon icon={faFileUpload} />,
+      icon: faFileUpload,
       adminPermission: 'assets.upload',
       perform: () => fileInputRef.current?.click(),
     },

@@ -21,7 +21,7 @@ function IconRenderer({ icon, ...props }: IconProps) {
 
   if (
     isValidElement<FontAwesomeIconProps>(icon) &&
-    (icon.type === FontAwesomeIcon || icon.type === BaseFontAwesomeIcon)
+    (icon.type === FontAwesomeIcon || icon.type === BaseFontAwesomeIcon || icon.type === Icon)
   ) {
     return cloneElement(icon, { ...props, className: classNames(icon.props.className, props.className) });
   }
@@ -36,7 +36,12 @@ function IconRenderer({ icon, ...props }: IconProps) {
     <span
       {...attributes}
       ref={props.ref as Ref<HTMLSpanElement>}
-      className={classNames('svg-inline--fa *:size-full', props.size && `fa-${props.size}`, props.className)}
+      className={classNames(
+        'svg-inline--fa',
+        !isValidElement(icon) && '*:size-full',
+        props.size && `fa-${props.size}`,
+        props.className,
+      )}
       style={{ color: props.color, ...props.style }}
       title={props.title}
     >

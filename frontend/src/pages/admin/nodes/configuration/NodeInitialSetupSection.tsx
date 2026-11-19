@@ -108,7 +108,7 @@ export default function NodeInitialSetupSection({
               />
             </div>
             {portMismatch && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mt='md'>
+              <Alert color='yellow' icon={faExclamationTriangle} mt='md'>
                 {t('pages.admin.nodes.tabs.configuration.page.alert.portMismatch', {
                   connectPort: String(connectPort),
                   apiPort: String(apiPort),

@@ -316,45 +316,30 @@ export default function ServerCreate() {
           )}
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
-              icon={<FontAwesomeIcon icon={faInfoCircle} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})} icon={faInfoCircle}>
               <FormEngine form={form} fields={basicInfoFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
-              icon={<FontAwesomeIcon icon={faAddressCard} />}
+              icon={faAddressCard}
             >
               <FormEngine form={form} fields={serverAssignmentFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
-              icon={<FontAwesomeIcon icon={faStopwatch} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})} icon={faStopwatch}>
               <FormEngine form={form} fields={resourceLimitsFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
-              icon={<FontAwesomeIcon icon={faWrench} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})} icon={faWrench}>
               <FormEngine form={form} fields={serverConfigFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
-              icon={<FontAwesomeIcon icon={faIcons} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})} icon={faIcons}>
               <FormEngine form={form} fields={featureLimitsFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.allocations', {})}
-              icon={<FontAwesomeIcon icon={faNetworkWired} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.allocations', {})} icon={faNetworkWired}>
               {noAvailableAllocations && <NoAvailableAllocationsAlert className='mb-4' nodeUuid={selectedNodeUuid} />}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Select
@@ -395,7 +380,7 @@ export default function ServerCreate() {
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.variables', {})}
-              icon={<FontAwesomeIcon icon={faPlay} />}
+              icon={faPlay}
               className='col-span-full'
             >
               <Stack>

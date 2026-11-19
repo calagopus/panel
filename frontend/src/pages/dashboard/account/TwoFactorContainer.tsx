@@ -1,5 +1,4 @@
 import { faShieldHalved } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router';
 import Button from '@/elements/buttons/Button.tsx';
 import Badge from '@/elements/data-display/Badge.tsx';
@@ -35,7 +34,7 @@ export default function TwoFactorContainer() {
   return (
     <TitleCard
       title={t('pages.account.account.containers.twoFactor.title', {})}
-      icon={<FontAwesomeIcon icon={faShieldHalved} />}
+      icon={faShieldHalved}
       className='h-full order-30'
     >
       <Stack h='100%'>

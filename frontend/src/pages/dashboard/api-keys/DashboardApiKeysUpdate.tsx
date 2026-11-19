@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -152,17 +151,17 @@ export default function DashboardApiKeysUpdate() {
             return (
               <Stack>
                 {hasAddedAdmin && (
-                  <Alert color='red' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                  <Alert color='red' icon={faExclamationTriangle}>
                     {t('pages.account.apiKeys.create.alert.adminPermissions', {}).md()}
                   </Alert>
                 )}
                 {replace && (
-                  <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                  <Alert color='yellow' icon={faExclamationTriangle}>
                     {t('pages.account.apiKeys.update.alert.replaceMode', {}).md()}
                   </Alert>
                 )}
                 {callbackUrl && (
-                  <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+                  <Alert color='yellow' icon={faExclamationTriangle}>
                     {t('pages.account.apiKeys.update.alert.callbackUrl', { url: callbackUrl.origin }).md()}
                   </Alert>
                 )}

@@ -9,7 +9,6 @@ import {
   faXmark,
   faXmarksLines,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { join } from 'pathe';
 import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
@@ -87,7 +86,7 @@ export default function useFileTreeTabQuickActions({
         id: `files.tree.close.${action ?? 'current'}`,
         category,
         label,
-        icon: <FontAwesomeIcon icon={icon} />,
+        icon: icon,
         keywords: ['tab', 'editor'],
         isVisible: () => visible,
         perform: () => {
@@ -104,7 +103,7 @@ export default function useFileTreeTabQuickActions({
               : 'pages.account.shortcuts.fileManager.nextEditorTab',
             {},
           ),
-        icon: <FontAwesomeIcon icon={offset === -1 ? faArrowLeft : faArrowRight} />,
+        icon: offset === -1 ? faArrowLeft : faArrowRight,
         isVisible: () => tabs.length > 1,
         perform: () => {
           const next = getRelativeFileTreeTabId(tabIds, activeTabId, offset);
@@ -115,7 +114,7 @@ export default function useFileTreeTabQuickActions({
         id: 'files.tree.reveal',
         category,
         label: () => t('pages.server.files.tree.revealInTree', {}),
-        icon: <FontAwesomeIcon icon={faFolderOpen} />,
+        icon: faFolderOpen,
         keywords: ['locate', 'active', 'file'],
         permission: 'files.read',
         isVisible: () => hasPath,
@@ -127,7 +126,7 @@ export default function useFileTreeTabQuickActions({
         id: 'files.tree.keepOpen',
         category,
         label: () => t('pages.server.files.quickAction.keepFileOpen', {}),
-        icon: <FontAwesomeIcon icon={faThumbtack} />,
+        icon: faThumbtack,
         keywords: ['preview', 'tab'],
         isVisible: () => activeTabId === previewTabId,
         perform: () => {
@@ -138,7 +137,7 @@ export default function useFileTreeTabQuickActions({
         id: 'files.tree.copyFilePath',
         category,
         label: () => t('pages.server.files.quickAction.copyFilePath', {}),
-        icon: <FontAwesomeIcon icon={faClipboard} />,
+        icon: faClipboard,
         keywords: ['clipboard', 'active'],
         isVisible: () => hasPath,
         perform: () => {

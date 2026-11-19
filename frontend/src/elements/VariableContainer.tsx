@@ -39,7 +39,7 @@ export default function VariableContainer({
   const description = variable.descriptionTranslations?.[language] || variable.description;
 
   return (
-    <TitleCard title={title} icon={<FontAwesomeIcon icon={faCog} />}>
+    <TitleCard title={title} icon={faCog}>
       <div className='flex flex-row w-full justify-between items-start'>
         <div className='w-full min-w-0'>
           {variable.rules.includes('boolean') ||

@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -75,7 +74,7 @@ export default function ServerDeleteModal({ server, ...props }: ModalProps & { s
           />
 
           {deleteDoForce && (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='red' icon={faTriangleExclamation}>
               {t('pages.admin.servers.tabs.management.page.delete.modal.alert.forceWarning', {})}
             </Alert>
           )}

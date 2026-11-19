@@ -80,7 +80,7 @@ export default function MountActionBar({
           }).md()}
 
           {skippedDetaches > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.server.mounts.modal.detachMounts.alert.skipped', { mounts: tItem('mount', skippedDetaches) })}
             </Alert>
           )}

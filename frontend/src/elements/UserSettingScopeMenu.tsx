@@ -1,16 +1,10 @@
-import {
-  faCheck,
-  faCloud,
-  faCloudArrowUp,
-  faDesktop,
-  faRotateLeft,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCloud, faCloudArrowUp, faDesktop, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Fragment, ReactNode } from 'react';
 import ActionIcon from '@/elements/buttons/ActionIcon.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import UnstyledButton from '@/elements/buttons/UnstyledButton.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import Menu from '@/elements/overlays/Menu.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { UserSettingValue } from '@/lib/schemas/user/settings.ts';
@@ -28,7 +22,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export interface UserSettingScopeAction {
   id: 'account' | 'device' | 'useAccountValue' | 'saveToAccount';
-  icon: IconDefinition;
+  icon: IconLike;
   label: string;
   active: boolean;
   dividerBefore: boolean;
@@ -158,7 +152,7 @@ export default function UserSettingScopeMenu({
             <Fragment key={action.id}>
               {action.dividerBefore && <Menu.Divider />}
               <Menu.Item
-                leftSection={<FontAwesomeIcon icon={action.icon} />}
+                leftSection={<Icon icon={action.icon} />}
                 rightSection={action.active && <FontAwesomeIcon icon={faCheck} size='sm' />}
                 disabled={action.active}
                 onClick={action.onClick}

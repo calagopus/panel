@@ -58,7 +58,7 @@ export default function DatabaseInstanceStats() {
     <ChartSyncGroup>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0'>
         <ChartBlock
-          icon={<FontAwesomeIcon icon={faMicrochip} />}
+          icon={faMicrochip}
           title={t('common.stat.cpuLoad', {})}
           value={cpu.value}
           overlayIcon={overlayIcon}
@@ -67,7 +67,7 @@ export default function DatabaseInstanceStats() {
           <StreamChart {...cpu.props} />
         </ChartBlock>
         <ChartBlock
-          icon={<FontAwesomeIcon icon={faMemory} />}
+          icon={faMemory}
           title={t('common.stat.memoryLoad', {})}
           value={memory.value}
           overlayIcon={overlayIcon}

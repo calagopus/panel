@@ -1,5 +1,4 @@
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -49,7 +48,7 @@ export default function TrashCard({ server }: { server: AdminServer }) {
   return (
     <TitleCard
       title={t('pages.admin.servers.tabs.management.page.trash.title', {})}
-      icon={<FontAwesomeIcon icon={faTrashCan} />}
+      icon={faTrashCan}
       className='order-50'
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>

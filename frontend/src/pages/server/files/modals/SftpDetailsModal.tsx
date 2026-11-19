@@ -55,7 +55,7 @@ export default function SftpDetailsModal({ ...props }: ModalProps) {
             readOnly
           />
         ) : (
-          <Alert className='col-span-4' color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+          <Alert className='col-span-4' color='yellow' icon={faTriangleExclamation}>
             {t('common.alert.passwordAuthUnavailable', {})}
           </Alert>
         )}

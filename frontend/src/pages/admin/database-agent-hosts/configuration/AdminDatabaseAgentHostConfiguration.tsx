@@ -155,7 +155,7 @@ export default function AdminDatabaseAgentHostConfiguration({
     >
       {!revealed ? (
         <Stack>
-          <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+          <Alert color='yellow' icon={faExclamationTriangle}>
             {t('pages.admin.databaseAgentHosts.tabs.configuration.page.alert.tokenWarning', {})}
           </Alert>
           <div>

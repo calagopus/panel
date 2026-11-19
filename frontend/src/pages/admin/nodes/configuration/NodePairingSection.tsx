@@ -71,7 +71,7 @@ export default function NodePairingSection({ node, onConnected }: { node: AdminN
   };
 
   return (
-    <TitleCard title={t('pages.admin.nodes.pairing.title', {})} icon={<FontAwesomeIcon icon={faPlug} />}>
+    <TitleCard title={t('pages.admin.nodes.pairing.title', {})} icon={faPlug}>
       <Text size='sm' c='dimmed' mb='sm'>
         {t('pages.admin.nodes.pairing.description', {}).md()}
       </Text>

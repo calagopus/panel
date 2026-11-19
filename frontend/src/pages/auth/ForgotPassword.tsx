@@ -58,11 +58,7 @@ export default function ForgotPassword() {
     <AuthWrapper registry={window.extensionContext.extensionRegistry.pages.auth.forgotPassword.container}>
       <div className='flex flex-col space-y-4 mb-4 w-full'>
         {![settings.app.url, ...settings.app.additionalUrls].includes(window.location.origin) && (
-          <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-            color='yellow'
-            title={t('common.alert.warning', {})}
-          >
+          <Alert icon={faExclamationTriangle} color='yellow' title={t('common.alert.warning', {})}>
             {t('pages.auth.alert.urlMismatch', {
               appUrl: settings.app.url,
               currentUrl: window.location.origin,
@@ -71,7 +67,7 @@ export default function ForgotPassword() {
         )}
         {error && (
           <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={faExclamationTriangle}
             color='red'
             title={t('common.alert.error', {})}
             onClose={() => setError('')}
@@ -82,7 +78,7 @@ export default function ForgotPassword() {
         )}
         {success && (
           <Alert
-            icon={<FontAwesomeIcon icon={faInfoCircle} />}
+            icon={faInfoCircle}
             color='green'
             title={t('common.alert.success', {})}
             onClose={() => setSuccess('')}

@@ -321,7 +321,7 @@ export default function RouteOrderEditor({
   return (
     <Stack gap='xs'>
       {availableRoutes.length > 0 && (
-        <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+        <Alert color='yellow' icon={faTriangleExclamation}>
           {t('elements.routeOrderEditor.missingRoutes', {
             routes: availableRoutes.map((r) => (typeof r.name === 'string' ? r.name : r.name!())).join(', '),
           })}

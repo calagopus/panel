@@ -1,5 +1,4 @@
 import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -19,7 +18,7 @@ export default function PasswordLoginContainer({ requireTwoFactorActivation }: A
   return (
     <TitleCard
       title={t('pages.account.account.containers.passwordLogin.title', {})}
-      icon={<FontAwesomeIcon icon={faRightToBracket} />}
+      icon={faRightToBracket}
       className={classNames('h-full order-40', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <Stack h='100%'>

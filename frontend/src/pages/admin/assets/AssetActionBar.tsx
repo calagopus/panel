@@ -38,7 +38,7 @@ export default function AssetActionBar({
       id: 'assets.deleteSelection',
       category: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => t('pages.admin.assets.quickAction.deleteSelection', {}),
-      icon: <FontAwesomeIcon icon={faTrash} />,
+      icon: faTrash,
       danger: true,
       adminPermission: 'assets.delete',
       isVisible: () => selectedAssets.size > 0,

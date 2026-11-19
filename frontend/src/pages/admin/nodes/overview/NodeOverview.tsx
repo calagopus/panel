@@ -139,10 +139,7 @@ export default function NodeOverview({ node }: { node: Node }) {
 
       <Stack gap='md'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-          <TitleCard
-            title={t('pages.admin.nodes.tabs.overview.page.card.nodeDetails', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
-          >
+          <TitleCard title={t('pages.admin.nodes.tabs.overview.page.card.nodeDetails', {})} icon={faServer}>
             <Stack gap={0}>
               <InfoRow label={t('common.form.location', {})}>
                 <TableLink to={`/admin/locations/${node.location.uuid}`} className='inline-flex items-center'>
@@ -207,10 +204,7 @@ export default function NodeOverview({ node }: { node: Node }) {
             </Stack>
           </TitleCard>
 
-          <TitleCard
-            title={t('pages.admin.nodes.tabs.overview.page.card.systemInfo', {})}
-            icon={<FontAwesomeIcon icon={faCircleInfo} />}
-          >
+          <TitleCard title={t('pages.admin.nodes.tabs.overview.page.card.systemInfo', {})} icon={faCircleInfo}>
             {error ? (
               <Stack gap={0}>
                 <InfoRow label={t('pages.admin.nodes.tabs.overview.page.label.wingsVersion', {})}>
@@ -295,7 +289,7 @@ export default function NodeOverview({ node }: { node: Node }) {
 
         <TitleCard
           title={t('pages.admin.nodes.tabs.capacity.page.card.resources', {})}
-          icon={<FontAwesomeIcon icon={faChartPie} />}
+          icon={faChartPie}
           rightSection={
             <Badge color='gray' variant='light' ml='auto' loading={!capacityResource.data && !capacityResource.error}>
               <FontAwesomeIcon icon={faServer} className='mr-1.5' />
@@ -308,7 +302,7 @@ export default function NodeOverview({ node }: { node: Node }) {
               <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
                 <CapacityCard
                   label={t('pages.admin.nodes.tabs.capacity.page.label.memory', {})}
-                  icon={<FontAwesomeIcon icon={faMemory} />}
+                  icon={faMemory}
                   allocated={capacity.allocated.memory}
                   limit={capacity.limits.memory}
                   noLimitLabel={t('pages.admin.nodes.tabs.capacity.page.label.noLimit', {})}
@@ -338,7 +332,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 />
                 <CapacityCard
                   label={t('pages.admin.nodes.tabs.capacity.page.label.disk', {})}
-                  icon={<FontAwesomeIcon icon={faHardDrive} />}
+                  icon={faHardDrive}
                   allocated={capacity.allocated.disk}
                   limit={capacity.limits.disk}
                   noLimitLabel={t('pages.admin.nodes.tabs.capacity.page.label.noLimit', {})}
@@ -354,7 +348,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 />
                 <CapacityCard
                   label={t('common.stat.cpu', {})}
-                  icon={<FontAwesomeIcon icon={faMicrochip} />}
+                  icon={faMicrochip}
                   allocated={capacity.allocated.cpu}
                   limit={0}
                   noLimitLabel={t('pages.admin.nodes.tabs.capacity.page.label.noLimit', {})}
@@ -376,10 +370,7 @@ export default function NodeOverview({ node }: { node: Node }) {
           </ResourceView>
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.nodes.tabs.capacity.page.card.breakdown', {})}
-          icon={<FontAwesomeIcon icon={faChartBar} />}
-        >
+        <TitleCard title={t('pages.admin.nodes.tabs.capacity.page.card.breakdown', {})} icon={faChartBar}>
           <ResourceView resource={capacityResource}>
             {(capacity) => {
               const formatSize = (value: number) => bytesToString(mbToBytes(value));
@@ -391,7 +382,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                 <Stack gap='lg'>
                   <AllocationBar
                     label={t('pages.admin.nodes.tabs.capacity.page.label.memory', {})}
-                    icon={<FontAwesomeIcon icon={faMemory} />}
+                    icon={faMemory}
                     segments={[
                       ...serverSegments(capacity.servers, (server) => server.memory),
                       ...(capacity.allocated.memoryOverhead > 0
@@ -419,7 +410,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                   />
                   <AllocationBar
                     label={t('pages.admin.nodes.tabs.capacity.page.label.disk', {})}
-                    icon={<FontAwesomeIcon icon={faHardDrive} />}
+                    icon={faHardDrive}
                     segments={serverSegments(capacity.servers, (server) => server.disk)}
                     limit={capacity.limits.disk}
                     formatValue={formatSize}
@@ -435,7 +426,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                   />
                   <AllocationBar
                     label={t('common.stat.cpu', {})}
-                    icon={<FontAwesomeIcon icon={faMicrochip} />}
+                    icon={faMicrochip}
                     segments={serverSegments(capacity.servers, (server) => server.cpu)}
                     limit={0}
                     formatValue={(value) => `${value}%`}

@@ -1,12 +1,11 @@
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { makeComponentHookable } from 'shared';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 
 interface KbdKeyProps {
   children: React.ReactNode;
   className?: string;
-  icon?: IconDefinition;
+  icon?: IconLike;
 }
 
 function KbdKey({ children, className, icon }: KbdKeyProps) {
@@ -17,7 +16,7 @@ function KbdKey({ children, className, icon }: KbdKeyProps) {
         className,
       )}
     >
-      {icon ? <FontAwesomeIcon icon={icon} size='sm' /> : children}
+      {icon ? <Icon icon={icon} size='sm' /> : children}
     </div>
   );
 }

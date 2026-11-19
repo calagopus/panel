@@ -1,5 +1,4 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import getServerByExternalId from '@/api/admin/servers/getServerByExternalId.ts';
 import ResourceLookupModal from '@/elements/modals/ResourceLookupModal.tsx';
@@ -21,7 +20,7 @@ export default function ExternalIdLookupModal({ ...props }: ModalProps) {
         resultTitle: t(`${tr}.modal.result.title`, {}),
         viewResult: t(`${tr}.modal.result.viewServer`, {}),
       }}
-      resultIcon={<FontAwesomeIcon icon={faServer} />}
+      resultIcon={faServer}
       lookup={(externalId) => getServerByExternalId(externalId)}
       fields={(server) => [
         { label: t(`${tr}.modal.result.name`, {}), value: server.name },

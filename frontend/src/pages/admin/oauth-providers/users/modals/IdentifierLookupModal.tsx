@@ -1,5 +1,4 @@
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import getOAuthProviderUserByIdentifier from '@/api/admin/oauth-providers/users/getOAuthProviderUserByIdentifier.ts';
 import ResourceLookupModal from '@/elements/modals/ResourceLookupModal.tsx';
@@ -24,7 +23,7 @@ export default function IdentifierLookupModal({
         resultTitle: t(`${tr}.modal.result.title`, {}),
         viewResult: t(`${tr}.modal.result.viewUser`, {}),
       }}
-      resultIcon={<FontAwesomeIcon icon={faUser} />}
+      resultIcon={faUser}
       lookup={(identifier) => getOAuthProviderUserByIdentifier(oauthProviderUuid, identifier)}
       fields={(link) => [
         { label: t(`${tr}.modal.result.username`, {}), value: link.user.username },

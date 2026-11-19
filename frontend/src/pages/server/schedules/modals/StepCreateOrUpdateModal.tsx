@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -281,13 +280,13 @@ export default function StepCreateOrUpdateModal({
         )}
 
         {unavailableReasons[form.values.action.type] && (
-          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+          <Alert icon={faExclamationTriangle} color='yellow'>
             {unavailableReasons[form.values.action.type]}
           </Alert>
         )}
 
         {variableIssues.length > 0 && (
-          <Alert icon={<FontAwesomeIcon icon={faExclamationTriangle} />} color='yellow'>
+          <Alert icon={faExclamationTriangle} color='yellow'>
             <VariableIssueList issues={variableIssues} />
           </Alert>
         )}

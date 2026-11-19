@@ -120,7 +120,7 @@ export default function AdminOverviewHealth() {
   return (
     <>
       {flaggedCards.length > 0 && (
-        <Alert className='mb-4' color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+        <Alert className='mb-4' color='yellow' icon={faExclamationTriangle}>
           {t('pages.admin.home.tabs.health.page.alert.flagged', { cards: flaggedCards.join(', ') })}
         </Alert>
       )}
@@ -131,10 +131,7 @@ export default function AdminOverviewHealth() {
           name='health-prepended'
         />
 
-        <TitleCard
-          title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})}
-          icon={<FontAwesomeIcon icon={faInfoCircle} />}
-        >
+        <TitleCard title={t('pages.admin.home.tabs.health.page.card.generalHealth', {})} icon={faInfoCircle}>
           <ResourceView resource={generalHealth}>
             {(general) => (
               <div className='grid grid-cols-2 xl:grid-cols-4 gap-4'>
@@ -161,7 +158,7 @@ export default function AdminOverviewHealth() {
 
         <TitleCard
           title={t('pages.admin.home.tabs.health.page.card.extensionMigrationHealth', {})}
-          icon={<FontAwesomeIcon icon={faPuzzlePiece} />}
+          icon={faPuzzlePiece}
         >
           <ResourceView resource={generalHealth}>
             {(general) =>
@@ -197,10 +194,7 @@ export default function AdminOverviewHealth() {
           </ResourceView>
         </TitleCard>
 
-        <TitleCard
-          title={t('pages.admin.home.tabs.health.page.card.reverseProxy', {})}
-          icon={<FontAwesomeIcon icon={faNetworkWired} />}
-        >
+        <TitleCard title={t('pages.admin.home.tabs.health.page.card.reverseProxy', {})} icon={faNetworkWired}>
           <ResourceView resource={proxiesHealth}>
             {(proxies) =>
               proxies.suspiciousIps.length === 0 ? (
@@ -243,10 +237,7 @@ export default function AdminOverviewHealth() {
         </TitleCard>
 
         <AdminCan action='settings.read'>
-          <TitleCard
-            title={t('pages.admin.home.tabs.health.page.card.debugMode', {})}
-            icon={<FontAwesomeIcon icon={faBug} />}
-          >
+          <TitleCard title={t('pages.admin.home.tabs.health.page.card.debugMode', {})} icon={faBug}>
             <ResourceView resource={debug}>
               {(debugMode) => (
                 <div className='flex flex-col md:flex-row gap-2 justify-between'>
@@ -291,7 +282,7 @@ export default function AdminOverviewHealth() {
         <AdminCan action='nodes.read'>
           <OutdatedResourceCard
             title={t('pages.admin.home.tabs.health.page.card.desyncNodes', {})}
-            icon={<FontAwesomeIcon icon={faServer} />}
+            icon={faServer}
             table={{
               loading,
               error,

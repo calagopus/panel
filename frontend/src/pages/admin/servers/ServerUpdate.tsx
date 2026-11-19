@@ -6,7 +6,6 @@ import {
   faStopwatch,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import getBackupConfigurations from '@/api/admin/backup-configurations/getBackupConfigurations.ts';
@@ -141,45 +140,33 @@ export default function ServerUpdate({ contextServer }: { contextServer: AdminSe
             <Alert
               title={t('pages.admin.servers.tabs.general.page.badge.serverSuspended', {})}
               color='orange'
-              icon={<FontAwesomeIcon icon={faCircleInfo} />}
+              icon={faCircleInfo}
             >
               {t('pages.admin.servers.tabs.general.page.alert.suspended', {})}
             </Alert>
           )}
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})}
-              icon={<FontAwesomeIcon icon={faInfoCircle} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.basicInformation', {})} icon={faInfoCircle}>
               <FormEngine form={form} fields={basicInfoFields} />
             </TitleCard>
 
             <TitleCard
               title={t('pages.admin.servers.tabs.general.page.card.serverAssignment', {})}
-              icon={<FontAwesomeIcon icon={faAddressCard} />}
+              icon={faAddressCard}
             >
               <FormEngine form={form} fields={serverAssignmentFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})}
-              icon={<FontAwesomeIcon icon={faStopwatch} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.resourceLimits', {})} icon={faStopwatch}>
               <FormEngine form={form} fields={resourceLimitsFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})}
-              icon={<FontAwesomeIcon icon={faWrench} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.serverConfiguration', {})} icon={faWrench}>
               <FormEngine form={form} fields={serverConfigFields} />
             </TitleCard>
 
-            <TitleCard
-              title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})}
-              icon={<FontAwesomeIcon icon={faIcons} />}
-            >
+            <TitleCard title={t('pages.admin.servers.tabs.general.page.card.featureLimits', {})} icon={faIcons}>
               <FormEngine form={form} fields={featureLimitsFields} />
             </TitleCard>
           </div>

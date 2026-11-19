@@ -183,12 +183,7 @@ const Captcha = ({ onValidChange, ref }: CaptchaProps) => {
   );
 
   const failedAlert = failed && (
-    <Alert
-      color='red'
-      icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-      title={t('common.alert.error', {})}
-      className='w-full'
-    >
+    <Alert color='red' icon={faExclamationTriangle} title={t('common.alert.error', {})} className='w-full'>
       <div className='flex flex-col gap-2 items-start'>
         {t('elements.captcha.loadFailed', {})}
         <Button variant='default' size='xs' leftSection={<FontAwesomeIcon icon={faRotateRight} />} onClick={retry}>

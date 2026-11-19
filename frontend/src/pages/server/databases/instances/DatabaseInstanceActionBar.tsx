@@ -119,7 +119,7 @@ export default function DatabaseInstanceActionBar({
           }).md()}
 
           {skippedDeletes > 0 && (
-            <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='yellow' icon={faTriangleExclamation}>
               {t('pages.server.databases.instance.modal.deleteDatabaseInstances.alert.skipped', {
                 databaseInstances: tItem('databaseInstance', skippedDeletes),
               })}

@@ -142,7 +142,7 @@ export default function AllocationActionBar({
           />
 
           {force && (
-            <Alert color='red' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+            <Alert color='red' icon={faTriangleExclamation}>
               {t('pages.admin.nodes.tabs.allocations.page.modal.delete.alert.forceWarning', {})}
             </Alert>
           )}

@@ -1,5 +1,4 @@
 import { faSkull } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
@@ -49,11 +48,7 @@ export default function AutokillContainer() {
   };
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.autokill.title', {})}
-      icon={<FontAwesomeIcon icon={faSkull} />}
-      className='h-full order-20'
-    >
+    <TitleCard title={t('pages.server.settings.autokill.title', {})} icon={faSkull} className='h-full order-20'>
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           <Switch label={t('common.form.enabled', {})} {...form.getInputProps('enabled', { type: 'checkbox' })} />

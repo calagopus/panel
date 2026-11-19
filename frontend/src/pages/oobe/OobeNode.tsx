@@ -194,7 +194,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
               />
             </div>
             {!(isEdit && isNodeAIO(existingNode)) && urlIsMissingPort(form.values.url) && (
-              <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />}>
+              <Alert color='yellow' icon={faExclamationTriangle}>
                 <div className='flex flex-col items-start gap-2'>
                   {t('pages.admin.nodes.tabs.general.page.alert.urlMissingPort', {
                     port: String(getUrlConnectPort(form.values.url) ?? 443),

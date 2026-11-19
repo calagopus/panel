@@ -1,5 +1,4 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import createDevice from '@/api/admin/devices/createDevice.ts';
@@ -79,7 +78,7 @@ export default function DeviceCreateOrUpdate({ contextDevice }: { contextDevice?
         />
       )}
 
-      <Alert color='yellow' icon={<FontAwesomeIcon icon={faExclamationTriangle} />} mb='md'>
+      <Alert color='yellow' icon={faExclamationTriangle} mb='md'>
         {t('pages.admin.devices.tabs.general.page.alert', {})}
       </Alert>
 

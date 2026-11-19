@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -23,7 +22,7 @@ export default function FileEditorDraftModal({ pendingDraft, onDiscard, onRestor
       <p>{t('pages.server.files.modal.draftRestore.content', {})}</p>
 
       {pendingDraft?.hashMismatch && (
-        <Alert mt='sm' color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+        <Alert mt='sm' color='yellow' icon={faTriangleExclamation}>
           {t('pages.server.files.modal.draftRestore.contentHashMismatch', {})}
         </Alert>
       )}

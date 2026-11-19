@@ -1,5 +1,4 @@
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
@@ -34,7 +33,7 @@ export default function AdminServerActions({ server }: { server: AdminServer }) 
       category: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => t('pages.admin.servers.quickAction.viewClient', {}),
       keywords: ['client'],
-      icon: <FontAwesomeIcon icon={faExternalLink} />,
+      icon: faExternalLink,
       adminPermission: 'servers.read',
       perform: () => navigate(`/server/${server.uuidShort}`),
     },
@@ -45,7 +44,7 @@ export default function AdminServerActions({ server }: { server: AdminServer }) 
         category: CORE_QUICK_ACTION_CATEGORIES.page,
         label: () => action.paletteLabel,
         keywords: action.paletteKeywords,
-        icon: <FontAwesomeIcon icon={action.icon} />,
+        icon: action.icon,
         danger: action.danger || undefined,
         perform: () => doOpenModal(action.modal),
       })),

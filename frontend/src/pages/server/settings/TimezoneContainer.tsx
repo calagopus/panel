@@ -1,5 +1,4 @@
 import { faClock } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
@@ -63,11 +62,7 @@ export default function TimezoneContainer() {
   }, [form.values.timezone]);
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.timezone.title', {})}
-      icon={<FontAwesomeIcon icon={faClock} />}
-      className='h-full order-40'
-    >
+    <TitleCard title={t('pages.server.settings.timezone.title', {})} icon={faClock} className='h-full order-40'>
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           <Stack gap='xs'>

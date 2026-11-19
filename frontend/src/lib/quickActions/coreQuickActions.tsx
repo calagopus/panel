@@ -14,7 +14,6 @@ import {
   faUserCog,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import type {
@@ -83,25 +82,25 @@ export function buildCoreQuickActionCategories(): Record<string, QuickActionCate
     navigation: {
       id: CORE_QUICK_ACTION_CATEGORIES.navigation,
       label: () => getTranslations().t('elements.quickActions.category.navigation', {}),
-      icon: <FontAwesomeIcon icon={faCompass} />,
+      icon: faCompass,
       order: 50,
     },
     power: {
       id: CORE_QUICK_ACTION_CATEGORIES.power,
       label: () => getTranslations().t('elements.quickActions.category.power', {}),
-      icon: <FontAwesomeIcon icon={faPowerOff} />,
+      icon: faPowerOff,
       order: 30,
     },
     account: {
       id: CORE_QUICK_ACTION_CATEGORIES.account,
       label: () => getTranslations().t('elements.quickActions.category.account', {}),
-      icon: <FontAwesomeIcon icon={faUserCog} />,
+      icon: faUserCog,
       order: 60,
     },
     page: {
       id: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => getTranslations().t('elements.quickActions.category.page', {}),
-      icon: <FontAwesomeIcon icon={faFileLines} />,
+      icon: faFileLines,
       order: 20,
     },
     ...Object.fromEntries(
@@ -113,7 +112,7 @@ export function buildCoreQuickActionCategories(): Record<string, QuickActionCate
           {
             id,
             label: () => getTranslations().t('elements.quickActions.category.pageNavigation', {}),
-            icon: <FontAwesomeIcon icon={faFolderTree} />,
+            icon: faFolderTree,
             order: 25 - index / 10,
           },
         ];
@@ -122,19 +121,19 @@ export function buildCoreQuickActionCategories(): Record<string, QuickActionCate
     math: {
       id: CORE_QUICK_ACTION_CATEGORIES.math,
       label: () => getTranslations().t('elements.quickActions.category.math', {}),
-      icon: <FontAwesomeIcon icon={faCalculator} />,
+      icon: faCalculator,
       order: 10,
     },
     servers: {
       id: CORE_QUICK_ACTION_CATEGORIES.servers,
       label: () => getTranslations().t('elements.quickActions.category.servers', {}),
-      icon: <FontAwesomeIcon icon={faServer} />,
+      icon: faServer,
       order: 40,
     },
     users: {
       id: CORE_QUICK_ACTION_CATEGORIES.users,
       label: () => getTranslations().t('elements.quickActions.category.users', {}),
-      icon: <FontAwesomeIcon icon={faUsers} />,
+      icon: faUsers,
       order: 45,
     },
   };
@@ -164,7 +163,7 @@ export function buildServerQuickActionItem(
     category: CORE_QUICK_ACTION_CATEGORIES.servers,
     label: server.name,
     description: server.nodeName,
-    icon: <FontAwesomeIcon icon={faServer} />,
+    icon: faServer,
     onSelect: () => {
       close();
       navigate(path);
@@ -192,7 +191,7 @@ export function buildAdminServerQuickActionItem(
       </Group>
     ),
     keywords: [server.owner.username],
-    icon: <FontAwesomeIcon icon={faServer} />,
+    icon: faServer,
     onSelect: () => {
       close();
       navigate(`/admin/servers/${server.uuid}`);
@@ -223,7 +222,7 @@ export function buildAdminUserQuickActionItem(
       </Group>
     ),
     keywords: [user.email, user.nameFirst, user.nameLast].filter((keyword): keyword is string => !!keyword),
-    icon: <FontAwesomeIcon icon={faUser} />,
+    icon: faUser,
     onSelect: () => {
       close();
       navigate(`/admin/users/${user.uuid}`);
@@ -307,7 +306,7 @@ export function useCoreQuickActionModes(): QuickActionMode[] {
                 ? getTranslations().t('elements.quickActions.math.calculating', {})
                 : (mathResult ?? getTranslations().t('elements.quickActions.math.unsolvable', {})),
               description: mathResult ? getTranslations().t('elements.quickActions.math.copyResult', {}) : undefined,
-              icon: <FontAwesomeIcon icon={faEquals} />,
+              icon: faEquals,
               onSelect: () => {
                 if (!mathResult) return;
 
@@ -372,7 +371,7 @@ export function useCoreQuickActionDefinitions(requestLogout: () => void): QuickA
       id: 'general.goHome',
       category: navigation,
       label: () => getTranslations().t('pages.account.home.title', {}),
-      icon: <FontAwesomeIcon icon={faServer} />,
+      icon: faServer,
       scopes: ['dashboard', 'server'],
       perform: () => navigate('/'),
     },
@@ -380,7 +379,7 @@ export function useCoreQuickActionDefinitions(requestLogout: () => void): QuickA
       id: 'general.goAdmin',
       category: navigation,
       label: () => getTranslations().t('pages.account.admin.title', {}),
-      icon: <FontAwesomeIcon icon={faGraduationCap} />,
+      icon: faGraduationCap,
       scopes: ['dashboard', 'server'],
       adminPermission: true,
       perform: () => navigate('/admin'),
@@ -389,7 +388,7 @@ export function useCoreQuickActionDefinitions(requestLogout: () => void): QuickA
       id: 'general.goBack',
       category: navigation,
       label: () => getTranslations().t('common.button.back', {}),
-      icon: <FontAwesomeIcon icon={faReply} />,
+      icon: faReply,
       scopes: ['admin'],
       perform: () => navigate('/'),
     },
@@ -400,7 +399,7 @@ export function useCoreQuickActionDefinitions(requestLogout: () => void): QuickA
         getImpersonatedUser()
           ? getTranslations().t('elements.sidebar.button.stopImpersonating', {})
           : getTranslations().t('elements.sidebar.button.logout', {}),
-      icon: <FontAwesomeIcon icon={faArrowRightFromBracket} />,
+      icon: faArrowRightFromBracket,
       danger: true,
       perform: requestLogout,
     },

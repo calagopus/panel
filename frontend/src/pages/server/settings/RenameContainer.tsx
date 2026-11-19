@@ -1,5 +1,4 @@
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
@@ -49,11 +48,7 @@ export default function RenameContainer() {
   };
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.rename.title', {})}
-      icon={<FontAwesomeIcon icon={faPenToSquare} />}
-      className='h-full order-10'
-    >
+    <TitleCard title={t('pages.server.settings.rename.title', {})} icon={faPenToSquare} className='h-full order-10'>
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>
         <Stack h='100%'>
           <TextInput withAsterisk label={t('common.form.serverName', {})} {...form.getInputProps('name')} />

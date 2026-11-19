@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { makeComponentHookable } from 'shared';
 import Card from '@/elements/data-display/Card.tsx';
+import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
 
 function ChartBlock({
@@ -15,7 +16,7 @@ function ChartBlock({
   bodyClassName,
   children,
 }: {
-  icon: ReactNode;
+  icon: IconLike;
   title: string;
   value?: ReactNode;
   legend?: ReactNode;
@@ -31,7 +32,9 @@ function ChartBlock({
       <div className='@container border-b border-(--mantine-color-default-border) px-4 py-3'>
         <div className='flex flex-col items-start gap-1 @lg:flex-row @lg:items-center @lg:justify-between @lg:gap-2'>
           <h3 className='flex min-w-0 max-w-full items-center transition-colors duration-100'>
-            <span className='mr-2 shrink-0'>{icon}</span>
+            <span className='mr-2 shrink-0'>
+              <Icon icon={icon} />
+            </span>
             <ScrollingText>{title}</ScrollingText>
             {action && <span className='ml-1 shrink-0'>{action}</span>}
           </h3>

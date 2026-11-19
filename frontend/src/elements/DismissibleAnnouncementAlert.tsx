@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import Alert from '@/elements/feedback/Alert.tsx';
@@ -59,7 +58,7 @@ export default function DismissibleAnnouncementAlert({ announcement }: { announc
 
   return (
     <Alert
-      icon={<FontAwesomeIcon icon={announcementTypeIconMapping[announcement.type]} />}
+      icon={announcementTypeIconMapping[announcement.type]}
       key={announcement.uuid}
       title={announcement.titleTranslations[language] ?? announcement.title}
       color={announcementTypeColorMapping[announcement.type]}

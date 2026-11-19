@@ -1,5 +1,4 @@
 import { faCog } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
@@ -13,11 +12,7 @@ export default function ReinstallContainer() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <TitleCard
-      title={t('pages.server.settings.reinstall.title', {})}
-      icon={<FontAwesomeIcon icon={faCog} />}
-      className='h-full order-60'
-    >
+    <TitleCard title={t('pages.server.settings.reinstall.title', {})} icon={faCog} className='h-full order-60'>
       <SettingsReinstallModal opened={modalOpen} onClose={() => setModalOpen(false)} />
 
       <Stack h='100%'>

@@ -69,12 +69,7 @@ export default function OobeRegister({ onNext }: OobeComponentProps) {
 
       {error && <AlertError error={error} setError={setError} />}
 
-      <Alert
-        icon={<FontAwesomeIcon icon={faShieldHalved} />}
-        title={t('pages.oobe.register.alert.title', {})}
-        color='blue'
-        variant='light'
-      >
+      <Alert icon={faShieldHalved} title={t('pages.oobe.register.alert.title', {})} color='blue' variant='light'>
         {t('pages.oobe.register.alert.description', {})}
       </Alert>
 

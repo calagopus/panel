@@ -1,5 +1,4 @@
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { z } from 'zod';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Code from '@/elements/typography/Code.tsx';
@@ -29,7 +28,7 @@ export function useStorageDriverVariants(): Partial<Record<StorageDriver, Discri
       defaults: { accessKey: '', secretKey: '', bucket: '', region: '', publicUrl: '', endpoint: '', pathStyle: false },
       before: (
         <Alert
-          icon={<FontAwesomeIcon icon={faInfoCircle} />}
+          icon={faInfoCircle}
           title={t('pages.admin.settings.tabs.storage.page.s3.alert.permissionsTitle', {})}
           color='blue'
         >

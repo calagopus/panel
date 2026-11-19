@@ -1,11 +1,5 @@
-import {
-  faPlugCircleCheck,
-  faPlugCircleXmark,
-  faReply,
-  faSatellite,
-  faTrash,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlugCircleCheck, faPlugCircleXmark, faReply, faSatellite, faTrash } from '@fortawesome/free-solid-svg-icons';
+import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { AdminServerModal } from '@/stores/slices/admin/server.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
@@ -17,7 +11,7 @@ const palette = 'pages.admin.servers.quickAction';
 export interface ServerManagementAction {
   id: 'transfer' | 'suspend' | 'unsuspend' | 'clearState' | 'delete';
   modal: AdminServerModal;
-  icon: IconDefinition;
+  icon: IconLike;
   color: 'blue' | 'green' | 'red';
   danger: boolean;
   orderClass: string;

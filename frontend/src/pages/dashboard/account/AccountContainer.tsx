@@ -1,5 +1,4 @@
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
 import classNames from 'classnames';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -75,7 +74,7 @@ export default function AccountContainer({ requireTwoFactorActivation }: Account
   return (
     <TitleCard
       title={t('pages.account.account.containers.account.title', {})}
-      icon={<FontAwesomeIcon icon={faUser} />}
+      icon={faUser}
       className={classNames('h-full order-50', requireTwoFactorActivation && 'blur-xs pointer-events-none select-none')}
     >
       <form onSubmit={form.onSubmit(() => doUpdate())} className='h-full'>

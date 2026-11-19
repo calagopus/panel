@@ -1,5 +1,4 @@
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactNode } from 'react';
 import Button from '@/elements/buttons/Button.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
@@ -24,7 +23,7 @@ export default function UrlMissingPortAlert({
   }
 
   return (
-    <Alert color='yellow' icon={<FontAwesomeIcon icon={faTriangleExclamation} />}>
+    <Alert color='yellow' icon={faTriangleExclamation}>
       <div className='flex flex-col items-start gap-2'>
         {children}
         {onAddPort && (

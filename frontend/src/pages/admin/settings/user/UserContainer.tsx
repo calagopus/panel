@@ -1,6 +1,5 @@
 import type { RouteDefinition } from 'shared';
 import { faList } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import updateUserSettings from '@/api/admin/settings/updateUserSettings.ts';
@@ -86,7 +85,7 @@ export default function UserContainer() {
 
         <CollapsibleSection
           className='mt-4'
-          icon={<FontAwesomeIcon icon={faList} />}
+          icon={faList}
           title={t('pages.admin.settings.tabs.user.page.routeOrder.title', {})}
           enabled={form.values.routeOrder !== null}
           onToggle={(enabled) => form.setFieldValue('routeOrder', enabled ? defaultRoutes.order : null)}

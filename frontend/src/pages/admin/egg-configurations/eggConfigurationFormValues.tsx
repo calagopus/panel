@@ -1,5 +1,4 @@
 import { faList, faNetworkWired, faPlay, faToggleOn } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMemo } from 'react';
 import { ServerRouteDefinition } from 'shared';
 import { z } from 'zod';
@@ -136,7 +135,7 @@ export function useEggConfigurationFormFields({
         type: 'section',
         name: 'configAllocations',
         colSpan: 'full',
-        icon: <FontAwesomeIcon icon={faNetworkWired} />,
+        icon: faNetworkWired,
         title: t('pages.admin.eggConfigurations.tabs.general.page.allocation.title', {}),
         nullableDefault: defaultEggConfigurationAllocations,
         render: (f) => <EggConfigurationAllocationsSection form={f} />,
@@ -145,7 +144,7 @@ export function useEggConfigurationFormFields({
         type: 'section',
         name: 'configFeatures',
         colSpan: 'full',
-        icon: <FontAwesomeIcon icon={faToggleOn} />,
+        icon: faToggleOn,
         title: t('pages.admin.eggConfigurations.tabs.general.page.features.title', {}),
         nullableDefault: defaultEggConfigurationFeatures,
         render: (f) =>
@@ -180,7 +179,7 @@ export function useEggConfigurationFormFields({
         type: 'section',
         name: 'configStartup',
         colSpan: 'full',
-        icon: <FontAwesomeIcon icon={faPlay} />,
+        icon: faPlay,
         title: t('pages.admin.eggConfigurations.tabs.general.page.startup.title', {}),
         nullableDefault: defaultEggConfigurationStartup,
         render: (f) => (
@@ -199,7 +198,7 @@ export function useEggConfigurationFormFields({
         type: 'section',
         name: 'configRoutes',
         colSpan: 'full',
-        icon: <FontAwesomeIcon icon={faList} />,
+        icon: faList,
         title: t('elements.routeOrderEditor.title', {}),
         nullableDefault: () => ({ order: defaultRoutes.order }),
         render: (f) =>
