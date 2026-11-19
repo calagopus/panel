@@ -134,9 +134,17 @@ mod put {
         pwa_display: Option<shared::settings::metadata::PwaDisplay>,
         #[garde(pattern("^#[0-9a-fA-F]{6}$"))]
         pwa_background_color: Option<compact_str::CompactString>,
-        #[garde(length(chars, min = 1, max = 255))]
-        #[serde(default, with = "::serde_with::rust::double_option")]
-        pwa_icon: Option<Option<compact_str::CompactString>>,
+        #[garde(length(max = 8), dive)]
+        pwa_icons: Option<Vec<shared::settings::metadata::PwaIcon>>,
+        #[garde(length(max = 8), dive)]
+        pwa_screenshots: Option<Vec<shared::settings::metadata::PwaScreenshot>>,
+        #[garde(length(max = 10), dive)]
+        pwa_shortcuts: Option<Vec<shared::settings::metadata::PwaShortcut>>,
+        #[garde(
+            length(max = 10),
+            inner(inner(length(chars, min = 1, max = 32), pattern("^[a-z0-9-]+$")))
+        )]
+        pwa_categories: Option<Vec<compact_str::CompactString>>,
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -497,8 +505,17 @@ mod put {
             if let Some(pwa_background_color) = metadata.pwa_background_color {
                 settings.metadata.pwa_background_color = pwa_background_color;
             }
-            if let Some(pwa_icon) = metadata.pwa_icon {
-                settings.metadata.pwa_icon = pwa_icon;
+            if let Some(pwa_icons) = metadata.pwa_icons {
+                settings.metadata.pwa_icons = pwa_icons;
+            }
+            if let Some(pwa_screenshots) = metadata.pwa_screenshots {
+                settings.metadata.pwa_screenshots = pwa_screenshots;
+            }
+            if let Some(pwa_shortcuts) = metadata.pwa_shortcuts {
+                settings.metadata.pwa_shortcuts = pwa_shortcuts;
+            }
+            if let Some(pwa_categories) = metadata.pwa_categories {
+                settings.metadata.pwa_categories = pwa_categories;
             }
         }
         if let Some(user) = data.user {

@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
+import TagsInput from '@/elements/input/TagsInput.tsx';
 import { adminSettingsMetadataSchema } from '@/lib/schemas/admin/settings.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
+import PwaIconsInput from './PwaIconsInput.tsx';
+import PwaScreenshotsInput from './PwaScreenshotsInput.tsx';
+import PwaShortcutsInput from './PwaShortcutsInput.tsx';
 
 type MetadataFormValues = z.infer<typeof adminSettingsMetadataSchema>;
 
@@ -16,7 +20,10 @@ export const metadataEmptyFormValues: MetadataFormValues = {
   pwaShortName: null,
   pwaDisplay: 'standalone',
   pwaBackgroundColor: '#222222',
-  pwaIcon: null,
+  pwaIcons: [],
+  pwaScreenshots: [],
+  pwaShortcuts: [],
+  pwaCategories: [],
 };
 
 export const metadataToFormValues = (metadata: MetadataFormValues): Partial<MetadataFormValues> => ({ ...metadata });
@@ -107,16 +114,6 @@ export function useMetadataFormFields({
     },
 
     {
-      type: 'autocomplete',
-      name: 'pwaIcon',
-      label: t('pages.admin.settings.tabs.metadata.page.form.pwaIcon', {}),
-      description: t('pages.admin.settings.tabs.metadata.page.form.pwaIconDescription', {}),
-      options: assetUrls,
-      props: { placeholder: '/android-chrome-512x512.png' },
-      when: (values) => values.pwaEnabled,
-    },
-
-    {
       type: 'select',
       name: 'pwaDisplay',
       label: t('pages.admin.settings.tabs.metadata.page.form.pwaDisplay', {}),
@@ -137,6 +134,61 @@ export function useMetadataFormFields({
       description: t('pages.admin.settings.tabs.metadata.page.form.pwaBackgroundColorDescription', {}),
       required: true,
       when: (values) => values.pwaEnabled,
+    },
+
+    {
+      type: 'custom',
+      name: 'pwaCategories',
+      colSpan: 'full',
+      when: (values) => values.pwaEnabled,
+      render: (f) => {
+        const invalidCategories = f.values.pwaCategories.filter((category) => !/^[a-z0-9-]{1,32}$/.test(category));
+
+        return (
+          <TagsInput
+            label={t('pages.admin.settings.tabs.metadata.page.form.pwaCategories', {})}
+            description={t('pages.admin.settings.tabs.metadata.page.form.pwaCategoriesDescription', {})}
+            placeholder='utilities'
+            value={f.values.pwaCategories}
+            onChange={(categories) =>
+              f.setFieldValue(
+                'pwaCategories',
+                categories.map((category) => category.trim().toLowerCase().replace(/\s+/g, '-')),
+              )
+            }
+            invalidTags={invalidCategories}
+            error={
+              invalidCategories.length > 0
+                ? t('pages.admin.settings.tabs.metadata.page.form.pwaCategoriesInvalid', {})
+                : undefined
+            }
+          />
+        );
+      },
+    },
+
+    {
+      type: 'custom',
+      name: 'pwaIcons',
+      colSpan: 'full',
+      when: (values) => values.pwaEnabled,
+      render: (f) => <PwaIconsInput form={f} assetUrls={assetUrls} />,
+    },
+
+    {
+      type: 'custom',
+      name: 'pwaScreenshots',
+      colSpan: 'full',
+      when: (values) => values.pwaEnabled,
+      render: (f) => <PwaScreenshotsInput form={f} assetUrls={assetUrls} />,
+    },
+
+    {
+      type: 'custom',
+      name: 'pwaShortcuts',
+      colSpan: 'full',
+      when: (values) => values.pwaEnabled,
+      render: (f) => <PwaShortcutsInput form={f} />,
     },
   ];
 }

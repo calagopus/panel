@@ -301,6 +301,47 @@ export const adminSettingsWebauthnSchema = z.object({
   registrationTimeoutSeconds: z.number().min(30).max(600),
 });
 
+const pwaImageSizes = z.string().regex(
+  /^(any|[1-9]\d{0,4}x[1-9]\d{0,4}( [1-9]\d{0,4}x[1-9]\d{0,4})*)$/,
+  ruleMessage((t) => t('common.form.rule.imageSizes', {})),
+);
+const pwaImageType = z.preprocess(
+  nullableString,
+  z
+    .string()
+    .regex(/^image\/[a-z0-9.+-]+$/)
+    .nullable(),
+);
+
+export const adminSettingsPwaIconSchema = z.object({
+  src: z.string().min(1).max(255),
+  sizes: pwaImageSizes,
+  type: pwaImageType,
+  purpose: z.enum(['any', 'maskable', 'monochrome']),
+});
+
+export const adminSettingsPwaScreenshotSchema = z.object({
+  src: z.string().min(1).max(255),
+  sizes: pwaImageSizes,
+  type: pwaImageType,
+  formFactor: z.enum(['wide', 'narrow']).nullable(),
+  label: z.preprocess(nullableString, z.string().min(1).max(128).nullable()),
+});
+
+export const adminSettingsPwaShortcutSchema = z.object({
+  name: z.string().min(1).max(64),
+  shortName: z.preprocess(nullableString, z.string().min(1).max(32).nullable()),
+  url: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(
+      /^\/([^/\\].*)?$/,
+      ruleMessage((t) => t('common.form.rule.appPath', {})),
+    ),
+  description: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+});
+
 export const adminSettingsMetadataSchema = z.object({
   description: z.preprocess(nullableString, z.string().min(1).max(320).nullable()),
   themeColor: z.string().regex(
@@ -318,7 +359,18 @@ export const adminSettingsMetadataSchema = z.object({
     /^#[0-9a-fA-F]{6}$/,
     ruleMessage((t) => t('common.form.rule.hexColor', {})),
   ),
-  pwaIcon: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+  pwaIcons: z.array(adminSettingsPwaIconSchema).max(8),
+  pwaScreenshots: z.array(adminSettingsPwaScreenshotSchema).max(8),
+  pwaShortcuts: z.array(adminSettingsPwaShortcutSchema).max(10),
+  pwaCategories: z
+    .array(
+      z
+        .string()
+        .min(1)
+        .max(32)
+        .regex(/^[a-z0-9-]+$/),
+    )
+    .max(10),
 });
 
 export const adminSettingsUpdatesSchema = z.object({

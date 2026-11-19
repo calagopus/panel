@@ -58,7 +58,10 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     pwaShortName: null,
     pwaDisplay: 'standalone',
     pwaBackgroundColor: '#222222',
-    pwaIcon: null,
+    pwaIcons: [],
+    pwaScreenshots: [],
+    pwaShortcuts: [],
+    pwaCategories: [],
   },
   server: {
     maxFileManagerViewSize: 10 * 1024 * 1024 * 1024,

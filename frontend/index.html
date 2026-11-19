@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="darkreader-lock"/>
-    <link class="app-icon" rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" href="{{ metadata.apple_touch_icon }}"/>
     <link class="app-icon" rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
     <link class="app-icon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
     <link rel="manifest" href="/site.webmanifest"/>
@@ -16,6 +16,7 @@
     <meta name="title" content="{{ settings.app.name }}"/>
     <meta name="description" content="{{ metadata.description }}"/>
     <meta name="theme-color" content="{{ metadata.theme_color }}" id="meta-theme-color"/>
+    <meta name="apple-mobile-web-app-title" content="{{ metadata.apple_title }}"/>
     <meta name="robots" content="{{ metadata.robots }}"/>
 
     <!-- Open Graph / Facebook / Discord -->

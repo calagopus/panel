@@ -5,6 +5,7 @@ use super::{
     SettingsSerializer, app::AppSettingsApp,
 };
 use compact_str::ToCompactString;
+use garde::Validate;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -35,6 +36,81 @@ impl PwaDisplay {
     }
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum PwaIconPurpose {
+    Any,
+    Maskable,
+    Monochrome,
+}
+
+#[derive(ToSchema, Serialize, Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum PwaFormFactor {
+    Wide,
+    Narrow,
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+pub struct PwaIcon {
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub src: compact_str::CompactString,
+    #[garde(pattern(r"^(any|[1-9]\d{0,4}x[1-9]\d{0,4}( [1-9]\d{0,4}x[1-9]\d{0,4})*)$"))]
+    pub sizes: compact_str::CompactString,
+    #[garde(pattern(r"^image/[a-z0-9.+-]+$"))]
+    pub r#type: Option<compact_str::CompactString>,
+    #[garde(skip)]
+    pub purpose: PwaIconPurpose,
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+pub struct PwaScreenshot {
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub src: compact_str::CompactString,
+    #[garde(pattern(r"^(any|[1-9]\d{0,4}x[1-9]\d{0,4}( [1-9]\d{0,4}x[1-9]\d{0,4})*)$"))]
+    pub sizes: compact_str::CompactString,
+    #[garde(pattern(r"^image/[a-z0-9.+-]+$"))]
+    pub r#type: Option<compact_str::CompactString>,
+    #[garde(skip)]
+    pub form_factor: Option<PwaFormFactor>,
+    #[garde(length(chars, min = 1, max = 128))]
+    #[schema(min_length = 1, max_length = 128)]
+    pub label: Option<compact_str::CompactString>,
+}
+
+#[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
+pub struct PwaShortcut {
+    #[garde(length(chars, min = 1, max = 64))]
+    #[schema(min_length = 1, max_length = 64)]
+    pub name: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 32))]
+    #[schema(min_length = 1, max_length = 32)]
+    pub short_name: Option<compact_str::CompactString>,
+    #[garde(length(chars, min = 1, max = 255), pattern(r"^/([^/\\].*)?$"))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub url: compact_str::CompactString,
+    #[garde(length(chars, min = 1, max = 255))]
+    #[schema(min_length = 1, max_length = 255)]
+    pub description: Option<compact_str::CompactString>,
+}
+
+fn is_svg(src: &str, r#type: Option<&str>) -> bool {
+    match r#type {
+        Some(r#type) => r#type == "image/svg+xml",
+        None => src.ends_with(".svg"),
+    }
+}
+
+fn largest_dimension(sizes: &str) -> Option<u32> {
+    sizes
+        .split(' ')
+        .filter_map(|size| size.split_once('x'))
+        .filter_map(|(width, height)| Some(width.parse::<u32>().ok()?.max(height.parse().ok()?)))
+        .max()
+}
+
 #[derive(Clone, ToSchema, Serialize, Deserialize)]
 pub struct AppSettingsMetadata {
     pub description: Option<compact_str::CompactString>,
@@ -48,7 +124,10 @@ pub struct AppSettingsMetadata {
     pub pwa_short_name: Option<compact_str::CompactString>,
     pub pwa_display: PwaDisplay,
     pub pwa_background_color: compact_str::CompactString,
-    pub pwa_icon: Option<compact_str::CompactString>,
+    pub pwa_icons: Vec<PwaIcon>,
+    pub pwa_screenshots: Vec<PwaScreenshot>,
+    pub pwa_shortcuts: Vec<PwaShortcut>,
+    pub pwa_categories: Vec<compact_str::CompactString>,
 }
 
 #[derive(Serialize)]
@@ -59,9 +138,37 @@ pub struct ResolvedMetadata {
     pub twitter_card: &'static str,
     pub robots: &'static str,
     pub pwa_enabled: bool,
+    pub apple_touch_icon: compact_str::CompactString,
+    pub apple_title: compact_str::CompactString,
 }
 
 impl AppSettingsMetadata {
+    fn apple_touch_icon(&self, app: &AppSettingsApp) -> compact_str::CompactString {
+        let raster_icon = |purpose: PwaIconPurpose| {
+            self.pwa_icons
+                .iter()
+                .filter(|icon| {
+                    icon.purpose == purpose && !is_svg(&icon.src, icon.r#type.as_deref())
+                })
+                .min_by_key(|icon| {
+                    largest_dimension(&icon.sizes).map_or(u32::MAX, |size| size.abs_diff(180))
+                })
+        };
+
+        if self.pwa_enabled
+            && let Some(icon) =
+                raster_icon(PwaIconPurpose::Any).or_else(|| raster_icon(PwaIconPurpose::Maskable))
+        {
+            return icon.src.clone();
+        }
+
+        if !is_svg(&app.icon, None) {
+            return app.icon.clone();
+        }
+
+        "/apple-touch-icon.png".into()
+    }
+
     pub fn resolve(&self, app: &AppSettingsApp) -> ResolvedMetadata {
         let base_url = app.url.trim_end_matches('/');
 
@@ -96,28 +203,48 @@ impl AppSettingsMetadata {
                 "noindex, nofollow"
             },
             pwa_enabled: self.pwa_enabled,
+            apple_touch_icon: self.apple_touch_icon(app),
+            apple_title: match self.pwa_enabled {
+                true => self
+                    .pwa_short_name
+                    .clone()
+                    .or_else(|| self.pwa_name.clone())
+                    .unwrap_or_else(|| app.name.clone()),
+                false => app.name.clone(),
+            },
         }
     }
 
     pub fn web_manifest(&self, app: &AppSettingsApp) -> serde_json::Value {
-        let icons = match self.pwa_icon.as_deref() {
-            Some(icon) if icon.ends_with(".svg") => serde_json::json!([
-                { "src": icon, "sizes": "any", "type": "image/svg+xml" },
-            ]),
-            Some(icon) => serde_json::json!([
-                { "src": icon, "sizes": "192x192" },
-                { "src": icon, "sizes": "512x512" },
-            ]),
-            None => serde_json::json!([
+        let icons = if self.pwa_icons.is_empty() {
+            serde_json::json!([
                 { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
                 { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
-            ]),
+            ])
+        } else {
+            self.pwa_icons
+                .iter()
+                .map(|icon| {
+                    let mut entry = serde_json::json!({
+                        "src": icon.src,
+                        "sizes": icon.sizes,
+                        "purpose": icon.purpose,
+                    });
+                    if let Some(r#type) = &icon.r#type {
+                        entry["type"] = r#type.as_str().into();
+                    }
+
+                    entry
+                })
+                .collect()
         };
 
-        serde_json::json!({
+        let mut manifest = serde_json::json!({
+            "id": "/",
             "name": self.pwa_name.as_deref().unwrap_or(&app.name),
             "short_name": self.pwa_short_name.as_deref().unwrap_or(&app.name),
             "description": self.resolve(app).description,
+            "lang": app.language,
             "start_url": "/",
             "scope": "/",
             "display": self.pwa_display.as_str(),
@@ -125,7 +252,58 @@ impl AppSettingsMetadata {
             "theme_color": self.theme_color,
             "orientation": "any",
             "icons": icons,
-        })
+        });
+
+        if !self.pwa_screenshots.is_empty() {
+            manifest["screenshots"] = self
+                .pwa_screenshots
+                .iter()
+                .map(|screenshot| {
+                    let mut entry = serde_json::json!({
+                        "src": screenshot.src,
+                        "sizes": screenshot.sizes,
+                    });
+                    if let Some(r#type) = &screenshot.r#type {
+                        entry["type"] = r#type.as_str().into();
+                    }
+                    if let Some(form_factor) = screenshot.form_factor {
+                        entry["form_factor"] = serde_json::json!(form_factor);
+                    }
+                    if let Some(label) = &screenshot.label {
+                        entry["label"] = label.as_str().into();
+                    }
+
+                    entry
+                })
+                .collect();
+        }
+
+        if !self.pwa_shortcuts.is_empty() {
+            manifest["shortcuts"] = self
+                .pwa_shortcuts
+                .iter()
+                .map(|shortcut| {
+                    let mut entry = serde_json::json!({
+                        "name": shortcut.name,
+                        "url": shortcut.url,
+                    });
+                    if let Some(short_name) = &shortcut.short_name {
+                        entry["short_name"] = short_name.as_str().into();
+                    }
+                    if let Some(description) = &shortcut.description {
+                        entry["description"] = description.as_str().into();
+                    }
+
+                    entry
+                })
+                .collect();
+        }
+
+        if !self.pwa_categories.is_empty() {
+            manifest["categories"] = serde_json::json!(self.pwa_categories);
+        }
+
+        manifest
     }
 }
 
@@ -155,7 +333,10 @@ impl SettingsSerializeExt for AppSettingsMetadata {
             )
             .write_raw_setting("pwa_display", self.pwa_display.as_str())
             .write_raw_setting("pwa_background_color", &*self.pwa_background_color)
-            .write_raw_setting("pwa_icon", self.pwa_icon.as_deref().unwrap_or("")))
+            .write_serde_setting("pwa_icons", &self.pwa_icons)?
+            .write_serde_setting("pwa_screenshots", &self.pwa_screenshots)?
+            .write_serde_setting("pwa_shortcuts", &self.pwa_shortcuts)?
+            .write_serde_setting("pwa_categories", &self.pwa_categories)?)
     }
 }
 
@@ -204,9 +385,32 @@ impl SettingsDeserializeExt for AppSettingsMetadataDeserializer {
             pwa_background_color: deserializer
                 .take_raw_setting("pwa_background_color")
                 .unwrap_or_else(|| "#222222".into()),
-            pwa_icon: deserializer
-                .take_raw_setting("pwa_icon")
-                .and_then(|s| s.into_optional()),
+            pwa_icons: match deserializer.read_serde_setting("pwa_icons") {
+                Ok(Some(icons)) => icons,
+                _ => deserializer
+                    .take_raw_setting("pwa_icon")
+                    .and_then(|s| s.into_optional())
+                    .map(|src| {
+                        let svg = is_svg(&src, None);
+
+                        vec![PwaIcon {
+                            sizes: if svg { "any" } else { "512x512" }.into(),
+                            r#type: svg.then(|| "image/svg+xml".into()),
+                            src,
+                            purpose: PwaIconPurpose::Any,
+                        }]
+                    })
+                    .unwrap_or_default(),
+            },
+            pwa_screenshots: deserializer
+                .read_serde_setting("pwa_screenshots")
+                .unwrap_or_default(),
+            pwa_shortcuts: deserializer
+                .read_serde_setting("pwa_shortcuts")
+                .unwrap_or_default(),
+            pwa_categories: deserializer
+                .read_serde_setting("pwa_categories")
+                .unwrap_or_default(),
         }))
     }
 }

@@ -575,7 +575,9 @@
           "variableName": "Beginnt mit einem Kleinbuchstaben, gefolgt von bis zu 63 Kleinbuchstaben, Ziffern oder Unterstrichen.",
           "hexColor": "Eine Hex-Farbe wie #1c7ed6.",
           "devicePermissions": "Beliebige Kombination aus r (lesen), w (schreiben) und m (mknod).",
-          "percentage": "Ein Prozentwert zwischen 0 und 100."
+          "percentage": "Ein Prozentwert zwischen 0 und 100.",
+          "imageSizes": "Größen wie 512x512, mehrere durch Leerzeichen getrennt, oder any.",
+          "appPath": "Ein Pfad im Panel, der mit einem einzelnen Schrägstrich beginnt, z. B. /admin."
         }
       },
       "table": {
@@ -2555,8 +2557,26 @@
                   "pwaNameDescription": "Wird in der Installationsaufforderung und auf dem Startbildschirm angezeigt.",
                   "pwaShortName": "Kurzer App-Name",
                   "pwaShortNameDescription": "Wird unter dem Symbol auf dem Startbildschirm angezeigt, wenn der volle Name nicht passt.",
-                  "pwaIcon": "App-Symbol",
-                  "pwaIconDescription": "Ein quadratisches PNG mit mindestens 512x512 oder ein SVG.",
+                  "pwaIcons": "App-Symbole",
+                  "pwaIconsDescription": "Quadratische PNGs mit 192x192 und 512x512 oder ein SVG. Ohne Symbole werden die Standardsymbole verwendet. Halte das Logo eines maskierbaren Symbols in den mittleren 80 %, Android schneidet den Rest ab.",
+                  "pwaScreenshots": "Screenshots",
+                  "pwaScreenshotsDescription": "Werden im Installationsdialog angezeigt. Breite Screenshots werden auf dem Desktop verwendet, schmale auf Mobilgeräten.",
+                  "pwaShortcuts": "Verknüpfungen",
+                  "pwaShortcutsDescription": "Werden angezeigt, wenn das Symbol der installierten App lange gedrückt oder per Rechtsklick geöffnet wird.",
+                  "pwaCategories": "Kategorien",
+                  "pwaCategoriesDescription": "Kleingeschriebene Wörter, nach denen App-Stores sortieren, z. B. utilities oder games.",
+                  "pwaCategoriesInvalid": "Kategorien dürfen nur Kleinbuchstaben, Ziffern und Bindestriche enthalten.",
+                  "imageUrl": "Bild-URL",
+                  "imageSizes": "Größen",
+                  "imageSizesDescription": "Wird aus dem Bild übernommen, sobald es geladen ist.",
+                  "imageType": "Typ",
+                  "iconPurpose": "Zweck",
+                  "screenshotFormFactor": "Formfaktor",
+                  "screenshotLabel": "Beschriftung",
+                  "shortcutName": "Name",
+                  "shortcutShortName": "Kurzname",
+                  "shortcutUrl": "Pfad",
+                  "shortcutDescription": "Beschreibung",
                   "pwaDisplay": "Anzeigemodus",
                   "pwaBackgroundColor": "Farbe des Startbildschirms",
                   "pwaBackgroundColorDescription": "Hintergrund des Startbildschirms, der beim Öffnen der App angezeigt wird."
@@ -2571,13 +2591,26 @@
                     "fullscreen": "Vollbild",
                     "minimalUi": "Minimale Oberfläche",
                     "browser": "Browser-Tab"
+                  },
+                  "iconPurpose": {
+                    "any": "Beliebig",
+                    "maskable": "Maskierbar",
+                    "monochrome": "Einfarbig"
+                  },
+                  "screenshotFormFactor": {
+                    "any": "Beliebig",
+                    "wide": "Breit (Desktop)",
+                    "narrow": "Schmal (Mobil)"
                   }
                 },
                 "placeholder": {
                   "description": "Verwalte deine Gameserver und Dienste mit {name}."
                 },
                 "button": {
-                  "autofill": "Automatisch ausfüllen"
+                  "autofill": "Automatisch ausfüllen",
+                  "addIcon": "Symbol hinzufügen",
+                  "addScreenshot": "Screenshot hinzufügen",
+                  "addShortcut": "Verknüpfung hinzufügen"
                 },
                 "toast": {
                   "updated": "Metadaten-Einstellungen aktualisiert."
