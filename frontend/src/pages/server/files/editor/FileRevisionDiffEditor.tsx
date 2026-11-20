@@ -91,6 +91,7 @@ export default function FileRevisionDiffEditor({
         fixedOverflowWidgets: true,
       }}
       onMount={(editor, monaco) => {
+        editor.getModifiedEditor().updateOptions({ scrollbar: { vertical: 'hidden' } });
         if (previousRevisionId === undefined) {
           const modifiedEditor = editor.getModifiedEditor();
           modifiedEditor.onDidChangeModelContent(() => {

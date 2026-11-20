@@ -81,6 +81,7 @@ export default function FileEditorConflictDiffModal({
                   original: originalModel,
                   modified: modifiedModel,
                 });
+                diffEditor.getModifiedEditor().updateOptions({ scrollbar: { vertical: 'hidden' } });
               }}
             />
           )}
