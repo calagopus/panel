@@ -1,3 +1,5 @@
+import { faEgg } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps, useModalsStack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -5,6 +7,7 @@ import { z } from 'zod';
 import installEggs from '@/api/admin/egg-repositories/eggs/installEggs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import NestSelect from '@/elements/input/NestSelect.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
@@ -86,6 +89,18 @@ export default function EggRepositoryEggInstallModal({
         title={t('pages.admin.eggRepositories.tabs.eggs.page.modal.install.title', { eggs: tItem('egg', eggs.length) })}
       >
         <Stack>
+          <ItemPreviewList
+            items={eggs}
+            getKey={(egg) => egg.uuid}
+            renderItem={(egg) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={faEgg} />}
+                name={egg.exportedEgg.name}
+                description={egg.exportedEgg.author}
+              />
+            )}
+          />
+
           <div className='flex flex-col gap-1'>
             <NestSelect
               withAsterisk

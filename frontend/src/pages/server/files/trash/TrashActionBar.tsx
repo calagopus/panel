@@ -1,5 +1,6 @@
-import { faFolderOpen, faRotateLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faFile, faFolder, faFolderOpen, faRotateLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { dirname, join } from 'pathe';
 import { useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
@@ -7,8 +8,11 @@ import deleteTrashEntries from '@/api/server/files/trash/deleteTrashEntries.ts';
 import restoreTrashEntries from '@/api/server/files/trash/restoreTrashEntries.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { bytesToString } from '@/lib/format/size.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverTrashEntrySchema } from '@/lib/schemas/server/files.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
@@ -115,9 +119,24 @@ export default function TrashActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.server.files.trash.modal.deleteEntries.content', {
-          entries: tItem('file', entries.length),
-        }).md()}
+        <Stack>
+          {t('pages.server.files.trash.modal.deleteEntries.content', {
+            entries: tItem('file', entries.length),
+          }).md()}
+
+          <ItemPreviewList
+            items={entries}
+            getKey={(entry) => entry.uuid}
+            renderItem={(entry) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={entry.directory ? faFolder : faFile} />}
+                name={entry.name}
+                description={join('/', dirname(entry.path))}
+                meta={bytesToString(entry.size)}
+              />
+            )}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedEntries.size > 0}>

@@ -1,11 +1,13 @@
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faClipboard, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteCommandSnippet from '@/api/me/command-snippets/deleteCommandSnippet.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { userCommandSnippetSchema } from '@/lib/schemas/user/commandSnippets.ts';
@@ -55,9 +57,23 @@ export default function CommandSnippetActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.commandSnippets.modal.deleteCommandSnippets.content', {
-          commandSnippets: tItem('commandSnippet', commandSnippets.length),
-        }).md()}
+        <Stack>
+          {t('pages.account.commandSnippets.modal.deleteCommandSnippets.content', {
+            commandSnippets: tItem('commandSnippet', commandSnippets.length),
+          }).md()}
+
+          <ItemPreviewList
+            items={commandSnippets}
+            getKey={(commandSnippet) => commandSnippet.uuid}
+            renderItem={(commandSnippet) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={faClipboard} />}
+                name={`!${commandSnippet.name}`}
+                description={commandSnippet.command}
+              />
+            )}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedCommandSnippets.size > 0}>

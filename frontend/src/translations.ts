@@ -709,6 +709,7 @@ const baseTranslations = defineTranslations({
       never: 'Never',
       none: 'None',
       unknown: 'Unknown',
+      moreItems: '+{count} more',
       yes: 'Yes',
       no: 'No',
       web: 'Web',
@@ -4042,6 +4043,7 @@ const baseTranslations = defineTranslations({
               alert: {
                 forceWarning:
                   'Force deletion removes these servers from the panel even if their nodes cannot be reached. Their files and databases may not be fully cleaned up, leaving orphaned data behind.',
+                skipped: '{servers} will be skipped because they are already in that state.',
               },
             },
             successWithSkipped: 'Successfully {action} {servers}. {skippedServers} skipped.',

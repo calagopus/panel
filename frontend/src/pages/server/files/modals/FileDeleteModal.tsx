@@ -5,13 +5,14 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteFiles from '@/api/server/files/deleteFiles.ts';
 import restoreTrashEntries from '@/api/server/files/trash/restoreTrashEntries.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList from '@/elements/data-display/ItemPreviewList.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import { Modal, ModalFooter } from '@/elements/modals/Modal.tsx';
-import Code from '@/elements/typography/Code.tsx';
 import { isTrashEnabled } from '@/lib/domain/server.ts';
 import { createUndoAction } from '@/lib/files/undoableFileMutation.ts';
 import { formatSeconds } from '@/lib/format/time.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import FileListItem from '@/pages/server/files/list/FileListItem.tsx';
 import { useUndoableToast } from '@/plugins/toast/useUndoableToast.ts';
 import { useFileManager } from '@/providers/contexts/fileManagerContext.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -113,15 +114,12 @@ export default function FileDeleteModal({ files, ...props }: Props) {
           {trash
             ? t('pages.server.files.modal.deleteFile.multipleFilesTrash', { retention }).md()
             : t('pages.server.files.modal.deleteFile.multipleFilesWarning', {}).md()}
-          <Code block className='mt-1'>
-            <ul>
-              {files.map((file) => (
-                <li key={file.name}>
-                  <span>{file.name}</span>
-                </li>
-              ))}
-            </ul>
-          </Code>
+          <ItemPreviewList
+            className='mt-2'
+            items={files}
+            getKey={(file) => file.name}
+            renderItem={(file) => <FileListItem file={file} />}
+          />
         </>
       )}
 

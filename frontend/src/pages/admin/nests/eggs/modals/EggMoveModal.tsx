@@ -1,3 +1,5 @@
+import { faEgg } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ModalProps } from '@mantine/core';
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -6,6 +8,7 @@ import moveEgg from '@/api/admin/nests/eggs/moveEgg.ts';
 import moveEggs from '@/api/admin/nests/eggs/moveEggs.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import NestSelect from '@/elements/input/NestSelect.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import FormModal from '@/elements/modals/FormModal.tsx';
@@ -75,6 +78,16 @@ export default function EggMoveModal({
       onSubmit={doMove}
     >
       <Stack>
+        {isBulk && (
+          <ItemPreviewList
+            items={eggs}
+            getKey={(egg) => egg.uuid}
+            renderItem={(egg) => (
+              <ItemPreviewRow icon={<FontAwesomeIcon icon={faEgg} />} name={egg.name} description={egg.author} />
+            )}
+          />
+        )}
+
         <NestSelect
           withAsterisk
           label={t('common.form.nest', {})}

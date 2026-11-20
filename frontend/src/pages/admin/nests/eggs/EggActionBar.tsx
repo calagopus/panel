@@ -1,4 +1,4 @@
-import { faArrowTurnUp, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faArrowTurnUp, faEgg, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -8,6 +8,8 @@ import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
@@ -92,7 +94,17 @@ export default function EggActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.nests.tabs.eggs.page.modal.deleteBulk.content', { count: selectedEggs.size }).md()}
+        <Stack>
+          {t('pages.admin.nests.tabs.eggs.page.modal.deleteBulk.content', { count: selectedEggs.size }).md()}
+
+          <ItemPreviewList
+            items={selectedEggs.values()}
+            getKey={(egg) => egg.uuid}
+            renderItem={(egg) => (
+              <ItemPreviewRow icon={<FontAwesomeIcon icon={faEgg} />} name={egg.name} description={egg.author} />
+            )}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedEggs.size > 0}>

@@ -887,6 +887,7 @@
       "never": "Nie",
       "none": "Keine",
       "unknown": "Unbekannt",
+      "moreItems": "+{count} weitere",
       "yes": "Ja",
       "no": "Nein",
       "web": "Web",
@@ -4061,7 +4062,8 @@
                 "deleteBackups": "Möchtest du die Backups dieser Server löschen?"
               },
               "alert": {
-                "forceWarning": "Das erzwungene Löschen entfernt diese Server aus dem Panel, auch wenn ihre Nodes nicht erreichbar sind. Ihre Dateien und Datenbanken werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben."
+                "forceWarning": "Das erzwungene Löschen entfernt diese Server aus dem Panel, auch wenn ihre Nodes nicht erreichbar sind. Ihre Dateien und Datenbanken werden möglicherweise nicht vollständig bereinigt, sodass verwaiste Daten zurückbleiben.",
+                "skipped": "{servers} werden übersprungen, da sie sich bereits in diesem Zustand befinden."
               }
             },
             "successWithSkipped": "Erfolgreich {servers} {action}. {skippedServers} übersprungen.",

@@ -1,4 +1,4 @@
-import { faBan, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faCheck, faCloud, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -6,7 +6,9 @@ import deleteApiKey from '@/api/me/api-keys/deleteApiKey.ts';
 import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { userApiKeySchema } from '@/lib/schemas/user/apiKeys.ts';
@@ -72,9 +74,23 @@ export default function ApiKeyActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.apiKeys.modal.deleteApiKeys.content', {
-          apiKeys: tItem('apiKey', apiKeys.length),
-        }).md()}
+        <Stack>
+          {t('pages.account.apiKeys.modal.deleteApiKeys.content', {
+            apiKeys: tItem('apiKey', apiKeys.length),
+          }).md()}
+
+          <ItemPreviewList
+            items={apiKeys}
+            getKey={(apiKey) => apiKey.uuid}
+            renderItem={(apiKey) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={faCloud} />}
+                name={apiKey.name}
+                description={`${apiKey.keyStart}...`}
+              />
+            )}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedApiKeys.size > 0}>

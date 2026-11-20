@@ -1,4 +1,4 @@
-import { faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faDatabase, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -6,10 +6,12 @@ import deleteDatabase from '@/api/server/databases/deleteDatabase.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { databaseTypeLabelMapping } from '@/lib/enums.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverDatabaseSchema } from '@/lib/schemas/server/databases.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
@@ -66,6 +68,19 @@ export default function DatabaseActionBar({
           {t('pages.server.databases.modal.deleteDatabases.content', {
             databases: tItem('database', deletable.length),
           }).md()}
+
+          <ItemPreviewList
+            items={deletable}
+            getKey={(database) => database.uuid}
+            renderItem={(database) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={faDatabase} />}
+                name={database.name}
+                description={database.username}
+                meta={databaseTypeLabelMapping[database.type]}
+              />
+            )}
+          />
 
           {skippedDeletes > 0 && (
             <Alert color='yellow' icon={faTriangleExclamation}>

@@ -1,11 +1,13 @@
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faKey, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteSshKey from '@/api/me/ssh-keys/deleteSshKey.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { userSshKeySchema } from '@/lib/schemas/user/sshKeys.ts';
@@ -55,7 +57,21 @@ export default function SshKeyActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.sshKeys.modal.deleteSshKeys.content', { sshKeys: tItem('sshKey', sshKeys.length) }).md()}
+        <Stack>
+          {t('pages.account.sshKeys.modal.deleteSshKeys.content', { sshKeys: tItem('sshKey', sshKeys.length) }).md()}
+
+          <ItemPreviewList
+            items={sshKeys}
+            getKey={(sshKey) => sshKey.uuid}
+            renderItem={(sshKey) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={faKey} />}
+                name={sshKey.name}
+                description={sshKey.fingerprint}
+              />
+            )}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedSshKeys.size > 0}>

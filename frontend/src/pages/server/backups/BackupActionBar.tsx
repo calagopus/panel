@@ -1,4 +1,12 @@
-import { faLayerGroup, faLock, faLockOpen, faTrash, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBoxArchive,
+  faDatabase,
+  faLayerGroup,
+  faLock,
+  faLockOpen,
+  faTrash,
+  faTriangleExclamation,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -8,11 +16,14 @@ import updateBackups from '@/api/server/backups/updateBackups.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
+import { bytesToString } from '@/lib/format/size.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverBackupGroupSchema, serverBackupSchema } from '@/lib/schemas/server/backups.ts';
@@ -116,6 +127,19 @@ export default function BackupActionBar({
           {t('pages.server.backups.modal.deleteBackups.content', {
             backups: tItem('backup', deletable.length),
           }).md()}
+
+          <ItemPreviewList
+            items={deletable}
+            getKey={(backup) => backup.uuid}
+            renderItem={(backup) => (
+              <ItemPreviewRow
+                icon={<FontAwesomeIcon icon={backup.kind === 'server' ? faBoxArchive : faDatabase} />}
+                name={backup.name}
+                description={<FormattedTimestamp timestamp={backup.created} />}
+                meta={bytesToString(backup.bytes)}
+              />
+            )}
+          />
 
           {skippedDeletes > 0 && (
             <Alert color='yellow' icon={faTriangleExclamation}>

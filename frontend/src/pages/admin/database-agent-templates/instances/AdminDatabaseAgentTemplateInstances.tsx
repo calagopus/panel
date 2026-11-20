@@ -1,4 +1,4 @@
-import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsRotate, faDatabase } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Ref, useState } from 'react';
 import { z } from 'zod';
@@ -9,9 +9,12 @@ import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import Table, { tableSelectionHeader } from '@/elements/data-display/Table.tsx';
 import SelectionArea from '@/elements/dnd/SelectionArea.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import { databaseAgentTypeLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminDatabaseAgentTemplateSchema } from '@/lib/schemas/admin/databaseAgentTemplates.ts';
 import { databaseAgentTemplateInstanceTableColumns } from '@/lib/tableColumns.ts';
@@ -123,14 +126,31 @@ export default function AdminDatabaseAgentTemplateInstances({
         confirmColor='blue'
         onConfirmed={doApplyUpdates}
       >
-        {pendingScope === 'all'
-          ? t('pages.admin.databaseAgentTemplates.tabs.instances.page.modal.applyUpdates.contentAll', {
-              name: databaseAgentTemplate.name,
-            }).md()
-          : t('pages.admin.databaseAgentTemplates.tabs.instances.page.modal.applyUpdates.content', {
+        {pendingScope === 'all' ? (
+          t('pages.admin.databaseAgentTemplates.tabs.instances.page.modal.applyUpdates.contentAll', {
+            name: databaseAgentTemplate.name,
+          }).md()
+        ) : (
+          <Stack>
+            {t('pages.admin.databaseAgentTemplates.tabs.instances.page.modal.applyUpdates.content', {
               count: selected.size,
               name: databaseAgentTemplate.name,
             }).md()}
+
+            <ItemPreviewList
+              items={selected.values()}
+              getKey={(databaseAgent) => databaseAgent.uuid}
+              renderItem={(databaseAgent) => (
+                <ItemPreviewRow
+                  icon={<FontAwesomeIcon icon={faDatabase} />}
+                  name={databaseAgent.name}
+                  description={databaseAgent.server.name}
+                  meta={databaseAgentTypeLabelMapping[databaseAgent.type]}
+                />
+              )}
+            />
+          </Stack>
+        )}
       </ConfirmationModal>
 
       <ActionBar opened={selected.size > 0}>

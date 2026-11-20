@@ -5,6 +5,7 @@ import {
   faReply,
   faRotateRight,
   faSatellite,
+  faServer,
   faStop,
   faTrash,
   faTriangleExclamation,
@@ -19,6 +20,7 @@ import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Icon, { type IconLike } from '@/elements/data-display/Icon.tsx';
+import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -290,12 +292,39 @@ export default function ServerActionBar({
       return null;
     }
 
-    const servers = tItem('server', targets(confirming).length);
+    const confirmTargets = targets(confirming);
+    const servers = tItem('server', confirmTargets.length);
+    const skipped = selectedServers.size - confirmTargets.length;
+
+    const serverList = (
+      <>
+        {skipped > 0 && (
+          <Alert color='yellow' icon={faTriangleExclamation}>
+            {t('pages.admin.servers.bulkActions.modal.alert.skipped', { servers: tItem('server', skipped) })}
+          </Alert>
+        )}
+
+        <ItemPreviewList
+          items={confirmTargets}
+          getKey={(server) => server.uuid}
+          renderItem={(server) => (
+            <ItemPreviewRow
+              icon={<Icon icon={faServer} />}
+              name={server.name}
+              description={server.owner.username}
+              meta={server.node.name}
+            />
+          )}
+        />
+      </>
+    );
 
     if (confirming === 'delete') {
       return (
         <Stack>
           {t('pages.admin.servers.bulkActions.modal.deleteContent', { servers }).md()}
+
+          {serverList}
 
           <Switch
             label={t('common.form.force', {})}
@@ -321,10 +350,16 @@ export default function ServerActionBar({
       );
     }
 
-    return t('pages.admin.servers.bulkActions.modal.content', {
-      action: t(`pages.admin.servers.bulkActions.verb.${confirming}`, {}),
-      servers,
-    }).md();
+    return (
+      <Stack>
+        {t('pages.admin.servers.bulkActions.modal.content', {
+          action: t(`pages.admin.servers.bulkActions.verb.${confirming}`, {}),
+          servers,
+        }).md()}
+
+        {serverList}
+      </Stack>
+    );
   };
 
   const closeConfirmation = () => {

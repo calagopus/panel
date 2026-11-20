@@ -4,8 +4,11 @@ import { useState } from 'react';
 import ActionBar from '@/elements/ActionBar.tsx';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
+import ItemPreviewList from '@/elements/data-display/ItemPreviewList.tsx';
+import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
+import AssetListItem from '@/pages/admin/assets/AssetListItem.tsx';
 import { AssetSet } from '@/pages/admin/assets/hooks/useAssetSelection.ts';
 import { useDeleteAssets } from '@/pages/admin/assets/hooks/useDeleteAssets.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
@@ -15,9 +18,11 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AssetActionBar({
   selectedAssets,
+  currentDirectory,
   onDeleted,
 }: {
   selectedAssets: AssetSet;
+  currentDirectory: string;
   onDeleted: () => void;
 }) {
   const { t } = useTranslations();
@@ -66,7 +71,15 @@ export default function AssetActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.assets.modal.deleteAssets.content', { count: selectedAssets.size }).md()}
+        <Stack>
+          {t('pages.admin.assets.modal.deleteAssets.content', { count: selectedAssets.size }).md()}
+
+          <ItemPreviewList
+            items={selectedAssets.values()}
+            getKey={(asset) => asset.name}
+            renderItem={(asset) => <AssetListItem asset={asset} currentDirectory={currentDirectory} />}
+          />
+        </Stack>
       </ConfirmationModal>
 
       <ActionBar opened={selectedAssets.size > 0}>

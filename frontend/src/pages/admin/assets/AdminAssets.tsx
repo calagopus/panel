@@ -163,6 +163,7 @@ export default function AdminAssets() {
 
       <AssetActionBar
         selectedAssets={selection.selected}
+        currentDirectory={currentDirectory}
         onDeleted={() => {
           selection.clear();
           invalidateAssets();
