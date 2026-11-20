@@ -5,11 +5,11 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
-garde = { workspace = true }
+garde = { version = "0.23.0", default-features = false }
 serde_json = { workspace = true }
-reqwest = { workspace = true }
-chrono = { workspace = true }
-chrono-tz = { workspace = true }
-uuid = { workspace = true }
-regex = { workspace = true }
-compact_str = { workspace = true }
+url = "2.5.8"
+chrono = { version = "0.4.40", default-features = false, features = ["alloc", "std"] }
+chrono-tz = { version = "0.10.4", default-features = false }
+uuid = { version = "1.17.0", default-features = false, features = ["std"] }
+regex = { version = "1.11.1", default-features = false, features = ["std", "unicode"] }
+compact_str = { version = "0.10.0", default-features = false, features = ["std"] }

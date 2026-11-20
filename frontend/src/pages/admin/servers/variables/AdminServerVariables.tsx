@@ -7,7 +7,9 @@ import Button from '@/elements/buttons/Button.tsx';
 import AdminSubContentContainer from '@/elements/containers/AdminSubContentContainer.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
+import { getExcludedVariables } from '@/lib/domain/eggVariableRules.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useRuleValidator } from '@/lib/ruleValidator.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { useUnsavedChanges } from '@/plugins/form/useFormDraft.ts';
@@ -27,6 +29,20 @@ export default function AdminServerVariables({ server }: { server: AdminServer }
     queryKey: queryKeys.admin.servers.variables(server.uuid),
     queryFn: () => getServerVariables(server.uuid),
   });
+
+  const ruleValidator = useRuleValidator();
+
+  const ruleVariables = serverVariables.map((variable) => ({
+    envVariable: variable.envVariable,
+    rules: variable.rules,
+    value: values[variable.envVariable] ?? variable.value,
+  }));
+  const validation = ruleValidator?.validate(ruleVariables);
+  const excludedVariables = validation?.excluded ?? getExcludedVariables(ruleVariables);
+  const variableErrors = Object.fromEntries(
+    Object.entries(validation?.errors ?? {}).filter(([envVariable]) => envVariable in values),
+  );
+  const canSave = Object.keys(values).length > 0 && Object.keys(variableErrors).length === 0;
 
   const doUpdate = () => {
     setLoading(true);
@@ -48,14 +64,14 @@ export default function AdminServerVariables({ server }: { server: AdminServer }
   useKeyboardShortcut(
     's',
     () => {
-      if (Object.keys(values).length > 0 && !loading) {
+      if (canSave && !loading) {
         doUpdate();
       }
     },
     {
       modifiers: ['ctrlOrMeta'],
       allowWhenInputFocused: true,
-      deps: [values, loading],
+      deps: [values, loading, canSave],
     },
   );
 
@@ -64,7 +80,7 @@ export default function AdminServerVariables({ server }: { server: AdminServer }
       title={t('pages.admin.servers.tabs.variables.page.title', {})}
       titleOrder={2}
       contentRight={
-        <Button onClick={doUpdate} disabled={Object.keys(values).length === 0} loading={loading} color='blue'>
+        <Button onClick={doUpdate} disabled={!canSave} loading={loading} color='blue'>
           {t('common.button.save', {})}
         </Button>
       }
@@ -82,16 +98,19 @@ export default function AdminServerVariables({ server }: { server: AdminServer }
       </ConfirmationModal>
 
       <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4'>
-        {serverVariables.map((variable) => (
-          <VariableContainer
-            key={variable.envVariable}
-            variable={variable}
-            loading={loading}
-            overrideReadonly
-            value={values[variable.envVariable] ?? variable.value ?? variable.defaultValue ?? ''}
-            setValue={(value) => setValues((prev) => ({ ...prev, [variable.envVariable]: value }))}
-          />
-        ))}
+        {serverVariables
+          .filter((variable) => !excludedVariables.has(variable.envVariable))
+          .map((variable) => (
+            <VariableContainer
+              key={variable.envVariable}
+              variable={variable}
+              loading={loading}
+              overrideReadonly
+              value={values[variable.envVariable] ?? variable.value ?? variable.defaultValue ?? ''}
+              error={variableErrors[variable.envVariable]}
+              setValue={(value) => setValues((prev) => ({ ...prev, [variable.envVariable]: value }))}
+            />
+          ))}
       </div>
     </AdminSubContentContainer>
   );

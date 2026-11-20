@@ -5,7 +5,7 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 import zlib from 'node:zlib';
 
-const COMPRESSIBLE_EXTENSIONS = new Set(['.css', '.html', '.ico', '.js', '.json', '.svg', '.webmanifest']);
+const COMPRESSIBLE_EXTENSIONS = new Set(['.css', '.html', '.ico', '.js', '.json', '.svg', '.wasm', '.webmanifest']);
 
 const MIN_SIZE_BYTES = 1024;
 const CONCURRENCY = Math.max(1, Math.min(os.cpus().length || 4, 16));

@@ -447,7 +447,7 @@ impl ValidateRule for Url {
 
     fn validate(&self, key: &str, data: &Validator) -> Result<(), compact_str::CompactString> {
         if let Some(value) = data.data.get(key)
-            && let Ok(url) = reqwest::Url::parse(value)
+            && let Ok(url) = url::Url::parse(value)
             && !url.cannot_be_a_base()
             && (self.protocols.is_empty() || self.protocols.contains(&url.scheme().into()))
         {

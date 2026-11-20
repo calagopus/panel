@@ -2,7 +2,7 @@ use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap, HashSet},
     future::Future,
     pin::Pin,
     sync::{Arc, LazyLock},
@@ -179,6 +179,51 @@ impl ServerVariable {
         }
 
         Ok(())
+    }
+
+    pub fn into_viewable(variables: Vec<Self>) -> Vec<Self> {
+        let visible: HashSet<&str> = variables
+            .iter()
+            .filter(|variable| variable.variable.user_viewable)
+            .map(|variable| variable.variable.env_variable.as_str())
+            .collect();
+
+        let mut resolved: HashMap<
+            compact_str::CompactString,
+            Option<Vec<compact_str::CompactString>>,
+        > = match rule_validator::resolve_hidden_references(
+            variables
+                .iter()
+                .map(|variable| {
+                    (
+                        variable.variable.env_variable.as_str(),
+                        (variable.variable.rules.as_slice(), variable.value.as_str()),
+                    )
+                })
+                .collect(),
+            &visible,
+        ) {
+            Ok(resolved) => resolved
+                .into_iter()
+                .map(|(env_variable, rules)| (env_variable.into(), rules))
+                .collect(),
+            Err(_) => HashMap::new(),
+        };
+
+        variables
+            .into_iter()
+            .filter(|variable| variable.variable.user_viewable)
+            .filter_map(
+                |mut variable| match resolved.remove(&variable.variable.env_variable) {
+                    Some(None) => None,
+                    Some(Some(rules)) => {
+                        variable.variable.rules = rules;
+                        Some(variable)
+                    }
+                    None => Some(variable),
+                },
+            )
+            .collect()
     }
 
     pub async fn all_by_server_uuid_egg_uuid(

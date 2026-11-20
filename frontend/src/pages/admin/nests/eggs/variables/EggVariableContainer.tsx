@@ -11,6 +11,7 @@ import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import { type FieldDef, FormEngine, useFormEngine } from '@/elements/form-engine/index.ts';
+import EggVariableRulesInput from '@/elements/input/EggVariableRulesInput.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
@@ -161,11 +162,19 @@ export default function EggVariableContainer({
       label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.secret', {}),
     },
     {
-      type: 'tags',
+      type: 'custom',
       name: 'rules',
-      label: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rules', {}),
-      description: t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rulesDescription', {}),
       colSpan: 'full',
+      render: (f) => (
+        <EggVariableRulesInput
+          label={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rules', {})}
+          description={t('pages.admin.nests.tabs.eggs.page.tabs.variables.page.form.rulesDescription', {})}
+          envVariables={eggVariables
+            .map((variable) => variable.envVariable)
+            .filter((envVariable) => envVariable !== f.values.envVariable)}
+          {...f.getInputProps('rules')}
+        />
+      ),
     },
   ];
 

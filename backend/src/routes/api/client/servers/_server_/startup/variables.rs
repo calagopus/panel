@@ -53,9 +53,8 @@ mod get {
         }
 
         ApiResponse::new_serialized(Response {
-            variables: variables
+            variables: ServerVariable::into_viewable(variables)
                 .into_iter()
-                .filter(|variable| variable.variable.user_viewable)
                 .map(|variable| variable.into_api_object(&state, ()))
                 .try_collect_async_vec()
                 .await?,
@@ -160,7 +159,9 @@ mod put {
                 &mut variable.variable.rules,
             )
             .await?;
+        }
 
+        for variable in variables.iter() {
             validator_variables.insert(
                 variable.variable.env_variable.as_str(),
                 (
@@ -199,7 +200,12 @@ mod put {
                 .iter()
                 .find(|v| v.variable.env_variable == data_variable.env_variable)
             {
-                Some(variable) if variable.variable.user_editable => variable.variable.uuid,
+                Some(variable)
+                    if variable.variable.user_editable
+                        && !validator.is_excluded(&variable.variable.env_variable) =>
+                {
+                    variable.variable.uuid
+                }
                 _ => continue,
             };
 

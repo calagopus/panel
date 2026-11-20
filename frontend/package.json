@@ -13,6 +13,8 @@
     "build:fast": "pnpm build",
     "build:docs": "typedoc --options typedoc.json --skipErrorChecking",
     "build:translations": "tsx build-translations.mts",
+    "build:rule-validator-wasm": "tsx build-rule-validator-wasm.mts",
+    "check:rule-validator-wasm": "tsx build-rule-validator-wasm.mts --check",
     "diff:translations": "tsx diff-translations.mts",
     "format:translations": "tsx format-translations.mts",
     "lint": "oxlint",

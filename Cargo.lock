@@ -6869,9 +6869,19 @@ dependencies = [
  "compact_str 0.10.0",
  "garde",
  "regex",
- "reqwest",
  "serde_json",
+ "url",
  "uuid",
+]
+
+[[package]]
+name = "rule-validator-wasm"
+version = "1.2.11"
+dependencies = [
+ "compact_str 0.10.0",
+ "rule-validator",
+ "serde_json",
+ "wasm-bindgen",
 ]
 
 [[package]]

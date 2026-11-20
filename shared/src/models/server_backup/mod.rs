@@ -1444,7 +1444,12 @@ impl ServerBackup {
                     .iter()
                     .find(|v| v.variable.env_variable == env_var)
                 {
-                    Some(variable) if variable.variable.user_editable => variable.variable.uuid,
+                    Some(variable)
+                        if variable.variable.user_editable
+                            && !validator.is_excluded(&variable.variable.env_variable) =>
+                    {
+                        variable.variable.uuid
+                    }
                     _ => continue,
                 };
 

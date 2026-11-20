@@ -70,3 +70,23 @@ pnpm fmt:check
 pnpm lint:fix
 pnpm fmt
 ```
+
+### Rule validator WASM
+
+The admin egg variable rules editor validates rules in the browser with a WASM build of `rule-validator`. The generated package is committed in `frontend/src/wasm/rule-validator/`, so normal builds never compile it, and the frontend still builds and works without it (the admin pages fall back to plain inputs).
+
+After changing anything in `rule-validator` or `rule-validator-wasm`, regenerate it, or the `check:rule-validator-wasm` CI step fails:
+
+```bash
+# One-time setup
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack
+
+cd frontend
+
+# Regenerate the package
+pnpm build:rule-validator-wasm
+
+# Check it matches the Rust sources
+pnpm check:rule-validator-wasm
+```

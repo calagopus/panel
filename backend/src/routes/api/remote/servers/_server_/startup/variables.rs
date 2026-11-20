@@ -110,6 +110,12 @@ mod put {
                 .ok();
         }
 
+        if validator.is_excluded(&data.env_variable) {
+            return ApiResponse::error("variable is excluded")
+                .with_status(StatusCode::BAD_REQUEST)
+                .ok();
+        }
+
         ServerVariable::create(&state.database, server.uuid, variable_uuid, &data.value).await?;
 
         if let Err(err) = ServerActivity::create(

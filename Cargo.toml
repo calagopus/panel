@@ -5,6 +5,7 @@ members = [
 	"database-migrator",
 	"embedded-assets",
 	"rule-validator",
+	"rule-validator-wasm",
 	"shared",
 	"bins/*",
 	"api-clients/*",

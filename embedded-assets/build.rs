@@ -8,6 +8,7 @@ const COMPRESSIBLE_EXTENSIONS: &[&str] = &[
     "js",
     "json",
     "svg",
+    "wasm",
     "webmanifest",
     "woff",
 ];

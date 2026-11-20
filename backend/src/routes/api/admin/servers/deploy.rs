@@ -322,8 +322,10 @@ mod post {
                     .iter()
                     .find(|v| v.env_variable == data_variable.env_variable)
                 {
-                    Some(variable) => variable.uuid,
-                    None => continue,
+                    Some(variable) if !validator.is_excluded(&variable.env_variable) => {
+                        variable.uuid
+                    }
+                    _ => continue,
                 };
 
                 server_variables.insert(variable_uuid, data_variable.value.clone().into());

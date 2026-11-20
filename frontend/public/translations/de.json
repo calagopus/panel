@@ -325,6 +325,24 @@
           "copyAll": "Alle kopieren",
           "pasteReplace": "Einfügen (ersetzen)"
         },
+        "eggVariableRulesInput": {
+          "editorMode": "Editor",
+          "textMode": "Text",
+          "addRule": "Regel hinzufügen...",
+          "value": "Wert",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "version": "Version",
+          "variable": "Variable",
+          "variables": "Variablen",
+          "values": "Werte",
+          "formats": "Formate",
+          "pattern": "Muster",
+          "flag": "Nur {flag}",
+          "commaSeparated": "Mehrere Einträge mit Kommas trennen.",
+          "textDescription": "Regeln mit | oder Zeilenumbrüchen trennen.",
+          "unknownVariable": "Verweist auf unbekannte Variable {variable}."
+        },
         "serverFileInput": {
           "notFound": "Es existiert noch keine Datei mit diesem Namen.",
           "isDirectory": "Das ist ein Verzeichnis, keine Datei."

@@ -40,6 +40,11 @@ jobs:
           pnpm run lint
           pnpm run fmt:check
 
+      - name: Check rule-validator wasm is up to date
+        run: |
+          cd frontend
+          pnpm run check:rule-validator-wasm
+
   lint-translations:
     name: Lint Translations
     runs-on: ubuntu-24.04

@@ -7,5 +7,6 @@
   "rules": {},
   "env": {
     "builtin": true
-  }
+  },
+  "ignorePatterns": ["src/wasm"]
 }

@@ -20,6 +20,7 @@ import Group from '@/elements/layout/Group.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
+import { getExcludedVariables } from '@/lib/domain/eggVariableRules.ts';
 import { useKeyboardShortcut } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
 import { useBlocker } from '@/plugins/useBlocker.ts';
 import { useServerCan } from '@/plugins/usePermissions.ts';
@@ -111,11 +112,16 @@ export default function ServerStartup() {
     }
   }, [dockerImage]);
 
+  const excludedVariables = getExcludedVariables(
+    variables.map((variable) => ({ ...variable, value: values[variable.envVariable] ?? variable.value })),
+  );
+
   const doUpdate = () => {
     const missing: Record<string, string> = {};
     for (const variable of variables) {
       if (
         variable.envVariable in values &&
+        !excludedVariables.has(variable.envVariable) &&
         variable.rules.includes('required') &&
         values[variable.envVariable].trim() === ''
       ) {
@@ -288,24 +294,26 @@ export default function ServerStartup() {
         ) : null}
         {!variablesLoading &&
           !variablesError &&
-          variables.map((variable) => (
-            <VariableContainer
-              key={variable.envVariable}
-              variable={variable}
-              loading={loading}
-              disabled={!canModifyVariables}
-              value={values[variable.envVariable] ?? variable.value ?? variable.defaultValue ?? ''}
-              error={variableErrors[variable.envVariable]}
-              setValue={(value) => {
-                setValues((prev) => ({ ...prev, [variable.envVariable]: value }));
-                setVariableErrors((prev) => {
-                  const next = { ...prev };
-                  delete next[variable.envVariable];
-                  return next;
-                });
-              }}
-            />
-          ))}
+          variables
+            .filter((variable) => !excludedVariables.has(variable.envVariable))
+            .map((variable) => (
+              <VariableContainer
+                key={variable.envVariable}
+                variable={variable}
+                loading={loading}
+                disabled={!canModifyVariables}
+                value={values[variable.envVariable] ?? variable.value ?? variable.defaultValue ?? ''}
+                error={variableErrors[variable.envVariable]}
+                setValue={(value) => {
+                  setValues((prev) => ({ ...prev, [variable.envVariable]: value }));
+                  setVariableErrors((prev) => {
+                    const next = { ...prev };
+                    delete next[variable.envVariable];
+                    return next;
+                  });
+                }}
+              />
+            ))}
       </div>
     </ServerContentContainer>
   );

@@ -79,6 +79,10 @@ const admin = {
     servers: (eggUuid: string) => ['admin', 'eggs', eggUuid, 'servers'] as const,
   },
 
+  ruleValidator: {
+    module: () => ['admin', 'rule-validator'] as const,
+  },
+
   locations: {
     all: () => ['admin', 'locations'] as const,
     detail: (uuid: string) => ['admin', 'locations', { uuid }] as const,

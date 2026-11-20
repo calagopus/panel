@@ -37,8 +37,10 @@ import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import VariableContainer from '@/elements/VariableContainer.tsx';
+import { getExcludedVariables } from '@/lib/domain/eggVariableRules.ts';
 import { formatAllocation } from '@/lib/domain/server.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
+import { useRuleValidator } from '@/lib/ruleValidator.ts';
 import { adminBackupConfigurationSchema } from '@/lib/schemas/admin/backupConfigurations.ts';
 import { adminEggVariableSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminLocationSchema } from '@/lib/schemas/admin/locations.ts';
@@ -125,6 +127,7 @@ export default function ServerCreate() {
   const [selectedEggUuid, setSelectedEggUuid] = useState('');
   const [selectedNodeUuid, setSelectedNodeUuid] = useState('');
   const [deploying, setDeploying] = useState(false);
+  const [variableValues, setVariableValues] = useState<ServerCreateFormValues['variables']>([]);
   const eggsWithNestsRef = useRef<z.infer<typeof adminEggWithNestSchema>[]>([]);
   form.watch('eggUuid', ({ value }) => {
     setSelectedEggUuid(value);
@@ -136,6 +139,16 @@ export default function ServerCreate() {
   });
   form.watch('nodeUuid', ({ value }) => setSelectedNodeUuid(value));
   form.watch('deployment', ({ value }) => setDeploying(!!value));
+  form.watch('variables', ({ value }) => setVariableValues(value));
+  const ruleValidator = useRuleValidator();
+
+  const ruleVariables = eggVariables.map((variable) => ({
+    envVariable: variable.envVariable,
+    rules: variable.rules,
+    value: variableValues.find((v) => v.envVariable === variable.envVariable)?.value ?? variable.defaultValue ?? '',
+  }));
+  const variableValidation = ruleValidator?.validate(ruleVariables);
+  const excludedVariables = variableValidation?.excluded ?? getExcludedVariables(ruleVariables);
 
   const [advanced] = useAdvancedMode();
   useEffect(() => {
@@ -423,29 +436,36 @@ export default function ServerCreate() {
                   <Spinner.Centered />
                 ) : (
                   <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-                    {eggVariables.map((variable) => (
-                      <VariableContainer
-                        key={variable.envVariable}
-                        variable={{
-                          ...variable,
-                          value: '',
-                          isEditable: variable.userEditable,
-                        }}
-                        loading={loading}
-                        overrideReadonly
-                        value={
-                          form.getValues().variables.find((v) => v.envVariable === variable.envVariable)?.value ??
-                          variable.defaultValue ??
-                          ''
-                        }
-                        setValue={(value) =>
-                          form.setFieldValue('variables', (prev) => [
-                            ...prev.filter((v) => v.envVariable !== variable.envVariable),
-                            { envVariable: variable.envVariable, value },
-                          ])
-                        }
-                      />
-                    ))}
+                    {eggVariables
+                      .filter((variable) => !excludedVariables.has(variable.envVariable))
+                      .map((variable) => (
+                        <VariableContainer
+                          key={variable.envVariable}
+                          variable={{
+                            ...variable,
+                            value: '',
+                            isEditable: variable.userEditable,
+                          }}
+                          loading={loading}
+                          overrideReadonly
+                          value={
+                            form.getValues().variables.find((v) => v.envVariable === variable.envVariable)?.value ??
+                            variable.defaultValue ??
+                            ''
+                          }
+                          error={
+                            variableValues.some((v) => v.envVariable === variable.envVariable)
+                              ? variableValidation?.errors[variable.envVariable]
+                              : undefined
+                          }
+                          setValue={(value) =>
+                            form.setFieldValue('variables', (prev) => [
+                              ...prev.filter((v) => v.envVariable !== variable.envVariable),
+                              { envVariable: variable.envVariable, value },
+                            ])
+                          }
+                        />
+                      ))}
                   </div>
                 )}
               </Stack>

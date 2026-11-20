@@ -1,0 +1,25 @@
+[package]
+name = "rule-validator-wasm"
+license = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rule-validator = { workspace = true }
+compact_str = { version = "0.10.0", default-features = false, features = ["std"] }
+serde_json = { workspace = true }
+wasm-bindgen = "0.2.130"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+	"-Oz",
+	"--enable-bulk-memory",
+	"--enable-mutable-globals",
+	"--enable-nontrapping-float-to-int",
+	"--enable-reference-types",
+	"--enable-sign-ext",
+	"--enable-multivalue",
+]

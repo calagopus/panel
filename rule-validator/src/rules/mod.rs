@@ -1,14 +1,517 @@
 use super::{ParseValidationRule, ValidateRule, Validator};
 
+mod exclusion;
 mod format;
 mod presence;
 mod size;
 mod string;
 
+pub use exclusion::*;
 pub use format::*;
 pub use presence::*;
 pub use size::*;
 pub use string::*;
+
+pub enum RuleArguments {
+    None,
+    Flag(&'static str),
+    Number,
+    NumberRange,
+    Version,
+    Field,
+    Fields,
+    FieldValues,
+    Values,
+    Pattern,
+    Formats,
+}
+
+pub type RuleParser =
+    fn(&[compact_str::CompactString]) -> Result<Box<dyn ValidateRule>, compact_str::CompactString>;
+
+pub struct RuleDefinition {
+    pub name: &'static str,
+    pub aliases: &'static [&'static str],
+    pub implicit: bool,
+    pub arguments: RuleArguments,
+    pub optional_arguments: bool,
+    pub parse: RuleParser,
+}
+
+pub static RULES: &[RuleDefinition] = &[
+    RuleDefinition {
+        name: "accepted",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Accepted::parse_rule,
+    },
+    RuleDefinition {
+        name: "accepted_if",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::FieldValues,
+        optional_arguments: false,
+        parse: AcceptedIf::parse_rule,
+    },
+    RuleDefinition {
+        name: "alpha",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Flag("ascii"),
+        optional_arguments: true,
+        parse: Alpha::parse_rule,
+    },
+    RuleDefinition {
+        name: "alpha_dash",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Flag("ascii"),
+        optional_arguments: true,
+        parse: AlphaDash::parse_rule,
+    },
+    RuleDefinition {
+        name: "alpha_num",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Flag("ascii"),
+        optional_arguments: true,
+        parse: AlphaNum::parse_rule,
+    },
+    RuleDefinition {
+        name: "ascii",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Ascii::parse_rule,
+    },
+    RuleDefinition {
+        name: "between",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::NumberRange,
+        optional_arguments: false,
+        parse: Between::parse_rule,
+    },
+    RuleDefinition {
+        name: "boolean",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Boolean::parse_rule,
+    },
+    RuleDefinition {
+        name: "confirmed",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Field,
+        optional_arguments: true,
+        parse: Confirmed::parse_rule,
+    },
+    RuleDefinition {
+        name: "date",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Date::parse_rule,
+    },
+    RuleDefinition {
+        name: "date_format",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Formats,
+        optional_arguments: false,
+        parse: DateFormat::parse_rule,
+    },
+    RuleDefinition {
+        name: "declined",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Declined::parse_rule,
+    },
+    RuleDefinition {
+        name: "declined_if",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::FieldValues,
+        optional_arguments: false,
+        parse: DeclinedIf::parse_rule,
+    },
+    RuleDefinition {
+        name: "different",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Fields,
+        optional_arguments: false,
+        parse: Different::parse_rule,
+    },
+    RuleDefinition {
+        name: "digits",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Digits::parse_rule,
+    },
+    RuleDefinition {
+        name: "digits_between",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::NumberRange,
+        optional_arguments: false,
+        parse: DigitsBetween::parse_rule,
+    },
+    RuleDefinition {
+        name: "doesnt_start_with",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: DoesntStartWith::parse_rule,
+    },
+    RuleDefinition {
+        name: "doesnt_end_with",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: DoesntEndWith::parse_rule,
+    },
+    RuleDefinition {
+        name: "ends_with",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: EndsWith::parse_rule,
+    },
+    RuleDefinition {
+        name: "exclude",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Exclude::parse_rule,
+    },
+    RuleDefinition {
+        name: "exclude_if",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::FieldValues,
+        optional_arguments: false,
+        parse: ExcludeIf::parse_rule,
+    },
+    RuleDefinition {
+        name: "exclude_unless",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::FieldValues,
+        optional_arguments: false,
+        parse: ExcludeUnless::parse_rule,
+    },
+    RuleDefinition {
+        name: "exclude_with",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::Field,
+        optional_arguments: false,
+        parse: ExcludeWith::parse_rule,
+    },
+    RuleDefinition {
+        name: "exclude_without",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::Field,
+        optional_arguments: false,
+        parse: ExcludeWithout::parse_rule,
+    },
+    RuleDefinition {
+        name: "gt",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Gt::parse_rule,
+    },
+    RuleDefinition {
+        name: "gte",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Gte::parse_rule,
+    },
+    RuleDefinition {
+        name: "hex_color",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: HexColor::parse_rule,
+    },
+    RuleDefinition {
+        name: "in",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: In::parse_rule,
+    },
+    RuleDefinition {
+        name: "integer",
+        aliases: &["int"],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Integer::parse_rule,
+    },
+    RuleDefinition {
+        name: "ip",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Ip::parse_rule,
+    },
+    RuleDefinition {
+        name: "ipv4",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Ipv4::parse_rule,
+    },
+    RuleDefinition {
+        name: "ipv6",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Ipv6::parse_rule,
+    },
+    RuleDefinition {
+        name: "json",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Json::parse_rule,
+    },
+    RuleDefinition {
+        name: "lt",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Lt::parse_rule,
+    },
+    RuleDefinition {
+        name: "lte",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Lte::parse_rule,
+    },
+    RuleDefinition {
+        name: "lowercase",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Lowercase::parse_rule,
+    },
+    RuleDefinition {
+        name: "mac_address",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: MacAddress::parse_rule,
+    },
+    RuleDefinition {
+        name: "max",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Max::parse_rule,
+    },
+    RuleDefinition {
+        name: "max_digits",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: MaxDigits::parse_rule,
+    },
+    RuleDefinition {
+        name: "min",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Min::parse_rule,
+    },
+    RuleDefinition {
+        name: "min_digits",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: MinDigits::parse_rule,
+    },
+    RuleDefinition {
+        name: "multiple_of",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: MultipleOf::parse_rule,
+    },
+    RuleDefinition {
+        name: "not_in",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: NotIn::parse_rule,
+    },
+    RuleDefinition {
+        name: "not_regex",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Pattern,
+        optional_arguments: false,
+        parse: NotRegex::parse_rule,
+    },
+    RuleDefinition {
+        name: "nullable",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Nullable::parse_rule,
+    },
+    RuleDefinition {
+        name: "numeric",
+        aliases: &["num"],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Numeric::parse_rule,
+    },
+    RuleDefinition {
+        name: "regex",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Pattern,
+        optional_arguments: false,
+        parse: Regex::parse_rule,
+    },
+    RuleDefinition {
+        name: "required",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Required::parse_rule,
+    },
+    RuleDefinition {
+        name: "required_if",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::FieldValues,
+        optional_arguments: false,
+        parse: RequiredIf::parse_rule,
+    },
+    RuleDefinition {
+        name: "required_if_accepted",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::Field,
+        optional_arguments: false,
+        parse: RequiredIfAccepted::parse_rule,
+    },
+    RuleDefinition {
+        name: "required_if_declined",
+        aliases: &[],
+        implicit: true,
+        arguments: RuleArguments::Field,
+        optional_arguments: false,
+        parse: RequiredIfDeclined::parse_rule,
+    },
+    RuleDefinition {
+        name: "same",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Field,
+        optional_arguments: false,
+        parse: Same::parse_rule,
+    },
+    RuleDefinition {
+        name: "size",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Number,
+        optional_arguments: false,
+        parse: Size::parse_rule,
+    },
+    RuleDefinition {
+        name: "starts_with",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: false,
+        parse: StartsWith::parse_rule,
+    },
+    RuleDefinition {
+        name: "string",
+        aliases: &["str"],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: StringRule::parse_rule,
+    },
+    RuleDefinition {
+        name: "timezone",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Timezone::parse_rule,
+    },
+    RuleDefinition {
+        name: "uppercase",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::None,
+        optional_arguments: false,
+        parse: Uppercase::parse_rule,
+    },
+    RuleDefinition {
+        name: "url",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Values,
+        optional_arguments: true,
+        parse: Url::parse_rule,
+    },
+    RuleDefinition {
+        name: "uuid",
+        aliases: &[],
+        implicit: false,
+        arguments: RuleArguments::Version,
+        optional_arguments: true,
+        parse: Uuid::parse_rule,
+    },
+];
 
 pub fn parse_validation_rule(
     rule: &str,
@@ -28,63 +531,13 @@ pub fn parse_validation_rule(
         })
         .unwrap_or_default();
 
-    match rule_name {
-        "accepted" => Accepted::parse_rule(&rule_args),
-        "accepted_if" => AcceptedIf::parse_rule(&rule_args),
-        "alpha" => Alpha::parse_rule(&rule_args),
-        "alpha_dash" => AlphaDash::parse_rule(&rule_args),
-        "alpha_num" => AlphaNum::parse_rule(&rule_args),
-        "ascii" => Ascii::parse_rule(&rule_args),
-        "between" => Between::parse_rule(&rule_args),
-        "boolean" => Boolean::parse_rule(&rule_args),
-        "confirmed" => Confirmed::parse_rule(&rule_args),
-        "date" => Date::parse_rule(&rule_args),
-        "date_format" => DateFormat::parse_rule(&rule_args),
-        "declined" => Declined::parse_rule(&rule_args),
-        "declined_if" => DeclinedIf::parse_rule(&rule_args),
-        "different" => Different::parse_rule(&rule_args),
-        "digits" => Digits::parse_rule(&rule_args),
-        "digits_between" => DigitsBetween::parse_rule(&rule_args),
-        "doesnt_start_with" => DoesntStartWith::parse_rule(&rule_args),
-        "doesnt_end_with" => DoesntEndWith::parse_rule(&rule_args),
-        "ends_with" => EndsWith::parse_rule(&rule_args),
-        "gt" => Gt::parse_rule(&rule_args),
-        "gte" => Gte::parse_rule(&rule_args),
-        "hex_color" => HexColor::parse_rule(&rule_args),
-        "in" => In::parse_rule(&rule_args),
-        "integer" | "int" => Integer::parse_rule(&rule_args),
-        "ip" => Ip::parse_rule(&rule_args),
-        "ipv4" => Ipv4::parse_rule(&rule_args),
-        "ipv6" => Ipv6::parse_rule(&rule_args),
-        "json" => Json::parse_rule(&rule_args),
-        "lt" => Lt::parse_rule(&rule_args),
-        "lte" => Lte::parse_rule(&rule_args),
-        "lowercase" => Lowercase::parse_rule(&rule_args),
-        "mac_address" => MacAddress::parse_rule(&rule_args),
-        "max" => Max::parse_rule(&rule_args),
-        "max_digits" => MaxDigits::parse_rule(&rule_args),
-        "min" => Min::parse_rule(&rule_args),
-        "min_digits" => MinDigits::parse_rule(&rule_args),
-        "multiple_of" => MultipleOf::parse_rule(&rule_args),
-        "not_in" => NotIn::parse_rule(&rule_args),
-        "not_regex" => NotRegex::parse_rule(&rule_args),
-        "nullable" => Nullable::parse_rule(&rule_args),
-        "numeric" | "num" => Numeric::parse_rule(&rule_args),
-        "regex" => Regex::parse_rule(&rule_args),
-        "required" => Required::parse_rule(&rule_args),
-        "required_if" => RequiredIf::parse_rule(&rule_args),
-        "required_if_accepted" => RequiredIfAccepted::parse_rule(&rule_args),
-        "required_if_declined" => RequiredIfDeclined::parse_rule(&rule_args),
-        "same" => Same::parse_rule(&rule_args),
-        "size" => Size::parse_rule(&rule_args),
-        "starts_with" => StartsWith::parse_rule(&rule_args),
-        "string" | "str" => StringRule::parse_rule(&rule_args),
-        "timezone" => Timezone::parse_rule(&rule_args),
-        "uppercase" => Uppercase::parse_rule(&rule_args),
-        "url" => Url::parse_rule(&rule_args),
-        "uuid" => Uuid::parse_rule(&rule_args),
-        rule => Err(compact_str::format_compact!(
-            "unknown or unsupported validation rule: {rule}"
+    match RULES
+        .iter()
+        .find(|definition| definition.name == rule_name || definition.aliases.contains(&rule_name))
+    {
+        Some(definition) => (definition.parse)(&rule_args),
+        None => Err(compact_str::format_compact!(
+            "unknown or unsupported validation rule: {rule_name}"
         )),
     }
 }
@@ -132,6 +585,35 @@ pub(crate) fn parse_dependent_parameters(
     }
 
     Ok((rule[0].clone(), rule[1..].to_vec()))
+}
+
+fn normalize_boolean(value: &str) -> &str {
+    match value {
+        "true" => "1",
+        "false" => "0",
+        value => value,
+    }
+}
+
+// https://github.com/laravel/framework/blob/6291d28a53dbf5b768df0d0a009fcc636a1e5e65/src/Illuminate/Validation/Concerns/ValidatesAttributes.php#L2435
+// Booleans are normalized to '1'/'0' instead of PHP's loose comparison, and a
+// missing key matches the literal 'null'.
+pub(crate) fn dependent_value_matches(
+    other_key: &str,
+    values: &[compact_str::CompactString],
+    validator: &Validator,
+) -> bool {
+    let Some(other) = validator.data.get(other_key).copied() else {
+        return values.iter().any(|value| value == "null");
+    };
+
+    if validator.has_rule(other_key, "boolean") {
+        return values
+            .iter()
+            .any(|value| normalize_boolean(value) == normalize_boolean(other));
+    }
+
+    values.iter().any(|value| value == other)
 }
 
 pub(crate) fn parse_preg_pattern(raw: &str) -> Result<regex::Regex, compact_str::CompactString> {

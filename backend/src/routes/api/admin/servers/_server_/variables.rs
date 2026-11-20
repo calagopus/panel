@@ -179,8 +179,10 @@ mod put {
                 .iter()
                 .find(|v| v.variable.env_variable == data_variable.env_variable)
             {
-                Some(variable) => variable.variable.uuid,
-                None => continue,
+                Some(variable) if !validator.is_excluded(&variable.variable.env_variable) => {
+                    variable.variable.uuid
+                }
+                _ => continue,
             };
 
             ServerVariable::create(
