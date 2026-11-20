@@ -83,24 +83,26 @@ fn main() {
         && target_os == "linux"
         && let Some((tag, url)) = fetch_release_metadata(&target_arch)
         && (tag != existing_version || release_env.starts_with("latest"))
-        && let Ok(mut resp) = ureq::get(url).call()
-        && resp.status().is_success()
+        && let Some(compressed_data) = with_retry("wings-rs download", || {
+            println!(
+                "cargo:warning=Downloading and Compressing wings-rs version {tag} for {target_arch} from GitHub..."
+            );
+
+            let mut resp = ureq::get(&url).call().map_err(|err| err.to_string())?;
+            let compressed_data =
+                zstd::encode_all(resp.body_mut().as_reader(), 22).map_err(|err| err.to_string())?;
+
+            println!(
+                "cargo:warning=Compressed binary size: {} bytes -> {} bytes",
+                resp.headers()
+                    .get("Content-Length")
+                    .map_or("?", |v| v.to_str().unwrap_or("?")),
+                compressed_data.len()
+            );
+
+            Ok(compressed_data)
+        })
     {
-        println!(
-            "cargo:warning=Downloading and Compressing wings-rs version {tag} for {target_arch} from GitHub..."
-        );
-
-        let compressed_data = zstd::encode_all(resp.body_mut().as_reader(), 22)
-            .expect("Failed to compress binary with zstd");
-
-        println!(
-            "cargo:warning=Compressed binary size: {} bytes -> {} bytes",
-            resp.headers()
-                .get("Content-Length")
-                .map_or("?", |v| v.to_str().unwrap_or("?")),
-            compressed_data.len()
-        );
-
         let mut file = File::create(&bin_path).expect("Failed to create bin");
         file.write_all(&compressed_data)
             .expect("Failed to write compressed bin");
@@ -129,11 +131,13 @@ fn main() {
 }
 
 fn fetch_release_metadata(arch: &str) -> Option<(String, String)> {
-    let mut resp = ureq::get("https://api.github.com/repos/calagopus/wings/releases/latest")
-        .header("User-Agent", "rust-build-script")
-        .call()
-        .ok()?;
-    let release: GithubRelease = serde_json::from_reader(resp.body_mut().as_reader()).ok()?;
+    let release: GithubRelease = with_retry("wings-rs release lookup", || {
+        let mut resp = ureq::get("https://api.github.com/repos/calagopus/wings/releases/latest")
+            .header("User-Agent", "rust-build-script")
+            .call()
+            .map_err(|err| err.to_string())?;
+        serde_json::from_reader(resp.body_mut().as_reader()).map_err(|err| err.to_string())
+    })?;
 
     let release_arch = match arch {
         "powerpc64" => "ppc64le",
@@ -147,4 +151,22 @@ fn fetch_release_metadata(arch: &str) -> Option<(String, String)> {
         .find(|a| a.name == expected_name)?;
 
     Some((release.tag_name, asset.browser_download_url))
+}
+
+fn with_retry<T>(what: &str, mut f: impl FnMut() -> Result<T, String>) -> Option<T> {
+    const ATTEMPTS: u32 = 5;
+
+    for attempt in 1..=ATTEMPTS {
+        match f() {
+            Ok(value) => return Some(value),
+            Err(err) => {
+                println!("cargo:warning={what} failed (attempt {attempt}/{ATTEMPTS}): {err}");
+                if attempt < ATTEMPTS {
+                    std::thread::sleep(std::time::Duration::from_secs(2u64.pow(attempt)));
+                }
+            }
+        }
+    }
+
+    None
 }
