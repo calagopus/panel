@@ -39,6 +39,7 @@ import { isNamedRoutePathAccessible } from '@/lib/routes.ts';
 import {
   DEFAULT_THEME_VARIANT,
   getThemeVariant,
+  getThemeVariantCategories,
   getThemeVariants,
   ThemeVariantDefinition,
 } from '@/lib/themeVariants.ts';
@@ -269,6 +270,7 @@ function Footer() {
   const adminHidden = suspended || !user || !isAdmin(user);
 
   const themeVariants = getThemeVariants();
+  const themeVariantCategories = getThemeVariantCategories();
   const allowedSchemes = getThemeVariant(DEFAULT_THEME_VARIANT)!.schemes;
   const activeSchemes = (getThemeVariant(themeVariant) ?? getThemeVariant(DEFAULT_THEME_VARIANT)!).schemes;
   const prefersAuto = colorScheme === 'auto' || autoScheme;
@@ -348,6 +350,37 @@ function Footer() {
     });
   };
 
+  const themeVariantItems = (parent?: string): ContextMenuItem[] => {
+    const isChild = (category?: string) =>
+      (category && themeVariantCategories.some((c) => c.id === category) ? category : undefined) === parent;
+
+    return [
+      ...themeVariants
+        .filter((variant) => isChild(variant.category))
+        .map((variant) => ({
+          type: 'action' as const,
+          icon: variant.icon ?? faPalette,
+          label: resolveString(variant.label),
+          rightSection: variant.id === themeVariant && <FontAwesomeIcon icon={faCheck} size='sm' />,
+          hidden: themeVariants.length < 2,
+          onClick: (e: React.MouseEvent) => changeThemeVariant(e, variant),
+        })),
+      ...themeVariantCategories
+        .filter((category) => isChild(category.category))
+        .map((category) => {
+          const items = themeVariantItems(category.id);
+
+          return {
+            type: 'action' as const,
+            icon: category.icon ?? faPalette,
+            label: resolveString(category.label),
+            hidden: themeVariants.length < 2 || !items.some((item) => item.type === 'action' && !item.hidden),
+            items,
+          };
+        }),
+    ];
+  };
+
   const items: ContextMenuItem[] = useMemo(
     () => [
       {
@@ -378,14 +411,7 @@ function Footer() {
         label: t('elements.sidebar.button.theme', {}),
         hidden: themeVariants.length < 2 && activeSchemes.length < 2,
         items: [
-          ...themeVariants.map((variant) => ({
-            type: 'action' as const,
-            icon: variant.icon ?? faPalette,
-            label: resolveString(variant.label),
-            rightSection: variant.id === themeVariant && <FontAwesomeIcon icon={faCheck} size='sm' />,
-            hidden: themeVariants.length < 2,
-            onClick: (e: React.MouseEvent) => changeThemeVariant(e, variant),
-          })),
+          ...themeVariantItems(),
           {
             type: 'divider' as const,
             hidden: themeVariants.length < 2,

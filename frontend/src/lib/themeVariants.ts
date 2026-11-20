@@ -55,9 +55,19 @@ export interface ThemeVariantDefinition {
   label: LazyString;
   icon?: IconLike;
   schemes: ThemeScheme[];
+  /** id of the `ThemeVariantCategory` this variant is listed under */
+  category?: string;
   mantineTheme?: MantineThemeOverride;
   cssVariablesResolver?: CSSVariablesResolver;
   enter?: (scope: ThemeVariantScope) => void;
+}
+
+export interface ThemeVariantCategory {
+  id: string;
+  label: LazyString;
+  icon?: IconLike;
+  /** id of the parent category */
+  category?: string;
 }
 
 export const DEFAULT_THEME_VARIANT = 'standard';
@@ -92,6 +102,29 @@ export function getThemeVariants(): ThemeVariantDefinition[] {
   }
 
   return [...variants.values()];
+}
+
+export function getThemeVariantCategories(): ThemeVariantCategory[] {
+  const categories = window.extensionContext.extensionRegistry.themes.categories;
+
+  return Object.values(categories).map((category) => {
+    const seen = new Set([category.id]);
+    let parent = category.category;
+
+    while (parent && categories[parent]) {
+      if (seen.has(parent)) {
+        if (parent !== category.id) return category;
+
+        console.warn('Theme variant category cycle, listing at the top level:', category.id);
+        return { ...category, category: undefined };
+      }
+
+      seen.add(parent);
+      parent = categories[parent].category;
+    }
+
+    return category;
+  });
 }
 
 export function getThemeVariant(id: string): ThemeVariantDefinition | undefined {

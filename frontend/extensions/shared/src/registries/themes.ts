@@ -1,9 +1,12 @@
 import { Registry } from 'shared';
-import type { ThemeScheme, ThemeVariantDefinition } from '@/lib/themeVariants.ts';
+import type { ThemeScheme, ThemeVariantCategory, ThemeVariantDefinition } from '@/lib/themeVariants.ts';
 
 export class ThemeRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.variants.push(...other.variants);
+    for (const [id, category] of Object.entries(other.categories)) {
+      this.categories[id] = category;
+    }
     if (other.variantsDisabled) {
       this.disableVariants({ schemes: other.allowedSchemes });
     }
@@ -28,6 +31,23 @@ export class ThemeRegistry implements Registry {
    */
   public addVariant(definition: ThemeVariantDefinition): this {
     this.variants.push(definition);
+    return this;
+  }
+
+  /**
+   * Keyed by category id, a later registration with the same id replaces the earlier one.
+   * @since 1.2.11
+   */
+  public categories: Record<string, ThemeVariantCategory> = {};
+
+  /**
+   * Groups variants into a submenu of the theme picker: variants and other categories join it by setting `category`
+   * to its id, so categories nest and several extensions can share one. Prefix ids with your extension id to avoid
+   * collisions. An unknown `category` places the entry at the top level, empty categories are hidden.
+   * @since 1.2.11
+   */
+  public addCategory(category: ThemeVariantCategory): this {
+    this.categories[category.id] = category;
     return this;
   }
 

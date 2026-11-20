@@ -29,7 +29,8 @@ export interface ContextMenuActionItem {
   loading?: boolean;
   onClick?: (e: MouseEvent) => void | Promise<unknown>;
   color?: 'gray' | 'red';
-  items?: (Omit<ContextMenuActionItem, 'items'> | ContextMenuDividerItem)[];
+  /** nested submenus are supported @since 1.2.11 */
+  items?: ContextMenuItem[];
   canAccess?: boolean;
 }
 
@@ -69,8 +70,72 @@ const ConditionalMenuTooltip = ({ label, children }: { label?: string; children:
     <>{children}</>
   );
 
-const itemIcon = (item: Omit<ContextMenuActionItem, 'items'>) =>
+const itemIcon = (item: ContextMenuActionItem) =>
   item.loading ? <Spinner size={14} /> : item.icon ? <Icon icon={item.icon} /> : undefined;
+
+const SUBMENU_WIDTH = 300;
+
+function ContextMenuItems({
+  items,
+  x,
+  depth,
+  hideMenu,
+}: {
+  items: ContextMenuItem[];
+  x: number;
+  depth: number;
+  hideMenu: () => void;
+}) {
+  const onClick = (item: ContextMenuActionItem) => (e: MouseEvent) => {
+    if (!e.isTrusted) return;
+
+    if (item.onClick) {
+      item.onClick(e);
+      hideMenu();
+    }
+  };
+
+  return items
+    .filter((item) => !item.hidden && item.canAccess !== false)
+    .map((item, idx) =>
+      item.type === 'divider' ? (
+        <Menu.Divider key={idx} />
+      ) : (item.items || []).length > 0 ? (
+        <Menu.Sub
+          key={idx}
+          position={x + SUBMENU_WIDTH * (depth + 1) > window.innerWidth ? 'left-start' : 'right-start'}
+          opened={item.disabled ? false : undefined}
+        >
+          <Menu.Sub.Target>
+            <Menu.Sub.Item
+              leftSection={itemIcon(item)}
+              color={item.color === 'red' ? 'red' : undefined}
+              disabled={item.disabled || item.loading}
+              onClick={onClick(item)}
+            >
+              {item.label}
+            </Menu.Sub.Item>
+          </Menu.Sub.Target>
+
+          <Menu.Sub.Dropdown>
+            <ContextMenuItems items={item.items!} x={x} depth={depth + 1} hideMenu={hideMenu} />
+          </Menu.Sub.Dropdown>
+        </Menu.Sub>
+      ) : (
+        <ConditionalMenuTooltip key={idx} label={item.tooltip}>
+          <Menu.Item
+            leftSection={itemIcon(item)}
+            rightSection={item.rightSection}
+            color={item.color === 'red' ? 'red' : undefined}
+            disabled={item.disabled || item.loading}
+            onClick={onClick(item)}
+          >
+            {item.label}
+          </Menu.Item>
+        </ConditionalMenuTooltip>
+      ),
+    );
+}
 
 export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<ContextMenuState>({
@@ -144,85 +209,7 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
         {children}
 
         <Menu.Dropdown>
-          {state.items
-            .filter((item) => !item.hidden && item.canAccess !== false)
-            .map((item, idx) =>
-              item.type === 'divider' ? (
-                <Menu.Divider key={idx} />
-              ) : (item.items || []).length > 0 ? (
-                <Menu.Sub
-                  key={idx}
-                  position={state.x + 300 > window.innerWidth ? 'left-start' : 'right-start'}
-                  opened={item.disabled ? false : undefined}
-                >
-                  <Menu.Sub.Target>
-                    <Menu.Sub.Item
-                      key={idx}
-                      leftSection={itemIcon(item)}
-                      color={item.color === 'red' ? 'red' : undefined}
-                      disabled={item.disabled || item.loading}
-                      onClick={(e) => {
-                        if (!e.isTrusted) return;
-
-                        if (item.onClick) {
-                          item.onClick(e);
-                          hideMenu();
-                        }
-                      }}
-                    >
-                      {item.label}
-                    </Menu.Sub.Item>
-                  </Menu.Sub.Target>
-
-                  <Menu.Sub.Dropdown>
-                    {item
-                      .items!.filter((subItem) => !subItem.hidden && subItem.canAccess !== false)
-                      .map((subItem, subIdx) =>
-                        subItem.type === 'divider' ? (
-                          <Menu.Divider key={idx.toString() + subIdx.toString()} />
-                        ) : (
-                          <Menu.Item
-                            key={idx.toString() + subIdx.toString()}
-                            leftSection={itemIcon(subItem)}
-                            rightSection={subItem.rightSection}
-                            color={subItem.color === 'red' ? 'red' : undefined}
-                            disabled={subItem.disabled || subItem.loading}
-                            onClick={(e) => {
-                              if (!e.isTrusted) return;
-
-                              if (subItem.onClick) {
-                                subItem.onClick(e);
-                                hideMenu();
-                              }
-                            }}
-                          >
-                            {subItem.label}
-                          </Menu.Item>
-                        ),
-                      )}
-                  </Menu.Sub.Dropdown>
-                </Menu.Sub>
-              ) : (
-                <ConditionalMenuTooltip key={idx} label={item.tooltip}>
-                  <Menu.Item
-                    leftSection={itemIcon(item)}
-                    rightSection={item.rightSection}
-                    color={item.color === 'red' ? 'red' : undefined}
-                    disabled={item.disabled || item.loading}
-                    onClick={(e) => {
-                      if (!e.isTrusted) return;
-
-                      if (item.onClick) {
-                        item.onClick(e);
-                        hideMenu();
-                      }
-                    }}
-                  >
-                    {item.label}
-                  </Menu.Item>
-                </ConditionalMenuTooltip>
-              ),
-            )}
+          <ContextMenuItems items={state.items} x={state.x} depth={0} hideMenu={hideMenu} />
         </Menu.Dropdown>
       </Menu>
     </ContextMenuContext.Provider>
@@ -288,42 +275,35 @@ function ContextMenuBase<P>({
   const loading = loadingProp || pendingKeys.length > 0;
 
   const items = useMemo(() => {
-    const track = <T extends ContextMenuActionItem | Omit<ContextMenuActionItem, 'items'>>(
-      item: T,
-      key: string,
-    ): T => ({
-      ...item,
-      disabled: item.disabled || loading,
-      loading: item.loading || pendingKeys.some((pendingKey) => pendingKey === key || pendingKey.startsWith(`${key}.`)),
-      onClick:
-        item.onClick &&
-        ((e: MouseEvent) => {
-          const result = item.onClick!(e);
-
-          if (result instanceof Promise) {
-            setPendingKeys((keys) => [...keys, key]);
-            result.finally(() =>
-              setPendingKeys((keys) => {
-                const index = keys.indexOf(key);
-                return index === -1 ? keys : keys.toSpliced(index, 1);
-              }),
-            );
-          }
-
-          return result;
-        }),
-    });
-
-    return interceptedItems.map((item, idx) =>
+    const track = (item: ContextMenuItem, key: string): ContextMenuItem =>
       item.type === 'divider'
         ? item
         : {
-            ...track(item, `${idx}`),
-            items: item.items?.map((subItem, subIdx) =>
-              subItem.type === 'divider' ? subItem : track(subItem, `${idx}.${subIdx}`),
-            ),
-          },
-    );
+            ...item,
+            disabled: item.disabled || loading,
+            loading:
+              item.loading || pendingKeys.some((pendingKey) => pendingKey === key || pendingKey.startsWith(`${key}.`)),
+            onClick:
+              item.onClick &&
+              ((e: MouseEvent) => {
+                const result = item.onClick!(e);
+
+                if (result instanceof Promise) {
+                  setPendingKeys((keys) => [...keys, key]);
+                  result.finally(() =>
+                    setPendingKeys((keys) => {
+                      const index = keys.indexOf(key);
+                      return index === -1 ? keys : keys.toSpliced(index, 1);
+                    }),
+                  );
+                }
+
+                return result;
+              }),
+            items: item.items?.map((subItem, subIdx) => track(subItem, `${key}.${subIdx}`)),
+          };
+
+    return interceptedItems.map((item, idx) => track(item, `${idx}`));
   }, [interceptedItems, loading, pendingKeys]);
 
   const showMenu = context?.showMenu;
