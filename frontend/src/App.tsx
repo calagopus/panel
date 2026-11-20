@@ -17,6 +17,7 @@ import getLanguages from './api/getLanguages.ts';
 import getSettings from './api/getSettings.ts';
 import ErrorBoundary from './elements/ErrorBoundary.tsx';
 import ExtensionSlot from './elements/ExtensionSlot.tsx';
+import { replaceEqualDeepWithDates } from './lib/queryCache.ts';
 import { combineCssVariablesResolvers, getForcedColorScheme, getThemeVariant } from './lib/themeVariants.ts';
 import { HistoryContext } from './providers/contexts/historyContext.ts';
 import { CurrentWindowProvider } from './providers/CurrentWindowProvider.tsx';
@@ -37,6 +38,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: true,
       refetchOnMount: 'always',
       retry: 1,
+      structuralSharing: (oldData, newData) => replaceEqualDeepWithDates(oldData, newData),
     },
   },
 });

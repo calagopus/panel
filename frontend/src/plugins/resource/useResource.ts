@@ -21,7 +21,7 @@ export function useResource<T>({
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data, isFetching, error, refetch } = useQuery({
+  const { data, isFetching, isLoading, error, refetch } = useQuery({
     queryKey,
     queryFn,
     enabled,
@@ -35,6 +35,7 @@ export function useResource<T>({
   return {
     data,
     loading: isFetching,
+    initialLoading: isLoading,
     error,
     refetch: () => refetch(),
     invalidate: () => queryClient.invalidateQueries({ queryKey }),

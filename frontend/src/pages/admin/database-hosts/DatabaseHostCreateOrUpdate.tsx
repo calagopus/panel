@@ -1,6 +1,6 @@
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import createDatabaseHost from '@/api/admin/database-hosts/createDatabaseHost.ts';
 import deleteDatabaseHost from '@/api/admin/database-hosts/deleteDatabaseHost.ts';
@@ -18,6 +18,7 @@ import {
   adminDatabaseHostSchema,
   adminDatabaseHostUpdateSchema,
 } from '@/lib/schemas/admin/databaseHosts.ts';
+import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
 import { useHostAction } from '@/plugins/useHostAction.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -42,7 +43,9 @@ export default function DatabaseHostCreateOrUpdate({
 
   const form = useFormEngine<DatabaseHostFormValues>('admin.databaseHosts.createOrUpdate', {
     schema: (contextDatabaseHost ? adminDatabaseHostUpdateSchema : adminDatabaseHostCreateSchema).unwrap(),
-    initialValues: databaseHostEmptyFormValues,
+    initialValues: contextDatabaseHost
+      ? databaseHostEmptyFormValues
+      : { ...databaseHostEmptyFormValues, credentials: adminDatabaseCredentialsDefaults.connection_string },
   });
 
   const { loading, setLoading, doCreateOrUpdate, doDelete } = useResourceForm<
@@ -64,13 +67,7 @@ export default function DatabaseHostCreateOrUpdate({
 
   const runHostAction = useHostAction(contextDatabaseHost?.uuid, setLoading);
 
-  useEffect(() => {
-    form.setValues(
-      contextDatabaseHost
-        ? databaseHostToFormValues(contextDatabaseHost)
-        : { credentials: adminDatabaseCredentialsDefaults.connection_string },
-    );
-  }, [contextDatabaseHost]);
+  useHydrateForm(form, contextDatabaseHost, databaseHostToFormValues);
 
   const doTest = () =>
     runHostAction(testDatabaseHost, t('pages.admin.databaseHosts.tabs.general.page.toast.tested', {}));

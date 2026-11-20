@@ -42,7 +42,7 @@ export default function BackupConfigurationDuplicateModal({
     const values = { name: `${backupConfiguration.name} (copy)` };
     form.setValues(values);
     form.resetDirty(values);
-  }, [props.opened, backupConfiguration]);
+  }, [props.opened]);
 
   return (
     <FormModal

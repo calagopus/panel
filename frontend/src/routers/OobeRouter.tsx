@@ -61,28 +61,28 @@ export default function OobeRouter() {
   const activeStep = steps.find((step) => to(step.path, '/oobe') === location.pathname);
   const currentAllowedStep = settings.oobeStep ? steps.find((s) => s.stepKey === settings.oobeStep) : null;
 
-  const { data: locationsData, loading: locLoading } = useResource({
+  const { data: locationsData, initialLoading: locLoading } = useResource({
     queryKey: queryKeys.admin.locations.all(),
     queryFn: () => getLocations(1).then((r) => r.data),
     enabled: !!user,
   });
-  const { data: nodesData, loading: nodesLoading } = useResource({
+  const { data: nodesData, initialLoading: nodesLoading } = useResource({
     queryKey: queryKeys.admin.nodes.all(),
     queryFn: () => getNodes(1).then((r) => r.data),
     enabled: !!user,
   });
   const nodeUuid = nodesData?.[0]?.uuid;
-  const { data: nodeAllocationsData, loading: nodeAllocationsLoading } = useResource({
+  const { data: nodeAllocationsData, initialLoading: nodeAllocationsLoading } = useResource({
     queryKey: queryKeys.admin.nodes.allocations(nodeUuid ?? ''),
     queryFn: () => getNodeAllocations(nodeUuid!, 1).then((r) => r.data),
     enabled: !!user && !!nodeUuid,
   });
-  const { data: serversData, loading: serversLoading } = useResource({
+  const { data: serversData, initialLoading: serversLoading } = useResource({
     queryKey: queryKeys.admin.servers.all(),
     queryFn: () => getServers(1).then((r) => r.data),
     enabled: !!user,
   });
-  const { data: eggReposData, loading: eggReposLoading } = useResource({
+  const { data: eggReposData, initialLoading: eggReposLoading } = useResource({
     queryKey: queryKeys.admin.eggRepositories.all(),
     queryFn: () => getEggRepositories(1).then((r) => r.data),
     enabled: !!user,
