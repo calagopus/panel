@@ -183,6 +183,20 @@ const baseTranslations = defineTranslations({
           },
           nextRun: 'Next run is {timestamp}.',
         },
+        passwordGenerator: {
+          tooltip: 'Generate password',
+          length: 'Length',
+          lowercase: 'Lowercase (a-z)',
+          uppercase: 'Uppercase (A-Z)',
+          digits: 'Digits (0-9)',
+          symbols: 'Symbols (!#$%&*)',
+          excludeAmbiguous: 'Exclude ambiguous characters (I, l, 1, O, 0, o)',
+          noCharsets: 'Select at least one character set.',
+          button: {
+            regenerate: 'Regenerate',
+            use: 'Use Password',
+          },
+        },
         iconInput: {
           defaultIcon: 'Default icon',
           searchPlaceholder: 'Search icons…',

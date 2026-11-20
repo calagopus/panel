@@ -120,6 +120,7 @@ export default function PasswordContainer({ requireTwoFactorActivation }: Accoun
             withAsterisk
             label={t('pages.account.account.containers.password.form.newPassword', {})}
             autoComplete='new-password'
+            onGenerate={(password) => form.setFieldValue('confirmNewPassword', password)}
             {...form.getInputProps('newPassword')}
           />
           <PasswordInput

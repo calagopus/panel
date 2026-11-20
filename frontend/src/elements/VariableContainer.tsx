@@ -10,6 +10,7 @@ import Select from '@/elements/input/Select.tsx';
 import Switch from '@/elements/input/Switch.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { getPasswordConstraints } from '@/lib/domain/eggVariableRules.ts';
 import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { serverVariableSchema } from '@/lib/schemas/server/startup.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -37,6 +38,7 @@ export default function VariableContainer({
 
   const title = variable.nameTranslations?.[language] || variable.name;
   const description = variable.descriptionTranslations?.[language] || variable.description;
+  const passwordConstraints = variable.isSecret ? getPasswordConstraints(variable.rules) : null;
 
   return (
     <TitleCard title={title} icon={faCog}>
@@ -102,6 +104,8 @@ export default function VariableContainer({
               onChange={(e) => setValue(e.target.value)}
               disabled={disabled || loading || (!variable.isEditable && !overrideReadonly)}
               error={error}
+              withGenerator={!!passwordConstraints}
+              generatorConstraints={passwordConstraints ?? undefined}
             />
           ) : (
             <TextInput

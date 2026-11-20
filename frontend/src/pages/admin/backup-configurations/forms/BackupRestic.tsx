@@ -114,6 +114,7 @@ export default function BackupRestic({ form, onRemove }: { form: ResticForm; onR
         <PasswordInput
           withAsterisk
           label={t('common.form.password', {})}
+          withGenerator
           value={form.values.environment?.RESTIC_PASSWORD || ''}
           onChange={(e) => form.setFieldValue('environment.RESTIC_PASSWORD', e.target.value)}
         />

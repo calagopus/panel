@@ -374,6 +374,20 @@
           },
           "nextRun": "Nächste Ausführung ist {timestamp}."
         },
+        "passwordGenerator": {
+          "tooltip": "Passwort generieren",
+          "length": "Länge",
+          "lowercase": "Kleinbuchstaben (a-z)",
+          "uppercase": "Großbuchstaben (A-Z)",
+          "digits": "Ziffern (0-9)",
+          "symbols": "Sonderzeichen (!#$%&*)",
+          "excludeAmbiguous": "Mehrdeutige Zeichen ausschließen (I, l, 1, O, 0, o)",
+          "noCharsets": "Wähle mindestens einen Zeichensatz aus.",
+          "button": {
+            "regenerate": "Neu generieren",
+            "use": "Passwort verwenden"
+          }
+        },
         "iconInput": {
           "defaultIcon": "Standardsymbol",
           "searchPlaceholder": "Symbole durchsuchen…",

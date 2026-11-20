@@ -107,7 +107,7 @@ export function useUserFormFields({
       type: 'password',
       name: 'password',
       label: t('common.form.password', {}),
-      props: { disabled: !isRootAdmin && editingOtherUser },
+      props: { disabled: !isRootAdmin && editingOtherUser, withGenerator: true },
     },
     {
       type: 'switch',

@@ -5,7 +5,6 @@ import {
   CheckboxProps,
   MultiSelectProps,
   NumberInputProps,
-  PasswordInputProps,
   SelectProps,
   SwitchProps,
   TextareaProps,
@@ -16,6 +15,7 @@ import { UseFormReturnType } from '@mantine/form';
 import { ReactNode } from 'react';
 import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import type { MultiSelectProps as WrappedMultiSelectProps } from '@/elements/input/MultiSelect.tsx';
+import type { PasswordInputProps as WrappedPasswordInputProps } from '@/elements/input/PasswordInput.tsx';
 import type { SelectProps as WrappedSelectProps } from '@/elements/input/Select.tsx';
 import { LazyString } from '@/lib/lazy.ts';
 
@@ -55,7 +55,7 @@ export interface TextFieldDef<T extends Record<string, unknown>> extends BaseFie
 
 export interface PasswordFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'password';
-  props?: Partial<PasswordInputProps>;
+  props?: Partial<WrappedPasswordInputProps>;
 }
 
 export interface TextAreaFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
