@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
 import type { FieldDef } from '@/elements/form-engine/index.ts';
 import getNodeBandwidth from '@/api/admin/nodes/getNodeBandwidth.ts';
+import getNodeConfig from '@/api/admin/nodes/getNodeConfig.ts';
 import getNodeSystemDirect from '@/api/admin/nodes/system/getNodeSystemDirect.ts';
 import MultiKeyValueInput from '@/elements/input/MultiKeyValueInput.tsx';
 import Select from '@/elements/input/Select.tsx';
@@ -675,34 +676,25 @@ function buildServerConfigFields<T extends ServerEggAssignmentFormValues>(
     form,
     eggs,
     eggImages,
+    nodeTimezone,
   }: {
     mode: ServerFormMode;
     form: UseFormReturnType<T>;
     eggs: EggsResource;
     eggImages: Record<string, string>;
+    nodeTimezone: string | null;
   },
 ): FieldDef<T>[] {
-  const timezoneField: FieldDef<T> =
-    mode === 'create'
-      ? {
-          type: 'timezone',
-          name: 'timezone',
-          label: t('common.form.timezone', {}),
-          withSystemOption: true,
-          props: {
-            placeholder: 'Europe/Amsterdam',
-          },
-        }
-      : {
-          type: 'timezone',
-          name: 'timezone',
-          label: t('common.form.timezone', {}),
-          props: {
-            placeholder: t('common.form.timezoneSystem', {}),
-            allowDeselect: true,
-            clearable: true,
-          },
-        };
+  const timezoneField: FieldDef<T> = {
+    type: 'timezone',
+    name: 'timezone',
+    label: t('common.form.timezone', {}),
+    props: {
+      placeholder: nodeTimezone ?? t('common.form.timezoneSystem', {}),
+      allowDeselect: true,
+      clearable: true,
+    },
+  };
 
   const createOnlyFields: FieldDef<T>[] =
     mode === 'create'
@@ -822,6 +814,14 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
     silent: true,
   });
 
+  const { data: nodeConfig } = useResource({
+    queryKey: queryKeys.admin.nodes.config(nodeUuid),
+    queryFn: () => getNodeConfig(nodeUuid),
+    enabled: !!nodeUuid,
+    silent: true,
+  });
+  const nodeTimezone = (nodeConfig?.config as { system?: { timezone?: string } } | undefined)?.system?.timezone ?? null;
+
   const nodeItems = mode === 'create' ? (nodes?.items ?? []) : [];
   const unreachableNodeUuidList = useQueries({
     queries: nodeItems.map((node) => ({
@@ -898,8 +898,8 @@ export function useServerFormFields<T extends ServerEggAssignmentFormValues>(opt
   );
 
   const serverConfigFields = useMemo(
-    () => buildServerConfigFields<T>(t, { mode, form, eggs, eggImages }),
-    [t, mode, form, eggs, eggImages],
+    () => buildServerConfigFields<T>(t, { mode, form, eggs, eggImages, nodeTimezone }),
+    [t, mode, form, eggs, eggImages, nodeTimezone],
   );
 
   return { basicInfoFields, serverAssignmentFields, resourceLimitsFields, serverConfigFields, featureLimitsFields };

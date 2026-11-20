@@ -326,6 +326,9 @@ const server = (serverUuid: string) => ({
   firewall: {
     all: () => ['server', serverUuid, 'firewall'] as const,
   },
+  settings: {
+    timezone: () => ['server', serverUuid, 'settings', 'timezone'] as const,
+  },
   mounts: {
     all: () => ['server', serverUuid, 'mounts'] as const,
   },

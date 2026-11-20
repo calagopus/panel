@@ -24,6 +24,10 @@ export const serverSettingsTimezoneSchema = z.object({
   timezone: z.preprocess((value) => (value === '' ? null : value), z.string().min(3).max(255).nullable()),
 });
 
+export const serverSettingsTimezoneDefaultSchema = z.object({
+  defaultTimezone: z.string().nullable(),
+});
+
 export const serverTrashSettingsSchema = z.object({
   retention: z.number().int().min(0).max(31536000),
   usageThreshold: z.number().int().min(0).max(100),

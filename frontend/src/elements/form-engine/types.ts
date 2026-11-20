@@ -131,7 +131,6 @@ export interface SizeFieldDef<T extends Record<string, unknown>> extends BaseFie
 
 export interface TimezoneFieldDef<T extends Record<string, unknown>> extends BaseFieldDef<T> {
   type: 'timezone';
-  withSystemOption?: boolean;
   props?: Partial<SelectProps>;
 }
 

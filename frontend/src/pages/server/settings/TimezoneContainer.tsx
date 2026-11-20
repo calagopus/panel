@@ -1,9 +1,11 @@
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from '@mantine/form';
+import { useQuery } from '@tanstack/react-query';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import getTimezone from '@/api/server/settings/getTimezone.ts';
 import updateTimezone from '@/api/server/settings/updateTimezone.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import TitleCard from '@/elements/data-display/TitleCard.tsx';
@@ -11,6 +13,7 @@ import TimezoneInput from '@/elements/input/TimezoneInput.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import { formatDateTimeAsTimezone } from '@/lib/format/time.ts';
+import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSettingsTimezoneSchema } from '@/lib/schemas/server/settings.ts';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
@@ -25,6 +28,11 @@ export default function TimezoneContainer() {
 
   const [loading, setLoading] = useState(false);
   const [time, setTime] = useState<string | null>(null);
+
+  const { data: timezoneSettings } = useQuery({
+    queryKey: queryKeys.server(server.uuid).settings.timezone(),
+    queryFn: () => getTimezone(server.uuid),
+  });
 
   const form = useForm<z.infer<typeof serverSettingsTimezoneSchema>>({
     initialValues: {
@@ -68,7 +76,7 @@ export default function TimezoneContainer() {
           <Stack gap='xs'>
             <TimezoneInput
               withAsterisk
-              placeholder={t('common.form.timezoneSystem', {})}
+              placeholder={timezoneSettings?.defaultTimezone ?? t('common.form.timezoneSystem', {})}
               allowDeselect
               clearable
               {...form.getInputProps('timezone')}

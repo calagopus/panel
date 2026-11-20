@@ -1,6 +1,48 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod get {
+    use serde::Serialize;
+    use shared::{
+        ApiError, GetState,
+        models::{server::GetServer, user::GetPermissionManager},
+        response::{ApiResponse, ApiResponseResult},
+    };
+    use utoipa::ToSchema;
+
+    #[derive(ToSchema, Serialize)]
+    struct Response {
+        default_timezone: Option<compact_str::CompactString>,
+    }
+
+    #[utoipa::path(get, path = "/", responses(
+        (status = OK, body = inline(Response)),
+        (status = UNAUTHORIZED, body = ApiError),
+    ), params(
+        (
+            "server" = uuid::Uuid,
+            description = "The server ID",
+            example = "123e4567-e89b-12d3-a456-426614174000",
+        ),
+    ))]
+    pub async fn route(
+        state: GetState,
+        permissions: GetPermissionManager,
+        server: GetServer,
+    ) -> ApiResponseResult {
+        permissions.has_server_permission("settings.timezone")?;
+
+        let default_timezone = server
+            .node
+            .fetch_cached(&state.database)
+            .await?
+            .fetch_default_timezone(&state.database)
+            .await;
+
+        ApiResponse::new_serialized(Response { default_timezone }).ok()
+    }
+}
+
 mod put {
     use serde::{Deserialize, Serialize};
     use shared::{
@@ -68,6 +110,7 @@ mod put {
 
 pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
+        .routes(routes!(get::route))
         .routes(routes!(put::route))
         .with_state(state.clone())
 }

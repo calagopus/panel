@@ -300,7 +300,6 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
           label={fieldLabel(field)}
           description={resolveString(field.description)}
           withAsterisk={field.required}
-          withSystemOption={field.withSystemOption}
           key={f.key(field.name)}
           {...f.getInputProps(field.name)}
           {...field.props}

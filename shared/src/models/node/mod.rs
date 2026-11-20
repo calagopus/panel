@@ -800,6 +800,8 @@ impl Node {
     /// Whether this node will enforce firewall rules, `None` when its configuration could not
     /// be retrieved in time. False covers both a node that cannot firewall at all and one with
     /// firewalling turned off, so the reason stays out of the client API.
+    ///
+    /// Cached for 120 seconds.
     pub async fn fetch_firewall_support(
         &self,
         database: &crate::database::Database,
@@ -815,8 +817,37 @@ impl Node {
         firewall_supported(&config).ok()
     }
 
+    /// The timezone servers on this node run in when they have none of their own, `None` when
+    /// its configuration could not be retrieved in time.
+    ///
+    /// Cached for 120 seconds.
+    pub async fn fetch_default_timezone(
+        &self,
+        database: &crate::database::Database,
+    ) -> Option<compact_str::CompactString> {
+        const DEFAULT_TIMEZONE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(3);
+
+        nestify::nest! {
+            #[derive(Default, Deserialize)] #[serde(default)] struct TimezoneConfig {
+                system: #[derive(Default, Deserialize)] #[serde(default)] struct TimezoneConfigSystem {
+                    timezone: Option<compact_str::CompactString>,
+                },
+            }
+        }
+
+        let config =
+            tokio::time::timeout(DEFAULT_TIMEZONE_TIMEOUT, self.fetch_configuration(database))
+                .await
+                .ok()?
+                .ok()?;
+
+        config.view::<TimezoneConfig>().ok()?.system.timezone
+    }
+
     /// The node's `allowed_mounts` / `allowed_devices`, `None` when its configuration could
     /// not be retrieved in time.
+    ///
+    /// Cached for 120 seconds.
     pub async fn fetch_allowed_sources(
         &self,
         database: &crate::database::Database,
