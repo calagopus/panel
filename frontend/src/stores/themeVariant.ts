@@ -9,16 +9,20 @@ import {
 } from '@/lib/themeVariants.ts';
 
 const storageKey = 'theme_variant';
+const autoSchemeStorageKey = 'theme_auto_scheme';
 
 interface ThemeVariantStore {
   variant: string;
   // the selected variant while it supports the current scheme, standard otherwise
   activeVariant: string;
+  // auto was picked while the selected variant only has one scheme
+  autoScheme: boolean;
 }
 
 export const useThemeVariantStore = create<ThemeVariantStore>()(() => ({
   variant: safeLocalStorageGet(storageKey) || DEFAULT_THEME_VARIANT,
   activeVariant: DEFAULT_THEME_VARIANT,
+  autoScheme: safeLocalStorageGet(autoSchemeStorageKey) === '1',
 }));
 
 export function setThemeVariant(variant: string) {
@@ -29,6 +33,16 @@ export function setThemeVariant(variant: string) {
   }
 
   useThemeVariantStore.setState({ variant });
+}
+
+export function setAutoScheme(autoScheme: boolean) {
+  if (autoScheme) {
+    safeLocalStorageSet(autoSchemeStorageKey, '1');
+  } else {
+    safeLocalStorageRemove(autoSchemeStorageKey);
+  }
+
+  useThemeVariantStore.setState({ autoScheme });
 }
 
 function currentScheme(): ThemeScheme {
@@ -59,10 +73,18 @@ export function registerThemeVariant() {
     // forceColorScheme handles the session, the stored value only keeps themeBoot.js painting the right scheme
     safeLocalStorageSet('mantine-color-scheme-value', forcedScheme);
     document.documentElement.setAttribute('data-mantine-color-scheme', forcedScheme);
+    setAutoScheme(false);
   }
 
   if (!getThemeVariant(useThemeVariantStore.getState().variant)) {
     setThemeVariant(DEFAULT_THEME_VARIANT);
+  }
+
+  const { variant, autoScheme } = useThemeVariantStore.getState();
+  if (autoScheme && getThemeVariant(variant)!.schemes.length > 1) {
+    // runs before MantineProvider mounts, which reads the stored value initially
+    safeLocalStorageSet('mantine-color-scheme-value', 'auto');
+    setAutoScheme(false);
   }
 
   const syncActiveVariant = () => {
@@ -88,6 +110,8 @@ export function registerThemeVariant() {
     if (event.key === storageKey) {
       const variant = event.newValue || DEFAULT_THEME_VARIANT;
       useThemeVariantStore.setState({ variant: getThemeVariant(variant) ? variant : DEFAULT_THEME_VARIANT });
+    } else if (event.key === autoSchemeStorageKey) {
+      useThemeVariantStore.setState({ autoScheme: event.newValue === '1' });
     }
   });
 }

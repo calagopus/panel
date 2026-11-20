@@ -53,7 +53,7 @@ import { preloadRouterForPath } from '@/routers/routerImports.ts';
 import { useGlobalStore } from '@/stores/global.ts';
 import { useQuickActionsStore } from '@/stores/quickActions.ts';
 import { useRelativePageStore } from '@/stores/relativePage.ts';
-import { setThemeVariant, useThemeVariantStore } from '@/stores/themeVariant.ts';
+import { setAutoScheme, setThemeVariant, useThemeVariantStore } from '@/stores/themeVariant.ts';
 
 const CloseMobileMenuContext = createContext<(() => void) | null>(null);
 
@@ -257,6 +257,7 @@ function Footer() {
   const deviceOverrideCount = useDeviceOverrideCount();
   const [redactAddresses, setRedactAddresses] = useRedactAddresses();
   const themeVariant = useThemeVariantStore((state) => state.variant);
+  const autoScheme = useThemeVariantStore((state) => state.autoScheme);
   const routeOrder = useGlobalStore((state) => state.settings.user?.routeOrder);
 
   const { confirmLogout, logoutModal } = useLogoutConfirmation();
@@ -268,12 +269,21 @@ function Footer() {
   const adminHidden = suspended || !user || !isAdmin(user);
 
   const themeVariants = getThemeVariants();
+  const allowedSchemes = getThemeVariant(DEFAULT_THEME_VARIANT)!.schemes;
   const activeSchemes = (getThemeVariant(themeVariant) ?? getThemeVariant(DEFAULT_THEME_VARIANT)!).schemes;
+  const prefersAuto = colorScheme === 'auto' || autoScheme;
 
   const changeTheme = async (event: React.MouseEvent, nextTheme: 'auto' | 'dark' | 'light') => {
-    if (nextTheme === colorScheme) {
+    if (nextTheme === 'auto' ? prefersAuto : nextTheme === colorScheme && !autoScheme) {
       return;
     }
+
+    if (nextTheme === 'auto' && activeSchemes.length < 2) {
+      setAutoScheme(true);
+      return;
+    }
+
+    setAutoScheme(false);
 
     const nextComputed =
       nextTheme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : nextTheme;
@@ -291,13 +301,20 @@ function Footer() {
       return;
     }
 
-    const keepsScheme =
-      colorScheme === 'auto' ? variant.schemes.length > 1 : variant.schemes.includes(computedColorScheme);
+    const bothSchemes = variant.schemes.length > 1;
+    const nextScheme = prefersAuto
+      ? bothSchemes
+        ? 'auto'
+        : variant.schemes[0]
+      : variant.schemes.includes(computedColorScheme)
+        ? computedColorScheme
+        : variant.schemes[0];
 
     animateThemeChange(event, () => {
       setThemeVariant(variant.id);
-      if (!keepsScheme) {
-        setColorScheme(variant.schemes[0]);
+      setAutoScheme(prefersAuto && !bothSchemes);
+      if (nextScheme !== colorScheme) {
+        setColorScheme(nextScheme);
       }
     });
   };
@@ -377,8 +394,8 @@ function Footer() {
             type: 'action' as const,
             icon: faCircleHalfStroke,
             label: t('elements.sidebar.button.themeAuto', {}),
-            hidden: activeSchemes.length < 2,
-            rightSection: colorScheme === 'auto' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+            hidden: allowedSchemes.length < 2,
+            rightSection: prefersAuto && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'auto'),
           },
           {
@@ -386,7 +403,7 @@ function Footer() {
             icon: faMoon,
             label: t('elements.sidebar.button.themeDark', {}),
             hidden: !activeSchemes.includes('dark'),
-            rightSection: colorScheme === 'dark' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+            rightSection: colorScheme === 'dark' && !autoScheme && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'dark'),
           },
           {
@@ -394,7 +411,7 @@ function Footer() {
             icon: faSun,
             label: t('elements.sidebar.button.themeLight', {}),
             hidden: !activeSchemes.includes('light'),
-            rightSection: colorScheme === 'light' && <FontAwesomeIcon icon={faCheck} size='sm' />,
+            rightSection: colorScheme === 'light' && !autoScheme && <FontAwesomeIcon icon={faCheck} size='sm' />,
             onClick: (e: React.MouseEvent) => changeTheme(e, 'light'),
           },
         ],
@@ -436,6 +453,7 @@ function Footer() {
       colorScheme,
       computedColorScheme,
       themeVariant,
+      autoScheme,
       deviceOverrideCount,
       redactAddresses,
       setRedactAddresses,
