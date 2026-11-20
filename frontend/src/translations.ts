@@ -4005,6 +4005,9 @@ const baseTranslations = defineTranslations({
           },
           bulkActions: {
             verb: {
+              start: 'start',
+              restart: 'restart',
+              stop: 'stop',
               suspend: 'suspend',
               unsuspend: 'unsuspend',
               clearState: 'clear the state of',
@@ -4025,6 +4028,7 @@ const baseTranslations = defineTranslations({
             },
             successWithSkipped: 'Successfully {action} {servers}. {skippedServers} skipped.',
             nothingToDo: 'Every selected server is already in that state.',
+            transferMixedNodes: 'Only servers on the same node can be transferred together.',
           },
           externalIdLookup: {
             button: 'Find by External ID',

@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Ref, useState } from 'react';
 import { z } from 'zod';
 import getNodeServers from '@/api/admin/nodes/servers/getNodeServers.ts';
@@ -14,16 +15,15 @@ import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminNode } from '@/lib/schemas/admin/nodes.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
-import { serverSelectorSchema } from '@/lib/schemas/generic.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
+import ServerActionBar from '@/pages/admin/servers/ServerActionBar.tsx';
 import ServerRow from '@/pages/admin/servers/ServerRow.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useSelectKeyHeld } from '@/plugins/selection/useSelectKeyHeld.ts';
 import { useTableSelection } from '@/plugins/selection/useTableSelection.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import BulkActionBar from './BulkActionBar.tsx';
 import ServersTransferModal from './modals/ServersTransferModal.tsx';
 import ServerPowerButtons from './ServerPowerButtons.tsx';
 
@@ -39,14 +39,12 @@ const ACTION_PAST_TENSE: Record<PowerAction, 'started' | 'stopped' | 'restarted'
 export default function AdminNodeServers({ node }: { node: AdminNode }) {
   const { t, tItem } = useTranslations();
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const sKeyPressedRef = useSelectKeyHeld();
-  const [bulkActionLoading, setBulkActionLoading] = useState<PowerAction | null>(null);
   const [allActionLoading, setAllActionLoading] = useState<PowerAction | null>(null);
-  const [transferScope, setTransferScope] = useState<'bulk' | 'all' | null>(null);
-  const [confirmPowerAction, setConfirmPowerAction] = useState<{ action: PowerAction; scope: 'bulk' | 'all' } | null>(
-    null,
-  );
+  const [transferAllOpen, setTransferAllOpen] = useState(false);
+  const [confirmPowerAction, setConfirmPowerAction] = useState<PowerAction | null>(null);
 
   const {
     data: nodeServers,
@@ -78,15 +76,11 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
     }
   };
 
-  const runPowerAction = (
-    selector: z.infer<typeof serverSelectorSchema>,
-    total: number,
-    setLoading: (action: PowerAction | null) => void,
-    action: PowerAction,
-  ) => {
-    setLoading(action);
+  const runPowerAction = (action: PowerAction) => {
+    const total = nodeServers?.total ?? 0;
+    setAllActionLoading(action);
 
-    sendNodeServersPowerAction(node.uuid, selector, action)
+    sendNodeServersPowerAction(node.uuid, { type: 'all' }, action)
       .then((successful) => {
         const failed = total - successful;
         const pastTense = t(`common.enum.bulkActionServerAction.${ACTION_PAST_TENSE[action]}`, {});
@@ -108,36 +102,18 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
         }
       })
       .catch((err) => addToast(httpErrorToHuman(err), 'error'))
-      .finally(() => {
-        setLoading(null);
-        if (selector.type === 'uuids') {
-          clearSelectedServers();
-        }
-      });
+      .finally(() => setAllActionLoading(null));
   };
 
   const searchActive = !!search;
-
-  const confirmCount = confirmPowerAction?.scope === 'all' ? (nodeServers?.total ?? 0) : selectedServers.size;
 
   const onConfirmPowerAction = () => {
     if (!confirmPowerAction) {
       return;
     }
 
-    const { action, scope } = confirmPowerAction;
     setConfirmPowerAction(null);
-
-    if (scope === 'all') {
-      runPowerAction({ type: 'all' }, nodeServers?.total ?? 0, setAllActionLoading, action);
-    } else {
-      runPowerAction(
-        { type: 'uuids', uuids: selectedServers.keys() },
-        selectedServers.size,
-        setBulkActionLoading,
-        action,
-      );
-    }
+    runPowerAction(confirmPowerAction);
   };
 
   const columns = [
@@ -154,11 +130,11 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
       <AdminCan action='nodes.transfers'>
         <ServersTransferModal
           contextNode={node}
-          selector={transferScope === 'all' ? { type: 'all' } : { type: 'uuids', uuids: selectedServers.keys() }}
-          count={transferScope === 'all' ? (nodeServers?.total ?? 0) : selectedServers.size}
+          selector={{ type: 'all' }}
+          count={nodeServers?.total ?? 0}
           clearSelected={clearSelectedServers}
-          opened={transferScope !== null}
-          onClose={() => setTransferScope(null)}
+          opened={transferAllOpen}
+          onClose={() => setTransferAllOpen(false)}
         />
       </AdminCan>
 
@@ -171,8 +147,8 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
       >
         {confirmPowerAction
           ? t('pages.admin.nodes.tabs.servers.page.modal.powerAction.content', {
-              action: t(`common.enum.serverPowerAction.${confirmPowerAction.action}`, {}),
-              servers: tItem('server', confirmCount),
+              action: t(`common.enum.serverPowerAction.${confirmPowerAction}`, {}),
+              servers: tItem('server', nodeServers?.total ?? 0),
             }).md()
           : null}
       </ConfirmationModal>
@@ -193,13 +169,13 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
               <ServerPowerButtons
                 count={nodeServers?.total ?? 0}
                 loading={allActionLoading}
-                onAction={(action) => setConfirmPowerAction({ action, scope: 'all' })}
+                onAction={setConfirmPowerAction}
                 disabled={searchActive || nodeServers?.total === 0}
               />
               <AdminCan action='nodes.transfers'>
                 <Button
                   color='gray'
-                  onClick={() => setTransferScope('all')}
+                  onClick={() => setTransferAllOpen(true)}
                   disabled={searchActive || allActionLoading !== null || nodeServers?.total === 0}
                 >
                   {t('common.button.transfer', {})} ({nodeServers?.total})
@@ -236,12 +212,10 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
         </SelectionArea>
       </AdminSubContentContainer>
 
-      <BulkActionBar
-        selectedCount={selectedServers.size}
-        onClear={clearSelectedServers}
-        onPowerAction={(action) => setConfirmPowerAction({ action, scope: 'bulk' })}
-        onTransfer={() => setTransferScope('bulk')}
-        loading={bulkActionLoading}
+      <ServerActionBar
+        selectedServers={selectedServers}
+        clearSelectedServers={clearSelectedServers}
+        invalidateServers={() => queryClient.invalidateQueries({ queryKey: queryKeys.admin.nodes.servers(node.uuid) })}
       />
     </>
   );

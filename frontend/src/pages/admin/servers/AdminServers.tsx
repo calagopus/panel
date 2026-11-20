@@ -14,6 +14,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { AdminServer } from '@/lib/schemas/admin/servers.ts';
 import { serverTableColumns } from '@/lib/tableColumns.ts';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
+import { useSelectKeyHeld } from '@/plugins/selection/useSelectKeyHeld.ts';
 import { useTableSelection } from '@/plugins/selection/useTableSelection.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
@@ -27,6 +28,7 @@ function ServersContainer() {
   const { t } = useTranslations();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const sKeyPressedRef = useSelectKeyHeld();
   const [lookupOpen, setLookupOpen] = useState(false);
 
   const {
@@ -52,7 +54,7 @@ function ServersContainer() {
   } = useTableSelection<AdminServer>({ items: servers?.data });
 
   const handleServerClick = (server: AdminServer, event: React.MouseEvent) => {
-    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+    if (sKeyPressedRef.current || event.ctrlKey || event.metaKey || event.shiftKey) {
       event.preventDefault();
       event.stopPropagation();
       toggleServer(server, !selectedServers.has(server), event.shiftKey);

@@ -4027,6 +4027,9 @@
           },
           "bulkActions": {
             "verb": {
+              "start": "starten",
+              "restart": "neu starten",
+              "stop": "stoppen",
               "suspend": "suspendieren",
               "unsuspend": "entsuspendieren",
               "clearState": "in ihrem Status zurücksetzen",
@@ -4044,7 +4047,8 @@
               }
             },
             "successWithSkipped": "Erfolgreich {servers} {action}. {skippedServers} übersprungen.",
-            "nothingToDo": "Jeder ausgewählte Server befindet sich bereits in diesem Zustand."
+            "nothingToDo": "Jeder ausgewählte Server befindet sich bereits in diesem Zustand.",
+            "transferMixedNodes": "Nur Server auf derselben Node können zusammen transferiert werden."
           },
           "externalIdLookup": {
             "button": "Über externe ID suchen",
