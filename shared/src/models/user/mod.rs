@@ -1,5 +1,5 @@
 use crate::{
-    crypt::{BcryptString, EncryptedString},
+    crypt::{EncryptedString, PasswordHashString},
     models::{InsertQueryBuilder, UpdateQueryBuilder},
     prelude::*,
     storage::StorageUrlRetriever,
@@ -288,7 +288,7 @@ impl User {
         password: &str,
         language: &str,
     ) -> Result<uuid::Uuid, crate::database::DatabaseError> {
-        let password = BcryptString::hash(password).await?;
+        let password = PasswordHashString::hash(password, database.password_algorithm()).await?;
 
         let row = sqlx::query(
             r#"
@@ -489,13 +489,13 @@ impl User {
         password: &str,
     ) -> Result<Option<Self>, crate::database::DatabaseError> {
         let Some(row) = row else {
-            BcryptString::verify_dummy(password).await?;
+            PasswordHashString::verify_dummy(password, database.password_algorithm()).await?;
 
             return Ok(None);
         };
 
-        let Some(hash) = row.try_get::<Option<BcryptString>, _>("password_hash")? else {
-            BcryptString::verify_dummy(password).await?;
+        let Some(hash) = row.try_get::<Option<PasswordHashString>, _>("password_hash")? else {
+            PasswordHashString::verify_dummy(password, database.password_algorithm()).await?;
 
             return Ok(None);
         };
@@ -615,13 +615,13 @@ impl User {
         &self,
         database: &crate::database::Database,
         password: &str,
-        current_hash: &BcryptString,
+        current_hash: &PasswordHashString,
     ) -> Result<(), crate::database::DatabaseError> {
-        if !current_hash.needs_rehash() {
+        if !current_hash.needs_rehash(database.password_algorithm()) {
             return Ok(());
         }
 
-        let new_hash = BcryptString::hash(password).await?;
+        let new_hash = PasswordHashString::hash(password, database.password_algorithm()).await?;
 
         sqlx::query(
             r#"
@@ -747,12 +747,12 @@ impl User {
         .await?;
 
         let hash = match row {
-            Some(row) => row.try_get::<Option<BcryptString>, _>("password")?,
+            Some(row) => row.try_get::<Option<PasswordHashString>, _>("password")?,
             None => None,
         };
 
         let Some(hash) = hash else {
-            BcryptString::verify_dummy(password).await?;
+            PasswordHashString::verify_dummy(password, database.password_algorithm()).await?;
 
             return Ok(false);
         };
@@ -773,7 +773,8 @@ impl User {
         password: Option<&str>,
     ) -> Result<(), crate::database::DatabaseError> {
         if let Some(password) = password {
-            let password = BcryptString::hash(password).await?;
+            let password =
+                PasswordHashString::hash(password, database.password_algorithm()).await?;
 
             sqlx::query(
                 r#"
@@ -819,11 +820,13 @@ impl User {
     /// Update the User password, `None` will disallow password login and not require one when changing
     pub async fn update_password_with_transaction(
         &mut self,
+        database: &crate::database::Database,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         password: Option<&str>,
     ) -> Result<(), crate::database::DatabaseError> {
         if let Some(password) = password {
-            let password = BcryptString::hash(password).await?;
+            let password =
+                PasswordHashString::hash(password, database.password_algorithm()).await?;
 
             sqlx::query(
                 r#"
@@ -1177,7 +1180,10 @@ impl CreatableModel for User {
             .set("name_last", options.name_last.as_deref());
 
         if let Some(password) = &options.password {
-            query_builder.set("password", BcryptString::hash(password).await?);
+            query_builder.set(
+                "password",
+                PasswordHashString::hash(password, state.database.password_algorithm()).await?,
+            );
         }
 
         query_builder
@@ -1403,8 +1409,12 @@ impl UpdatableModel for User {
         }
 
         if let Some(password) = options.password {
-            self.update_password_with_transaction(transaction, password.as_deref())
-                .await?;
+            self.update_password_with_transaction(
+                &state.database,
+                transaction,
+                password.as_deref(),
+            )
+            .await?;
         }
 
         self.run_after_update_handlers(state, transaction).await?;

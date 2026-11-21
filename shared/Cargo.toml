@@ -73,6 +73,7 @@ russh = { workspace = true }
 rand = { workspace = true }
 constant_time_eq = "0.6.0"
 bcrypt = "0.19.3"
+argon2 = "0.6.0"
 urlencoding = { workspace = true }
 ignore = "0.4.23"
 futures-util = { workspace = true }

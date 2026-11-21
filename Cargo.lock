@@ -6040,6 +6040,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aab41826031698d6ffcd9cff78ef56ef998e39dc7e5067cdfebe373842d4723b"
 dependencies = [
+ "getrandom 0.4.3",
  "phc",
 ]
 
@@ -6111,6 +6112,7 @@ checksum = "44dc769b75f93afdddd8c7fa12d685292ddeff1e66f7f0f3a234cf1818afe892"
 dependencies = [
  "base64ct",
  "ctutils",
+ "getrandom 0.4.3",
 ]
 
 [[package]]
@@ -7760,6 +7762,7 @@ dependencies = [
  "accept-header",
  "anyhow",
  "arc-swap",
+ "argon2 0.6.0",
  "async-trait",
  "aws-sdk-s3",
  "axum",

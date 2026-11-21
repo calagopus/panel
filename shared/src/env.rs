@@ -117,6 +117,7 @@ pub struct Env {
     pub app_blocked_cidrs: Vec<cidr::IpCidr>,
     pub app_log_directory: Option<String>,
     pub app_request_log_limit: usize,
+    pub app_password_algorithm: crate::crypt::PasswordAlgorithm,
     pub app_encryption_key: String,
     pub server_name: Option<String>,
 }
@@ -170,6 +171,40 @@ impl Env {
             );
             std::process::exit(1);
         }
+
+        let app_password_algorithm = match std::env::var("APP_PASSWORD_ALGORITHM")
+            .unwrap_or("bcrypt".to_string())
+            .trim_matches('"')
+        {
+            "bcrypt" => crate::crypt::PasswordAlgorithm::bcrypt(
+                std::env::var("APP_PASSWORD_BCRYPT_COST")
+                    .unwrap_or("12".to_string())
+                    .trim_matches('"')
+                    .parse()
+                    .context("Invalid APP_PASSWORD_BCRYPT_COST value")?,
+            )
+            .context("Invalid APP_PASSWORD_BCRYPT_COST value")?,
+            "argon2id" => crate::crypt::PasswordAlgorithm::argon2id(
+                std::env::var("APP_PASSWORD_ARGON2_MEMORY")
+                    .unwrap_or("64".to_string())
+                    .trim_matches('"')
+                    .parse()
+                    .context("Invalid APP_PASSWORD_ARGON2_MEMORY value")?,
+                std::env::var("APP_PASSWORD_ARGON2_ITERATIONS")
+                    .unwrap_or("3".to_string())
+                    .trim_matches('"')
+                    .parse()
+                    .context("Invalid APP_PASSWORD_ARGON2_ITERATIONS value")?,
+            )
+            .context(
+                "Invalid APP_PASSWORD_ARGON2_MEMORY or APP_PASSWORD_ARGON2_ITERATIONS value",
+            )?,
+            _ => {
+                return Err(anyhow::anyhow!(
+                    "Invalid APP_PASSWORD_ALGORITHM. Expected 'bcrypt' or 'argon2id'."
+                ));
+            }
+        };
 
         let app_log_directory = std::env::var("APP_LOG_DIRECTORY")
             .ok()
@@ -358,6 +393,7 @@ impl Env {
                 .trim_matches('"')
                 .parse()
                 .context("Invalid APP_REQUEST_LOG_LIMIT value")?,
+            app_password_algorithm,
             app_encryption_key,
             server_name: std::env::var("SERVER_NAME")
                 .ok()

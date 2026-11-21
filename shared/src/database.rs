@@ -20,6 +20,7 @@ pub struct Database {
     read: Option<sqlx::PgPool>,
 
     encryption_key: Arc<str>,
+    password_algorithm: crate::crypt::PasswordAlgorithm,
     decryption_cache: Option<moka::future::Cache<[u8; 32], Arc<Vec<u8>>>>,
     batch_actions: Arc<Mutex<HashMap<(&'static str, uuid::Uuid), BatchFuture>>>,
 }
@@ -53,6 +54,7 @@ impl Database {
             },
 
             encryption_key: env.app_encryption_key.clone().into(),
+            password_algorithm: env.app_password_algorithm,
             decryption_cache: env.app_use_decryption_cache.then(|| {
                 moka::future::Cache::builder()
                     .max_capacity(16384)
@@ -136,6 +138,11 @@ impl Database {
             .await?;
 
         Ok(size.0 as u64)
+    }
+
+    #[inline]
+    pub fn password_algorithm(&self) -> crate::crypt::PasswordAlgorithm {
+        self.password_algorithm
     }
 
     #[inline]
