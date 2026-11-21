@@ -27,6 +27,7 @@ pub const CREATE_TABLE_MAX_COLUMNS: usize = 100;
 pub const SCHEMA_MAX_TABLES: usize = 1000;
 
 const QUERY_MAX_BYTES: usize = 4 * 1024 * 1024;
+const QUERY_MAX_RESULT_SETS: usize = 1000;
 const QUERY_MAX_VALUE_BYTES: usize = 256 * 1024;
 const QUERY_STATEMENT_TIMEOUT_MS: u64 = 10_000;
 const QUERY_CONNECTION_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
@@ -310,17 +311,28 @@ impl ResultCollector {
         columns: impl FnOnce() -> Vec<QueryColumn>,
         row: impl FnOnce() -> Vec<QueryValue>,
     ) {
-        if self.columns.is_empty() {
-            self.columns = columns();
+        if self.results.len() >= QUERY_MAX_RESULT_SETS || self.bytes >= QUERY_MAX_BYTES {
+            self.truncated = true;
+            return;
         }
 
-        if self.rows.len() >= self.max_rows || self.bytes >= QUERY_MAX_BYTES {
+        if self.columns.is_empty() {
+            self.columns = columns();
+            self.bytes += self
+                .columns
+                .iter()
+                .map(QueryColumn::byte_len)
+                .sum::<usize>();
+        }
+
+        if self.rows.len() >= self.max_rows {
             self.truncated = true;
             return;
         }
 
         let row = row();
-        let bytes = row.iter().map(QueryValue::byte_len).sum::<usize>();
+        let bytes =
+            size_of::<Vec<QueryValue>>() + row.iter().map(QueryValue::byte_len).sum::<usize>();
 
         if self.bytes + bytes > QUERY_MAX_BYTES {
             self.bytes = QUERY_MAX_BYTES;
@@ -333,6 +345,15 @@ impl ResultCollector {
     }
 
     fn finish_set(&mut self, rows_affected: u64) {
+        if self.results.len() >= QUERY_MAX_RESULT_SETS {
+            if let Some(last) = self.results.last_mut() {
+                last.truncated = true;
+            }
+            self.truncated = false;
+
+            return;
+        }
+
         self.results.push(QueryResultSet {
             columns: std::mem::take(&mut self.columns),
             rows: std::mem::take(&mut self.rows),
@@ -342,7 +363,7 @@ impl ResultCollector {
     }
 
     fn into_results(mut self) -> Vec<QueryResultSet> {
-        if !self.columns.is_empty() || !self.rows.is_empty() {
+        if !self.columns.is_empty() || !self.rows.is_empty() || self.truncated {
             self.finish_set(0);
         }
 
@@ -357,6 +378,12 @@ pub struct QueryColumn {
     #[serde(skip)]
     pub type_oid: Option<u32>,
     pub binary: bool,
+}
+
+impl QueryColumn {
+    fn byte_len(&self) -> usize {
+        size_of::<Self>() + self.name.len() + self.type_name.len()
+    }
 }
 
 #[derive(ToSchema, Serialize, Clone)]
@@ -406,10 +433,11 @@ impl QueryValue {
     }
 
     fn byte_len(&self) -> usize {
-        match self {
-            Self::Null => 0,
-            Self::Text { value, .. } | Self::Binary { value, .. } => value.len(),
-        }
+        size_of::<Self>()
+            + match self {
+                Self::Null => 0,
+                Self::Text { value, .. } | Self::Binary { value, .. } => value.len(),
+            }
     }
 }
 
@@ -1549,5 +1577,83 @@ impl From<ColumnDefinition> for db_agent_api::ColumnDefinition {
             primary_key: column.primary_key,
             auto_increment: column.auto_increment,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn null_column(index: usize) -> QueryColumn {
+        QueryColumn {
+            name: format!("c{index}").into(),
+            type_name: "int".into(),
+            type_oid: None,
+            binary: false,
+        }
+    }
+
+    fn push_null_rows(collector: &mut ResultCollector, rows: usize, columns: usize) {
+        for _ in 0..rows {
+            collector.push(
+                || (0..columns).map(null_column).collect(),
+                || (0..columns).map(|_| QueryValue::Null).collect(),
+            );
+        }
+    }
+
+    // ResultCollector
+    #[test]
+    fn null_rows_are_charged_against_the_shared_byte_budget() {
+        let mut collector = ResultCollector::new(QUERY_MAX_ROWS as usize);
+        for _ in 0..10 {
+            push_null_rows(&mut collector, 50, 1600);
+            collector.finish_set(0);
+        }
+        let results = collector.into_results();
+
+        let cells = results
+            .iter()
+            .map(|set| set.rows.iter().map(Vec::len).sum::<usize>())
+            .sum::<usize>();
+        assert!(cells * size_of::<QueryValue>() <= QUERY_MAX_BYTES);
+
+        let first_truncated = results
+            .iter()
+            .position(|set| set.truncated)
+            .expect("budget should truncate a set");
+        assert!(
+            results[..first_truncated]
+                .iter()
+                .all(|set| set.rows.len() == 50)
+        );
+        assert!(results[first_truncated].rows.len() < 50);
+    }
+
+    #[test]
+    fn a_set_after_the_budget_is_spent_keeps_its_rows_affected() {
+        let mut collector = ResultCollector::new(QUERY_MAX_ROWS as usize);
+        push_null_rows(&mut collector, 1000, 1600);
+        collector.finish_set(0);
+        collector.finish_set(7);
+        let results = collector.into_results();
+
+        let last = results.last().expect("dml set should be kept");
+        assert_eq!(last.rows_affected, 7);
+        assert!(last.rows.is_empty());
+        assert!(!last.truncated);
+    }
+
+    #[test]
+    fn result_sets_stop_at_the_cap_and_flag_the_last_stored_one() {
+        let mut collector = ResultCollector::new(QUERY_MAX_ROWS as usize);
+        for _ in 0..1500 {
+            collector.finish_set(1);
+        }
+        let results = collector.into_results();
+
+        assert_eq!(results.len(), QUERY_MAX_RESULT_SETS);
+        assert!(!results.first().expect("first set").truncated);
+        assert!(results.last().expect("last set").truncated);
     }
 }

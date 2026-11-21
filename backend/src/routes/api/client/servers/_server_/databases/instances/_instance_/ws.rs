@@ -71,9 +71,11 @@ impl InstanceWebsocketHandler {
     }
 
     async fn handle_client_message(&self, message: Message) -> bool {
-        if let Message::Text(text) = &message
-            && let Ok(parsed) = serde_json::from_str::<WebsocketMessage>(text.as_str())
-        {
+        let message = if let Message::Text(text) = &message {
+            let Ok(parsed) = serde_json::from_str::<WebsocketMessage>(text.as_str()) else {
+                return true;
+            };
+
             match parsed.event {
                 WebsocketEvent::SendStats | WebsocketEvent::SendStatus => {}
                 WebsocketEvent::SendLogs => {
@@ -142,7 +144,21 @@ impl InstanceWebsocketHandler {
                 }
                 _ => return true,
             }
-        }
+
+            let message = match serde_json::to_string(&parsed) {
+                Ok(message) => message,
+                Err(err) => {
+                    tracing::error!("failed to serialize websocket message: {:?}", err);
+                    return true;
+                }
+            };
+
+            Message::Text(message.into())
+        } else if matches!(message, Message::Binary(_)) {
+            return true;
+        } else {
+            message
+        };
 
         self.upstream
             .lock()

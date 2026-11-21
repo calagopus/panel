@@ -665,8 +665,8 @@ impl ScheduleActionInner {
                 &["backups.restore", "database-instances.read"]
             }
             ScheduleActionInner::CreateDirectory { .. } => &["files.create"],
-            ScheduleActionInner::WriteFile { .. } => &["files.update"],
-            ScheduleActionInner::CopyFile { .. } => &["files.update"],
+            ScheduleActionInner::WriteFile { .. } => &["files.create", "files.update"],
+            ScheduleActionInner::CopyFile { .. } => &["files.create", "files.update"],
             ScheduleActionInner::DeleteFiles { .. } => &["files.delete"],
             ScheduleActionInner::RenameFiles { .. } => &["files.update"],
             ScheduleActionInner::CompressFiles { .. } => &["files.archive"],

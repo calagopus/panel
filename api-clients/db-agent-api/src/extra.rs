@@ -216,6 +216,7 @@ pub const FORBIDDEN_CONFIG_PATHS: &[&str] = &[
     "socket_dir",
     "data_dir",
     "log_dir",
+    "database.url",
     "docker.socket",
     "api.token",
     "api.bind",
