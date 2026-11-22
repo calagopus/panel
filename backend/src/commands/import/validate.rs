@@ -125,13 +125,7 @@ fn is_username_char(c: char) -> bool {
 fn sanitize_username(username: &str) -> String {
     let mut sanitized: String = username
         .chars()
-        .map(|c| {
-            if is_username_char(c) {
-                c
-            } else {
-                '_'
-            }
-        })
+        .map(|c| if is_username_char(c) { c } else { '_' })
         .take(48)
         .collect();
     while chars(&sanitized) < 3 {
@@ -3379,8 +3373,7 @@ mod tests {
     }
 
     fn valid_username(name: &str) -> bool {
-        (3..=48).contains(&name.chars().count())
-            && name.chars().all(is_username_char)
+        (3..=48).contains(&name.chars().count()) && name.chars().all(is_username_char)
     }
 
     // build_plan
