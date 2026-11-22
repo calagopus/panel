@@ -61,9 +61,9 @@ mod patch {
 
     #[derive(ToSchema, Validate, Deserialize)]
     pub struct Payload {
-        #[garde(length(chars, min = 3, max = 48), pattern("^[a-zA-Z0-9_]+$"))]
+        #[garde(length(chars, min = 3, max = 48), pattern("^[a-zA-Z0-9_.-]+$"))]
         #[schema(min_length = 3, max_length = 48)]
-        #[schema(pattern = "^[a-zA-Z0-9_]+$")]
+        #[schema(pattern = "^[a-zA-Z0-9_.-]+$")]
         username: Option<compact_str::CompactString>,
         #[garde(length(chars, min = 1, max = 255))]
         #[schema(min_length = 1, max_length = 255)]

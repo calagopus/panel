@@ -118,11 +118,15 @@ fn numbered(base: &str, max: usize, separator: &str, taken: impl Fn(&str) -> boo
     unreachable!()
 }
 
+fn is_username_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-')
+}
+
 fn sanitize_username(username: &str) -> String {
     let mut sanitized: String = username
         .chars()
         .map(|c| {
-            if c.is_ascii_alphanumeric() || c == '_' {
+            if is_username_char(c) {
                 c
             } else {
                 '_'
@@ -673,9 +677,7 @@ impl Validator<'_> {
 
             let mut username = user.username.trim().to_string();
             let length = chars(&username);
-            let pattern_ok = username
-                .chars()
-                .all(|c| c.is_ascii_alphanumeric() || c == '_');
+            let pattern_ok = username.chars().all(is_username_char);
             let taken = |candidate: &str| {
                 let candidate = candidate.to_lowercase();
                 reserved.contains(&candidate) || usernames.holder(&candidate).is_some()
@@ -690,7 +692,7 @@ impl Validator<'_> {
                     "username",
                     "rule",
                     &username,
-                    "usernames must be 3-48 characters of a-z, A-Z, 0-9 and _",
+                    "usernames must be 3-48 characters of a-z, A-Z, 0-9, _, . and -",
                     Some(format!("rename to {suggestion:?}")),
                 ) {
                     username = suggestion;
@@ -3378,7 +3380,7 @@ mod tests {
 
     fn valid_username(name: &str) -> bool {
         (3..=48).contains(&name.chars().count())
-            && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+            && name.chars().all(is_username_char)
     }
 
     // build_plan
@@ -3634,6 +3636,7 @@ mod tests {
     #[test]
     fn sanitize_username_produces_valid_names() {
         assert_eq!(sanitize_username("bad name!"), "bad_name_");
+        assert_eq!(sanitize_username("john.doe-2"), "john.doe-2");
         assert_eq!(
             sanitize_username(&"abcdefghijklmnopqrstuvwxyz".repeat(2)),
             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
