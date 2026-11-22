@@ -40,15 +40,24 @@ impl Database {
     pub async fn new(env: &crate::env::Env, cache: Arc<crate::cache::Cache>) -> Self {
         let start = std::time::Instant::now();
 
+        let write_pool_size = env.database_write_pool_size.map(std::num::NonZeroU32::get);
+        let read_pool_size = env
+            .database_read_pool_size
+            .map_or(50, std::num::NonZeroU32::get);
+
         let instance = Self {
             cache,
 
             write: match &env.database_url_primary {
-                Some(url) => connect_pool("primary database", url, 20).await,
-                None => connect_pool("database", &env.database_url, 50).await,
+                Some(url) => {
+                    connect_pool("primary database", url, write_pool_size.unwrap_or(20)).await
+                }
+                None => {
+                    connect_pool("database", &env.database_url, write_pool_size.unwrap_or(50)).await
+                }
             },
             read: if env.database_url_primary.is_some() {
-                Some(connect_pool("read database", &env.database_url, 50).await)
+                Some(connect_pool("read database", &env.database_url, read_pool_size).await)
             } else {
                 None
             },

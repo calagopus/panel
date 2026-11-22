@@ -23,6 +23,8 @@ pub mod firewall;
 pub type GetServer = crate::extract::ConsumingExtension<Server>;
 pub type GetServerActivityLogger = crate::extract::ConsumingExtension<ServerActivityLogger>;
 
+const WINGS_REQUEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
 /// The path is resolved before matching so that alternative spellings of the same file
 /// (`/./x`, `//x`, `/a/../x`) cannot slip past an anchored pattern, since wings collapses
 /// those components before touching the filesystem.
@@ -1357,30 +1359,30 @@ impl Server {
             start_on_completion,
         } = options;
 
-        let mut transaction = state.database.write().begin().await?;
+        let api_client = self
+            .node
+            .fetch_cached(&state.database)
+            .await?
+            .api_client(&state.database)
+            .await?;
 
         if !Self::try_set_status_by_uuid(
-            &mut *transaction,
+            state.database.write(),
             self.uuid,
             None,
             Some(ServerStatus::Installing),
         )
         .await?
         {
-            transaction.rollback().await?;
-
             return Err(DisplayError::new(
                 "server is already installing or in an invalid state for reinstalling",
             )
             .into());
         }
 
-        match self
-            .node
-            .fetch_cached(&state.database)
-            .await?
-            .api_client(&state.database)
-            .await?
+        Self::invalidate_cached(&state.database, self.uuid).await;
+
+        match api_client
             .post_servers_server_reinstall_with(
                 self.uuid,
                 &wings_api::servers_server_reinstall::post::RequestBody {
@@ -1407,15 +1409,18 @@ impl Server {
         {
             Ok(_) => {}
             Err(err) => {
-                transaction.rollback().await?;
+                Self::try_set_status_by_uuid(
+                    state.database.write(),
+                    self.uuid,
+                    Some(ServerStatus::Installing),
+                    None,
+                )
+                .await?;
+                Self::invalidate_cached(&state.database, self.uuid).await;
 
                 return Err(err.into());
             }
         };
-
-        transaction.commit().await?;
-
-        Self::invalidate_cached(&state.database, self.uuid).await;
 
         Self::get_event_emitter().emit(
             state.clone(),
@@ -1607,13 +1612,16 @@ impl Server {
 
         // the transfer state is only committed once the source node has accepted the job,
         // otherwise a failing node leaves the server permanently marked as transferring.
-        match self
+        let api_client = self
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
-            .await?
-            .post_servers_server_transfer(
+            .await?;
+
+        match tokio::time::timeout(
+            WINGS_REQUEST_TIMEOUT,
+            api_client.post_servers_server_transfer(
                 self.uuid,
                 &wings_api::servers_server_transfer::post::RequestBody {
                     url: url.to_compact_string(),
@@ -1624,14 +1632,32 @@ impl Server {
                     compression_level: options.compression_level,
                     multiplex_streams: options.multiplex_channels,
                 },
-            )
-            .await
+            ),
+        )
+        .await
         {
-            Ok(_) => {}
-            Err(err) => {
+            Ok(Ok(_)) => {}
+            Ok(Err(err)) => {
                 transaction.rollback().await?;
 
                 return Err(err.into());
+            }
+            Err(_) => {
+                transaction.rollback().await?;
+
+                // the node may have accepted the job after all
+                if let Ok(Err(err)) = tokio::time::timeout(
+                    WINGS_REQUEST_TIMEOUT,
+                    api_client.delete_servers_server_transfer(self.uuid),
+                )
+                .await
+                {
+                    tracing::warn!(server = %self.uuid, "failed to cancel timed out transfer: {:?}", err);
+                }
+
+                return Err(anyhow::anyhow!(
+                    "timed out starting the transfer on the node"
+                ));
             }
         }
 
@@ -3215,22 +3241,32 @@ impl DeletableModel for Server {
         let server_uuid = self.uuid;
 
         tokio::spawn(async move {
-            match node
-                .api_client(&state.database)
-                .await?
-                .delete_servers_server(server_uuid)
-                .await
+            let api_client = node.api_client(&state.database).await?;
+            match tokio::time::timeout(
+                WINGS_REQUEST_TIMEOUT,
+                api_client.delete_servers_server(server_uuid),
+            )
+            .await
             {
-                Ok(_) => {}
-                Err(wings_api::client::ApiHttpError::Http(reqwest::StatusCode::NOT_FOUND, _)) => {}
-                Err(err) if options.force => {
+                Ok(Ok(_)) => {}
+                Ok(Err(wings_api::client::ApiHttpError::Http(reqwest::StatusCode::NOT_FOUND, _))) => {}
+                Ok(Err(err)) if options.force => {
                     tracing::error!(server = %server_uuid, node = %node.uuid, "failed to delete server: {:?}", err);
                 }
-                Err(err) => {
+                Ok(Err(err)) => {
                     tracing::error!(server = %server_uuid, node = %node.uuid, "failed to delete server: {:?}", err);
 
                     transaction.rollback().await?;
                     return Err(err.into());
+                }
+                Err(_) if options.force => {
+                    tracing::error!(server = %server_uuid, node = %node.uuid, "timed out deleting server");
+                }
+                Err(_) => {
+                    tracing::error!(server = %server_uuid, node = %node.uuid, "timed out deleting server");
+
+                    transaction.rollback().await?;
+                    return Err(anyhow::anyhow!("timed out deleting the server on the node"));
                 }
             }
 

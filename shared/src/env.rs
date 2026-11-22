@@ -99,6 +99,8 @@ pub struct Env {
     pub database_migrate: bool,
     pub database_url: String,
     pub database_url_primary: Option<String>,
+    pub database_write_pool_size: Option<std::num::NonZeroU32>,
+    pub database_read_pool_size: Option<std::num::NonZeroU32>,
 
     pub bind: String,
     pub port: u16,
@@ -321,6 +323,16 @@ impl Env {
             database_url_primary: std::env::var("DATABASE_URL_PRIMARY")
                 .ok()
                 .map(|s| s.trim_matches('"').to_string()),
+            database_write_pool_size: std::env::var("DATABASE_WRITE_POOL_SIZE")
+                .ok()
+                .map(|s| s.trim_matches('"').parse())
+                .transpose()
+                .context("Invalid DATABASE_WRITE_POOL_SIZE value")?,
+            database_read_pool_size: std::env::var("DATABASE_READ_POOL_SIZE")
+                .ok()
+                .map(|s| s.trim_matches('"').parse())
+                .transpose()
+                .context("Invalid DATABASE_READ_POOL_SIZE value")?,
 
             bind: std::env::var("BIND")
                 .unwrap_or("0.0.0.0".to_string())

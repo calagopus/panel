@@ -21,6 +21,8 @@ use std::{
 };
 use utoipa::ToSchema;
 
+const WINGS_REQUEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(30);
+
 #[derive(Debug, ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "kebab-case")]
 #[sqlx(type_name = "backup_disk", rename_all = "SCREAMING_SNAKE_CASE")]
@@ -1204,22 +1206,28 @@ impl ServerBackup {
                 .await?;
         }
 
-        server
+        let api_client = server
             .node
             .fetch_cached(&state.database)
             .await?
             .api_client(&state.database)
-            .await?
-            .post_servers_server_backup_backup_restore(
+            .await?;
+        let request_data = wings_api::servers_server_backup_backup_restore::post::RequestBody {
+            adapter: self.disk.to_wings_adapter(),
+            download_url: self.wings_restore_download_url(state, server.uuid).await?,
+            truncate_directory: options.truncate_directory,
+        };
+
+        tokio::time::timeout(
+            WINGS_REQUEST_TIMEOUT,
+            api_client.post_servers_server_backup_backup_restore(
                 server.uuid,
                 self.uuid,
-                &wings_api::servers_server_backup_backup_restore::post::RequestBody {
-                    adapter: self.disk.to_wings_adapter(),
-                    download_url: self.wings_restore_download_url(state, server.uuid).await?,
-                    truncate_directory: options.truncate_directory,
-                },
-            )
-            .await?;
+                &request_data,
+            ),
+        )
+        .await
+        .map_err(|_| anyhow::anyhow!("timed out starting the backup restore on the node"))??;
 
         Self::get_event_emitter().emit(
             state.clone(),

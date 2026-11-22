@@ -68,13 +68,18 @@ mod post {
             .execute(&mut *transaction)
             .await?;
 
-            if let Err(err) = destination_node
-                .api_client(&state.database)
-                .await?
-                .delete_servers_server(server.uuid)
-                .await
+            let api_client = destination_node.api_client(&state.database).await?;
+            match tokio::time::timeout(
+                std::time::Duration::from_secs(30),
+                api_client.delete_servers_server(server.uuid),
+            )
+            .await
             {
-                tracing::error!("failed to delete server on destination node: {:?}", err);
+                Ok(Ok(_)) => {}
+                Ok(Err(err)) => {
+                    tracing::error!("failed to delete server on destination node: {:?}", err);
+                }
+                Err(_) => tracing::error!("timed out deleting server on destination node"),
             }
         }
 

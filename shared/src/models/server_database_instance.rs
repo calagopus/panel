@@ -12,6 +12,8 @@ use std::{
 };
 use utoipa::ToSchema;
 
+const DB_AGENT_DELETE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
+
 #[derive(ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 #[sqlx(
@@ -1084,11 +1086,15 @@ impl DeletableModel for ServerDatabaseInstance {
         options: Self::DeleteOptions,
     ) -> Result<(), anyhow::Error> {
         let run_delete = async {
-            self.database_agent_host
-                .api_client(&state.database)
-                .await?
-                .delete_instances_instance(self.uuid)
-                .await?;
+            let api_client = self.database_agent_host.api_client(&state.database).await?;
+            tokio::time::timeout(
+                DB_AGENT_DELETE_TIMEOUT,
+                api_client.delete_instances_instance(self.uuid),
+            )
+            .await
+            .map_err(|_| {
+                anyhow::anyhow!("timed out deleting the database instance on the agent")
+            })??;
 
             Ok::<_, anyhow::Error>(())
         };
