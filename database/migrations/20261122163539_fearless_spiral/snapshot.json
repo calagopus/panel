@@ -1,0 +1,47 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "a954b317-4662-40d4-961b-7d276f6fd841",
+  "prevIds": [
+    "0d1d97fc-7ffd-4b64-8093-2f252d7163e7"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "user_api_keys",
+        "unrestricted_admin"
+      ],
+      "writes": [
+        "s|col|public.user_api_keys.unrestricted_admin",
+        "n|col|public.user_api_keys.unrestricted_admin",
+        "e|col|public.user_api_keys.unrestricted_admin"
+      ],
+      "reads": [
+        "n|tbl|public.user_api_keys",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_api_keys",
+        "name": "unrestricted_admin",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}

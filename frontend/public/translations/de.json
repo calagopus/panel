@@ -2214,6 +2214,12 @@
             "apiDocumentation": "API Dokumentation",
             "copyUuid": "UUID kopieren"
           },
+          "badge": {
+            "unrestrictedAdmin": "Uneingeschränkter Admin"
+          },
+          "alert": {
+            "unrestrictedAdmin": "Dieser API-Schlüssel handelt überall dort, wo das Panel API-Schlüssel normalerweise ablehnt, wie ein **vollständiger, per Sitzung angemeldeter Administrator**. Solange dein Konto Administrator ist, kann jeder mit diesem Schlüssel Adminrechte vergeben und entziehen, andere Administratoren erstellen, bearbeiten und imitieren, Passwort und E-Mail jedes Kontos einschließlich deines eigenen ändern, beliebige Identitäten mit beliebigen Konten verknüpfen, ändern, wie OAuth-Anbieter Benutzer identifizieren, und die Einstellungen für E-Mail-Versand, Speicher, Panel-URLs, Zwei-Faktor, Passwort-Login und WebAuthn ändern. Das reicht aus, um dieses Panel vollständig zu übernehmen. Die für ihn gewählten Berechtigungen gelten weiterhin, gewähre also nur die nötigen, und aktiviere dies nur für Automatisierungen, die du vollständig kontrollierst."
+          },
           "tooltip": {
             "limitReached": "Du bist auf {max} API-Schlüssel limitiert.",
             "keyStartOnly": "Nur der Anfang des Schlüssels wird angezeigt, der vollständige Schlüssel ist nur einmal nach der (Neu-)Erstellung sichtbar."
@@ -2241,6 +2247,10 @@
               "toast": {
                 "updated": "API-Schlüssel aktualisiert."
               }
+            },
+            "enableUnrestrictedAdmin": {
+              "title": "Aktivieren von uneingeschränktem Admin bestätigen",
+              "content": "Bist du sicher, dass du diesem API-Schlüssel **uneingeschränkten Admin**-Zugriff geben möchtest?"
             },
             "duplicateApiKey": {
               "title": "API-Schlüssel duplizieren",
@@ -2277,7 +2287,9 @@
             "allowedIps": "Erlaubte IPs",
             "userPermissions": "Benutzer-Berechtigungen",
             "serverPermissions": "Server-Berechtigungen",
-            "adminPermissions": "Admin-Berechtigungen"
+            "adminPermissions": "Admin-Berechtigungen",
+            "unrestrictedAdmin": "Uneingeschränkter Admin",
+            "unrestrictedAdminDescription": "Erlaubt diesem API-Schlüssel, die Prüfungen zu bestehen, die sonst einen per Sitzung angemeldeten Administrator erfordern."
           },
           "create": {
             "title": "API-Schlüssel erstellen",

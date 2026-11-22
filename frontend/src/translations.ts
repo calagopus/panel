@@ -2089,6 +2089,13 @@ const baseTranslations = defineTranslations({
             apiDocumentation: 'API Documentation',
             copyUuid: 'Copy UUID',
           },
+          badge: {
+            unrestrictedAdmin: 'Unrestricted Admin',
+          },
+          alert: {
+            unrestrictedAdmin:
+              'This API key will act as a **full administrator signed in with a session** wherever the panel normally refuses API keys. As long as your account is an administrator, anyone holding it can grant and revoke admin status, create, modify and impersonate other administrators, change the password and email of any account including your own, link any identity to any account, change how OAuth providers identify users, and change mail delivery, storage, panel URL, two-factor, password login and WebAuthn settings. That is enough to take over this panel entirely. The permissions you select for it still apply, so only grant the ones it needs, and only enable this for automation you fully control.',
+          },
           tooltip: {
             limitReached: 'You are limited to {max} api keys.',
             keyStartOnly: 'Only the start of the key is shown, the full key is only visible once after (re)creation.',
@@ -2116,6 +2123,10 @@ const baseTranslations = defineTranslations({
               toast: {
                 updated: 'API key updated.',
               },
+            },
+            enableUnrestrictedAdmin: {
+              title: 'Confirm Enabling Unrestricted Admin',
+              content: 'Are you sure you want to give this API key **unrestricted admin** access?',
             },
             duplicateApiKey: {
               title: 'Duplicate API Key',
@@ -2156,6 +2167,9 @@ const baseTranslations = defineTranslations({
             userPermissions: 'User Permissions',
             serverPermissions: 'Server Permissions',
             adminPermissions: 'Admin Permissions',
+            unrestrictedAdmin: 'Unrestricted Admin',
+            unrestrictedAdminDescription:
+              'Lets this API key pass the checks that otherwise require an administrator signed in with a session.',
           },
           create: {
             title: 'Create API Key',

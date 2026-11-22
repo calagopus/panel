@@ -70,6 +70,14 @@ mod post {
             .ok();
         }
 
+        if api_key.unrestricted_admin && !permissions.is_unrestricted_admin() {
+            return ApiResponse::error(
+                "only administrators can recreate an api key with unrestricted admin access",
+            )
+            .with_status(StatusCode::FORBIDDEN)
+            .ok();
+        }
+
         let key = api_key.recreate(&state.database).await?;
 
         activity_logger

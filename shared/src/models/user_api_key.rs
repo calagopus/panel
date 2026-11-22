@@ -27,6 +27,8 @@ pub struct UserApiKey {
     pub admin_permissions: Arc<Vec<compact_str::CompactString>>,
     pub server_permissions: Arc<Vec<compact_str::CompactString>>,
 
+    pub unrestricted_admin: bool,
+
     pub last_used: Option<chrono::NaiveDateTime>,
     pub expires: Option<chrono::NaiveDateTime>,
     pub created: chrono::NaiveDateTime,
@@ -90,6 +92,10 @@ impl BaseModel for UserApiKey {
                 compact_str::format_compact!("{prefix}server_permissions"),
             ),
             (
+                "user_api_keys.unrestricted_admin",
+                compact_str::format_compact!("{prefix}unrestricted_admin"),
+            ),
+            (
                 "user_api_keys.last_used",
                 compact_str::format_compact!("{prefix}last_used"),
             ),
@@ -125,6 +131,8 @@ impl BaseModel for UserApiKey {
             server_permissions: Arc::new(
                 row.try_get(compact_str::format_compact!("{prefix}server_permissions").as_str())?,
             ),
+            unrestricted_admin: row
+                .try_get(compact_str::format_compact!("{prefix}unrestricted_admin").as_str())?,
             last_used: row.try_get(compact_str::format_compact!("{prefix}last_used").as_str())?,
             expires: row.try_get(compact_str::format_compact!("{prefix}expires").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
@@ -421,6 +429,7 @@ impl IntoApiObject for UserApiKey {
                 user_permissions: self.user_permissions,
                 admin_permissions: self.admin_permissions,
                 server_permissions: self.server_permissions,
+                unrestricted_admin: self.unrestricted_admin,
                 last_used: self.last_used.map(|dt| dt.and_utc()),
                 expires: self.expires.map(|dt| dt.and_utc()),
                 created: self.created.and_utc(),
@@ -454,6 +463,9 @@ pub struct CreateUserApiKeyOptions {
     pub admin_permissions: Vec<compact_str::CompactString>,
     #[garde(custom(crate::permissions::validate_server_permissions))]
     pub server_permissions: Vec<compact_str::CompactString>,
+
+    #[garde(skip)]
+    pub unrestricted_admin: bool,
 
     #[garde(inner(custom(crate::utils::validate_time_in_future)))]
     pub expires: Option<chrono::DateTime<chrono::Utc>>,
@@ -494,6 +506,7 @@ impl CreatableModel for UserApiKey {
             .set("user_permissions", &options.user_permissions)
             .set("admin_permissions", &options.admin_permissions)
             .set("server_permissions", &options.server_permissions)
+            .set("unrestricted_admin", options.unrestricted_admin)
             .set("expires", options.expires.map(|d| d.naive_utc()));
 
         let row = query_builder
@@ -528,6 +541,9 @@ pub struct UpdateUserApiKeyOptions {
     pub admin_permissions: Option<Vec<compact_str::CompactString>>,
     #[garde(inner(custom(crate::permissions::validate_server_permissions)))]
     pub server_permissions: Option<Vec<compact_str::CompactString>>,
+
+    #[garde(skip)]
+    pub unrestricted_admin: Option<bool>,
 
     #[garde(inner(inner(custom(crate::utils::validate_time_in_future))))]
     #[serde(
@@ -608,6 +624,7 @@ impl UpdatableModel for UserApiKey {
             .set("user_permissions", options.user_permissions.as_ref())
             .set("admin_permissions", options.admin_permissions.as_ref())
             .set("server_permissions", options.server_permissions.as_ref())
+            .set("unrestricted_admin", options.unrestricted_admin)
             .set(
                 "expires",
                 options
@@ -636,6 +653,9 @@ impl UpdatableModel for UserApiKey {
         }
         if let Some(server_permissions) = options.server_permissions {
             self.server_permissions = Arc::new(server_permissions);
+        }
+        if let Some(unrestricted_admin) = options.unrestricted_admin {
+            self.unrestricted_admin = unrestricted_admin;
         }
         if let Some(expires) = options.expires {
             self.expires = expires.map(|d| d.naive_utc());
@@ -692,6 +712,7 @@ impl DuplicableModel for UserApiKey {
             .set("user_permissions", &*self.user_permissions)
             .set("admin_permissions", &*self.admin_permissions)
             .set("server_permissions", &*self.server_permissions)
+            .set("unrestricted_admin", self.unrestricted_admin)
             .set("expires", self.expires);
 
         let row = query_builder
@@ -833,6 +854,8 @@ pub struct ApiUserApiKey {
     pub user_permissions: Arc<Vec<compact_str::CompactString>>,
     pub admin_permissions: Arc<Vec<compact_str::CompactString>>,
     pub server_permissions: Arc<Vec<compact_str::CompactString>>,
+
+    pub unrestricted_admin: bool,
 
     pub last_used: Option<chrono::DateTime<chrono::Utc>>,
     pub expires: Option<chrono::DateTime<chrono::Utc>>,

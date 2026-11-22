@@ -102,6 +102,7 @@ export default function DashboardApiKeysCreate() {
       allowedIps: [],
       enabled: true,
       ...requestedPermissions,
+      unrestrictedAdmin: false,
       expires: null,
     })
       .then((key) => {

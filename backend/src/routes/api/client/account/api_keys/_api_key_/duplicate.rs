@@ -77,6 +77,14 @@ mod post {
             .ok();
         }
 
+        if api_key.unrestricted_admin && !permissions.is_unrestricted_admin() {
+            return ApiResponse::error(
+                "only administrators can duplicate an api key with unrestricted admin access",
+            )
+            .with_status(StatusCode::FORBIDDEN)
+            .ok();
+        }
+
         let api_keys_lock = state
             .cache
             .lock(
