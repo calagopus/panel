@@ -191,7 +191,16 @@ const ApiKeyRow = forwardRef<HTMLTableRowElement, ApiKeyRowProps>(function ApiKe
               <TableSelectionCell id={apiKey.uuid} checked={isSelected} onChange={onSelectionChange} />
             )}
 
-            <TableData>{apiKey.name}</TableData>
+            <TableData>
+              <div className='flex flex-row items-center gap-2'>
+                {apiKey.name}
+                {apiKey.unrestrictedAdmin && (
+                  <Badge color='red' className='w-max!'>
+                    {t('pages.account.apiKeys.badge.unrestrictedAdmin', {})}
+                  </Badge>
+                )}
+              </div>
+            </TableData>
 
             <TableData>
               <div className='flex flex-row items-center gap-2'>

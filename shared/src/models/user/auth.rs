@@ -53,6 +53,7 @@ pub enum CredentialScope {
         user: Arc<Vec<compact_str::CompactString>>,
         admin: Arc<Vec<compact_str::CompactString>>,
         server: Arc<Vec<compact_str::CompactString>>,
+        unrestricted_admin: bool,
     },
 }
 
@@ -64,6 +65,7 @@ impl From<&AuthMethod> for CredentialScope {
                 user: Arc::clone(&api_key.user_permissions),
                 admin: Arc::clone(&api_key.admin_permissions),
                 server: Arc::clone(&api_key.server_permissions),
+                unrestricted_admin: api_key.unrestricted_admin,
             },
         }
     }
@@ -108,6 +110,17 @@ impl CredentialScope {
     #[inline]
     pub fn is_session(&self) -> bool {
         matches!(self, Self::Session)
+    }
+
+    /// Sessions, and api keys an unrestricted administrator explicitly marked as such.
+    #[inline]
+    pub fn is_unrestricted(&self) -> bool {
+        match self {
+            Self::Session => true,
+            Self::ApiKey {
+                unrestricted_admin, ..
+            } => *unrestricted_admin,
+        }
     }
 
     /// Whether this credential is scoped to every given permission, so it cannot hand out more
@@ -255,9 +268,10 @@ impl PermissionManager {
     /// Actions that could turn the caller into a full administrator (granting admin status,
     /// writing to or impersonating administrators, linking identities, changing how an oauth
     /// provider identifies users) need an administrator signed in with a session, because an api
-    /// key scoped to a single admin permission would otherwise be enough.
+    /// key scoped to a single admin permission would otherwise be enough, unless that key was
+    /// explicitly marked as unrestricted.
     pub fn is_unrestricted_admin(&self) -> bool {
-        self.user_admin && self.scope.is_session()
+        self.user_admin && self.scope.is_unrestricted()
     }
 
     /// A linked identity signs in as the account from then on. Besides unrestricted administrators,
@@ -336,6 +350,16 @@ mod tests {
             user: permissions(user),
             admin: permissions(admin),
             server: permissions(server),
+            unrestricted_admin: false,
+        }
+    }
+
+    fn unrestricted_api_key(user: &[&str], admin: &[&str], server: &[&str]) -> CredentialScope {
+        CredentialScope::ApiKey {
+            user: permissions(user),
+            admin: permissions(admin),
+            server: permissions(server),
+            unrestricted_admin: true,
         }
     }
 
@@ -555,7 +579,7 @@ mod tests {
 
     // PermissionManager::is_unrestricted_admin
     #[test]
-    fn only_an_admin_session_is_unrestricted() {
+    fn only_an_admin_session_or_flagged_admin_key_is_unrestricted() {
         let mut session = manager(CredentialScope::Session);
         session.user_admin = true;
         let mut key = manager(api_key(
@@ -564,12 +588,26 @@ mod tests {
             &["files.read"],
         ));
         key.user_admin = true;
+        let mut flagged = manager(unrestricted_api_key(&[], &[], &[]));
+        flagged.user_admin = true;
+        let flagged_non_admin = manager(unrestricted_api_key(&[], &[], &[]));
         let mut role = manager(CredentialScope::Session);
         role.role_admin_permissions = permissions(&["roles.read", "servers.read", "users.update"]);
 
         assert!(session.is_unrestricted_admin());
+        assert!(flagged.is_unrestricted_admin());
         assert!(!key.is_unrestricted_admin());
+        assert!(!flagged_non_admin.is_unrestricted_admin());
         assert!(!role.is_unrestricted_admin());
+    }
+
+    #[test]
+    fn an_unrestricted_admin_key_keeps_its_scope() {
+        let mut manager = manager(unrestricted_api_key(&[], &["users.update"], &[]));
+        manager.user_admin = true;
+
+        assert!(manager.has_admin_permission("users.update").is_ok());
+        assert!(manager.has_admin_permission("roles.read").is_err());
     }
 
     // PermissionManager::deny_while_impersonating
@@ -626,15 +664,18 @@ mod tests {
     }
 
     #[test]
-    fn only_an_admin_session_may_modify_an_admin() {
+    fn only_an_unrestricted_admin_may_modify_an_admin() {
         let mut session = manager(CredentialScope::Session);
         session.user_admin = true;
+        let mut flagged = manager(unrestricted_api_key(&[], &["users.update"], &[]));
+        flagged.user_admin = true;
         let mut key = manager(api_key(&["account.infos"], &["users.update"], &[]));
         key.user_admin = true;
         let mut role = manager(CredentialScope::Session);
         role.role_admin_permissions = permissions(&["users.update"]);
 
         assert!(session.can_modify_user(&user(true, None)).is_ok());
+        assert!(flagged.can_modify_user(&user(true, None)).is_ok());
         assert_eq!(
             key.can_modify_user(&user(true, None)).unwrap_err().status,
             StatusCode::FORBIDDEN

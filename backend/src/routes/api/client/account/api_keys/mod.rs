@@ -115,6 +115,10 @@ mod post {
         #[garde(custom(shared::permissions::validate_server_permissions))]
         server_permissions: Vec<compact_str::CompactString>,
 
+        #[garde(skip)]
+        #[serde(default)]
+        unrestricted_admin: bool,
+
         #[garde(inner(custom(shared::utils::validate_time_in_future)))]
         expires: Option<chrono::DateTime<chrono::Utc>>,
     }
@@ -151,6 +155,14 @@ mod post {
                 .ok();
         }
 
+        if data.unrestricted_admin && !permissions.is_unrestricted_admin() {
+            return ApiResponse::error(
+                "only administrators can create an api key with unrestricted admin access",
+            )
+            .with_status(StatusCode::FORBIDDEN)
+            .ok();
+        }
+
         let api_keys_lock = state
             .cache
             .lock(
@@ -175,6 +187,7 @@ mod post {
             user_permissions: data.user_permissions,
             admin_permissions: data.admin_permissions,
             server_permissions: data.server_permissions,
+            unrestricted_admin: data.unrestricted_admin,
             expires: data.expires,
         };
         let (key, api_key) = match UserApiKey::create(&state, options).await {
@@ -201,6 +214,7 @@ mod post {
                     "user_permissions": api_key.user_permissions,
                     "admin_permissions": api_key.admin_permissions,
                     "server_permissions": api_key.server_permissions,
+                    "unrestricted_admin": api_key.unrestricted_admin,
                     "expires": api_key.expires,
                 }),
             )

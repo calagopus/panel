@@ -1,0 +1,1 @@
+ALTER TABLE "user_api_keys" ADD COLUMN "unrestricted_admin" boolean DEFAULT false NOT NULL;

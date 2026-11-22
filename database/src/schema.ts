@@ -418,6 +418,7 @@ export const userApiKeysTable = pgTable(
     user_permissions: varchar({ length: 64 }).array().notNull(),
     admin_permissions: varchar({ length: 64 }).array().notNull(),
     server_permissions: varchar({ length: 64 }).array().notNull(),
+    unrestricted_admin: boolean().default(false).notNull(),
     last_used: timestamp(),
     expires: timestamp(),
     created: timestamp().defaultNow().notNull(),

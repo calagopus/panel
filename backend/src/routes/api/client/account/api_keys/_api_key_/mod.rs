@@ -128,6 +128,14 @@ mod patch {
                 .ok();
         }
 
+        if data.unrestricted_admin == Some(true) && !permissions.is_unrestricted_admin() {
+            return ApiResponse::error(
+                "only administrators can grant an api key unrestricted admin access",
+            )
+            .with_status(StatusCode::FORBIDDEN)
+            .ok();
+        }
+
         let mut api_key =
             match UserApiKey::by_user_uuid_uuid(&state.database, user.uuid, api_key).await? {
                 Some(api_key) => api_key,
@@ -137,6 +145,17 @@ mod patch {
                         .ok();
                 }
             };
+
+        if api_key.unrestricted_admin
+            && data.unrestricted_admin != Some(false)
+            && !permissions.is_unrestricted_admin()
+        {
+            return ApiResponse::error(
+                "only administrators can update an api key with unrestricted admin access",
+            )
+            .with_status(StatusCode::FORBIDDEN)
+            .ok();
+        }
 
         match api_key.update(&state, data).await {
             Ok(_) => {}
@@ -160,6 +179,7 @@ mod patch {
                     "user_permissions": api_key.user_permissions,
                     "admin_permissions": api_key.admin_permissions,
                     "server_permissions": api_key.server_permissions,
+                    "unrestricted_admin": api_key.unrestricted_admin,
                     "expires": api_key.expires,
                 }),
             )
