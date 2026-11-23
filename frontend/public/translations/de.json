@@ -6413,6 +6413,7 @@
             "fingerprint": "Fingerabdruck",
             "permissions": "Berechtigungen",
             "extract": "Entpacken",
+            "applyPatch": "Patch anwenden",
             "archive": "Archivieren",
             "more": "Mehr",
             "moveToTrash": "In den Papierkorb verschieben",
@@ -6553,6 +6554,7 @@
             "trashCouldNotBeUndone": "Dateien konnten nicht aus dem Papierkorb wiederhergestellt werden.",
             "archiveCreationStarted": "Archiverstellung hat begonnen.",
             "decompressionStarted": "Das Entpacken des Archivs hat begonnen.",
+            "filesPatched": "{files} gepatcht.",
             "fileCopyingStarted": "Dateikopiervorgang hat begonnen.",
             "duplicating": "Datei wird dupliziert...",
             "fileCopyingStartedMany": "Dateikopiervorgang auf {servers} hat begonnen.",
@@ -6686,6 +6688,18 @@
             "extractFile": {
               "title": "Archiv entpacken",
               "extractedTo": "Der Inhalt von {file} wird entpackt nach "
+            },
+            "patchFile": {
+              "title": "Patch anwenden",
+              "form": {
+                "format": "Format",
+                "directory": "Verzeichnis",
+                "strip": "Pfadkomponenten entfernen",
+                "stripDescription": "Führende Pfadkomponenten, die aus den Pfaden im Patch entfernt werden, wie bei patch -p.",
+                "file": "Zu patchende Datei",
+                "fileDescription": "Relativ zum Verzeichnis, in dem der Patch angewendet wird."
+              },
+              "appliedIn": "{file} wird angewendet auf "
             },
             "createArchive": {
               "title": "Archiv erstellen",
@@ -8084,6 +8098,22 @@
                 "detail": {
                   "file": "Datei: {file}",
                   "root": "Root: {root}"
+                }
+              }
+            },
+            "patchFiles": {
+              "title": "Dateien patchen",
+              "description": "Wendet einen Git-Diff- oder bsdiff-Patch auf Dateien in einem Ordner an.",
+              "form": {
+                "patch": "Patch-Datei"
+              },
+              "renderer": {
+                "compact": "Wende {patch} in {root} an",
+                "detail": {
+                  "patch": "Patch: {patch}",
+                  "root": "Root: {root}",
+                  "file": "Datei: {file}",
+                  "format": "Format: {format}"
                 }
               }
             },

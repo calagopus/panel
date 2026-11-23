@@ -1,6 +1,6 @@
 import cronstrue from 'cronstrue';
 import { ZodType, z } from 'zod';
-import { archiveFormatLabelMapping, scheduleHttpMethodLabelMapping } from '@/lib/enums.ts';
+import { archiveFormatLabelMapping, patchFormatLabelMapping, scheduleHttpMethodLabelMapping } from '@/lib/enums.ts';
 import { ruleMessage } from '@/lib/schemas/rules.ts';
 
 export function isValidCronExpression(schedule: string): boolean {
@@ -476,6 +476,16 @@ export const serverScheduleStepDecompressFileSchema = z.object({
   file: serverScheduleStepDynamicSchema,
 });
 
+export const serverScheduleStepPatchFilesSchema = z.object({
+  type: z.literal('patch_files'),
+  ignoreFailure: z.boolean(),
+  root: serverScheduleStepDynamicSchema,
+  format: z.enum(Object.keys(patchFormatLabelMapping)),
+  patch: serverScheduleStepDynamicSchema,
+  file: serverScheduleStepDynamicSchema.nullable(),
+  strip: z.number().int().min(0),
+});
+
 export const serverScheduleStepPullFileSchema = z.object({
   type: z.literal('pull_file'),
   ignoreFailure: z.boolean(),
@@ -555,6 +565,7 @@ export const serverScheduleStepActionSchema = z.discriminatedUnion('type', [
   serverScheduleStepRenameFilesSchema,
   serverScheduleStepCompressFilesSchema,
   serverScheduleStepDecompressFileSchema,
+  serverScheduleStepPatchFilesSchema,
   serverScheduleStepPullFileSchema,
   serverScheduleStepUpdateStartupVariableSchema,
   serverScheduleStepUpdateStartupCommandSchema,

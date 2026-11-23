@@ -2,7 +2,9 @@ import { z } from 'zod';
 import Stack from '@/elements/layout/Stack.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { patchFormatLabelMapping } from '@/lib/enums.ts';
 import { formatMilliseconds } from '@/lib/format/time.ts';
+import { patchFormat } from '@/lib/schemas/server/files.ts';
 import { serverScheduleStepActionSchema } from '@/lib/schemas/server/schedules.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import ScheduleDynamicParameterRenderer from '../renderers/ScheduleDynamicParameterRenderer.tsx';
@@ -435,6 +437,34 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
             })}
           </Text>
           <ForegroundText foreground={action.foreground} />
+          <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
+        </Stack>
+      );
+    case 'patch_files':
+      return (
+        <Stack gap='xs'>
+          <Text size='sm'>
+            {tReact('pages.server.schedules.steps.patchFiles.renderer.detail.patch', {
+              patch: <ScheduleDynamicParameterRenderer value={action.patch} />,
+            })}
+          </Text>
+          <Text size='sm'>
+            {tReact('pages.server.schedules.steps.patchFiles.renderer.detail.root', {
+              root: <ScheduleDynamicParameterRenderer value={action.root} />,
+            })}
+          </Text>
+          {action.file && (
+            <Text size='sm'>
+              {tReact('pages.server.schedules.steps.patchFiles.renderer.detail.file', {
+                file: <ScheduleDynamicParameterRenderer value={action.file} />,
+              })}
+            </Text>
+          )}
+          <Text size='xs' c='dimmed'>
+            {t('pages.server.schedules.steps.patchFiles.renderer.detail.format', {
+              format: patchFormatLabelMapping[action.format as z.infer<typeof patchFormat>],
+            })}
+          </Text>
           <IgnoreFailureText ignoreFailure={action.ignoreFailure} />
         </Stack>
       );

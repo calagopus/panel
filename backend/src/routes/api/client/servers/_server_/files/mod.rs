@@ -20,6 +20,7 @@ mod largest_directories;
 mod lines;
 mod list;
 mod operations;
+mod patch;
 mod pull;
 mod rename;
 mod revisions;
@@ -57,6 +58,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/sqlite-query", sqlite_query::router(state))
         .nest("/stat", stat::router(state))
         .nest("/trash", trash::router(state))
+        .nest("/patch", patch::router(state))
         .nest("/pull", pull::router(state))
         .nest("/operations", operations::router(state))
         .nest("/revisions", revisions::router(state))

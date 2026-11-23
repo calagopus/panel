@@ -450,6 +450,14 @@ nestify::nest! {
     }
 }
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum PatchFormat {
+    #[serde(rename = "git")]
+    Git,
+    #[serde(rename = "bsdiff")]
+    Bsdiff,
+}
+
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct PbsRepositoryConfiguration {
         #[schema(inline)]
@@ -2247,6 +2255,43 @@ pub mod servers_server_files_operations_operation {
         }
 
         pub type Response404 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
+pub mod servers_server_files_patch {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct RequestBody {
+                #[schema(inline)]
+                pub root: compact_str::CompactString,
+                #[schema(inline)]
+                pub format: PatchFormat,
+                #[schema(inline)]
+                pub source: Source,
+                #[schema(inline)]
+                pub file: Option<compact_str::CompactString>,
+                #[schema(inline)]
+                pub strip: u64,
+                #[schema(inline)]
+                pub user: Option<uuid::Uuid>,
+            }
+        }
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+                #[schema(inline)]
+                pub patched: u64,
+            }
+        }
+
+        pub type Response404 = ApiError;
+
+        pub type Response417 = ApiError;
 
         pub type Response = Response200;
     }

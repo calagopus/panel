@@ -1,6 +1,7 @@
 import {
   faAnglesUp,
   faArrowUpRightFromSquare,
+  faBandage,
   faClone,
   faCopy,
   faEnvelopesBulk,
@@ -400,6 +401,15 @@ export default function FileRowContextMenu({
               onClick: () => openModal('fingerprint'),
               color: 'gray',
               canAccess: canReadContent,
+            },
+            {
+              type: 'action',
+              icon: faBandage,
+              label: t('pages.server.files.button.applyPatch', {}),
+              hidden: !file.file || !activeWritableDirectory || !!upload,
+              onClick: () => openModal('patch'),
+              color: 'gray',
+              canAccess: canReadContent && canUpdate,
             },
             {
               type: 'action',

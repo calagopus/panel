@@ -31,6 +31,13 @@ pub enum ServerSelector {
 }
 
 #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum Source {
+    Inline { data: String },
+    File { path: compact_str::CompactString },
+}
+
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone)]
 #[serde(tag = "adapter")]
 #[non_exhaustive]
 pub enum BackupTestTarget {
@@ -556,6 +563,23 @@ pub enum ScheduleActionInner {
         #[garde(dive)]
         file: ScheduleDynamicParameter,
     },
+    PatchFiles {
+        #[garde(skip)]
+        ignore_failure: bool,
+
+        #[garde(dive)]
+        root: ScheduleDynamicParameter,
+        #[garde(skip)]
+        format: super::PatchFormat,
+        #[garde(dive)]
+        patch: ScheduleDynamicParameter,
+        #[garde(dive)]
+        #[serde(default)]
+        file: Option<ScheduleDynamicParameter>,
+        #[garde(skip)]
+        #[serde(default = "default_patch_strip")]
+        strip: usize,
+    },
     PullFile {
         #[garde(skip)]
         ignore_failure: bool,
@@ -671,6 +695,15 @@ impl ScheduleActionInner {
             ScheduleActionInner::RenameFiles { .. } => &["files.update"],
             ScheduleActionInner::CompressFiles { .. } => &["files.archive"],
             ScheduleActionInner::DecompressFile { .. } => &["files.archive"],
+            ScheduleActionInner::PatchFiles { format, .. } => match format {
+                super::PatchFormat::Git => &[
+                    "files.read-content",
+                    "files.create",
+                    "files.update",
+                    "files.delete",
+                ],
+                super::PatchFormat::Bsdiff => &["files.read-content", "files.update"],
+            },
             ScheduleActionInner::PullFile { .. } => &["files.create"],
             ScheduleActionInner::UpdateStartupVariable { .. } => &["startup.update"],
             ScheduleActionInner::UpdateStartupCommand { .. } => &["startup.command"],
@@ -747,6 +780,10 @@ pub enum ScheduleTrigger {
 }
 
 fn default_week_interval() -> u32 {
+    1
+}
+
+fn default_patch_strip() -> usize {
     1
 }
 

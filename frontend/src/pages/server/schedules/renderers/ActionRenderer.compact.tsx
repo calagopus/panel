@@ -187,6 +187,15 @@ export function renderCompact(action: Action, { t, tReact, tItem }: Translations
           })}
         </span>
       );
+    case 'patch_files':
+      return (
+        <span>
+          {tReact('pages.server.schedules.steps.patchFiles.renderer.compact', {
+            patch: <ScheduleDynamicParameterRenderer value={action.patch} />,
+            root: <ScheduleDynamicParameterRenderer value={action.root} />,
+          })}
+        </span>
+      );
     case 'pull_file':
       return (
         <span>

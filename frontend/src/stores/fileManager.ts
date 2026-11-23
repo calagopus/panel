@@ -39,6 +39,7 @@ export type ModalType =
   | 'permissions'
   | 'archive'
   | 'extract'
+  | 'patch'
   | 'delete'
   | 'details'
   | 'nameDirectory'

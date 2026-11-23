@@ -6501,6 +6501,7 @@ const baseTranslations = defineTranslations({
             fingerprint: 'Fingerprint',
             permissions: 'Permissions',
             extract: 'Extract',
+            applyPatch: 'Apply Patch',
             archive: 'Archive',
             more: 'More',
             moveToTrash: 'Move to Trash',
@@ -6641,6 +6642,7 @@ const baseTranslations = defineTranslations({
             trashCouldNotBeUndone: 'Files could not be restored from the trash.',
             archiveCreationStarted: 'Archive creation has begun.',
             decompressionStarted: 'Archive extraction has started.',
+            filesPatched: '{files} patched.',
             fileCopyingStarted: 'File copying has started.',
             duplicating: 'Duplicating file...',
             fileCopyingStartedMany: 'File copying to {servers} has started.',
@@ -6781,6 +6783,18 @@ const baseTranslations = defineTranslations({
             extractFile: {
               title: 'Extract Archive',
               extractedTo: 'The contents of {file} will be extracted into ',
+            },
+            patchFile: {
+              title: 'Apply Patch',
+              form: {
+                format: 'Format',
+                directory: 'Directory',
+                strip: 'Strip Path Components',
+                stripDescription: 'Leading path components removed from paths in the patch, like patch -p.',
+                file: 'File to Patch',
+                fileDescription: 'Relative to the directory the patch is applied in.',
+              },
+              appliedIn: '{file} will be applied to ',
             },
             createArchive: {
               title: 'Create Archive',
@@ -8220,6 +8234,22 @@ const baseTranslations = defineTranslations({
                 detail: {
                   file: 'File: {file}',
                   root: 'Root: {root}',
+                },
+              },
+            },
+            patchFiles: {
+              title: 'Patch Files',
+              description: 'Apply a git diff or bsdiff patch to files in a folder.',
+              form: {
+                patch: 'Patch File',
+              },
+              renderer: {
+                compact: 'Apply {patch} in {root}',
+                detail: {
+                  patch: 'Patch: {patch}',
+                  root: 'Root: {root}',
+                  file: 'File: {file}',
+                  format: 'Format: {format}',
                 },
               },
             },

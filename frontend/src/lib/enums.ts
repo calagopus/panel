@@ -1,6 +1,7 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faDocker } from '@fortawesome/free-brands-svg-icons';
 import {
+  faBandage,
   faBoxArchive,
   faBriefcase,
   faBullhorn,
@@ -83,7 +84,7 @@ import {
 import { serverBackupKind } from '@/lib/schemas/server/backups.ts';
 import { serverDatabaseInstanceUserPermission } from '@/lib/schemas/server/databaseInstances.ts';
 import { serverDatabaseFilterOperator } from '@/lib/schemas/server/databases.ts';
-import { archiveFormat, compressionLevel, fingerprintAlgorithm } from '@/lib/schemas/server/files.ts';
+import { archiveFormat, compressionLevel, fingerprintAlgorithm, patchFormat } from '@/lib/schemas/server/files.ts';
 import { serverFirewallRuleAction } from '@/lib/schemas/server/firewall.ts';
 import {
   serverScheduleComparator,
@@ -254,6 +255,11 @@ export const archiveFormatLabelMapping: Record<z.infer<typeof archiveFormat>, st
   tar_zstd: '.tar.zst',
   zip: '.zip',
   seven_zip: '.7z',
+};
+
+export const patchFormatLabelMapping: Record<z.infer<typeof patchFormat>, string> = {
+  git: 'Git Diff',
+  bsdiff: 'bsdiff',
 };
 
 export const transferArchiveFormatLabelMapping: Record<z.infer<typeof transferArchiveFormat>, string> = {
@@ -630,6 +636,7 @@ export const scheduleStepLabelMapping: Record<z.infer<typeof serverScheduleStepA
   rename_files: () => getTranslations().t('pages.server.schedules.steps.renameFiles.title', {}),
   compress_files: () => getTranslations().t('pages.server.schedules.steps.compressFiles.title', {}),
   decompress_file: () => getTranslations().t('pages.server.schedules.steps.decompressFile.title', {}),
+  patch_files: () => getTranslations().t('pages.server.schedules.steps.patchFiles.title', {}),
   pull_file: () => getTranslations().t('pages.server.schedules.steps.pullFile.title', {}),
   update_startup_variable: () => getTranslations().t('pages.server.schedules.steps.updateStartupVariable.title', {}),
   update_startup_command: () => getTranslations().t('pages.server.schedules.steps.updateStartupCommand.title', {}),
@@ -680,6 +687,7 @@ export const scheduleStepGroupMapping: Record<
   rename_files: 'files',
   compress_files: 'files',
   decompress_file: 'files',
+  patch_files: 'files',
   pull_file: 'files',
   update_startup_variable: 'startup',
   update_startup_command: 'startup',
@@ -704,6 +712,7 @@ export const scheduleStepSelectionOrder = [
   'create_directory',
   'decompress_file',
   'delete_files',
+  'patch_files',
   'pull_file',
   'rename_files',
   'write_file',
@@ -758,6 +767,7 @@ export const scheduleStepDescriptionMapping: Record<
   rename_files: () => getTranslations().t('pages.server.schedules.steps.renameFiles.description', {}),
   compress_files: () => getTranslations().t('pages.server.schedules.steps.compressFiles.description', {}),
   decompress_file: () => getTranslations().t('pages.server.schedules.steps.decompressFile.description', {}),
+  patch_files: () => getTranslations().t('pages.server.schedules.steps.patchFiles.description', {}),
   pull_file: () => getTranslations().t('pages.server.schedules.steps.pullFile.description', {}),
   update_startup_variable: () =>
     getTranslations().t('pages.server.schedules.steps.updateStartupVariable.description', {}),
@@ -936,6 +946,15 @@ export const scheduleStepDefaultMapping: Record<
     root: '/',
     file: '',
   },
+  patch_files: {
+    type: 'patch_files',
+    ignoreFailure: false,
+    root: '/',
+    format: 'git',
+    patch: '',
+    file: null,
+    strip: 1,
+  },
   pull_file: {
     type: 'pull_file',
     ignoreFailure: false,
@@ -1004,6 +1023,7 @@ export const scheduleStepIconMapping: Record<z.infer<typeof serverScheduleStepAc
   rename_files: faEdit,
   compress_files: faCompress,
   decompress_file: faExpand,
+  patch_files: faBandage,
   pull_file: faDownload,
   update_startup_variable: faGear,
   update_startup_command: faCode,

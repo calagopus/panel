@@ -980,6 +980,24 @@ impl WingsClient {
         .await
     }
 
+    pub async fn post_servers_server_files_patch(
+        &self,
+        server: uuid::Uuid,
+        data: &super::servers_server_files_patch::post::RequestBody,
+    ) -> Result<super::servers_server_files_patch::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/files/patch"),
+            Some(&ServersServerFilesPatchPostBody {
+                inner: data,
+                ignored: &self.ignored,
+            }),
+            None,
+        )
+        .await
+    }
+
     pub async fn get_servers_server_files_pull(
         &self,
         server: uuid::Uuid,
@@ -2095,6 +2113,13 @@ struct ServersServerFilesDeletePostBody<'a> {
 struct ServersServerFilesIgnoreMatchesPostBody<'a> {
     #[serde(flatten)]
     inner: &'a super::servers_server_files_ignore_matches::post::RequestBody,
+    ignored: &'a Vec<compact_str::CompactString>,
+}
+
+#[derive(Serialize)]
+struct ServersServerFilesPatchPostBody<'a> {
+    #[serde(flatten)]
+    inner: &'a super::servers_server_files_patch::post::RequestBody,
     ignored: &'a Vec<compact_str::CompactString>,
 }
 

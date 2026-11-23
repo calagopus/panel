@@ -61,6 +61,7 @@ const compatBodyProperties: Record<string, Record<string, 'client' | 'extra'>> =
     'post /api/servers/{server}/files/decompress': { ignored: 'client' },
     'post /api/servers/{server}/files/delete': { ignored: 'client' },
     'post /api/servers/{server}/files/ignore-matches': { ignored: 'client' },
+    'post /api/servers/{server}/files/patch': { ignored: 'client' },
     'post /api/servers/{server}/files/pull': { ignored: 'client' },
     'put /api/servers/{server}/files/rename': { ignored: 'client', create_directories: 'extra' },
     'post /api/servers/{server}/files/search': { match_context: 'extra' },
@@ -435,7 +436,7 @@ for (const [name, schema] of Object.entries(openapi.components?.schemas || {})) 
     if (schema.$ref || name === 'CompactString') continue
 
     // internally tagged enums the generator cannot represent, hand-written in extra.rs
-    if (name === 'QueryValue' || name === 'ServerSelector' || name === 'BackupTestTarget' || name === 'TupleUnit') continue
+    if (name === 'QueryValue' || name === 'ServerSelector' || name === 'BackupTestTarget' || name === 'Source' || name === 'TupleUnit') continue
 
     generateSchemaObject(output, 0, null, name, schema as oas31.SchemaObject, false, { serdeDefault: serdeDefaultProperties[name] })
 }

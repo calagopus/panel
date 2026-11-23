@@ -35,6 +35,15 @@ export const serverFilesExtractSchema = z.object({
   destination: z.string().min(1).max(255),
 });
 
+export const serverFilesPatchSchema = z
+  .object({
+    root: z.string().min(1).max(255),
+    format: z.lazy(() => patchFormat),
+    file: z.preprocess(nullableString, z.string().min(1).max(255).nullable()),
+    strip: z.number().int().min(0),
+  })
+  .refine((data) => data.format !== 'bsdiff' || !!data.file, { path: ['file'] });
+
 export const serverFilesNameSchema = z.object({
   name: z.string().min(1).max(255),
 });
@@ -266,6 +275,8 @@ export const archiveFormat = z.enum([
   'zip',
   'seven_zip',
 ]);
+
+export const patchFormat = z.enum(['git', 'bsdiff']);
 
 export const compressionLevel = z.enum(['best_speed', 'good_speed', 'good_compression', 'best_compression']);
 
