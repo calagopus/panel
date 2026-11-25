@@ -1,122 +1,223 @@
 <!doctype html>
 <html lang="{{ language }}">
-	<head>
-		<meta charset="utf-8" />
-		<title>{{ subject }}</title>
-	</head>
-	<body
-		style="
-			margin: 0;
-			padding: 0;
-			background-color: #f4f5f7;
-			font-family:
-				-apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-				Helvetica, Arial, sans-serif;
-			color: #333333;
-		"
-	>
-		<div
-			style="
-				max-width: 600px;
-				margin: 40px auto;
-				background-color: #ffffff;
-				border-radius: 8px;
-				overflow: hidden;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-				border: 1px solid #eaebed;
-			"
-		>
-			<div
-				style="
-					background-color: #ffffff;
-					padding: 32px 32px 16px 32px;
-					text-align: center;
-					border-bottom: 1px solid #eaebed;
-				"
-			>
-				<h1
-					style="
-						margin: 0;
-						font-size: 24px;
-						color: #111827;
-						letter-spacing: -0.5px;
-					"
-				>
-					{{ settings.app.name }}
-				</h1>
-			</div>
-
-			<div style="padding: 32px">
-				<p
-					style="
-						margin-top: 0;
-						margin-bottom: 16px;
-						font-size: 16px;
-						line-height: 1.6;
-						color: #4b5563;
-					"
-				>
-					{{ vars.greeting }}
-				</p>
-				<p
-					style="
-						margin-top: 0;
-						margin-bottom: 24px;
-						font-size: 16px;
-						line-height: 1.6;
-						color: #4b5563;
-					"
-				>
-					{{ vars.intro }}
-				</p>
-
-				<div style="text-align: center; margin-bottom: 32px">
-					<div
-						style="
-							display: inline-block;
-							padding: 16px 32px;
-							background-color: #f3f4f6;
-							border: 1px solid #e5e7eb;
-							border-radius: 6px;
-							font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-							font-size: 32px;
-							font-weight: 700;
-							letter-spacing: 8px;
-							color: #111827;
-						"
-					>
-						{{ code }}
-					</div>
-				</div>
-
-				<div
-					style="
-						background-color: #f9fafb;
-						border-left: 4px solid #f59e0b;
-						padding: 16px;
-						border-radius: 4px;
-					"
-				>
-					<p
-						style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5"
-					>
-						{{ vars.note }}
-					</p>
-				</div>
-			</div>
-
-			<div
-				style="
-					padding: 24px 32px;
-					background-color: #f9fafb;
-					border-top: 1px solid #eaebed;
-					text-align: center;
-				"
-			>
-				<p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5">
-					{{ vars.footer }}
-				</p>
-			</div>
-		</div>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>{{ subject }}</title>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .canvas {
+          background-color: #242424 !important;
+        }
+        .card {
+          background-color: #2e2e2e !important;
+          border-color: #424242 !important;
+        }
+        .bright {
+          color: #ffffff !important;
+        }
+        .text {
+          color: #c9c9c9 !important;
+        }
+        .subtle {
+          color: #b8b8b8 !important;
+        }
+        .dimmed {
+          color: #828282 !important;
+        }
+        .divider,
+        .table,
+        .row {
+          border-color: #424242 !important;
+        }
+        .code {
+          background-color: #242424 !important;
+          border-color: #424242 !important;
+          color: #ffffff !important;
+        }
+        .alert-yellow {
+          background-color: #4d4228 !important;
+        }
+        .alert-green {
+          background-color: #314434 !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="canvas" style="margin: 0; padding: 0; background-color: #f0eff0">
+    <table
+      role="presentation"
+      class="canvas"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background-color: #f0eff0"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 16px">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="max-width: 600px"
+          >
+            <tr>
+              <td style="padding: 0 0 20px; text-align: center">
+                <p
+                  class="bright"
+                  style="
+                    margin: 0;
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #000000;
+                  "
+                >
+                  {{ settings.app.name }}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td
+                class="card"
+                style="
+                  padding: 32px 32px 16px;
+                  background-color: #ffffff;
+                  border: 1px solid #dee2e6;
+                  border-radius: 8px;
+                "
+              >
+                <h1
+                  class="bright"
+                  style="
+                    margin: 0 0 16px;
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 22px;
+                    font-weight: 700;
+                    line-height: 1.35;
+                    color: #000000;
+                  "
+                >
+                  {{ vars.subject }}
+                </h1>
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 16px;
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.55;
+                    color: #000000;
+                  "
+                >
+                  {{ vars.greeting }}
+                </p>
+                <p
+                  class="text"
+                  style="
+                    margin: 0 0 16px;
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.55;
+                    color: #000000;
+                  "
+                >
+                  {{ vars.intro }}
+                </p>
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="margin: 8px 0 24px"
+                >
+                  <tr>
+                    <td
+                      class="code"
+                      style="
+                        padding: 12px 16px 12px 24px;
+                        background-color: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 4px;
+                        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, &quot;Liberation Mono&quot;, &quot;Courier New&quot;, monospace;
+                        font-size: 32px;
+                        font-weight: 700;
+                        letter-spacing: 8px;
+                        color: #000000;
+                      "
+                    >
+                      {{ code }}
+                    </td>
+                  </tr>
+                </table>
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="margin: 0 0 16px"
+                >
+                  <tr>
+                    <td
+                      class="alert-yellow"
+                      style="padding: 16px; background-color: #fff3bf; border-radius: 8px"
+                    >
+                      <p
+                        class="bright"
+                        style="
+                          margin: 0;
+                          font-family: Helvetica, Arial, sans-serif;
+                          font-size: 14px;
+                          line-height: 1.55;
+                          color: #000000;
+                        "
+                      >
+                        {{ vars.note }}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                <p
+                  class="divider subtle"
+                  style="
+                    margin: 8px 0 16px;
+                    padding-top: 16px;
+                    border-top: 1px solid #dee2e6;
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 13px;
+                    line-height: 1.55;
+                    color: #495057;
+                  "
+                >
+                  {{ vars.footer }}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0 0; text-align: center">
+                <a
+                  class="dimmed"
+                  href="{{ settings.app.url }}"
+                  style="
+                    font-family: Helvetica, Arial, sans-serif;
+                    font-size: 12px;
+                    color: #868e96;
+                    text-decoration: none;
+                  "
+                >
+                  {{ settings.app.url }}
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
