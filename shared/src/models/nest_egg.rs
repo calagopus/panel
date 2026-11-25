@@ -794,14 +794,16 @@ impl NestEgg {
                     SELECT DISTINCT ON (nest_eggs.uuid) {}
                     FROM servers
                     JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
-                    LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                    {access_joins}
                     JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                    WHERE (servers.owner_uuid = $1 OR server_subusers.user_uuid = $1 OR $2)
+                    WHERE ({accessible} OR $2)
                         AND {search}
                     ORDER BY nest_eggs.uuid
                 ) AS eggs
                 "#,
                 Self::columns_sql(None),
+                access_joins = super::server::Server::ACCESS_JOINS_SQL,
+                accessible = super::server::Server::ACCESSIBLE_SQL,
                 search = super::search_sql(3, &["nest_eggs.name"], &["nest_eggs.uuid"]),
             ),
             "eggs.created, eggs.uuid",

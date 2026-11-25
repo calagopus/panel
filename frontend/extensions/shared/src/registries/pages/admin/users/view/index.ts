@@ -5,11 +5,13 @@ import { SubNavigationRegistry } from '../../../../slices/subNavigation.ts';
 import { ActivityRegistry } from './activity.ts';
 import { OAuthLinksRegistry } from './oauthLinks.ts';
 import { ServersRegistry } from './servers.ts';
+import { TeamsRegistry } from './teams.ts';
 
 export class ViewRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.subNavigation.mergeFrom(other.subNavigation);
     this.servers.mergeFrom(other.servers);
+    this.teams.mergeFrom(other.teams);
     this.oauthLinks.mergeFrom(other.oauthLinks);
     this.activity.mergeFrom(other.activity);
 
@@ -20,6 +22,8 @@ export class ViewRegistry implements Registry {
   public subNavigation = new SubNavigationRegistry<{ user: z.infer<typeof adminFullUserSchema> }>();
   /** @since 1.1.1 */
   public servers: ServersRegistry = new ServersRegistry();
+  /** @since 1.3.0 */
+  public teams: TeamsRegistry = new TeamsRegistry();
   /** @since 1.1.1 */
   public oauthLinks: OAuthLinksRegistry = new OAuthLinksRegistry();
   /** @since 1.1.1 */
@@ -36,6 +40,12 @@ export class ViewRegistry implements Registry {
   /** @since 1.1.1 */
   public enterServers(callback: (registry: ServersRegistry) => unknown): this {
     callback(this.servers);
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public enterTeams(callback: (registry: TeamsRegistry) => unknown): this {
+    callback(this.teams);
     return this;
   }
 

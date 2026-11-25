@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { forwardRef, memo } from 'react';
 import { TableData, TableRow, TableSelectionCell } from '@/elements/data-display/Table.tsx';
 import TableLink from '@/elements/data-display/TableLink.tsx';
+import { ContextMenuChildrenProps, ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
 import RedactedText from '@/elements/typography/RedactedText.tsx';
@@ -17,6 +18,7 @@ interface ServerRowProps {
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean, range?: boolean) => void;
   onClick?: (event: React.MouseEvent) => void;
+  contextMenuProps?: ContextMenuChildrenProps;
 }
 
 function ServerStatus({ server, stats }: { server: AdminServer; stats: ReturnType<typeof useServerStats> }) {
@@ -41,14 +43,24 @@ function ServerStatus({ server, stats }: { server: AdminServer; stats: ReturnTyp
 
 const ServerRow = memo(
   forwardRef<HTMLTableRowElement, ServerRowProps>(function ServerRow(
-    { server, isSelected = false, onSelectionChange, onClick },
+    { server, isSelected = false, onSelectionChange, onClick, contextMenuProps },
     ref,
   ) {
     const { t } = useTranslations();
     const stats = useServerStats(server);
 
     return (
-      <TableRow bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined} onClick={onClick} ref={ref}>
+      <TableRow
+        bg={isSelected ? 'var(--mantine-color-blue-light)' : undefined}
+        onClick={onClick}
+        onContextMenu={(e) => {
+          if (!contextMenuProps) return;
+
+          e.preventDefault();
+          contextMenuProps.openMenu(e.clientX, e.clientY);
+        }}
+        ref={ref}
+      >
         {onSelectionChange !== undefined && (
           <TableSelectionCell id={server.uuid} checked={isSelected} onChange={onSelectionChange} />
         )}
@@ -92,6 +104,12 @@ const ServerRow = memo(
         <TableData>
           <FormattedTimestamp timestamp={server.created} />
         </TableData>
+
+        {contextMenuProps && (
+          <TableData className='relative cursor-pointer min-w-10 text-center'>
+            <ContextMenuToggle items={contextMenuProps.items} openMenu={contextMenuProps.openMenu} />
+          </TableData>
+        )}
       </TableRow>
     );
   }),

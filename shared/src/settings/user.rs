@@ -15,9 +15,13 @@ pub struct AppSettingsUser {
     pub max_ssh_key_count: u64,
     pub max_settings_count: u64,
     pub max_settings_value_bytes: u64,
+    pub max_team_count: u64,
+    pub max_team_member_count: u64,
+    pub max_team_preset_count: u64,
 
     pub allow_changing_language: bool,
     pub allow_changing_avatar: bool,
+    pub allow_creating_teams: bool,
 
     pub route_order: Option<Vec<super::RouteOrderItem>>,
 }
@@ -57,6 +61,15 @@ impl SettingsSerializeExt for AppSettingsUser {
                 "max_settings_value_bytes",
                 self.max_settings_value_bytes.to_compact_string(),
             )
+            .write_raw_setting("max_team_count", self.max_team_count.to_compact_string())
+            .write_raw_setting(
+                "max_team_member_count",
+                self.max_team_member_count.to_compact_string(),
+            )
+            .write_raw_setting(
+                "max_team_preset_count",
+                self.max_team_preset_count.to_compact_string(),
+            )
             .write_raw_setting(
                 "allow_changing_language",
                 self.allow_changing_language.to_compact_string(),
@@ -64,6 +77,10 @@ impl SettingsSerializeExt for AppSettingsUser {
             .write_raw_setting(
                 "allow_changing_avatar",
                 self.allow_changing_avatar.to_compact_string(),
+            )
+            .write_raw_setting(
+                "allow_creating_teams",
+                self.allow_creating_teams.to_compact_string(),
             )
             .write_serde_setting("route_order", &self.route_order)?)
     }
@@ -106,12 +123,28 @@ impl SettingsDeserializeExt for AppSettingsUserDeserializer {
                 .take_raw_setting("max_settings_value_bytes")
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(16384),
+            max_team_count: deserializer
+                .take_raw_setting("max_team_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(10),
+            max_team_member_count: deserializer
+                .take_raw_setting("max_team_member_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(50),
+            max_team_preset_count: deserializer
+                .take_raw_setting("max_team_preset_count")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(25),
             allow_changing_language: deserializer
                 .take_raw_setting("allow_changing_language")
                 .map(|s| s == "true")
                 .unwrap_or(true),
             allow_changing_avatar: deserializer
                 .take_raw_setting("allow_changing_avatar")
+                .map(|s| s == "true")
+                .unwrap_or(true),
+            allow_creating_teams: deserializer
+                .take_raw_setting("allow_creating_teams")
                 .map(|s| s == "true")
                 .unwrap_or(true),
             route_order: deserializer

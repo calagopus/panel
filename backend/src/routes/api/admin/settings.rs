@@ -229,11 +229,19 @@ mod put {
         max_settings_count: Option<u64>,
         #[garde(skip)]
         max_settings_value_bytes: Option<u64>,
+        #[garde(skip)]
+        max_team_count: Option<u64>,
+        #[garde(skip)]
+        max_team_member_count: Option<u64>,
+        #[garde(skip)]
+        max_team_preset_count: Option<u64>,
 
         #[garde(skip)]
         allow_changing_language: Option<bool>,
         #[garde(skip)]
         allow_changing_avatar: Option<bool>,
+        #[garde(skip)]
+        allow_creating_teams: Option<bool>,
 
         #[garde(length(max = 100), dive)]
         #[schema(max_items = 100)]
@@ -259,6 +267,13 @@ mod put {
         user_log_retention_count: Option<Option<u64>>,
         #[garde(range(min = 1, max = 3650))]
         #[schema(minimum = 1, maximum = 3650)]
+        team_log_retention_days: Option<u16>,
+        #[garde(range(min = 1))]
+        #[schema(minimum = 1)]
+        #[serde(default, with = "::serde_with::rust::double_option")]
+        team_log_retention_count: Option<Option<u64>>,
+        #[garde(range(min = 1, max = 3650))]
+        #[schema(minimum = 1, maximum = 3650)]
         server_log_retention_days: Option<u16>,
         #[garde(range(min = 1))]
         #[schema(minimum = 1)]
@@ -271,6 +286,8 @@ mod put {
         server_log_schedule_activity: Option<bool>,
         #[garde(skip)]
         server_hide_activity_ips: Option<shared::settings::activity::ActivityIpHiding>,
+        #[garde(skip)]
+        team_hide_activity_ips: Option<shared::settings::activity::ActivityIpHiding>,
     }
 
     #[derive(ToSchema, Validate, Deserialize)]
@@ -306,6 +323,8 @@ mod put {
         #[garde(dive)]
         client_servers_subusers_create:
             Option<shared::settings::ratelimits::RatelimitConfiguration>,
+        #[garde(dive)]
+        client_teams_members_create: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
         remote: Option<shared::settings::ratelimits::RatelimitConfiguration>,
         #[garde(dive)]
@@ -540,11 +559,23 @@ mod put {
             if let Some(max_settings_value_bytes) = user.max_settings_value_bytes {
                 settings.user.max_settings_value_bytes = max_settings_value_bytes;
             }
+            if let Some(max_team_count) = user.max_team_count {
+                settings.user.max_team_count = max_team_count;
+            }
+            if let Some(max_team_member_count) = user.max_team_member_count {
+                settings.user.max_team_member_count = max_team_member_count;
+            }
+            if let Some(max_team_preset_count) = user.max_team_preset_count {
+                settings.user.max_team_preset_count = max_team_preset_count;
+            }
             if let Some(allow_changing_language) = user.allow_changing_language {
                 settings.user.allow_changing_language = allow_changing_language;
             }
             if let Some(allow_changing_avatar) = user.allow_changing_avatar {
                 settings.user.allow_changing_avatar = allow_changing_avatar;
+            }
+            if let Some(allow_creating_teams) = user.allow_creating_teams {
+                settings.user.allow_creating_teams = allow_creating_teams;
             }
             if let Some(route_order) = user.route_order {
                 settings.user.route_order = route_order;
@@ -655,6 +686,12 @@ mod put {
             if let Some(user_log_retention_count) = activity.user_log_retention_count {
                 settings.activity.user_log_retention_count = user_log_retention_count;
             }
+            if let Some(team_log_retention_days) = activity.team_log_retention_days {
+                settings.activity.team_log_retention_days = team_log_retention_days;
+            }
+            if let Some(team_log_retention_count) = activity.team_log_retention_count {
+                settings.activity.team_log_retention_count = team_log_retention_count;
+            }
             if let Some(server_log_retention_days) = activity.server_log_retention_days {
                 settings.activity.server_log_retention_days = server_log_retention_days;
             }
@@ -669,6 +706,9 @@ mod put {
             }
             if let Some(server_hide_activity_ips) = activity.server_hide_activity_ips {
                 settings.activity.server_hide_activity_ips = server_hide_activity_ips;
+            }
+            if let Some(team_hide_activity_ips) = activity.team_hide_activity_ips {
+                settings.activity.team_hide_activity_ips = team_hide_activity_ips;
             }
         }
         if let Some(ratelimits) = data.ratelimits {
@@ -720,6 +760,9 @@ mod put {
             if let Some(client_servers_subusers_create) = ratelimits.client_servers_subusers_create
             {
                 settings.ratelimits.client_servers_subusers_create = client_servers_subusers_create;
+            }
+            if let Some(client_teams_members_create) = ratelimits.client_teams_members_create {
+                settings.ratelimits.client_teams_members_create = client_teams_members_create;
             }
             if let Some(remote) = ratelimits.remote {
                 settings.ratelimits.remote = remote;

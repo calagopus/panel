@@ -54,6 +54,8 @@ export const serverSchema = z.looseObject({
   isTransferring: z.boolean(),
   permissions: z.array(z.string()),
   ignoredFiles: z.array(z.string()),
+  teamUuid: z.string().nullable(),
+  teamName: z.string().nullable(),
   locationUuid: z.string(),
   locationName: z.string(),
   locationFlag: z.string().nullable(),

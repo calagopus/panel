@@ -17,6 +17,7 @@ use shared::models::{
         SystemBackupPolicyRunTarget, SystemBackupPolicyRunTargetClaim,
         SystemBackupPolicyRunTargetReason, SystemBackupPolicyRunTargetStatus,
     },
+    team_activity::TeamActivity,
     user_activity::UserActivity,
     user_api_key::UserApiKey,
     user_email_verification::UserEmailVerification,
@@ -739,6 +740,8 @@ pub async fn define_background_tasks(
             let admin_retention_count = settings.activity.admin_log_retention_count;
             let user_retention_days = settings.activity.user_log_retention_days;
             let user_retention_count = settings.activity.user_log_retention_count;
+            let team_retention_days = settings.activity.team_log_retention_days;
+            let team_retention_count = settings.activity.team_log_retention_count;
             let server_retention_days = settings.activity.server_log_retention_days;
             let server_retention_count = settings.activity.server_log_retention_count;
             drop(settings);
@@ -787,6 +790,30 @@ pub async fn define_background_tasks(
                         "deleted {} old user activity logs to retain latest {} logs",
                         deleted_user_activity,
                         user_retention_count
+                    );
+                }
+            }
+
+            let deleted_team_activity = TeamActivity::delete_older_than(
+                &state.database,
+                chrono::Utc::now() - chrono::Duration::days(team_retention_days as i64),
+            )
+            .await?;
+            if deleted_team_activity > 0 {
+                tracing::info!("deleted {} old team activity logs", deleted_team_activity);
+            }
+
+            if let Some(team_retention_count) = team_retention_count {
+                let deleted_team_activity = TeamActivity::retain_latest_logs_per_team(
+                    &state.database,
+                    team_retention_count as i64,
+                )
+                .await?;
+                if deleted_team_activity > 0 {
+                    tracing::info!(
+                        "deleted {} old team activity logs to retain latest {} logs",
+                        deleted_team_activity,
+                        team_retention_count
                     );
                 }
             }

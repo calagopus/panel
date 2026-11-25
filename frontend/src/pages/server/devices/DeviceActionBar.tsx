@@ -38,7 +38,7 @@ export default function DeviceActionBar({
   const detachable = devices.filter((device) => device.created);
   const skippedDetaches = selectedDevices.size - detachable.length;
 
-  const doAttach = () =>
+  const doAttach = () => {
     run({
       action: 'attach',
       items: attachable,
@@ -51,6 +51,7 @@ export default function DeviceActionBar({
         ),
       onFinished: clearSelection,
     });
+  };
 
   const doDetach = () => {
     setConfirmingDetach(false);

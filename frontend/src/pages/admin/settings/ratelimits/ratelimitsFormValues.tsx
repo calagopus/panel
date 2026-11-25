@@ -24,6 +24,7 @@ export const ratelimitEndpoints: RatelimitEndpoint[] = [
   { label: 'client/servers/files/pull', key: 'clientServersFilesPull' },
   { label: 'client/servers/files/pull/query', key: 'clientServersFilesPullQuery' },
   { label: 'client/servers/subusers/create', key: 'clientServersSubusersCreate' },
+  { label: 'client/teams/members/create', key: 'clientTeamsMembersCreate' },
   { label: 'remote', key: 'remote' },
   { label: 'remote/sftp/auth', key: 'remoteSftpAuth' },
   { label: 'remote/enroll', key: 'remoteEnroll' },

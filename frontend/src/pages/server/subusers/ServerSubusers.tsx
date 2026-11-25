@@ -1,8 +1,6 @@
 import { faPlus, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Ref, useEffect, useState } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import getPermissions from '@/api/getPermissions.ts';
+import { Ref, useState } from 'react';
 import getSubusers from '@/api/server/subusers/getSubusers.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { ServerCan } from '@/elements/Can.tsx';
@@ -21,27 +19,17 @@ import { useServerStore } from '@/stores/server.ts';
 import SubuserCreateModal from './modals/SubuserCreateModal.tsx';
 import SubuserActionBar from './SubuserActionBar.tsx';
 import SubuserRow from './SubuserRow.tsx';
+import SubuserTeamMembers from './SubuserTeamMembers.tsx';
 
 export default function ServerSubusers() {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
-  const { settings, setAvailablePermissions } = useGlobalStore(
-    useShallow((state) => ({
-      settings: state.settings,
-      setAvailablePermissions: state.setAvailablePermissions,
-    })),
-  );
+  const settings = useGlobalStore((state) => state.settings);
 
   const canCreate = useServerCan('subusers.create');
   const canDelete = useServerCan('subusers.delete');
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
-
-  useEffect(() => {
-    getPermissions().then((res) => {
-      setAvailablePermissions(res);
-    });
-  }, []);
 
   const {
     data: subusers,
@@ -177,6 +165,8 @@ export default function ServerSubusers() {
           ))}
         </Table>
       </SelectionArea>
+
+      {server.teamUuid && <SubuserTeamMembers />}
     </ServerContentContainer>
   );
 }

@@ -18,6 +18,18 @@ const admin = {
     counts: () => ['admin', 'roles', 'counts'] as const,
   },
 
+  teams: {
+    all: () => ['admin', 'teams'] as const,
+    detail: (uuid: string) => ['admin', 'teams', { uuid }] as const,
+    byUser: (userUuid: string) => ['admin', 'teams', 'user', userUuid] as const,
+    activity: (teamUuid: string) => ['admin', 'teams', teamUuid, 'activity'] as const,
+    members: (teamUuid: string) => ['admin', 'teams', teamUuid, 'members'] as const,
+    presets: (teamUuid: string) => ['admin', 'teams', teamUuid, 'presets'] as const,
+    servers: (teamUuid: string) => ['admin', 'teams', teamUuid, 'servers'] as const,
+    availableServers: (teamUuid: string) => ['admin', 'teams', teamUuid, 'servers', 'available'] as const,
+    counts: () => ['admin', 'teams', 'counts'] as const,
+  },
+
   nodes: {
     all: () => ['admin', 'nodes'] as const,
     detail: (uuid: string) => ['admin', 'nodes', { uuid }] as const,
@@ -352,6 +364,7 @@ const server = (serverUuid: string) => ({
   },
   subusers: {
     all: () => ['server', serverUuid, 'subusers'] as const,
+    team: () => ['server', serverUuid, 'subusers', 'team'] as const,
   },
   tunnel: {
     all: () => ['server', serverUuid, 'tunnel'] as const,
@@ -392,11 +405,24 @@ const user = {
   sshKeys: {
     all: () => ['user', 'ssh-keys'] as const,
   },
+  teams: {
+    all: () => ['user', 'teams'] as const,
+    detail: (uuid: string) => ['user', 'teams', { uuid }] as const,
+    activity: (teamUuid: string) => ['user', 'teams', teamUuid, 'activity'] as const,
+    members: (teamUuid: string) => ['user', 'teams', teamUuid, 'members'] as const,
+    presets: (teamUuid: string) => ['user', 'teams', teamUuid, 'presets'] as const,
+    servers: (teamUuid: string) => ['user', 'teams', teamUuid, 'servers'] as const,
+    availableServers: (teamUuid: string) => ['user', 'teams', teamUuid, 'servers', 'available'] as const,
+    counts: () => ['user', 'teams', 'counts'] as const,
+  },
 };
 
 const global = {
   iconManifest: {
     all: () => ['global', 'iconManifest'] as const,
+  },
+  permissions: {
+    all: () => ['global', 'permissions'] as const,
   },
   timezones: {
     all: () => ['global', 'timezones'] as const,

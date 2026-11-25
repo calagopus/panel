@@ -1,5 +1,6 @@
 import { ZodType, z } from 'zod';
 import { adminFullUserSchema } from '@/lib/schemas/admin/users.ts';
+import { userTeamMemberManagement } from '@/lib/schemas/user/teams.ts';
 import { nullableString } from '@/lib/serialization/transformers.ts';
 
 export const adminOAuthProviderSchema = z.looseObject({
@@ -173,6 +174,13 @@ export const adminOAuthProviderMappingTypeSchema = z.discriminatedUnion('type', 
     serverUuid: z.string(),
     permissions: z.array(z.string()),
     ignoredFiles: z.array(z.string()),
+    revokeUnmatched: z.boolean(),
+  }),
+  z.object({
+    type: z.literal('team_member'),
+    teamUuid: z.string(),
+    presetUuid: z.string(),
+    management: z.array(userTeamMemberManagement),
     revokeUnmatched: z.boolean(),
   }),
 ]);

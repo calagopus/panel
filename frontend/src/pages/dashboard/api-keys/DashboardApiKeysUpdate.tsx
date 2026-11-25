@@ -1,16 +1,16 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import getPermissions from '@/api/getPermissions.ts';
 import getApiKeyByIdentifier from '@/api/me/api-keys/getApiKeyByIdentifier.ts';
 import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import AccountContentContainer from '@/elements/containers/AccountContentContainer.tsx';
 import Card from '@/elements/data-display/Card.tsx';
 import Alert from '@/elements/feedback/Alert.tsx';
+import ErrorState from '@/elements/feedback/ErrorState.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
@@ -23,10 +23,10 @@ import { userApiKeySchema } from '@/lib/schemas/user/apiKeys.ts';
 import { parseCallbackUrl, parseRequestedPermissions } from '@/pages/dashboard/api-keys/redirectParams.ts';
 import RequestedPermissions, { type RequestedPermission } from '@/pages/dashboard/api-keys/RequestedPermissions.tsx';
 import { useResource } from '@/plugins/resource/useResource.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 
 function resolvePermissions(existing: string[], requested: string[], replace: boolean) {
   const final = replace ? [...requested].sort() : Array.from(new Set([...existing, ...requested])).sort();
@@ -45,12 +45,16 @@ export default function DashboardApiKeysUpdate() {
   const { addToast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
-  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const {
+    availablePermissions,
+    loading: permissionsFetching,
+    initialLoading: permissionsLoading,
+    error: permissionsError,
+    refetch: refetchPermissions,
+  } = useAvailablePermissions();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updated, setUpdated] = useState(false);
 
@@ -62,17 +66,6 @@ export default function DashboardApiKeysUpdate() {
     queryFn: () => getApiKeyByIdentifier(keyStart),
     enabled: !!keyStart,
   });
-
-  useEffect(() => {
-    getPermissions()
-      .then((res) => {
-        setAvailablePermissions(res);
-        setPermissionsLoaded(true);
-      })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      });
-  }, []);
 
   const callbackUrl = useMemo(() => parseCallbackUrl(searchParams), [searchParams]);
 
@@ -119,7 +112,13 @@ export default function DashboardApiKeysUpdate() {
       title={t('pages.account.apiKeys.update.title', {})}
       subtitle={t('pages.account.apiKeys.update.subtitle', {})}
     >
-      {!permissionsLoaded ? (
+      {permissionsError ? (
+        <ErrorState
+          error={httpErrorToHuman(permissionsError)}
+          onRetry={refetchPermissions}
+          retrying={permissionsFetching}
+        />
+      ) : permissionsLoading ? (
         <Spinner.Centered />
       ) : updated ? (
         <Card>

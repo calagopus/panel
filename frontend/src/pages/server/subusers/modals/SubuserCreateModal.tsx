@@ -20,6 +20,7 @@ import { ignorePasswordManagerProps } from '@/lib/passwordManager.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserCreateSchema } from '@/lib/schemas/server/subusers.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
@@ -29,7 +30,7 @@ export default function SubuserCreateModal({ ...props }: ModalProps) {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const { availablePermissions } = useAvailablePermissions();
   const passwordLoginEnabled = useGlobalStore((state) => state.settings.app.passwordLoginEnabled);
   const queryClient = useQueryClient();
 

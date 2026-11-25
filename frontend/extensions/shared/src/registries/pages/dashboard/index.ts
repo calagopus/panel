@@ -10,6 +10,7 @@ import { OAuthLinksRegistry } from './oauthLinks.ts';
 import { SecurityKeysRegistry } from './securityKeys.ts';
 import { SessionsRegistry } from './sessions.ts';
 import { SshKeysRegistry } from './sshKeys.ts';
+import { TeamsRegistry } from './teams/index.ts';
 
 export class DashboardRegistry implements Registry {
   public mergeFrom(other: this): this {
@@ -18,6 +19,7 @@ export class DashboardRegistry implements Registry {
     this.securityKeys.mergeFrom(other.securityKeys);
     this.apiKeys.mergeFrom(other.apiKeys);
     this.sshKeys.mergeFrom(other.sshKeys);
+    this.teams.mergeFrom(other.teams);
     this.commandSnippets.mergeFrom(other.commandSnippets);
     this.oauthLinks.mergeFrom(other.oauthLinks);
     this.sessions.mergeFrom(other.sessions);
@@ -40,6 +42,8 @@ export class DashboardRegistry implements Registry {
   public apiKeys: ApiKeysRegistry = new ApiKeysRegistry();
   /** @since 1.0.0 */
   public sshKeys: SshKeysRegistry = new SshKeysRegistry();
+  /** @since 1.3.0 */
+  public teams: TeamsRegistry = new TeamsRegistry();
   /** @since 1.0.0 */
   public commandSnippets: CommandSnippetsRegistry = new CommandSnippetsRegistry();
   /** @since 1.0.0 */
@@ -83,6 +87,12 @@ export class DashboardRegistry implements Registry {
   /** @since 1.0.0 */
   public enterSshKeys(callback: (registry: SshKeysRegistry) => unknown): this {
     callback(this.sshKeys);
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public enterTeams(callback: (registry: TeamsRegistry) => unknown): this {
+    callback(this.teams);
     return this;
   }
 

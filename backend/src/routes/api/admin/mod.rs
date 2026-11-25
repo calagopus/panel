@@ -39,6 +39,7 @@ mod settings;
 mod stats;
 mod system;
 mod system_backup_policies;
+mod teams;
 mod users;
 
 pub async fn auth(
@@ -107,6 +108,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .nest("/devices", devices::router(state))
         .nest("/users", users::router(state))
         .nest("/roles", roles::router(state))
+        .nest("/teams", teams::router(state))
         .nest("/extensions", extensions::router(state))
         .nest("/activity", activity::router(state))
         .nest("/announcements", announcements::router(state))

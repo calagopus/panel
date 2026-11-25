@@ -38,7 +38,7 @@ export default function MountActionBar({
   const detachable = mounts.filter((mount) => mount.created);
   const skippedDetaches = selectedMounts.size - detachable.length;
 
-  const doAttach = () =>
+  const doAttach = () => {
     run({
       action: 'attach',
       items: attachable,
@@ -49,6 +49,7 @@ export default function MountActionBar({
         attachMount(server.uuid, mount.uuid).then(() => setMountAttached(queryClient, server.uuid, mount.uuid, true)),
       onFinished: clearSelection,
     });
+  };
 
   const doDetach = () => {
     setConfirmingDetach(false);

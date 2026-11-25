@@ -20,6 +20,7 @@ mod activity;
 mod email;
 mod oauth_links;
 mod servers;
+mod teams;
 mod two_factor;
 
 #[derive(Clone)]
@@ -304,6 +305,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(patch::route))
         .nest("/two-factor", two_factor::router(state))
         .nest("/servers", servers::router(state))
+        .nest("/teams", teams::router(state))
         .nest("/activity", activity::router(state))
         .nest("/oauth-links", oauth_links::router(state))
         .nest("/email", email::router(state))

@@ -53,6 +53,53 @@ fn is_path_ignored_subtree(
     list.is_ignored_subtree(&ignore_match_path(path.as_ref()), is_dir)
 }
 
+type ServerAccess = (
+    Vec<compact_str::CompactString>,
+    Vec<compact_str::CompactString>,
+);
+
+/// Combines two grants (permissions, ignored files) on the same server.
+fn merge_access(a: Option<ServerAccess>, b: Option<ServerAccess>) -> Option<ServerAccess> {
+    let (a, b) = match (a, b) {
+        (Some(a), Some(b)) => (a, b),
+        (a, b) => return a.or(b),
+    };
+
+    let dominates = |x: &ServerAccess, y: &ServerAccess| {
+        y.0.iter().all(|permission| x.0.contains(permission)) && y.1.ends_with(&x.1)
+    };
+    if dominates(&a, &b) {
+        return Some(a);
+    }
+    if dominates(&b, &a) {
+        return Some(b);
+    }
+
+    let ((mut permissions, mut a_ignored), (b_permissions, b_ignored)) = (a, b);
+    permissions.extend(b_permissions);
+    permissions.sort_unstable();
+    permissions.dedup();
+
+    let negates = |line: &compact_str::CompactString| line.trim().starts_with('!');
+    let ignored_files = if a_ignored.ends_with(&b_ignored) {
+        a_ignored
+    } else if b_ignored.ends_with(&a_ignored) {
+        b_ignored
+    } else if !a_ignored.iter().chain(&b_ignored).any(negates) {
+        a_ignored.extend(b_ignored);
+        a_ignored
+    } else {
+        // a `!` re-include from one list could expose what the other one hides
+        a_ignored
+            .into_iter()
+            .chain(b_ignored)
+            .filter(|line| !negates(line))
+            .collect()
+    };
+
+    Some((permissions, ignored_files))
+}
+
 #[derive(Clone)]
 pub struct ServerActivityLogger {
     pub state: State,
@@ -169,6 +216,8 @@ pub struct Server {
     pub node: Fetchable<super::node::Node>,
     pub destination_node: Option<Fetchable<super::node::Node>>,
     pub owner: super::user::User,
+    pub team_uuid: Option<uuid::Uuid>,
+    pub team_name: Option<compact_str::CompactString>,
     pub egg: Box<super::nest_egg::NestEgg>,
     pub nest: Box<super::nest::Nest>,
     pub backup_configuration: Option<Fetchable<super::backup_configuration::BackupConfiguration>>,
@@ -254,6 +303,14 @@ impl BaseModel for Server {
             (
                 "servers.destination_node_uuid",
                 compact_str::format_compact!("{prefix}destination_node_uuid"),
+            ),
+            (
+                "servers.team_uuid",
+                compact_str::format_compact!("{prefix}team_uuid"),
+            ),
+            (
+                "teams.name",
+                compact_str::format_compact!("{prefix}team_name"),
             ),
             (
                 "servers.backup_configuration_uuid",
@@ -371,6 +428,17 @@ impl BaseModel for Server {
     fn map(prefix: Option<&str>, row: &PgRow) -> Result<Self, crate::database::DatabaseError> {
         let prefix = prefix.unwrap_or_default();
 
+        let read_access = |permissions: &str, ignored_files: &str| {
+            row.try_get::<Vec<compact_str::CompactString>, _>(permissions)
+                .ok()
+                .map(|permissions| (permissions, row.try_get(ignored_files).unwrap_or_default()))
+        };
+        let access = merge_access(
+            read_access("subuser_permissions", "subuser_ignored_files"),
+            read_access("team_preset_permissions", "team_preset_ignored_files"),
+        );
+        let (subuser_permissions, subuser_ignored_files) = access.unzip();
+
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
             uuid_short: row.try_get(compact_str::format_compact!("{prefix}uuid_short").as_str())?,
@@ -402,6 +470,8 @@ impl BaseModel for Server {
                 compact_str::format_compact!("{prefix}destination_node_uuid"),
             ),
             owner: super::user::User::map(Some("owner_"), row)?,
+            team_uuid: row.try_get(compact_str::format_compact!("{prefix}team_uuid").as_str())?,
+            team_name: row.try_get(compact_str::format_compact!("{prefix}team_name").as_str())?,
             egg: Box::new(super::nest_egg::NestEgg::map(Some("egg_"), row)?),
             nest: Box::new(super::nest::Nest::map(Some("nest_"), row)?),
             backup_configuration:
@@ -458,13 +528,8 @@ impl BaseModel for Server {
                 .try_get(compact_str::format_compact!("{prefix}backup_limit").as_str())?,
             schedule_limit: row
                 .try_get(compact_str::format_compact!("{prefix}schedule_limit").as_str())?,
-            subuser_permissions: row
-                .try_get::<Vec<compact_str::CompactString>, _>("permissions")
-                .map(Arc::new)
-                .ok(),
-            subuser_ignored_files: row
-                .try_get::<Vec<compact_str::CompactString>, _>("ignored_files")
-                .ok(),
+            subuser_permissions: subuser_permissions.map(Arc::new),
+            subuser_ignored_files,
             subuser_ignored_files_list: None,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
@@ -510,6 +575,7 @@ impl ResolvableModel for Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE servers.uuid_short = $1
             "#,
             Self::columns_sql(None)
@@ -523,6 +589,37 @@ impl ResolvableModel for Server {
 }
 
 impl Server {
+    /// What `$1` holds on a server someone else owns: their own subuser entry and the preset of
+    /// the team the server belongs to, merged by [`merge_access`].
+    pub(super) const ACCESS_JOINS_SQL: &'static str = r#"
+        LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+        LEFT JOIN team_members ON team_members.team_uuid = servers.team_uuid AND team_members.user_uuid = $1 AND team_members.accepted IS NOT NULL
+        LEFT JOIN team_presets ON team_presets.uuid = team_members.preset_uuid
+    "#;
+
+    const ACCESS_COLUMNS_SQL: &'static str = r#"
+        CASE WHEN servers.owner_uuid = $1 THEN NULL ELSE server_subusers.permissions END AS subuser_permissions,
+        CASE WHEN servers.owner_uuid = $1 THEN NULL ELSE server_subusers.ignored_files END AS subuser_ignored_files,
+        CASE WHEN servers.owner_uuid = $1 THEN NULL ELSE team_presets.permissions END AS team_preset_permissions,
+        CASE WHEN servers.owner_uuid = $1 THEN NULL ELSE team_presets.ignored_files END AS team_preset_ignored_files
+    "#;
+
+    /// Needs [`Self::ACCESS_JOINS_SQL`].
+    pub(super) const ACCESSIBLE_SQL: &'static str = r#"
+        (servers.owner_uuid = $1 OR server_subusers.user_uuid IS NOT NULL OR team_members.user_uuid IS NOT NULL)
+    "#;
+
+    const ACCESSIBLE_UUIDS_SQL: &'static str = r#"
+        SELECT owned.uuid FROM servers owned WHERE owned.owner_uuid = $1
+        UNION ALL
+        SELECT server_subusers.server_uuid FROM server_subusers WHERE server_subusers.user_uuid = $1
+        UNION ALL
+        SELECT team_servers.uuid
+        FROM team_members memberships
+        JOIN servers team_servers ON team_servers.team_uuid = memberships.team_uuid
+        WHERE memberships.user_uuid = $1 AND memberships.accepted IS NOT NULL
+    "#;
+
     /// Why the client API refuses to act on this server, if it does. Checked in the order the
     /// client route guard uses, so a suspended server never reports anything past that.
     pub fn unavailable_reason(&self) -> Option<&'static str> {
@@ -555,6 +652,7 @@ impl Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE (servers.node_uuid = $1 OR servers.destination_node_uuid = $1) AND servers.uuid = $2
             "#,
             Self::columns_sql(None)
@@ -581,6 +679,7 @@ impl Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE servers.external_id = $1
             "#,
             Self::columns_sql(None)
@@ -606,6 +705,7 @@ impl Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE servers.{} = $1
             "#,
             Self::columns_sql(None),
@@ -635,7 +735,8 @@ impl Server {
 
     /// Get a server by its identifier, ensuring the user has access to it.
     ///
-    /// The server and the caller's subuser entry are cached until they are written to.
+    /// The server, the caller's subuser entry and their team preset are cached until they are
+    /// written to.
     pub async fn by_user_identifier(
         database: &crate::database::Database,
         permissions: &super::user::PermissionManager,
@@ -658,13 +759,27 @@ impl Server {
             return Ok(Some(server));
         }
 
-        if let Some((subuser_permissions, ignored_files)) =
+        let subuser_access =
             super::server_subuser::ServerSubuser::permissions_by_server_uuid_user_uuid_cached(
                 database,
                 server.uuid,
                 permissions.user_uuid(),
             )
-            .await?
+            .await?;
+        let team_access = match server.team_uuid {
+            Some(team_uuid) => {
+                super::team_member::TeamMember::permissions_by_team_uuid_user_uuid_cached(
+                    database,
+                    team_uuid,
+                    permissions.user_uuid(),
+                )
+                .await?
+            }
+            None => None,
+        };
+
+        if let Some((subuser_permissions, ignored_files)) =
+            merge_access(subuser_access, team_access)
         {
             server.subuser_permissions = Some(Arc::new(subuser_permissions));
             server.subuser_ignored_files = Some(ignored_files);
@@ -685,19 +800,23 @@ impl Server {
     ) -> Result<Vec<Self>, crate::database::DatabaseError> {
         let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
-            SELECT {}, server_subusers.permissions, server_subusers.ignored_files
+            SELECT {}, {access_columns}
             FROM servers
             LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
             LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
             JOIN users ON users.uuid = servers.owner_uuid
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
-            LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-            WHERE servers.uuid = ANY($3) AND (servers.owner_uuid = $1 OR server_subusers.user_uuid = $1 OR $2)
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
+            {access_joins}
+            WHERE servers.uuid = ANY($3) AND ({accessible} OR $2)
             ORDER BY array_position($3, servers.uuid)
             "#,
-            Self::columns_sql(None)
+            Self::columns_sql(None),
+            access_columns = Self::ACCESS_COLUMNS_SQL,
+            access_joins = Self::ACCESS_JOINS_SQL,
+            accessible = Self::ACCESSIBLE_SQL,
         )))
         .bind(permissions.user_uuid())
         .bind(permissions.has_admin_permission("servers.read").is_ok())
@@ -728,6 +847,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.owner_uuid = $1 AND {search}
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
@@ -735,6 +855,76 @@ impl Server {
             "servers.created, servers.uuid",
         )
         .bind(owner_uuid)
+        .bind(search)
+        .fetch(database, page, per_page)
+        .await
+    }
+
+    /// The servers of a team, with the access `user_uuid` holds on each of them.
+    pub async fn by_team_uuid_with_pagination(
+        database: &crate::database::Database,
+        team_uuid: uuid::Uuid,
+        user_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        super::PaginatedQueryBuilder::new(
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
+            format!(
+                r#"
+                FROM servers
+                LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
+                LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
+                JOIN users ON users.uuid = servers.owner_uuid
+                LEFT JOIN roles ON roles.uuid = users.role_uuid
+                JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
+                JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
+                WHERE servers.team_uuid = $2 AND {search}
+                "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                search = super::search_sql(3, &["servers.name"], &["servers.uuid"]),
+            ),
+            "servers.created, servers.uuid",
+        )
+        .bind(user_uuid)
+        .bind(team_uuid)
+        .bind(search)
+        .fetch(database, page, per_page)
+        .await
+    }
+
+    /// The servers of the owner that are not part of the team yet.
+    pub async fn available_by_team_uuid_owner_uuid_with_pagination(
+        database: &crate::database::Database,
+        team_uuid: uuid::Uuid,
+        owner_uuid: uuid::Uuid,
+        page: i64,
+        per_page: i64,
+        search: Option<&str>,
+    ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        super::PaginatedQueryBuilder::new(
+            Self::columns_sql(None),
+            format!(
+                r#"
+                FROM servers
+                LEFT JOIN server_allocations ON server_allocations.uuid = servers.allocation_uuid
+                LEFT JOIN node_allocations ON node_allocations.uuid = server_allocations.allocation_uuid
+                JOIN users ON users.uuid = servers.owner_uuid
+                LEFT JOIN roles ON roles.uuid = users.role_uuid
+                JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
+                JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                WHERE servers.owner_uuid = $1 AND servers.team_uuid IS DISTINCT FROM $2 AND {search}
+                "#,
+                search = super::search_sql(3, &["servers.name"], &["servers.uuid"]),
+            ),
+            "servers.created, servers.uuid",
+        )
+        .bind(owner_uuid)
+        .bind(team_uuid)
         .bind(search)
         .fetch(database, page, per_page)
         .await
@@ -749,7 +939,7 @@ impl Server {
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         super::PaginatedQueryBuilder::new(
-            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
                 r#"
                 FROM servers
@@ -759,11 +949,14 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
                 WHERE servers.uuid = ANY($2)
-                    AND (servers.owner_uuid = $1 OR server_subusers.user_uuid = $1 OR $4)
+                    AND ({accessible} OR $4)
                     AND {search}
                 "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
             ),
             "array_position($2, servers.uuid), servers.created",
@@ -784,7 +977,7 @@ impl Server {
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         super::PaginatedQueryBuilder::new(
-            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
                 r#"
                 FROM servers
@@ -794,15 +987,14 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
                 WHERE
-                    servers.uuid IN (
-                        SELECT owned.uuid FROM servers owned WHERE owned.owner_uuid = $1
-                        UNION ALL
-                        SELECT server_subusers.server_uuid FROM server_subusers WHERE server_subusers.user_uuid = $1
-                    )
+                    servers.uuid IN ({accessible_uuids})
                     AND {search}
                 "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                accessible_uuids = Self::ACCESSIBLE_UUIDS_SQL,
                 search = super::search_sql(2, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
             ),
             "servers.created, servers.uuid",
@@ -818,20 +1010,17 @@ impl Server {
         node_uuid: uuid::Uuid,
         user_uuid: uuid::Uuid,
     ) -> Result<Vec<uuid::Uuid>, crate::database::DatabaseError> {
-        let rows = sqlx::query(
+        let rows = sqlx::query(sqlx::AssertSqlSafe(format!(
             r#"
             SELECT servers.uuid
             FROM servers
-            WHERE servers.node_uuid = $1 AND servers.uuid IN (
-                SELECT owned.uuid FROM servers owned WHERE owned.owner_uuid = $2
-                UNION ALL
-                SELECT server_subusers.server_uuid FROM server_subusers WHERE server_subusers.user_uuid = $2
-            )
+            WHERE servers.node_uuid = $2 AND servers.uuid IN ({})
             ORDER BY servers.created, servers.uuid
-            "#
-        )
-        .bind(node_uuid)
+            "#,
+            Self::ACCESSIBLE_UUIDS_SQL
+        )))
         .bind(user_uuid)
+        .bind(node_uuid)
         .fetch_all(database.read())
         .await?;
 
@@ -849,7 +1038,7 @@ impl Server {
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
         super::PaginatedQueryBuilder::new(
-            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
                 r#"
                 FROM servers
@@ -859,11 +1048,14 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
                 WHERE
-                    servers.owner_uuid != $1 AND (server_subusers.user_uuid IS NULL OR server_subusers.user_uuid != $1)
+                    NOT {accessible}
                     AND {search}
                 "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(2, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
             ),
             "servers.created, servers.uuid",
@@ -889,7 +1081,7 @@ impl Server {
             exclude.iter().copied().unzip();
 
         super::PaginatedQueryBuilder::new(
-            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
                 r#"
                 FROM server_tunnels
@@ -900,13 +1092,10 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
                 WHERE
-                    servers.uuid IN (
-                        SELECT owned.uuid FROM servers owned WHERE owned.owner_uuid = $1
-                        UNION ALL
-                        SELECT server_subusers.server_uuid FROM server_subusers WHERE server_subusers.user_uuid = $1
-                    )
+                    servers.uuid IN ({accessible_uuids})
                     AND servers.uuid != $2
                     AND NOT servers.suspended
                     AND servers.destination_node_uuid IS NULL
@@ -914,6 +1103,8 @@ impl Server {
                     AND (servers.egg_uuid, servers.node_uuid) NOT IN (SELECT * FROM UNNEST($4::uuid[], $5::uuid[]))
                     AND {search}
                 "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                accessible_uuids = Self::ACCESSIBLE_UUIDS_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
             ),
             "servers.created, servers.uuid",
@@ -940,7 +1131,7 @@ impl Server {
             exclude.iter().copied().unzip();
 
         super::PaginatedQueryBuilder::new(
-            format!("{}, server_subusers.permissions, server_subusers.ignored_files", Self::columns_sql(None)),
+            format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
                 r#"
                 FROM server_tunnels
@@ -951,9 +1142,10 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
-                LEFT JOIN server_subusers ON server_subusers.server_uuid = servers.uuid AND server_subusers.user_uuid = $1
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
+                {access_joins}
                 WHERE
-                    servers.owner_uuid != $1 AND (server_subusers.user_uuid IS NULL OR server_subusers.user_uuid != $1)
+                    NOT {accessible}
                     AND servers.uuid != $2
                     AND NOT servers.suspended
                     AND servers.destination_node_uuid IS NULL
@@ -961,6 +1153,8 @@ impl Server {
                     AND (servers.egg_uuid, servers.node_uuid) NOT IN (SELECT * FROM UNNEST($4::uuid[], $5::uuid[]))
                     AND {search}
                 "#,
+                access_joins = Self::ACCESS_JOINS_SQL,
+                accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
             ),
             "servers.created, servers.uuid",
@@ -991,6 +1185,7 @@ impl Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE (servers.egg_uuid, servers.node_uuid) IN (SELECT * FROM UNNEST($1::uuid[], $2::uuid[]))
             "#,
             Self::columns_sql(None)
@@ -1023,6 +1218,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.node_uuid = $1 AND {search}
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
@@ -1053,6 +1249,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.node_uuid = $1 AND servers.destination_node_uuid IS NOT NULL
                     AND {search}
                 "#,
@@ -1084,6 +1281,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.egg_uuid = $1 AND {search}
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
@@ -1114,6 +1312,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.backup_configuration_uuid = $1 AND {search}
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
@@ -1143,6 +1342,7 @@ impl Server {
                 LEFT JOIN roles ON roles.uuid = users.role_uuid
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+                LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE {search}
                 "#,
                 search = super::search_sql(1, &["servers.name"], &["servers.uuid"]),
@@ -1198,6 +1398,22 @@ impl Server {
             "#,
         )
         .bind(egg_uuid)
+        .fetch_one(database.read())
+        .await
+    }
+
+    pub async fn count_by_team_uuid(
+        database: &crate::database::Database,
+        team_uuid: uuid::Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*)
+            FROM servers
+            WHERE servers.team_uuid = $1
+            "#,
+        )
+        .bind(team_uuid)
         .fetch_one(database.read())
         .await
     }
@@ -2272,6 +2488,8 @@ impl super::IntoAdminApiObject for Server {
                     .owner
                     .into_admin_api_object(state, storage_url_retriever)
                     .await?,
+                team_uuid: self.team_uuid,
+                team_name: self.team_name,
                 egg: egg?,
                 nest: self.nest.into_admin_api_object(state, ()).await?,
                 backup_configuration,
@@ -2366,6 +2584,8 @@ impl super::IntoApiObject for Server {
                         .map_or_else(|| vec!["*".into()], |p| p.to_vec())
                 },
                 ignored_files: self.subuser_ignored_files.unwrap_or_default(),
+                team_uuid: self.team_uuid,
+                team_name: self.team_name,
                 location_uuid: node.location.uuid,
                 location_name: node.location.name,
                 location_flag: node.location.flag,
@@ -2429,6 +2649,7 @@ impl ByUuid for Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE servers.uuid = $1
             "#,
             Self::columns_sql(None)
@@ -2454,6 +2675,7 @@ impl ByUuid for Server {
             LEFT JOIN roles ON roles.uuid = users.role_uuid
             JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
             JOIN nests ON nests.uuid = nest_eggs.nest_uuid
+            LEFT JOIN teams ON teams.uuid = servers.team_uuid
             WHERE servers.uuid = $1
             "#,
             Self::columns_sql(None)
@@ -2936,8 +3158,13 @@ impl UpdatableModel for Server {
         super::invalidate_cache_keys(&state.database, &self.cache_invalidation_keys()).await;
 
         if let Some(previous_owner) = previous_owner {
+            // the server also left the previous owner's team, whose members are only reached
+            // through the server
             let invalidation = super::node::PermissionsInvalidation {
                 users: vec![previous_owner, self.owner.uuid],
+                servers: Some(wings_api::ServerSelector::Uuids {
+                    uuids: HashSet::from([self.uuid]),
+                }),
                 ..Default::default()
             };
 
@@ -3030,6 +3257,13 @@ impl UpdatableModel for Server {
 
         query_builder
             .set("owner_uuid", options.owner_uuid.as_ref())
+            .set(
+                "team_uuid",
+                owner
+                    .as_ref()
+                    .filter(|owner| owner.uuid != self.owner.uuid)
+                    .map(|_| None::<uuid::Uuid>),
+            )
             .set("egg_uuid", options.egg_uuid.as_ref())
             .set(
                 "backup_configuration_uuid",
@@ -3115,6 +3349,10 @@ impl UpdatableModel for Server {
         }
 
         if let Some(owner) = owner {
+            if owner.uuid != self.owner.uuid {
+                self.team_uuid = None;
+                self.team_name = None;
+            }
             self.owner = owner;
         }
         if let Some(egg) = egg {
@@ -3456,6 +3694,8 @@ pub struct AdminApiServer {
     pub allocation: Option<super::server_allocation::ApiServerAllocation>,
     pub node: super::node::AdminApiNode,
     pub owner: super::user::AdminApiUser,
+    pub team_uuid: Option<uuid::Uuid>,
+    pub team_name: Option<compact_str::CompactString>,
     pub egg: super::nest_egg::AdminApiNestEgg,
     pub nest: super::nest::AdminApiNest,
     pub backup_configuration: Option<super::backup_configuration::AdminApiBackupConfiguration>,
@@ -3511,6 +3751,8 @@ pub struct ApiServer {
     pub is_transferring: bool,
     pub permissions: Vec<compact_str::CompactString>,
     pub ignored_files: Vec<compact_str::CompactString>,
+    pub team_uuid: Option<uuid::Uuid>,
+    pub team_name: Option<compact_str::CompactString>,
 
     pub location_uuid: uuid::Uuid,
     pub location_name: compact_str::CompactString,
@@ -3544,10 +3786,13 @@ pub struct ApiServer {
 
 #[cfg(test)]
 mod tests {
-    use super::{is_path_ignored, is_path_ignored_subtree, validate_labels};
+    use super::{
+        ServerAccess, is_path_ignored, is_path_ignored_subtree, merge_access, validate_labels,
+    };
     use crate::ignore_list::IgnoreList;
     use compact_str::CompactString;
     use indexmap::IndexMap;
+    use std::collections::HashSet;
 
     fn compile(patterns: &[&str]) -> IgnoreList {
         IgnoreList::try_from_lines(patterns).unwrap()
@@ -3625,6 +3870,178 @@ mod tests {
             assert!(!is_path_ignored(&list, path, true), "{path}");
             assert!(!is_path_ignored_subtree(&list, path, true), "{path}");
         }
+    }
+
+    // merge_access
+    const PROBES: &[(&str, bool)] = &[
+        ("/secret", false),
+        ("/secret", true),
+        ("/secret/token.txt", false),
+        ("/game/secret", false),
+        ("/keep", false),
+        ("/other", false),
+        ("/config", true),
+        ("/config/server.properties", false),
+    ];
+
+    fn access(permissions: &[&str], ignored: &[&str]) -> ServerAccess {
+        (
+            permissions
+                .iter()
+                .copied()
+                .map(CompactString::from)
+                .collect(),
+            ignored.iter().copied().map(CompactString::from).collect(),
+        )
+    }
+
+    fn compile_access(access: &ServerAccess) -> IgnoreList {
+        IgnoreList::try_from_lines(&access.1).unwrap()
+    }
+
+    fn hides(access: &ServerAccess, path: &str, is_dir: bool) -> bool {
+        is_path_ignored(&compile_access(access), path, is_dir)
+    }
+
+    fn permission_set(access: &ServerAccess) -> HashSet<&str> {
+        access.0.iter().map(CompactString::as_str).collect()
+    }
+
+    fn hidden_probes(access: &ServerAccess) -> Vec<(&'static str, bool)> {
+        let list = compile_access(access);
+
+        PROBES
+            .iter()
+            .copied()
+            .filter(|(path, is_dir)| is_path_ignored(&list, path, *is_dir))
+            .collect()
+    }
+
+    fn merge_both_ways(a: &ServerAccess, b: &ServerAccess) -> ServerAccess {
+        let forward = merge_access(Some(a.clone()), Some(b.clone())).unwrap();
+        let backward = merge_access(Some(b.clone()), Some(a.clone())).unwrap();
+
+        assert_eq!(permission_set(&forward), permission_set(&backward));
+        assert_eq!(hidden_probes(&forward), hidden_probes(&backward));
+
+        let union = permission_set(a)
+            .union(&permission_set(b))
+            .copied()
+            .collect::<HashSet<_>>();
+        assert_eq!(permission_set(&forward), union);
+
+        for permission in &forward.0 {
+            for &(path, is_dir) in PROBES {
+                if hides(&forward, path, is_dir) {
+                    continue;
+                }
+
+                assert!(
+                    [a, b]
+                        .iter()
+                        .any(|input| input.0.contains(permission) && !hides(input, path, is_dir)),
+                    "{permission} exposed on {path} (dir: {is_dir}) by {forward:?}"
+                );
+            }
+        }
+
+        forward
+    }
+
+    #[test]
+    fn a_missing_grant_leaves_the_other_untouched() {
+        let grant = access(&["files.read"], &["secret", "!secret/keep"]);
+
+        assert_eq!(merge_access(None, None), None);
+        assert_eq!(merge_access(Some(grant.clone()), None), Some(grant.clone()));
+        assert_eq!(merge_access(None, Some(grant.clone())), Some(grant));
+    }
+
+    #[test]
+    fn a_broader_preset_without_ignores_overrides_a_narrow_subuser_grant() {
+        let subuser = access(&["control.start"], &[]);
+        let preset = access(&["control.start", "files.read", "files.write"], &[]);
+
+        let merged = merge_both_ways(&subuser, &preset);
+
+        assert_eq!(permission_set(&merged), permission_set(&preset));
+        assert!(hidden_probes(&merged).is_empty(), "{merged:?}");
+    }
+
+    #[test]
+    fn a_dominant_grant_without_ignores_hides_nothing_in_the_merge() {
+        let narrow = access(&["files.read"], &["secret"]);
+        let dominant = access(&["files.read", "files.write"], &[]);
+
+        let merged = merge_both_ways(&narrow, &dominant);
+
+        assert_eq!(permission_set(&merged), permission_set(&dominant));
+        assert!(hidden_probes(&merged).is_empty(), "{merged:?}");
+    }
+
+    #[test]
+    fn a_dominant_grant_whose_list_is_a_suffix_of_the_other_hides_exactly_its_own_paths() {
+        let narrow = access(&["files.read"], &["*", "!keep", "secret"]);
+        let dominant = access(&["files.read", "files.write"], &["secret"]);
+
+        let merged = merge_both_ways(&narrow, &dominant);
+
+        assert_eq!(permission_set(&merged), permission_set(&dominant));
+        assert_eq!(hidden_probes(&merged), hidden_probes(&dominant));
+    }
+
+    #[test]
+    fn a_reinclude_in_one_grant_does_not_expose_what_the_other_hides_for_its_extra_permissions() {
+        let writer = access(&["files.read", "files.write"], &["secret"]);
+        let reader = access(&["files.read"], &["*", "!secret"]);
+
+        let merged = merge_both_ways(&writer, &reader);
+
+        assert!(hides(&merged, "/secret", false), "{merged:?}");
+        assert!(hides(&merged, "/game/secret", false), "{merged:?}");
+    }
+
+    #[test]
+    fn a_negation_in_one_grant_does_not_cancel_the_other_grants_ignore() {
+        for negation in ["!secret", "  !secret"] {
+            let writer = access(&["files.read", "files.write"], &["secret"]);
+            let reader = access(&["files.read"], &[negation]);
+
+            let merged = merge_both_ways(&writer, &reader);
+
+            assert!(hides(&merged, "/secret", false), "{negation:?}: {merged:?}");
+            assert!(
+                hides(&merged, "/secret/token.txt", false),
+                "{negation:?}: {merged:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_grant_without_file_permissions_does_not_lift_the_file_grants_ignores() {
+        let files = access(&["files.read", "files.write"], &["secret", "/config"]);
+        let control = access(&["control.start", "control.stop"], &[]);
+
+        let merged = merge_both_ways(&files, &control);
+
+        for (path, is_dir) in hidden_probes(&files) {
+            assert!(hides(&merged, path, is_dir), "{path}: {merged:?}");
+        }
+    }
+
+    #[test]
+    fn mixed_grants_with_disjoint_ignores_never_widen_access() {
+        merge_both_ways(
+            &access(&["files.read", "control.start"], &["*", "!keep"]),
+            &access(
+                &["files.read", "files.write"],
+                &["secret", "!secret/token.txt"],
+            ),
+        );
+        merge_both_ways(
+            &access(&["files.read"], &["/config"]),
+            &access(&["files.write"], &["secret"]),
+        );
     }
 
     // validate_labels

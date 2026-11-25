@@ -3,9 +3,6 @@ import { ModalProps, useModalsStack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { useShallow } from 'zustand/react/shallow';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import getPermissions from '@/api/getPermissions.ts';
 import createApiKey from '@/api/me/api-keys/createApiKey.ts';
 import updateApiKey from '@/api/me/api-keys/updateApiKey.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -23,10 +20,10 @@ import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { userApiKeySchema, userApiKeyUpdateSchema } from '@/lib/schemas/user/apiKeys.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 
 type Props = ModalProps & {
   contextApiKey?: z.infer<typeof userApiKeySchema>;
@@ -37,12 +34,7 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
   const { t } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const { availablePermissions, setAvailablePermissions } = useGlobalStore(
-    useShallow((state) => ({
-      availablePermissions: state.availablePermissions,
-      setAvailablePermissions: state.setAvailablePermissions,
-    })),
-  );
+  const { availablePermissions } = useAvailablePermissions();
   const { user } = useAuth();
   const stack = useModalsStack(['form', 'enableUnrestrictedAdmin']);
 
@@ -103,16 +95,6 @@ export default function ApiKeyCreateOrUpdateModal({ contextApiKey, onCreated, ..
       form.reset();
     }
   }, [props.opened]);
-
-  useEffect(() => {
-    getPermissions()
-      .then((res) => {
-        setAvailablePermissions(res);
-      })
-      .catch((err) => {
-        addToast(httpErrorToHuman(err), 'error');
-      });
-  }, []);
 
   return (
     <Modal.Stack>

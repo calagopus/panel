@@ -62,6 +62,19 @@
     "intro": "Du erhältst diese E-Mail, weil du als Unterbenutzer von <strong>{{ server.name }}</strong> entfernt wurdest.",
     "footer": "Du musst nichts weiter tun. Falls du glaubst, dass dies ein Fehler war, wende dich bitte an den Administrator des Servers."
   },
+  "invited_to_team": {
+    "subject": "Zu Team eingeladen",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil <strong>{{ team.owner.username }}</strong> dich in das Team <strong>{{ team.name }}</strong> eingeladen hat.",
+    "instruction": "Klicke auf die Schaltfläche unten, um die Einladung anzusehen. Zugriff auf die Server des Teams erhältst du erst, wenn du sie annimmst:",
+    "button": "Einladung ansehen"
+  },
+  "removed_from_team": {
+    "subject": "Aus Team entfernt",
+    "greeting": "Hallo,",
+    "intro": "Du erhältst diese E-Mail, weil du aus dem Team <strong>{{ team.name }}</strong> entfernt wurdest.",
+    "footer": "Du musst nichts weiter tun. Falls du glaubst, dass dies ein Fehler war, wende dich bitte an den Besitzer des Teams."
+  },
   "server_installed": {
     "subject": "Server installiert",
     "greeting": "Hallo,",

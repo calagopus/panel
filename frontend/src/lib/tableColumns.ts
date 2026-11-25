@@ -502,6 +502,32 @@ export const userTableColumns = (): string[] => {
   ];
 };
 
+export const teamTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('common.table.columns.owner', {}),
+    t('common.table.columns.servers', {}),
+    t('pages.account.teams.table.columns.members', {}),
+    t('common.table.columns.created', {}),
+  ];
+};
+
+export const dashboardTeamTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.name', {}),
+    t('common.table.columns.owner', {}),
+    t('pages.account.teams.table.columns.role', {}),
+    t('common.table.columns.servers', {}),
+    t('pages.account.teams.table.columns.members', {}),
+    t('common.table.columns.created', {}),
+    '',
+    '',
+  ];
+};
+
 export const eggRepositoryEggTableColumns = (): string[] => {
   const { t } = getTranslations();
   return [
@@ -548,6 +574,19 @@ export const adminUserOAuthLinkTableColumns = (): string[] => {
     t('common.table.columns.lastUsed', {}),
     t('common.table.columns.created', {}),
     '',
+  ];
+};
+
+export const adminUserTeamTableColumns = (): string[] => {
+  const { t } = getTranslations();
+  return [
+    t('common.table.columns.id', {}),
+    t('common.table.columns.name', {}),
+    t('common.table.columns.owner', {}),
+    t('pages.account.teams.table.columns.role', {}),
+    t('common.table.columns.servers', {}),
+    t('pages.account.teams.table.columns.members', {}),
+    t('common.table.columns.created', {}),
   ];
 };
 

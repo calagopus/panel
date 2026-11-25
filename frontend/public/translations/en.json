@@ -192,6 +192,22 @@
       "many": "{count} Subusers",
       "other": "{count} Subusers"
     },
+    "teamMember": {
+      "zero": "{count} Members",
+      "one": "{count} Member",
+      "two": "{count} Members",
+      "few": "{count} Members",
+      "many": "{count} Members",
+      "other": "{count} Members"
+    },
+    "teamPreset": {
+      "zero": "{count} Presets",
+      "one": "{count} Preset",
+      "two": "{count} Presets",
+      "few": "{count} Presets",
+      "many": "{count} Presets",
+      "other": "{count} Presets"
+    },
     "mount": {
       "zero": "{count} Mounts",
       "one": "{count} Mount",
@@ -643,6 +659,7 @@
           "command": "Command",
           "location": "Location",
           "node": "Node",
+          "egg": "Egg",
           "owner": "Owner",
           "added": "Added",
           "backupConfiguration": "Backup Configuration",
@@ -1644,6 +1661,7 @@
             "groupActions": "Group Actions",
             "noGroups": "No groups available to add server to",
             "noGroup": "This server is not in any group",
+            "team": "This server is part of the team {team}",
             "foreign": "This server is owned by another user, you have access to it as a subuser or administrator"
           },
           "tabs": {
@@ -2094,6 +2112,221 @@
               "content": "Are you sure you want to delete **{name}** from your account?",
               "toast": {
                 "removed": "SSH key removed."
+              }
+            }
+          }
+        },
+        "teams": {
+          "title": "Teams",
+          "subtitle": "Manage who can access groups of your servers in one place.",
+          "empty": {
+            "title": "No Teams",
+            "description": "A team gives a group of people access to several of your servers at once, each through a preset of permissions. Create one to manage that access in a single place.",
+            "descriptionReadOnly": "You have not been invited to any team."
+          },
+          "button": {
+            "createFirstTeam": "Create Team",
+            "accept": "Accept",
+            "decline": "Decline",
+            "leave": "Leave Team"
+          },
+          "badge": {
+            "owner": "Owner",
+            "invited": "Invited"
+          },
+          "table": {
+            "columns": {
+              "role": "Role",
+              "members": "Members",
+              "preset": "Preset",
+              "management": "Management",
+              "weight": "Weight",
+              "joined": "Joined"
+            }
+          },
+          "enum": {
+            "management": {
+              "members": "Members",
+              "presets": "Presets"
+            }
+          },
+          "toast": {
+            "inviteAccepted": "Team invite accepted.",
+            "inviteDeclined": "Team invite declined."
+          },
+          "modal": {
+            "createTeam": {
+              "title": "Create Team",
+              "toast": {
+                "created": "Team created."
+              }
+            },
+            "deleteTeam": {
+              "title": "Confirm Team Deletion",
+              "alert": {
+                "forceWarning": "Force deletion removes the team together with its members and presets. Every member loses access to its servers immediately."
+              },
+              "toast": {
+                "deleted": "Team deleted."
+              }
+            },
+            "leaveTeam": {
+              "title": "Confirm Leaving Team",
+              "content": "Are you sure you want to leave **{name}**? You will lose access to its servers.",
+              "toast": {
+                "left": "You left the team."
+              }
+            }
+          },
+          "tabs": {
+            "servers": {
+              "title": "Servers",
+              "empty": {
+                "title": "No Servers",
+                "description": "Members of this team cannot reach anything yet. Add one of your servers to give them access to it.",
+                "descriptionReadOnly": "This team has no servers yet."
+              },
+              "button": {
+                "attach": "Add Servers"
+              },
+              "modal": {
+                "attachServers": {
+                  "title": "Add Servers to Team",
+                  "form": {
+                    "serversDescription": "Every member of the team gets access to these servers through their preset.",
+                    "serversMoveDescription": "Selected servers that are part of another team will be moved out of it."
+                  }
+                },
+                "detachServers": {
+                  "title": "Confirm Server Removal",
+                  "content": "Are you sure you want to remove **{servers}** from this team? Its members will lose access to them."
+                },
+                "detachServer": {
+                  "title": "Confirm Server Removal",
+                  "content": "Are you sure you want to remove **{server}** from this team? Its members will lose access to it.",
+                  "toast": {
+                    "detached": "Server removed from team."
+                  }
+                }
+              }
+            },
+            "members": {
+              "title": "Members",
+              "subtitle": "{current} of {max} maximum members invited.",
+              "empty": {
+                "title": "No Members",
+                "description": "Nobody has been invited to this team. Invite someone to give them access to its servers through a preset."
+              },
+              "button": {
+                "invite": "Invite Member"
+              },
+              "tooltip": {
+                "limitReached": "This team is limited to {max} members."
+              },
+              "form": {
+                "management": "Management",
+                "managementDescription": "What the member may manage besides using the servers: members and presets ranked below their own preset. Leave empty for none.",
+                "preset": "Preset",
+                "presetDescription": "Decides what the member can do on every server of the team. Only presets you are allowed to hand out are listed."
+              },
+              "modal": {
+                "createMember": {
+                  "title": "Invite Member",
+                  "toast": {
+                    "invited": "Member invited."
+                  },
+                  "form": {
+                    "emailDescription": "They get access once they accept the invite."
+                  }
+                },
+                "updateMember": {
+                  "title": "Update {username}",
+                  "toast": {
+                    "updated": "Member updated."
+                  }
+                },
+                "removeMembers": {
+                  "title": "Confirm Member Removal",
+                  "content": "Are you sure you want to remove **{members}** from this team?",
+                  "alert": {
+                    "skipped": "{members} will be skipped. You can only remove members ranked below your own preset."
+                  }
+                },
+                "removeMember": {
+                  "title": "Confirm Member Removal",
+                  "content": "Are you sure you want to remove **{username}** from this team?",
+                  "toast": {
+                    "removed": "Member removed."
+                  }
+                }
+              }
+            },
+            "presets": {
+              "title": "Presets",
+              "resourceName": "Preset",
+              "subtitle": "A preset is the set of permissions a member holds on every server of the team.",
+              "empty": {
+                "title": "No Presets",
+                "description": "Members are invited with a preset, so create one first.",
+                "descriptionReadOnly": "This team has no presets yet."
+              },
+              "button": {
+                "createFirstPreset": "Create Preset"
+              },
+              "tooltip": {
+                "limitReached": "This team is limited to {max} presets."
+              },
+              "form": {
+                "weight": "Weight",
+                "weightDescription": "Ranks the preset. Members who manage the team can only act on members and presets with a lower weight than their own.",
+                "weightDescriptionLimited": "Ranks the preset. It has to stay below your own, so {max} at most.",
+                "ignoredFilesDescription": "Files and directories matching these patterns will be hidden from members with this preset. Uses gitignore-style glob patterns (e.g. `*.env`, `secrets/`)."
+              },
+              "modal": {
+                "createPreset": {
+                  "title": "Create Preset",
+                  "toast": {
+                    "created": "Preset created."
+                  }
+                },
+                "updatePreset": {
+                  "title": "Update Preset",
+                  "toast": {
+                    "updated": "Preset updated."
+                  }
+                },
+                "deletePresets": {
+                  "title": "Confirm Preset Deletion",
+                  "content": "Are you sure you want to delete **{presets}**? Presets that are still assigned to members cannot be deleted this way.",
+                  "alert": {
+                    "skipped": "{presets} will be skipped. You can only delete presets ranked below your own."
+                  }
+                },
+                "deletePreset": {
+                  "title": "Confirm Preset Deletion",
+                  "toast": {
+                    "deleted": "Preset deleted."
+                  },
+                  "form": {
+                    "replacement": "Replacement Preset",
+                    "replacementDescription": "Members holding the deleted preset are moved to this one. Required while the preset is still assigned."
+                  }
+                }
+              }
+            },
+            "activity": {
+              "title": "Activity"
+            },
+            "general": {
+              "toast": {
+                "updated": "Team updated."
+              },
+              "settings": {
+                "title": "Team Settings"
+              },
+              "membership": {
+                "title": "Your Membership",
+                "content": "This team is owned by **{owner}**. Your preset is **{preset}**, with management set to **{management}**."
               }
             }
           }
@@ -2925,10 +3158,15 @@
                   "maxSshKeyCount": "Max SSH Keys",
                   "maxSettingsCount": "Max Synced Settings",
                   "maxSettingsValueBytes": "Max Synced Setting Size (bytes)",
+                  "maxTeamCount": "Max Teams",
+                  "maxTeamMemberCount": "Max Team Members",
+                  "maxTeamPresetCount": "Max Team Presets",
                   "allowChangingLanguage": "Allow Changing Language",
                   "allowChangingLanguageDescription": "If enabled, users will be able to change their language preferences.",
                   "allowChangingAvatar": "Allow Changing Avatar",
-                  "allowChangingAvatarDescription": "If enabled, users will be able to upload and remove their avatar."
+                  "allowChangingAvatarDescription": "If enabled, users will be able to upload and remove their avatar.",
+                  "allowCreatingTeams": "Allow Creating Teams",
+                  "allowCreatingTeamsDescription": "If enabled, users who own a server will be able to create teams. Existing teams keep working either way."
                 },
                 "section": {
                   "limits": "Limits",
@@ -2949,16 +3187,20 @@
                 "form": {
                   "adminLogRetentionDays": "Admin Activity Retention Days",
                   "userLogRetentionDays": "User Activity Retention Days",
+                  "teamLogRetentionDays": "Team Activity Retention Days",
                   "serverLogRetentionDays": "Server Activity Retention Days",
                   "adminLogRetentionCount": "Admin Activity Retention Count",
                   "userLogRetentionCount": "User Activity Retention Count",
+                  "teamLogRetentionCount": "Team Activity Retention Count",
                   "serverLogRetentionCount": "Server Activity Retention Count",
                   "serverLogAdminActivity": "Log Server Admin Activity",
                   "serverLogAdminActivityDescription": "Enable or disable logging of admin activity on servers where the admin isn't an owner or subuser.",
                   "serverLogScheduleActivity": "Log Server Schedule Activity",
                   "serverLogScheduleActivityDescription": "Enable or disable logging of activity done by server schedules.",
                   "serverHideActivityIps": "Hide Server Activity IPs",
-                  "serverHideActivityIpsDescription": "Hide IP addresses in server activity logs, even from the server owner. Users always see the IP addresses of their own activity."
+                  "serverHideActivityIpsDescription": "Hide IP addresses in server activity logs, even from the server owner. Users always see the IP addresses of their own activity.",
+                  "teamHideActivityIps": "Hide Team Activity IPs",
+                  "teamHideActivityIpsDescription": "Hide IP addresses in team activity logs, even from the team owner. Team managers only ever see the IP addresses of their own activity."
                 },
                 "enum": {
                   "serverHideActivityIps": {
@@ -3311,6 +3553,12 @@
               "page": {
                 "title": "User Servers",
                 "showOwnedOnly": "Only show users' owned servers"
+              }
+            },
+            "teams": {
+              "title": "Teams",
+              "page": {
+                "title": "User Teams"
               }
             },
             "oauthLinks": {
@@ -5503,7 +5751,8 @@
                 "enum": {
                   "mappingType": {
                     "role": "Role",
-                    "serverSubuser": "Server Subuser"
+                    "serverSubuser": "Server Subuser",
+                    "teamMember": "Team Member"
                   },
                   "matcherType": {
                     "none": "None (Always applies)",
@@ -5548,9 +5797,10 @@
                   "startsWith": "Starts With",
                   "endsWith": "Ends With",
                   "revokeUnmatched": "Revoke when not matched",
-                  "revokeUnmatchedDescription": "Removes the assigned role or server subuser again when the matcher no longer matches on a later login.",
+                  "revokeUnmatchedDescription": "Removes the assigned role, server subuser or team membership again when the matcher no longer matches on a later login.",
                   "mappingType": "Mapping Type",
                   "role": "Role",
+                  "team": "Team",
                   "permissions": "Permissions"
                 },
                 "modal": {
@@ -6111,6 +6361,75 @@
               "title": "Users",
               "page": {
                 "title": "Role Users"
+              }
+            }
+          }
+        },
+        "teams": {
+          "title": "Teams",
+          "resourceName": "Team",
+          "tabs": {
+            "general": {
+              "page": {
+                "titleCreate": "Create Team",
+                "titleUpdate": "Update Team",
+                "form": {
+                  "owner": "Owner"
+                },
+                "modal": {
+                  "delete": {
+                    "title": "Confirm Team Deletion",
+                    "alert": {
+                      "forceWarning": "Force deletion removes the team together with its members and presets. Every member loses access to its servers immediately."
+                    }
+                  }
+                }
+              }
+            },
+            "presets": {
+              "title": "Presets",
+              "page": {
+                "title": "Team Presets"
+              }
+            },
+            "members": {
+              "title": "Members",
+              "page": {
+                "title": "Team Members",
+                "toast": {
+                  "created": "Team member added."
+                },
+                "form": {
+                  "user": "User"
+                },
+                "modal": {
+                  "create": {
+                    "title": "Add Team Member"
+                  }
+                }
+              }
+            },
+            "servers": {
+              "title": "Servers",
+              "page": {
+                "title": "Team Servers",
+                "toast": {
+                  "attached": "Server added to team."
+                },
+                "modal": {
+                  "attach": {
+                    "title": "Add Team Server",
+                    "form": {
+                      "serverDescription": "Every member of the team gets access to this server through their preset. A server that is part of another team is moved out of it."
+                    }
+                  }
+                }
+              }
+            },
+            "activity": {
+              "title": "Activity",
+              "page": {
+                "title": "Team Activity"
               }
             }
           }
@@ -8207,6 +8526,10 @@
           },
           "tooltip": {
             "limitReached": "This server is limited to {max} subusers."
+          },
+          "team": {
+            "title": "Team Members",
+            "subtitle": "These users reach this server through its team. A subuser entry of their own replaces what the team grants them here."
           },
           "table": {
             "columns": {

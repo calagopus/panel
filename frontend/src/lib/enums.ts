@@ -97,6 +97,7 @@ import { serverBackupStatus, serverPowerAction, serverPowerState } from '@/lib/s
 import { publicSettingsCaptchaProviderSchema } from '@/lib/schemas/settings.ts';
 import { UserCommandSnippetMatcher } from '@/lib/schemas/user/commandSnippets.ts';
 import { userSshKeyProvider } from '@/lib/schemas/user/sshKeys.ts';
+import { userTeamMemberManagement } from '@/lib/schemas/user/teams.ts';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 import { adminDatabaseCredentialsSchema } from './schemas/admin/databaseHosts.ts';
 import { adminEggRepositoryCredentialsSchema } from './schemas/admin/eggRepositories.ts';
@@ -412,6 +413,11 @@ export function commandSnippetMatcherSummary(matcher: UserCommandSnippetMatcher)
       return label;
   }
 }
+
+export const teamMemberManagementLabelMapping: Record<z.infer<typeof userTeamMemberManagement>, () => string> = {
+  members: () => getTranslations().t('pages.account.teams.enum.management.members', {}),
+  presets: () => getTranslations().t('pages.account.teams.enum.management.presets', {}),
+};
 
 export const oauthProviderMappingMatcherLabelMapping: Record<AdminOAuthProviderMappingMatcher['type'], () => string> = {
   none: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.none', {}),

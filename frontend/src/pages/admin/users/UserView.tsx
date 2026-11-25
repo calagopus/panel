@@ -1,4 +1,4 @@
-import { faBriefcase, faCog, faComputer, faFingerprint } from '@fortawesome/free-solid-svg-icons';
+import { faBriefcase, faCog, faComputer, faFingerprint, faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router';
 import getUser from '@/api/admin/users/getUser.ts';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -11,6 +11,7 @@ import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminUserActivity from './activity/AdminUserActivity.tsx';
 import AdminUserOAuthLinks from './oauthLinks/AdminUserOAuthLinks.tsx';
+import AdminUserTeams from './teams/AdminUserTeams.tsx';
 
 export default function UserView() {
   const params = useParams<'id'>();
@@ -45,6 +46,13 @@ export default function UserView() {
                 path: `/servers`,
                 element: <AdminUserServers user={user} />,
                 permission: 'servers.read',
+              },
+              {
+                name: t('pages.admin.users.tabs.teams.title', {}),
+                icon: faPeopleGroup,
+                path: `/teams`,
+                element: <AdminUserTeams user={user} />,
+                permission: 'teams.read',
               },
               {
                 name: t('pages.admin.users.tabs.oauthLinks.title', {}),

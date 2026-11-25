@@ -2,6 +2,7 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _subuser_;
+mod team;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -260,6 +261,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
         .routes(routes!(post::route))
+        .nest("/team", team::router(state))
         .nest("/{subuser}", _subuser_::router(state))
         .with_state(state.clone())
 }

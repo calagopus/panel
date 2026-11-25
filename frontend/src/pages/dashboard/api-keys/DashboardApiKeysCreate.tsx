@@ -4,7 +4,6 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { httpErrorToHuman } from '@/api/axios.ts';
-import getPermissions from '@/api/getPermissions.ts';
 import createApiKey from '@/api/me/api-keys/createApiKey.ts';
 import getApiKeys from '@/api/me/api-keys/getApiKeys.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -27,6 +26,7 @@ import {
 } from '@/pages/dashboard/api-keys/redirectParams.ts';
 import RequestedPermissions from '@/pages/dashboard/api-keys/RequestedPermissions.tsx';
 import { liveValidation } from '@/plugins/form/liveValidation.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useAuth } from '@/providers/AuthProvider.tsx';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,15 +36,17 @@ export default function DashboardApiKeysCreate() {
   const { t } = useTranslations();
   const { addToast } = useToast();
   const { user } = useAuth();
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
-  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const {
+    availablePermissions,
+    loading: permissionsFetching,
+    initialLoading: permissionsLoading,
+    error: permissionsError,
+    refetch: refetchPermissions,
+  } = useAvailablePermissions();
   const maxApiKeyCount = useGlobalStore((state) => state.settings.user.maxApiKeyCount);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [permissionsLoaded, setPermissionsLoaded] = useState(false);
-  const [permissionsError, setPermissionsError] = useState<string | null>(null);
-  const [retrying, setRetrying] = useState(false);
   const [apiKeyCount, setApiKeyCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
@@ -57,24 +59,7 @@ export default function DashboardApiKeysCreate() {
     validate: zod4Resolver(userApiKeySchema.pick({ name: true })),
   });
 
-  const loadPermissions = () => {
-    setRetrying(true);
-
-    getPermissions()
-      .then((res) => {
-        setAvailablePermissions(res);
-        setPermissionsError(null);
-        setPermissionsLoaded(true);
-      })
-      .catch((err) => {
-        setPermissionsError(httpErrorToHuman(err));
-      })
-      .finally(() => setRetrying(false));
-  };
-
   useEffect(() => {
-    loadPermissions();
-
     getApiKeys(1, undefined, 1)
       .then((keys) => setApiKeyCount(keys.total))
       .catch(() => setApiKeyCount(null));
@@ -90,8 +75,8 @@ export default function DashboardApiKeysCreate() {
   );
 
   const droppedPermissions = useMemo(
-    () => (permissionsLoaded ? getDroppedPermissions(searchParams, requestedPermissions) : []),
-    [permissionsLoaded, searchParams, requestedPermissions],
+    () => getDroppedPermissions(searchParams, requestedPermissions),
+    [searchParams, requestedPermissions],
   );
 
   const doCreate = () => {
@@ -126,9 +111,13 @@ export default function DashboardApiKeysCreate() {
       title={t('pages.account.apiKeys.create.title', {})}
       subtitle={t('pages.account.apiKeys.create.subtitle', {})}
     >
-      {permissionsError && !permissionsLoaded ? (
-        <ErrorState error={permissionsError} onRetry={loadPermissions} retrying={retrying} />
-      ) : !permissionsLoaded ? (
+      {permissionsError ? (
+        <ErrorState
+          error={httpErrorToHuman(permissionsError)}
+          onRetry={refetchPermissions}
+          retrying={permissionsFetching}
+        />
+      ) : permissionsLoading ? (
         <Spinner.Centered />
       ) : createdKey ? (
         <Card>

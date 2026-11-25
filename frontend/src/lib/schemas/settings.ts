@@ -92,9 +92,13 @@ export const publicSettingsSchema = z.object({
     maxCommandSnippetCount: z.number(),
     maxSecurityKeyCount: z.number(),
     maxSshKeyCount: z.number(),
+    maxTeamCount: z.number(),
+    maxTeamMemberCount: z.number(),
+    maxTeamPresetCount: z.number(),
 
     allowChangingLanguage: z.boolean(),
     allowChangingAvatar: z.boolean(),
+    allowCreatingTeams: z.boolean(),
 
     routeOrder: z.array(eggConfigurationRouteItemSchema).nullable(),
   }),

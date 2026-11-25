@@ -93,6 +93,7 @@ export const systemBackupPolicyRunTargetReasonEnum = pgEnum('system_backup_polic
 export const serverDatabaseInstanceStatusEnum = pgEnum('server_database_instance_status', ['RESTORING_BACKUP']);
 export const announcementTypeEnum = pgEnum('announcement_type', ['INFO', 'SUCCESS', 'WARNING', 'ERROR']);
 export const tunnelProtocolEnum = pgEnum('tunnel_protocol', ['TCP', 'UDP']);
+export const teamMemberManagementEnum = pgEnum('team_member_management', ['MEMBERS', 'PRESETS']);
 
 // Tables
 export const settingsTable = pgTable('settings', {
@@ -511,6 +512,97 @@ export const rolesTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [uniqueIndex('roles_name_idx').on(cols.name)],
+);
+
+export const teamsTable = pgTable(
+  'teams',
+  {
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    owner_uuid: uuid()
+      .references(() => usersTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    description: text(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('teams_owner_uuid_idx').on(cols.owner_uuid),
+    uniqueIndex('teams_uuid_owner_uuid_idx').on(cols.uuid, cols.owner_uuid),
+  ],
+);
+
+export const teamPresetsTable = pgTable(
+  'team_presets',
+  {
+    uuid: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    team_uuid: uuid()
+      .references(() => teamsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    name: varchar({ length: 255 * UTF8_MAX_SCALAR_SIZE }).notNull(),
+    description: text(),
+    weight: integer().default(0).notNull(),
+    permissions: varchar({ length: 64 }).array().notNull(),
+    ignored_files: text().array().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('team_presets_team_uuid_idx').on(cols.team_uuid),
+    uniqueIndex('team_presets_team_uuid_name_idx').on(cols.team_uuid, cols.name),
+  ],
+);
+
+export const teamMembersTable = pgTable(
+  'team_members',
+  {
+    team_uuid: uuid()
+      .references(() => teamsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    user_uuid: uuid()
+      .references(() => usersTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    preset_uuid: uuid()
+      .references(() => teamPresetsTable.uuid)
+      .notNull(),
+    management: teamMemberManagementEnum().array().default([]).notNull(),
+    inviter_uuid: uuid().references(() => usersTable.uuid, { onDelete: 'set null' }),
+    accepted: timestamp(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    primaryKey({ name: 'team_members_pk', columns: [cols.team_uuid, cols.user_uuid] }),
+    index('team_members_team_uuid_idx').on(cols.team_uuid),
+    index('team_members_user_uuid_idx').on(cols.user_uuid),
+    index('team_members_preset_uuid_idx').on(cols.preset_uuid),
+  ],
+);
+
+export const teamActivitiesTable = pgTable(
+  'team_activities',
+  {
+    team_uuid: uuid()
+      .references(() => teamsTable.uuid, { onDelete: 'cascade' })
+      .notNull(),
+    user_uuid: uuid().references(() => usersTable.uuid, { onDelete: 'set null' }),
+    impersonator_uuid: uuid().references(() => usersTable.uuid, { onDelete: 'set null' }),
+    api_key_uuid: uuid().references(() => userApiKeysTable.uuid, { onDelete: 'set null' }),
+    event: varchar({ length: 255 }).notNull(),
+    ip: inet(),
+    data: jsonb().notNull(),
+    created: timestamp().defaultNow().notNull(),
+  },
+  (cols) => [
+    index('team_activities_team_uuid_created_idx').on(cols.team_uuid, cols.created),
+    index('team_activities_impersonator_uuid_idx').on(cols.impersonator_uuid),
+    index('team_activities_api_key_uuid_idx').on(cols.api_key_uuid),
+    index('team_activities_created_idx').on(cols.created),
+    index('team_activities_user_uuid_created_idx').on(cols.user_uuid, cols.created),
+  ],
 );
 
 export const oauthProvidersTable = pgTable(
@@ -1295,6 +1387,7 @@ export const serversTable = pgTable(
     owner_uuid: uuid()
       .references(() => usersTable.uuid)
       .notNull(),
+    team_uuid: uuid().references(() => teamsTable.uuid, { onDelete: 'set null' }),
     egg_uuid: uuid()
       .references(() => nestEggsTable.uuid)
       .notNull(),
@@ -1328,11 +1421,16 @@ export const serversTable = pgTable(
     created: timestamp().defaultNow().notNull(),
   },
   (cols) => [
+    foreignKey({
+      columns: [cols.team_uuid, cols.owner_uuid],
+      foreignColumns: [teamsTable.uuid, teamsTable.owner_uuid],
+    }),
     index('servers_external_id_idx').on(cols.external_id),
     index('servers_allocation_uuid_idx').on(cols.allocation_uuid),
     index('servers_node_uuid_idx').on(cols.node_uuid),
     index('servers_destination_node_uuid_idx').on(cols.destination_node_uuid),
     index('servers_owner_uuid_idx').on(cols.owner_uuid),
+    index('servers_team_uuid_idx').on(cols.team_uuid),
     index('servers_egg_uuid_idx').on(cols.egg_uuid),
     index('servers_backup_configuration_uuid_idx').on(cols.backup_configuration_uuid),
     uniqueIndex('servers_uuid_short_idx').on(cols.uuid_short),

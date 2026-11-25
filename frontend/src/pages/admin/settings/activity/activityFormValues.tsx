@@ -10,11 +10,14 @@ export const activityEmptyFormValues: ActivityFormValues = {
   adminLogRetentionCount: null,
   userLogRetentionDays: 1,
   userLogRetentionCount: null,
+  teamLogRetentionDays: 1,
+  teamLogRetentionCount: null,
   serverLogRetentionDays: 1,
   serverLogRetentionCount: null,
   serverLogAdminActivity: false,
   serverLogScheduleActivity: false,
   serverHideActivityIps: 'none',
+  teamHideActivityIps: 'none',
 };
 
 export const activityToFormValues = (activity: ActivityFormValues): Partial<ActivityFormValues> => ({ ...activity });
@@ -47,6 +50,17 @@ export function useActivityFormFields(): FieldDef<ActivityFormValues>[] {
     },
     {
       type: 'number',
+      name: 'teamLogRetentionDays',
+      label: t('pages.admin.settings.tabs.activity.page.form.teamLogRetentionDays', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'teamLogRetentionCount',
+      label: t('pages.admin.settings.tabs.activity.page.form.teamLogRetentionCount', {}),
+    },
+    {
+      type: 'number',
       name: 'serverLogRetentionDays',
       label: t('pages.admin.settings.tabs.activity.page.form.serverLogRetentionDays', {}),
       required: true,
@@ -73,6 +87,21 @@ export function useActivityFormFields(): FieldDef<ActivityFormValues>[] {
       name: 'serverHideActivityIps',
       label: t('pages.admin.settings.tabs.activity.page.form.serverHideActivityIps', {}),
       description: t('pages.admin.settings.tabs.activity.page.form.serverHideActivityIpsDescription', {}),
+      required: true,
+      options: [
+        { label: t('pages.admin.settings.tabs.activity.page.enum.serverHideActivityIps.admins', {}), value: 'admins' },
+        {
+          label: t('pages.admin.settings.tabs.activity.page.enum.serverHideActivityIps.allUsers', {}),
+          value: 'all_users',
+        },
+        { label: t('pages.admin.settings.tabs.activity.page.enum.serverHideActivityIps.none', {}), value: 'none' },
+      ],
+    },
+    {
+      type: 'select',
+      name: 'teamHideActivityIps',
+      label: t('pages.admin.settings.tabs.activity.page.form.teamHideActivityIps', {}),
+      description: t('pages.admin.settings.tabs.activity.page.form.teamHideActivityIpsDescription', {}),
       required: true,
       options: [
         { label: t('pages.admin.settings.tabs.activity.page.enum.serverHideActivityIps.admins', {}), value: 'admins' },

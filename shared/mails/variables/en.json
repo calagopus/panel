@@ -62,6 +62,19 @@
     "intro": "You are receiving this email because you have been removed as a subuser from <strong>{{ server.name }}</strong>.",
     "footer": "There is no action required on your side. If you believe this was a mistake, please contact the server's administrator for more information."
   },
+  "invited_to_team": {
+    "subject": "Invited to Team",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because <strong>{{ team.owner.username }}</strong> invited you to the team <strong>{{ team.name }}</strong>.",
+    "instruction": "Click the button below to review the invite. You only get access to the team's servers once you accept it:",
+    "button": "View Invite"
+  },
+  "removed_from_team": {
+    "subject": "Removed from Team",
+    "greeting": "Hello,",
+    "intro": "You are receiving this email because you have been removed from the team <strong>{{ team.name }}</strong>.",
+    "footer": "There is no action required on your side. If you believe this was a mistake, please contact the team's owner for more information."
+  },
   "server_installed": {
     "subject": "Server Installed",
     "greeting": "Hello,",

@@ -1,0 +1,16 @@
+import { z } from 'zod';
+import { axiosInstance } from '@/api/axios.ts';
+import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { parsePaginationFromApi } from '@/lib/serialization/api-transform.ts';
+
+export default async (
+  teamUuid: string,
+  page: number,
+  search?: string,
+  perPage?: number,
+): Promise<Pagination<z.infer<typeof adminServerSchema>>> => {
+  const { data } = await axiosInstance.get(`/api/admin/teams/${teamUuid}/servers`, {
+    params: { page, per_page: perPage, search },
+  });
+  return parsePaginationFromApi(adminServerSchema, data.servers);
+};

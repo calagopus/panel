@@ -95,8 +95,12 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
     maxSshKeyCount: 50,
     maxSettingsCount: 512,
     maxSettingsValueBytes: 16384,
+    maxTeamCount: 10,
+    maxTeamMemberCount: 50,
+    maxTeamPresetCount: 25,
     allowChangingLanguage: true,
     allowChangingAvatar: true,
+    allowCreatingTeams: true,
     routeOrder: null,
   },
   webauthn: {
@@ -110,13 +114,16 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
   activity: {
     adminLogRetentionDays: 180,
     adminLogRetentionCount: null,
-    userLogRetentionDays: 90,
+    userLogRetentionDays: 180,
     userLogRetentionCount: null,
+    teamLogRetentionDays: 180,
+    teamLogRetentionCount: null,
     serverLogRetentionDays: 90,
     serverLogRetentionCount: null,
     serverLogAdminActivity: true,
     serverLogScheduleActivity: true,
     serverHideActivityIps: 'none',
+    teamHideActivityIps: 'none',
   },
   ratelimits: {
     authRegister: {
@@ -172,6 +179,10 @@ export const createSettingsSlice: StateCreator<AdminStore, [], [], SettingsSlice
       windowSeconds: 0,
     },
     clientServersSubusersCreate: {
+      hits: 0,
+      windowSeconds: 0,
+    },
+    clientTeamsMembersCreate: {
       hits: 0,
       windowSeconds: 0,
     },

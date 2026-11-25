@@ -99,10 +99,21 @@ export default function OAuthProviderMappingRow({
             <TableData>{mapping.name ?? t('common.na', {})}</TableData>
 
             <TableData>
-              <Badge className='w-max!' color={mapping.mapping.type === 'role' ? 'blue' : 'grape'}>
+              <Badge
+                className='w-max!'
+                color={
+                  mapping.mapping.type === 'role'
+                    ? 'blue'
+                    : mapping.mapping.type === 'server_subuser'
+                      ? 'grape'
+                      : 'teal'
+                }
+              >
                 {mapping.mapping.type === 'role'
                   ? t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.role', {})
-                  : t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {})}
+                  : mapping.mapping.type === 'server_subuser'
+                    ? t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {})
+                    : t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.teamMember', {})}
               </Badge>
             </TableData>
 
@@ -111,9 +122,13 @@ export default function OAuthProviderMappingRow({
                 <TableLink to={`/admin/roles/${mapping.mapping.roleUuid}`}>
                   <Code>{mapping.mapping.roleUuid}</Code>
                 </TableLink>
-              ) : (
+              ) : mapping.mapping.type === 'server_subuser' ? (
                 <TableLink to={`/admin/servers/${mapping.mapping.serverUuid}`}>
                   <Code>{mapping.mapping.serverUuid}</Code>
+                </TableLink>
+              ) : (
+                <TableLink to={`/admin/teams/${mapping.mapping.teamUuid}`}>
+                  <Code>{mapping.mapping.teamUuid}</Code>
                 </TableLink>
               )}
             </TableData>

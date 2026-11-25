@@ -122,6 +122,28 @@ pub(crate) static BASE_USER_PERMISSIONS: LazyLock<IndexMap<&'static str, Permiss
                 },
             ),
             (
+                "teams",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage teams the account owns or is a member of. What can be changed inside a team still depends on the preset and management held in it.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new teams."),
+                        (
+                            "read",
+                            "Allows viewing teams, their presets, members, servers and activity.",
+                        ),
+                        (
+                            "update",
+                            "Allows modifying teams, their presets, members and servers.",
+                        ),
+                        ("delete", "Allows deleting teams."),
+                        (
+                            "membership",
+                            "Allows accepting or declining team invites and leaving teams.",
+                        ),
+                    ]),
+                },
+            ),
+            (
                 "api-keys",
                 PermissionGroup {
                     description: "Permissions that control the ability to manage API keys on an account. API keys can never edit themselves or assign permissions they do not have.",
@@ -334,6 +356,22 @@ pub(crate) static BASE_ADMIN_PERMISSIONS: LazyLock<IndexMap<&'static str, Permis
                         ("read", "Allows viewing roles."),
                         ("update", "Allows modifying roles."),
                         ("delete", "Allows deleting roles."),
+                    ]),
+                },
+            ),
+            (
+                "teams",
+                PermissionGroup {
+                    description: "Permissions that control the ability to manage the teams of users for the panel.",
+                    permissions: IndexMap::from([
+                        ("create", "Allows creating new teams."),
+                        ("read", "Allows viewing teams and their presets."),
+                        (
+                            "update",
+                            "Allows modifying teams, adding and removing their members and attaching and detaching their servers.",
+                        ),
+                        ("delete", "Allows deleting teams."),
+                        ("activity", "Allows viewing a team's activity log."),
                     ]),
                 },
             ),

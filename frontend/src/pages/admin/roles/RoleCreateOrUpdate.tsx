@@ -1,12 +1,10 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import createRole from '@/api/admin/roles/createRole.ts';
 import deleteRole from '@/api/admin/roles/deleteRole.ts';
 import duplicateRole from '@/api/admin/roles/duplicateRole.ts';
 import updateRole from '@/api/admin/roles/updateRole.ts';
-import { httpErrorToHuman } from '@/api/axios.ts';
-import getPermissions from '@/api/getPermissions.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import { AdminCan } from '@/elements/Can.tsx';
 import AdminContentContainer from '@/elements/containers/AdminContentContainer.tsx';
@@ -22,7 +20,7 @@ import { adminRoleUpdateSchema } from '@/lib/schemas/admin/roles.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
 import { useHydrateForm } from '@/plugins/form/useHydrateForm.ts';
 import { useResourceForm } from '@/plugins/resource/useResourceForm.ts';
-import { useToast } from '@/providers/ToastProvider.tsx';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 import { roleEmptyFormValues, roleToFormValues, useRoleFormFields } from './roleFormValues.tsx';
@@ -31,13 +29,12 @@ type RoleFormValues = z.infer<typeof adminRoleUpdateSchema>;
 
 export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.infer<typeof roleSchema> }) {
   const { t } = useTranslations();
-  const { addToast } = useToast();
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
-  const setAvailablePermissions = useGlobalStore((state) => state.setAvailablePermissions);
+  const { availablePermissions, initialLoading: permissionsLoading } = useAvailablePermissions({
+    silent: false,
+  });
   const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
-  const [permissionsLoading, setPermissionsLoading] = useState(true);
 
   const form = useFormEngine<RoleFormValues>('admin.roles.createOrUpdate', {
     schema: adminRoleUpdateSchema.unwrap(),
@@ -55,13 +52,6 @@ export default function RoleCreateOrUpdate({ contextRole }: { contextRole?: z.in
   });
 
   useHydrateForm(form, contextRole, roleToFormValues);
-
-  useEffect(() => {
-    getPermissions()
-      .then(setAvailablePermissions)
-      .catch((err) => addToast(httpErrorToHuman(err), 'error'))
-      .finally(() => setPermissionsLoading(false));
-  }, []);
 
   const twoFactorUnsatisfiable = !hasAvailableTwoFactorMethod(settings.app.twoFactorAcceptedMethods, {
     webauthnEnabled: settings.webauthn.enabled,

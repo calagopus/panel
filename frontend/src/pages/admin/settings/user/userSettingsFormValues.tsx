@@ -13,8 +13,12 @@ export const userSettingsEmptyFormValues: UserSettingsFormValues = {
   maxSshKeyCount: 0,
   maxSettingsCount: 0,
   maxSettingsValueBytes: 0,
+  maxTeamCount: 0,
+  maxTeamMemberCount: 0,
+  maxTeamPresetCount: 0,
   allowChangingLanguage: true,
   allowChangingAvatar: true,
+  allowCreatingTeams: true,
   routeOrder: null,
 };
 
@@ -74,6 +78,24 @@ export function useUserSettingsFormFields(): FieldDef<UserSettingsFormValues>[] 
       required: true,
     },
     {
+      type: 'number',
+      name: 'maxTeamCount',
+      label: t('pages.admin.settings.tabs.user.page.form.maxTeamCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxTeamMemberCount',
+      label: t('pages.admin.settings.tabs.user.page.form.maxTeamMemberCount', {}),
+      required: true,
+    },
+    {
+      type: 'number',
+      name: 'maxTeamPresetCount',
+      label: t('pages.admin.settings.tabs.user.page.form.maxTeamPresetCount', {}),
+      required: true,
+    },
+    {
       type: 'divider',
       name: 'permissionsDivider',
       label: t('pages.admin.settings.tabs.user.page.section.permissions', {}),
@@ -89,6 +111,12 @@ export function useUserSettingsFormFields(): FieldDef<UserSettingsFormValues>[] 
       name: 'allowChangingAvatar',
       label: t('pages.admin.settings.tabs.user.page.form.allowChangingAvatar', {}),
       description: t('pages.admin.settings.tabs.user.page.form.allowChangingAvatarDescription', {}),
+    },
+    {
+      type: 'switch',
+      name: 'allowCreatingTeams',
+      label: t('pages.admin.settings.tabs.user.page.form.allowCreatingTeams', {}),
+      description: t('pages.admin.settings.tabs.user.page.form.allowCreatingTeamsDescription', {}),
     },
   ];
 }

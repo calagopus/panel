@@ -62,9 +62,13 @@ mod get {
         max_command_snippet_count: u64,
         max_security_key_count: u64,
         max_ssh_key_count: u64,
+        max_team_count: u64,
+        max_team_member_count: u64,
+        max_team_preset_count: u64,
 
         allow_changing_language: bool,
         allow_changing_avatar: bool,
+        allow_creating_teams: bool,
 
         route_order: Option<&'a [shared::settings::RouteOrderItem]>,
     }
@@ -152,9 +156,13 @@ mod get {
                 max_command_snippet_count: settings.user.max_command_snippet_count,
                 max_security_key_count: settings.user.max_security_key_count,
                 max_ssh_key_count: settings.user.max_ssh_key_count,
+                max_team_count: settings.user.max_team_count,
+                max_team_member_count: settings.user.max_team_member_count,
+                max_team_preset_count: settings.user.max_team_preset_count,
 
                 allow_changing_language: settings.user.allow_changing_language,
                 allow_changing_avatar: settings.user.allow_changing_avatar,
+                allow_creating_teams: settings.user.allow_creating_teams,
 
                 route_order: settings.user.route_order.as_deref(),
             },

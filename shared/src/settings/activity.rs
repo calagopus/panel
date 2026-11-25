@@ -20,12 +20,15 @@ pub struct AppSettingsActivity {
     pub admin_log_retention_count: Option<u64>,
     pub user_log_retention_days: u16,
     pub user_log_retention_count: Option<u64>,
+    pub team_log_retention_days: u16,
+    pub team_log_retention_count: Option<u64>,
     pub server_log_retention_days: u16,
     pub server_log_retention_count: Option<u64>,
 
     pub server_log_admin_activity: bool,
     pub server_log_schedule_activity: bool,
     pub server_hide_activity_ips: ActivityIpHiding,
+    pub team_hide_activity_ips: ActivityIpHiding,
 }
 
 #[async_trait::async_trait]
@@ -54,6 +57,15 @@ impl SettingsSerializeExt for AppSettingsActivity {
                     .map_or("".into(), |c| c.to_compact_string()),
             )
             .write_raw_setting(
+                "team_log_retention_days",
+                self.team_log_retention_days.to_compact_string(),
+            )
+            .write_raw_setting(
+                "team_log_retention_count",
+                self.team_log_retention_count
+                    .map_or("".into(), |c| c.to_compact_string()),
+            )
+            .write_raw_setting(
                 "server_log_retention_days",
                 self.server_log_retention_days.to_compact_string(),
             )
@@ -73,6 +85,14 @@ impl SettingsSerializeExt for AppSettingsActivity {
             .write_raw_setting(
                 "server_hide_activity_ips",
                 match self.server_hide_activity_ips {
+                    ActivityIpHiding::Admins => "admins",
+                    ActivityIpHiding::AllUsers => "all_users",
+                    ActivityIpHiding::None => "none",
+                },
+            )
+            .write_raw_setting(
+                "team_hide_activity_ips",
+                match self.team_hide_activity_ips {
                     ActivityIpHiding::Admins => "admins",
                     ActivityIpHiding::AllUsers => "all_users",
                     ActivityIpHiding::None => "none",
@@ -104,6 +124,13 @@ impl SettingsDeserializeExt for AppSettingsActivityDeserializer {
             user_log_retention_count: deserializer
                 .take_raw_setting("user_log_retention_count")
                 .and_then(|s| s.parse().ok()),
+            team_log_retention_days: deserializer
+                .take_raw_setting("team_log_retention_days")
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(180),
+            team_log_retention_count: deserializer
+                .take_raw_setting("team_log_retention_count")
+                .and_then(|s| s.parse().ok()),
             server_log_retention_days: deserializer
                 .take_raw_setting("server_log_retention_days")
                 .and_then(|s| s.parse().ok())
@@ -121,6 +148,14 @@ impl SettingsDeserializeExt for AppSettingsActivityDeserializer {
                 .unwrap_or(true),
             server_hide_activity_ips: match deserializer
                 .take_raw_setting("server_hide_activity_ips")
+                .as_deref()
+            {
+                Some("admins") => ActivityIpHiding::Admins,
+                Some("all_users") => ActivityIpHiding::AllUsers,
+                _ => ActivityIpHiding::None,
+            },
+            team_hide_activity_ips: match deserializer
+                .take_raw_setting("team_hide_activity_ips")
                 .as_deref()
             {
                 Some("admins") => ActivityIpHiding::Admins,

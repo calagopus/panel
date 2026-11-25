@@ -33,7 +33,7 @@ export function useBulkAction() {
     if (items.length === 0) {
       addToast(t('common.bulkActions.nothingToDo', {}), 'info');
       onFinished?.();
-      return;
+      return { successful: 0, failed: 0 };
     }
 
     setLoading(action);
@@ -72,6 +72,8 @@ export function useBulkAction() {
     }
 
     onFinished?.();
+
+    return { successful, failed };
   };
 
   const runRequest = async ({ action, itemKey, verb, request, onFinished }: RunRequestOptions) => {

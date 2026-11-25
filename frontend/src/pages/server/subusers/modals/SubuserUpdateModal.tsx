@@ -14,9 +14,9 @@ import { appendInheritedIgnoredFiles, stripInheritedIgnoredFiles } from '@/lib/d
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverSubuserSchema, serverSubuserUpdateSchema } from '@/lib/schemas/server/subusers.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import { useServerStore } from '@/stores/server.ts';
 
 type Props = ModalProps & {
@@ -28,7 +28,7 @@ export default function SubuserUpdateModal({ subuser, ...props }: Props) {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const server = useServerStore((state) => state.server);
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const { availablePermissions } = useAvailablePermissions();
 
   const grantablePermissions = server.permissions.includes('*') ? undefined : server.permissions;
 

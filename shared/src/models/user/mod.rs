@@ -4,7 +4,9 @@ use crate::{
     prelude::*,
     storage::StorageUrlRetriever,
 };
+use axum::http::StatusCode;
 use garde::Validate;
+use rand::distr::SampleString;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
@@ -419,6 +421,85 @@ impl User {
         .await?;
 
         row.try_map(|row| Self::map(None, &row))
+    }
+
+    /// The account behind an invited email address, created on the spot when there is none yet
+    /// and password login lets it be claimed.
+    pub async fn by_email_or_create_invited(
+        state: &crate::State,
+        email: &str,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(Self, bool), crate::database::DatabaseError> {
+        let mut user_created = false;
+        let user = match Self::by_email(&state.database, email).await? {
+            Some(user) => user,
+            None => {
+                if !state
+                    .settings
+                    .get_as(|s| s.app.password_login_enabled)
+                    .await?
+                {
+                    let message = if super::oauth_provider::OAuthProvider::exists_registrable(
+                        &state.database,
+                    )
+                    .await?
+                    {
+                        "user not found, they must sign in before being added"
+                    } else {
+                        "user not found, an administrator must create their account"
+                    };
+
+                    return Err(anyhow::Error::new(
+                        crate::response::DisplayError::new(message)
+                            .with_status(StatusCode::NOT_FOUND),
+                    )
+                    .into());
+                }
+
+                let username = email
+                    .split('@')
+                    .next()
+                    .unwrap_or("unknown")
+                    .chars()
+                    .filter(|c| c.is_alphanumeric() || *c == '_')
+                    .take(10)
+                    .collect::<compact_str::CompactString>();
+                let username = compact_str::format_compact!(
+                    "{username}_{}",
+                    rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 4)
+                );
+
+                let language = state.settings.get_as(|s| s.app.language.clone()).await?;
+
+                let create_options = CreateUserOptions {
+                    role_uuid: None,
+                    external_id: None,
+                    username: username.clone(),
+                    email: email.into(),
+                    name_first: None,
+                    name_last: None,
+                    password: None,
+                    admin: false,
+                    frozen: false,
+                    suspended: false,
+                    verify_email: false,
+                    send_email: false,
+                    language,
+                };
+                match Self::create_with_transaction(state, create_options, transaction).await {
+                    Ok(user) => {
+                        user_created = true;
+                        user
+                    }
+                    Err(err) => {
+                        tracing::error!(username = %username, email = %email, "failed to create invited user: {:?}", err);
+                        return Err(err);
+                    }
+                }
+            }
+        };
+
+        Ok((user, user_created))
     }
 
     pub async fn by_email_password(

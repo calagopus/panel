@@ -16,6 +16,7 @@ import {
   faFolderOpen,
   faFolderTree,
   faMicrochip,
+  faPeopleGroup,
   faPuzzlePiece,
   faScroll,
   faServer,
@@ -47,6 +48,7 @@ import AdminRoles from '@/pages/admin/roles/AdminRoles.tsx';
 import AdminServers from '@/pages/admin/servers/AdminServers.tsx';
 import AdminSettings from '@/pages/admin/settings/AdminSettings.tsx';
 import AdminSystemBackupPolicies from '@/pages/admin/system-backup-policies/AdminSystemBackupPolicies.tsx';
+import AdminTeams from '@/pages/admin/teams/AdminTeams.tsx';
 import AdminUsers from '@/pages/admin/users/AdminUsers.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
@@ -199,6 +201,14 @@ const routes: AdminRouteDefinition[] = [
     path: '/roles/*',
     element: AdminRoles,
     permission: ['roles.*'],
+    category: 'access',
+  },
+  {
+    name: () => getTranslations().t('pages.admin.teams.title', {}),
+    icon: faPeopleGroup,
+    path: '/teams/*',
+    element: AdminTeams,
+    permission: ['teams.*'],
     category: 'access',
   },
   {

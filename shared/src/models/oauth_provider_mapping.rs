@@ -7,7 +7,7 @@ use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashSet},
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
@@ -259,6 +259,18 @@ pub enum OAuthProviderMappingType {
         #[serde(default)]
         revoke_unmatched: bool,
     },
+    TeamMember {
+        #[garde(skip)]
+        team_uuid: uuid::Uuid,
+        #[garde(skip)]
+        preset_uuid: uuid::Uuid,
+        #[garde(skip)]
+        #[serde(default)]
+        management: Vec<super::team_member::TeamMemberManagement>,
+        #[garde(skip)]
+        #[serde(default)]
+        revoke_unmatched: bool,
+    },
 }
 
 impl OAuthProviderMappingType {
@@ -266,7 +278,8 @@ impl OAuthProviderMappingType {
     /// operator cannot grant more through a provider than they have themselves. A mapping to a
     /// role that no longer exists grants nothing. A subuser mapping writes, and with
     /// `revoke_unmatched` deletes, subusers on its server, so it needs the same access to that
-    /// server as the client subuser routes.
+    /// server as the client subuser routes. A team member mapping only automates what
+    /// `teams.update` already allows on every team, so it needs that permission.
     pub async fn is_within_permissions_of(
         &self,
         database: &crate::database::Database,
@@ -311,6 +324,9 @@ impl OAuthProviderMappingType {
                     && (!revoke_unmatched
                         || permissions.has_server_permission("subusers.delete").is_ok())
             }
+            OAuthProviderMappingType::TeamMember { .. } => {
+                permissions.has_admin_permission("teams.update").is_ok()
+            }
         })
     }
 
@@ -320,6 +336,9 @@ impl OAuthProviderMappingType {
                 revoke_unmatched, ..
             }
             | OAuthProviderMappingType::ServerSubuser {
+                revoke_unmatched, ..
+            }
+            | OAuthProviderMappingType::TeamMember {
                 revoke_unmatched, ..
             } => *revoke_unmatched,
         }
@@ -507,6 +526,13 @@ impl OAuthProviderMapping {
                 _ => None,
             })
             .collect::<Vec<_>>();
+        let matched_team_uuids = matched
+            .iter()
+            .filter_map(|mapping| match &mapping.mapping {
+                OAuthProviderMappingType::TeamMember { team_uuid, .. } => Some(*team_uuid),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
 
         for mapping in matched {
             if let Err(err) = mapping.apply(state, &mut user).await {
@@ -532,6 +558,11 @@ impl OAuthProviderMapping {
                 }
                 OAuthProviderMappingType::ServerSubuser { server_uuid, .. }
                     if matched_server_uuids.contains(server_uuid) =>
+                {
+                    continue;
+                }
+                OAuthProviderMappingType::TeamMember { team_uuid, .. }
+                    if matched_team_uuids.contains(team_uuid) =>
                 {
                     continue;
                 }
@@ -626,6 +657,82 @@ impl OAuthProviderMapping {
 
                 Ok(())
             }
+            OAuthProviderMappingType::TeamMember {
+                team_uuid,
+                preset_uuid,
+                management,
+                ..
+            } => {
+                let team =
+                    match super::team::Team::by_uuid_optional(&state.database, *team_uuid).await? {
+                        Some(team) => team,
+                        None => return Ok(()),
+                    };
+
+                if team.owner.uuid == user.uuid {
+                    return Ok(());
+                }
+
+                let preset = match super::team_preset::TeamPreset::by_team_uuid_uuid(
+                    &state.database,
+                    team.uuid,
+                    *preset_uuid,
+                )
+                .await?
+                {
+                    Some(preset) => preset,
+                    None => return Ok(()),
+                };
+
+                let management = management
+                    .iter()
+                    .copied()
+                    .collect::<HashSet<_>>()
+                    .into_iter()
+                    .collect::<Vec<_>>();
+
+                if let Some(mut member) = super::team_member::TeamMember::by_team_uuid_user_uuid(
+                    &state.database,
+                    team.uuid,
+                    user.uuid,
+                )
+                .await?
+                {
+                    if member.accepted.is_none()
+                        || member.preset.uuid != preset.uuid
+                        || member.management.iter().collect::<HashSet<_>>()
+                            != management.iter().collect()
+                    {
+                        member
+                            .update(
+                                state,
+                                super::team_member::UpdateTeamMemberOptions {
+                                    preset_uuid: Some(preset.uuid),
+                                    management: Some(management),
+                                },
+                            )
+                            .await?;
+                    }
+                    if member.accepted.is_none() {
+                        member.accept(state).await?;
+                    }
+                } else {
+                    super::team_member::TeamMember::create(
+                        state,
+                        super::team_member::CreateTeamMemberOptions {
+                            team: &team,
+                            preset: &preset,
+                            invitee: super::team_member::TeamMemberInvitee::User(user),
+                            management,
+                            inviter_uuid: None,
+                            accepted: true,
+                        },
+                    )
+                    .await?;
+                }
+
+                Ok(())
+            }
         }
     }
 
@@ -681,6 +788,34 @@ impl OAuthProviderMapping {
 
                 Ok(())
             }
+            OAuthProviderMappingType::TeamMember { team_uuid, .. } => {
+                let team =
+                    match super::team::Team::by_uuid_optional(&state.database, *team_uuid).await? {
+                        Some(team) => team,
+                        None => return Ok(()),
+                    };
+
+                if team.owner.uuid == user.uuid {
+                    return Ok(());
+                }
+
+                if let Some(member) = super::team_member::TeamMember::by_team_uuid_user_uuid(
+                    &state.database,
+                    team.uuid,
+                    user.uuid,
+                )
+                .await?
+                {
+                    member
+                        .delete(
+                            state,
+                            super::team_member::DeleteTeamMemberOptions { notify: false },
+                        )
+                        .await?;
+                }
+
+                Ok(())
+            }
         }
     }
 
@@ -695,6 +830,9 @@ impl OAuthProviderMapping {
             ) OR (
                 mapping->>'type' = 'server_subuser'
                 AND NOT EXISTS (SELECT 1 FROM servers WHERE uuid = (mapping->>'server_uuid')::uuid)
+            ) OR (
+                mapping->>'type' = 'team_member'
+                AND NOT EXISTS (SELECT 1 FROM team_presets WHERE uuid = (mapping->>'preset_uuid')::uuid AND team_uuid = (mapping->>'team_uuid')::uuid)
             )",
         )
         .execute(database.write())

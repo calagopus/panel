@@ -227,8 +227,12 @@ export const adminSettingsUserSchema = z.object({
   maxSshKeyCount: z.number().min(0),
   maxSettingsCount: z.number().min(0),
   maxSettingsValueBytes: z.number().min(0),
+  maxTeamCount: z.number().min(0),
+  maxTeamMemberCount: z.number().min(0),
+  maxTeamPresetCount: z.number().min(0),
   allowChangingLanguage: z.boolean(),
   allowChangingAvatar: z.boolean(),
+  allowCreatingTeams: z.boolean(),
   routeOrder: z.array(eggConfigurationRouteItemSchema).max(100).nullable(),
 });
 
@@ -237,11 +241,14 @@ export const adminSettingsActivitySchema = z.object({
   adminLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   userLogRetentionDays: z.number().min(1).max(3650),
   userLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
+  teamLogRetentionDays: z.number().min(1).max(3650),
+  teamLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   serverLogRetentionDays: z.number().min(1).max(3650),
   serverLogRetentionCount: z.preprocess(nullableNumber, z.number().min(1).nullable()),
   serverLogAdminActivity: z.boolean(),
   serverLogScheduleActivity: z.boolean(),
   serverHideActivityIps: z.enum(['admins', 'all_users', 'none']),
+  teamHideActivityIps: z.enum(['admins', 'all_users', 'none']),
 });
 
 export const adminSettingsRatelimitConfigurationSchema = z.object({
@@ -264,6 +271,7 @@ export const adminSettingsRatelimitsSchema = z.object({
   clientServersFilesPull: adminSettingsRatelimitConfigurationSchema,
   clientServersFilesPullQuery: adminSettingsRatelimitConfigurationSchema,
   clientServersSubusersCreate: adminSettingsRatelimitConfigurationSchema,
+  clientTeamsMembersCreate: adminSettingsRatelimitConfigurationSchema,
   remote: adminSettingsRatelimitConfigurationSchema,
   remoteSftpAuth: adminSettingsRatelimitConfigurationSchema,
   remoteEnroll: adminSettingsRatelimitConfigurationSchema,

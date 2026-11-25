@@ -16,6 +16,7 @@ import { OAuthProvidersRegistry } from './oAuthProviders/index.ts';
 import { RolesRegistry } from './roles/index.ts';
 import { ServersRegistry } from './servers/index.ts';
 import { SystemBackupPoliciesRegistry } from './systemBackupPolicies/index.ts';
+import { TeamsRegistry } from './teams/index.ts';
 import { UsersRegistry } from './users/index.ts';
 
 export class AdminRegistry implements Registry {
@@ -27,6 +28,7 @@ export class AdminRegistry implements Registry {
     this.locations.mergeFrom(other.locations);
     this.users.mergeFrom(other.users);
     this.roles.mergeFrom(other.roles);
+    this.teams.mergeFrom(other.teams);
     this.eggRepositories.mergeFrom(other.eggRepositories);
     this.mounts.mergeFrom(other.mounts);
     this.devices.mergeFrom(other.devices);
@@ -58,6 +60,8 @@ export class AdminRegistry implements Registry {
   public users: UsersRegistry = new UsersRegistry();
   /** @since 1.1.1 */
   public roles: RolesRegistry = new RolesRegistry();
+  /** @since 1.3.0 */
+  public teams: TeamsRegistry = new TeamsRegistry();
   /** @since 1.1.1 */
   public eggRepositories: EggRepositoriesRegistry = new EggRepositoriesRegistry();
   /** @since 1.1.1 */
@@ -111,6 +115,12 @@ export class AdminRegistry implements Registry {
   /** @since 1.1.1 */
   public enterRoles(callback: (registry: RolesRegistry) => unknown): this {
     callback(this.roles);
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public enterTeams(callback: (registry: TeamsRegistry) => unknown): this {
+    callback(this.teams);
     return this;
   }
 

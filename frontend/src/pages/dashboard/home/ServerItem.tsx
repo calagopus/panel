@@ -9,6 +9,7 @@ import {
   faMemory,
   faMicrochip,
   faMinus,
+  faPeopleGroup,
   faPlay,
   faRotateRight,
   faSkull,
@@ -218,6 +219,11 @@ export default function ServerItem({
                               icon={faUsers}
                               className='shrink-0 text-(--mantine-color-yellow-filled)'
                             />
+                          </Tooltip>
+                        )}
+                        {server.teamName && (
+                          <Tooltip label={t('pages.account.home.tooltip.team', { team: server.teamName })}>
+                            <FontAwesomeIcon size='sm' icon={faPeopleGroup} className='shrink-0' />
                           </Tooltip>
                         )}
                         {!serverListShowOthers && serverGroups.every((g) => !g.serverOrder.includes(server.uuid)) && (

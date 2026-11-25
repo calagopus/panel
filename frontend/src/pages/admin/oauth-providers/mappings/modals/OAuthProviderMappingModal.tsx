@@ -4,8 +4,11 @@ import createOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/cre
 import updateOAuthProviderMapping from '@/api/admin/oauth-providers/mappings/updateOAuthProviderMapping.ts';
 import getRoles from '@/api/admin/roles/getRoles.ts';
 import getServers from '@/api/admin/servers/getServers.ts';
+import getTeams from '@/api/admin/teams/getTeams.ts';
+import getTeamPresets from '@/api/admin/teams/presets/getTeamPresets.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import IgnoredFilesInput from '@/elements/input/IgnoredFilesInput.tsx';
+import MultiSelect from '@/elements/input/MultiSelect.tsx';
 import Select from '@/elements/input/Select.tsx';
 import ServerSelect from '@/elements/input/ServerSelect.tsx';
 import Switch from '@/elements/input/Switch.tsx';
@@ -17,16 +20,19 @@ import FormModal from '@/elements/modals/FormModal.tsx';
 import { ModalFooter } from '@/elements/modals/Modal.tsx';
 import PermissionSelector from '@/elements/PermissionSelector.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { teamMemberManagementLabelMapping } from '@/lib/enums.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminOAuthProviderMappingSchema, adminOAuthProviderSchema } from '@/lib/schemas/admin/oauthProviders.ts';
 import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminTeamSchema } from '@/lib/schemas/admin/teams.ts';
 import { roleSchema } from '@/lib/schemas/user.ts';
+import { userTeamMemberManagement, userTeamPresetSchema } from '@/lib/schemas/user/teams.ts';
 import { useModalForm } from '@/plugins/form/useModalForm.ts';
 import { useInfiniteSearchableResource } from '@/plugins/resource/useInfiniteSearchableResource.ts';
+import { useAvailablePermissions } from '@/plugins/useAvailablePermissions.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
-import { useGlobalStore } from '@/stores/global.ts';
 import {
   type OAuthProviderMappingFormValues,
   oauthProviderMappingEmptyFormValues,
@@ -47,8 +53,9 @@ export default function OAuthProviderMappingModal({
 }) {
   const { t } = useTranslations();
   const { addToast } = useToast();
-  const availablePermissions = useGlobalStore((state) => state.availablePermissions);
+  const { availablePermissions } = useAvailablePermissions();
   const canReadRoles = useAdminCan('roles.read');
+  const canReadTeams = useAdminCan('teams.read');
 
   const isEdit = !!mapping;
 
@@ -56,6 +63,12 @@ export default function OAuthProviderMappingModal({
     queryKey: queryKeys.admin.roles.all(),
     fetcher: (page, search) => getRoles(page, search),
     canRequest: canReadRoles,
+  });
+
+  const teams = useInfiniteSearchableResource<z.infer<typeof adminTeamSchema>>({
+    queryKey: queryKeys.admin.teams.all(),
+    fetcher: (page, search) => getTeams(page, search),
+    canRequest: canReadTeams,
   });
 
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<OAuthProviderMappingFormValues>({
@@ -83,7 +96,28 @@ export default function OAuthProviderMappingModal({
     roleOptions.unshift({ label: form.values.roleUuid, value: form.values.roleUuid });
   }
 
-  const canSubmit = form.values.type === 'role' ? !!form.values.roleUuid : !!form.values.serverUuid;
+  const presets = useInfiniteSearchableResource<z.infer<typeof userTeamPresetSchema>>({
+    queryKey: queryKeys.admin.teams.presets(form.values.teamUuid),
+    fetcher: (page, search) => getTeamPresets(form.values.teamUuid, page, search),
+    canRequest: canReadTeams && !!form.values.teamUuid,
+  });
+
+  const teamOptions = teams.items.map((team) => ({ label: team.name, value: team.uuid }));
+  if (form.values.teamUuid && !teamOptions.some((o) => o.value === form.values.teamUuid)) {
+    teamOptions.unshift({ label: form.values.teamUuid, value: form.values.teamUuid });
+  }
+
+  const presetOptions = presets.items.map((preset) => ({ label: preset.name, value: preset.uuid }));
+  if (form.values.presetUuid && !presetOptions.some((o) => o.value === form.values.presetUuid)) {
+    presetOptions.unshift({ label: form.values.presetUuid, value: form.values.presetUuid });
+  }
+
+  const canSubmit =
+    form.values.type === 'role'
+      ? !!form.values.roleUuid
+      : form.values.type === 'server_subuser'
+        ? !!form.values.serverUuid
+        : !!form.values.teamUuid && !!form.values.presetUuid;
 
   return (
     <FormModal
@@ -95,7 +129,7 @@ export default function OAuthProviderMappingModal({
       )}
       isDirty={isDirty}
       loading={loading}
-      size={form.values.type === 'role' ? 'lg' : '95%'}
+      size={form.values.type === 'server_subuser' ? '95%' : 'lg'}
       {...props}
       onClose={handleClose}
       onSubmit={handleSubmit}
@@ -114,6 +148,10 @@ export default function OAuthProviderMappingModal({
                 label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.serverSubuser', {}),
                 value: 'server_subuser',
               },
+              {
+                label: t('pages.admin.oAuthProviders.tabs.mappings.page.enum.mappingType.teamMember', {}),
+                value: 'team_member',
+              },
             ]}
             {...form.getInputProps('type')}
           />
@@ -131,6 +169,62 @@ export default function OAuthProviderMappingModal({
             loading={roles.loading}
             {...form.getInputProps('roleUuid')}
           />
+        ) : form.values.type === 'team_member' ? (
+          <>
+            <Select
+              withAsterisk
+              label={t('pages.admin.oAuthProviders.tabs.mappings.page.form.team', {})}
+              data={teamOptions}
+              renderOption={({ option }) => {
+                const owner = teams.items.find((team) => team.uuid === option.value)?.owner;
+
+                return (
+                  <div className='flex items-center justify-between gap-2 w-full'>
+                    <span className='truncate'>{option.label}</span>
+                    {owner && (
+                      <Text size='xs' c='dimmed' truncate>
+                        {owner.username}
+                      </Text>
+                    )}
+                  </div>
+                );
+              }}
+              searchable
+              searchValue={teams.search}
+              onSearchChange={teams.setSearch}
+              infiniteScroll={teams.infiniteScroll}
+              loading={teams.loading}
+              value={form.values.teamUuid}
+              error={form.errors.teamUuid}
+              onChange={(value) => {
+                form.setFieldValue('teamUuid', value || '');
+                form.setFieldValue('presetUuid', '');
+              }}
+            />
+
+            <Select
+              withAsterisk
+              label={t('pages.account.teams.tabs.members.form.preset', {})}
+              data={presetOptions}
+              searchable
+              searchValue={presets.search}
+              onSearchChange={presets.setSearch}
+              infiniteScroll={presets.infiniteScroll}
+              loading={presets.loading}
+              disabled={!form.values.teamUuid}
+              {...form.getInputProps('presetUuid')}
+            />
+
+            <MultiSelect
+              label={t('pages.account.teams.tabs.members.form.management', {})}
+              description={t('pages.account.teams.tabs.members.form.managementDescription', {})}
+              data={userTeamMemberManagement.options.map((management) => ({
+                value: management,
+                label: teamMemberManagementLabelMapping[management](),
+              }))}
+              {...form.getInputProps('management')}
+            />
+          </>
         ) : (
           <>
             <ServerSelect<z.infer<typeof adminServerSchema>>

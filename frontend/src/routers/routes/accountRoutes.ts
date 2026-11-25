@@ -6,6 +6,7 @@ import {
   faFingerprint,
   faKey,
   faKeyboard,
+  faPeopleGroup,
   faUnlockKeyhole,
   faUser,
   faUserSecret,
@@ -21,6 +22,8 @@ import DashboardSecurityKeys from '@/pages/dashboard/security-keys/DashboardSecu
 import DashboardSessions from '@/pages/dashboard/sessions/DashboardSessions.tsx';
 import DashboardShortcuts from '@/pages/dashboard/shortcuts/DashboardShortcuts.tsx';
 import DashboardSshKeys from '@/pages/dashboard/ssh-keys/DashboardSshKeys.tsx';
+import DashboardTeams from '@/pages/dashboard/teams/DashboardTeams.tsx';
+import DashboardTeamView from '@/pages/dashboard/teams/DashboardTeamView.tsx';
 import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 const routes: RouteDefinition[] = [
@@ -58,6 +61,17 @@ const routes: RouteDefinition[] = [
     icon: faKey,
     path: '/ssh-keys',
     element: DashboardSshKeys,
+  },
+  {
+    name: () => getTranslations().t('pages.account.teams.title', {}),
+    icon: faPeopleGroup,
+    path: '/teams',
+    element: DashboardTeams,
+  },
+  {
+    name: undefined,
+    path: '/teams/:id/*',
+    element: DashboardTeamView,
   },
   {
     name: () => getTranslations().t('pages.account.commandSnippets.title', {}),

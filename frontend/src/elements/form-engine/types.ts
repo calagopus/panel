@@ -236,6 +236,7 @@ export interface RegisteredFormIds {
   'admin.eggRepositories.credentialPrivateKey': true;
   'admin.eggConfigurations.createOrUpdate': true;
   'admin.users.createOrUpdate': true;
+  'admin.teams.createOrUpdate': true;
   'admin.announcements.createOrUpdate': true;
   'admin.settings.server': true;
   'admin.settings.webauthn': true;

@@ -1,0 +1,46 @@
+import { ContainerRegistry, Registry } from 'shared';
+import { z } from 'zod';
+import type { Props as SubContainerProps } from '@/elements/containers/AdminSubContentContainer.tsx';
+import { adminServerSchema } from '@/lib/schemas/admin/servers.ts';
+import { adminTeamSchema } from '@/lib/schemas/admin/teams.ts';
+import { ContextMenuRegistry } from '../../../../slices/contextMenu.ts';
+
+type PageProps = { team: z.infer<typeof adminTeamSchema> };
+
+export class ServersRegistry implements Registry {
+  public mergeFrom(other: this): this {
+    this.subContainer.mergeFrom(other.subContainer);
+    this.contextMenu.mergeFrom(other.contextMenu);
+
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public subContainer: ContainerRegistry<SubContainerProps<PageProps>, PageProps> = new ContainerRegistry();
+  /** @since 1.3.0 */
+  public contextMenu: ContextMenuRegistry<{
+    team: z.infer<typeof adminTeamSchema>;
+    server: z.infer<typeof adminServerSchema>;
+  }> = new ContextMenuRegistry();
+
+  /** @since 1.3.0 */
+  public enterSubContainer(
+    callback: (registry: ContainerRegistry<SubContainerProps<PageProps>, PageProps>) => unknown,
+  ): this {
+    callback(this.subContainer);
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public enterContextMenu(
+    callback: (
+      registry: ContextMenuRegistry<{
+        team: z.infer<typeof adminTeamSchema>;
+        server: z.infer<typeof adminServerSchema>;
+      }>,
+    ) => unknown,
+  ): this {
+    callback(this.contextMenu);
+    return this;
+  }
+}
