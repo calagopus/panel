@@ -2951,6 +2951,17 @@ const baseTranslations = defineTranslations({
                 form: {
                   subject: 'Subject',
                 },
+                preview: {
+                  editor: 'Editor',
+                  preview: 'Preview',
+                  desktop: 'Desktop',
+                  mobile: 'Mobile',
+                  sampleData:
+                    'Rendered with sample data and the saved variables, unsaved variable changes are not included. Secrets in settings show as censored.',
+                  unavailable: 'This template does not provide preview data, so it cannot be previewed.',
+                  disabled: 'This template is disabled and is not sent.',
+                  error: 'Failed to render template',
+                },
                 toast: {
                   saved: 'Email template saved.',
                   reset: 'Email template reset to default.',

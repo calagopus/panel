@@ -340,6 +340,28 @@ impl SettingsSerializeExt for AppSettingsMetadata {
     }
 }
 
+impl AppSettingsMetadata {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            description: None,
+            theme_color: "#6c5ce7".into(),
+            og_image: None,
+            twitter_card: TwitterCard::SummaryLargeImage,
+            indexable: true,
+            pwa_enabled: true,
+            pwa_name: None,
+            pwa_short_name: None,
+            pwa_display: PwaDisplay::Standalone,
+            pwa_background_color: "#222222".into(),
+            pwa_icons: Vec::new(),
+            pwa_screenshots: Vec::new(),
+            pwa_shortcuts: Vec::new(),
+            pwa_categories: Vec::new(),
+        }
+    }
+}
+
 pub struct AppSettingsMetadataDeserializer;
 
 #[async_trait::async_trait]

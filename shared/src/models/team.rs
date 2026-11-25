@@ -178,6 +178,26 @@ pub struct Team {
     extension_data: super::ModelExtensionData,
 }
 
+impl PreviewSample for Team {
+    fn preview_sample(settings: &crate::settings::AppSettings) -> Self {
+        let mut owner = super::user::User::preview_sample(settings);
+        owner.username = "sam".into();
+        owner.email = "sam@example.com".into();
+        owner.name_first = Some("Sam".into());
+        owner.name_last = Some("Taylor".into());
+
+        Self {
+            uuid: uuid::Uuid::nil(),
+            owner,
+            name: "Example Team".into(),
+            description: None,
+            membership: None,
+            created: chrono::Utc::now().naive_utc(),
+            extension_data: Vec::new(),
+        }
+    }
+}
+
 impl BaseModel for Team {
     const NAME: &'static str = "team";
 

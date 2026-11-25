@@ -121,6 +121,36 @@ impl SettingsSerializeExt for AppSettingsServer {
     }
 }
 
+impl AppSettingsServer {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            max_file_manager_view_size: 10 * 1024 * 1024,
+            max_file_manager_content_search_size: 5 * 1024 * 1024,
+            max_file_manager_search_results: 100,
+            max_subuser_count: 25,
+            max_schedule_step_count: 50,
+            max_backup_group_count: 10,
+            max_firewall_rule_count: 100,
+            max_firewall_rule_source_count: 50,
+            max_tunnel_connection_count: 25,
+            max_tunnel_port_count: 10,
+            max_database_instance_database_count: 10,
+            max_database_instance_user_count: 10,
+            allow_overwriting_custom_docker_image: true,
+            allow_viewing_installation_logs: true,
+            allow_acknowledging_installation_failure: true,
+            allow_viewing_transfer_progress: true,
+            trash: TrashSettings {
+                retention: 7 * 24 * 60 * 60,
+                usage_threshold: 90,
+            },
+            allow_changing_trash_settings: true,
+            container_prelude: "container@calagopus~".into(),
+        }
+    }
+}
+
 pub struct AppSettingsServerDeserializer;
 
 #[async_trait::async_trait]

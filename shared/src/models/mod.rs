@@ -1598,6 +1598,11 @@ impl<T> sqlx::Type<sqlx::Postgres> for OrderedJson<T> {
     }
 }
 
+/// A realistic stand-in for a model where no real row is available, such as email template previews.
+pub trait PreviewSample {
+    fn preview_sample(settings: &crate::settings::AppSettings) -> Self;
+}
+
 #[async_trait::async_trait]
 pub trait IntoApiObject {
     type ApiObject: Send;

@@ -325,6 +325,36 @@ pub struct NestEgg {
     extension_data: super::ModelExtensionData,
 }
 
+impl PreviewSample for NestEgg {
+    fn preview_sample(_settings: &crate::settings::AppSettings) -> Self {
+        Self {
+            uuid: uuid::Uuid::nil(),
+            nest: super::nest::Nest::get_fetchable(uuid::Uuid::nil()),
+            egg_repository_egg: None,
+            egg_repository_egg_hash: None,
+            name: "Paper".into(),
+            description: None,
+            author: "support@example.com".into(),
+            config_files: Vec::new(),
+            config_startup: NestEggConfigStartup::default(),
+            config_stop: NestEggConfigStop::default(),
+            config_script: NestEggConfigScript {
+                container: "ghcr.io/example/installer:latest".into(),
+                entrypoint: "bash".into(),
+                content: String::new(),
+            },
+            startup_commands: IndexMap::new(),
+            force_outgoing_ip: false,
+            separate_port: false,
+            features: Vec::new(),
+            docker_images: IndexMap::new(),
+            file_denylist: Vec::new(),
+            created: chrono::Utc::now().naive_utc(),
+            extension_data: Vec::new(),
+        }
+    }
+}
+
 impl BaseModel for NestEgg {
     const NAME: &'static str = "nest_egg";
 

@@ -21,6 +21,7 @@ import TextInput from '@/elements/input/TextInput.tsx';
 import Divider from '@/elements/layout/Divider.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Paper from '@/elements/layout/Paper.tsx';
+import SegmentedControl from '@/elements/layout/SegmentedControl.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import NavLink from '@/elements/navigation/NavLink.tsx';
@@ -34,6 +35,7 @@ import { useResource } from '@/plugins/resource/useResource.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useAdminStore } from '@/stores/admin.tsx';
+import EmailTemplatePreview from './EmailTemplatePreview.tsx';
 import EmailVariablesSection from './EmailVariablesSection.tsx';
 
 const templateFormSchema = z.object({
@@ -52,6 +54,7 @@ export default function EmailTemplatesContainer() {
   const [editorContent, setEditorContent] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [view, setView] = useState<'editor' | 'preview'>('editor');
 
   const form = useForm<z.infer<typeof templateFormSchema>>({
     initialValues: { subject: '', enabled: true },
@@ -303,6 +306,23 @@ export default function EmailTemplatesContainer() {
                         <Text size='sm' fw={500} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
                           {selectedIdentifier}
                         </Text>
+                        <AdminCan action={['settings.read', 'email-templates.update']}>
+                          <SegmentedControl
+                            size='xs'
+                            value={view}
+                            onChange={(value) => setView(value as 'editor' | 'preview')}
+                            data={[
+                              {
+                                value: 'editor',
+                                label: t('pages.admin.settings.tabs.mailTemplates.page.preview.editor', {}),
+                              },
+                              {
+                                value: 'preview',
+                                label: t('pages.admin.settings.tabs.mailTemplates.page.preview.preview', {}),
+                              },
+                            ]}
+                          />
+                        </AdminCan>
                       </Group>
                       <Group gap='xs'>
                         <AdminCan action={['settings.read', 'email-templates.update']}>
@@ -349,31 +369,47 @@ export default function EmailTemplatesContainer() {
 
                   <Divider />
 
-                  <div className='relative flex-1 min-h-[60vh]'>
-                    <div className='absolute inset-0'>
-                      <MonacoEditor
-                        height='100%'
-                        language='html'
-                        value={effectiveContent}
-                        options={{
-                          automaticLayout: true,
-                          stickyScroll: { enabled: false },
-                          minimap: { enabled: false },
-                          codeLens: false,
-                          scrollBeyondLastLine: false,
-                          smoothScrolling: false,
-                          inertialScroll: true,
-                          wordWrap: 'on',
-                        }}
-                        onChange={(value) => setEditorContent(value ?? '')}
+                  {view === 'preview' ? (
+                    template.previewable ? (
+                      <EmailTemplatePreview
+                        identifier={selectedIdentifier}
+                        subject={form.values.subject}
+                        content={effectiveContent}
+                        enabled={form.values.enabled}
+                        variables={[...(globalVariables ?? []), ...(templateVariables ?? [])]}
                       />
+                    ) : (
+                      <Stack p='md'>
+                        <Alert>{t('pages.admin.settings.tabs.mailTemplates.page.preview.unavailable', {})}</Alert>
+                      </Stack>
+                    )
+                  ) : (
+                    <div className='relative flex-1 min-h-[60vh]'>
+                      <div className='absolute inset-0'>
+                        <MonacoEditor
+                          height='100%'
+                          language='html'
+                          value={effectiveContent}
+                          options={{
+                            automaticLayout: true,
+                            stickyScroll: { enabled: false },
+                            minimap: { enabled: false },
+                            codeLens: false,
+                            scrollBeyondLastLine: false,
+                            smoothScrolling: false,
+                            inertialScroll: true,
+                            wordWrap: 'on',
+                          }}
+                          onChange={(value) => setEditorContent(value ?? '')}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </Paper>
 
-            <div className='shrink-0 lg:w-[26rem] w-full lg:relative'>
+            <div className='shrink-0 lg:w-104 w-full lg:relative'>
               <EmailVariablesSection templateIdentifier={selectedIdentifier} className='lg:absolute lg:inset-0' />
             </div>
           </>

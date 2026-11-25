@@ -4,7 +4,9 @@ use sqlx::Row;
 use std::{borrow::Cow, collections::BTreeMap, sync::Arc};
 use utoipa::ToSchema;
 
+mod preview;
 mod variables;
+pub use preview::*;
 pub use variables::*;
 
 #[derive(Clone)]
@@ -137,6 +139,7 @@ impl EmailTemplate {
 pub struct ExtensionEmailTemplateBuilder {
     pub templates: Vec<EmailTemplate>,
     pub variables: Vec<EmailVariable>,
+    pub preview_contexts: EmailTemplatePreviewContexts,
 }
 
 impl Default for ExtensionEmailTemplateBuilder {
@@ -229,6 +232,7 @@ impl Default for ExtensionEmailTemplateBuilder {
                 },
             ],
             variables: core_variables(),
+            preview_contexts: core_preview_contexts(),
         }
     }
 }
@@ -342,7 +346,26 @@ impl ExtensionEmailTemplateBuilder {
         self
     }
 
-    pub(super) fn finish(mut self) -> (Vec<Arc<EmailTemplate>>, Vec<Arc<EmailVariable>>) {
+    /// Set the sample context the admin preview renders a template with, replacing any existing one.
+    /// The context should have the same shape as the one passed when sending the template,
+    /// templates without one cannot be previewed.
+    pub fn set_template_preview_context(
+        mut self,
+        identifier: &'static str,
+        context: impl Fn(&crate::settings::AppSettings) -> serde_json::Value + Send + Sync + 'static,
+    ) -> Self {
+        self.preview_contexts.insert(identifier, Arc::new(context));
+
+        self
+    }
+
+    pub(super) fn finish(
+        mut self,
+    ) -> (
+        Vec<Arc<EmailTemplate>>,
+        Vec<Arc<EmailVariable>>,
+        EmailTemplatePreviewContexts,
+    ) {
         for template in &mut self.templates {
             for global in ["settings", "language"] {
                 if !template.available_variables.contains(&global) {
@@ -354,6 +377,7 @@ impl ExtensionEmailTemplateBuilder {
         (
             self.templates.into_iter().map(Arc::new).collect(),
             self.variables.into_iter().map(Arc::new).collect(),
+            self.preview_contexts,
         )
     }
 }
@@ -361,6 +385,7 @@ impl ExtensionEmailTemplateBuilder {
 pub struct EmailTemplateManager {
     pub(super) templates: parking_lot::RwLock<Vec<Arc<EmailTemplate>>>,
     pub(super) variables: parking_lot::RwLock<Vec<Arc<EmailVariable>>>,
+    pub(super) preview_contexts: parking_lot::RwLock<EmailTemplatePreviewContexts>,
 }
 
 impl Default for EmailTemplateManager {
@@ -368,6 +393,7 @@ impl Default for EmailTemplateManager {
         Self {
             templates: parking_lot::RwLock::new(vec![]),
             variables: parking_lot::RwLock::new(vec![]),
+            preview_contexts: parking_lot::RwLock::new(BTreeMap::new()),
         }
     }
 }
@@ -391,23 +417,6 @@ impl EmailTemplateManager {
 mod tests {
     use super::*;
 
-    fn fixture_context() -> minijinja::Value {
-        minijinja::context! {
-            user => minijinja::value::Serde(serde_json::json!({ "username": "tester", "email": "tester@example.com" })),
-            server => minijinja::value::Serde(serde_json::json!({ "name": "Example Server" })),
-            team => minijinja::value::Serde(serde_json::json!({ "name": "Example Team", "owner": { "username": "owner" } })),
-            email => "tester@example.com",
-            reset_link => "https://panel.example.com/auth/reset-password?token=x",
-            verification_link => "https://panel.example.com/auth/verify-email?token=x",
-            sessions_link => "https://panel.example.com/account/sessions",
-            server_link => "https://panel.example.com/server/00000001",
-            teams_link => "https://panel.example.com/account/teams",
-            code => "123456",
-            ip => "127.0.0.1",
-            user_agent => "test-agent",
-        }
-    }
-
     fn strict_environment(
         variables: &BTreeMap<compact_str::CompactString, String>,
     ) -> minijinja::Environment<'static> {
@@ -430,12 +439,22 @@ mod tests {
         environment
     }
 
+    // ExtensionEmailTemplateBuilder::default
     #[test]
-    fn stock_templates_render_against_english_defaults() {
+    fn stock_templates_render_against_their_preview_contexts() {
         let builder = ExtensionEmailTemplateBuilder::default();
-        let context = fixture_context();
+        let mut settings = crate::settings::AppSettings::mock();
+        settings.app.name = "Panel & Co".into();
+        settings.app.url = "https://panel.example.com".into();
 
         for template in &builder.templates {
+            let preview_context = builder
+                .preview_contexts
+                .get(template.identifier)
+                .unwrap_or_else(|| panic!("{} has no preview context", template.identifier));
+            let context =
+                minijinja::Value::from(minijinja::value::Serde(preview_context(&settings)));
+
             let variables: BTreeMap<compact_str::CompactString, String> = builder
                 .variables
                 .iter()

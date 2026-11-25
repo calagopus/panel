@@ -88,7 +88,7 @@ compact_str = { version = "0.10.0", features = ["serde", "utoipa", "garde", "sql
 nestify = "0.3.3"
 sysinfo = { version = "0.40.0", default-features = false, features = ["system", "disk"] }
 serde_with = "3.16.1"
-minijinja = { version = "3.0.2", features = ["json", "serde"] }
+minijinja = { version = "3.0.2", features = ["fuel", "json", "serde"] }
 dialoguer = "0.12.0"
 hex = "0.4.3"
 zstd = "0.14.0"

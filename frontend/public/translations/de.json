@@ -3035,6 +3035,16 @@
                 "form": {
                   "subject": "Betreff"
                 },
+                "preview": {
+                  "editor": "Editor",
+                  "preview": "Vorschau",
+                  "desktop": "Desktop",
+                  "mobile": "Mobil",
+                  "sampleData": "Mit Beispieldaten und den gespeicherten Variablen gerendert, ungespeicherte Änderungen an Variablen sind nicht enthalten. Geheimnisse in den Einstellungen werden zensiert angezeigt.",
+                  "unavailable": "Diese Vorlage stellt keine Vorschaudaten bereit und kann daher nicht in der Vorschau angezeigt werden.",
+                  "disabled": "Diese Vorlage ist deaktiviert und wird nicht versendet.",
+                  "error": "Vorlage konnte nicht gerendert werden"
+                },
                 "toast": {
                   "saved": "E-Mail-Vorlage gespeichert.",
                   "reset": "E-Mail-Vorlage auf Standard zurückgesetzt."

@@ -266,9 +266,10 @@ impl ExtensionManager {
             }
         }
 
-        let (templates, variables) = email_templates_builder.finish();
+        let (templates, variables, preview_contexts) = email_templates_builder.finish();
         *state.mail.templates.templates.write() = templates;
         *state.mail.templates.variables.write() = variables;
+        *state.mail.templates.preview_contexts.write() = preview_contexts;
 
         state
             .settings

@@ -107,9 +107,18 @@ impl From<&User> for MailRecipient {
     }
 }
 
+const RENDER_FUEL: u64 = 250_000;
+const PREVIEW_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
+
 struct RenderedMail {
     subject: String,
     body: String,
+}
+
+pub enum EmailTemplatePreview {
+    Unavailable,
+    Rendered { subject: String, body: String },
+    Failed(String),
 }
 
 fn render_variables(
@@ -168,6 +177,7 @@ fn render(
     let settings = minijinja::Value::from(minijinja::value::Serde(settings));
 
     let mut text_environment = minijinja::Environment::new();
+    text_environment.set_fuel(Some(RENDER_FUEL));
     text_environment.add_global("settings", settings.clone());
     text_environment.add_global("language", language);
     render_variables(&mut text_environment, variables, context, false)?;
@@ -175,6 +185,7 @@ fn render(
     let subject = text_environment.render_str(subject, context)?;
 
     let mut html_environment = minijinja::Environment::new();
+    html_environment.set_fuel(Some(RENDER_FUEL));
     html_environment.set_auto_escape_callback(|_| minijinja::AutoEscape::Html);
     html_environment.add_global("settings", settings);
     html_environment.add_global("language", language);
@@ -339,6 +350,64 @@ impl Mail {
             .get(state)
             .await?
             .enabled)
+    }
+
+    /// Renders a template against its preview context instead of sending it, with secrets censored
+    /// from `settings`. Unlike sending, this ignores whether the template is enabled.
+    pub async fn preview_template(
+        &self,
+        state: &crate::State,
+        identifier: &str,
+        language: &str,
+        subject: Option<String>,
+        content: Option<String>,
+    ) -> Result<EmailTemplatePreview, anyhow::Error> {
+        let template = self.templates.get_template(identifier)?;
+        let Some(preview_context) = self.templates.get_preview_context(identifier) else {
+            return Ok(EmailTemplatePreview::Unavailable);
+        };
+        let fetched_template = template.get(state).await?;
+
+        let variables = self
+            .templates
+            .resolve_variables(state, identifier, language)
+            .await?;
+        let (settings, context) = {
+            let settings = self.settings.get().await?;
+
+            (settings.censored(), preview_context(&settings))
+        };
+
+        let language = compact_str::CompactString::from(language);
+        let subject = subject.unwrap_or_else(|| fetched_template.subject.into_owned());
+        let content = content.unwrap_or_else(|| fetched_template.content.into_owned());
+
+        let rendering = tokio::task::spawn_blocking(move || {
+            render(
+                &settings,
+                &language,
+                &variables,
+                &subject,
+                &content,
+                &minijinja::Value::from(minijinja::value::Serde(context)),
+            )
+        });
+
+        Ok(
+            match tokio::time::timeout(PREVIEW_TIMEOUT, rendering).await {
+                Ok(rendered) => match rendered? {
+                    Ok(rendered) => EmailTemplatePreview::Rendered {
+                        subject: rendered.subject,
+                        body: rendered.body,
+                    },
+                    Err(err) => EmailTemplatePreview::Failed(err.to_string()),
+                },
+                Err(_) => EmailTemplatePreview::Failed(format!(
+                    "rendering timed out after {} seconds",
+                    PREVIEW_TIMEOUT.as_secs()
+                )),
+            },
+        )
     }
 
     pub async fn send_template_foreground(
@@ -641,5 +710,26 @@ mod tests {
         .expect("broken variable must fail rendering");
 
         assert!(err.to_string().contains("email variable 'broken'"), "{err}");
+    }
+
+    // render
+    #[test]
+    fn runaway_templates_exhaust_fuel() {
+        let runaway =
+            "{% for a in range(10000) %}{% for b in range(10000) %}x{% endfor %}{% endfor %}";
+
+        for (subject, body) in [(runaway, "b"), ("s", runaway)] {
+            assert!(
+                render(
+                    &settings(),
+                    "en",
+                    &variables(&[]),
+                    subject,
+                    body,
+                    &minijinja::context! {},
+                )
+                .is_err()
+            );
+        }
     }
 }

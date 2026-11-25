@@ -43,6 +43,20 @@ impl SettingsSerializeExt for AppSettingsWebauthn {
     }
 }
 
+impl AppSettingsWebauthn {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            enabled: true,
+            allow_discoverable: true,
+            rp_id: "localhost".into(),
+            rp_origin: "http://localhost".into(),
+            authentication_timeout_seconds: 300,
+            registration_timeout_seconds: 300,
+        }
+    }
+}
+
 pub struct AppSettingsWebauthnDeserializer;
 
 #[async_trait::async_trait]

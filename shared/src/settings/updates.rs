@@ -82,6 +82,16 @@ impl SettingsSerializeExt for AppSettingsUpdates {
     }
 }
 
+impl AppSettingsUpdates {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            wings_release_token: None,
+            db_agent_release_token: None,
+        }
+    }
+}
+
 pub struct AppSettingsUpdatesDeserializer;
 
 #[async_trait::async_trait]

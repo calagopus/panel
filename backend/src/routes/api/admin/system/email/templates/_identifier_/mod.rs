@@ -1,6 +1,7 @@
 use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod preview;
 mod variables;
 
 mod get {
@@ -23,6 +24,7 @@ mod get {
         subject: Option<String>,
         default_content: &'static str,
         content: Option<String>,
+        previewable: bool,
     }
 
     #[derive(ToSchema, Serialize)]
@@ -70,6 +72,11 @@ mod get {
                     Cow::Owned(content) => Some(content),
                     Cow::Borrowed(_) => None,
                 },
+                previewable: state
+                    .mail
+                    .templates
+                    .get_preview_context(&identifier)
+                    .is_some(),
             },
         })
         .ok()
@@ -142,6 +149,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
     OpenApiRouter::new()
         .routes(routes!(get::route))
         .routes(routes!(put::route))
+        .nest("/preview", preview::router(state))
         .nest("/variables", variables::router(state))
         .with_state(state.clone())
 }

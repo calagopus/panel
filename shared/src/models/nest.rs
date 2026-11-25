@@ -24,6 +24,19 @@ pub struct Nest {
     extension_data: super::ModelExtensionData,
 }
 
+impl PreviewSample for Nest {
+    fn preview_sample(_settings: &crate::settings::AppSettings) -> Self {
+        Self {
+            uuid: uuid::Uuid::nil(),
+            name: "Minecraft".into(),
+            description: None,
+            author: "support@example.com".into(),
+            created: chrono::Utc::now().naive_utc(),
+            extension_data: Vec::new(),
+        }
+    }
+}
+
 impl BaseModel for Nest {
     const NAME: &'static str = "nest";
 

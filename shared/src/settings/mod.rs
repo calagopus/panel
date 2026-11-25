@@ -419,6 +419,49 @@ pub struct AppSettings {
 }
 
 impl AppSettings {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            telemetry_uuid: None,
+            telemetry_cron_schedule: None,
+            oobe_step: None,
+            storage_driver: StorageDriver::Filesystem {
+                path: "/var/lib/calagopus".into(),
+            },
+            mail_mode: MailMode::None,
+            captcha_provider: CaptchaProvider::None,
+            app: app::AppSettingsApp::mock(),
+            metadata: metadata::AppSettingsMetadata::mock(),
+            webauthn: webauthn::AppSettingsWebauthn::mock(),
+            server: server::AppSettingsServer::mock(),
+            user: user::AppSettingsUser::mock(),
+            activity: activity::AppSettingsActivity::mock(),
+            ratelimits: ratelimits::AppSettingsRatelimits::mock(),
+            updates: updates::AppSettingsUpdates::mock(),
+            disabled_extensions: Vec::new(),
+            extension_permissions: BTreeMap::new(),
+            extensions: HashMap::new(),
+        }
+    }
+
+    /// The settings as they may be logged, with every secret censored.
+    ///
+    /// There is deliberately no [`Censor`] impl: this runs on the live buffer that
+    /// [`SettingsWriteGuard::save`] writes to the database, so censoring it in place would persist
+    /// the placeholder as the real secret. The secret bearing settings are censored on clones instead.
+    pub fn censored(&self) -> serde_json::Value {
+        let mut json = serde_json::to_value(self).unwrap();
+
+        json["storage_driver"] =
+            serde_json::to_value(self.storage_driver.clone().censored()).unwrap();
+        json["mail_mode"] = serde_json::to_value(self.mail_mode.clone().censored()).unwrap();
+        json["captcha_provider"] =
+            serde_json::to_value(self.captcha_provider.clone().censored()).unwrap();
+        json["updates"] = serde_json::to_value(self.updates.clone().censored()).unwrap();
+
+        json
+    }
+
     pub fn get_extension_settings<T: 'static>(
         &self,
         ext_identifier: &str,
@@ -1183,26 +1226,6 @@ impl<'a> SettingsWriteGuard<'a> {
 
         Ok(())
     }
-
-    /// The settings as they may be logged, with every secret censored.
-    ///
-    /// [`AppSettings`] deliberately has no [`Censor`] impl: this runs on the live buffer that
-    /// [`Self::save`] writes to the database, so censoring it in place would persist the
-    /// placeholder as the real secret. The secret bearing settings are censored on clones instead.
-    pub fn censored(&self) -> serde_json::Value {
-        let settings = self.settings.as_ref().expect("settings have been dropped");
-
-        let mut json = serde_json::to_value(settings).unwrap();
-
-        json["storage_driver"] =
-            serde_json::to_value(settings.storage_driver.clone().censored()).unwrap();
-        json["mail_mode"] = serde_json::to_value(settings.mail_mode.clone().censored()).unwrap();
-        json["captcha_provider"] =
-            serde_json::to_value(settings.captcha_provider.clone().censored()).unwrap();
-        json["updates"] = serde_json::to_value(settings.updates.clone().censored()).unwrap();
-
-        json
-    }
 }
 
 impl Deref for SettingsWriteGuard<'_> {
@@ -1871,5 +1894,43 @@ mod tests {
             inactive.contains(&format!("[{SPINNER}][{SPINNER}]")),
             "{inactive}"
         );
+    }
+
+    // AppSettings::censored
+    #[test]
+    fn censored_settings_hide_secrets_without_touching_the_original() {
+        let mut settings = AppSettings::mock();
+        settings.mail_mode = MailMode::Smtp {
+            host: "smtp.example.com".into(),
+            port: 587,
+            username: Some("smtp-user-secret".into()),
+            password: Some("smtp-password-secret".into()),
+            tls_mode: TlsMode::StartTls,
+            skip_cert_validation: false,
+            helo_domain: None,
+            from_address: "panel@example.com".into(),
+            from_name: None,
+        };
+        settings.captcha_provider = CaptchaProvider::Turnstile {
+            site_key: "public".into(),
+            secret_key: "captcha-key-secret".into(),
+        };
+        let mail_mode = settings.mail_mode.clone();
+
+        let censored = settings.censored().to_string();
+
+        for secret in [
+            "smtp-user-secret",
+            "smtp-password-secret",
+            "captcha-key-secret",
+        ] {
+            assert!(!censored.contains(secret), "{secret} leaked");
+        }
+        assert!(censored.contains("smtp.example.com"));
+        assert!(settings.mail_mode == mail_mode);
+        assert!(matches!(
+            &settings.captcha_provider,
+            CaptchaProvider::Turnstile { secret_key, .. } if secret_key == "captcha-key-secret"
+        ));
     }
 }

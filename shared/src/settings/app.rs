@@ -166,6 +166,31 @@ impl SettingsSerializeExt for AppSettingsApp {
     }
 }
 
+impl AppSettingsApp {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            name: "Calagopus".into(),
+            icon: "/icon.svg".into(),
+            icon_light: None,
+            banner: None,
+            banner_light: None,
+            url: "http://localhost:8000".into(),
+            additional_urls: Vec::new(),
+            language: "en".into(),
+            two_factor_requirement: TwoFactorRequirement::None,
+            email_two_factor_enabled: false,
+            two_factor_accepted_methods: TwoFactorMethod::DEFAULT_ACCEPTED.to_vec(),
+            email_verification_required: false,
+            session_cookie: "calagopus_session".into(),
+            session_duration_seconds: 7 * 24 * 3600,
+            telemetry_enabled: true,
+            registration_enabled: true,
+            password_login_enabled: true,
+        }
+    }
+}
+
 pub struct AppSettingsAppDeserializer;
 
 #[async_trait::async_trait]

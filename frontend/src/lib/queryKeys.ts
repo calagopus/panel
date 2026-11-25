@@ -260,6 +260,8 @@ const admin = {
   emailTemplates: {
     all: () => ['admin', 'emailTemplates'] as const,
     detail: (identifier: string) => ['admin', 'emailTemplates', { identifier }] as const,
+    preview: (identifier: string, options: Record<string, unknown>) =>
+      ['admin', 'emailTemplates', { identifier }, 'preview', options] as const,
     variables: (identifier: string | null) => ['admin', 'emailTemplates', 'variables', { identifier }] as const,
   },
 };

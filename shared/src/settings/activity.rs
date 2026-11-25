@@ -101,6 +101,26 @@ impl SettingsSerializeExt for AppSettingsActivity {
     }
 }
 
+impl AppSettingsActivity {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            admin_log_retention_days: 180,
+            admin_log_retention_count: None,
+            user_log_retention_days: 180,
+            user_log_retention_count: None,
+            team_log_retention_days: 180,
+            team_log_retention_count: None,
+            server_log_retention_days: 90,
+            server_log_retention_count: None,
+            server_log_admin_activity: true,
+            server_log_schedule_activity: true,
+            server_hide_activity_ips: ActivityIpHiding::None,
+            team_hide_activity_ips: ActivityIpHiding::None,
+        }
+    }
+}
+
 pub struct AppSettingsActivityDeserializer;
 
 #[async_trait::async_trait]

@@ -161,6 +161,18 @@ export const adminSettingsEmailTemplateSchema = z.object({
   subject: z.string().nullable(),
   defaultContent: z.string(),
   content: z.string().nullable(),
+  previewable: z.boolean(),
+});
+
+export const adminSettingsEmailTemplatePreviewSchema = z.object({
+  language: z.string(),
+  subject: z.string().min(1).max(255).optional(),
+  content: z.string().min(1).optional(),
+});
+
+export const adminSettingsEmailTemplatePreviewResultSchema = z.object({
+  subject: z.string(),
+  body: z.string(),
 });
 
 export const adminSettingsEmailTemplateUpdateSchema = z.object({

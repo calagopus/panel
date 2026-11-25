@@ -264,6 +264,63 @@ pub struct Server {
     extension_data: super::ModelExtensionData,
 }
 
+impl PreviewSample for Server {
+    fn preview_sample(settings: &crate::settings::AppSettings) -> Self {
+        let egg = super::nest_egg::NestEgg::preview_sample(settings);
+        let nest = super::nest::Nest::preview_sample(settings);
+
+        Self {
+            uuid: uuid::Uuid::nil(),
+            uuid_short: 0,
+            external_id: None,
+            allocation: None,
+            destination_allocation_uuid: None,
+            node: super::node::Node::get_fetchable(uuid::Uuid::nil()),
+            destination_node: None,
+            owner: super::user::User::preview_sample(settings),
+            team_uuid: None,
+            team_name: None,
+            egg: Box::new(egg),
+            nest: Box::new(nest),
+            backup_configuration: None,
+            status: None,
+            suspended: false,
+            name: "Example Server".into(),
+            description: None,
+            memory: 4096,
+            memory_overhead: 0,
+            swap: 0,
+            disk: 10240,
+            bandwidth_upload: 0,
+            bandwidth_download: 0,
+            io_weight: None,
+            cpu: 200,
+            pinned_cpus: Vec::new(),
+            startup: "java -Xms128M -jar server.jar".into(),
+            image: "ghcr.io/example/java:21".into(),
+            labels: IndexMap::new(),
+            auto_kill: wings_api::ServerConfigurationAutoKill {
+                enabled: false,
+                seconds: 30,
+            },
+            auto_start_behavior: ServerAutoStartBehavior::UnlessStopped,
+            timezone: None,
+            trash: None,
+            hugepages_passthrough_enabled: false,
+            kvm_passthrough_enabled: false,
+            allocation_limit: 1,
+            database_limit: 1,
+            backup_limit: 3,
+            schedule_limit: 5,
+            subuser_permissions: None,
+            subuser_ignored_files: None,
+            subuser_ignored_files_list: None,
+            created: chrono::Utc::now().naive_utc(),
+            extension_data: Vec::new(),
+        }
+    }
+}
+
 impl BaseModel for Server {
     const NAME: &'static str = "server";
 

@@ -86,6 +86,28 @@ impl SettingsSerializeExt for AppSettingsUser {
     }
 }
 
+impl AppSettingsUser {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            max_server_group_count: 25,
+            max_api_key_count: 50,
+            max_command_snippet_count: 100,
+            max_security_key_count: 50,
+            max_ssh_key_count: 50,
+            max_settings_count: 512,
+            max_settings_value_bytes: 16384,
+            max_team_count: 10,
+            max_team_member_count: 50,
+            max_team_preset_count: 25,
+            allow_changing_language: true,
+            allow_changing_avatar: true,
+            allow_creating_teams: true,
+            route_order: Default::default(),
+        }
+    }
+}
+
 pub struct AppSettingsUserDeserializer;
 
 #[async_trait::async_trait]

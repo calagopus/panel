@@ -509,6 +509,7 @@ mod tests {
         let builder = ExtensionEmailTemplateBuilder {
             templates: vec![],
             variables: vec![],
+            preview_contexts: BTreeMap::new(),
         }
         .add_template_variables(&VARIABLES_DIR);
         let core = ExtensionEmailTemplateBuilder::default();

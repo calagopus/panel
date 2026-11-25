@@ -100,6 +100,88 @@ impl SettingsSerializeExt for AppSettingsRatelimits {
     }
 }
 
+impl AppSettingsRatelimits {
+    #[cfg(test)]
+    pub fn mock() -> Self {
+        Self {
+            auth_register: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            auth_login: RatelimitConfiguration {
+                hits: 20,
+                window_seconds: 300,
+            },
+            auth_login_checkpoint: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 300,
+            },
+            auth_login_checkpoint_email: RatelimitConfiguration {
+                hits: 5,
+                window_seconds: 900,
+            },
+            auth_login_security_key: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 300,
+            },
+            auth_password_forgot: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            auth_password_reset: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 300,
+            },
+            auth_email_verification: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            client: RatelimitConfiguration {
+                hits: 360,
+                window_seconds: 30,
+            },
+            client_account_email_resend_verification: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            client_servers_backups_create: RatelimitConfiguration {
+                hits: 4,
+                window_seconds: 300,
+            },
+            client_servers_files_pull: RatelimitConfiguration {
+                hits: 5,
+                window_seconds: 60,
+            },
+            client_servers_files_pull_query: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 60,
+            },
+            client_servers_subusers_create: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            client_teams_members_create: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 3600,
+            },
+            remote: RatelimitConfiguration {
+                hits: 720,
+                window_seconds: 30,
+            },
+            remote_sftp_auth: RatelimitConfiguration {
+                hits: 60,
+                window_seconds: 30,
+            },
+            remote_enroll: RatelimitConfiguration {
+                hits: 10,
+                window_seconds: 60,
+            },
+            exempt_ips: Default::default(),
+            exempt_api_keys: Default::default(),
+        }
+    }
+}
+
 pub struct AppSettingsRatelimitsDeserializer;
 
 #[async_trait::async_trait]

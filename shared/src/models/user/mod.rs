@@ -57,6 +57,35 @@ pub struct User {
     extension_data: super::ModelExtensionData,
 }
 
+impl PreviewSample for User {
+    fn preview_sample(settings: &crate::settings::AppSettings) -> Self {
+        Self {
+            uuid: uuid::Uuid::nil(),
+            role: None,
+            external_id: None,
+            avatar: None,
+            username: "alex".into(),
+            email: "alex@example.com".into(),
+            name_first: Some("Alex".into()),
+            name_last: Some("Doe".into()),
+            admin: false,
+            frozen: false,
+            suspended: false,
+            totp_enabled: false,
+            totp_last_used: None,
+            totp_secret: None,
+            email_two_factor_enabled: false,
+            has_security_key: false,
+            email_verified: true,
+            password_login_disabled: false,
+            language: settings.app.language.clone(),
+            has_password: true,
+            created: chrono::Utc::now().naive_utc(),
+            extension_data: Vec::new(),
+        }
+    }
+}
+
 impl BaseModel for User {
     const NAME: &'static str = "user";
 
