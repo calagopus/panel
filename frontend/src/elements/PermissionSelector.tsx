@@ -1,4 +1,11 @@
-import { faChevronDown, faChevronUp, faClipboard, faPaste, faX } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronDown,
+  faChevronUp,
+  faClipboard,
+  faPaste,
+  faPuzzlePiece,
+  faX,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Checkbox, Group, Input, Menu, Stack, Text, Title } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
@@ -239,7 +246,8 @@ export default function PermissionSelector({
                     <Icon
                       icon={
                         permissionIcons[permissionIconMap[permissionsMapType]][category] ??
-                        permissionCategoryIconMapping[category]
+                        permissionCategoryIconMapping[category] ??
+                        faPuzzlePiece
                       }
                     />
                     <div>

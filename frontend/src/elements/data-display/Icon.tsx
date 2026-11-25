@@ -15,6 +15,11 @@ export function isIconDefinition(icon: unknown): icon is IconDefinition {
 }
 
 function IconRenderer({ icon, ...props }: IconProps) {
+  // extension-provided icons can be missing at runtime even tho not allowed by type
+  if (!icon) {
+    return null;
+  }
+
   if (isIconDefinition(icon)) {
     return <BaseFontAwesomeIcon icon={icon} {...props} />;
   }
