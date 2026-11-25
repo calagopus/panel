@@ -670,6 +670,7 @@ impl DatabaseHost {
             SELECT {}
             FROM database_hosts
             WHERE database_hosts.uuid = $3
+            AND database_hosts.deployment_enabled
             AND (
                 EXISTS (
                     SELECT 1 FROM node_database_hosts
