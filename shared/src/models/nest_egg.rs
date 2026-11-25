@@ -470,29 +470,41 @@ impl BaseModel for NestEgg {
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             author: row.try_get(compact_str::format_compact!("{prefix}author").as_str())?,
-            config_files: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}config_files").as_str())?,
-            )?,
-            config_startup: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}config_startup").as_str())?,
-            )?,
-            config_stop: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}config_stop").as_str())?,
-            )?,
-            config_script: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}config_script").as_str())?,
-            )?,
-            startup_commands: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}startup_commands").as_str())?,
-            )?,
+            config_files: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}config_files").as_str(),
+                )?
+                .0,
+            config_startup: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}config_startup").as_str(),
+                )?
+                .0,
+            config_stop: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}config_stop").as_str(),
+                )?
+                .0,
+            config_script: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}config_script").as_str(),
+                )?
+                .0,
+            startup_commands: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}startup_commands").as_str(),
+                )?
+                .0,
             force_outgoing_ip: row
                 .try_get(compact_str::format_compact!("{prefix}force_outgoing_ip").as_str())?,
             separate_port: row
                 .try_get(compact_str::format_compact!("{prefix}separate_port").as_str())?,
             features: row.try_get(compact_str::format_compact!("{prefix}features").as_str())?,
-            docker_images: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}docker_images").as_str())?,
-            )?,
+            docker_images: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}docker_images").as_str(),
+                )?
+                .0,
             file_denylist: row
                 .try_get(compact_str::format_compact!("{prefix}file_denylist").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,

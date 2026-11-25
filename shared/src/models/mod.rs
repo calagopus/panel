@@ -336,10 +336,8 @@ pub async fn invalidate_cache_keys(
     database: &crate::database::Database,
     keys: &[compact_str::CompactString],
 ) {
-    for key in keys {
-        if let Err(err) = database.cache.invalidate(key).await {
-            tracing::warn!(key = %key, "failed to invalidate cache entry: {err:#?}");
-        }
+    if let Err(err) = database.cache.invalidate_many(keys).await {
+        tracing::warn!(?keys, "failed to invalidate cache entries: {err:#?}");
     }
 }
 
@@ -1034,6 +1032,18 @@ pub trait ByUuid: BaseModel {
         let key = compact_str::format_compact!("{}::{uuid}", Self::NAME);
 
         invalidate_cache_keys(database, &[key]).await;
+    }
+
+    async fn invalidate_cached_many(
+        database: &crate::database::Database,
+        uuids: impl IntoIterator<Item = uuid::Uuid> + Send,
+    ) {
+        let keys = uuids
+            .into_iter()
+            .map(|uuid| compact_str::format_compact!("{}::{uuid}", Self::NAME))
+            .collect::<Vec<_>>();
+
+        invalidate_cache_keys(database, &keys).await;
     }
 }
 

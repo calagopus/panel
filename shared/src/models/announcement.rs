@@ -203,13 +203,17 @@ impl BaseModel for Announcement {
             dismissible_end: row
                 .try_get(compact_str::format_compact!("{prefix}dismissible_end").as_str())?,
             title: row.try_get(compact_str::format_compact!("{prefix}title").as_str())?,
-            title_translations: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}title_translations").as_str())?,
-            )?,
+            title_translations: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}title_translations").as_str(),
+                )?
+                .0,
             content: row.try_get(compact_str::format_compact!("{prefix}content").as_str())?,
-            content_translations: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}content_translations").as_str())?,
-            )?,
+            content_translations: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}content_translations").as_str(),
+                )?
+                .0,
             locations: row.try_get(compact_str::format_compact!("{prefix}locations").as_str())?,
             nodes: row.try_get(compact_str::format_compact!("{prefix}nodes").as_str())?,
             backup_configurations: row

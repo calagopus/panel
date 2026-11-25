@@ -6,7 +6,7 @@ use garde::Validate;
 use serde::{Deserialize, Serialize};
 use sqlx::{Row, postgres::PgRow};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap},
     sync::{Arc, LazyLock},
 };
 use utoipa::ToSchema;
@@ -81,9 +81,11 @@ impl BaseModel for ServerBackupGroup {
                 .try_get(compact_str::format_compact!("{prefix}server_uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             order: row.try_get(compact_str::format_compact!("{prefix}order").as_str())?,
-            retention: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}retention").as_str())?,
-            )?,
+            retention: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}retention").as_str(),
+                )?
+                .0,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })
@@ -213,20 +215,56 @@ impl ServerBackupGroup {
 
         Ok((row.total, row.usable, row.usable_unlocked))
     }
+
+    /// [`Self::backup_counts`] of every group of a server, groups without backups are absent
+    pub async fn backup_counts_by_server_uuid(
+        database: &crate::database::Database,
+        server_uuid: uuid::Uuid,
+    ) -> Result<HashMap<uuid::Uuid, (i64, i64, i64)>, crate::database::DatabaseError> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT
+                server_backup_groups.uuid,
+                COUNT(*) AS "total!",
+                COUNT(*) FILTER (
+                    WHERE server_backups.successful AND server_backups.completed IS NOT NULL
+                ) AS "usable!",
+                COUNT(*) FILTER (
+                    WHERE server_backups.successful
+                        AND server_backups.completed IS NOT NULL
+                        AND NOT server_backups.locked
+                ) AS "usable_unlocked!"
+            FROM server_backups
+            JOIN server_backup_groups ON server_backup_groups.uuid = server_backups.backup_group_uuid
+            WHERE server_backup_groups.server_uuid = $1 AND server_backups.deleted IS NULL
+            GROUP BY server_backup_groups.uuid
+            "#,
+            server_uuid,
+        )
+        .fetch_all(database.read())
+        .await?;
+
+        Ok(rows
+            .into_iter()
+            .map(|row| (row.uuid, (row.total, row.usable, row.usable_unlocked)))
+            .collect())
+    }
 }
 
 #[async_trait::async_trait]
 impl IntoApiObject for ServerBackupGroup {
     type ApiObject = ApiServerBackupGroup;
-    type ExtraArgs<'a> = ();
+    type ExtraArgs<'a> = Option<(i64, i64, i64)>;
 
     async fn into_api_object<'a>(
         self,
         state: &crate::State,
-        _args: Self::ExtraArgs<'a>,
+        backup_counts: Self::ExtraArgs<'a>,
     ) -> Result<Self::ApiObject, crate::database::DatabaseError> {
-        let (total_backups, usable_backups, usable_unlocked_backups) =
-            self.backup_counts(&state.database).await?;
+        let (total_backups, usable_backups, usable_unlocked_backups) = match backup_counts {
+            Some(backup_counts) => backup_counts,
+            None => self.backup_counts(&state.database).await?,
+        };
 
         let api_object = ApiServerBackupGroup::init_hooks(&self, state).await?;
 

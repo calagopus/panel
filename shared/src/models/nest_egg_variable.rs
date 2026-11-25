@@ -214,9 +214,11 @@ impl BaseModel for NestEggVariable {
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
-            name_translations: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}name_translations").as_str())?,
-            )?,
+            name_translations: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}name_translations").as_str(),
+                )?
+                .0,
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             description_translations: serde_json::from_value(row.try_get(

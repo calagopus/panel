@@ -428,6 +428,7 @@ export const userApiKeysTable = pgTable(
     index('user_api_keys_user_uuid_idx').on(cols.user_uuid),
     uniqueIndex('user_api_keys_user_uuid_name_idx').on(cols.user_uuid, cols.name),
     uniqueIndex('user_api_keys_user_uuid_key_start_idx').on(cols.user_uuid, cols.key_start),
+    index('user_api_keys_key_start_idx').on(cols.key_start),
     uniqueIndex('user_api_keys_key_idx').on(cols.key),
     index('user_api_keys_expires_idx').on(cols.expires),
   ],

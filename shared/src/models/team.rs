@@ -459,9 +459,7 @@ impl Team {
             return;
         }
 
-        for &server_uuid in &server_uuids {
-            super::server::Server::invalidate_cached(database, server_uuid).await;
-        }
+        super::server::Server::invalidate_cached_many(database, server_uuids.iter().copied()).await;
 
         super::node::Node::invalidate_permissions_everywhere(
             database,
@@ -768,9 +766,11 @@ impl UpdatableModel for Team {
         transaction.commit().await?;
 
         if renamed {
-            for server_uuid in self.server_uuids(&state.database).await? {
-                super::server::Server::invalidate_cached(&state.database, server_uuid).await;
-            }
+            super::server::Server::invalidate_cached_many(
+                &state.database,
+                self.server_uuids(&state.database).await?,
+            )
+            .await;
         }
 
         Ok(())

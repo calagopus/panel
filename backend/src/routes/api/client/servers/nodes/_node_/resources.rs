@@ -39,10 +39,12 @@ mod get {
     ) -> ApiResponseResult {
         permissions.has_user_permission("servers.read")?;
 
-        let server_uuids = if permissions.has_admin_permission("servers.read").is_ok() {
-            None
-        } else {
-            Some(
+        let (server_uuids, node) = tokio::try_join!(
+            async {
+                if permissions.has_admin_permission("servers.read").is_ok() {
+                    return Ok(None);
+                }
+
                 state
                     .cache
                     .cached(
@@ -57,9 +59,11 @@ mod get {
                             .await
                         },
                     )
-                    .await?,
-            )
-        };
+                    .await
+                    .map(Some)
+            },
+            Node::by_uuid_optional_cached(&state.database, node),
+        )?;
 
         if server_uuids.as_ref().is_some_and(|s| s.is_empty()) {
             return ApiResponse::new_serialized(Response {
@@ -68,18 +72,18 @@ mod get {
             .ok();
         }
 
-        let node = match Node::by_uuid_optional_cached(&state.database, node).await? {
-            Some(node) => node,
-            None => {
-                return ApiResponse::error("node not found")
-                    .with_status(StatusCode::NOT_FOUND)
-                    .ok();
-            }
+        let Some(node) = node else {
+            return ApiResponse::error("node not found")
+                .with_status(StatusCode::NOT_FOUND)
+                .ok();
         };
 
         let mut resources = node.fetch_server_resources(&state.database).await?;
         if let Some(server_uuids) = server_uuids {
-            resources.retain(|uuid, _| server_uuids.contains(uuid));
+            resources = server_uuids
+                .iter()
+                .filter_map(|uuid| resources.remove_entry(uuid))
+                .collect();
         }
 
         ApiResponse::new_serialized(Response { resources }).ok()

@@ -415,12 +415,16 @@ impl BaseModel for OAuthProviderMapping {
                 row.try_get(compact_str::format_compact!("{prefix}oauth_provider_uuid").as_str())?,
             ),
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
-            matcher: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}matcher").as_str())?,
-            )?,
-            mapping: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}mapping").as_str())?,
-            )?,
+            matcher: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}matcher").as_str(),
+                )?
+                .0,
+            mapping: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}mapping").as_str(),
+                )?
+                .0,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })

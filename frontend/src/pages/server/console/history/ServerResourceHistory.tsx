@@ -203,8 +203,16 @@ export default function ServerResourceHistory() {
   useEffect(() => {
     if (!timeframe.live) return;
 
-    const interval = setInterval(() => setNow(Date.now()), Math.max(timeframe.pointWidth, MIN_REFRESH));
-    return () => clearInterval(interval);
+    const tick = () => {
+      if (!document.hidden) setNow(Date.now());
+    };
+    const interval = setInterval(tick, Math.max(timeframe.pointWidth, MIN_REFRESH));
+    document.addEventListener('visibilitychange', tick);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', tick);
+    };
   }, [timeframe.live, timeframe.pointWidth]);
 
   const historyQuery = (frame: ResourceHistoryTimeframe) => ({

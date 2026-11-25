@@ -286,9 +286,11 @@ impl UserSession {
         .fetch_all(database.write())
         .await?;
 
-        for row in &rows {
-            Self::invalidate_cached(database, row.try_get("uuid")?).await;
-        }
+        let uuids = rows
+            .iter()
+            .map(|row| row.try_get("uuid"))
+            .collect::<Result<Vec<_>, _>>()?;
+        Self::invalidate_cached_many(database, uuids).await;
 
         Ok(rows.len() as u64)
     }

@@ -107,12 +107,16 @@ impl BaseModel for ServerSchedule {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
             enabled: row.try_get(compact_str::format_compact!("{prefix}enabled").as_str())?,
-            triggers: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}triggers").as_str())?,
-            )?,
-            condition: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}condition").as_str())?,
-            )?,
+            triggers: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}triggers").as_str(),
+                )?
+                .0,
+            condition: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}condition").as_str(),
+                )?
+                .0,
             last_run: row.try_get(compact_str::format_compact!("{prefix}last_run").as_str())?,
             last_failure: row
                 .try_get(compact_str::format_compact!("{prefix}last_failure").as_str())?,

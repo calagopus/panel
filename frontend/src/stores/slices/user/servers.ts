@@ -18,7 +18,7 @@ export interface ServerSlice {
   _nodeFetchTimestamps: Map<string, number>;
   _pendingNodeFetches: Map<string, Promise<void>>;
   _nodeSubscribers: Map<string, number>;
-  _nodeIntervals: Map<string, ReturnType<typeof setInterval>>;
+  _nodePollStops: Map<string, () => void>;
 
   setServerGroups: (serverGroups: z.infer<typeof userServerGroupSchema>[]) => void;
   addServerGroup: (serverGroup: z.infer<typeof userServerGroupSchema>) => void;
@@ -41,7 +41,7 @@ export const createServersSlice: StateCreator<UserStore, [], [], ServerSlice> = 
   _nodeFetchTimestamps: new Map(),
   _pendingNodeFetches: new Map(),
   _nodeSubscribers: new Map(),
-  _nodeIntervals: new Map(),
+  _nodePollStops: new Map(),
 
   setServerGroups: (value) => set({ serverGroups: value }),
   addServerGroup: (serverGroup) => set((state) => ({ serverGroups: [...state.serverGroups, serverGroup] })),
@@ -123,11 +123,16 @@ export const createServersSlice: StateCreator<UserStore, [], [], ServerSlice> = 
     if (current === 0) {
       get().fetchNodeResources(nodeUuid);
 
-      const intervalId = setInterval(() => {
-        get().fetchNodeResources(nodeUuid);
-      }, POLL_INTERVAL_MS);
+      const poll = () => {
+        if (!document.hidden) get().fetchNodeResources(nodeUuid);
+      };
+      const intervalId = setInterval(poll, POLL_INTERVAL_MS);
+      document.addEventListener('visibilitychange', poll);
 
-      state._nodeIntervals.set(nodeUuid, intervalId);
+      state._nodePollStops.set(nodeUuid, () => {
+        clearInterval(intervalId);
+        document.removeEventListener('visibilitychange', poll);
+      });
     }
 
     return () => {
@@ -136,11 +141,8 @@ export const createServersSlice: StateCreator<UserStore, [], [], ServerSlice> = 
 
       if (count <= 0) {
         s._nodeSubscribers.delete(nodeUuid);
-        const interval = s._nodeIntervals.get(nodeUuid);
-        if (interval) {
-          clearInterval(interval);
-          s._nodeIntervals.delete(nodeUuid);
-        }
+        s._nodePollStops.get(nodeUuid)?.();
+        s._nodePollStops.delete(nodeUuid);
       } else {
         s._nodeSubscribers.set(nodeUuid, count);
       }

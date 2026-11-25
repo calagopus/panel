@@ -29,7 +29,6 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true }
 indexmap = { workspace = true }
 reqwest = { workspace = true }
-aws-lc-rs = "1.19.0"
 tower-cookies = { workspace = true }
 tower-http = { workspace = true }
 rand = { workspace = true }
@@ -61,6 +60,7 @@ minijinja = { workspace = true }
 serde-saphyr = { workspace = true }
 hyper = "1.8.1"
 hex = { workspace = true }
+xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 aes = "0.9.0"
 cbc = "0.2.1"
 spki = "0.8.0"

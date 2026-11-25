@@ -60,9 +60,11 @@ mod post {
             .fetch_all(state.database.read()),
         )?;
 
-        for server in &reset_servers {
-            Server::invalidate_cached(&state.database, server.uuid).await;
-        }
+        Server::invalidate_cached_many(
+            &state.database,
+            reset_servers.iter().map(|server| server.uuid),
+        )
+        .await;
 
         tokio::try_join!(
             sqlx::query!(

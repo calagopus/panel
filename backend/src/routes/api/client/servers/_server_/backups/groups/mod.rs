@@ -39,13 +39,22 @@ mod get {
     ) -> ApiResponseResult {
         permissions.has_server_permission("backup-groups.read")?;
 
-        let backup_groups =
-            ServerBackupGroup::all_by_server_uuid(&state.database, server.uuid).await?;
+        let (backup_groups, backup_counts) = tokio::try_join!(
+            ServerBackupGroup::all_by_server_uuid(&state.database, server.uuid),
+            ServerBackupGroup::backup_counts_by_server_uuid(&state.database, server.uuid),
+        )?;
 
         ApiResponse::new_serialized(Response {
             backup_groups: backup_groups
                 .into_iter()
-                .map(|backup_group| backup_group.into_api_object(&state, ()))
+                .map(|backup_group| {
+                    let counts = backup_counts
+                        .get(&backup_group.uuid)
+                        .copied()
+                        .unwrap_or_default();
+
+                    backup_group.into_api_object(&state, Some(counts))
+                })
                 .try_collect_async_vec()
                 .await?,
         })
@@ -158,7 +167,7 @@ mod post {
             .await;
 
         ApiResponse::new_serialized(Response {
-            backup_group: group.into_api_object(&state, ()).await?,
+            backup_group: group.into_api_object(&state, None).await?,
         })
         .ok()
     }

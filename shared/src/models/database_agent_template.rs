@@ -180,18 +180,24 @@ impl BaseModel for DatabaseAgentTemplate {
             r#type: row.try_get(compact_str::format_compact!("{prefix}type").as_str())?,
             deployment_enabled: row
                 .try_get(compact_str::format_compact!("{prefix}deployment_enabled").as_str())?,
-            docker_images: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}docker_images").as_str())?,
-            )?,
-            env: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}env").as_str())?,
-            )?,
+            docker_images: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}docker_images").as_str(),
+                )?
+                .0,
+            env: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}env").as_str(),
+                )?
+                .0,
             image_uid: row.try_get(compact_str::format_compact!("{prefix}image_uid").as_str())?,
             image_gid: row.try_get(compact_str::format_compact!("{prefix}image_gid").as_str())?,
             cmd: row.try_get(compact_str::format_compact!("{prefix}cmd").as_str())?,
-            volumes: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}volumes").as_str())?,
-            )?,
+            volumes: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}volumes").as_str(),
+                )?
+                .0,
             socket_path: row
                 .try_get(compact_str::format_compact!("{prefix}socket_path").as_str())?,
             control_socket_path: row

@@ -89,9 +89,11 @@ impl BaseModel for EggRepositoryEgg {
             ),
             readme: row.try_get(compact_str::format_compact!("{prefix}readme").as_str())?,
             banner: row.try_get(compact_str::format_compact!("{prefix}banner").as_str())?,
-            exported_egg: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}exported_egg").as_str())?,
-            )?,
+            exported_egg: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}exported_egg").as_str(),
+                )?
+                .0,
             hash: row.try_get(compact_str::format_compact!("{prefix}hash").as_str())?,
             updated: row.try_get(compact_str::format_compact!("{prefix}updated").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,

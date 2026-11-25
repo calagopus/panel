@@ -80,9 +80,11 @@ impl BaseModel for ServerScheduleStep {
 
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
-            action: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}action").as_str())?,
-            )?,
+            action: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}action").as_str(),
+                )?
+                .0,
             order: row.try_get(compact_str::format_compact!("{prefix}order").as_str())?,
             error: row.try_get(compact_str::format_compact!("{prefix}error").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,

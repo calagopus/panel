@@ -1,0 +1,1 @@
+CREATE INDEX "user_api_keys_key_start_idx" ON "user_api_keys" ("key_start");

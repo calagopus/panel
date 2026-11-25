@@ -397,9 +397,11 @@ impl BaseModel for EggConfiguration {
             description: row
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             order: row.try_get(compact_str::format_compact!("{prefix}order_").as_str())?,
-            matcher: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}matcher").as_str())?,
-            )?,
+            matcher: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}matcher").as_str(),
+                )?
+                .0,
             config_allocations: row
                 .try_get::<Option<serde_json::Value>, _>(
                     compact_str::format_compact!("{prefix}config_allocations").as_str(),

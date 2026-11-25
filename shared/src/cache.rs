@@ -637,6 +637,7 @@ impl Cache {
     }
 
     #[tracing::instrument(
+        level = "debug",
         skip(self, fn_compute),
         fields(cache.prefix = %key_prefix(key), cache.outcome = tracing::field::Empty)
     )]
@@ -694,7 +695,7 @@ impl Cache {
                             outcome.store(OUTCOME_REMOTE_HIT, Ordering::Relaxed);
 
                             return Ok(DataEntry {
-                                data: Arc::new(value.to_vec()),
+                                data: Arc::new(value.into()),
                                 intended_ttl: effective_moka_ttl,
                             });
                         }
@@ -767,8 +768,7 @@ impl Cache {
 
             if let Some(value) = cached_value {
                 tracing::debug!("get: found in redis cache");
-                let data = Arc::new(value.to_vec());
-                return Ok(Some(rmp_serde::from_slice::<T>(&data)?));
+                return Ok(Some(rmp_serde::from_slice::<T>(&value)?));
             }
         }
 
@@ -787,7 +787,7 @@ impl Cache {
 
             if let Some(value) = cached_value {
                 tracing::debug!("get_raw: found in redis cache");
-                return Ok(Some(Arc::new(value.to_vec())));
+                return Ok(Some(Arc::new(value.into())));
             }
         }
 
@@ -944,6 +944,25 @@ impl Cache {
         self.local.invalidate(key).await;
         if let Some(client) = &self.client {
             client.del(self.redis_key(key).as_ref()).await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn invalidate_many(&self, keys: &[impl AsRef<str>]) -> Result<(), anyhow::Error> {
+        if keys.is_empty() {
+            return Ok(());
+        }
+
+        for key in keys {
+            self.local.invalidate(key.as_ref()).await;
+        }
+        if let Some(client) = &self.client {
+            let redis_keys = keys
+                .iter()
+                .map(|key| self.redis_key(key.as_ref()))
+                .collect::<Vec<_>>();
+            client.del(redis_keys).await?;
         }
 
         Ok(())

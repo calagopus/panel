@@ -263,9 +263,9 @@ impl EmailTemplateManager {
                             Ok(EmailVariableRow {
                                 name: row.try_get("name")?,
                                 value: row.try_get("value")?,
-                                value_translations: serde_json::from_value(
-                                    row.try_get("value_translations")?,
-                                )?,
+                                value_translations: row
+                                    .try_get::<sqlx::types::Json<_>, _>("value_translations")?
+                                    .0,
                             })
                         })
                         .collect::<Result<Vec<_>, anyhow::Error>>()

@@ -199,9 +199,11 @@ impl BaseModel for DatabaseAgentHost {
                 .map_err(anyhow::Error::new)?,
             memory: row.try_get(compact_str::format_compact!("{prefix}memory").as_str())?,
             disk: row.try_get(compact_str::format_compact!("{prefix}disk").as_str())?,
-            types: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}types").as_str())?,
-            )?,
+            types: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}types").as_str(),
+                )?
+                .0,
             token: row.try_get(compact_str::format_compact!("{prefix}token").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,

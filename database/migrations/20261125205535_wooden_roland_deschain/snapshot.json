@@ -1,0 +1,57 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "9eb9f769-d6af-40d4-82eb-63630b600a6c",
+  "prevIds": [
+    "23c34fcf-a527-458a-98d8-daeee588311b"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "user_api_keys",
+        "user_api_keys_key_start_idx"
+      ],
+      "writes": [
+        "s|idx|public.user_api_keys_key_start_idx",
+        "n|idx|public.user_api_keys_key_start_idx",
+        "e|idx|public.user_api_keys_key_start_idx",
+        "n|rel|public.user_api_keys_key_start_idx"
+      ],
+      "reads": [
+        "n|tbl|public.user_api_keys",
+        "n|sch|public",
+        "n|col|public.user_api_keys.key_start"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "user_api_keys",
+        "name": "user_api_keys_key_start_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "key_start",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

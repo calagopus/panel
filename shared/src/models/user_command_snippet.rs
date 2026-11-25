@@ -149,9 +149,11 @@ impl BaseModel for UserCommandSnippet {
         Ok(Self {
             uuid: row.try_get(compact_str::format_compact!("{prefix}uuid").as_str())?,
             name: row.try_get(compact_str::format_compact!("{prefix}name").as_str())?,
-            matcher: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}matcher").as_str())?,
-            )?,
+            matcher: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}matcher").as_str(),
+                )?
+                .0,
             command: row.try_get(compact_str::format_compact!("{prefix}command").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,

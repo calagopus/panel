@@ -957,7 +957,6 @@ version = "1.3.0"
 dependencies = [
  "aes 0.9.4",
  "anyhow",
- "aws-lc-rs",
  "aws-sdk-s3",
  "axum",
  "axum-extra",
@@ -1018,6 +1017,7 @@ dependencies = [
  "webauthn-rs-proto",
  "which",
  "wings-api",
+ "xxhash-rust",
 ]
 
 [[package]]

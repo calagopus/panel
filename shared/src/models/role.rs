@@ -125,9 +125,7 @@ impl Role {
         database: &crate::database::Database,
     ) -> Result<(), sqlx::Error> {
         Self::invalidate_cached(database, self.uuid).await;
-        for user_uuid in self.user_uuids(database).await? {
-            super::user::User::invalidate_cached(database, user_uuid).await;
-        }
+        super::user::User::invalidate_cached_many(database, self.user_uuids(database).await?).await;
 
         Ok(())
     }
@@ -444,9 +442,8 @@ impl DeletableModel for Role {
         transaction.commit().await?;
 
         Self::invalidate_cached(&state.database, self.uuid).await;
-        for &user_uuid in &user_uuids {
-            super::user::User::invalidate_cached(&state.database, user_uuid).await;
-        }
+        super::user::User::invalidate_cached_many(&state.database, user_uuids.iter().copied())
+            .await;
         super::node::Node::invalidate_permissions_everywhere(
             &state.database,
             super::node::PermissionsInvalidation {

@@ -353,12 +353,7 @@ pub async fn handle_postprocessing(
             Err(_) => return Ok(Response::from_parts(parts, Body::empty())),
         };
 
-        let hash = hex::encode(aws_lc_rs::digest::digest(
-            &aws_lc_rs::digest::SHA256,
-            &body_bytes,
-        ));
-
-        let etag = format!("\"{hash}\"");
+        let etag = format!("\"{:032x}\"", xxhash_rust::xxh3::xxh3_128(&body_bytes));
         parts.headers.insert("ETag", etag.parse().unwrap());
 
         (

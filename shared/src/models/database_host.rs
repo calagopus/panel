@@ -363,9 +363,11 @@ impl BaseModel for DatabaseHost {
                 .try_get(compact_str::format_compact!("{prefix}public_host").as_str())?,
             public_port: row
                 .try_get(compact_str::format_compact!("{prefix}public_port").as_str())?,
-            credentials: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}credentials").as_str())?,
-            )?,
+            credentials: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}credentials").as_str(),
+                )?
+                .0,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,
             extension_data: Self::map_extensions(prefix, row)?,
         })

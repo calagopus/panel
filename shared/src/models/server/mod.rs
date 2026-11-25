@@ -556,21 +556,24 @@ impl BaseModel for Server {
                 .try_get(compact_str::format_compact!("{prefix}pinned_cpus").as_str())?,
             startup: row.try_get(compact_str::format_compact!("{prefix}startup").as_str())?,
             image: row.try_get(compact_str::format_compact!("{prefix}image").as_str())?,
-            labels: serde_json::from_value(row.try_get::<serde_json::Value, _>(
-                compact_str::format_compact!("{prefix}labels").as_str(),
-            )?)?,
-            auto_kill: serde_json::from_value(row.try_get::<serde_json::Value, _>(
-                compact_str::format_compact!("{prefix}auto_kill").as_str(),
-            )?)?,
+            labels: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}labels").as_str(),
+                )?
+                .0,
+            auto_kill: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}auto_kill").as_str(),
+                )?
+                .0,
             auto_start_behavior: row
                 .try_get(compact_str::format_compact!("{prefix}auto_start_behavior").as_str())?,
             timezone: row.try_get(compact_str::format_compact!("{prefix}timezone").as_str())?,
             trash: row
-                .try_get::<Option<serde_json::Value>, _>(
+                .try_get::<Option<sqlx::types::Json<_>>, _>(
                     compact_str::format_compact!("{prefix}trash").as_str(),
                 )?
-                .map(serde_json::from_value)
-                .transpose()?,
+                .map(|trash| trash.0),
             hugepages_passthrough_enabled: row.try_get(
                 compact_str::format_compact!("{prefix}hugepages_passthrough_enabled").as_str(),
             )?,
@@ -816,24 +819,26 @@ impl Server {
             return Ok(Some(server));
         }
 
-        let subuser_access =
+        let (subuser_access, team_access) = tokio::try_join!(
             super::server_subuser::ServerSubuser::permissions_by_server_uuid_user_uuid_cached(
                 database,
                 server.uuid,
                 permissions.user_uuid(),
-            )
-            .await?;
-        let team_access = match server.team_uuid {
-            Some(team_uuid) => {
-                super::team_member::TeamMember::permissions_by_team_uuid_user_uuid_cached(
-                    database,
-                    team_uuid,
-                    permissions.user_uuid(),
-                )
-                .await?
-            }
-            None => None,
-        };
+            ),
+            async {
+                match server.team_uuid {
+                    Some(team_uuid) => {
+                        super::team_member::TeamMember::permissions_by_team_uuid_user_uuid_cached(
+                            database,
+                            team_uuid,
+                            permissions.user_uuid(),
+                        )
+                        .await
+                    }
+                    None => Ok(None),
+                }
+            },
+        )?;
 
         if let Some((subuser_permissions, ignored_files)) =
             merge_access(subuser_access, team_access)

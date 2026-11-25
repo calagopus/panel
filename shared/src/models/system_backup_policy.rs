@@ -118,9 +118,11 @@ impl BaseModel for SystemBackupPolicy {
             kind: row.try_get(compact_str::format_compact!("{prefix}kind").as_str())?,
             cron: croner::Cron::from_str(&cron)
                 .map_err(|err| crate::database::DatabaseError::Any(anyhow::Error::new(err)))?,
-            retention: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}retention").as_str())?,
-            )?,
+            retention: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}retention").as_str(),
+                )?
+                .0,
             parallelism: row
                 .try_get(compact_str::format_compact!("{prefix}parallelism").as_str())?,
             created: row.try_get(compact_str::format_compact!("{prefix}created").as_str())?,

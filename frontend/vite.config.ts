@@ -188,6 +188,7 @@ export default defineConfig({
               name: 'collab',
               test: /node_modules\/(yjs|y-protocols|y-monaco|lib0)\//,
               priority: 10,
+              includeDependenciesRecursively: false,
             },
             {
               name: 'cron',

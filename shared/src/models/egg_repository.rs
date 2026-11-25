@@ -412,9 +412,11 @@ impl BaseModel for EggRepository {
                 .try_get(compact_str::format_compact!("{prefix}description").as_str())?,
             git_repository: row
                 .try_get(compact_str::format_compact!("{prefix}git_repository").as_str())?,
-            credentials: serde_json::from_value(
-                row.try_get(compact_str::format_compact!("{prefix}credentials").as_str())?,
-            )?,
+            credentials: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}credentials").as_str(),
+                )?
+                .0,
             ssh_host_key: row
                 .try_get(compact_str::format_compact!("{prefix}ssh_host_key").as_str())?,
             default_nest: row

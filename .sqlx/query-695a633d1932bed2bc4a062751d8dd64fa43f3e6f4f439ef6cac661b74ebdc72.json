@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                server_backup_groups.uuid,\n                COUNT(*) AS \"total!\",\n                COUNT(*) FILTER (\n                    WHERE server_backups.successful AND server_backups.completed IS NOT NULL\n                ) AS \"usable!\",\n                COUNT(*) FILTER (\n                    WHERE server_backups.successful\n                        AND server_backups.completed IS NOT NULL\n                        AND NOT server_backups.locked\n                ) AS \"usable_unlocked!\"\n            FROM server_backups\n            JOIN server_backup_groups ON server_backup_groups.uuid = server_backups.backup_group_uuid\n            WHERE server_backup_groups.server_uuid = $1 AND server_backups.deleted IS NULL\n            GROUP BY server_backup_groups.uuid\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "server_backup_groups",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "total!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "usable!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "usable_unlocked!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "695a633d1932bed2bc4a062751d8dd64fa43f3e6f4f439ef6cac661b74ebdc72"
+}
