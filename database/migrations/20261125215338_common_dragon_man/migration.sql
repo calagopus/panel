@@ -1,0 +1,1 @@
+ALTER TABLE "nest_eggs" ADD COLUMN "config_crash_detection" jsonb DEFAULT '{}' NOT NULL;

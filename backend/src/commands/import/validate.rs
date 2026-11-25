@@ -13,8 +13,8 @@ use shared::models::{
     mount::CreateMountOptions,
     nest::CreateNestOptions,
     nest_egg::{
-        CreateNestEggOptions, NestEggConfigScript, NestEggConfigStartup, NestEggConfigStop,
-        ProcessConfigurationFile,
+        CreateNestEggOptions, NestEggConfigCrashDetection, NestEggConfigScript,
+        NestEggConfigStartup, NestEggConfigStop, ProcessConfigurationFile,
     },
     nest_egg_variable::CreateNestEggVariableOptions,
     node::CreateNodeOptions,
@@ -1559,6 +1559,7 @@ impl Validator<'_> {
                 config_startup,
                 config_stop,
                 config_script,
+                config_crash_detection: NestEggConfigCrashDetection::default(),
                 startup_commands,
                 force_outgoing_ip: egg.force_outgoing_ip,
                 separate_port: false,

@@ -40,6 +40,12 @@ export const adminEggSchema = z.looseObject({
     type: z.string(),
     value: z.preprocess(nullableString, z.string().nullable()),
   }),
+  configCrashDetection: z.object({
+    enabled: z.boolean().nullable(),
+    detectCleanExitAsCrash: z.boolean().nullable(),
+    timeout: z.number().int().nonnegative().nullable(),
+    cleanExitCodes: z.array(z.number().int().min(-2147483648).max(2147483647)).nullable(),
+  }),
   startupCommands: z.record(z.string(), z.string()),
   forceOutgoingIp: z.boolean(),
   separatePort: z.boolean(),

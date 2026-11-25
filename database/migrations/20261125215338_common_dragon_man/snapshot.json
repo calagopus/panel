@@ -1,0 +1,47 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "a2e21fd8-c126-4f7a-95c7-5c7e4169b202",
+  "prevIds": [
+    "9eb9f769-d6af-40d4-82eb-63630b600a6c"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "nest_eggs",
+        "config_crash_detection"
+      ],
+      "writes": [
+        "s|col|public.nest_eggs.config_crash_detection",
+        "n|col|public.nest_eggs.config_crash_detection",
+        "e|col|public.nest_eggs.config_crash_detection"
+      ],
+      "reads": [
+        "n|tbl|public.nest_eggs",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "nest_eggs",
+        "name": "config_crash_detection",
+        "type": "jsonb",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'{}'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}

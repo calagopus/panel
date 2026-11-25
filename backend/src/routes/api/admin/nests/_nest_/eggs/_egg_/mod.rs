@@ -244,6 +244,7 @@ mod patch {
                     "config_startup": egg.config_startup,
                     "config_stop": egg.config_stop,
                     "config_script": egg.config_script,
+                    "config_crash_detection": egg.config_crash_detection,
 
                     "startup_commands": egg.startup_commands,
                     "force_outgoing_ip": egg.force_outgoing_ip,

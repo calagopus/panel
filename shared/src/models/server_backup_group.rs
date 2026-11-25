@@ -216,7 +216,6 @@ impl ServerBackupGroup {
         Ok((row.total, row.usable, row.usable_unlocked))
     }
 
-    /// [`Self::backup_counts`] of every group of a server, groups without backups are absent
     pub async fn backup_counts_by_server_uuid(
         database: &crate::database::Database,
         server_uuid: uuid::Uuid,

@@ -2450,6 +2450,15 @@ impl Server {
                     egg: wings_api::ServerConfigurationEgg {
                         id: self.egg.uuid,
                         file_denylist: self.egg.file_denylist,
+                        crash_detection: wings_api::ServerConfigurationEggCrashDetection {
+                            enabled: self.egg.config_crash_detection.enabled,
+                            detect_clean_exit_as_crash: self
+                                .egg
+                                .config_crash_detection
+                                .detect_clean_exit_as_crash,
+                            timeout: self.egg.config_crash_detection.timeout,
+                            clean_exit_codes: self.egg.config_crash_detection.clean_exit_codes,
+                        },
                     },
                     container: wings_api::ServerConfigurationContainer {
                         image: self.image,

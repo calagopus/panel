@@ -1165,6 +1165,7 @@ export const nestEggsTable = pgTable(
     config_startup: jsonb().notNull(),
     config_stop: jsonb().notNull(),
     config_script: jsonb().notNull(),
+    config_crash_detection: jsonb().default({}).notNull(),
     startup_commands: json().notNull(),
     force_outgoing_ip: boolean().default(false).notNull(),
     separate_port: boolean().default(false).notNull(),

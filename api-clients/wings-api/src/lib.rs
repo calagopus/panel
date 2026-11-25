@@ -725,6 +725,18 @@ nestify::nest! {
             pub id: uuid::Uuid,
             #[schema(inline)]
             pub file_denylist: Vec<compact_str::CompactString>,
+            #[schema(inline)]
+            pub crash_detection: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct ServerConfigurationEggCrashDetection {
+                #[schema(inline)]
+                pub enabled: Option<bool>,
+                #[schema(inline)]
+                pub detect_clean_exit_as_crash: Option<bool>,
+                #[schema(inline)]
+                pub timeout: Option<u64>,
+                #[schema(inline)]
+                pub clean_exit_codes: Option<Vec<i32>>,
+            },
+
         },
 
         #[schema(inline)]

@@ -4848,6 +4848,7 @@ const baseTranslations = defineTranslations({
                         startupConfiguration: 'Startup Configuration',
                         stopConfiguration: 'Stop Configuration',
                         configFiles: 'Config Files Configuration',
+                        crashDetection: 'Crash Detection',
                       },
                       form: {
                         eggRepository: 'Egg Repository',
@@ -4860,6 +4861,22 @@ const baseTranslations = defineTranslations({
                         stopType: 'Stop Type',
                         stopCommand: 'Stop Command',
                         stopSignal: 'Stop Signal',
+                        disableCrashDetection: 'Disable crash detection',
+                        disableCrashDetectionDescription:
+                          'Servers using this egg are never restarted automatically after a crash, even if the node has crash detection enabled.',
+                        detectCleanExitAsCrash: 'Treat Clean Exit as Crash',
+                        detectCleanExitAsCrashDescription:
+                          'Whether stopping with a clean exit code, without being stopped from the panel, counts as a crash.',
+                        crashTimeout: 'Restart Timeout (Seconds)',
+                        crashTimeoutDescription:
+                          'A server that crashes again within this time is not restarted. Leave empty to use the node default.',
+                        overrideCleanExitCodes: 'Override clean exit codes',
+                        overrideCleanExitCodesDescription:
+                          'Exit codes that count as a clean exit. When off, the node default is used.',
+                        cleanExitCodes: 'Clean Exit Codes',
+                        cleanExitCodePlaceholder: 'Exit Code',
+                        cleanExitCodesInvalid: 'Exit codes must be whole numbers.',
+                        nodeDefault: 'Node Default',
                         parser: 'Parser',
                         createNewFile: 'Create New File',
                         createNewFileDescription:

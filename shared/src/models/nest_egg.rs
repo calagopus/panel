@@ -133,6 +133,20 @@ pub struct NestEggConfigStop {
     pub value: Option<compact_str::CompactString>,
 }
 
+#[derive(ToSchema, Serialize, Deserialize, Clone, Default, PartialEq)]
+pub struct NestEggConfigCrashDetection {
+    pub enabled: Option<bool>,
+    pub detect_clean_exit_as_crash: Option<bool>,
+    pub timeout: Option<u64>,
+    pub clean_exit_codes: Option<Vec<i32>>,
+}
+
+impl NestEggConfigCrashDetection {
+    pub fn is_unset(&self) -> bool {
+        *self == Self::default()
+    }
+}
+
 #[derive(ToSchema, Serialize, Deserialize, Clone)]
 pub struct NestEggConfigScript {
     pub container: compact_str::CompactString,
@@ -177,6 +191,14 @@ pub struct ExportedNestEggConfigs {
         deserialize_with = "crate::deserialize::deserialize_nest_egg_config_stop"
     )]
     pub stop: NestEggConfigStop,
+    #[garde(skip)]
+    #[schema(inline)]
+    #[serde(
+        default,
+        deserialize_with = "crate::deserialize::deserialize_defaultable",
+        skip_serializing_if = "NestEggConfigCrashDetection::is_unset"
+    )]
+    pub crash_detection: NestEggConfigCrashDetection,
 }
 
 #[derive(ToSchema, Validate, Serialize, Deserialize, Clone)]
@@ -311,6 +333,7 @@ pub struct NestEgg {
     pub config_startup: NestEggConfigStartup,
     pub config_stop: NestEggConfigStop,
     pub config_script: NestEggConfigScript,
+    pub config_crash_detection: NestEggConfigCrashDetection,
 
     pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub force_outgoing_ip: bool,
@@ -343,6 +366,7 @@ impl PreviewSample for NestEgg {
                 entrypoint: "bash".into(),
                 content: String::new(),
             },
+            config_crash_detection: NestEggConfigCrashDetection::default(),
             startup_commands: IndexMap::new(),
             force_outgoing_ip: false,
             separate_port: false,
@@ -419,6 +443,10 @@ impl BaseModel for NestEgg {
                 compact_str::format_compact!("{prefix}config_script"),
             ),
             (
+                "nest_eggs.config_crash_detection",
+                compact_str::format_compact!("{prefix}config_crash_detection"),
+            ),
+            (
                 "nest_eggs.startup_commands",
                 compact_str::format_compact!("{prefix}startup_commands"),
             ),
@@ -490,6 +518,11 @@ impl BaseModel for NestEgg {
                     compact_str::format_compact!("{prefix}config_script").as_str(),
                 )?
                 .0,
+            config_crash_detection: row
+                .try_get::<sqlx::types::Json<_>, _>(
+                    compact_str::format_compact!("{prefix}config_crash_detection").as_str(),
+                )?
+                .0,
             startup_commands: row
                 .try_get::<sqlx::types::Json<_>, _>(
                     compact_str::format_compact!("{prefix}startup_commands").as_str(),
@@ -554,6 +587,7 @@ impl NestEgg {
                 config_startup: exported_egg.config.startup,
                 config_stop: exported_egg.config.stop,
                 config_script: exported_egg.scripts.installation,
+                config_crash_detection: exported_egg.config.crash_detection,
                 startup_commands: exported_egg.startup_commands,
                 force_outgoing_ip: exported_egg.force_outgoing_ip,
                 separate_port: exported_egg.separate_port,
@@ -619,7 +653,7 @@ impl NestEgg {
                 config_script = $8, startup_commands = $9::json,
                 force_outgoing_ip = $10, separate_port = $11, features = $12,
                 docker_images = $13::json, file_denylist = $14,
-                egg_repository_egg_hash = $15
+                egg_repository_egg_hash = $15, config_crash_detection = $16
             WHERE nest_eggs.uuid = $1",
             self.uuid,
             &exported_egg.author,
@@ -656,6 +690,7 @@ impl NestEgg {
                 .map(|f| f.into())
                 .collect::<Vec<_>>(),
             from_repository.then(|| exported_egg_hash.as_str()),
+            serde_json::to_value(&exported_egg.config.crash_detection)?,
         )
         .execute(&mut *transaction)
         .await?;
@@ -963,6 +998,7 @@ impl NestEgg {
                     .collect(),
                 startup: self.config_startup,
                 stop: self.config_stop,
+                crash_detection: self.config_crash_detection,
             },
             scripts: ExportedNestEggScripts {
                 installation: self.config_script,
@@ -1017,6 +1053,7 @@ impl IntoAdminApiObject for NestEgg {
                 config_startup: self.config_startup,
                 config_stop: self.config_stop,
                 config_script: self.config_script,
+                config_crash_detection: self.config_crash_detection,
                 startup_commands: self.startup_commands,
                 force_outgoing_ip: self.force_outgoing_ip,
                 separate_port: self.separate_port,
@@ -1135,6 +1172,10 @@ pub struct CreateNestEggOptions {
     #[garde(skip)]
     #[schema(inline)]
     pub config_script: NestEggConfigScript,
+    #[garde(skip)]
+    #[schema(inline)]
+    #[serde(default)]
+    pub config_crash_detection: NestEggConfigCrashDetection,
     #[garde(custom(validate_startup_commands))]
     pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     #[garde(skip)]
@@ -1198,6 +1239,10 @@ impl CreatableModel for NestEgg {
                 "config_script",
                 serde_json::to_value(&options.config_script)?,
             )
+            .set(
+                "config_crash_detection",
+                serde_json::to_value(&options.config_crash_detection)?,
+            )
             .set("startup_commands", OrderedJson(&options.startup_commands))
             .set("force_outgoing_ip", options.force_outgoing_ip)
             .set("separate_port", options.separate_port)
@@ -1252,6 +1297,9 @@ pub struct UpdateNestEggOptions {
     #[garde(skip)]
     #[schema(inline)]
     pub config_script: Option<NestEggConfigScript>,
+    #[garde(skip)]
+    #[schema(inline)]
+    pub config_crash_detection: Option<NestEggConfigCrashDetection>,
     #[garde(inner(custom(validate_startup_commands)))]
     pub startup_commands: Option<IndexMap<compact_str::CompactString, compact_str::CompactString>>,
     #[garde(skip)]
@@ -1361,6 +1409,14 @@ impl UpdatableModel for NestEgg {
                     .transpose()?,
             )
             .set(
+                "config_crash_detection",
+                options
+                    .config_crash_detection
+                    .as_ref()
+                    .map(serde_json::to_value)
+                    .transpose()?,
+            )
+            .set(
                 "startup_commands",
                 options.startup_commands.as_ref().map(OrderedJson),
             )
@@ -1400,6 +1456,9 @@ impl UpdatableModel for NestEgg {
         }
         if let Some(config_script) = options.config_script {
             self.config_script = config_script;
+        }
+        if let Some(config_crash_detection) = options.config_crash_detection {
+            self.config_crash_detection = config_crash_detection;
         }
         if let Some(startup_commands) = options.startup_commands {
             self.startup_commands = startup_commands;
@@ -1509,6 +1568,10 @@ impl DuplicableModel for NestEgg {
             )
             .set("config_stop", serde_json::to_value(&self.config_stop)?)
             .set("config_script", serde_json::to_value(&self.config_script)?)
+            .set(
+                "config_crash_detection",
+                serde_json::to_value(&self.config_crash_detection)?,
+            )
             .set("startup_commands", OrderedJson(&self.startup_commands))
             .set("force_outgoing_ip", self.force_outgoing_ip)
             .set("separate_port", self.separate_port)
@@ -1592,6 +1655,8 @@ pub struct AdminApiNestEgg {
     pub config_stop: NestEggConfigStop,
     #[schema(inline)]
     pub config_script: NestEggConfigScript,
+    #[schema(inline)]
+    pub config_crash_detection: NestEggConfigCrashDetection,
 
     pub startup_commands: IndexMap<compact_str::CompactString, compact_str::CompactString>,
     pub force_outgoing_ip: bool,

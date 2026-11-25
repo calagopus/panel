@@ -4841,7 +4841,8 @@
                       "card": {
                         "startupConfiguration": "Startkonfiguration",
                         "stopConfiguration": "Stopp-Konfiguration",
-                        "configFiles": "Konfigurationsdateien-Konfiguration"
+                        "configFiles": "Konfigurationsdateien-Konfiguration",
+                        "crashDetection": "Absturzerkennung"
                       },
                       "form": {
                         "eggRepository": "Egg Repository",
@@ -4853,6 +4854,18 @@
                         "stopType": "Stopp-Typ",
                         "stopCommand": "Stopp-Befehl",
                         "stopSignal": "Stopp-Signal",
+                        "disableCrashDetection": "Absturzerkennung deaktivieren",
+                        "disableCrashDetectionDescription": "Server mit diesem Egg werden nach einem Absturz nie automatisch neu gestartet, auch wenn die Absturzerkennung auf der Node aktiviert ist.",
+                        "detectCleanExitAsCrash": "Sauberes Beenden als Absturz werten",
+                        "detectCleanExitAsCrashDescription": "Ob ein Beenden mit einem sauberen Exit-Code, ohne Stopp über das Panel, als Absturz zählt.",
+                        "crashTimeout": "Neustart-Timeout (Sekunden)",
+                        "crashTimeoutDescription": "Ein Server, der innerhalb dieser Zeit erneut abstürzt, wird nicht neu gestartet. Leer lassen, um den Node-Standard zu verwenden.",
+                        "overrideCleanExitCodes": "Saubere Exit-Codes überschreiben",
+                        "overrideCleanExitCodesDescription": "Exit-Codes, die als sauberes Beenden zählen. Wenn deaktiviert, wird der Node-Standard verwendet.",
+                        "cleanExitCodes": "Saubere Exit-Codes",
+                        "cleanExitCodePlaceholder": "Exit-Code",
+                        "cleanExitCodesInvalid": "Exit-Codes müssen ganze Zahlen sein.",
+                        "nodeDefault": "Node-Standard",
                         "parser": "Parser",
                         "createNewFile": "Neue Datei erstellen",
                         "createNewFileDescription": "Wenn aktiviert, wird die Datei erstellt, falls sie nicht existiert. Wenn deaktiviert, muss die Datei bereits existieren, andernfalls schlägt die Ersetzung fehl.",

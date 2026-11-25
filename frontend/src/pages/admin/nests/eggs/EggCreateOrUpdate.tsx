@@ -48,6 +48,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { trackActivity } from '@/stores/activity.ts';
 import { EggExportMenu, EggUpdateFromMenu } from './EggActionsMenu.tsx';
 import EggConfigFilesEditor from './EggConfigFilesEditor.tsx';
+import EggCrashDetectionEditor from './EggCrashDetectionEditor.tsx';
 import { DEFAULT_EGG_CONFIG_SCRIPT, eggEmptyFormValues, eggToFormValues } from './eggFormValues.ts';
 import EggStopConfigEditor from './EggStopConfigEditor.tsx';
 import EggDuplicateModal from './modals/EggDuplicateModal.tsx';
@@ -342,6 +343,8 @@ export default function EggCreateOrUpdate({
           </TitleCard>
 
           <EggStopConfigEditor form={form} />
+
+          <EggCrashDetectionEditor form={form} />
 
           <EggConfigFilesEditor form={form} />
 
