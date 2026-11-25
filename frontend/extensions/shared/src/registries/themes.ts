@@ -18,10 +18,13 @@ export class ThemeRegistry implements Registry {
   public variants: ThemeVariantDefinition[] = [];
 
   /**
-   * Lists the variant in the theme picker, an id matching a stock variant overrides it. Ship the styling in your
-   * `app.css`, scoped by both attributes: `:root[data-mantine-color-scheme='dark'][data-theme-variant='<id>']`.
+   * Lists the variant in the theme picker, an id matching a stock variant overrides it. Scope the styling by both
+   * attributes: `:root[data-mantine-color-scheme='dark'][data-theme-variant='<id>']`. Small styling can live in your
+   * `app.css`, but every rule there is matched on every page whatever its scoping, so ship anything sizeable through
+   * `stylesheets`: those are loaded and adopted only while the variant is active, after all other panel CSS.
    *
-   * While the variant is active (selected and the current scheme is in `schemes`), `mantineTheme` is merged over the
+   * While the variant is active (selected and the current scheme is in `schemes`), `stylesheets` are adopted (switching
+   * keeps the previous variant applied until they have loaded), `mantineTheme` is merged over the
    * app theme with `mergeThemeOverrides` (functions, arrays and strings replace the base value rather than merging),
    * `cssVariablesResolver` runs after the app resolvers, and `enter(scope)` runs. Everything registered through the
    * scope (interceptors, base component replacements, `onExit` callbacks) is undone automatically on exit.

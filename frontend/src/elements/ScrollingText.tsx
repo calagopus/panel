@@ -31,14 +31,12 @@ export default function ScrollingText({ children, className }: { children: React
       setDistance(overflow > 1 ? overflow : 0);
     };
 
-    measure();
-
     const observer = new ResizeObserver(measure);
     observer.observe(container);
     observer.observe(content);
 
     return () => observer.disconnect();
-  }, [children]);
+  }, []);
 
   const animate = distance > 0 && !reducedMotion;
   const duration = Math.min(Math.max(distance / SPEED, MIN_DURATION), MAX_DURATION);

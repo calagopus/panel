@@ -4,9 +4,11 @@ import {
   DEFAULT_THEME_VARIANT,
   getForcedColorScheme,
   getThemeVariant,
+  loadThemeVariantStylesheets,
   type ThemeScheme,
   ThemeVariantScope,
 } from '@/lib/themeVariants.ts';
+import { scheduleAssetReload } from '@/stores/assetReload.ts';
 
 const storageKey = 'theme_variant';
 const autoSchemeStorageKey = 'theme_auto_scheme';
@@ -54,20 +56,60 @@ function resolveActiveVariant(variant: string): string {
 }
 
 let activeScope: ThemeVariantScope | null = null;
+let targetVariant: string | null = null;
+let enterGeneration = 0;
+let appliedGeneration = 0;
 
-function enterVariant(id: string) {
+function selectedVariantAttribute(): string {
+  const { variant } = useThemeVariantStore.getState();
+
+  return getThemeVariant(variant) ? variant : DEFAULT_THEME_VARIANT;
+}
+
+// the previous variant stays applied, until the next ones stylesheets have loaded
+async function enterVariant(id: string) {
+  const generation = ++enterGeneration;
+  targetVariant = id;
+
+  let sheets: CSSStyleSheet[];
+  try {
+    sheets = await loadThemeVariantStylesheets(getThemeVariant(id));
+  } catch (err) {
+    if (generation !== enterGeneration) return;
+
+    console.error('Failed to load theme variant stylesheets', id, err);
+    scheduleAssetReload();
+    // session-only fallback, the stored selection is retried on the next load
+    useThemeVariantStore.setState({ variant: DEFAULT_THEME_VARIANT });
+    return;
+  }
+
+  if (generation !== enterGeneration) return;
+  appliedGeneration = generation;
+
   activeScope?.dispose();
-  activeScope = new ThemeVariantScope();
+  const scope = new ThemeVariantScope();
+  activeScope = scope;
+
+  document.documentElement.dataset.themeVariant = selectedVariantAttribute();
+  useThemeVariantStore.setState({ activeVariant: id });
+
+  if (sheets.length > 0) {
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, ...sheets];
+    scope.onExit(() => {
+      document.adoptedStyleSheets = document.adoptedStyleSheets.filter((sheet) => !sheets.includes(sheet));
+    });
+  }
 
   try {
-    getThemeVariant(id)?.enter?.(activeScope);
+    getThemeVariant(id)?.enter?.(scope);
   } catch (err) {
     console.error('Error while entering theme variant', id, err);
-    activeScope.dispose();
+    scope.dispose();
   }
 }
 
-export function registerThemeVariant() {
+export function registerThemeVariant(): Promise<void> {
   const forcedScheme = getForcedColorScheme();
   if (forcedScheme) {
     // forceColorScheme handles the session, the stored value only keeps themeBoot.js painting the right scheme
@@ -87,18 +129,17 @@ export function registerThemeVariant() {
     setAutoScheme(false);
   }
 
-  const syncActiveVariant = () => {
-    const { variant, activeVariant } = useThemeVariantStore.getState();
-    const nextActive = resolveActiveVariant(variant);
+  const syncActiveVariant = async () => {
+    const nextActive = resolveActiveVariant(useThemeVariantStore.getState().variant);
 
-    document.documentElement.dataset.themeVariant = getThemeVariant(variant) ? variant : DEFAULT_THEME_VARIANT;
-    if (nextActive !== activeVariant || !activeScope) {
-      enterVariant(nextActive);
-      useThemeVariantStore.setState({ activeVariant: nextActive });
+    if (nextActive !== targetVariant) {
+      await enterVariant(nextActive);
+    } else if (appliedGeneration === enterGeneration) {
+      document.documentElement.dataset.themeVariant = selectedVariantAttribute();
     }
   };
 
-  syncActiveVariant();
+  const initialVariant = syncActiveVariant();
   useThemeVariantStore.subscribe((state, previous) => {
     if (state.variant !== previous.variant) syncActiveVariant();
   });
@@ -114,4 +155,6 @@ export function registerThemeVariant() {
       useThemeVariantStore.setState({ autoScheme: event.newValue === '1' });
     }
   });
+
+  return initialVariant;
 }

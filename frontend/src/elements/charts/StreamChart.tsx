@@ -406,8 +406,10 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
                       domain: [start - EDGE, end + EDGE],
                       allowDataOverflow: true,
                       hide: true,
+                      tick: false,
                     }}
-                    yAxisProps={{ domain: [0, yMax], allowDataOverflow: true, hide: true }}
+                    yAxisProps={{ domain: [0, yMax], allowDataOverflow: true, hide: true, tick: false }}
+                    rightYAxisProps={{ tick: false }}
                     areaProps={(entry) => ({
                       isAnimationActive: false,
                       fillOpacity: highlighted && highlighted !== entry.name ? 0 : 1,

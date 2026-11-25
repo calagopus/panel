@@ -8,6 +8,8 @@ import { getTranslations } from '@/providers/TranslationProvider.tsx';
 
 export type ThemeScheme = 'light' | 'dark';
 
+export type ThemeVariantStylesheet = () => Promise<{ default: string }>;
+
 export class ThemeVariantScope {
   private disposers: (() => void)[] = [];
 
@@ -59,6 +61,12 @@ export interface ThemeVariantDefinition {
   category?: string;
   mantineTheme?: MantineThemeOverride;
   cssVariablesResolver?: CSSVariablesResolver;
+  /**
+   * CSS that only applies while the variant is active, e.g. `() => import('./styles/xp.css?inline')`. Variants sharing
+   * a loader function share the parsed sheet.
+   * @since 1.3.0
+   */
+  stylesheets?: ThemeVariantStylesheet[];
   enter?: (scope: ThemeVariantScope) => void;
 }
 
@@ -129,6 +137,28 @@ export function getThemeVariantCategories(): ThemeVariantCategory[] {
 
 export function getThemeVariant(id: string): ThemeVariantDefinition | undefined {
   return getThemeVariants().find((variant) => variant.id === id);
+}
+
+const loadedStylesheets = new Map<ThemeVariantStylesheet, Promise<CSSStyleSheet>>();
+
+export function loadThemeVariantStylesheets(variant: ThemeVariantDefinition | undefined): Promise<CSSStyleSheet[]> {
+  return Promise.all(
+    (variant?.stylesheets ?? []).map((loader) => {
+      let sheet = loadedStylesheets.get(loader);
+
+      if (!sheet) {
+        sheet = loader().then(({ default: css }) => {
+          const stylesheet = new CSSStyleSheet();
+          stylesheet.replaceSync(css);
+          return stylesheet;
+        });
+        sheet.catch(() => loadedStylesheets.delete(loader));
+        loadedStylesheets.set(loader, sheet);
+      }
+
+      return sheet;
+    }),
+  );
 }
 
 export function getForcedColorScheme(): ThemeScheme | undefined {

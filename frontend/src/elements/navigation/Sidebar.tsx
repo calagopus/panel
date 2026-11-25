@@ -313,11 +313,12 @@ function Footer() {
         : variant.schemes[0];
 
     animateThemeChange(event, () => {
-      setThemeVariant(variant.id);
-      setAutoScheme(prefersAuto && !bothSchemes);
+      // scheme first, otherwise the variant briefly resolves to standard under the old scheme
       if (nextScheme !== colorScheme) {
         setColorScheme(nextScheme);
       }
+      setAutoScheme(prefersAuto && !bothSchemes);
+      setThemeVariant(variant.id);
     });
   };
 

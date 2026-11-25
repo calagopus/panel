@@ -117,7 +117,7 @@ setExtensionStylesEnabled((identifier) => renderedInactiveExtensions?.includes(i
   );
 
   registerIconReplacements();
-  registerThemeVariant();
+  await registerThemeVariant();
 
   createRoot(root!).render(
     <App
