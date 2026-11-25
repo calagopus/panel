@@ -201,6 +201,7 @@ impl UpdateManager {
                         let data: Response = state
                             .client
                             .get("https://calagopus.com/api/latest")
+                            .timeout(std::time::Duration::from_secs(30))
                             .send()
                             .await?
                             .json()

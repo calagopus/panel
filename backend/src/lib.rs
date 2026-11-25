@@ -769,8 +769,6 @@ pub async fn handle_startup() -> Result<
         env,
     });
 
-    state.updates.init(state.clone());
-
     let (app, background_task_builder, shutdown_handler_builder) = extensions
         .init(
             state.clone(),
@@ -778,6 +776,8 @@ pub async fn handle_startup() -> Result<
             |routes| mount_extension_routes(&state, routes),
         )
         .await;
+
+    state.updates.init(state.clone());
 
     settings
         .set_inactive_extensions(&extensions.inactive())
