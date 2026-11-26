@@ -556,6 +556,7 @@ const baseTranslations = defineTranslations({
           suspended: 'suspended',
           unsuspended: 'unsuspended',
           stateCleared: 'cleared the state of',
+          exported: 'exported',
         },
       },
       tabs: {

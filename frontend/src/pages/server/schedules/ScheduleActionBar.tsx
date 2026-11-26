@@ -1,8 +1,18 @@
-import { faBan, faCheck, faChevronDown, faPlay, faPlayCircle, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBan,
+  faCheck,
+  faChevronDown,
+  faFileDownload,
+  faPlay,
+  faPlayCircle,
+  faShareAlt,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteSchedule from '@/api/server/schedules/deleteSchedule.ts';
+import exportSchedule from '@/api/server/schedules/exportSchedule.ts';
 import triggerSchedule from '@/api/server/schedules/triggerSchedule.ts';
 import updateSchedule from '@/api/server/schedules/updateSchedule.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
@@ -11,6 +21,7 @@ import { ServerCan } from '@/elements/Can.tsx';
 import ExtensionSlot from '@/elements/ExtensionSlot.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { downloadExportFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
@@ -64,6 +75,18 @@ export default function ScheduleActionBar({
       skipped: selectedSchedules.size - enabledSchedules.length,
       request: (schedule) => triggerSchedule(server.uuid, schedule.uuid, skipCondition),
       onFinished: finish,
+    });
+
+  const doExport = (format: ResourceExportFormat) =>
+    run({
+      action: 'export',
+      items: schedules,
+      itemKey: 'schedule',
+      verb: t('common.bulkActions.verb.exported', {}),
+      request: (schedule) =>
+        exportSchedule(server.uuid, schedule.uuid).then((data) =>
+          downloadExportFile(data, `schedule-${schedule.uuid}`, format),
+        ),
     });
 
   const doDelete = () => {
@@ -155,6 +178,44 @@ export default function ScheduleActionBar({
             <FontAwesomeIcon icon={faBan} className='mr-2' />
             {t('common.button.disable', {})} ({enabledSchedules.length})
           </Button>
+        </ServerCan>
+
+        <ServerCan action='schedules.read'>
+          <ContextMenu
+            menuProps={{ position: 'top-start' }}
+            items={[
+              {
+                type: 'action',
+                icon: faFileDownload,
+                label: t('common.button.exportAs', { format: 'JSON' }),
+                onClick: () => doExport('json'),
+                color: 'gray',
+              },
+              {
+                type: 'action',
+                icon: faFileDownload,
+                label: t('common.button.exportAs', { format: 'YAML' }),
+                onClick: () => doExport('yaml'),
+                color: 'gray',
+              },
+            ]}
+          >
+            {({ openMenu }) => (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  openMenu(rect.left, rect.top);
+                }}
+                variant='default'
+                loading={loading === 'export'}
+                rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+              >
+                <FontAwesomeIcon icon={faShareAlt} className='mr-2' />
+                {t('common.button.export', {})} ({schedules.length})
+              </Button>
+            )}
+          </ContextMenu>
         </ServerCan>
 
         <ServerCan action='schedules.delete'>

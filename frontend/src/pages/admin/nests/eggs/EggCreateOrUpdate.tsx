@@ -1,7 +1,6 @@
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@mantine/form';
-import { dump } from 'js-yaml';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { ChangeEvent, useState } from 'react';
 import { z } from 'zod';
@@ -31,7 +30,7 @@ import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ConditionalTooltip from '@/elements/overlays/ConditionalTooltip.tsx';
 import { toPterodactylEgg } from '@/lib/domain/pterodactylEgg.ts';
-import { downloadTextFile } from '@/lib/download/download.ts';
+import { downloadExportFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { parseStructuredDocument } from '@/lib/parseStructuredDocument.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { adminEggRepositoryEggSchema, adminEggRepositorySchema } from '@/lib/schemas/admin/eggRepositories.ts';
@@ -129,7 +128,7 @@ export default function EggCreateOrUpdate({
   });
   const eggServers = contextEgg ? (eggCounts?.[contextEgg.uuid]?.nestEggServers ?? 0) : 0;
 
-  const doExport = (format: 'calagopus' | 'pterodactyl', fileType: 'json' | 'yaml') => {
+  const doExport = (format: 'calagopus' | 'pterodactyl', fileType: ResourceExportFormat) => {
     if (!contextEgg) return;
 
     setLoading(true);
@@ -139,12 +138,7 @@ export default function EggCreateOrUpdate({
         const data = format === 'pterodactyl' ? toPterodactylEgg(exported) : exported;
 
         addToast(t('pages.admin.nests.tabs.eggs.page.tabs.general.page.toast.exported', {}), 'success');
-
-        if (fileType === 'json') {
-          downloadTextFile(JSON.stringify(data, undefined, 2), `egg-${contextEgg!.uuid}.json`);
-        } else {
-          downloadTextFile(dump(data, { flowLevel: -1, forceQuotes: true }), `egg-${contextEgg!.uuid}.yml`);
-        }
+        downloadExportFile(data, `egg-${contextEgg!.uuid}`, fileType);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

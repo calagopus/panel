@@ -5,6 +5,21 @@ import { serializeForApi } from '@/lib/serialization/api-transform.ts';
 
 export type ResourceExportFormat = 'json' | 'yaml';
 
+export function formatExportFile(
+  data: unknown,
+  format: ResourceExportFormat,
+): { contents: string; extension: 'json' | 'yml' } {
+  const contents =
+    format === 'json' ? JSON.stringify(data, undefined, 2) : dump(data, { flowLevel: -1, forceQuotes: true });
+
+  return { contents, extension: format === 'json' ? 'json' : 'yml' };
+}
+
+export function downloadExportFile(data: unknown, filenamePrefix: string, format: ResourceExportFormat): void {
+  const { contents, extension } = formatExportFile(data, format);
+  downloadTextFile(contents, `${filenamePrefix}.${extension}`);
+}
+
 export function serializeResourceFile<T extends z.ZodTypeAny>(
   schema: T,
   data: z.infer<T>,
@@ -19,12 +34,7 @@ export function serializeResourceFile<T extends z.ZodTypeAny>(
     }
   }
 
-  const contents =
-    format === 'json'
-      ? JSON.stringify(serialized, undefined, 2)
-      : dump(serialized, { flowLevel: -1, forceQuotes: true });
-
-  return { contents, extension: format === 'json' ? 'json' : 'yml' };
+  return formatExportFile(serialized, format);
 }
 
 export function downloadResourceFile<T extends z.ZodTypeAny>(

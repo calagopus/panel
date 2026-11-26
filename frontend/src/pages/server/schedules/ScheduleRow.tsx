@@ -1,6 +1,5 @@
 import { faClone, faFileDownload, faPlay, faPlayCircle, faShareAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { dump } from 'js-yaml';
 import { forwardRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -13,7 +12,7 @@ import { TableData, TableRow, TableSelectionCell } from '@/elements/data-display
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
-import { downloadTextFile } from '@/lib/download/download.ts';
+import { downloadExportFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { serverScheduleSchema } from '@/lib/schemas/server/schedules.ts';
 import ScheduleDuplicateModal from '@/pages/server/schedules/modals/ScheduleDuplicateModal.tsx';
@@ -55,16 +54,11 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
       });
   };
 
-  const doExport = (format: 'json' | 'yaml') =>
+  const doExport = (format: ResourceExportFormat) =>
     exportSchedule(server.uuid, schedule.uuid)
       .then((data) => {
         addToast(t('pages.server.schedules.toast.exported', {}), 'success');
-
-        if (format === 'json') {
-          downloadTextFile(JSON.stringify(data, undefined, 2), `schedule-${schedule.uuid}.json`);
-        } else {
-          downloadTextFile(dump(data, { flowLevel: -1, forceQuotes: true }), `schedule-${schedule.uuid}.yml`);
-        }
+        downloadExportFile(data, `schedule-${schedule.uuid}`, format);
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');

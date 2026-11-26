@@ -1,8 +1,17 @@
-import { faArrowTurnUp, faEgg, faRefresh, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowTurnUp,
+  faChevronDown,
+  faEgg,
+  faFileDownload,
+  faRefresh,
+  faShareAlt,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { z } from 'zod';
 import deleteEggs from '@/api/admin/nests/eggs/deleteEggs.ts';
+import exportEgg from '@/api/admin/nests/eggs/exportEgg.ts';
 import updateEggsUsingRepository from '@/api/admin/nests/eggs/updateEggsUsingRepository.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import ActionBar from '@/elements/ActionBar.tsx';
@@ -11,10 +20,14 @@ import { AdminCan } from '@/elements/Can.tsx';
 import ItemPreviewList, { ItemPreviewRow } from '@/elements/data-display/ItemPreviewList.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
+import ContextMenu from '@/elements/overlays/ContextMenu.tsx';
+import { toPterodactylEgg } from '@/lib/domain/pterodactylEgg.ts';
+import { downloadExportFile, type ResourceExportFormat } from '@/lib/download/export.ts';
 import { ObjectSet } from '@/lib/objectSet.ts';
 import { adminEggSchema } from '@/lib/schemas/admin/eggs.ts';
 import { adminNestSchema } from '@/lib/schemas/admin/nests.ts';
 import { useKeyboardShortcuts } from '@/plugins/quick-actions/useKeyboardShortcuts.ts';
+import { useBulkAction } from '@/plugins/selection/useBulkAction.ts';
 import { useAdminCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -36,6 +49,7 @@ export default function EggActionBar({
 
   const [openModal, setOpenModal] = useState<'move' | 'delete' | null>(null);
   const [loading, setLoading] = useState(false);
+  const { run, loading: bulkLoading } = useBulkAction();
 
   const doUpdateUsingRepository = () => {
     setLoading(true);
@@ -53,6 +67,22 @@ export default function EggActionBar({
       })
       .finally(() => setLoading(false));
   };
+
+  const doExport = (format: 'calagopus' | 'pterodactyl', fileType: ResourceExportFormat) =>
+    run({
+      action: 'export',
+      items: selectedEggs.values(),
+      itemKey: 'egg',
+      verb: t('common.bulkActions.verb.exported', {}),
+      request: (egg) =>
+        exportEgg(nest.uuid, egg.uuid).then((exported) =>
+          downloadExportFile(
+            format === 'pterodactyl' ? toPterodactylEgg(exported) : exported,
+            `egg-${egg.uuid}`,
+            fileType,
+          ),
+        ),
+    });
 
   const doDelete = async () => {
     await deleteEggs(nest.uuid, selectedEggs.keys())
@@ -117,6 +147,48 @@ export default function EggActionBar({
             <FontAwesomeIcon icon={faArrowTurnUp} className='mr-2' /> {t('common.button.move', {})}
           </Button>
         </AdminCan>
+        <ContextMenu
+          menuProps={{ position: 'top-start' }}
+          items={[
+            {
+              type: 'action',
+              icon: faFileDownload,
+              label: t('common.button.exportAs', { format: 'JSON' }),
+              onClick: () => doExport('calagopus', 'json'),
+              color: 'gray',
+            },
+            {
+              type: 'action',
+              icon: faFileDownload,
+              label: t('common.button.exportAs', { format: 'YAML' }),
+              onClick: () => doExport('calagopus', 'yaml'),
+              color: 'gray',
+            },
+            {
+              type: 'action',
+              icon: faFileDownload,
+              label: t('common.button.exportAs', { format: 'Pterodactyl' }),
+              onClick: () => doExport('pterodactyl', 'json'),
+              color: 'gray',
+            },
+          ]}
+        >
+          {({ openMenu }) => (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                openMenu(rect.left, rect.top);
+              }}
+              className='col-span-2'
+              variant='default'
+              loading={bulkLoading === 'export'}
+              rightSection={<FontAwesomeIcon icon={faChevronDown} />}
+            >
+              <FontAwesomeIcon icon={faShareAlt} className='mr-2' /> {t('common.button.export', {})}
+            </Button>
+          )}
+        </ContextMenu>
         <AdminCan action='eggs.delete'>
           <Button color='red' onClick={() => setOpenModal('delete')} className='col-span-2' disabled={loading}>
             <FontAwesomeIcon icon={faTrash} className='mr-2' /> {t('common.button.delete', {})}

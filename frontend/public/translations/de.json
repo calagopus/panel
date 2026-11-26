@@ -818,7 +818,8 @@
           "killed": "gekillt",
           "suspended": "suspendiert",
           "unsuspended": "entsuspendiert",
-          "stateCleared": "im Status zurückgesetzt"
+          "stateCleared": "im Status zurückgesetzt",
+          "exported": "exportiert"
         }
       },
       "tabs": {
