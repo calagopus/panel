@@ -109,6 +109,14 @@ export const serverResourceUsageSchema = z.object({
     txBytes: z.number(),
     txPackets: z.number(),
   }),
+  disk: z
+    .object({
+      readBytes: z.number(),
+      readOps: z.number(),
+      writeBytes: z.number(),
+      writeOps: z.number(),
+    })
+    .optional(),
   cpuAbsolute: z.number(),
   cpuLimitAbsolute: z.number(),
   uptime: z.number(),
@@ -132,6 +140,8 @@ export const serverResourceHistoryPointSchema = z.object({
   diskBytes: z.number().nullable(),
   networkRxBytes: z.number().nullable(),
   networkTxBytes: z.number().nullable(),
+  diskReadBytes: z.number().nullable(),
+  diskWriteBytes: z.number().nullable(),
 });
 
 export const serverResourceHistoryLimitsSchema = z.object({

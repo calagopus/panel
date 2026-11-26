@@ -49,6 +49,10 @@ export type ResourceHistoryRow = {
   networkTxBytes: number | null;
   networkRx: number | null;
   networkTx: number | null;
+  diskReadBytes: number | null;
+  diskWriteBytes: number | null;
+  diskRead: number | null;
+  diskWrite: number | null;
 };
 
 export interface ResourceHistorySummary {
@@ -60,6 +64,8 @@ export interface ResourceHistorySummary {
   disk: number | null;
   networkRxBytes: number | null;
   networkTxBytes: number | null;
+  diskReadBytes: number | null;
+  diskWriteBytes: number | null;
 }
 
 export function getDefaultResourceHistoryRanges(): ResourceHistoryRange[] {
@@ -171,7 +177,7 @@ export function buildResourceHistoryRows(
     const covered = Math.max(Math.min(t + timeframe.pointWidth, timeframe.now) - t, 0);
     const seconds = covered / 1000;
     const limit = limitAt(limits, t);
-    const rate = (bytes: number | null) => (bytes === null || seconds <= 0 ? null : (bytes * 8) / seconds);
+    const rate = (bytes: number | null, unit = 1) => (bytes === null || seconds <= 0 ? null : (bytes * unit) / seconds);
 
     return {
       t,
@@ -188,8 +194,12 @@ export function buildResourceHistoryRows(
       diskLimit: point.diskBytes !== null && diskLimitBytes ? diskLimitBytes : null,
       networkRxBytes: point.networkRxBytes,
       networkTxBytes: point.networkTxBytes,
-      networkRx: rate(point.networkRxBytes),
-      networkTx: rate(point.networkTxBytes),
+      networkRx: rate(point.networkRxBytes, 8),
+      networkTx: rate(point.networkTxBytes, 8),
+      diskReadBytes: point.diskReadBytes,
+      diskWriteBytes: point.diskWriteBytes,
+      diskRead: rate(point.diskReadBytes),
+      diskWrite: rate(point.diskWriteBytes),
     };
   });
 }
@@ -205,6 +215,8 @@ export function summarizeResourceHistory(rows: ResourceHistoryRow[]): ResourceHi
   let disk: number | null = null;
   let rx: number | null = null;
   let tx: number | null = null;
+  let read: number | null = null;
+  let write: number | null = null;
 
   for (const row of rows) {
     if (row.states) {
@@ -223,6 +235,8 @@ export function summarizeResourceHistory(rows: ResourceHistoryRow[]): ResourceHi
     if (row.disk !== null) disk = row.disk;
     if (row.networkRxBytes !== null) rx = (rx ?? 0) + row.networkRxBytes;
     if (row.networkTxBytes !== null) tx = (tx ?? 0) + row.networkTxBytes;
+    if (row.diskReadBytes !== null) read = (read ?? 0) + row.diskReadBytes;
+    if (row.diskWriteBytes !== null) write = (write ?? 0) + row.diskWriteBytes;
   }
 
   return {
@@ -234,5 +248,7 @@ export function summarizeResourceHistory(rows: ResourceHistoryRow[]): ResourceHi
     disk,
     networkRxBytes: rx,
     networkTxBytes: tx,
+    diskReadBytes: read,
+    diskWriteBytes: write,
   };
 }

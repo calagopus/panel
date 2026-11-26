@@ -1,27 +1,17 @@
-import {
-  faBan,
-  faPlay,
-  faRotateRight,
-  faSkull,
-  faStop,
-  faTowerBroadcast,
-  faTriangleExclamation,
-} from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faRotateRight, faSkull, faStop } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import classNames from 'classnames';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import Button from '@/elements/buttons/Button.tsx';
 import Card from '@/elements/data-display/Card.tsx';
-import Spinner from '@/elements/feedback/Spinner.tsx';
 import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import ScrollingText from '@/elements/ScrollingText.tsx';
-import { serverStatusInfo, statusToColor } from '@/lib/domain/server.ts';
 import { formatMilliseconds } from '@/lib/format/time.ts';
 import { serverPowerAction } from '@/lib/schemas/server/server.ts';
+import { useServerStatusLabel } from '@/plugins/server/useServerStatusLabel.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -54,55 +44,7 @@ export default function ServerStatusIndicator() {
   const powerBlocked =
     !socketConnected || !!server.status || server.isSuspended || server.isTransferring || server.nodeMaintenanceEnabled;
 
-  const { indicator, label } = useMemo((): { indicator: ReactNode; label: string } => {
-    const dot = (pulse: boolean) => (
-      <span className={classNames('rounded-full size-2', statusToColor(state), pulse && 'animate-pulse')} />
-    );
-    const icon = (definition: typeof faBan, className?: string) => (
-      <FontAwesomeIcon icon={definition} className={classNames('size-3', className)} />
-    );
-    const spinner = <Spinner size={12} />;
-
-    if (!socketConnected) {
-      return {
-        indicator: icon(faTowerBroadcast, 'text-(--mantine-color-dimmed)'),
-        label: t('common.enum.connectionStatus.offline', {}),
-      };
-    }
-    if (server.isSuspended) {
-      return { indicator: icon(faBan, 'text-server-status-offline'), label: t('common.server.state.suspended', {}) };
-    }
-    if (server.isTransferring) {
-      return { indicator: spinner, label: t('common.server.state.transferring', {}) };
-    }
-    if (server.nodeMaintenanceEnabled) {
-      return {
-        indicator: icon(faBan, 'text-server-status-offline'),
-        label: t('common.server.state.nodeMaintenance', {}),
-      };
-    }
-    if (server.status) {
-      const status = serverStatusInfo[server.status];
-
-      return {
-        indicator: status.failed ? icon(faTriangleExclamation, 'text-server-status-starting') : spinner,
-        label: status.label(),
-      };
-    }
-
-    return {
-      indicator: dot(state === 'starting' || state === 'stopping'),
-      label: t(`common.enum.serverState.${state ?? 'unknown'}`, {}),
-    };
-  }, [
-    socketConnected,
-    server.isSuspended,
-    server.isTransferring,
-    server.nodeMaintenanceEnabled,
-    server.status,
-    state,
-    t,
-  ]);
+  const { indicator, label } = useServerStatusLabel();
 
   const uptime = state === 'running' && stats?.uptime ? formatMilliseconds(stats.uptime, true, false) : null;
 

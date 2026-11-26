@@ -1,11 +1,18 @@
 import type { ResourceHistoryProps } from 'shared/src/registries/pages/server/console/history.ts';
-import { faCloudDownload, faHardDrive, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
+import { faCloudDownload, faFloppyDisk, faHardDrive, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
 import type { IconLike } from '@/elements/data-display/Icon.tsx';
 import ChartBlock from '@/elements/charts/ChartBlock.tsx';
 import ChartLegend from '@/elements/charts/ChartLegend.tsx';
 import HistoryChart from '@/elements/charts/HistoryChart.tsx';
 import Spinner from '@/elements/feedback/Spinner.tsx';
-import { ChartScale, formatBytes, formatPercent, HistoryChartSeries, historyChartLegend } from '@/lib/chart.ts';
+import {
+  ChartScale,
+  formatBytes,
+  formatBytesRate,
+  formatPercent,
+  HistoryChartSeries,
+  historyChartLegend,
+} from '@/lib/chart.ts';
 import { bitsPerSecondToString, mbToBytes } from '@/lib/format/size.ts';
 import { RESOURCE_HISTORY_CHART_SYNC_ID } from '@/lib/resourceHistory.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -110,6 +117,25 @@ export function HistoryNetworkBlock(props: ResourceHistoryProps) {
       ]}
       format={bitsPerSecondToString}
       min={1000}
+      props={props}
+    />
+  );
+}
+
+export function HistoryDiskIoBlock(props: ResourceHistoryProps) {
+  const { t } = useTranslations();
+
+  return (
+    <HistoryBlock
+      icon={faFloppyDisk}
+      title={t('common.stat.diskIo', {})}
+      series={[
+        { key: 'diskWrite', label: t('common.stat.write', {}) },
+        { key: 'diskRead', label: t('common.stat.read', {}), dash: '6 4' },
+      ]}
+      format={formatBytesRate}
+      scale='binary'
+      min={1024}
       props={props}
     />
   );

@@ -834,6 +834,9 @@
         "network": "Netzwerk",
         "inbound": "Eingehend",
         "outbound": "Ausgehend",
+        "diskIo": "Datenträger-E/A",
+        "read": "Lesen",
+        "write": "Schreiben",
         "uptime": "Laufzeit",
         "resources": "Ressourcen",
         "limit": "Limit {limit}"
@@ -6538,9 +6541,8 @@
           "details": {
             "address": "Adresse",
             "port": "Port",
-            "networkIn": "Netzwerk (Eingehend)",
-            "networkOut": "Netzwerk (Ausgehend)",
             "networkDetails": "{total} gesamt · {packets} Pakete/s",
+            "diskDetails": "{total} gesamt · {ops} IOPS",
             "normalizeCpuLoad": "Normalisiere CPU-Last (skaliert auf max. 100%)"
           },
           "power": {
@@ -6550,9 +6552,6 @@
                 "content": "Das gewaltsame Stoppen eines Servers kann zu Datenverlust führen."
               }
             }
-          },
-          "stats": {
-            "offline": "Server ist offline"
           },
           "history": {
             "title": "Ressourcenverlauf",
@@ -6582,7 +6581,8 @@
               "limit": "Limit"
             },
             "summary": {
-              "peak": "Spitze {value}"
+              "peak": "Spitze {value}",
+              "diskIo": "{read} gelesen · {written} geschrieben"
             },
             "unavailable": {
               "title": "Ressourcenverlauf nicht verfügbar",

@@ -1,3 +1,5 @@
+import { faPlay, faRotateRight, faSkull, faStop } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
@@ -69,6 +71,7 @@ export default function ServerPowerControls() {
           loading={state === 'starting'}
           onClick={() => onButtonClick('start')}
           className='flex-1 min-w-fit'
+          leftSection={<FontAwesomeIcon icon={faPlay} size='sm' />}
         >
           {t('common.enum.serverPowerAction.start', {})}
         </Button>
@@ -79,6 +82,7 @@ export default function ServerPowerControls() {
           disabled={!socketConnected || !state || !!server.status || server.isSuspended || server.isTransferring}
           onClick={() => onButtonClick('restart')}
           className='flex-1 min-w-fit'
+          leftSection={<FontAwesomeIcon icon={faRotateRight} size='sm' />}
         >
           {t('common.enum.serverPowerAction.restart', {})}
         </Button>
@@ -91,6 +95,7 @@ export default function ServerPowerControls() {
           }
           onClick={() => onButtonClick(killable ? 'kill' : 'stop')}
           className='flex-1 min-w-fit'
+          leftSection={<FontAwesomeIcon icon={killable ? faSkull : faStop} size='sm' />}
         >
           {killable ? t('common.enum.serverPowerAction.kill', {}) : t('common.enum.serverPowerAction.stop', {})}
         </Button>

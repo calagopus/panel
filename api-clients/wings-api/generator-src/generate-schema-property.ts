@@ -98,7 +98,7 @@ export default function generateSchemaProperty(output: fs.WriteStream, _spaces: 
             case 'integer': return output.write(`${convertType(object)},\n`)
             case 'number': return output.write('f64,\n')
             case 'string': return output.write(`${convertType(object)},\n`)
-            case 'object': return generateSchemaObject(output, _spaces + 4, parent, pascalCase(parent) + pascalCase(name), object)
+            case 'object': return generateSchemaObject(output, _spaces + 4, parent, pascalCase(parent) + pascalCase(name), object, false, { deriveDefault: serdeDefault })
             case 'array': return output.write(`Vec<${convertType(object.items!)}>,\n`)
         }
     } else {

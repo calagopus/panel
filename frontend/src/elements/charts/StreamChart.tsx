@@ -15,6 +15,7 @@ const EDGE = CHART_TICK * 1.5;
 const TOOLTIP_GAP = 12;
 const SYNC_TOLERANCE = CHART_TICK * 0.75;
 const CEILING_DURATION = 500;
+const COMPACT_GUTTER = 16;
 
 function formatOffset(at: number, end: number): string {
   const seconds = Math.round((at - end) / 1000);
@@ -226,7 +227,7 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
         .map((entry) => ({ name: entry.name, dataKey: entry.name, color: entry.color, payload: hoveredRow }))
     : [];
 
-  const tooltipShown = hovering && hoveredRow !== undefined && payload.length > 0;
+  const tooltipShown = !compact && hovering && hoveredRow !== undefined && payload.length > 0;
 
   useLayoutEffect(() => {
     const element = tooltip.current;
@@ -311,6 +312,7 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
   const pointerY = pointer ? Math.min(Math.max(pointer.y, PLOT_INSET), PLOT_INSET + plotHeight) : 0;
   const pointerValue = plotHeight > 0 ? (1 - (pointerY - PLOT_INSET) / plotHeight) * displayMax : 0;
   const hoveredX = hoveredRow ? ((hoveredRow.t! - start) * size.width) / CHART_WINDOW + edgePixels : 0;
+  const hoveredFraction = size.width > 0 ? Math.min(Math.max((hoveredX - edgePixels) / size.width, 0), 1) : 0;
 
   const tooltipLeft = pointer
     ? pointer.x + TOOLTIP_GAP + tooltipSize.width > size.width
@@ -345,9 +347,9 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
 
       <div
         ref={viewport}
-        className={compact ? 'relative min-w-0 flex-1' : 'relative min-w-0 flex-1 cursor-crosshair touch-pan-y'}
-        onPointerMove={compact ? undefined : onPointerMove}
-        onPointerLeave={compact ? undefined : onPointerLeave}
+        className='relative min-w-0 flex-1 cursor-crosshair touch-pan-y'
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
       >
         {!compact &&
           shownLabels.map((tick) => (
@@ -364,14 +366,16 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
             style={{ top: `max(${toY(limit)}, 0px)` }}
           >
             <span
-              className={`absolute right-1 whitespace-nowrap text-[10px] text-(--mantine-color-red-filled) tabular-nums ${plotY(limit, displayMax, plotHeight) < 16 ? 'top-0.5' : 'bottom-0.5'}`}
+              className={`absolute whitespace-nowrap text-[10px] text-(--mantine-color-red-filled) tabular-nums ${compact ? 'right-4' : 'right-1'} ${plotY(limit, displayMax, plotHeight) < 16 ? 'top-0.5' : 'bottom-0.5'}`}
             >
               {t('common.stat.limit', { limit: format(limit) })}
             </span>
           </div>
         )}
         {limit !== null && limit !== undefined && limit > yMax && (
-          <span className='pointer-events-none absolute top-0 right-1 whitespace-nowrap text-[10px] text-(--mantine-color-dimmed) tabular-nums'>
+          <span
+            className={`pointer-events-none absolute top-0 whitespace-nowrap text-[10px] text-(--mantine-color-dimmed) tabular-nums ${compact ? 'right-4' : 'right-1'}`}
+          >
             <FontAwesomeIcon icon={faArrowUp} className='mr-1' />
             {t('common.stat.limit', { limit: format(limit) })}
           </span>
@@ -439,10 +443,15 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
                     }}
                   />
                 ))}
-                {!hovering && payload.length > 0 && (
+                {(compact || !hovering) && payload.length > 0 && (
                   <span
-                    className={`absolute top-1 flex gap-2 whitespace-nowrap rounded-sm bg-(--mantine-color-body) px-1 text-[10px] tabular-nums ring-1 ring-(--mantine-color-default-border) ${hoveredX - edgePixels > size.width / 2 ? '-translate-x-[calc(100%+6px)]' : 'translate-x-1.5'}`}
-                    style={{ left: hoveredX }}
+                    className={`absolute top-1 flex gap-2 whitespace-nowrap rounded-sm bg-(--mantine-color-body) px-1 text-[10px] tabular-nums ring-1 ring-(--mantine-color-default-border) ${compact ? '' : hoveredX - edgePixels > size.width / 2 ? '-translate-x-[calc(100%+6px)]' : 'translate-x-1.5'}`}
+                    style={{
+                      left: hoveredX,
+                      transform: compact
+                        ? `translateX(calc(-${hoveredFraction * 100}% + ${(1 - 2 * hoveredFraction) * COMPACT_GUTTER}px))`
+                        : undefined,
+                    }}
                   >
                     {payload.map((item) => (
                       <span key={item.name} style={{ color: payload.length > 1 ? item.color : undefined }}>
@@ -456,7 +465,7 @@ function StreamChart({ data, domain, ticks, yMax, series, format, highlighted, l
           </div>
         </div>
 
-        {pointer && (
+        {pointer && !compact && (
           <div
             className='pointer-events-none absolute inset-x-0 border-t border-dashed border-(--chart-tick-color)'
             style={{ top: pointerY }}

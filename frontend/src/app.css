@@ -130,6 +130,11 @@
   /* Fallback until useContainerAutoHeight measures the real room in AuthWrapper. */
   --auth-page-height: 100dvh;
 
+  /* Fallback until useContainerAutoHeight measures the real room below the console page header. */
+  --console-fit-height: calc(100dvh - 9rem);
+  /* Room kept below the console for the page margin and the global Calagopus copyright footer. */
+  --console-fit-reserve: 4.25rem;
+
   /* Leave room for the normal page header and global Calagopus copyright footer. */
   --file-manager-workspace-height: calc(100dvh - 8rem);
   --file-manager-workspace-min-height: 42rem;

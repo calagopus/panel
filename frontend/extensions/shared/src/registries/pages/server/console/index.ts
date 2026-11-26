@@ -15,6 +15,7 @@ export class ConsoleRegistry implements Registry {
   public mergeFrom(other: this): this {
     this.container.mergeFrom(other.container);
     this.powerButtonComponents.mergeFrom(other.powerButtonComponents);
+    this.indicatorComponents.mergeFrom(other.indicatorComponents);
     this.terminalHeaderLeftComponents.mergeFrom(other.terminalHeaderLeftComponents);
     this.terminalHeaderRightComponents.mergeFrom(other.terminalHeaderRightComponents);
     this.xterm.mergeFrom(other.xterm);
@@ -36,6 +37,12 @@ export class ConsoleRegistry implements Registry {
    * @since 1.0.0
    */
   public powerButtonComponents: ComponentListRegistry = new ComponentListRegistry();
+  /**
+   * Rendered around the status, address and uptime indicators below the server name.
+   * `Indicator` from `@/elements/data-display/Indicator.tsx` matches the stock ones.
+   * @since 1.3.0
+   */
+  public indicatorComponents: ComponentListRegistry = new ComponentListRegistry();
   /**
    * Rendered around the connection status on the left of the bar above the terminal.
    * @since 1.0.0
@@ -64,7 +71,7 @@ export class ConsoleRegistry implements Registry {
    */
   public statCards: FC[] = [];
   /**
-   * Chart blocks after the stock live cpu, memory and network charts.
+   * Chart blocks in a row below the console and the stat tiles.
    * @since 1.0.0
    */
   public statBlocks: FC[] = [];
@@ -83,6 +90,12 @@ export class ConsoleRegistry implements Registry {
   /** @since 1.0.0 */
   public enterPowerButtonComponents(callback: (registry: ComponentListRegistry) => unknown): this {
     callback(this.powerButtonComponents);
+    return this;
+  }
+
+  /** @since 1.3.0 */
+  public enterIndicatorComponents(callback: (registry: ComponentListRegistry) => unknown): this {
+    callback(this.indicatorComponents);
     return this;
   }
 

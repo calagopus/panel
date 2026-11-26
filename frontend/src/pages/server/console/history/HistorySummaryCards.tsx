@@ -109,6 +109,14 @@ export function HistoryDiskCard({ summary, loading }: ResourceHistoryProps) {
       icon={faHardDrive}
       label={t('common.stat.diskUsage', {})}
       value={summary.disk === null ? t('common.na', {}) : formatBytes(summary.disk)}
+      details={
+        summary.diskReadBytes === null || summary.diskWriteBytes === null
+          ? null
+          : t('pages.server.console.history.summary.diskIo', {
+              read: bytesToString(summary.diskReadBytes, 1, true),
+              written: bytesToString(summary.diskWriteBytes, 1, true),
+            })
+      }
       loading={loading && summary.disk === null}
     />
   );

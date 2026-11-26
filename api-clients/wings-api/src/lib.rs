@@ -371,6 +371,10 @@ nestify::nest! {
         pub network_rx_bytes: Option<u64>,
         #[schema(inline)]
         pub network_tx_bytes: Option<u64>,
+        #[schema(inline)]
+        pub disk_read_bytes: Option<u64>,
+        #[schema(inline)]
+        pub disk_write_bytes: Option<u64>,
     }
 }
 
@@ -532,6 +536,19 @@ nestify::nest! {
             pub tx_bytes: u64,
             #[schema(inline)]
             pub tx_packets: u64,
+        },
+
+        #[schema(inline)]
+        #[serde(default)]
+        pub disk: #[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Default)] pub struct ResourceUsageDisk {
+            #[schema(inline)]
+            pub read_bytes: u64,
+            #[schema(inline)]
+            pub read_ops: u64,
+            #[schema(inline)]
+            pub write_bytes: u64,
+            #[schema(inline)]
+            pub write_ops: u64,
         },
 
         #[schema(inline)]

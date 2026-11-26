@@ -571,6 +571,9 @@ const baseTranslations = defineTranslations({
         network: 'Network',
         inbound: 'Inbound',
         outbound: 'Outbound',
+        diskIo: 'Disk I/O',
+        read: 'Read',
+        write: 'Write',
         uptime: 'Uptime',
         resources: 'Resources',
         limit: 'Limit {limit}',
@@ -6559,9 +6562,8 @@ const baseTranslations = defineTranslations({
           details: {
             address: 'Address',
             port: 'Port',
-            networkIn: 'Network (In)',
-            networkOut: 'Network (Out)',
             networkDetails: '{total} total · {packets} pps',
+            diskDetails: '{total} total · {ops} IOPS',
             normalizeCpuLoad: 'Normalize CPU Load (shifted to max 100%)',
           },
           power: {
@@ -6571,9 +6573,6 @@ const baseTranslations = defineTranslations({
                 content: 'Forcibly stopping a server can lead to data corruption.',
               },
             },
-          },
-          stats: {
-            offline: 'Server is offline',
           },
           history: {
             title: 'Resource History',
@@ -6604,6 +6603,7 @@ const baseTranslations = defineTranslations({
             },
             summary: {
               peak: 'Peak {value}',
+              diskIo: '{read} read · {written} written',
             },
             unavailable: {
               title: 'Resource History Unavailable',

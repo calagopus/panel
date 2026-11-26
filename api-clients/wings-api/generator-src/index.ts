@@ -78,7 +78,7 @@ const compatBodyProperties: Record<string, Record<string, 'client' | 'extra'>> =
 /** Properties wings only started sending after the schema shipped, so older nodes omit them. */
 const serdeDefaultProperties: Record<string, string[]> = {
     QueryResultSet: ['truncated'],
-    ResourceUsage: ['trash_bytes'],
+    ResourceUsage: ['trash_bytes', 'disk'],
 }
 
 /** The same, for properties of a route's inline response bodies. */

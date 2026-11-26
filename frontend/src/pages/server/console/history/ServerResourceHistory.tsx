@@ -35,7 +35,13 @@ import {
 import { useResource } from '@/plugins/resource/useResource.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
-import { HistoryCpuBlock, HistoryDiskBlock, HistoryMemoryBlock, HistoryNetworkBlock } from './HistoryChartBlocks.tsx';
+import {
+  HistoryCpuBlock,
+  HistoryDiskBlock,
+  HistoryDiskIoBlock,
+  HistoryMemoryBlock,
+  HistoryNetworkBlock,
+} from './HistoryChartBlocks.tsx';
 import HistoryStateTimeline from './HistoryStateTimeline.tsx';
 import {
   HistoryCpuCard,
@@ -172,6 +178,7 @@ const stockBlocks: ResourceHistoryItem[] = [
   { id: 'memory', component: HistoryMemoryBlock },
   { id: 'network', component: HistoryNetworkBlock },
   { id: 'disk', component: HistoryDiskBlock },
+  { id: 'diskIo', component: HistoryDiskIoBlock },
 ];
 
 export default function ServerResourceHistory() {

@@ -2,7 +2,7 @@ import { makeComponentHookable } from 'shared';
 import { ChartLegendProps, StreamChartSeries } from '@/lib/chart.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-function SeriesKey({ entry }: { entry: StreamChartSeries }) {
+export function SeriesKey({ entry }: { entry: StreamChartSeries }) {
   return (
     <svg width={14} height={2} viewBox='0 0 14 2' className='-mt-0.5 shrink-0 overflow-visible' aria-hidden>
       <line

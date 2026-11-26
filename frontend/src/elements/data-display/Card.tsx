@@ -1,4 +1,10 @@
-import { Card as MantineCard, CardProps as MantineCardProps, MantineColor, Progress } from '@mantine/core';
+import {
+  Card as MantineCard,
+  CardProps as MantineCardProps,
+  MantineColor,
+  MantineSpacing,
+  Progress,
+} from '@mantine/core';
 import classNames from 'classnames';
 import { ComponentProps, forwardRef } from 'react';
 import { makeComponentHookable } from 'shared';
@@ -10,11 +16,23 @@ export interface CardProps extends MantineCardProps {
   progress?: number | null;
   total?: number | null;
   progressColor?: MantineColor;
+  progressMargin?: MantineSpacing;
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps & ComponentProps<'div'>>(
   (
-    { className, pl, hoverable = false, leftStripeClassName, progress, total, progressColor, children, ...rest },
+    {
+      className,
+      pl,
+      hoverable = false,
+      leftStripeClassName,
+      progress,
+      total,
+      progressColor,
+      progressMargin = 'md',
+      children,
+      ...rest
+    },
     ref,
   ) => {
     const percent = usagePercent(progress, total);
@@ -37,7 +55,7 @@ const Card = forwardRef<HTMLDivElement, CardProps & ComponentProps<'div'>>(
         )}
         {children}
         {percent !== null && (
-          <MantineCard.Section mt='md'>
+          <MantineCard.Section mt={progressMargin}>
             <Progress value={percent} color={progressColor} size='sm' radius={0} />
           </MantineCard.Section>
         )}
