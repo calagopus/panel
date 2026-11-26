@@ -235,7 +235,8 @@ export default function NodeOverview({ node }: { node: Node }) {
                         {t('common.badge.restarting', {})}
                       </Badge>
                     ) : (
-                      overview.upgrade && (
+                      overview.upgrade &&
+                      upgradeAvailability === 'available' && (
                         <AdminCan action='nodes.upgrade'>
                           <Button
                             size='xs'
