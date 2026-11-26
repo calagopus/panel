@@ -294,7 +294,6 @@
       "alert": {
         "warning": "Advertencia",
         "success": "Éxito",
-        "clockOffset": "El reloj de tu sistema está desincronizado con el servidor por más de 5 segundos. Esto puede causar problemas con la autenticación por passkey y la autenticación de dos factores. Sincroniza tu reloj si aparecen problemas. Diferencia actual: {offset} segundo(s).",
         "passwordAuthUnavailable": "Tu contraseña no funcionará para esta conexión. Usa una clave SSH en su lugar. Puedes añadir una en la página de Claves SSH de tu cuenta."
       },
       "divider": {
@@ -338,7 +337,6 @@
           "exception": "Excepción",
           "invalid": "Patrón inválido",
           "unavailable": "Cuenta no disponible",
-          "tooManyPatterns": "Las coincidencias no se cuentan automáticamente cuando hay más de {max} patrones.",
           "unanchoredException": "`{pattern}` coincide en cualquier profundidad, usa `{anchored}` para coincidir sólo en el directorio raíz."
         },
         "cronInput": {
@@ -354,7 +352,6 @@
         },
         "iconInput": {
           "defaultIcon": "Icono predeterminado",
-          "searchPlaceholder": "Buscar iconos…",
           "noResults": "Ningún icono coincide con tu búsqueda.",
           "moreResults": "Usando las primeras {count} coincidencias, refina tu búsqueda para ver más.",
           "button": {
@@ -413,15 +410,13 @@
         },
         "deleteFailedBackups": {
           "title": "Confirmar la eliminación de la copia de seguridad fallida\n",
-          "content": "¿Quieres eliminar las {count} copias de seguridad fallidas? Las copias de seguridad bloqueadas y aquellas cuya configuración está en mantenimiento se conservarán. La eliminación se ejecuta en segundo plano y puede tardar un tiempo en completarse.",
           "alert": {
             "forceWarning": "La eliminación forzada elimina estas copias de seguridad incluso si falta su configuración o no se puede acceder al almacenamiento remoto. Es posible que los archivos de las copias de seguridad no se eliminen por completo y queden datos huérfanos."
           }
         }
       },
       "toast": {
-        "duplicated": "{resource} duplicado.",
-        "failedBackupDeletionStarted": "Eliminando {count} copias de seguridad fallidas en segundo plano."
+        "duplicated": "{resource} duplicado."
       },
       "settingScope": {
         "account": "Sincronizar con la cuenta",
@@ -738,16 +733,6 @@
           "unlessStopped": "A menos que se detenga",
           "never": "Nunca"
         },
-        "bulkActionServerAction": {
-          "started": "Iniciado",
-          "stopped": "Detenido",
-          "restarted": "Reiniciado",
-          "killed": "Forzado",
-          "suspended": "Suspendido",
-          "unsuspended": "Reactivado",
-          "clearedState": "Limpiado el estado de",
-          "deleted": "Eliminado"
-        },
         "compressionLevel": {
           "bestSpeed": "Más rápido",
           "goodSpeed": "Buena velocidad",
@@ -806,7 +791,6 @@
         "dividerPlaceholder": "Etiqueta del separador (opcional)",
         "redirectNamePlaceholder": "Nombre de la redirección",
         "destinationPlaceholder": "URL de destino (p. ej., https://...)",
-        "selectRoutePlaceholder": "Selecciona una ruta...",
         "button": {
           "addDivider": "Añadir separador",
           "addRedirect": "Añadir redirección"
@@ -1048,12 +1032,8 @@
       "fileUpload": {
         "title": "Subiendo {files}",
         "adminAssets": "Recursos de administrador",
-        "waiting": "Esperando: {file}",
-        "uploading": "Subiendo: {file}",
         "uploadingFolder": "Subiendo carpeta: {folder} ({files})",
-        "failed": "Fallido: {file}",
         "failedFolder": "Subida fallida: {folder} ({files})",
-        "paused": "En pausa: {file}",
         "pause": "Pausar subida",
         "resume": "Reanudar subida",
         "cancel": "Cancelar subida",
@@ -1185,10 +1165,7 @@
             "frontendConnectionError": "Tu navegador no ha podido conectarse al nodo. Comprueba la URL (pública), el certificado TLS y el cortafuegos. Los Websockets y las descargas dependen de esta conexión"
           },
           "successMessage": "La conexión con tu nodo se verificó correctamente. Ya puedes continuar.",
-          "configurationDescription": "Pega esto en el archivo de configuración en `{file}` o ejecuta:",
-          "button": {
-            "verify": "Verificar conexión"
-          }
+          "configurationDescription": "Pega esto en el archivo de configuración en `{file}` o ejecuta:"
         },
         "configuration": {
           "title": "Ajustes de la aplicación",
@@ -1231,8 +1208,7 @@
             "nestDescription": "Para empezar a usar este egg, tendrás que crear un nest; los nests son colecciones de eggs. Ponle un nombre:"
           },
           "server": {
-            "title": "Servidor",
-            "nestDescription": "Para empezar a usar este egg, tendrás que crear un nest; los nests son colecciones de eggs. Ponle un nombre:"
+            "title": "Servidor"
           },
           "error": {
             "noNodes": "Algo salió mal. No se encontraron nodos."
@@ -1252,8 +1228,7 @@
               "subtitle": "Ajustes y preferencias del panel configurados"
             },
             "eggRepositories": {
-              "title": "Repositorios de eggs",
-              "subtitle": "{count} repositorios"
+              "title": "Repositorios de eggs"
             },
             "location": "Ubicación",
             "node": "Nodo",
@@ -1384,10 +1359,7 @@
         "verifyEmail": {
           "title": "Verifica tu correo electrónico",
           "success": "Tu correo electrónico **{email}** ha sido verificado.",
-          "failed": "Este enlace de verificación es inválido o ha expirado. Solicita uno nuevo e inténtalo de nuevo.",
-          "button": {
-            "continue": "Continuar"
-          }
+          "failed": "Este enlace de verificación es inválido o ha expirado. Solicita uno nuevo e inténtalo de nuevo."
         },
         "resetPassword": {
           "title": "Restablecer contraseña",
@@ -1442,21 +1414,18 @@
                   },
                   "deleteServerGroup": {
                     "title": "Confirmar eliminación del grupo de servidores",
-                    "content": "¿Seguro que quieres eliminar **{group}** de tu cuenta?",
                     "toast": {
                       "deleted": "Grupo de servidores eliminado."
                     }
                   },
                   "addServerToGroup": {
                     "title": "Añadir servidores a {group}",
-                    "noServers": "Todos los servidores ya están en este grupo.",
                     "toast": {
                       "added": "{servers} añadido al grupo."
                     }
                   },
                   "removeServerFromGroup": {
                     "title": "Confirmar la eliminación del servidor",
-                    "content": "¿Quieres eliminar **{server}** de **{group}**?",
                     "toast": {
                       "removed": "Servidor eliminado del grupo."
                     }
@@ -1469,8 +1438,7 @@
                       "description": "Este servidor ya es parte de {group}."
                     },
                     "groupFull": {
-                      "title": "El grupo está lleno.",
-                      "description": "Un grupo no puede contener más de {max} servidores."
+                      "title": "El grupo está lleno."
                     }
                   },
                   "toast": {
@@ -1497,11 +1465,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Modo de selección",
             "select": "Seleccionar servidor",
             "deselect": "Deseleccionar servidor",
-            "success": "Se {action} correctamente {servers}.",
-            "partial": "Se {action} correctamente {successfulServers}. Fallaron {failedServers}.",
             "groupActions": "Acciones del grupo"
           }
         },
@@ -1653,7 +1618,6 @@
         },
         "securityKeys": {
           "title": "Claves de seguridad",
-          "subtitle": "{current} de {max} claves de seguridad máximas creadas.",
           "table": {
             "columns": {
               "credentialId": "ID de credencial"
@@ -1661,7 +1625,6 @@
           },
           "tooltip": {
             "secureContextRequired": "Se requiere un contexto seguro (HTTPS) para usar claves de seguridad.",
-            "limitReached": "Tienes un límite de {max} claves de seguridad.",
             "disabled": "Un administrador ha desactivado las claves de seguridad."
           },
           "alert": {
@@ -1685,7 +1648,6 @@
             },
             "deleteSecurityKey": {
               "title": "Confirmar eliminación de la clave de seguridad",
-              "content": "¿Seguro que quieres eliminar **{key}** de tu cuenta?",
               "toast": {
                 "deleted": "La clave de seguridad se eliminó correctamente."
               }
@@ -1782,17 +1744,10 @@
             "searchContent": "Buscar en la salida de la consola",
             "previousCommand": "Comando anterior en el historial",
             "nextCommand": "Siguiente comando en el historial"
-          },
-          "serverList": {
-            "selectServer": "Mantén pulsada S y haz clic para seleccionar/deseleccionar el servidor"
           }
         },
         "sshKeys": {
           "title": "Claves SSH",
-          "subtitle": "{current} de {max} claves SSH máximas creadas.",
-          "tooltip": {
-            "limitReached": "Tienes un límite de {max} claves SSH."
-          },
           "table": {
             "columns": {
               "fingerprint": "Huella"
@@ -1824,12 +1779,10 @@
               }
             },
             "deleteSshKeys": {
-              "title": "Confirmar eliminación de la clave SSH",
-              "content": "¿Quieres eliminar **{sshKeys}** de tu cuenta?"
+              "title": "Confirmar eliminación de la clave SSH"
             },
             "deleteSshKey": {
               "title": "Confirmar eliminación de la clave SSH",
-              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
               "toast": {
                 "removed": "Clave SSH eliminada."
               }
@@ -1838,10 +1791,6 @@
         },
         "commandSnippets": {
           "title": "Fragmentos de comandos",
-          "subtitle": "{current} de {max} fragmentos de comandos creados (máximo).",
-          "tooltip": {
-            "limitReached": "Tienes un límite de {max} fragmentos de comandos."
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Crear fragmento de comando",
@@ -1856,12 +1805,10 @@
               }
             },
             "deleteCommandSnippets": {
-              "title": "Confirmar eliminación del fragmento de comando",
-              "content": "¿Quieres eliminar **{commandSnippets}** de tu cuenta?"
+              "title": "Confirmar eliminación del fragmento de comando"
             },
             "deleteCommandSnippet": {
               "title": "Confirmar eliminación del fragmento de comando",
-              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
               "toast": {
                 "removed": "Fragmento de comando eliminado."
               }
@@ -1887,8 +1834,7 @@
           },
           "modal": {
             "deleteOAuthLinks": {
-              "title": "Confirmar eliminación de la vinculación OAuth",
-              "content": "¿Quieres eliminar **{oauthLinks}** de tu cuenta?"
+              "title": "Confirmar eliminación de la vinculación OAuth"
             },
             "deleteOAuthLink": {
               "title": "Confirmar eliminación de la vinculación OAuth",
@@ -1901,13 +1847,9 @@
         },
         "apiKeys": {
           "title": "Claves API",
-          "subtitle": "{current} de {max} claves API máximas creadas.",
           "button": {
             "apiDocumentation": "Documentación de la API",
             "copyUuid": "Copiar UUID"
-          },
-          "tooltip": {
-            "limitReached": "Tienes un límite de {max} claves API."
           },
           "table": {
             "columns": {
@@ -1941,12 +1883,10 @@
               }
             },
             "deleteApiKeys": {
-              "title": "Confirmar eliminación de la clave API",
-              "content": "¿Quieres eliminar **{apiKeys}** de tu cuenta?"
+              "title": "Confirmar eliminación de la clave API"
             },
             "deleteApiKey": {
               "title": "Confirmar eliminación de la clave API",
-              "content": "¿Seguro que quieres eliminar **{name}** de tu cuenta?",
               "toast": {
                 "removed": "Clave API eliminada."
               }
@@ -2095,7 +2035,6 @@
                   "latestVersion": "Última versión: {version}"
                 },
                 "table": {
-                  "version": "Versión",
                   "installed": "Instalado",
                   "packageName": "Nombre del paquete",
                   "latestVersion": "Última versión",
@@ -2147,7 +2086,6 @@
                 "form": {
                   "additionalUrls": "URLs adicionales",
                   "additionalUrlsDescription": "Otras direcciones desde las que se puede acceder al panel. Los inicios de sesión, OAuth y los correos electrónicos de autoservicio utilizan la URL desde la que se realizó la solicitud; todo lo demás utiliza la URL principal. Las claves de seguridad solo funcionan en las URL que están bajo el ID de RP de WebAuthn.",
-                  "icon": "Icono",
                   "iconLight": "Icono (modo claro)",
                   "bannerLight": "Banner (modo claro)",
                   "sessionCookie": "Cookie de sesión",
@@ -2211,7 +2149,6 @@
               "page": {
                 "title": "Configuración de metadatos",
                 "form": {
-                  "description": "Descripción",
                   "descriptionDescription": "Se muestra bajo el título en los resultados de búsqueda y vistas previas de enlaces.",
                   "ogImage": "Imagen de vista previa",
                   "ogImageDescription": "Se muestra en vistas previas de enlaces. Debe ser un PNG o JPEG, no un SVG.",
@@ -2564,8 +2501,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Confirmar eliminación del anuncio",
-                    "content": "¿Quieres eliminar **{title}**?"
+                    "title": "Confirmar eliminación del anuncio"
                   },
                   "duplicate": {
                     "content": "¿Quieres duplicar **{title}**?"
@@ -2610,8 +2546,7 @@
             "deleteSelection": "Eliminar selección"
           },
           "dropzone": {
-            "title": "Suelta archivos o directorios aquí para subirlos",
-            "subtitle": "Suelta para empezar a subir"
+            "title": "Suelta archivos o directorios aquí para subirlos"
           },
           "toast": {
             "assetDeleted": "Recurso eliminado.",
@@ -2619,12 +2554,10 @@
           },
           "modal": {
             "createDirectory": {
-              "title": "Nuevo directorio",
-              "createdAs": "Se creará en"
+              "title": "Nuevo directorio"
             },
             "deleteAssets": {
-              "title": "Confirmar la eliminación del recurso",
-              "content": "¿Quieres eliminar `{count}` recursos?"
+              "title": "Confirmar la eliminación del recurso"
             },
             "deleteAsset": {
               "title": "Eliminar recurso",
@@ -2687,18 +2620,6 @@
             "enableExtension": "Habilitar extensión",
             "disableExtension": "Deshabilitar extensión"
           },
-          "phase": {
-            "queued": "En cola...",
-            "preparing": "Preparando...",
-            "clearing": "Limpiando extensiones...",
-            "adding": "Añadiendo extensiones ({done}/{total})...",
-            "resync": "Resolviendo dependencias...",
-            "stagingTranslations": "Preparando traducciones...",
-            "compiling": "Compilando...",
-            "verifying": "Verificando...",
-            "installing": "Instalando...",
-            "restarting": "Reiniciando el panel..."
-          },
           "badge": {
             "frontendMissing": "Falta la interfaz",
             "backendMissing": "Falta el backend",
@@ -2707,7 +2628,6 @@
             "startFailed": "Error al iniciar",
             "pendingRemoval": "Eliminación pendiente",
             "pendingRestart": "Reinicio pendiente",
-            "disabled": "Deshabilitado",
             "processing": "Procesando"
           },
           "card": {
@@ -2812,8 +2732,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirmar la eliminación del usuario",
-                    "content": "¿Quieres eliminar a **{username}**?"
+                    "title": "Confirmar la eliminación del usuario"
                   },
                   "grantAdmin": {
                     "title": "Confirmar acceso de administrador",
@@ -2970,7 +2889,6 @@
             },
             "probe": {
               "title": "Wings {version} está esperando a ser emparejado",
-              "resources": "{cores} núcleos de CPU, {memory} memoria, {disk} disco ({architecture})",
               "dockerAvailable": "Docker {version} es accesible.",
               "dockerUnavailable": "Docker no se encuentra accesible. Wings no podrá iniciar servidores hasta que lo esté.",
               "container": "Wings se ejecuta en un contenedor, por lo que no puede ver las interfaces de red del host. Introduce manualmente la IP de asignación."
@@ -3008,7 +2926,6 @@
                   "sftpAddress": "Dirección SFTP",
                   "createdAt": "Creación",
                   "inheritedFromLocation": "Heredado de la ubicación",
-                  "none": "Ninguno",
                   "wingsVersion": "Versión de Wings",
                   "memory": "Memoria",
                   "servers": "Servidores",
@@ -3017,7 +2934,6 @@
                   "unavailable": "No disponible"
                 },
                 "badge": {
-                  "updateAvailable": "Actualización disponible",
                   "latestVersionUnknown": "Última versión Desconocida"
                 }
               }
@@ -3036,8 +2952,7 @@
                   "publicUrlDescription": "Se utiliza para las conexiones WebSocket y descargas.",
                   "backupConfigurationPlaceholder": "Heredado de la ubicación",
                   "memoryDescription": "La memoria total disponible para los servidores en este nodo.",
-                  "diskDescription": "El disco total disponible para los servidores en este nodo.",
-                  "unlimitedTooltip": "0 no establecerá un límite."
+                  "diskDescription": "El disco total disponible para los servidores en este nodo."
                 },
                 "section": {
                   "connection": "Conexión",
@@ -3088,8 +3003,7 @@
                 },
                 "button": {
                   "save": "Guardar configuración",
-                  "reveal": "Revelar configuración",
-                  "verify": "Verificar conexión"
+                  "reveal": "Revelar configuración"
                 },
                 "alert": {
                   "couldNotReach": "No se ha podido alcanzar el nodo: {error}",
@@ -3105,8 +3019,7 @@
                 },
                 "toast": {
                   "applied": "Configuración aplicada correctamente.",
-                  "submittedNotApplied": "La configuración se ha enviado pero no se ha aplicado.",
-                  "invalidYaml": "YAML inválido: {error}"
+                  "submittedNotApplied": "La configuración se ha enviado pero no se ha aplicado."
                 }
               }
             },
@@ -3123,7 +3036,6 @@
                 "label": {
                   "memory": "Memoria",
                   "disk": "Disco",
-                  "cpuThreads": "{model} ({threads} hilos)",
                   "usedByWings": "{size} en uso por Wings",
                   "networkIn": "Entrada: {in}",
                   "networkOut": "Salida: {out}"
@@ -3132,24 +3044,14 @@
                   "diskIo": "E/S del disco",
                   "networkTraffic": "Tráfico de red",
                   "diskRead": "Lectura del disco",
-                  "diskWrite": "Escritura del disco",
-                  "networkInLabel": "Entrada de red",
-                  "networkOutLabel": "Salida de red"
+                  "diskWrite": "Escritura del disco"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "Capacidad de despliegue",
-                "subtitle": "Recursos asignados a los servidores de este nodo, comparados con los límites configurados en los ajustes del nodo, no con la capacidad física de la máquina. La implementación solo comprueba la memoria y el disco.",
                 "card": {
                   "resources": "Recursos asignados"
-                },
-                "status": {
-                  "deploymentEnabled": "Despliegue habilitado",
-                  "deploymentDisabled": "Despliegue deshabilitado",
-                  "maintenanceEnabled": "En mantenimiento",
-                  "maintenanceDisabled": "No está en mantenimiento"
                 },
                 "label": {
                   "memory": "Memoria",
@@ -3249,8 +3151,7 @@
                     "title": "Añadir montaje del nodo"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del montaje del nodo",
-                    "content": "¿Quieres eliminar el montaje **{mount}** de **{name}**?"
+                    "title": "Confirmar eliminación del montaje del nodo"
                   }
                 }
               }
@@ -3268,8 +3169,7 @@
                     "title": "Añadir dispositivo al nodo"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del dispositivo del nodo",
-                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                    "title": "Confirmar eliminación del dispositivo del nodo"
                   }
                 }
               }
@@ -3323,7 +3223,6 @@
                   "backupNotOnSameNode": "Esta copia de seguridad no se encuentra en el mismo nodo que el servidor. No se puede ver mediante la API de cliente."
                 },
                 "toast": {
-                  "downloadStarted": "Descarga iniciada.",
                   "detached": "Copia de seguridad desvinculada correctamente.",
                   "reattached": "La copia de seguridad se ha vuelto a vincular a {name} correctamente.",
                   "reassigned": "La copia de seguridad se ha reasignado correctamente.",
@@ -3381,8 +3280,7 @@
                       "started": "La transferencia de {servers} se ha iniciado."
                     },
                     "confirm": {
-                      "title": "Confirmar transferencia del servidor",
-                      "content": "¿Quieres transferir {count} servidores de {from} a {to}? Esta acción no se puede deshacer."
+                      "title": "Confirmar transferencia del servidor"
                     },
                     "enum": {
                       "allocationMode": {
@@ -3430,7 +3328,6 @@
                 },
                 "form": {
                   "hostDescription": "El nombre de host o la IP que utilizan otros nodos para conectarse a este. Se resuelve en el momento de establecer la conexión.",
-                  "port": "Puerto",
                   "portDescription": "El puerto UDP en el que el nodo escucha las conexiones de otros nodos. Debe ser accesible desde estos."
                 },
                 "section": {
@@ -3455,14 +3352,11 @@
                     "uptime": "Tiempo de actividad del demonio",
                     "controlLink": "Enlace de control",
                     "frontends": "Frontends vinculados",
-                    "flowsOpen": "{count} flujos abiertos",
-                    "localDrops": "Descartes en el mismo nodo",
-                    "frozenFlows": "{count} flujos congelados"
+                    "localDrops": "Descartes en el mismo nodo"
                   },
                   "column": {
                     "peer": "Par",
                     "role": "Rol",
-                    "address": "Dirección",
                     "path": "Ruta",
                     "loss": "Pérdida",
                     "transferred": "Transferido",
@@ -3501,8 +3395,6 @@
                   }
                 },
                 "button": {
-                  "enable": "Habilitar",
-                  "disable": "Deshabilitar",
                   "rotate": "Rotar identidad"
                 },
                 "toast": {
@@ -3536,9 +3428,6 @@
               },
               "toast": {
                 "applied": "Configuración aplicada a {nodes}."
-              },
-              "error": {
-                "invalidYaml": "YAML inválido: {error}"
               }
             }
           }
@@ -3572,7 +3461,6 @@
                 "forceWarning": "La eliminación forzada elimina estos servidores del panel incluso si no se puede acceder a sus nodos. Es posible que sus archivos y bases de datos no se limpien por completo, dejando datos huérfanos."
               }
             },
-            "successWithSkipped": "Se ha {action} {servers} correctamente. {skippedServers} se han omitido.",
             "nothingToDo": "Todos los servidores seleccionados ya están en ese estado."
           },
           "externalIdLookup": {
@@ -3620,7 +3508,6 @@
                   "swap": "Memoria de intercambio",
                   "allocations": "Asignaciones",
                   "databases": "Bases de datos",
-                  "databaseAgents": "Agentes de base de datos",
                   "backups": "Copias de seguridad",
                   "schedules": "Programas",
                   "unlimited": "Ilimitado",
@@ -3659,7 +3546,6 @@
                   "descriptionPlaceholder": "Descripción del servidor",
                   "owner": "Dueño",
                   "ownerCreateHint": "¿No puedes encontrarlo? Crea un nuevo usuario",
-                  "egg": "Huevo",
                   "backupConfigurationPlaceholder": "Heredar del nodo/ubicación",
                   "cpuLimit": "Límite de CPU (%)",
                   "cpuLimitDescription": "El límite de CPU en % que el servidor puede utilizar.",
@@ -3668,7 +3554,6 @@
                   "swapDescription": "La cantidad de memoria de intercambio para dar a este servidor.",
                   "swapTooltip": "-1 no establecerá un límite",
                   "memoryDescription": "El límite de memoria del contenedor del servidor.",
-                  "memoryTooltip": "0 no establecerá un límite.",
                   "memoryOverhead": "Sobrecarga de memoria",
                   "memoryOverheadDescription": "Memoria oculta que se añadirá al contenedor.",
                   "diskSpace": "Espacio en disco",
@@ -3696,7 +3581,6 @@
                   "kvmPassthroughEnabledDescription": "Activa el passthrough de KVM para el servidor (permite acceder a /dev/kvm dentro del contenedor).",
                   "allocationsLimit": "Asignaciones",
                   "databasesLimit": "Bases de datos",
-                  "databaseAgentsLimit": "Agentes de base de datos",
                   "backupsLimit": "Copias de seguridad",
                   "schedulesLimit": "Programas"
                 },
@@ -3727,8 +3611,7 @@
                   "updated": "Asignación actualizada.",
                   "setPrimary": "Asignación establecida como principal.",
                   "unsetPrimary": "La asignación ya no es principal.",
-                  "removed": "Se ha eliminado la asignación.",
-                  "added": "{count} asignaciones eliminadas."
+                  "removed": "Se ha eliminado la asignación."
                 },
                 "modal": {
                   "add": {
@@ -3768,8 +3651,7 @@
                     "title": "Añadir montaje al servidor"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del montaje del servidor",
-                    "content": "¿Quieres eliminar el montaje **{mount}** de **{name}**?"
+                    "title": "Confirmar eliminación del montaje del servidor"
                   }
                 }
               }
@@ -3787,8 +3669,7 @@
                     "title": "Añadir dispositivo al servidor"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del dispositivo del servidor",
-                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                    "title": "Confirmar eliminación del dispositivo del servidor"
                   }
                 }
               }
@@ -3940,8 +3821,7 @@
                 "title": "Huevos",
                 "resourceName": "Huevo",
                 "dropzone": {
-                  "title": "Suelta archivos aquí para importarlos como huevos",
-                  "subtitle": "Suelta para empezar la importación"
+                  "title": "Suelta archivos aquí para importarlos como huevos"
                 },
                 "button": {
                   "updateFromRepository": "Actualizar desde el repositorio",
@@ -3970,14 +3850,6 @@
                   },
                   "move": {
                     "title": "Mover huevo"
-                  },
-                  "moveBulk": {
-                    "title": "Mover huevos",
-                    "confirm": "Mover {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Confirmar eliminación del huevo",
-                    "content": "¿Quieres eliminar `{count}` huevos?"
                   }
                 },
                 "tabs": {
@@ -4101,8 +3973,7 @@
                           "title": "Añadir montaje del huevo"
                         },
                         "delete": {
-                          "title": "Confirmar eliminación del montaje del huevo",
-                          "content": "¿Quieres eliminar el montaje **{mount}** de **{egg}**?"
+                          "title": "Confirmar eliminación del montaje del huevo"
                         }
                       }
                     }
@@ -4120,8 +3991,7 @@
                           "title": "Añadir dispositivo al huevo"
                         },
                         "delete": {
-                          "title": "Confirmar eliminación del dispositivo del huevo",
-                          "content": "¿Quieres eliminar el dispositivo **{device}** de **{egg}**?"
+                          "title": "Confirmar eliminación del dispositivo del huevo"
                         }
                       }
                     }
@@ -4156,7 +4026,6 @@
                 },
                 "enum": {
                   "matcherType": {
-                    "not": "NOT (no debe coincidir)",
                     "nodes": "Nodos",
                     "locations": "Ubicaciones"
                   },
@@ -4328,9 +4197,7 @@
                 "title": "Huevos de repositorio de huevos",
                 "table": {
                   "columns": {
-                    "path": "Ruta",
-                    "repository": "Repositorio",
-                    "installedIn": "Instalado en"
+                    "path": "Ruta"
                   }
                 },
                 "toast": {
@@ -4343,13 +4210,11 @@
                     "button": "Instalar {eggs}"
                   },
                   "catalog": {
-                    "title": "Instalar Huevo desde Repository",
                     "searchPlaceholder": "Buscar huevos en cada repositorio...",
                     "selected": "Seleccionado: **{egg}**",
                     "moreResults": "Mostrando {shown} de huevos {total}, sigue escribiendo para reducirlo.",
                     "installingInto": "El huevo se instalará en **{nest}**.",
                     "noEggs": "Aún no hay huevos disponibles. Añada un repositorio de huevos bajo los repositorio de Egg Repositories, se sincroniza automáticamente.",
-                    "button": "Instalar",
                     "buttonSelect": "Instalar & Seleccionar"
                   }
                 },
@@ -4436,8 +4301,7 @@
                   "typePublicHost": "Host público",
                   "typePublicPort": "Puerto público",
                   "memoryDescription": "La memoria total disponible para los servidores en este host.",
-                  "diskDescription": "El disco total disponible para las instancias de bases de datos en este host.",
-                  "unlimitedTooltip": "0 no establecerá un límite."
+                  "diskDescription": "El disco total disponible para las instancias de bases de datos en este host."
                 },
                 "alert": {
                   "urlMissingPort": "No se ha especificado ningún puerto. El panel se conectará a este host a través del puerto {port}. El agente de base de datos escucha en el puerto {agentPort} de forma predeterminada, así que añádelo a la URL, a menos que un proxy inverso en el puerto {port} redirija las conexiones al agente."
@@ -4492,10 +4356,7 @@
             "backups": {
               "title": "Copias de seguridad",
               "page": {
-                "title": "Copias de seguridad del host de agente de bases de datos",
-                "toast": {
-                  "downloadStarted": "Descarga iniciada."
-                }
+                "title": "Copias de seguridad del host de agente de bases de datos"
               }
             },
             "configuration": {
@@ -4525,8 +4386,7 @@
                 },
                 "button": {
                   "save": "Guardar configuración",
-                  "reveal": "Revelar configuración",
-                  "verify": "Verificar conexión"
+                  "reveal": "Revelar configuración"
                 },
                 "alert": {
                   "couldNotReach": "No se pudo alcanzar el agente de host de bases de datos: {error}",
@@ -4539,8 +4399,7 @@
                 },
                 "toast": {
                   "applied": "Configuración aplicada correctamente.",
-                  "submittedNotApplied": "La configuración se ha enviado pero no se ha aplicado.",
-                  "invalidYaml": "YAML inválido: {error}"
+                  "submittedNotApplied": "La configuración se ha enviado pero no se ha aplicado."
                 }
               }
             },
@@ -4548,12 +4407,6 @@
               "title": "Resumen",
               "page": {
                 "title": "Resumen del host del agente de base de datos",
-                "status": {
-                  "deploymentEnabled": "Despliegue habilitado",
-                  "deploymentDisabled": "Despliegue deshabilitado",
-                  "maintenanceEnabled": "Mantenimiento habilitado",
-                  "maintenanceDisabled": "Mantenimiento deshabilitado"
-                },
                 "card": {
                   "hostDetails": "Detalles del host",
                   "systemInfo": "Información del sistema",
@@ -4571,9 +4424,6 @@
                   "noLimit": "Sin límite de host",
                   "free": "{size} libre",
                   "cores": "{cores} núcleos asignados"
-                },
-                "badge": {
-                  "updateAvailable": "Actualización disponible"
                 }
               }
             },
@@ -4585,7 +4435,6 @@
                   "graphs": "Gráficas"
                 },
                 "label": {
-                  "cpuThreads": "{model} ({threads} hilos)",
                   "memory": "Memoria",
                   "usedByAgent": "{size} utilizado por el agente",
                   "disk": "Disco",
@@ -4596,9 +4445,7 @@
                   "diskIo": "E/S del disco",
                   "diskRead": "Lectura del disco",
                   "diskWrite": "Escritura del disco",
-                  "networkTraffic": "Tráfico de red",
-                  "inbound": "Entrante",
-                  "outbound": "Saliente"
+                  "networkTraffic": "Tráfico de red"
                 },
                 "toast": {
                   "connectionLost": "Se ha perdido la conexión con el host del agente de base de datos."
@@ -4614,9 +4461,6 @@
               },
               "toast": {
                 "applied": "Configuración aplicada a {hosts}."
-              },
-              "error": {
-                "invalidYaml": "YAML inválido: {error}"
               }
             }
           }
@@ -4625,8 +4469,7 @@
           "title": "Plantillas de agente de bases de datos",
           "resourceName": "Plantilla de agente de bases de datos",
           "dropzone": {
-            "title": "Suelta archivos aquí para importarlos como plantillas de agente de bases de datos",
-            "subtitle": "Suelta para empezar a importar"
+            "title": "Suelta archivos aquí para importarlos como plantillas de agente de bases de datos"
           },
           "toast": {
             "imported": "Plantilla del agente de bases de datos importada.",
@@ -4650,7 +4493,6 @@
                   "imageUid": "UID de imagen",
                   "imageGid": "GID de imagen",
                   "memoryDescription": "El límite de memoria del contenedor de la base de datos.",
-                  "memoryTooltip": "0 no establecerá un límite.",
                   "swap": "Memoria de intercambio",
                   "swapDescription": "La cantidad de memoria de intercambio que dar a esta base de datos.",
                   "swapTooltip": "-1 no establecerá un límite.",
@@ -4685,7 +4527,6 @@
                 "modal": {
                   "applyUpdates": {
                     "title": "Aplicar actualizaciones de plantilla",
-                    "content": "Esto enviará la configuración actual de **{name}** a las {count} instancias seleccionadas. Las instancias se reiniciarán para aplicar la nueva configuración. Las instancias bloqueadas y las instancias en hosts en modo de mantenimiento se omitirán.",
                     "contentAll": "Esto enviará la configuración actual de **{name}** a todas las instancias desactualizadas, incluidas las instancias que no se muestran en la búsqueda actual. Las instancias se reiniciarán para aplicar la nueva configuración. Las instancias bloqueadas y las instancias en hosts en modo de mantenimiento se omitirán."
                   }
                 }
@@ -4697,8 +4538,7 @@
           "title": "Proveedores OAuth",
           "resourceName": "Proveedor OAuth",
           "dropzone": {
-            "title": "Suelta archivos aquí para importar como proveedores OAuth",
-            "subtitle": "Suelta para empezar a importar"
+            "title": "Suelta archivos aquí para importar como proveedores OAuth"
           },
           "table": {
             "columns": {
@@ -4781,9 +4621,6 @@
                   },
                   "matcherType": {
                     "none": "Ninguno (siempre aplica)",
-                    "and": "AND (todos deben coincidir)",
-                    "or": "OR (cualquiera debe coincidir)",
-                    "not": "NOT (no debe coincidir)",
                     "scopes": "Ámbitos coincididos",
                     "fieldExists": "El campo existe",
                     "fieldEquals": "El campo equivale",
@@ -4797,18 +4634,9 @@
                   "updated": "Mapeo del proveedor OAuth actualizado.",
                   "deleted": "Mape del proveedor OAuth eliminado."
                 },
-                "button": {
-                  "addMatcher": "Añadir coincidencia"
-                },
-                "matcher": {
-                  "allMustMatch": "Todas las coincidencias deben coincidir",
-                  "anyMustMatch": "Cualquier coincidencia debe coincidir",
-                  "mustNotMatch": "Ninguna coincidencia debe coincidir"
-                },
                 "form": {
                   "matcher": "Coincidencia",
                   "matcherDescription": "Decide si este mapeo aplica a un usuario que inicia sesión con este proveedor.",
-                  "matcherType": "Tipo de coincidencia",
                   "scopes": "Ámbitos (scopes)",
                   "scopesDescription": "Ámbitos (scopes) OAuth que deben haber sido coincididos para que esta coincidencia se cumpla.",
                   "path": "Ruta del campo",
@@ -4817,7 +4645,6 @@
                   "startsWith": "Empieza por",
                   "endsWith": "Termina en",
                   "revokeUnmatched": "Revocar cuando no coincida",
-                  "revokeUnmatchedDescription": "Elimina el rol asignado o el subusuario del servidor cuando la coincidencia deje de cumplirse en un inicio de sesión posterior.",
                   "mappingType": "Tipo de mapeo",
                   "role": "Rol",
                   "permissions": "Permisos"
@@ -4983,10 +4810,7 @@
             "backups": {
               "title": "Copias de seguridad",
               "page": {
-                "title": "Copias de seguridad de las configuraciones de copias de seguridad",
-                "toast": {
-                  "downloadStarted": "Descarga iniciada."
-                }
+                "title": "Copias de seguridad de las configuraciones de copias de seguridad"
               }
             },
             "locations": {
@@ -5061,10 +4885,7 @@
             "backups": {
               "title": "Copias de seguridad",
               "page": {
-                "title": "Copias de seguridad de la política de copias de seguridad del sistema",
-                "toast": {
-                  "downloadStarted": "Descarga iniciada."
-                }
+                "title": "Copias de seguridad de la política de copias de seguridad del sistema"
               }
             },
             "locations": {
@@ -5080,8 +4901,7 @@
                     "title": "Añadir ubicación"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación de la ubicación",
-                    "content": "¿Quieres eliminar **{name}** de **{policy}**?"
+                    "title": "Confirmar eliminación de la ubicación"
                   }
                 }
               }
@@ -5099,8 +4919,7 @@
                     "title": "Añadir nodo"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del nodo",
-                    "content": "¿Quieres eliminar **{name}** de **{policy}**?"
+                    "title": "Confirmar eliminación del nodo"
                   }
                 }
               }
@@ -5118,8 +4937,7 @@
                     "title": "Añadir host de agente de base de datos"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del host de agente de base de datos",
-                    "content": "¿Quieres eliminar **{name}** de **{policy}**?"
+                    "title": "Confirmar eliminación del host de agente de base de datos"
                   }
                 }
               }
@@ -5137,8 +4955,7 @@
                     "title": "Añadir servidor"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del servidor",
-                    "content": "¿Quieres eliminar **{name}** de **{policy}**?"
+                    "title": "Confirmar eliminación del servidor"
                   }
                 }
               }
@@ -5174,14 +4991,10 @@
                 },
                 "modal": {
                   "add": {
-                    "title": "Añadir huevo de montaje",
-                    "form": {
-                      "egg": "Huevo"
-                    }
+                    "title": "Añadir huevo de montaje"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del huevo de montaje",
-                    "content": "¿Quieres eliminar el montaje **{mount}** de **{name}**?"
+                    "title": "Confirmar eliminación del huevo de montaje"
                   }
                 }
               }
@@ -5199,8 +5012,7 @@
                     "title": "Añadir nodo de montaje."
                   },
                   "remove": {
-                    "title": "Confirmar eliminación de nodo de montaje",
-                    "content": "¿Quieres eliminar el montaje **{mount}** de **{name}**?"
+                    "title": "Confirmar eliminación de nodo de montaje"
                   }
                 }
               }
@@ -5244,14 +5056,10 @@
                 },
                 "modal": {
                   "add": {
-                    "title": "Añadir dispositivo al huevo",
-                    "form": {
-                      "egg": "Huevo"
-                    }
+                    "title": "Añadir dispositivo al huevo"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del dispositivo del huevo",
-                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                    "title": "Confirmar eliminación del dispositivo del huevo"
                   }
                 }
               }
@@ -5269,8 +5077,7 @@
                     "title": "Añadir dispositivo al nodo"
                   },
                   "remove": {
-                    "title": "Confirmar eliminación del dispositivo del nodo",
-                    "content": "¿Quieres eliminar el dispositivo **{device}** de **{name}**?"
+                    "title": "Confirmar eliminación del dispositivo del nodo"
                   }
                 }
               }
@@ -5475,19 +5282,12 @@
             "searchPlaceholder": "Buscar archivos...",
             "noSearchResults": "No se encontraron archivos coincidentes",
             "upload": "Subir",
-            "uploadFromComputer": "Subir desde el dispositivo",
-            "uploadFromUrl": "Subir desde URL",
             "selectItem": "Seleccionar {name}",
             "deselectItem": "Dejar de seleccionar {name}",
             "selectFileToOpen": "Seleccione un archivo del árbol para abrirlo.",
             "noEditorAvailable": "No hay ningún editor disponible para este tipo de archivo.",
             "editorTabsLabel": "Abrir archivos",
             "closeEditorTab": "Cerrar {name}",
-            "closeOtherTabs": "Cerrar otros",
-            "closeTabsToRight": "Cerrar a la derecha",
-            "closeSavedTabs": "Cerrar guardado",
-            "closeAllTabs": "Cerrar todas",
-            "revealInTree": "Mostrar en el árbol",
             "revealNotFound": "No se ha podido encontrar {path} en el árbol de archivos.",
             "unsavedTab": "{name} tiene cambios sin guardar",
             "resizeEditorPanes": "Redimensionar los paneles del editor",
@@ -5614,8 +5414,7 @@
             "cancelAllOperations": "Cancelar todas las operaciones"
           },
           "dropzone": {
-            "title": "Soltar archivos o carpetas aquí para subir",
-            "subtitle": "Suelta para empezar a subir"
+            "title": "Soltar archivos o carpetas aquí para subir"
           },
           "settings": {
             "clickOnce": "Haz clic una vez para abrir un archivo o carpeta",
@@ -5643,7 +5442,6 @@
             "filesMoved": "{files} movidos.",
             "moveUndone": "Se ha deshecho el traslado de {files}.",
             "moveCouldNotBeUndone": "No se pudo deshacer el traslado.",
-            "downloadStarted": "Descarga iniciada.",
             "filesDeleted": "Los archivos se han eliminado.",
             "filesTrashed": "{files} movidos a la papelera.",
             "filesTrashedPartiallyDeleted": "{files} movidos a la papelera, {deleted} eliminados permanentemente.",
@@ -5701,10 +5499,6 @@
                 "restore": "Restaurar esta revisión al editor",
                 "viewDiff": "Ver diferencia entre el archivo actual",
                 "compareToPrevious": "Comparar con la revisión anterior"
-              },
-              "diff": {
-                "original": "Revisión",
-                "current": "Actual"
               }
             }
           },
@@ -5733,8 +5527,7 @@
               },
               "restoreTo": {
                 "title": "Restaurar en directorio",
-                "destination": "Directorio de destino",
-                "restoredAs": "Este archivo será restaurado como "
+                "destination": "Directorio de destino"
               },
               "restoreConflict": {
                 "title": "Resolver conflictos de la restauración",
@@ -5773,28 +5566,22 @@
               "contentHashMismatch": "El archivo se ha modificado en el servidor desde que se guardó este borrador. Restaurar el borrador podría sobrescribir esos cambios."
             },
             "extractFile": {
-              "title": "Extraer archivo",
-              "extractedTo": "El contenido de {file} se extraerá a "
+              "title": "Extraer archivo"
             },
             "createArchive": {
               "title": "Crear archivo",
               "form": {
                 "format": "Formato"
-              },
-              "createdAs": "Este archivo se creará como "
+              }
             },
             "createDirectory": {
-              "title": "Crear directorio",
-              "createdAs": "Este directorio se creará como "
+              "title": "Crear directorio"
             },
             "createSymlink": {
-              "title": "Crear enlace simbólico",
-              "createdAs": "Este enlace simbólico se creará como ",
-              "pointsTo": "Apuntará a "
+              "title": "Crear enlace simbólico"
             },
             "copyFile": {
               "title": "Copiar archivo",
-              "createdAs": "Este archivo se creará como ",
               "conflict": "Ya existe un archivo con ese nombre en el destino."
             },
             "copyConflict": {
@@ -5814,8 +5601,7 @@
               "servers": "Servidores de destino",
               "addFromGroup": "Añadir servidores de un grupo",
               "browsingOn": "Al explorar {server}, la ruta seleccionada se utiliza en todos los servidores de destino.",
-              "noCreatePermission": "No tienes permiso para crear archivos en {servers}.",
-              "createdAs": "Estos archivos serán creados en {servers} como "
+              "noCreatePermission": "No tienes permiso para crear archivos en {servers}."
             },
             "fileFingerprints": {
               "title": "Huella del archivo",
@@ -5948,7 +5734,6 @@
                 "fileUrl": "URL del archivo",
                 "query": "Consulta"
               },
-              "createdAs": "Este archivo se creará como ",
               "pull": "Traer"
             },
             "sftpDetails": {
@@ -5965,15 +5750,11 @@
         },
         "databases": {
           "title": "Bases de datos",
-          "subtitle": "{current} de {max} bases de datos máximas creadas.",
           "empty": {
             "title": "No hay bases de datos",
             "description": "Este servidor no tiene una base de datos para almacenar datos. Crea una para obtener una dirección, un usuario y una contraseña con la que conectarte.",
             "descriptionReadOnly": "Este servidor no tiene ninguna base de datos en la que almacenar datos.",
             "descriptionUnavailable": "Este servidor no tiene ninguna base de datos en la que almacenar datos. Ningún host de base de datos se encuentra disponible, así que no se pueden crear aún."
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} bases de datos."
           },
           "table": {
             "columns": {
@@ -6145,7 +5926,6 @@
           },
           "instance": {
             "title": "Bases de datos gestionadas",
-            "updateAvailable": "Actualización disponible",
             "empty": {
               "title": "No hay bases de datos gestionadas",
               "description": "Este servidor no está ejecutando una base de datos propia. Crea una base de datos gestionada para obtener una con sus propios recursos, usuarios y copias de seguridad.",
@@ -6156,9 +5936,6 @@
               "applyUpdate": "Aplicar actualización",
               "createFirstInstance": "Crear base de datos gestionada"
             },
-            "tooltip": {
-              "limitReached": "Este servidor está limitado a {max} bases de datos gestionadas."
-            },
             "view": {
               "tabs": {
                 "databases": "Bases de datos",
@@ -6167,17 +5944,14 @@
                 "logs": "Registros"
               },
               "stats": {
-                "connecting": "Conectando...",
                 "offline": "La instancia está desconectada"
               }
             },
             "databases": {
               "title": "Bases de datos",
-              "subtitle": "{current} de {max} bases de datos máximas creadas.",
               "tooltip": {
                 "offline": "La instancia debe estar ejecutándose para crear bases de datos.",
-                "noUser": "La base de datos no tiene ningún usuario adjunto aún. Crea un usuario para accederla.",
-                "limitReached": "Esta instancia está limitada a {max} bases de datos."
+                "noUser": "La base de datos no tiene ningún usuario adjunto aún. Crea un usuario para accederla."
               },
               "button": {
                 "remoteImport": "Importar desde remoto"
@@ -6224,11 +5998,6 @@
                   "content": "Recrear una base de datos eliminará permanentemente todos los datos de la base de datos **{name}** y creará una nueva vacía con el mismo nombre y los mismos permisos de acceso de los usuarios."
                 }
               },
-              "table": {
-                "columns": {
-                  "database": "Base de datos"
-                }
-              },
               "toast": {
                 "created": "Base de datos creada.",
                 "deleted": "Bases de datos eliminada.",
@@ -6240,13 +6009,11 @@
             },
             "users": {
               "title": "Usuarios",
-              "subtitle": "{current} de {max} usuarios máximos creados.",
               "button": {
                 "permissions": "Permisos"
               },
               "tooltip": {
-                "offline": "La instancia debe estar ejecutándose para crear usuarios.",
-                "limitReached": "La instancia está limitada a {max} usuarios."
+                "offline": "La instancia debe estar ejecutándose para crear usuarios."
               },
               "enum": {
                 "permission": {
@@ -6258,11 +6025,6 @@
               "form": {
                 "databases": "Acceso a la base de datos",
                 "noDatabases": "Esta instancia no tiene bases de datos aún."
-              },
-              "table": {
-                "columns": {
-                  "databases": "Bases de datos"
-                }
               },
               "modal": {
                 "createUser": {
@@ -6324,7 +6086,6 @@
             },
             "backups": {
               "title": "Copias de seguridad",
-              "subtitle": "{current} de {max} copias de seguridad máximas creadas en este servidor, compartidas con las copias de seguridad del servidor.",
               "badge": {
                 "restoring": "Restaurando copia de seguridad"
               },
@@ -6332,7 +6093,6 @@
                 "restoring": "Una copia de seguridad está siendo restaurado en esta base de datos gestionada. Por favor, espera..."
               },
               "tooltip": {
-                "limitReached": "Este servidor está limitado a {max} copias de seguridad, compartidas entre las copias de seguridad del servidor y de la base de datos.",
                 "offline": "La base de datos gestionada debe estar ejecutándose para realizar una copia de seguridad.",
                 "restoring": "Una copia de seguridad está siendo restaurada en esta base de datos gestionada."
               },
@@ -6465,18 +6225,10 @@
         },
         "schedules": {
           "title": "Tareas programadas",
-          "subtitle": "{current} de {max} tareas programadas máximas creadas.",
-          "dropzone": {
-            "title": "Suelta algunos archivos aquí para importarlos como tareas programadas",
-            "subtitle": "Suelta para empezar a importar"
-          },
           "empty": {
             "title": "Sin programación",
             "description": "No hay automatizaciones en este servidor. Añade un programa para ejecutar comandos, copias de seguridad y más en un temporizador o en reacción a un evento.",
             "descriptionReadOnly": "No hay automatizaciones en este servidor."
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} tareas programadas."
           },
           "table": {
             "columns": {
@@ -6557,12 +6309,10 @@
               "truncatedWarning": "Se han omitido algunas ejecuciones futuras para mantener el calendario ágil."
             },
             "deleteSchedules": {
-              "title": "Confirmar eliminación del programa",
-              "content": "¿Quieres eliminar **{schedules}** de este servidor?"
+              "title": "Confirmar eliminación del programa"
             },
             "deleteSchedule": {
-              "title": "Confirmar eliminación de la tarea programada",
-              "content": "¿Quieres eliminar **{name}** de este servidor?"
+              "title": "Confirmar eliminación de la tarea programada"
             },
             "createStep": {
               "title": "Crear paso de tarea programada"
@@ -6754,9 +6504,6 @@
             }
           },
           "steps": {
-            "tooltip": {
-              "limitReached": "Esta tarea programada está limitada a {max} pasos."
-            },
             "empty": {
               "descriptionReadOnly": "Esta tarea programada no hace nada cuando se ejecuta.",
               "title": "No hay pasos configurados",
@@ -7010,8 +6757,7 @@
               "renderer": {
                 "compact": "Crear {name} en {root}",
                 "detail": {
-                  "directory": "Directorio: {name}",
-                  "root": "Raíz: {root}"
+                  "directory": "Directorio: {name}"
                 }
               }
             },
@@ -7024,7 +6770,6 @@
               "renderer": {
                 "compact": "Escribir en {file}",
                 "detail": {
-                  "file": "Archivo: {file}",
                   "append": "Añadir: {value}"
                 }
               }
@@ -7050,11 +6795,7 @@
                 "filesToDelete": "Archivos a eliminar"
               },
               "renderer": {
-                "compact": "Eliminar {files}",
-                "detail": {
-                  "root": "Raíz: {root}",
-                  "files": "Archivos: {files}"
-                }
+                "compact": "Eliminar {files}"
               }
             },
             "renameFiles": {
@@ -7066,11 +6807,7 @@
                 "to": "a"
               },
               "renderer": {
-                "compact": "Renombrar {files}",
-                "detail": {
-                  "root": "Raíz: {root}",
-                  "files": "Archivos: {files}"
-                }
+                "compact": "Renombrar {files}"
               }
             },
             "compressFiles": {
@@ -7083,9 +6820,7 @@
                 "compact": "Comprimir {files} en {root} como {name}",
                 "detail": {
                   "output": "Salida: {name}",
-                  "root": "Raíz: {root}",
-                  "format": "Formato: {format}",
-                  "files": "Archivos: {files}"
+                  "format": "Formato: {format}"
                 }
               }
             },
@@ -7096,11 +6831,7 @@
                 "file": "Archivo"
               },
               "renderer": {
-                "compact": "Descomprimir {file} en {root}",
-                "detail": {
-                  "file": "Archivo: {file}",
-                  "root": "Raíz: {root}"
-                }
+                "compact": "Descomprimir {file} en {root}"
               }
             },
             "pullFile": {
@@ -7113,7 +6844,6 @@
               "renderer": {
                 "compact": "Descarga {url} a {root}",
                 "detail": {
-                  "root": "Raíz: {root}",
                   "fileName": "Nombre de archivo: {fileName}",
                   "useHeader": "Usar nombre del archivo de respuesta: {value}"
                 }
@@ -7180,7 +6910,6 @@
         },
         "subusers": {
           "title": "Subusuarios",
-          "subtitle": "{current} de {max} subusuarios máximos creados.",
           "empty": {
             "title": "No hay subusuarios",
             "description": "Nadie más tiene acceso a este servidor. Añade un subusuario para compartirlo, con solo los permisos que elijas.",
@@ -7188,9 +6917,6 @@
           },
           "button": {
             "createFirstSubuser": "Crear subusuario"
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} subusuarios."
           },
           "table": {
             "columns": {
@@ -7219,12 +6945,10 @@
               }
             },
             "removeSubusers": {
-              "title": "Confirmar eliminación del subusuario",
-              "content": "¿Quieres eliminar a **{subusers}** de este servidor?"
+              "title": "Confirmar eliminación del subusuario"
             },
             "removeSubuser": {
               "title": "Confirmar eliminación del subusuario",
-              "content": "¿Seguro que quieres eliminar a **{username}** de este servidor?",
               "toast": {
                 "removed": "Subusuario eliminado."
               }
@@ -7233,15 +6957,10 @@
         },
         "backups": {
           "title": "Copias de seguridad",
-          "subtitle": "{current} de {max} copias de seguridad máximas creadas.",
-          "subtitleWithDatabase": "{current} de {max} copias de seguridad máximas creadas ({server} servidor, {database} base de datos).",
           "empty": {
             "title": "No hay copias de seguridad",
             "description": "No se puede restaurar nada de este servidor si algo sale mal. Crea una copia de seguridad para conservar una copia a la que puedas volver más adelante.",
             "descriptionReadOnly": "No se puede restaurar nada de este servidor si algo sale mal."
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} copias de seguridad."
           },
           "table": {
             "columns": {
@@ -7251,7 +6970,6 @@
             }
           },
           "badge": {
-            "deleting": "Eliminando...",
             "deleteFailed": "Eliminación fallida",
             "sourceDeleted": "{name} (eliminado)"
           },
@@ -7266,7 +6984,6 @@
             "unlock": "Desbloquear"
           },
           "toast": {
-            "downloadStarted": "Descarga iniciada.",
             "restoringBackup": "Restaurando copia de seguridad...",
             "exportStarted": "Exportación de la copia de seguridad iniciada."
           },
@@ -7296,14 +7013,12 @@
             },
             "deleteBackups": {
               "title": "Confirmar eliminación de la copia de seguridad",
-              "content": "¿Quieres eliminar **{backups}** de este servidor?",
               "alert": {
                 "skipped": "Se omitirán {backups}. Las copias de seguridad bloqueadas, las que aún no hayan finalizado y las que ya se estén eliminando no se pueden borrar."
               }
             },
             "deleteBackup": {
               "title": "Confirmar eliminación de la copia de seguridad",
-              "content": "¿Seguro que quieres eliminar **{name}** de este servidor?",
               "toast": {
                 "started": "Eliminación de la copia de seguridad iniciada.",
                 "deleted": "Copia de seguridad eliminada."
@@ -7353,12 +7068,8 @@
         },
         "network": {
           "title": "Red",
-          "subtitle": "{current} de {max} asignaciones máximas asignadas.",
           "allocations": {
             "title": "Asignaciones"
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} asignaciones."
           },
           "table": {
             "columns": {
@@ -7376,14 +7087,12 @@
           "modal": {
             "removeAllocations": {
               "title": "Confirmar eliminación de la asignación",
-              "content": "¿Quieres eliminar **{allocations}** de este servidor?",
               "alert": {
                 "skipped": "{allocations} se omitirán. La asignación primaria no puede ser eliminada."
               }
             },
             "removeAllocation": {
-              "title": "Confirmar eliminación de la asignación",
-              "content": "¿Seguro que quieres eliminar **{allocation}** de este servidor?"
+              "title": "Confirmar eliminación de la asignación"
             }
           }
         },
@@ -7391,8 +7100,7 @@
           "title": "Cortafuegos",
           "subtitle": "Las reglas se comprueban de arriba abajo; la primera que coincida es la que se aplica.",
           "dropzone": {
-            "title": "Suelta archivos aquí para importarlos como reglas del cortafuegos",
-            "subtitle": "Suelta para empezar a importar"
+            "title": "Suelta archivos aquí para importarlos como reglas del cortafuegos"
           },
           "empty": {
             "title": "No hay reglas de cortafuegos",
@@ -7403,9 +7111,6 @@
             "createFirstRule": "Crear regla",
             "addRule": "Añadir regla",
             "addDenyAll": "Rechazar todo lo demás"
-          },
-          "tooltip": {
-            "limitReached": "Este servidor está limitado a {max} reglas de cortafuegos."
           },
           "rule": {
             "anySource": "cualquier fuente",
@@ -7496,16 +7201,7 @@
             "join": "Unirse a la red privada",
             "leave": "Abandonar la red privada",
             "connect": "Conectar un servidor",
-            "addPort": "Añadir puerto",
-            "editPorts": "Puertos ofrecidos"
-          },
-          "action": {
-            "rename": "Cambiar nombre de host",
-            "editPorts": "Editar puertos ofrecidos",
-            "removeOutgoing": "Dejar de acceder a este servidor",
-            "removeIncoming": "Dejar de permitir que este servidor acceda a nosotros",
-            "grantOutgoing": "Permitir que este servidor acceda a él",
-            "grantIncoming": "Permitir que él acceda a este servidor"
+            "addPort": "Añadir puerto"
           },
           "canvas": {
             "hint": "Haz clic en una conexión para activar o desactivar esa dirección. Arrastra para desplazarte, mantén pulsada la tecla Ctrl y desplázate para hacer zoom, o pellizca en una pantalla táctil.",
@@ -7534,8 +7230,7 @@
             }
           },
           "tooltip": {
-            "nodeNotOnNetwork": "El nodo en el que se ejecuta este servidor no está conectado a la red privada.",
-            "connectionLimitReached": "Este servidor está limitado a {max} conexiones salientes."
+            "nodeNotOnNetwork": "El nodo en el que se ejecuta este servidor no está conectado a la red privada."
           },
           "alert": {
             "nodeNotOnNetwork": "El nodo en el que se ejecuta este servidor **no está conectado a la red privada**, por lo que no puede unirse. Pide a un administrador que la habilite para el nodo.",
@@ -7546,9 +7241,7 @@
             "name": "Nombre de host",
             "nameDescription": "Letras minúsculas, números y guiones, hasta 63 caracteres. Un servidor no puede acceder a dos servidores con el mismo nombre de host.",
             "namePlaceholder": "Déjalo vacío para derivar uno a partir del nombre del servidor",
-            "port": "Puerto",
             "protocols": "Protocolos",
-            "server": "Servidor",
             "serverDescription": "Solo se muestran los servidores que ya están en la red privada."
           },
           "toast": {

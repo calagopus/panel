@@ -275,7 +275,6 @@
         "error": "錯誤",
         "warning": "警告",
         "success": "成功",
-        "clockOffset": "你的系統時鐘與伺服器相差超過 5 秒。這可能會造成通行密鑰驗證與雙因素驗證問題。若發生問題，請同步你的時鐘。目前偏移：{offset} 秒。",
         "passwordAuthUnavailable": "您的密碼無法用於此連線。請改用 SSH 金鑰，您可以在帳戶的「SSH 金鑰」頁面中新增金鑰。"
       },
       "divider": {
@@ -317,8 +316,7 @@
           "countMatches": "計算相符數量",
           "matches": "{count} 個相符",
           "noMatches": "沒有相符項目",
-          "exception": "例外",
-          "tooManyPatterns": "超過 {max} 個模式時不會自動計算相符數量。"
+          "exception": "例外"
         },
         "cronInput": {
           "segments": {
@@ -361,15 +359,13 @@
           "content": "確定要刪除 **{name}** 嗎？"
         },
         "deleteFailedBackups": {
-          "content": "您確定要刪除 `{count}` 個失敗的備份嗎？已鎖定的備份和設定正在維護中的備份將被保留。刪除操作在背景運行，可能需要一些時間才能完成。",
           "alert": {
             "forceWarning": "強制刪除操作會移除這些備份，即使它們的配置資訊缺失或遠端儲存無法存取。備份檔案本身可能無法完全清理，從而留下孤立資料。"
           }
         }
       },
       "toast": {
-        "duplicated": "{resource} 已複製。",
-        "failedBackupDeletionStarted": "正在背景刪除 {count} 個失敗的備份。"
+        "duplicated": "{resource} 已複製。"
       },
       "settingScope": {
         "account": "與帳戶同步",
@@ -600,12 +596,6 @@
           "unlessStopped": "除非已停止",
           "never": "永不"
         },
-        "bulkActionServerAction": {
-          "started": "已啟動",
-          "stopped": "已停止",
-          "restarted": "已重新啟動",
-          "killed": "已強制終止"
-        },
         "compressionLevel": {
           "bestSpeed": "最快速度",
           "goodSpeed": "較快速度",
@@ -658,7 +648,6 @@
         "dividerPlaceholder": "分隔線標籤（選填）",
         "redirectNamePlaceholder": "重新導向名稱",
         "destinationPlaceholder": "目標 URL（例如 https://...）",
-        "selectRoutePlaceholder": "選取路由…",
         "button": {
           "addDivider": "新增分隔線",
           "addRedirect": "新增重新導向"
@@ -899,12 +888,8 @@
       "fileUpload": {
         "title": "上傳中：{files}",
         "adminAssets": "管理員資源",
-        "waiting": "等待中：{file}",
-        "uploading": "上傳中：{file}",
         "uploadingFolder": "正在上傳資料夾：{folder}（{files}）",
-        "failed": "失敗:{file}",
         "failedFolder": "上傳失敗:{folder}({files})",
-        "paused": "已暫停:{file}",
         "pause": "暫停上傳",
         "resume": "繼續上傳",
         "cancel": "取消上傳",
@@ -1012,10 +997,7 @@
             "frontendConnectionError": "您的瀏覽器無法連線至節點。請檢查(公開)URL、TLS 憑證與防火牆設定,WebSocket 連線與下載功能皆仰賴此連線。"
           },
           "successMessage": "已成功驗證與節點的連線。你現在可以繼續。",
-          "configurationDescription": "將此內容放入 `{file}` 的設定檔中，或執行：",
-          "button": {
-            "verify": "驗證連線"
-          }
+          "configurationDescription": "將此內容放入 `{file}` 的設定檔中，或執行："
         },
         "configuration": {
           "title": "應用程式設定",
@@ -1057,8 +1039,7 @@
             "nestDescription": "若要開始使用此 Egg，你需要建立一個 Nest；Nest 是 Egg 的集合。請為它命名："
           },
           "server": {
-            "title": "伺服器",
-            "nestDescription": "若要開始使用此 Egg，你需要建立一個 Nest；Nest 是 Egg 的集合。請為它命名："
+            "title": "伺服器"
           },
           "error": {
             "noNodes": "發生錯誤。找不到任何節點。"
@@ -1078,8 +1059,7 @@
               "subtitle": "已設定面板設定與偏好"
             },
             "eggRepositories": {
-              "title": "Egg 儲存庫",
-              "subtitle": "{count} 個儲存庫"
+              "title": "Egg 儲存庫"
             },
             "location": "位置",
             "node": "節點",
@@ -1236,17 +1216,12 @@
                   },
                   "deleteServerGroup": {
                     "title": "確認刪除伺服器群組",
-                    "content": "你確定要從你的帳戶刪除 **{group}** 嗎？",
                     "toast": {
                       "deleted": "已刪除伺服器群組。"
                     }
                   },
-                  "addServerToGroup": {
-                    "noServers": "所有伺服器都已在此群組中。"
-                  },
                   "removeServerFromGroup": {
                     "title": "確認移除伺服器",
-                    "content": "你確定要從 **{group}** 移除 **{server}** 嗎？",
                     "toast": {
                       "removed": "已從群組移除伺服器。"
                     }
@@ -1272,11 +1247,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "選取模式",
             "select": "選取伺服器",
             "deselect": "取消選取伺服器",
-            "success": "已成功{action} {servers}。",
-            "partial": "已成功{action} {successfulServers}。{failedServers} 失敗。",
             "groupActions": "群組動作"
           }
         },
@@ -1360,7 +1332,6 @@
         },
         "securityKeys": {
           "title": "安全性金鑰",
-          "subtitle": "已建立 {current} / {max} 個安全性金鑰。",
           "table": {
             "columns": {
               "credentialId": "憑證 ID"
@@ -1368,7 +1339,6 @@
           },
           "tooltip": {
             "secureContextRequired": "使用安全性金鑰需要安全內容（HTTPS）。",
-            "limitReached": "你最多只能使用 {max} 個安全性金鑰。",
             "disabled": "安全金鑰已被管理員停用。"
           },
           "alert": {
@@ -1392,7 +1362,6 @@
             },
             "deleteSecurityKey": {
               "title": "確認刪除安全性金鑰",
-              "content": "你確定要從你的帳戶刪除 **{key}** 嗎？",
               "toast": {
                 "deleted": "安全性金鑰已成功刪除。"
               }
@@ -1471,17 +1440,10 @@
             "searchContent": "搜尋主控台輸出",
             "previousCommand": "歷史紀錄中的上一個指令",
             "nextCommand": "歷史紀錄中的下一個指令"
-          },
-          "serverList": {
-            "selectServer": "按住 S 並點選以選取/取消選取伺服器"
           }
         },
         "sshKeys": {
           "title": "SSH 金鑰",
-          "subtitle": "已建立 {current} / {max} 個 SSH 金鑰。",
-          "tooltip": {
-            "limitReached": "你最多只能使用 {max} 個 SSH 金鑰。"
-          },
           "table": {
             "columns": {
               "fingerprint": "指紋"
@@ -1514,7 +1476,6 @@
             },
             "deleteSshKey": {
               "title": "確認刪除 SSH 金鑰",
-              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
               "toast": {
                 "removed": "SSH 金鑰已移除。"
               }
@@ -1523,10 +1484,6 @@
         },
         "commandSnippets": {
           "title": "指令片段",
-          "subtitle": "已建立 {current} / {max} 個指令片段。",
-          "tooltip": {
-            "limitReached": "你最多只能使用 {max} 個指令片段。"
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "建立指令片段",
@@ -1542,7 +1499,6 @@
             },
             "deleteCommandSnippet": {
               "title": "確認刪除指令片段",
-              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
               "toast": {
                 "removed": "指令片段已移除。"
               }
@@ -1578,12 +1534,8 @@
         },
         "apiKeys": {
           "title": "API 金鑰",
-          "subtitle": "已建立 {current} / {max} 個 API 金鑰。",
           "button": {
             "apiDocumentation": "API 文件"
-          },
-          "tooltip": {
-            "limitReached": "你最多只能使用 {max} 個 API 金鑰。"
           },
           "table": {
             "columns": {
@@ -1614,7 +1566,6 @@
             },
             "deleteApiKey": {
               "title": "確認刪除 API 金鑰",
-              "content": "你確定要從你的帳戶刪除 **{name}** 嗎？",
               "toast": {
                 "removed": "API 金鑰已移除。"
               }
@@ -1740,7 +1691,6 @@
                 "nodesUpToDate": "所有節點似乎都是最新版本。（{failed} 個檢查失敗）",
                 "databaseAgentHostsUpToDate": "看起來所有資料庫代理主機都已是最新版本。（{failed} 個檢查失敗）",
                 "table": {
-                  "version": "版本",
                   "installed": "已安裝",
                   "packageName": "套件名稱",
                   "latestVersion": "最新版本",
@@ -1793,7 +1743,6 @@
               "page": {
                 "title": "應用程式設定",
                 "form": {
-                  "icon": "圖示",
                   "iconLight": "圖示（淺色模式）",
                   "banner": "橫幅",
                   "bannerLight": "橫幅（淺色模式）",
@@ -2063,8 +2012,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "確認刪除公告",
-                    "content": "你確定要刪除 **{title}** 嗎？"
+                    "title": "確認刪除公告"
                   },
                   "duplicate": {
                     "content": "確定要複製 **{title}**？"
@@ -2109,21 +2057,16 @@
             "parentDirectory": "前往上層目錄",
             "deleteSelection": "刪除選取項目"
           },
-          "dropzone": {
-            "subtitle": "放開即可開始上傳"
-          },
           "toast": {
             "assetDeleted": "資產已刪除。",
             "assetsDeleted": "已刪除 {assets}。"
           },
           "modal": {
             "createDirectory": {
-              "title": "新目錄",
-              "createdAs": "將建立於 "
+              "title": "新目錄"
             },
             "deleteAssets": {
-              "title": "確認刪除資產",
-              "content": "你確定要刪除 `{count}` 個資產嗎？"
+              "title": "確認刪除資產"
             },
             "deleteAsset": {
               "title": "刪除資產",
@@ -2163,18 +2106,6 @@
             "noBackend": "設定此擴充功能需要後端擴充功能。",
             "noConfigurationPage": "此擴充功能未定義設定頁面。",
             "removeExtension": "移除擴充功能"
-          },
-          "phase": {
-            "queued": "排隊中…",
-            "preparing": "準備中…",
-            "clearing": "清除擴充套件中…",
-            "adding": "新增擴充套件中({done}/{total})…",
-            "resync": "解析相依套件中…",
-            "stagingTranslations": "暫存翻譯中…",
-            "compiling": "編譯中…",
-            "verifying": "驗證中…",
-            "installing": "安裝中…",
-            "restarting": "重新啟動面板中…"
           },
           "badge": {
             "frontendMissing": "前端遺失",
@@ -2280,8 +2211,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "確認刪除使用者",
-                    "content": "你確定要刪除 **{username}** 嗎？"
+                    "title": "確認刪除使用者"
                   },
                   "disableTwoFactor": {
                     "title": "停用使用者雙因素驗證",
@@ -2420,16 +2350,12 @@
                   "sftpAddress": "SFTP 位址",
                   "createdAt": "建立時間",
                   "inheritedFromLocation": "繼承自位置",
-                  "none": "無",
                   "wingsVersion": "Wings 版本",
                   "memory": "記憶體",
                   "servers": "伺服器",
                   "architecture": "架構",
                   "kernelVersion": "核心版本",
                   "unavailable": "無法取得"
-                },
-                "badge": {
-                  "updateAvailable": "有可用更新"
                 }
               }
             },
@@ -2446,8 +2372,7 @@
                   "publicUrlDescription": "用於 websocket 連線與下載。",
                   "backupConfigurationPlaceholder": "繼承自位置",
                   "memoryDescription": "此節點上可供伺服器使用的記憶體總量。",
-                  "diskDescription": "此節點上可供伺服器使用的磁碟總量。",
-                  "unlimitedTooltip": "設為 0 表示不設限。"
+                  "diskDescription": "此節點上可供伺服器使用的磁碟總量。"
                 },
                 "section": {
                   "connection": "連線",
@@ -2498,8 +2423,7 @@
                 },
                 "button": {
                   "save": "儲存設定",
-                  "reveal": "顯示設定內容",
-                  "verify": "驗證連線"
+                  "reveal": "顯示設定內容"
                 },
                 "alert": {
                   "couldNotReach": "無法連線到節點：{error}",
@@ -2514,8 +2438,7 @@
                 },
                 "toast": {
                   "applied": "設定已成功套用。",
-                  "submittedNotApplied": "設定已提交但未套用。",
-                  "invalidYaml": "無效的 YAML：{error}"
+                  "submittedNotApplied": "設定已提交但未套用。"
                 }
               }
             },
@@ -2532,7 +2455,6 @@
                 "label": {
                   "memory": "記憶體",
                   "disk": "磁碟",
-                  "cpuThreads": "{model}（{threads} 執行緒）",
                   "usedByWings": "{size} 由 Wings 使用",
                   "networkIn": "傳入：{in}",
                   "networkOut": "傳出：{out}"
@@ -2541,24 +2463,14 @@
                   "diskIo": "磁碟 I/O",
                   "networkTraffic": "網路流量",
                   "diskRead": "磁碟讀取",
-                  "diskWrite": "磁碟寫入",
-                  "networkInLabel": "網路傳入",
-                  "networkOutLabel": "網路傳出"
+                  "diskWrite": "磁碟寫入"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "部署容量",
-                "subtitle": "此節點上分配給伺服器的資源，以節點設定中設定的限制為基準，而非實體機器容量。部署僅檢查記憶體與磁碟。",
                 "card": {
                   "resources": "已分配資源"
-                },
-                "status": {
-                  "deploymentEnabled": "部署已啟用",
-                  "deploymentDisabled": "部署已停用",
-                  "maintenanceEnabled": "維護中",
-                  "maintenanceDisabled": "非維護中"
                 },
                 "label": {
                   "memory": "記憶體",
@@ -2656,8 +2568,7 @@
                     "title": "新增節點掛載"
                   },
                   "remove": {
-                    "title": "確認移除節點掛載",
-                    "content": "你確定要從 **{name}** 移除掛載 **{mount}** 嗎？"
+                    "title": "確認移除節點掛載"
                   }
                 }
               }
@@ -2711,7 +2622,6 @@
                   "backupNotOnSameNode": "此備份不在與伺服器相同的節點上，無法從客戶端 API 檢視。"
                 },
                 "toast": {
-                  "downloadStarted": "下載已開始。",
                   "detached": "備份已成功卸離。",
                   "reattached": "已成功將備份重新附加到 {name}。",
                   "restoring": "正在將備份還原到 {name}...",
@@ -2761,8 +2671,7 @@
                       "started": "{servers} 轉移已開始。"
                     },
                     "confirm": {
-                      "title": "確認伺服器轉移",
-                      "content": "你確定要將 `{count}` 台伺服器從 **{from}** 轉移到 **{to}** 嗎？此操作無法復原。"
+                      "title": "確認伺服器轉移"
                     },
                     "enum": {
                       "allocationMode": {
@@ -2810,9 +2719,6 @@
               },
               "toast": {
                 "applied": "設定已套用至 {nodes}。"
-              },
-              "error": {
-                "invalidYaml": "無效的 YAML：{error}"
               }
             }
           }
@@ -2872,7 +2778,6 @@
                   "swap": "置換空間",
                   "allocations": "連接埠分配",
                   "databases": "資料庫",
-                  "databaseAgents": "代理資料庫",
                   "backups": "備份",
                   "schedules": "排程",
                   "unlimited": "無限制",
@@ -2919,7 +2824,6 @@
                   "swapDescription": "分配給此伺服器的 swap 大小。",
                   "swapTooltip": "設為 -1 表示不設限。",
                   "memoryDescription": "伺服器容器的記憶體限制。",
-                  "memoryTooltip": "設為 0 表示不設限。",
                   "memoryOverhead": "記憶體額外開銷",
                   "memoryOverheadDescription": "將新增至容器的隱藏記憶體。",
                   "diskSpace": "磁碟空間",
@@ -2945,7 +2849,6 @@
                   "kvmPassthroughEnabledDescription": "為伺服器啟用 KVM 透傳（允許在容器內存取 /dev/kvm）。",
                   "allocationsLimit": "分配",
                   "databasesLimit": "資料庫",
-                  "databaseAgentsLimit": "代理資料庫",
                   "backupsLimit": "備份",
                   "schedulesLimit": "排程"
                 },
@@ -2976,8 +2879,7 @@
                   "updated": "分配已更新。",
                   "setPrimary": "分配已設為主要。",
                   "unsetPrimary": "分配已取消主要。",
-                  "removed": "分配已移除。",
-                  "added": "已新增 {count} 個分配。"
+                  "removed": "分配已移除。"
                 },
                 "modal": {
                   "add": {
@@ -3018,8 +2920,7 @@
                     "title": "新增伺服器掛載"
                   },
                   "remove": {
-                    "title": "確認移除伺服器掛載",
-                    "content": "你確定要從 **{name}** 移除掛載 **{mount}** 嗎？"
+                    "title": "確認移除伺服器掛載"
                   }
                 }
               }
@@ -3169,8 +3070,7 @@
               "page": {
                 "title": "Egg",
                 "dropzone": {
-                  "title": "將一些檔案拖放到此處以匯入為 Egg",
-                  "subtitle": "放開即可開始匯入"
+                  "title": "將一些檔案拖放到此處以匯入為 Egg"
                 },
                 "button": {
                   "updateFromRepository": "從儲存庫更新"
@@ -3186,14 +3086,6 @@
                 "modal": {
                   "move": {
                     "title": "移動 Egg"
-                  },
-                  "moveBulk": {
-                    "title": "移動 Egg",
-                    "confirm": "移動 {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "確認刪除 Egg",
-                    "content": "你確定要刪除 `{count}` 個 Egg 嗎？"
                   }
                 },
                 "tabs": {
@@ -3315,8 +3207,7 @@
                           "title": "新增 Egg 掛載"
                         },
                         "delete": {
-                          "title": "確認移除 Egg 掛載",
-                          "content": "你確定要從 **{egg}** 移除掛載 **{mount}** 嗎？"
+                          "title": "確認移除 Egg 掛載"
                         }
                       }
                     }
@@ -3613,8 +3504,7 @@
                 },
                 "button": {
                   "save": "儲存設定",
-                  "reveal": "顯示設定",
-                  "verify": "驗證連線"
+                  "reveal": "顯示設定"
                 },
                 "alert": {
                   "couldNotReach": "無法連線至資料庫代理主機:{error}",
@@ -3627,8 +3517,7 @@
                 },
                 "toast": {
                   "applied": "設定套用成功。",
-                  "submittedNotApplied": "設定已送出但尚未套用。",
-                  "invalidYaml": "無效的 YAML:{error}"
+                  "submittedNotApplied": "設定已送出但尚未套用。"
                 }
               }
             },
@@ -3636,12 +3525,6 @@
               "title": "總覽",
               "page": {
                 "title": "資料庫代理主機總覽",
-                "status": {
-                  "deploymentEnabled": "已啟用部署",
-                  "deploymentDisabled": "已停用部署",
-                  "maintenanceEnabled": "已啟用維護模式",
-                  "maintenanceDisabled": "已停用維護模式"
-                },
                 "card": {
                   "hostDetails": "主機詳細資訊",
                   "systemInfo": "系統資訊",
@@ -3659,9 +3542,6 @@
                   "noLimit": "無主機限制",
                   "free": "剩餘 {size}",
                   "cores": "已分配 {cores} 核心"
-                },
-                "badge": {
-                  "updateAvailable": "有可用更新"
                 }
               }
             },
@@ -3673,7 +3553,6 @@
                   "graphs": "圖表"
                 },
                 "label": {
-                  "cpuThreads": "{model}({threads} 執行緒)",
                   "memory": "記憶體",
                   "usedByAgent": "代理已使用 {size}",
                   "disk": "磁碟",
@@ -3684,9 +3563,7 @@
                   "diskIo": "磁碟 I/O",
                   "diskRead": "磁碟讀取",
                   "diskWrite": "磁碟寫入",
-                  "networkTraffic": "網路流量",
-                  "inbound": "送入",
-                  "outbound": "送出"
+                  "networkTraffic": "網路流量"
                 },
                 "toast": {
                   "connectionLost": "與資料庫代理主機的連線已中斷。"
@@ -3702,9 +3579,6 @@
               },
               "toast": {
                 "applied": "設定已套用至 {hosts}。"
-              },
-              "error": {
-                "invalidYaml": "無效的 YAML:{error}"
               }
             }
           }
@@ -3712,8 +3586,7 @@
         "databaseAgentTemplates": {
           "title": "資料庫代理範本",
           "dropzone": {
-            "title": "將檔案拖曳至此匯入為資料庫代理範本",
-            "subtitle": "放開即開始匯入"
+            "title": "將檔案拖曳至此匯入為資料庫代理範本"
           },
           "toast": {
             "imported": "資料庫代理範本已匯入。",
@@ -3737,7 +3610,6 @@
                   "imageUid": "映像檔 UID",
                   "imageGid": "映像檔 GID",
                   "memoryDescription": "資料庫容器的記憶體限制。",
-                  "memoryTooltip": "設為 0 表示不設限。",
                   "swap": "置換空間",
                   "swapDescription": "分配給此資料庫的置換空間量。",
                   "swapTooltip": "設為 -1 表示不設限。",
@@ -3772,7 +3644,6 @@
                 "modal": {
                   "applyUpdates": {
                     "title": "套用範本更新",
-                    "content": "這將把 **{name}** 目前的設定推送至 {count} 個已選取的執行個體。執行個體將重新啟動以套用新設定。已鎖定的執行個體,以及位於維護模式主機上的執行個體將會被略過。",
                     "contentAll": "這將把 **{name}** 目前的設定推送至所有已過時的執行個體,包含未顯示於目前搜尋結果中的執行個體。執行個體將重新啟動以套用新設定。已鎖定的執行個體,以及位於維護模式主機上的執行個體將會被略過。"
                   }
                 }
@@ -3784,8 +3655,7 @@
           "title": "OAuth 提供者",
           "resourceName": "OAuth 提供者",
           "dropzone": {
-            "title": "將一些檔案拖放到此處以匯入為 OAuth 提供者",
-            "subtitle": "放開即可開始匯入"
+            "title": "將一些檔案拖放到此處以匯入為 OAuth 提供者"
           },
           "table": {
             "columns": {
@@ -3862,9 +3732,6 @@
                   },
                   "matcherType": {
                     "none": "無(一律套用)",
-                    "and": "AND(全部須符合)",
-                    "or": "OR(任一符合即可)",
-                    "not": "NOT(須不符合)",
                     "scopes": "已授予範圍",
                     "fieldExists": "欄位存在",
                     "fieldEquals": "欄位等於",
@@ -3878,18 +3745,9 @@
                   "updated": "OAuth 提供者對應已更新。",
                   "deleted": "OAuth 提供者對應已刪除。"
                 },
-                "button": {
-                  "addMatcher": "新增比對條件"
-                },
-                "matcher": {
-                  "allMustMatch": "所有比對條件皆須符合：",
-                  "anyMustMatch": "任一比對條件符合即可：",
-                  "mustNotMatch": "比對條件須不符合："
-                },
                 "form": {
                   "matcher": "比對條件",
                   "matcherDescription": "決定此對應規則是否套用於透過此提供者登入的使用者。",
-                  "matcherType": "比對條件類型",
                   "scopes": "範圍",
                   "scopesDescription": "此對應套用所需的 OAuth 範圍。",
                   "path": "欄位路徑",
@@ -3898,7 +3756,6 @@
                   "startsWith": "開頭為",
                   "endsWith": "結尾為",
                   "revokeUnmatched": "不符合時撤銷",
-                  "revokeUnmatchedDescription": "當後續登入時比對條件不再符合,將移除先前指派的角色或伺服器子使用者權限。",
                   "mappingType": "對應類型",
                   "role": "角色",
                   "permissions": "權限"
@@ -4059,10 +3916,7 @@
             "backups": {
               "title": "備份",
               "page": {
-                "title": "備份設定備份",
-                "toast": {
-                  "downloadStarted": "下載已開始。"
-                }
+                "title": "備份設定備份"
               }
             },
             "locations": {
@@ -4133,10 +3987,7 @@
             "backups": {
               "title": "備份",
               "page": {
-                "title": "系統備份政策備份",
-                "toast": {
-                  "downloadStarted": "已開始下載。"
-                }
+                "title": "系統備份政策備份"
               }
             },
             "locations": {
@@ -4152,8 +4003,7 @@
                     "title": "新增位置"
                   },
                   "remove": {
-                    "title": "確認移除位置",
-                    "content": "確定要將 **{name}** 從 **{policy}** 移除嗎？"
+                    "title": "確認移除位置"
                   }
                 }
               }
@@ -4171,8 +4021,7 @@
                     "title": "新增節點"
                   },
                   "remove": {
-                    "title": "確認移除節點",
-                    "content": "確定要將 **{name}** 從 **{policy}** 移除嗎？"
+                    "title": "確認移除節點"
                   }
                 }
               }
@@ -4190,8 +4039,7 @@
                     "title": "新增伺服器"
                   },
                   "remove": {
-                    "title": "確認移除伺服器",
-                    "content": "確定要將 **{name}** 從 **{policy}** 移除嗎？"
+                    "title": "確認移除伺服器"
                   }
                 }
               }
@@ -4230,8 +4078,7 @@
                     "title": "新增掛載 Egg"
                   },
                   "remove": {
-                    "title": "確認移除掛載 Egg",
-                    "content": "你確定要從 **{name}** 移除掛載 **{mount}** 嗎？"
+                    "title": "確認移除掛載 Egg"
                   }
                 }
               }
@@ -4249,8 +4096,7 @@
                     "title": "新增掛載節點"
                   },
                   "remove": {
-                    "title": "確認移除掛載節點",
-                    "content": "你確定要從 **{name}** 移除掛載 **{mount}** 嗎？"
+                    "title": "確認移除掛載節點"
                   }
                 }
               }
@@ -4507,9 +4353,6 @@
             "sendingRemote": "正在傳送 {files} 到遠端伺服器",
             "exportingBackup": "正在將備份匯出至 {destination}"
           },
-          "dropzone": {
-            "subtitle": "放開即可開始上傳"
-          },
           "settings": {
             "clickOnce": "點選一次即可開啟檔案或資料夾",
             "preferPhysicalSize": "顯示實體大小而非邏輯大小",
@@ -4532,7 +4375,6 @@
             "filesMoved": "{files} 已移動。",
             "moveUndone": "已復原 {files} 的移動操作。",
             "moveCouldNotBeUndone": "無法復原移動操作。",
-            "downloadStarted": "下載已開始。",
             "filesDeleted": "檔案已刪除。",
             "archiveCreationStarted": "已開始建立壓縮檔。",
             "decompressionStarted": "已開始解壓縮封存檔。",
@@ -4578,10 +4420,6 @@
                 "restore": "將此修訂版本還原到編輯器",
                 "viewDiff": "檢視與目前檔案的差異",
                 "compareToPrevious": "與上一個修訂版本比較"
-              },
-              "diff": {
-                "original": "修訂版本",
-                "current": "目前"
               }
             }
           },
@@ -4607,23 +4445,19 @@
               "contentHashMismatch": "自儲存此草稿後，伺服器上的檔案已被修改。還原草稿可能會覆寫那些變更。"
             },
             "extractFile": {
-              "title": "解壓縮封存檔",
-              "extractedTo": "{file} 的內容將會解壓縮到 "
+              "title": "解壓縮封存檔"
             },
             "createArchive": {
               "title": "建立壓縮檔",
               "form": {
                 "format": "格式"
-              },
-              "createdAs": "此壓縮檔將建立為 "
+              }
             },
             "createDirectory": {
-              "title": "建立目錄",
-              "createdAs": "此目錄將建立為 "
+              "title": "建立目錄"
             },
             "copyFile": {
               "title": "複製檔案",
-              "createdAs": "此檔案將建立為 ",
               "conflict": "目標位置已存在同名檔案。"
             },
             "copyConflict": {
@@ -4766,7 +4600,6 @@
                 "fileUrl": "檔案 URL",
                 "query": "查詢"
               },
-              "createdAs": "此檔案將建立為 ",
               "pull": "拉取"
             },
             "sftpDetails": {
@@ -4777,10 +4610,6 @@
         },
         "databases": {
           "title": "資料庫",
-          "subtitle": "已建立 {current} / {max} 個資料庫。",
-          "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 個資料庫。"
-          },
           "table": {
             "columns": {
               "locked": "已鎖定？"
@@ -4945,12 +4774,8 @@
           },
           "instance": {
             "title": "受管理的資料庫",
-            "updateAvailable": "有可用更新",
             "button": {
               "applyUpdate": "套用更新"
-            },
-            "tooltip": {
-              "limitReached": "此伺服器最多只能有 {max} 個受管理的資料庫。"
             },
             "view": {
               "tabs": {
@@ -4964,11 +4789,9 @@
             },
             "databases": {
               "title": "資料庫",
-              "subtitle": "已建立 {current} 個資料庫，上限為 {max} 個。",
               "tooltip": {
                 "offline": "執行個體必須處於執行中狀態才能建立資料庫。",
-                "noUser": "此資料庫尚未連結任何使用者，請建立使用者以存取此資料庫。",
-                "limitReached": "此執行個體最多只能有 {max} 個資料庫。"
+                "noUser": "此資料庫尚未連結任何使用者，請建立使用者以存取此資料庫。"
               },
               "button": {
                 "remoteImport": "從遠端匯入"
@@ -5010,11 +4833,6 @@
                   "content": "重新建立資料庫將永久刪除 **{name}** 資料庫中的所有資料，並建立一個名稱相同、使用者存取權限相同的新空白資料庫。"
                 }
               },
-              "table": {
-                "columns": {
-                  "database": "資料庫"
-                }
-              },
               "toast": {
                 "created": "資料庫已建立。",
                 "deleted": "資料庫已刪除。",
@@ -5026,10 +4844,6 @@
             },
             "users": {
               "title": "使用者",
-              "subtitle": "已建立 {current} 個使用者，上限為 {max} 個。",
-              "tooltip": {
-                "limitReached": "此執行個體最多只能有 {max} 個使用者。"
-              },
               "modal": {
                 "createUser": {
                   "title": "建立使用者",
@@ -5176,14 +4990,6 @@
         },
         "schedules": {
           "title": "排程",
-          "subtitle": "已建立 {current} / {max} 個排程。",
-          "dropzone": {
-            "title": "將一些檔案拖放到此處以匯入為排程",
-            "subtitle": "放開即可開始匯入"
-          },
-          "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 個排程。"
-          },
           "table": {
             "columns": {
               "lastRun": "上次執行",
@@ -5637,8 +5443,7 @@
               "renderer": {
                 "compact": "在 {root} 建立 {name}",
                 "detail": {
-                  "directory": "目錄：{name}",
-                  "root": "根目錄：{root}"
+                  "directory": "目錄：{name}"
                 }
               }
             },
@@ -5651,7 +5456,6 @@
               "renderer": {
                 "compact": "寫入 {file}",
                 "detail": {
-                  "file": "檔案：{file}",
                   "append": "附加：{value}"
                 }
               }
@@ -5677,11 +5481,7 @@
                 "filesToDelete": "要刪除的檔案"
               },
               "renderer": {
-                "compact": "刪除 {files}",
-                "detail": {
-                  "root": "根目錄：{root}",
-                  "files": "檔案：{files}"
-                }
+                "compact": "刪除 {files}"
               }
             },
             "renameFiles": {
@@ -5693,11 +5493,7 @@
                 "to": "到"
               },
               "renderer": {
-                "compact": "重新命名 {files}",
-                "detail": {
-                  "root": "根目錄：{root}",
-                  "files": "檔案：{files}"
-                }
+                "compact": "重新命名 {files}"
               }
             },
             "compressFiles": {
@@ -5710,9 +5506,7 @@
                 "compact": "將 {root} 中的 {files} 壓縮為 {name}",
                 "detail": {
                   "output": "輸出：{name}",
-                  "root": "根目錄：{root}",
-                  "format": "格式：{format}",
-                  "files": "檔案：{files}"
+                  "format": "格式：{format}"
                 }
               }
             },
@@ -5723,11 +5517,7 @@
                 "file": "檔案"
               },
               "renderer": {
-                "compact": "將 {file} 解壓縮到 {root}",
-                "detail": {
-                  "file": "檔案：{file}",
-                  "root": "根目錄：{root}"
-                }
+                "compact": "將 {file} 解壓縮到 {root}"
               }
             },
             "updateStartupVariable": {
@@ -5792,10 +5582,6 @@
         },
         "subusers": {
           "title": "子使用者",
-          "subtitle": "已建立 {current} / {max} 位子使用者。",
-          "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 位子使用者。"
-          },
           "table": {
             "columns": {
               "twoFactorEnabled": "已啟用 2FA",
@@ -5823,7 +5609,6 @@
             },
             "removeSubuser": {
               "title": "確認移除子使用者",
-              "content": "你確定要從此伺服器移除 **{username}** 嗎？",
               "toast": {
                 "removed": "子使用者已移除。"
               }
@@ -5832,17 +5617,12 @@
         },
         "backups": {
           "title": "備份",
-          "subtitle": "已建立 {current} / {max} 個備份。",
-          "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 個備份。"
-          },
           "table": {
             "columns": {
               "locked": "已鎖定？"
             }
           },
           "badge": {
-            "deleting": "刪除中…",
             "deleteFailed": "刪除失敗"
           },
           "button": {
@@ -5852,7 +5632,6 @@
             "createGroup": "建立備份群組"
           },
           "toast": {
-            "downloadStarted": "下載已開始。",
             "restoringBackup": "正在還原備份...",
             "exportStarted": "備份匯出已開始。"
           },
@@ -5878,7 +5657,6 @@
             },
             "deleteBackup": {
               "title": "確認刪除備份",
-              "content": "你確定要從此伺服器刪除 **{name}** 嗎？",
               "toast": {
                 "started": "備份刪除已開始。",
                 "deleted": "備份已刪除。"
@@ -5925,10 +5703,6 @@
         },
         "network": {
           "title": "網路",
-          "subtitle": "已指派 {current} / {max} 個分配。",
-          "tooltip": {
-            "limitReached": "此伺服器最多只能使用 {max} 個分配。"
-          },
           "table": {
             "columns": {
               "hostname": "主機名稱",
@@ -5944,8 +5718,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "確認移除分配",
-              "content": "你確定要從此伺服器移除 **{allocation}** 嗎？"
+              "title": "確認移除分配"
             }
           }
         },

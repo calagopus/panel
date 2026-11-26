@@ -178,8 +178,7 @@
       "alert": {
         "error": "Błąd",
         "warning": "Ostrzeżenie",
-        "success": "Sukces",
-        "clockOffset": "Zegar systemowy rozbiega się z zegarem serwerem o więcej niż 5 sekund. Może to powodować problemy z uwierzytelnianiem hasłem i uwierzytelnianiem dwuskładnikowym. Proszę zsynchronizować zegar, jeśli pojawią się problemy. Aktualne przesunięcie: {offset} sekund(y)."
+        "success": "Sukces"
       },
       "divider": {
         "or": "LUB"
@@ -209,8 +208,7 @@
           "countMatches": "Ilość dopasowań",
           "matches": "dopasowano {count}",
           "noMatches": "Brak dopasowań",
-          "exception": "Wyjątek",
-          "tooManyPatterns": "Dopasowanie nie jest liczone automatycznie dla więcej niż {max} ścieżek."
+          "exception": "Wyjątek"
         }
       },
       "modal": {
@@ -388,12 +386,6 @@
           "always": "Zawsze",
           "unlessStopped": "Gdy nie wyłączono",
           "never": "Nigdy"
-        },
-        "bulkActionServerAction": {
-          "started": "Uruchomiono",
-          "stopped": "Zatrzymano",
-          "restarted": "Uruchomiono ponownie",
-          "killed": "Zabito"
         },
         "compressionLevel": {
           "bestSpeed": "Najwyższa prędkość",
@@ -599,12 +591,8 @@
       "fileUpload": {
         "title": "Przesyłanie {files}",
         "adminAssets": "Zasoby administracyjne",
-        "waiting": "Oczekiwanie: {file}",
-        "uploading": "Przesyłanie: {file}",
         "uploadingFolder": "Przesyłanie folderu: {folder} ({files})",
-        "failed": "Niepowodzenie: {file}",
         "failedFolder": "Przesyłanie nie powiodło się: {folder} ({files})",
-        "paused": "Wstrzymano: {file}",
         "pause": "Wstrzymaj przesyłanie",
         "resume": "Wznów przesyłanie",
         "cancel": "Anuluj przesyłanie",
@@ -714,10 +702,7 @@
             "frontendConnectionError": "Twoja przeglądarka nie może dotrzeć do węzła. Sprawdź (publiczny) adres URL, certyfikat TLS i zaporę. Websocket i pobieranie plików wymagają tego połączenia."
           },
           "successMessage": "Połączenie z twoim węzłem zostało pomyślnie zweryfikowane. Możesz teraz kontynuować.",
-          "configurationDescription": "Umieść to w pliku konfiguracyjnym `{file}` oraz uruchom:",
-          "button": {
-            "verify": "Zweryfikuj połączenie"
-          }
+          "configurationDescription": "Umieść to w pliku konfiguracyjnym `{file}` oraz uruchom:"
         },
         "configuration": {
           "title": "Ustawienia aplikacji",
@@ -760,8 +745,7 @@
             "nestDescription": "Aby zacząć używać tego jajka, musisz stworzyć gniazdo. Gniazda to kolekcje jajek. Nadaj mu nazwę:"
           },
           "server": {
-            "title": "Serwer",
-            "nestDescription": "Aby zacząć używać tego jajka, musisz stworzyć gniazdo. Gniazda to kolekcje jajek. Nadaj mu nazwę:"
+            "title": "Serwer"
           },
           "error": {
             "noNodes": "Coś poszło nie tak. Nie znaleziono żadnych węzłów."
@@ -781,8 +765,7 @@
               "subtitle": "Ustawienia panelu i konfiguracja"
             },
             "eggRepositories": {
-              "title": "Repozytoria Jajek",
-              "subtitle": "{count} repozytoriów"
+              "title": "Repozytoria Jajek"
             },
             "location": "Lokalizacja",
             "node": "Węzeł",
@@ -929,17 +912,12 @@
                   },
                   "deleteServerGroup": {
                     "title": "Potwierdź usunięcie grupy serwerów",
-                    "content": "Czy na pewno chcesz usunąć **{group}** ze swojego konta?",
                     "toast": {
                       "deleted": "Grupa serwerów usunięta."
                     }
                   },
-                  "addServerToGroup": {
-                    "noServers": "Wszystkie serwery są już w tej grupie."
-                  },
                   "removeServerFromGroup": {
                     "title": "Potwierdź usunięcie serwera",
-                    "content": "Czy na pewno chcesz usunąć **{server}** z **{group}**?",
                     "toast": {
                       "removed": "Serwer usunięty z grupy."
                     }
@@ -965,10 +943,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Tryb wyboru",
             "select": "Zaznacz serwer",
             "deselect": "Odznacz serwer",
-            "success": "Pomyślnie {action} {servers}.",
             "groupActions": "Działania grupowe"
           }
         },
@@ -1059,7 +1035,6 @@
             },
             "deleteSecurityKey": {
               "title": "Potwierdź usunięcie klucza bezpieczeństwa",
-              "content": "Czy na pewno chcesz usunąć **{key}** ze swojego konta?",
               "toast": {
                 "deleted": "Pomyślnie usunięto klucz bezpieczeństwa."
               }
@@ -1128,17 +1103,10 @@
           },
           "console": {
             "title": "Konsola serwera"
-          },
-          "serverList": {
-            "selectServer": "Przytrzymaj S i kliknij aby zaznaczyć/odznaczyć serwer"
           }
         },
         "sshKeys": {
           "title": "Klucze SSH",
-          "subtitle": "{current} z {max} maksimum utworzonych kluczy ssh.",
-          "tooltip": {
-            "limitReached": "Jesteś ograniczony do {max} kluczy ssh."
-          },
           "modal": {
             "createSshKey": {
               "title": "Utwórz klucz SSH",
@@ -1166,7 +1134,6 @@
             },
             "deleteSshKey": {
               "title": "Potwierdź usunięcie klucza SSH",
-              "content": "Czy na pewno chcesz usunąć **{name}** ze swojego konta?",
               "toast": {
                 "removed": "Usunięto klucz SSH."
               }
@@ -1196,12 +1163,8 @@
         },
         "apiKeys": {
           "title": "Klucze API",
-          "subtitle": "{current} z {max} maksimum utworzonych kluczy api.",
           "button": {
             "apiDocumentation": "Dokumentacja API"
-          },
-          "tooltip": {
-            "limitReached": "Jesteś ograniczony do {max} kluczy api."
           },
           "table": {
             "columns": {
@@ -1232,7 +1195,6 @@
             },
             "deleteApiKey": {
               "title": "Potwierdź usunięcie klucza API",
-              "content": "Czy na pewno chcesz usunąć **{name}** ze swojego konta?",
               "toast": {
                 "removed": "Usunięto klucz API."
               }
@@ -1343,7 +1305,6 @@
                 "noChangelog": "Brak listy zmian",
                 "nodesUpToDate": "Wygląda na to, że wszystkie węzły są aktualne. (nie udało się sprawdzić {failed})",
                 "table": {
-                  "version": "Wersja",
                   "packageName": "Nazwa pakietu",
                   "latestVersion": "Najnowsza wersja",
                   "changes": "Zmiany",
@@ -1382,7 +1343,6 @@
               "page": {
                 "title": "Ustawienia aplikacji",
                 "form": {
-                  "icon": "Ikona",
                   "iconLight": "Ikona (tryb jasny)",
                   "banner": "Baner",
                   "bannerLight": "Baner (tryb jasny)",
@@ -1590,8 +1550,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Potwierdź usunięcie ogłoszenia",
-                    "content": "Czy na pewno chcesz usunąć **{title}**?"
+                    "title": "Potwierdź usunięcie ogłoszenia"
                   },
                   "duplicate": {
                     "content": "Czy na pewno chcesz zduplikować **{title}**?"
@@ -1627,21 +1586,16 @@
             "upload": "Prześlij",
             "copyLink": "Kopiuj link"
           },
-          "dropzone": {
-            "subtitle": "Puść aby rozpocząć przesyłanie"
-          },
           "toast": {
             "assetDeleted": "Zasób usunięty.",
             "assetsDeleted": "Usunięto {assets}."
           },
           "modal": {
             "createDirectory": {
-              "title": "Nowy Katalog",
-              "createdAs": "Zostanie utworzony w "
+              "title": "Nowy Katalog"
             },
             "deleteAssets": {
-              "title": "Potwierdź usunięcie zasobów",
-              "content": "Czy na pewno chcesz usunąć `{count}` zasobów?"
+              "title": "Potwierdź usunięcie zasobów"
             },
             "deleteAsset": {
               "title": "Usuń zasób",
@@ -1667,16 +1621,6 @@
           },
           "tooltip": {
             "removeExtension": "Usuń rozszerzenie"
-          },
-          "phase": {
-            "preparing": "Przygotowywanie…",
-            "clearing": "Czyszczenie rozszerzeń…",
-            "adding": "Dodawanie rozszerzeń ({done}/{total})…",
-            "resync": "Rozwiązywanie zależności…",
-            "compiling": "Kompilowanie…",
-            "verifying": "Weryfikowanie…",
-            "installing": "Instalowanie…",
-            "restarting": "Restartowanie panelu…"
           },
           "badge": {
             "frontendMissing": "Brak frontendu",
@@ -1779,8 +1723,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Potwierdź usunięcie użytkownika",
-                    "content": "Czy na pewno chcesz usunąć **{username}**?"
+                    "title": "Potwierdź usunięcie użytkownika"
                   },
                   "disableTwoFactor": {
                     "title": "Wyłącz weryfikację dwuetapową użytkownika",
@@ -1872,16 +1815,12 @@
                   "sftpAddress": "Adres SFTP",
                   "createdAt": "Data utworzenia",
                   "inheritedFromLocation": "Dziedziczone z lokalizacji",
-                  "none": "Brak",
                   "wingsVersion": "Wersja Wings",
                   "memory": "Pamięć",
                   "servers": "Serwery",
                   "architecture": "Architektura",
                   "kernelVersion": "Wersja jądra",
                   "unavailable": "Niedostępny"
-                },
-                "badge": {
-                  "updateAvailable": "Dostępna aktualizacja"
                 }
               }
             },
@@ -1897,8 +1836,7 @@
                   "publicUrlDescription": "Używane do połączeń websocket i pobierania danych.",
                   "backupConfigurationPlaceholder": "Dziedzicz z lokalizacji",
                   "memoryDescription": "Całkowita pamięć dostępna dla serwerów w tym węźle.",
-                  "diskDescription": "Całkowity dysk dostępny dla serwerów w tym węźle.",
-                  "unlimitedTooltip": "0 nie ustawi limitu."
+                  "diskDescription": "Całkowity dysk dostępny dla serwerów w tym węźle."
                 },
                 "section": {
                   "connection": "Połączenie",
@@ -1949,8 +1887,7 @@
                 },
                 "button": {
                   "save": "Zapisz konfigurację",
-                  "reveal": "Wyświetl konfigurację",
-                  "verify": "Zweryfikuj połączenie"
+                  "reveal": "Wyświetl konfigurację"
                 },
                 "alert": {
                   "couldNotReach": "Nie można dotrzeć do węzła: {error}",
@@ -1961,8 +1898,7 @@
                 },
                 "toast": {
                   "applied": "Konfiguracja zastosowana pomyślnie.",
-                  "submittedNotApplied": "Konfiguracja została przesłana, ale nie została zastosowana.",
-                  "invalidYaml": "Nieprawidłowy YAML: {error}"
+                  "submittedNotApplied": "Konfiguracja została przesłana, ale nie została zastosowana."
                 }
               }
             },
@@ -1979,7 +1915,6 @@
                 "label": {
                   "memory": "Pamięć",
                   "disk": "Dysk",
-                  "cpuThreads": "{model} ({threads} wątków)",
                   "usedByWings": "{size} używany przez wings",
                   "networkIn": "We: {in}",
                   "networkOut": "Wy: {out}"
@@ -1988,9 +1923,7 @@
                   "diskIo": "I/O Dysku",
                   "networkTraffic": "Ruch sieciowy",
                   "diskRead": "Odczyt dysku",
-                  "diskWrite": "Zapis dysku",
-                  "networkInLabel": "Sieć przychodząca",
-                  "networkOutLabel": "Sieć wychodząca"
+                  "diskWrite": "Zapis dysku"
                 }
               }
             },
@@ -1998,12 +1931,6 @@
               "page": {
                 "card": {
                   "resources": "Alokowane zasoby"
-                },
-                "status": {
-                  "deploymentEnabled": "Wdrożenie włączone",
-                  "deploymentDisabled": "Wdrożenie wyłączone",
-                  "maintenanceEnabled": "W trakcie przerwy technicznej",
-                  "maintenanceDisabled": "Nie w trakcie konserwacji"
                 },
                 "label": {
                   "memory": "Pamięć",
@@ -2082,13 +2009,6 @@
                     "progress": "Postęp"
                   }
                 }
-              }
-            }
-          },
-          "modal": {
-            "bulkConfig": {
-              "error": {
-                "invalidYaml": "Nieprawidłowy YAML: {error}"
               }
             }
           }
@@ -2171,7 +2091,6 @@
                   "externalIdPlaceholder": "Opcjonalny zewnętrzny identyfikator",
                   "descriptionPlaceholder": "Opis serwera",
                   "owner": "Właściciel",
-                  "egg": "Jajko",
                   "backupConfigurationPlaceholder": "Dziedzicz z lokalizacji",
                   "cpuLimit": "Limit CPU (%)",
                   "cpuLimitDescription": "Limit CPU w %, z którego może korzystać serwer.",
@@ -2179,7 +2098,6 @@
                   "swapDescription": "Ilość pamięci swap dla tego serwera.",
                   "swapTooltip": "-1 nie ustawi limitu.",
                   "memoryDescription": "Limit pamięci kontenera serwera.",
-                  "memoryTooltip": "0 nie ustawi limitu.",
                   "diskSpace": "Przestrzeń dyskowa",
                   "diskSpaceDescription": "Limit dysku serwera.",
                   "diskSpaceTooltip": "0 nie ustawi limitu. Jest to ograniczenie miękkie, chyba że ogranicznik dysku jest skonfigurowany w Wings.",
@@ -2225,8 +2143,7 @@
                 "toast": {
                   "updated": "Przydział zaktualizowany.",
                   "setPrimary": "Przydział ustawiony jako główny.",
-                  "removed": "Przydział usunięty.",
-                  "added": "Dodano {count} przydziałów."
+                  "removed": "Przydział usunięty."
                 },
                 "modal": {
                   "add": {
@@ -2393,8 +2310,7 @@
                 "title": "Jajka",
                 "resourceName": "Jajko",
                 "dropzone": {
-                  "title": "Upuść pliki tutaj, aby zaimportować je jako Jajka",
-                  "subtitle": "Upuść, aby rozpocząć importowanie"
+                  "title": "Upuść pliki tutaj, aby zaimportować je jako Jajka"
                 },
                 "button": {
                   "updateFromRepository": "Zaktualizuj z repozytorium"
@@ -2408,14 +2324,6 @@
                 "modal": {
                   "move": {
                     "title": "Przenieś jajko"
-                  },
-                  "moveBulk": {
-                    "title": "Przenieś jajka",
-                    "confirm": "Przenieś {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Potwierdź usunięcie jajka",
-                    "content": "Czy na pewno chcesz usunąć `{count}` jajek?"
                   }
                 },
                 "tabs": {
@@ -2532,14 +2440,10 @@
                 },
                 "button": {
                   "save": "Zapisz konfigurację",
-                  "reveal": "Wyświetl konfigurację",
-                  "verify": "Zweryfikuj połączenie"
+                  "reveal": "Wyświetl konfigurację"
                 },
                 "alert": {
                   "verifyNotTested": "Jeszcze nie przetestowano."
-                },
-                "toast": {
-                  "invalidYaml": "Nieprawidłowy YAML: {error}"
                 }
               }
             },
@@ -2555,9 +2459,6 @@
                   "architecture": "Architektura",
                   "free": "{size} wolne",
                   "cores": "{cores} przydzielonych rdzeni"
-                },
-                "badge": {
-                  "updateAvailable": "Dostępna aktualizacja"
                 }
               }
             },
@@ -2568,7 +2469,6 @@
                   "graphs": "Wykresy"
                 },
                 "label": {
-                  "cpuThreads": "{model} ({threads} wątków)",
                   "memory": "Pamięć",
                   "usedByAgent": "{size} używane przez agenta",
                   "disk": "Dysk",
@@ -2579,8 +2479,7 @@
                   "diskIo": "I/O Dysku",
                   "diskRead": "Odczyt dysku",
                   "diskWrite": "Zapis dysku",
-                  "networkTraffic": "Ruch sieciowy",
-                  "inbound": "Przychodzące"
+                  "networkTraffic": "Ruch sieciowy"
                 }
               }
             }
@@ -2667,13 +2566,6 @@
                 }
               }
             },
-            "backups": {
-              "page": {
-                "toast": {
-                  "downloadStarted": "Rozpoczęto pobieranie."
-                }
-              }
-            },
             "locations": {
               "title": "Lokalizacje"
             }
@@ -2702,12 +2594,7 @@
               }
             },
             "backups": {
-              "title": "Kopie zapasowe",
-              "page": {
-                "toast": {
-                  "downloadStarted": "Rozpoczęto pobieranie."
-                }
-              }
+              "title": "Kopie zapasowe"
             },
             "locations": {
               "title": "Lokalizacje",
@@ -2721,8 +2608,7 @@
                     "title": "Dodaj lokalizację"
                   },
                   "remove": {
-                    "title": "Potwierdź usunięcie lokalizacji",
-                    "content": "Czy na pewno chcesz usunąć **{name}** z **{policy}**?"
+                    "title": "Potwierdź usunięcie lokalizacji"
                   }
                 }
               }
@@ -2749,16 +2635,7 @@
         "mounts": {
           "tabs": {
             "eggs": {
-              "title": "Jajka",
-              "page": {
-                "modal": {
-                  "add": {
-                    "form": {
-                      "egg": "Jajko"
-                    }
-                  }
-                }
-              }
+              "title": "Jajka"
             },
             "nodes": {
               "title": "Węzły"
@@ -2926,9 +2803,6 @@
             "sendingRemote": "Wysyłanie {files} do zdalnego serwera",
             "exportingBackup": "Eksportowanie kopii zapasowej do {destination}"
           },
-          "dropzone": {
-            "subtitle": "Puść aby rozpocząć przesyłanie"
-          },
           "settings": {
             "clickOnce": "Kliknij raz, aby otworzyć plik lub folder",
             "preferPhysicalSize": "Pokaż rozmiar fizyczny zamiast rozmiaru logicznego",
@@ -2950,7 +2824,6 @@
             "filesMoved": "Przeniesiono {files}.",
             "moveUndone": "Cofnięto przeniesienie {files}.",
             "moveCouldNotBeUndone": "Przenoszenie nie mogło zostać cofnięte.",
-            "downloadStarted": "Rozpoczęto pobieranie.",
             "filesDeleted": "Usunięto pliki.",
             "archiveCreationStarted": "Rozpoczęto tworzenie archiwum.",
             "decompressionStarted": "Rozpoczęto ekstrakcję archiwum.",
@@ -2965,16 +2838,13 @@
           },
           "modal": {
             "createArchive": {
-              "title": "Utwórz archiwum",
-              "createdAs": "To archiwum zostanie utworzone jako "
+              "title": "Utwórz archiwum"
             },
             "createDirectory": {
-              "title": "Utwórz katalog",
-              "createdAs": "Ten katalog zostanie utworzony jako "
+              "title": "Utwórz katalog"
             },
             "copyFile": {
               "title": "Kopiuj plik",
-              "createdAs": "Ten plik zostanie utworzony jako ",
               "conflict": "Plik o takiej nazwie już istnieje w miejscu docelowym."
             },
             "copyConflict": {
@@ -3041,7 +2911,6 @@
               "form": {
                 "fileUrl": "Adres URL pliku"
               },
-              "createdAs": "Ten plik zostanie utworzony jako ",
               "pull": "Ściągnij"
             },
             "sftpDetails": {
@@ -3052,9 +2921,6 @@
         },
         "databases": {
           "title": "Bazy danych",
-          "tooltip": {
-            "limitReached": "Ten serwer jest ograniczony do {max} baz danych."
-          },
           "table": {
             "columns": {
               "locked": "Zablokowane?"
@@ -3109,12 +2975,8 @@
           },
           "instance": {
             "title": "Zarządzane bazy danych",
-            "updateAvailable": "Dostępna aktualizacja",
             "button": {
               "applyUpdate": "Zastosuj aktualizację"
-            },
-            "tooltip": {
-              "limitReached": "Ten serwer jest ograniczony do {max} zarządzanych baz danych."
             },
             "view": {
               "tabs": {
@@ -3124,11 +2986,6 @@
               }
             },
             "databases": {
-              "table": {
-                "columns": {
-                  "database": "Baza danych"
-                }
-              },
               "toast": {
                 "created": "Utworzono bazę danych.",
                 "deleted": "Usunięto bazę danych.",
@@ -3140,10 +2997,6 @@
             },
             "users": {
               "title": "Użytkownicy",
-              "subtitle": "{current} z {max} maksimum utworzonych użytkowników.",
-              "tooltip": {
-                "limitReached": "Ta instancja jest ograniczona do {max} użytkowników."
-              },
               "modal": {
                 "createUser": {
                   "title": "Utwórz użytkownika"
@@ -3450,7 +3303,6 @@
               "renderer": {
                 "compact": "Dopisz do {file}",
                 "detail": {
-                  "file": "Plik: {file}",
                   "append": "Dopisz: {value}"
                 }
               }
@@ -3476,10 +3328,7 @@
                 "filesToDelete": "Pliki do usunięcia"
               },
               "renderer": {
-                "compact": "Usuń {files}",
-                "detail": {
-                  "files": "Pliki: {files}"
-                }
+                "compact": "Usuń {files}"
               }
             },
             "renameFiles": {
@@ -3491,10 +3340,7 @@
                 "to": "do"
               },
               "renderer": {
-                "compact": "Zmień nazwę {files}",
-                "detail": {
-                  "files": "Pliki: {files}"
-                }
+                "compact": "Zmień nazwę {files}"
               }
             },
             "compressFiles": {
@@ -3527,9 +3373,6 @@
         },
         "subusers": {
           "title": "Podużytkownicy",
-          "tooltip": {
-            "limitReached": "Ten serwer jest ograniczony do {max} podużytkowników."
-          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA włączone",
@@ -3557,7 +3400,6 @@
             }
           },
           "badge": {
-            "deleting": "Usuwanie…",
             "deleteFailed": "Usuwanie nie powiodło się"
           },
           "button": {
@@ -3566,7 +3408,6 @@
             "createGroup": "Utwórz grupę kopii zapasowych"
           },
           "toast": {
-            "downloadStarted": "Rozpoczęto pobieranie.",
             "restoringBackup": "Przywracanie kopii zapasowej...",
             "exportStarted": "Rozpoczęto eksport kopii zapasowej."
           },

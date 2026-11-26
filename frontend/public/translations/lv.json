@@ -150,8 +150,7 @@
       "alert": {
         "error": "Kļūda",
         "warning": "Brīdinājums",
-        "success": "Veiksmīgi",
-        "clockOffset": "Jūsu sistēmas pulkstenis atpaliek vai steidzas vairāk nekā par 5 sekundēm attiecībā pret serveri. Tas var izraisīt problēmas ar piekļuves atslēgu (passkey) un divfaktoru autentifikāciju. Lūdzu, sinhronizējiet pulksteni, ja rodas problēmas. Pašreizējā nobīde: {offset} sekunde(-s)."
+        "success": "Veiksmīgi"
       },
       "divider": {
         "or": "QR"

@@ -263,7 +263,6 @@
         "error": "Fejl",
         "warning": "Advarsel",
         "success": "Succes",
-        "clockOffset": "Dit systems ur afviger mere end 5 sekunder fra serverens ur. Dette kan medføre problemer med godkendelse via adgangsnøgle og tofaktorautentificering. Synkroniser venligst dit ur, hvis der opstår problemer. Aktuel afvigelse: {offset} sekund(er).",
         "passwordAuthUnavailable": "Din adgangskode vil ikke virke for denne forbindelse. Brug i stedet en SSH-nøgle, du kan tilføje en på SSH-nøgler-siden på din konto."
       },
       "divider": {
@@ -301,7 +300,6 @@
           "matches": "{count} matches",
           "noMatches": "Ingen match",
           "exception": "Undtagelse",
-          "tooManyPatterns": "Matchning tælles ikke automatisk for mere end {max} mønstre.",
           "unanchoredException": "`{pattern}` matcher i alle dybder, brug `{anchored}` for kun at matche det i rodmappen."
         },
         "cronInput": {
@@ -343,15 +341,13 @@
         },
         "deleteFailedBackups": {
           "title": "Bekræft sletning af backup",
-          "content": "Er du sikker på, at du vil slette `{count}` mislykkede sikkerhedskopier? Låste sikkerhedskopier og sikkerhedskopier, hvis konfiguration er under vedligeholdelse, beholdes. Sletningen kører i baggrunden og kan tage et stykke tid at fuldføre.",
           "alert": {
             "forceWarning": "Tvungen sletning fjerner disse sikkerhedskopier, selvom deres konfiguration mangler, eller fjernlageret ikke kan nås. Selve sikkerhedskopiere slettes muligvis ikke fuldstændigt, hvilket kan efterlade forældreløse data."
           }
         }
       },
       "toast": {
-        "duplicated": "{resource} duplikeret.",
-        "failedBackupDeletionStarted": "Sletter {count} mislykkede sikkerhedskopier i baggrunden."
+        "duplicated": "{resource} duplikeret."
       },
       "settingScope": {
         "account": "Synkronisér med konto",
@@ -604,15 +600,6 @@
           "unlessStopped": "Medmindre stoppet",
           "never": "Aldrig"
         },
-        "bulkActionServerAction": {
-          "started": "Startet",
-          "stopped": "Stoppet",
-          "restarted": "Genstartet",
-          "suspended": "Suspenderet",
-          "unsuspended": "Genaktiveret",
-          "clearedState": "Ryddet for tilstand",
-          "deleted": "Slettet"
-        },
         "compressionLevel": {
           "bestSpeed": "Bedste hastighed",
           "goodSpeed": "God hastighed",
@@ -667,7 +654,6 @@
         "dividerPlaceholder": "Tekst til skillelinje (valgfri)",
         "redirectNamePlaceholder": "Navn på redirect",
         "destinationPlaceholder": "Destinations-URL (f.eks. https://...)",
-        "selectRoutePlaceholder": "Vælg en rute…",
         "button": {
           "addDivider": "Tilføj skillelinje",
           "addRedirect": "Tilføj redirect"
@@ -906,12 +892,8 @@
       "fileUpload": {
         "title": "Uploader {files}",
         "adminAssets": "Admin-assets",
-        "waiting": "Venter: {file}",
-        "uploading": "Uploader: {file}",
         "uploadingFolder": "Uploader mappe: {folder} ({files})",
-        "failed": "Mislykkedes: {file}",
         "failedFolder": "Upload mislykkedes: {folder} ({files})",
-        "paused": "Pauset: {file}",
         "pause": "Sæt upload på pause",
         "resume": "Genoptag upload",
         "cancel": "Annuller upload",
@@ -1032,10 +1014,7 @@
             "frontendConnectionError": "Din browser kunne ikke nå noden. Kontrollér den (offentlige) URL, TLS-certifikatet og firewallen. Websockets og downloads afhænger af denne forbindelse."
           },
           "successMessage": "Forbindelsen til din node blev verificeret. Du kan nu fortsætte.",
-          "configurationDescription": "Indsæt dette i konfigurationsfilen `{file}`, eller kør:",
-          "button": {
-            "verify": "Verificér forbindelse"
-          }
+          "configurationDescription": "Indsæt dette i konfigurationsfilen `{file}`, eller kør:"
         },
         "configuration": {
           "title": "Applikationsindstillinger",
@@ -1073,9 +1052,6 @@
           "existingServer": "Der er allerede oprettet en server. Du kan ændre indstillingerne senere i admin-menuen.",
           "egg": {
             "description": "Lad os få din første server op at køre. Hvilket egg vil du bruge?",
-            "nestDescription": "For at bruge dette egg skal du oprette et nest. Nests er samlinger af eggs. Giv det et navn:"
-          },
-          "server": {
             "nestDescription": "For at bruge dette egg skal du oprette et nest. Nests er samlinger af eggs. Giv det et navn:"
           },
           "error": {
@@ -1223,10 +1199,7 @@
         "verifyEmail": {
           "title": "Bekræft e-mail",
           "success": "Din e-mailadresse **{email}** er bekræftet.",
-          "failed": "Dette bekræftelseslink er ugyldigt eller udløbet. Anmod om et nyt, og prøv igen.",
-          "button": {
-            "continue": "Fortsæt"
-          }
+          "failed": "Dette bekræftelseslink er ugyldigt eller udløbet. Anmod om et nyt, og prøv igen."
         },
         "resetPassword": {
           "title": "Nulstil adgangskode",
@@ -1280,17 +1253,12 @@
                   },
                   "deleteServerGroup": {
                     "title": "Bekræft sletning af servergruppe",
-                    "content": "Er du sikker på, at du vil slette **{group}** fra din konto?",
                     "toast": {
                       "deleted": "Servergruppe slettet."
                     }
                   },
-                  "addServerToGroup": {
-                    "noServers": "Alle servere er allerede i denne gruppe."
-                  },
                   "removeServerFromGroup": {
                     "title": "Bekræft fjernelse af server",
-                    "content": "Er du sikker på, at du vil fjerne **{server}** fra **{group}**?",
                     "toast": {
                       "removed": "Server fjernet fra gruppen."
                     }
@@ -1303,8 +1271,7 @@
                       "description": "Denne server er allerede en del af {group}."
                     },
                     "groupFull": {
-                      "title": "Gruppen er fuld",
-                      "description": "En gruppe kan ikke indeholde mere end {max} servere."
+                      "title": "Gruppen er fuld"
                     }
                   },
                   "toast": {
@@ -1331,11 +1298,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Valgtilstand",
             "select": "Vælg server",
             "deselect": "Fravælg server",
-            "success": "{servers} blev {action}.",
-            "partial": "{successfulServers} blev {action}. {failedServers} mislykkedes.",
             "groupActions": "Gruppehandlinger"
           }
         },
@@ -1483,10 +1447,8 @@
         },
         "securityKeys": {
           "title": "Sikkerhedsnøgler",
-          "subtitle": "{current} af maksimalt {max} sikkerhedsnøgler oprettet.",
           "tooltip": {
             "secureContextRequired": "En sikker kontekst (HTTPS) er påkrævet for at bruge sikkerhedsnøgler.",
-            "limitReached": "Du er begrænset til {max} sikkerhedsnøgler.",
             "disabled": "Sikkerhedsnøgler er deaktiveret af en administrator."
           },
           "alert": {
@@ -1510,7 +1472,6 @@
             },
             "deleteSecurityKey": {
               "title": "Bekræft sletning af sikkerhedsnøgle",
-              "content": "Er du sikker på, at du vil slette **{key}** fra din konto?",
               "toast": {
                 "deleted": "Sikkerhedsnøgle slettet."
               }
@@ -1606,17 +1567,10 @@
             "searchContent": "Søg i konsol-output",
             "previousCommand": "Forrige kommando i historikken",
             "nextCommand": "Næste kommando i historikken"
-          },
-          "serverList": {
-            "selectServer": "Hold S nede og klik for at vælge/fravælge server"
           }
         },
         "sshKeys": {
           "title": "SSH-nøgler",
-          "subtitle": "{current} af maksimalt {max} SSH-nøgler oprettet.",
-          "tooltip": {
-            "limitReached": "Du er begrænset til {max} SSH-nøgler."
-          },
           "table": {
             "columns": {
               "fingerprint": "Fingeraftryk"
@@ -1649,7 +1603,6 @@
             },
             "deleteSshKey": {
               "title": "Bekræft sletning af SSH-nøgle",
-              "content": "Er du sikker på, at du vil slette **{name}** fra din konto?",
               "toast": {
                 "removed": "SSH-nøgle fjernet."
               }
@@ -1658,10 +1611,6 @@
         },
         "commandSnippets": {
           "title": "Kommando-snippets",
-          "subtitle": "{current} af maksimalt {max} kommando-snippets oprettet.",
-          "tooltip": {
-            "limitReached": "Du er begrænset til {max} kommando-snippets."
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Opret kommando-snippet",
@@ -1677,7 +1626,6 @@
             },
             "deleteCommandSnippet": {
               "title": "Bekræft sletning af kommando-snippet",
-              "content": "Er du sikker på, at du vil slette **{name}** fra din konto?",
               "toast": {
                 "removed": "Kommando-snippet fjernet."
               }
@@ -1713,13 +1661,9 @@
         },
         "apiKeys": {
           "title": "API-nøgler",
-          "subtitle": "{current} af maksimalt {max} API-nøgler oprettet.",
           "button": {
             "apiDocumentation": "API-dokumentation",
             "copyUuid": "Kopiér UUID"
-          },
-          "tooltip": {
-            "limitReached": "Du er begrænset til {max} API-nøgler."
           },
           "table": {
             "columns": {
@@ -1754,7 +1698,6 @@
             },
             "deleteApiKey": {
               "title": "Bekræft sletning af API-nøgle",
-              "content": "Er du sikker på, at du vil slette **{name}** fra din konto?",
               "toast": {
                 "removed": "API-nøgle fjernet."
               }
@@ -1925,7 +1868,6 @@
               "page": {
                 "title": "Applikationsindstillinger",
                 "form": {
-                  "icon": "Ikon",
                   "iconLight": "Ikon (lyst tema)",
                   "bannerLight": "Banner (lyst tema)",
                   "sessionCookie": "Session-cookie",
@@ -1976,7 +1918,6 @@
               "page": {
                 "title": "Metadata-indstillinger",
                 "form": {
-                  "description": "Beskrivelse",
                   "descriptionDescription": "Vises under titlen i søgeresultater og link-forhåndsvisninger.",
                   "ogImage": "Forhåndsvisningsbillede",
                   "ogImageDescription": "Vises i link-forhåndsvisninger. Skal være PNG eller JPEG, ikke SVG.",
@@ -2279,8 +2220,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Bekræft sletning af meddelelse",
-                    "content": "Er du sikker på, at du vil slette **{title}**?"
+                    "title": "Bekræft sletning af meddelelse"
                   },
                   "duplicate": {
                     "content": "Er du sikker på, at du vil duplikere **{title}**?"
@@ -2322,8 +2262,7 @@
             "deleteSelection": "Slet markering"
           },
           "dropzone": {
-            "title": "Slip filer eller mapper her for at uploade",
-            "subtitle": "Slip for at starte upload"
+            "title": "Slip filer eller mapper her for at uploade"
           },
           "toast": {
             "assetDeleted": "Asset slettet.",
@@ -2331,12 +2270,10 @@
           },
           "modal": {
             "createDirectory": {
-              "title": "Ny mappe",
-              "createdAs": "Oprettes som "
+              "title": "Ny mappe"
             },
             "deleteAssets": {
-              "title": "Bekræft sletning af assets",
-              "content": "Er du sikker på, at du vil slette `{count}` assets?"
+              "title": "Bekræft sletning af assets"
             },
             "deleteAsset": {
               "title": "Slet asset",
@@ -2384,25 +2321,12 @@
             "enableExtension": "Aktivér extension",
             "disableExtension": "Deaktivér extension"
           },
-          "phase": {
-            "queued": "I kø…",
-            "preparing": "Forbereder…",
-            "clearing": "Rydder extensions…",
-            "adding": "Tilføjer extensions ({done}/{total})…",
-            "resync": "Løser afhængigheder…",
-            "stagingTranslations": "Klargør oversættelser…",
-            "compiling": "Kompilerer…",
-            "verifying": "Verificerer…",
-            "installing": "Installerer…",
-            "restarting": "Genstarter panelet…"
-          },
           "badge": {
             "frontendMissing": "Frontend mangler",
             "backendMissing": "Backend mangler",
             "pendingBuild": "Afventer build",
             "pendingRemoval": "Afventer fjernelse",
-            "pendingRestart": "Afventer genstart",
-            "disabled": "Deaktiveret"
+            "pendingRestart": "Afventer genstart"
           },
           "card": {
             "authors": "Forfattere"
@@ -2503,8 +2427,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Bekræft sletning af bruger",
-                    "content": "Er du sikker på, at du vil slette **{username}**?"
+                    "title": "Bekræft sletning af bruger"
                   },
                   "grantAdmin": {
                     "title": "Bekræft admin-adgang",
@@ -2647,16 +2570,12 @@
                   "sftpAddress": "SFTP-adresse",
                   "createdAt": "Oprettet",
                   "inheritedFromLocation": "Nedarvet fra lokation",
-                  "none": "Ingen",
                   "wingsVersion": "Wings-version",
                   "memory": "Hukommelse",
                   "servers": "Servere",
                   "architecture": "Arkitektur",
                   "kernelVersion": "Kernel-version",
                   "unavailable": "Utilgængelig"
-                },
-                "badge": {
-                  "updateAvailable": "Opdatering tilgængelig"
                 }
               }
             },
@@ -2673,8 +2592,7 @@
                   "publicUrlDescription": "Bruges til websocket-forbindelser og downloads.",
                   "backupConfigurationPlaceholder": "Nedarv fra lokation",
                   "memoryDescription": "Den samlede hukommelse, der er tilgængelig for servere på denne node.",
-                  "diskDescription": "Den samlede disk, der er tilgængelig for servere på denne node.",
-                  "unlimitedTooltip": "0 sætter ingen grænse."
+                  "diskDescription": "Den samlede disk, der er tilgængelig for servere på denne node."
                 },
                 "section": {
                   "connection": "Forbindelse",
@@ -2725,8 +2643,7 @@
                 },
                 "button": {
                   "save": "Gem konfiguration",
-                  "reveal": "Vis konfiguration",
-                  "verify": "Verificér forbindelse"
+                  "reveal": "Vis konfiguration"
                 },
                 "alert": {
                   "couldNotReach": "Kunne ikke nå noden: {error}",
@@ -2742,8 +2659,7 @@
                 },
                 "toast": {
                   "applied": "Konfigurationen er anvendt.",
-                  "submittedNotApplied": "Konfigurationen blev sendt, men ikke anvendt.",
-                  "invalidYaml": "Ugyldig YAML: {error}"
+                  "submittedNotApplied": "Konfigurationen blev sendt, men ikke anvendt."
                 }
               }
             },
@@ -2759,7 +2675,6 @@
                 },
                 "label": {
                   "memory": "Hukommelse",
-                  "cpuThreads": "{model} ({threads} tråde)",
                   "usedByWings": "{size} brugt af Wings",
                   "networkIn": "Ind: {in}",
                   "networkOut": "Ud: {out}"
@@ -2768,24 +2683,14 @@
                   "diskIo": "Disk-I/O",
                   "networkTraffic": "Netværkstrafik",
                   "diskRead": "Disk-læsning",
-                  "diskWrite": "Disk-skrivning",
-                  "networkInLabel": "Netværk ind",
-                  "networkOutLabel": "Netværk ud"
+                  "diskWrite": "Disk-skrivning"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "Deployment-kapacitet",
-                "subtitle": "Ressourcer allokeret til servere på denne node, målt mod de grænser, der er konfigureret i nodens indstillinger, ikke maskinens fysiske kapacitet. Deployment tjekker kun hukommelse og disk.",
                 "card": {
                   "resources": "Allokerede ressourcer"
-                },
-                "status": {
-                  "deploymentEnabled": "Deployment aktiveret",
-                  "deploymentDisabled": "Deployment deaktiveret",
-                  "maintenanceEnabled": "Under vedligeholdelse",
-                  "maintenanceDisabled": "Ikke under vedligeholdelse"
                 },
                 "label": {
                   "memory": "Hukommelse",
@@ -2880,8 +2785,7 @@
                     "title": "Tilføj node-mount"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af node-mount",
-                    "content": "Er du sikker på, at du vil fjerne mountet **{mount}** fra **{name}**?"
+                    "title": "Bekræft fjernelse af node-mount"
                   }
                 }
               }
@@ -2933,7 +2837,6 @@
                   "backupNotOnSameNode": "Denne backup ligger ikke på samme node som serveren. Den kan ikke ses via Client API'et."
                 },
                 "toast": {
-                  "downloadStarted": "Download startet.",
                   "detached": "Backup frakoblet.",
                   "reattached": "Backup tilknyttet {name} igen.",
                   "reassigned": "Backuppen er omtildelt.",
@@ -2991,8 +2894,7 @@
                       "started": "Overførsel af {servers} startet."
                     },
                     "confirm": {
-                      "title": "Bekræft serveroverførsler",
-                      "content": "Er du sikker på, at du vil overføre `{count}` servere fra **{from}** til **{to}**? Denne handling kan ikke fortrydes."
+                      "title": "Bekræft serveroverførsler"
                     },
                     "enum": {
                       "allocationMode": {
@@ -3063,13 +2965,10 @@
                     "uptime": "Daemonens oppetid",
                     "controlLink": "Kontrol-link",
                     "frontends": "Bundne frontends",
-                    "flowsOpen": "{count} flows åbne",
-                    "localDrops": "Drops på samme node",
-                    "frozenFlows": "{count} flows frosset"
+                    "localDrops": "Drops på samme node"
                   },
                   "column": {
                     "role": "Rolle",
-                    "address": "Adresse",
                     "path": "Sti",
                     "loss": "Tab",
                     "transferred": "Overført",
@@ -3105,8 +3004,6 @@
                   }
                 },
                 "button": {
-                  "enable": "Aktivér",
-                  "disable": "Deaktivér",
                   "rotate": "Rotér identitet"
                 },
                 "toast": {
@@ -3140,9 +3037,6 @@
               },
               "toast": {
                 "applied": "Konfiguration anvendt på {nodes}."
-              },
-              "error": {
-                "invalidYaml": "Ugyldig YAML: {error}"
               }
             }
           }
@@ -3169,7 +3063,6 @@
               "content": "Er du sikker på, at du vil {action} **{servers}**?",
               "deleteContent": "Er du sikker på, at du vil slette **{servers}** og alt på dem permanent? Dette kan ikke fortrydes."
             },
-            "successWithSkipped": "{servers} blev {action}. {skippedServers} blev sprunget over.",
             "nothingToDo": "Alle valgte servere er allerede i den tilstand."
           },
           "externalIdLookup": {
@@ -3212,7 +3105,6 @@
                   "memory": "Hukommelse",
                   "allocations": "Allokeringer",
                   "databases": "Databaser",
-                  "databaseAgents": "Agent-databaser",
                   "unlimited": "Ubegrænset",
                   "autoKillDisabled": "Deaktiveret"
                 },
@@ -3255,7 +3147,6 @@
                   "swapDescription": "Mængden af swap, denne server får.",
                   "swapTooltip": "-1 sætter ingen grænse.",
                   "memoryDescription": "Hukommelsesgrænsen for servercontaineren.",
-                  "memoryTooltip": "0 sætter ingen grænse.",
                   "memoryOverhead": "Hukommelses-overhead",
                   "memoryOverheadDescription": "Skjult hukommelse, der lægges til containeren.",
                   "diskSpace": "Diskplads",
@@ -3280,8 +3171,7 @@
                   "kvmPassthroughEnabled": "Aktivér KVM-passthrough",
                   "kvmPassthroughEnabledDescription": "Aktivér KVM-passthrough for serveren (giver adgang til /dev/kvm inde i containeren).",
                   "allocationsLimit": "Allokeringer",
-                  "databasesLimit": "Databaser",
-                  "databaseAgentsLimit": "Agent-databaser"
+                  "databasesLimit": "Databaser"
                 },
                 "modal": {
                   "confirmNoAllocation": {
@@ -3310,8 +3200,7 @@
                   "updated": "Allokering opdateret.",
                   "setPrimary": "Allokering sat som primær.",
                   "unsetPrimary": "Allokering fjernet som primær.",
-                  "removed": "Allokering fjernet.",
-                  "added": "{count} allokeringer tilføjet."
+                  "removed": "Allokering fjernet."
                 },
                 "modal": {
                   "add": {
@@ -3351,8 +3240,7 @@
                     "title": "Tilføj server-mount"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af server-mount",
-                    "content": "Er du sikker på, at du vil fjerne mountet **{mount}** fra **{name}**?"
+                    "title": "Bekræft fjernelse af server-mount"
                   }
                 }
               }
@@ -3497,8 +3385,7 @@
             "eggs": {
               "page": {
                 "dropzone": {
-                  "title": "Slip filer her for at importere dem som eggs",
-                  "subtitle": "Slip for at starte importen"
+                  "title": "Slip filer her for at importere dem som eggs"
                 },
                 "button": {
                   "updateFromRepository": "Opdater fra repository",
@@ -3528,14 +3415,6 @@
                   },
                   "move": {
                     "title": "Flyt egg"
-                  },
-                  "moveBulk": {
-                    "title": "Flyt eggs",
-                    "confirm": "Flyt {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Bekræft sletning af eggs",
-                    "content": "Er du sikker på, at du vil slette `{count}` eggs?"
                   }
                 },
                 "tabs": {
@@ -3655,8 +3534,7 @@
                           "title": "Tilføj egg-mount"
                         },
                         "delete": {
-                          "title": "Bekræft fjernelse af egg-mount",
-                          "content": "Er du sikker på, at du vil fjerne mountet **{mount}** fra **{egg}**?"
+                          "title": "Bekræft fjernelse af egg-mount"
                         }
                       }
                     }
@@ -3932,10 +3810,7 @@
             },
             "backups": {
               "page": {
-                "title": "Backups for Database Agent Host",
-                "toast": {
-                  "downloadStarted": "Download startet."
-                }
+                "title": "Backups for Database Agent Host"
               }
             },
             "configuration": {
@@ -3965,8 +3840,7 @@
                 },
                 "button": {
                   "save": "Gem konfiguration",
-                  "reveal": "Vis konfiguration",
-                  "verify": "Verificér forbindelse"
+                  "reveal": "Vis konfiguration"
                 },
                 "alert": {
                   "couldNotReach": "Kunne ikke nå Database Agent Hosten: {error}",
@@ -3979,8 +3853,7 @@
                 },
                 "toast": {
                   "applied": "Konfigurationen er anvendt.",
-                  "submittedNotApplied": "Konfigurationen blev sendt, men ikke anvendt.",
-                  "invalidYaml": "Ugyldig YAML: {error}"
+                  "submittedNotApplied": "Konfigurationen blev sendt, men ikke anvendt."
                 }
               }
             },
@@ -3988,12 +3861,6 @@
               "title": "Oversigt",
               "page": {
                 "title": "Oversigt over Database Agent Host",
-                "status": {
-                  "deploymentEnabled": "Deployment aktiveret",
-                  "deploymentDisabled": "Deployment deaktiveret",
-                  "maintenanceEnabled": "Vedligeholdelse aktiveret",
-                  "maintenanceDisabled": "Vedligeholdelse deaktiveret"
-                },
                 "card": {
                   "hostDetails": "Hostdetaljer",
                   "systemInfo": "Systemoplysninger",
@@ -4009,9 +3876,6 @@
                   "noLimit": "Ingen host-grænse",
                   "free": "{size} ledig",
                   "cores": "{cores} kerner allokeret"
-                },
-                "badge": {
-                  "updateAvailable": "Opdatering tilgængelig"
                 }
               }
             },
@@ -4023,7 +3887,6 @@
                   "graphs": "Grafer"
                 },
                 "label": {
-                  "cpuThreads": "{model} ({threads} tråde)",
                   "memory": "Hukommelse",
                   "usedByAgent": "{size} brugt af agenten",
                   "networkIn": "Ind: {in}",
@@ -4033,9 +3896,7 @@
                   "diskIo": "Disk-I/O",
                   "diskRead": "Disk-læsning",
                   "diskWrite": "Disk-skrivning",
-                  "networkTraffic": "Netværkstrafik",
-                  "inbound": "Indgående",
-                  "outbound": "Udgående"
+                  "networkTraffic": "Netværkstrafik"
                 },
                 "toast": {
                   "connectionLost": "Forbindelsen til Database Agent Hosten blev afbrudt."
@@ -4051,9 +3912,6 @@
               },
               "toast": {
                 "applied": "Konfiguration anvendt på {hosts}."
-              },
-              "error": {
-                "invalidYaml": "Ugyldig YAML: {error}"
               }
             }
           }
@@ -4062,8 +3920,7 @@
           "title": "Database Agent-skabeloner",
           "resourceName": "Database Agent-skabelon",
           "dropzone": {
-            "title": "Slip filer her for at importere dem som Database Agent-skabeloner",
-            "subtitle": "Slip for at starte importen"
+            "title": "Slip filer her for at importere dem som Database Agent-skabeloner"
           },
           "toast": {
             "imported": "Database Agent-skabelon importeret.",
@@ -4085,7 +3942,6 @@
                   "imageUid": "Image-UID",
                   "imageGid": "Image-GID",
                   "memoryDescription": "Hukommelsesgrænsen for databasecontaineren.",
-                  "memoryTooltip": "0 sætter ingen grænse.",
                   "swapDescription": "Mængden af swap, denne database får.",
                   "swapTooltip": "-1 sætter ingen grænse.",
                   "diskDescription": "Databasens diskgrænse.",
@@ -4119,7 +3975,6 @@
                 "modal": {
                   "applyUpdates": {
                     "title": "Anvend skabelonopdateringer",
-                    "content": "Dette pusher den aktuelle konfiguration af **{name}** til de {count} valgte instanser. Instanserne genstartes for at anvende den nye konfiguration. Låste instanser og instanser på hosts i vedligeholdelsestilstand springes over.",
                     "contentAll": "Dette pusher den aktuelle konfiguration af **{name}** til alle forældede instanser, også dem der ikke vises i den aktuelle søgning. Instanserne genstartes for at anvende den nye konfiguration. Låste instanser og instanser på hosts i vedligeholdelsestilstand springes over."
                   }
                 }
@@ -4131,8 +3986,7 @@
           "title": "OAuth-udbydere",
           "resourceName": "OAuth-udbyder",
           "dropzone": {
-            "title": "Slip filer her for at importere dem som OAuth-udbydere",
-            "subtitle": "Slip for at starte importen"
+            "title": "Slip filer her for at importere dem som OAuth-udbydere"
           },
           "table": {
             "columns": {
@@ -4204,9 +4058,6 @@
                   },
                   "matcherType": {
                     "none": "Ingen (gælder altid)",
-                    "and": "AND (alle skal matche)",
-                    "or": "OR (mindst én skal matche)",
-                    "not": "NOT (må ikke matche)",
                     "scopes": "Tildelte scopes",
                     "fieldExists": "Felt findes",
                     "fieldEquals": "Felt er lig med",
@@ -4220,17 +4071,8 @@
                   "updated": "Mapping for OAuth-udbyder opdateret.",
                   "deleted": "Mapping for OAuth-udbyder slettet."
                 },
-                "button": {
-                  "addMatcher": "Tilføj matcher"
-                },
-                "matcher": {
-                  "allMustMatch": "Alle matchers skal matche:",
-                  "anyMustMatch": "Mindst én matcher skal matche:",
-                  "mustNotMatch": "Matcheren må ikke matche:"
-                },
                 "form": {
                   "matcherDescription": "Afgør, om denne mapping gælder for en bruger, der logger ind med denne udbyder.",
-                  "matcherType": "Matcher-type",
                   "scopesDescription": "OAuth-scopes, der alle skal være tildelt, for at denne matcher matcher.",
                   "path": "Feltsti",
                   "equals": "Er lig med",
@@ -4238,7 +4080,6 @@
                   "startsWith": "Starter med",
                   "endsWith": "Slutter med",
                   "revokeUnmatched": "Tilbagekald, når der ikke er match",
-                  "revokeUnmatchedDescription": "Fjerner den tildelte rolle eller server-underbruger igen, når matcheren ikke længere matcher ved et senere login.",
                   "mappingType": "Mapping-type",
                   "role": "Rolle",
                   "permissions": "Rettigheder"
@@ -4390,10 +4231,7 @@
             },
             "backups": {
               "page": {
-                "title": "Backup-konfigurationens backups",
-                "toast": {
-                  "downloadStarted": "Download startet."
-                }
+                "title": "Backup-konfigurationens backups"
               }
             },
             "locations": {
@@ -4459,10 +4297,7 @@
             },
             "backups": {
               "page": {
-                "title": "Systembackup-politikkens backups",
-                "toast": {
-                  "downloadStarted": "Download startet."
-                }
+                "title": "Systembackup-politikkens backups"
               }
             },
             "locations": {
@@ -4478,8 +4313,7 @@
                     "title": "Tilføj lokation"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af lokation",
-                    "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
+                    "title": "Bekræft fjernelse af lokation"
                   }
                 }
               }
@@ -4496,8 +4330,7 @@
                     "title": "Tilføj node"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af node",
-                    "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
+                    "title": "Bekræft fjernelse af node"
                   }
                 }
               }
@@ -4514,8 +4347,7 @@
                     "title": "Tilføj Database Agent Host"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af Database Agent Host",
-                    "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
+                    "title": "Bekræft fjernelse af Database Agent Host"
                   }
                 }
               }
@@ -4533,8 +4365,7 @@
                     "title": "Tilføj server"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af server",
-                    "content": "Er du sikker på, at du vil fjerne **{name}** fra **{policy}**?"
+                    "title": "Bekræft fjernelse af server"
                   }
                 }
               }
@@ -4570,8 +4401,7 @@
                     "title": "Føj egg til mount"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af egg fra mount",
-                    "content": "Er du sikker på, at du vil fjerne mountet **{mount}** fra **{name}**?"
+                    "title": "Bekræft fjernelse af egg fra mount"
                   }
                 }
               }
@@ -4588,8 +4418,7 @@
                     "title": "Føj node til mount"
                   },
                   "remove": {
-                    "title": "Bekræft fjernelse af node fra mount",
-                    "content": "Er du sikker på, at du vil fjerne mountet **{mount}** fra **{name}**?"
+                    "title": "Bekræft fjernelse af node fra mount"
                   }
                 }
               }
@@ -4793,19 +4622,12 @@
             "hide": "Skjul filtræ",
             "searchPlaceholder": "Søg efter filer...",
             "noSearchResults": "Ingen matchende filer",
-            "uploadFromComputer": "Upload fra computer",
-            "uploadFromUrl": "Upload fra URL",
             "selectItem": "Vælg {name}",
             "deselectItem": "Fravælg {name}",
             "selectFileToOpen": "Vælg en fil i træet for at åbne den.",
             "noEditorAvailable": "Der er ingen editor til denne filtype.",
             "editorTabsLabel": "Åbne filer",
             "closeEditorTab": "Luk {name}",
-            "closeOtherTabs": "Luk andre",
-            "closeTabsToRight": "Luk til højre",
-            "closeSavedTabs": "Luk gemte",
-            "closeAllTabs": "Luk alle",
-            "revealInTree": "Vis i træet",
             "revealNotFound": "Kunne ikke finde {path} i filtræet.",
             "unsavedTab": "{name} har ugemte ændringer",
             "resizeEditorPanes": "Tilpas størrelsen på editor-paneler",
@@ -4915,8 +4737,7 @@
             "cancelAllOperations": "Annuller alle handlinger"
           },
           "dropzone": {
-            "title": "Slip filer eller mapper her for at uploade",
-            "subtitle": "Slip for at starte upload"
+            "title": "Slip filer eller mapper her for at uploade"
           },
           "settings": {
             "clickOnce": "Klik én gang for at åbne fil eller mappe",
@@ -4942,7 +4763,6 @@
             "filesMoved": "{files} flyttet.",
             "moveUndone": "Flytning af {files} fortrudt.",
             "moveCouldNotBeUndone": "Flytningen kunne ikke fortrydes.",
-            "downloadStarted": "Download startet.",
             "filesDeleted": "Filerne er slettet.",
             "archiveCreationStarted": "Oprettelse af arkiv er startet.",
             "decompressionStarted": "Udpakning af arkiv er startet.",
@@ -4995,9 +4815,6 @@
                 "restore": "Gendan denne revision i editoren",
                 "viewDiff": "Vis diff mod den nuværende fil",
                 "compareToPrevious": "Sammenlign med forrige revision"
-              },
-              "diff": {
-                "current": "Nuværende"
               }
             }
           },
@@ -5023,25 +4840,19 @@
               "contentHashMismatch": "Filen er blevet ændret på serveren, siden denne kladde blev gemt. Gendannes kladden, kan de ændringer blive overskrevet."
             },
             "extractFile": {
-              "title": "Udpak arkiv",
-              "extractedTo": "Indholdet af {file} bliver udpakket i "
+              "title": "Udpak arkiv"
             },
             "createArchive": {
-              "title": "Opret arkiv",
-              "createdAs": "Dette arkiv bliver oprettet som "
+              "title": "Opret arkiv"
             },
             "createDirectory": {
-              "title": "Opret mappe",
-              "createdAs": "Denne mappe bliver oprettet som "
+              "title": "Opret mappe"
             },
             "createSymlink": {
-              "title": "Opret symlink",
-              "createdAs": "Dette symlink bliver oprettet som ",
-              "pointsTo": "Det peger på "
+              "title": "Opret symlink"
             },
             "copyFile": {
               "title": "Kopiér fil",
-              "createdAs": "Denne fil bliver oprettet som ",
               "conflict": "Der findes allerede en fil med det navn på destinationen."
             },
             "copyConflict": {
@@ -5060,8 +4871,7 @@
               "servers": "Destinationsservere",
               "addFromGroup": "Tilføj servere fra en gruppe",
               "browsingOn": "Gennemser {server}. Den valgte sti bruges på alle destinationsservere.",
-              "noCreatePermission": "Du har ikke rettigheder til at oprette filer på {servers}.",
-              "createdAs": "Disse filer bliver oprettet på {servers} under "
+              "noCreatePermission": "Du har ikke rettigheder til at oprette filer på {servers}."
             },
             "fileFingerprints": {
               "title": "Fil-fingeraftryk",
@@ -5186,7 +4996,6 @@
               "form": {
                 "fileUrl": "Fil-URL"
               },
-              "createdAs": "Denne fil bliver oprettet som ",
               "pull": "Hent"
             },
             "sftpDetails": {
@@ -5197,10 +5006,6 @@
         },
         "databases": {
           "title": "Databaser",
-          "subtitle": "{current} af maksimalt {max} databaser oprettet.",
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} databaser."
-          },
           "table": {
             "columns": {
               "locked": "Låst?"
@@ -5360,12 +5165,8 @@
           },
           "instance": {
             "title": "Managed databases",
-            "updateAvailable": "Opdatering tilgængelig",
             "button": {
               "applyUpdate": "Anvend opdatering"
-            },
-            "tooltip": {
-              "limitReached": "Denne server er begrænset til {max} managed databases."
             },
             "view": {
               "tabs": {
@@ -5378,11 +5179,9 @@
             },
             "databases": {
               "title": "Databaser",
-              "subtitle": "{current} af maksimalt {max} databaser oprettet.",
               "tooltip": {
                 "offline": "Instansen skal køre, før der kan oprettes databaser.",
-                "noUser": "Denne database har ingen bruger tilknyttet endnu. Opret en bruger for at få adgang til den.",
-                "limitReached": "Denne instans er begrænset til {max} databaser."
+                "noUser": "Denne database har ingen bruger tilknyttet endnu. Opret en bruger for at få adgang til den."
               },
               "button": {
                 "remoteImport": "Importér fra remote"
@@ -5440,13 +5239,11 @@
             },
             "users": {
               "title": "Brugere",
-              "subtitle": "{current} af maksimalt {max} brugere oprettet.",
               "button": {
                 "permissions": "Rettigheder"
               },
               "tooltip": {
-                "offline": "Instansen skal køre, før der kan oprettes brugere.",
-                "limitReached": "Denne instans er begrænset til {max} brugere."
+                "offline": "Instansen skal køre, før der kan oprettes brugere."
               },
               "enum": {
                 "permission": {
@@ -5458,11 +5255,6 @@
               "form": {
                 "databases": "Databaseadgang",
                 "noDatabases": "Denne instans har ingen databaser endnu."
-              },
-              "table": {
-                "columns": {
-                  "databases": "Databaser"
-                }
               },
               "modal": {
                 "createUser": {
@@ -5519,7 +5311,6 @@
               }
             },
             "backups": {
-              "subtitle": "{current} af maksimalt {max} backups oprettet på denne server, delt med server-backups.",
               "badge": {
                 "restoring": "Gendanner backup"
               },
@@ -5527,7 +5318,6 @@
                 "restoring": "En backup gendannes i øjeblikket i denne managed database. Vent venligst..."
               },
               "tooltip": {
-                "limitReached": "Denne server er begrænset til {max} backups, delt mellem server- og database-backups.",
                 "offline": "Den managed database skal køre, før der kan tages en backup.",
                 "restoring": "En backup gendannes i øjeblikket i denne managed database."
               },
@@ -5644,14 +5434,6 @@
           }
         },
         "schedules": {
-          "subtitle": "{current} af maksimalt {max} schedules oprettet.",
-          "dropzone": {
-            "title": "Slip filer her for at importere dem som schedules",
-            "subtitle": "Slip for at starte importen"
-          },
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} schedules."
-          },
           "table": {
             "columns": {
               "lastRun": "Sidste kørsel",
@@ -5730,8 +5512,7 @@
               "truncatedWarning": "Nogle kommende kørsler er udeladt for at holde kalenderen responsiv."
             },
             "deleteSchedule": {
-              "title": "Bekræft sletning af schedule",
-              "content": "Er du sikker på, at du vil slette **{name}** fra denne server?"
+              "title": "Bekræft sletning af schedule"
             },
             "createStep": {
               "title": "Opret schedule-step"
@@ -6155,8 +5936,7 @@
               "renderer": {
                 "compact": "Opret {name} i {root}",
                 "detail": {
-                  "directory": "Mappe: {name}",
-                  "root": "Rod: {root}"
+                  "directory": "Mappe: {name}"
                 }
               }
             },
@@ -6169,7 +5949,6 @@
               "renderer": {
                 "compact": "Skriv til {file}",
                 "detail": {
-                  "file": "Fil: {file}",
                   "append": "Tilføj til slutningen: {value}"
                 }
               }
@@ -6195,11 +5974,7 @@
                 "filesToDelete": "Filer, der skal slettes"
               },
               "renderer": {
-                "compact": "Slet {files}",
-                "detail": {
-                  "root": "Rod: {root}",
-                  "files": "Filer: {files}"
-                }
+                "compact": "Slet {files}"
               }
             },
             "renameFiles": {
@@ -6211,11 +5986,7 @@
                 "to": "til"
               },
               "renderer": {
-                "compact": "Omdøb {files}",
-                "detail": {
-                  "root": "Rod: {root}",
-                  "files": "Filer: {files}"
-                }
+                "compact": "Omdøb {files}"
               }
             },
             "compressFiles": {
@@ -6225,11 +5996,7 @@
                 "filesToCompress": "Filer, der skal komprimeres"
               },
               "renderer": {
-                "compact": "Komprimér {files} i {root} til {name}",
-                "detail": {
-                  "root": "Rod: {root}",
-                  "files": "Filer: {files}"
-                }
+                "compact": "Komprimér {files} i {root} til {name}"
               }
             },
             "decompressFile": {
@@ -6239,11 +6006,7 @@
                 "file": "Fil"
               },
               "renderer": {
-                "compact": "Udpak {file} til {root}",
-                "detail": {
-                  "file": "Fil: {file}",
-                  "root": "Rod: {root}"
-                }
+                "compact": "Udpak {file} til {root}"
               }
             },
             "pullFile": {
@@ -6256,7 +6019,6 @@
               "renderer": {
                 "compact": "Hent {url} til {root}",
                 "detail": {
-                  "root": "Rod: {root}",
                   "fileName": "Filnavn: {fileName}",
                   "useHeader": "Brug filnavnet fra svaret: {value}"
                 }
@@ -6315,10 +6077,6 @@
         },
         "subusers": {
           "title": "Underbrugere",
-          "subtitle": "{current} af maksimalt {max} underbrugere oprettet.",
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} underbrugere."
-          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA aktiveret",
@@ -6347,7 +6105,6 @@
             },
             "removeSubuser": {
               "title": "Bekræft fjernelse af underbruger",
-              "content": "Er du sikker på, at du vil fjerne **{username}** fra denne server?",
               "toast": {
                 "removed": "Underbruger fjernet."
               }
@@ -6355,11 +6112,6 @@
           }
         },
         "backups": {
-          "subtitle": "{current} af maksimalt {max} backups oprettet.",
-          "subtitleWithDatabase": "{current} af maksimalt {max} backups oprettet ({server} server, {database} database).",
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} backups."
-          },
           "table": {
             "columns": {
               "kind": "Type",
@@ -6367,7 +6119,6 @@
             }
           },
           "badge": {
-            "deleting": "Sletter…",
             "deleteFailed": "Sletning mislykkedes",
             "sourceDeleted": "{name} (slettet)"
           },
@@ -6378,7 +6129,6 @@
             "createGroup": "Opret backup-gruppe"
           },
           "toast": {
-            "downloadStarted": "Download startet.",
             "restoringBackup": "Gendanner backup...",
             "exportStarted": "Backup-eksport startet."
           },
@@ -6408,7 +6158,6 @@
             },
             "deleteBackup": {
               "title": "Bekræft sletning af backup",
-              "content": "Er du sikker på, at du vil slette **{name}** fra denne server?",
               "toast": {
                 "started": "Sletning af backup startet.",
                 "deleted": "Backup slettet."
@@ -6458,12 +6207,8 @@
         },
         "network": {
           "title": "Netværk",
-          "subtitle": "{current} af maksimalt {max} allokeringer tildelt.",
           "allocations": {
             "title": "Allokeringer"
-          },
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} allokeringer."
           },
           "toast": {
             "created": "Allokering oprettet.",
@@ -6474,8 +6219,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Bekræft fjernelse af allokering",
-              "content": "Er du sikker på, at du vil fjerne **{allocation}** fra denne server?"
+              "title": "Bekræft fjernelse af allokering"
             }
           }
         },
@@ -6490,9 +6234,6 @@
             "createFirstRule": "Opret regel",
             "addRule": "Tilføj regel",
             "addDenyAll": "Afvis alt andet"
-          },
-          "tooltip": {
-            "limitReached": "Denne server er begrænset til {max} firewall-regler."
           },
           "rule": {
             "anySource": "enhver kilde",
@@ -6573,16 +6314,7 @@
             "join": "Tilmeld privat netværk",
             "leave": "Forlad privat netværk",
             "connect": "Forbind en server",
-            "addPort": "Tilføj port",
-            "editPorts": "Udbudte porte"
-          },
-          "action": {
-            "rename": "Skift hostname",
-            "editPorts": "Rediger udbudte porte",
-            "removeOutgoing": "Stop med at nå denne server",
-            "removeIncoming": "Stop denne server i at nå os",
-            "grantOutgoing": "Lad denne server nå den",
-            "grantIncoming": "Lad den nå denne server"
+            "addPort": "Tilføj port"
           },
           "canvas": {
             "hint": "Klik på en forbindelse for at slå den retning til eller fra. Træk for at flytte rundt, hold Ctrl nede og scroll for at zoome, eller knib på en touchskærm.",
@@ -6611,8 +6343,7 @@
             }
           },
           "tooltip": {
-            "nodeNotOnNetwork": "Den node, denne server kører på, er ikke på det private netværk.",
-            "connectionLimitReached": "Denne server er begrænset til {max} udgående forbindelser."
+            "nodeNotOnNetwork": "Den node, denne server kører på, er ikke på det private netværk."
           },
           "alert": {
             "nodeNotOnNetwork": "Den node, denne server kører på, er **ikke på det private netværk**, så den kan ikke tilmelde sig. Bed en administrator om at aktivere det for noden.",

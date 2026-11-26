@@ -138,8 +138,7 @@
       "alert": {
         "error": "Chyba",
         "warning": "Upozornenie",
-        "success": "Úspech",
-        "clockOffset": "Vaše systémové hodiny sa od servera líšia o viac ako 5 sekúnd. Môže to spôsobiť problémy s overením pomocou passkey a dvojfaktorovým overením. Ak sa vyskytnú problémy, synchronizujte hodiny. Aktuálny posun: {offset} s."
+        "success": "Úspech"
       },
       "divider": {
         "or": "ALEBO"
@@ -320,12 +319,6 @@
           "always": "Vždy",
           "unlessStopped": "Ak nie je zastavený",
           "never": "Nikdy"
-        },
-        "bulkActionServerAction": {
-          "started": "Spustené",
-          "stopped": "Zastavené",
-          "restarted": "Reštartované",
-          "killed": "Ukončené"
         }
       },
       "unlimited": "Neobmedzené",
@@ -353,7 +346,6 @@
         "dividerPlaceholder": "Štítok oddeľovača (voliteľné)",
         "redirectNamePlaceholder": "Názov presmerovania",
         "destinationPlaceholder": "Cieľová adresa URL (napr. https://...)",
-        "selectRoutePlaceholder": "Vyberte trasu…",
         "button": {
           "addDivider": "Pridať oddeľovač",
           "addRedirect": "Pridať presmerovanie"
@@ -515,8 +507,6 @@
         }
       },
       "fileUpload": {
-        "waiting": "Čakanie: {file}",
-        "uploading": "Nahráva sa: {file}",
         "uploadingFolder": "Nahráva sa priečinok: {folder} ({files})",
         "rateLimited": "Rýchlosť nahrávania bola obmedzená. Čakanie...",
         "toast": {
@@ -605,10 +595,7 @@
             "connectionError": "Niečo sa pokazilo. Chyba pripojenia."
           },
           "successMessage": "Pripojenie k vášmu uzlu bolo úspešne overené. Teraz môžete pokračovať.",
-          "configurationDescription": "Vložte to do konfiguračného súboru `{file}` alebo spustite:",
-          "button": {
-            "verify": "Overiť pripojenie"
-          }
+          "configurationDescription": "Vložte to do konfiguračného súboru `{file}` alebo spustite:"
         },
         "configuration": {
           "title": "Nastavenia aplikácie",
@@ -646,9 +633,6 @@
             "description": "Spustime váš prvý server. Ktorý egg chcete použiť?",
             "nestDescription": "Ak chcete začať používať tento egg, musíte vytvoriť nest. Nesty sú kolekcie eggov. Zadajte názov:"
           },
-          "server": {
-            "nestDescription": "Ak chcete začať používať tento egg, musíte vytvoriť nest. Nesty sú kolekcie eggov. Zadajte názov:"
-          },
           "error": {
             "noNodes": "Niečo sa pokazilo. Nenašli sa žiadne uzly."
           },
@@ -667,8 +651,7 @@
               "subtitle": "Nastavenia a predvoľby panela sú nakonfigurované"
             },
             "eggRepositories": {
-              "title": "Repozitáre eggov",
-              "subtitle": "Počet repozitárov: {count}"
+              "title": "Repozitáre eggov"
             },
             "location": "Lokalita",
             "node": "Uzol"
@@ -821,17 +804,12 @@
                   },
                   "deleteServerGroup": {
                     "title": "Potvrdiť odstránenie skupiny serverov",
-                    "content": "Naozaj chcete odstrániť **{group}** zo svojho účtu?",
                     "toast": {
                       "deleted": "Skupina serverov bola odstránená."
                     }
                   },
-                  "addServerToGroup": {
-                    "noServers": "Všetky servery sú už v tejto skupine."
-                  },
                   "removeServerFromGroup": {
                     "title": "Potvrdiť odstránenie servera",
-                    "content": "Naozaj chcete odstrániť **{server}** zo skupiny **{group}**?",
                     "toast": {
                       "removed": "Server bol odstránený zo skupiny."
                     }
@@ -857,11 +835,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Režim výberu",
             "select": "Vybrať server",
             "deselect": "Zrušiť výber servera",
-            "success": "Akcia {action} bola úspešne vykonaná pre {servers}.",
-            "partial": "{successfulServers}: akcia {action} prebehla úspešne. {failedServers}: zlyhalo.",
             "groupActions": "Skupinové akcie"
           }
         },
@@ -938,15 +913,13 @@
         },
         "securityKeys": {
           "title": "Bezpečnostné kľúče",
-          "subtitle": "Vytvorených bezpečnostných kľúčov: {current} z {max}.",
           "table": {
             "columns": {
               "credentialId": "ID poverenia"
             }
           },
           "tooltip": {
-            "secureContextRequired": "Na používanie bezpečnostných kľúčov sa vyžaduje zabezpečený kontext (HTTPS).",
-            "limitReached": "Limit je {max} bezpečnostných kľúčov."
+            "secureContextRequired": "Na používanie bezpečnostných kľúčov sa vyžaduje zabezpečený kontext (HTTPS)."
           },
           "modal": {
             "createSecurityKey": {
@@ -964,7 +937,6 @@
             },
             "deleteSecurityKey": {
               "title": "Potvrdiť odstránenie bezpečnostného kľúča",
-              "content": "Naozaj chcete odstrániť **{key}** zo svojho účtu?",
               "toast": {
                 "deleted": "Bezpečnostný kľúč bol úspešne odstránený."
               }
@@ -1038,17 +1010,10 @@
             "searchContent": "Hľadať vo výstupe konzoly",
             "previousCommand": "Predchádzajúci príkaz v histórii",
             "nextCommand": "Ďalší príkaz v histórii"
-          },
-          "serverList": {
-            "selectServer": "Podržte S a kliknutím vyberte/zrušte výber servera"
           }
         },
         "sshKeys": {
           "title": "Kľúče SSH",
-          "subtitle": "Vytvorených kľúčov SSH: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Limit je {max} kľúčov SSH."
-          },
           "table": {
             "columns": {
               "fingerprint": "Odtlačok prsta"
@@ -1081,7 +1046,6 @@
             },
             "deleteSshKey": {
               "title": "Potvrdiť odstránenie kľúča SSH",
-              "content": "Naozaj chcete odstrániť **{name}** zo svojho účtu?",
               "toast": {
                 "removed": "Kľúč SSH bol odstránený."
               }
@@ -1090,10 +1054,6 @@
         },
         "commandSnippets": {
           "title": "Úryvky príkazov",
-          "subtitle": "Vytvorených úryvkov príkazov: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Limit je {max} úryvkov príkazov."
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Vytvoriť úryvok príkazu",
@@ -1109,7 +1069,6 @@
             },
             "deleteCommandSnippet": {
               "title": "Potvrdiť odstránenie úryvku príkazu",
-              "content": "Naozaj chcete odstrániť **{name}** zo svojho účtu?",
               "toast": {
                 "removed": "Úryvok príkazu bol odstránený."
               }
@@ -1139,12 +1098,8 @@
         },
         "apiKeys": {
           "title": "Kľúče API",
-          "subtitle": "Vytvorených kľúčov API: {current} z {max}.",
           "button": {
             "apiDocumentation": "API dokumentácia"
-          },
-          "tooltip": {
-            "limitReached": "Limit je {max} kľúčov API."
           },
           "table": {
             "columns": {
@@ -1175,7 +1130,6 @@
             },
             "deleteApiKey": {
               "title": "Potvrdiť odstránenie kľúča API",
-              "content": "Naozaj chcete odstrániť **{name}** zo svojho účtu?",
               "toast": {
                 "removed": "Kľúč API bol odstránený."
               }
@@ -1270,7 +1224,6 @@
                 "noChangelog": "Žiadny zoznam zmien",
                 "nodesUpToDate": "Zdá sa, že všetky uzly sú aktuálne. (Kontrola zlyhala pri {failed})",
                 "table": {
-                  "version": "Verzia",
                   "installed": "Nainštalované",
                   "packageName": "Názov balíka",
                   "latestVersion": "Najnovšia verzia",
@@ -1323,7 +1276,6 @@
               "page": {
                 "title": "Nastavenia aplikácie",
                 "form": {
-                  "icon": "Ikona",
                   "iconLight": "Ikona (svetlý režim)",
                   "bannerLight": "Banner (svetlý režim)",
                   "sessionCookie": "Súbor cookie relácie",
@@ -1581,8 +1533,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Potvrdiť odstránenie oznámenia",
-                    "content": "Naozaj chcete odstrániť **{title}**?"
+                    "title": "Potvrdiť odstránenie oznámenia"
                   }
                 },
                 "form": {
@@ -1618,21 +1569,16 @@
             "upload": "Nahrať",
             "copyLink": "Kopírovať odkaz"
           },
-          "dropzone": {
-            "subtitle": "Uvoľnením spustíte nahrávanie"
-          },
           "toast": {
             "assetDeleted": "Aktívum bolo odstránené.",
             "assetsDeleted": "{assets} odstránené."
           },
           "modal": {
             "createDirectory": {
-              "title": "Nový adresár",
-              "createdAs": "Vytvorí sa v "
+              "title": "Nový adresár"
             },
             "deleteAssets": {
-              "title": "Potvrdiť odstránenie aktív",
-              "content": "Naozaj chcete odstrániť `{count}` položiek?"
+              "title": "Potvrdiť odstránenie aktív"
             },
             "deleteAsset": {
               "title": "Odstrániť aktívum",
@@ -1744,8 +1690,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Potvrdiť odstránenie používateľa",
-                    "content": "Naozaj chcete odstrániť **{username}**?"
+                    "title": "Potvrdiť odstránenie používateľa"
                   },
                   "disableTwoFactor": {
                     "title": "Zakázať dvojfaktorové overenie používateľa",
@@ -1905,8 +1850,7 @@
                 },
                 "toast": {
                   "applied": "Konfigurácia bola úspešne použitá.",
-                  "submittedNotApplied": "Konfigurácia bola odoslaná, ale nebola použitá.",
-                  "invalidYaml": "Neplatný YAML: {error}"
+                  "submittedNotApplied": "Konfigurácia bola odoslaná, ale nebola použitá."
                 }
               }
             },
@@ -1922,7 +1866,6 @@
                 },
                 "label": {
                   "memory": "Pamäť",
-                  "cpuThreads": "{model} (vlákna {threads})",
                   "usedByWings": "{size} používa Wings",
                   "networkIn": "Príjem: {in}",
                   "networkOut": "Odosielanie: {out}"
@@ -1930,24 +1873,14 @@
                 "chart": {
                   "networkTraffic": "Sieťová prevádzka",
                   "diskRead": "Čítanie disku",
-                  "diskWrite": "Zápis na disk",
-                  "networkInLabel": "Sieť (príjem)",
-                  "networkOutLabel": "Sieť (odosielanie)"
+                  "diskWrite": "Zápis na disk"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "Kapacita nasadenia",
-                "subtitle": "Prostriedky pridelené serverom na tomto uzle, merané voči limitom nastaveným v nastaveniach uzla, nie voči fyzickej kapacite stroja. Nasadenie kontroluje iba pamäť a disk.",
                 "card": {
                   "resources": "Pridelené prostriedky"
-                },
-                "status": {
-                  "deploymentEnabled": "Nasadenie povolené",
-                  "deploymentDisabled": "Nasadenie vypnuté",
-                  "maintenanceEnabled": "V údržbe",
-                  "maintenanceDisabled": "Nie je v údržbe"
                 },
                 "label": {
                   "memory": "Pamäť",
@@ -2029,8 +1962,7 @@
                     "title": "Pridať mount k uzlu"
                   },
                   "remove": {
-                    "title": "Potvrdiť odstránenie mountu z uzla",
-                    "content": "Naozaj chcete odstrániť mount **{mount}** z **{name}**?"
+                    "title": "Potvrdiť odstránenie mountu z uzla"
                   }
                 }
               }
@@ -2046,7 +1978,6 @@
                   "backupNotOnSameNode": "Táto záloha nie je na rovnakom uzle ako server. Nie je možné ju zobraziť z klientského API."
                 },
                 "toast": {
-                  "downloadStarted": "Sťahovanie začalo.",
                   "detached": "Záloha bola úspešne odpojená.",
                   "reattached": "Záloha bola úspešne znovu pripojená k {name}.",
                   "restoring": "Obnovuje sa záloha na {name}..."
@@ -2088,8 +2019,7 @@
                       "started": "Spustený prenos: {servers}."
                     },
                     "confirm": {
-                      "title": "Potvrdiť prenosy servera",
-                      "content": "Naozaj chcete preniesť `{count}` serverov z **{from}** na **{to}**? Túto akciu nie je možné vrátiť späť."
+                      "title": "Potvrdiť prenosy servera"
                     },
                     "enum": {
                       "allocationMode": {
@@ -2133,9 +2063,6 @@
               },
               "toast": {
                 "applied": "Konfigurácia použitá na {nodes}."
-              },
-              "error": {
-                "invalidYaml": "Neplatný YAML: {error}"
               }
             }
           }
@@ -2224,8 +2151,7 @@
                   "updated": "Alokácia bola aktualizovaná.",
                   "setPrimary": "Alokácia bola nastavená ako primárna.",
                   "unsetPrimary": "Alokácia už nie je primárna.",
-                  "removed": "Alokácia bola odstránená.",
-                  "added": "Pridané alokácie: {count}."
+                  "removed": "Alokácia bola odstránená."
                 },
                 "modal": {
                   "add": {
@@ -2266,8 +2192,7 @@
                     "title": "Pridať mount k serveru"
                   },
                   "remove": {
-                    "title": "Potvrdiť odstránenie mountu zo servera",
-                    "content": "Naozaj chcete odstrániť mount **{mount}** z **{name}**?"
+                    "title": "Potvrdiť odstránenie mountu zo servera"
                   }
                 }
               }
@@ -2403,8 +2328,7 @@
               "page": {
                 "title": "Eggy",
                 "dropzone": {
-                  "title": "Sem presuňte súbory, ktoré chcete importovať ako eggy",
-                  "subtitle": "Uvoľnením spustíte import"
+                  "title": "Sem presuňte súbory, ktoré chcete importovať ako eggy"
                 },
                 "button": {
                   "updateFromRepository": "Aktualizovať z repozitára"
@@ -2420,14 +2344,6 @@
                 "modal": {
                   "move": {
                     "title": "Presunúť egg"
-                  },
-                  "moveBulk": {
-                    "title": "Presunúť eggy",
-                    "confirm": "Presunúť {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Potvrdiť odstránenie eggov",
-                    "content": "Naozaj chcete odstrániť `{count}` eggov?"
                   }
                 },
                 "tabs": {
@@ -2544,8 +2460,7 @@
                           "title": "Pridať mount k eggu"
                         },
                         "delete": {
-                          "title": "Potvrdiť odstránenie mountu z eggu",
-                          "content": "Naozaj chcete odstrániť mount **{mount}** z **{egg}**?"
+                          "title": "Potvrdiť odstránenie mountu z eggu"
                         }
                       }
                     }
@@ -2729,8 +2644,7 @@
           "title": "Poskytovatelia OAuth",
           "resourceName": "Poskytovateľ OAuth",
           "dropzone": {
-            "title": "Presuňte sem súbory, ktoré chcete importovať ako poskytovateľov OAuth",
-            "subtitle": "Uvoľnením spustíte import"
+            "title": "Presuňte sem súbory, ktoré chcete importovať ako poskytovateľov OAuth"
           },
           "table": {
             "columns": {
@@ -2920,10 +2834,7 @@
             "backups": {
               "title": "Zálohy",
               "page": {
-                "title": "Zálohy tejto konfigurácie",
-                "toast": {
-                  "downloadStarted": "Sťahovanie začalo."
-                }
+                "title": "Zálohy tejto konfigurácie"
               }
             },
             "locations": {
@@ -2977,8 +2888,7 @@
                     "title": "Pridať egg k mountu"
                   },
                   "remove": {
-                    "title": "Potvrdiť odstránenie eggu z mountu",
-                    "content": "Naozaj chcete odstrániť mount **{mount}** z **{name}**?"
+                    "title": "Potvrdiť odstránenie eggu z mountu"
                   }
                 }
               }
@@ -2996,8 +2906,7 @@
                     "title": "Pridať uzol k mountu"
                   },
                   "remove": {
-                    "title": "Potvrdiť odstránenie uzla mountu",
-                    "content": "Naozaj chcete odstrániť mount **{mount}** z **{name}**?"
+                    "title": "Potvrdiť odstránenie uzla mountu"
                   }
                 }
               }
@@ -3205,9 +3114,6 @@
             "receivingRemote": "Prijímanie {files} zo vzdialeného servera",
             "sendingRemote": "Odosielanie {files} na vzdialený server"
           },
-          "dropzone": {
-            "subtitle": "Uvoľnením spustíte nahrávanie"
-          },
           "settings": {
             "clickOnce": "Jedným kliknutím otvoríte súbor alebo priečinok",
             "preferPhysicalSize": "Zobraziť fyzickú veľkosť namiesto logickej veľkosti",
@@ -3222,7 +3128,6 @@
             "copyingStarted": "Začalo sa kopírovanie: {files}.",
             "filesCouldNotBeMoved": "Súbory nebolo možné presunúť.",
             "filesMoved": "{files} presunuté.",
-            "downloadStarted": "Sťahovanie začalo.",
             "filesDeleted": "Súbory boli odstránené.",
             "archiveCreationStarted": "Vytváranie archívu sa začalo.",
             "fileCopyingStarted": "Kopírovanie súboru sa začalo.",
@@ -3259,10 +3164,6 @@
                 "restore": "Obnoviť túto revíziu do editora",
                 "viewDiff": "Zobraziť rozdiel oproti aktuálnemu súboru",
                 "compareToPrevious": "Porovnať s predchádzajúcou revíziou"
-              },
-              "diff": {
-                "original": "Revízia",
-                "current": "Aktuálne"
               }
             }
           },
@@ -3280,16 +3181,13 @@
               "title": "Vytvoriť archív",
               "form": {
                 "format": "Formát"
-              },
-              "createdAs": "Tento archív bude vytvorený ako "
+              }
             },
             "createDirectory": {
-              "title": "Vytvoriť adresár",
-              "createdAs": "Tento adresár bude vytvorený ako "
+              "title": "Vytvoriť adresár"
             },
             "copyFile": {
-              "title": "Kopírovať súbor",
-              "createdAs": "Tento súbor bude vytvorený ako "
+              "title": "Kopírovať súbor"
             },
             "copyRemote": {
               "title": "Vzdialené kopírovanie súborov"
@@ -3417,7 +3315,6 @@
                 "fileUrl": "URL súboru",
                 "query": "Dopyt"
               },
-              "createdAs": "Tento súbor bude vytvorený ako ",
               "pull": "Stiahnuť"
             },
             "sftpDetails": {
@@ -3428,10 +3325,6 @@
         },
         "databases": {
           "title": "Databázy",
-          "subtitle": "Vytvorené databázy: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Tento server má limit {max} databáz."
-          },
           "table": {
             "columns": {
               "locked": "Zamknuté?"
@@ -3486,14 +3379,6 @@
         },
         "schedules": {
           "title": "Plány",
-          "subtitle": "Vytvorené plány: {current} z {max}.",
-          "dropzone": {
-            "title": "Sem presuňte súbory, ktoré chcete importovať ako plány",
-            "subtitle": "Uvoľnením spustíte import"
-          },
-          "tooltip": {
-            "limitReached": "Tento server má limit {max} plánov."
-          },
           "table": {
             "columns": {
               "lastRun": "Posledné spustenie",
@@ -3742,8 +3627,7 @@
               "renderer": {
                 "compact": "Vytvoriť {name} v {root}",
                 "detail": {
-                  "directory": "Adresár: {name}",
-                  "root": "Koreň: {root}"
+                  "directory": "Adresár: {name}"
                 }
               }
             },
@@ -3755,7 +3639,6 @@
               "renderer": {
                 "compact": "Zapísať do {file}",
                 "detail": {
-                  "file": "Súbor: {file}",
                   "append": "Pripojiť: {value}"
                 }
               }
@@ -3779,11 +3662,7 @@
                 "filesToDelete": "Súbory na odstránenie"
               },
               "renderer": {
-                "compact": "Odstrániť {files}",
-                "detail": {
-                  "root": "Koreň: {root}",
-                  "files": "Súbory: {files}"
-                }
+                "compact": "Odstrániť {files}"
               }
             },
             "renameFiles": {
@@ -3794,11 +3673,7 @@
                 "to": "do"
               },
               "renderer": {
-                "compact": "Premenovať {files}",
-                "detail": {
-                  "root": "Koreň: {root}",
-                  "files": "Súbory: {files}"
-                }
+                "compact": "Premenovať {files}"
               }
             },
             "compressFiles": {
@@ -3810,9 +3685,7 @@
                 "compact": "Komprimovať {files} z {root} do {name}",
                 "detail": {
                   "output": "Výstup: {name}",
-                  "root": "Koreň: {root}",
-                  "format": "Formát: {format}",
-                  "files": "Súbory: {files}"
+                  "format": "Formát: {format}"
                 }
               }
             },
@@ -3822,11 +3695,7 @@
                 "file": "Súbor"
               },
               "renderer": {
-                "compact": "Dekomprimovať {file} do {root}",
-                "detail": {
-                  "file": "Súbor: {file}",
-                  "root": "Koreň: {root}"
-                }
+                "compact": "Dekomprimovať {file} do {root}"
               }
             },
             "updateStartupVariable": {
@@ -3861,10 +3730,6 @@
         },
         "subusers": {
           "title": "Podužívatelia",
-          "subtitle": "Vytvorení podužívatelia: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Tento server má limit {max} podužívateľov."
-          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA povolené",
@@ -3892,7 +3757,6 @@
             },
             "removeSubuser": {
               "title": "Potvrdiť odstránenie podužívateľa",
-              "content": "Naozaj chcete odstrániť **{username}** z tohto servera?",
               "toast": {
                 "removed": "Podužívateľ bol odstránený."
               }
@@ -3901,10 +3765,6 @@
         },
         "backups": {
           "title": "Zálohy",
-          "subtitle": "Vytvorené zálohy: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Tento server má limit {max} záloh."
-          },
           "table": {
             "columns": {
               "locked": "Zamknuté?"
@@ -3914,7 +3774,6 @@
             "browse": "Prehľadávať"
           },
           "toast": {
-            "downloadStarted": "Sťahovanie začalo.",
             "restoringBackup": "Obnovuje sa záloha..."
           },
           "modal": {
@@ -3935,7 +3794,6 @@
             },
             "deleteBackup": {
               "title": "Potvrdiť odstránenie zálohy",
-              "content": "Naozaj chcete odstrániť **{name}** z tohto servera?",
               "toast": {
                 "deleted": "Záloha bola odstránená."
               }
@@ -3947,10 +3805,6 @@
         },
         "network": {
           "title": "Sieť",
-          "subtitle": "Použité alokácie: {current} z {max}.",
-          "tooltip": {
-            "limitReached": "Tento server má limit {max} alokácií."
-          },
           "table": {
             "columns": {
               "hostname": "Názov hostiteľa"
@@ -3965,8 +3819,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Potvrdiť odstránenie alokácie",
-              "content": "Naozaj chcete odstrániť **{allocation}** z tohto servera?"
+              "title": "Potvrdiť odstránenie alokácie"
             }
           }
         },
