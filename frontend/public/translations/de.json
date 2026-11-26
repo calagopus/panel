@@ -600,7 +600,7 @@
         "truncateDirectory": "Möchtest du alle Dateien dieses Servers löschen, bevor diese Aktion ausgeführt wird? Dies kann nicht rückgängig gemacht werden.",
         "rule": {
           "invalidCharacters": "Enthält Zeichen, die hier nicht erlaubt sind.",
-          "username": "3 bis 15 Zeichen, nur Buchstaben, Ziffern und Unterstriche.",
+          "username": "3 bis 48 Zeichen, nur Buchstaben, Ziffern, Unterstriche, Punkte und Bindestriche, ohne Punkt oder Bindestrich am Anfang oder Ende.",
           "databaseName": "Bis zu 31 Zeichen, nur Buchstaben, Ziffern und Unterstriche.",
           "databaseInstanceIdentifier": "2 bis 23 Zeichen, nur Buchstaben und Ziffern.",
           "captchaSiteKey": "Nur Buchstaben, Ziffern, Bindestriche und Unterstriche.",

@@ -122,6 +122,13 @@ fn is_username_char(c: char) -> bool {
     c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-')
 }
 
+fn valid_username(username: &str) -> bool {
+    (3..=48).contains(&chars(username))
+        && username.chars().all(is_username_char)
+        && !username.starts_with(['.', '-'])
+        && !username.ends_with(['.', '-'])
+}
+
 fn sanitize_username(username: &str) -> String {
     let mut sanitized: String = username
         .chars()
@@ -130,6 +137,12 @@ fn sanitize_username(username: &str) -> String {
         .collect();
     while chars(&sanitized) < 3 {
         sanitized.push('_');
+    }
+    if sanitized.starts_with(['.', '-']) {
+        sanitized.replace_range(..1, "_");
+    }
+    if sanitized.ends_with(['.', '-']) {
+        sanitized.replace_range(sanitized.len() - 1.., "_");
     }
     sanitized
 }
@@ -670,13 +683,11 @@ impl Validator<'_> {
             }
 
             let mut username = user.username.trim().to_string();
-            let length = chars(&username);
-            let pattern_ok = username.chars().all(is_username_char);
             let taken = |candidate: &str| {
                 let candidate = candidate.to_lowercase();
                 reserved.contains(&candidate) || usernames.holder(&candidate).is_some()
             };
-            if !(3..=48).contains(&length) || !pattern_ok {
+            if !valid_username(&username) {
                 let mut suggestion = sanitize_username(&username);
                 if taken(&suggestion) {
                     suggestion = numbered(&suggestion, 48, "_", taken);
@@ -686,7 +697,7 @@ impl Validator<'_> {
                     "username",
                     "rule",
                     &username,
-                    "usernames must be 3-48 characters of a-z, A-Z, 0-9, _, . and -",
+                    "usernames must be 3-48 characters of a-z, A-Z, 0-9, _, . and -, not starting or ending with . or -",
                     Some(format!("rename to {suggestion:?}")),
                 ) {
                     username = suggestion;
@@ -3372,10 +3383,6 @@ mod tests {
             .map(|r| r.decision)
     }
 
-    fn valid_username(name: &str) -> bool {
-        (3..=48).contains(&name.chars().count()) && name.chars().all(is_username_char)
-    }
-
     // build_plan
     #[test]
     fn a_clean_source_plans_everything() {
@@ -3630,6 +3637,8 @@ mod tests {
     fn sanitize_username_produces_valid_names() {
         assert_eq!(sanitize_username("bad name!"), "bad_name_");
         assert_eq!(sanitize_username("john.doe-2"), "john.doe-2");
+        assert_eq!(sanitize_username(".john-"), "_john_");
+        assert_eq!(sanitize_username("-a"), "_a_");
         assert_eq!(
             sanitize_username(&"abcdefghijklmnopqrstuvwxyz".repeat(2)),
             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"

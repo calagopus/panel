@@ -518,14 +518,26 @@ impl OAuthProvider {
             return Ok(rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 10));
         };
 
-        let username: String = match self.extract_required("username", path, value)? {
+        let mut username: String = match self.extract_required("username", path, value)? {
             serde_json::Value::String(string) => string.clone(),
             val => val.to_string(),
         }
         .chars()
-        .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
-        .take(15)
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-') {
+                c
+            } else {
+                '_'
+            }
+        })
+        .take(48)
         .collect();
+        if username.starts_with(['.', '-']) {
+            username.replace_range(..1, "_");
+        }
+        if username.ends_with(['.', '-']) {
+            username.replace_range(username.len() - 1.., "_");
+        }
 
         Ok(match username.len() {
             0 => rand::distr::Alphanumeric.sample_string(&mut rand::rng(), 10),
