@@ -294,7 +294,6 @@
         "error": "エラー",
         "warning": "警告",
         "success": "成功",
-        "clockOffset": "システム時刻がサーバーと5秒以上ずれています。これにより、パスキー認証や2要素認証で問題が発生する可能性があります。問題が発生した場合は時刻を同期してください。現在のずれ: {offset} 秒。",
         "passwordAuthUnavailable": "この接続ではパスワードを使用できません。SSHキーを使用してください。SSHキーはアカウントの「SSHキー」ページから追加できます。"
       },
       "divider": {
@@ -338,7 +337,6 @@
           "exception": "除外パターン",
           "invalid": "無効なパターン",
           "unavailable": "カウント利用不可",
-          "tooManyPatterns": "{max} 個を超えるパターンの場合、一致数は自動カウントされません。",
           "unanchoredException": "`{pattern}` は任意の階層で一致します。ルートディレクトリでのみ一致させるには `{anchored}` を使用してください。"
         },
         "cronInput": {
@@ -354,7 +352,6 @@
         },
         "iconInput": {
           "defaultIcon": "既定のアイコン",
-          "searchPlaceholder": "アイコンを検索…",
           "noResults": "検索条件に一致するアイコンがありません。",
           "button": {
             "reset": "既定のアイコンを使用"
@@ -417,7 +414,6 @@
         },
         "deleteFailedBackups": {
           "title": "失敗したバックアップの削除の確認",
-          "content": "`{count}` 件の失敗したバックアップを削除してもよろしいですか？ロックされているバックアップや、設定がメンテナンス中のバックアップは保持されます。削除はバックグラウンドで実行され、完了まで時間がかかる場合があります。",
           "alert": {
             "forceWarning": "強制削除を行うと、設定が存在しない場合やリモートストレージにアクセスできない場合でもバックアップを削除します。バックアップファイル自体が完全にクリーンアップされず、孤立したデータが残る可能性があります。"
           }
@@ -425,7 +421,6 @@
       },
       "toast": {
         "duplicated": "{resource} を複製しました。",
-        "failedBackupDeletionStarted": "{count} 件の失敗したバックアップの削除をバックグラウンドで開始しました。",
         "requestBlockedByExtension": "このリクエストは拡張機能によってブロックされました。"
       },
       "settingScope": {
@@ -761,16 +756,6 @@
           "unlessStopped": "手動停止時以外は起動",
           "never": "自動起動しない"
         },
-        "bulkActionServerAction": {
-          "started": "起動",
-          "stopped": "停止",
-          "restarted": "再起動",
-          "killed": "強制停止",
-          "suspended": "サスペンド済み",
-          "unsuspended": "サスペンド解除済み",
-          "clearedState": "状態をクリア",
-          "deleted": "削除"
-        },
         "compressionLevel": {
           "bestSpeed": "最高速度",
           "goodSpeed": "高速",
@@ -829,7 +814,6 @@
         "dividerPlaceholder": "区切り線のラベル (任意)",
         "redirectNamePlaceholder": "リダイレクト名",
         "destinationPlaceholder": "リダイレクト先URL (例: https://...)",
-        "selectRoutePlaceholder": "ルートを選択…",
         "button": {
           "addDivider": "区切り線を追加",
           "addRedirect": "リダイレクトを追加"
@@ -1096,12 +1080,8 @@
       "fileUpload": {
         "title": "{files} をアップロード中",
         "adminAssets": "管理アセット",
-        "waiting": "待機中: {file}",
-        "uploading": "アップロード中: {file}",
         "uploadingFolder": "フォルダーをアップロード中: {folder} ({files})",
-        "failed": "失敗: {file}",
         "failedFolder": "アップロード失敗: {folder} ({files})",
-        "paused": "一時停止中: {file}",
         "pause": "アップロードを一時停止",
         "resume": "アップロードを再開",
         "cancel": "アップロードをキャンセル",
@@ -1235,10 +1215,7 @@
             "frontendConnectionError": "ブラウザからノードに接続できませんでした。(公開)URL、TLS証明書、およびファイアウォールを確認してください。WebSocketおよびダウンロードはこの接続に依存しています。"
           },
           "successMessage": "ノードへの接続が正常に確認されました。次に進むことができます。",
-          "configurationDescription": "これを `{file}` の設定ファイルに配置するか、以下を実行してください:",
-          "button": {
-            "verify": "接続を確認"
-          }
+          "configurationDescription": "これを `{file}` の設定ファイルに配置するか、以下を実行してください:"
         },
         "configuration": {
           "title": "アプリケーション設定",
@@ -1283,8 +1260,7 @@
             "nestDescription": "このEggの使用を開始するには、EggをまとめるNestを作成する必要があります。名前を入力してください:"
           },
           "server": {
-            "title": "サーバー",
-            "nestDescription": "このEggの使用を開始するには、EggをまとめるNestを作成する必要があります。名前を入力してください:"
+            "title": "サーバー"
           },
           "error": {
             "noNodes": "エラーが発生しました。ノードが見つかりませんでした。"
@@ -1304,8 +1280,7 @@
               "subtitle": "パネルの設定と環境設定が構成されました"
             },
             "eggRepositories": {
-              "title": "Eggリポジトリ",
-              "subtitle": "{count} 個のリポジトリ"
+              "title": "Eggリポジトリ"
             },
             "location": "ロケーション",
             "node": "ノード",
@@ -1436,10 +1411,7 @@
         "verifyEmail": {
           "title": "メールアドレスの確認",
           "success": "メールアドレス **{email}** が確認されました。",
-          "failed": "この確認リンクは無効であるか、有効期限が切れています。新しいリンクをリクエストして再試行してください。",
-          "button": {
-            "continue": "続ける"
-          }
+          "failed": "この確認リンクは無効であるか、有効期限が切れています。新しいリンクをリクエストして再試行してください。"
         },
         "resetPassword": {
           "title": "パスワードの再設定",
@@ -1504,21 +1476,18 @@
                   },
                   "deleteServerGroup": {
                     "title": "サーバーグループの削除の確認",
-                    "content": "アカウントから **{group}** を削除してもよろしいですか？",
                     "toast": {
                       "deleted": "サーバーグループを削除しました。"
                     }
                   },
                   "addServerToGroup": {
                     "title": "{group} にサーバーを追加",
-                    "noServers": "すべてのサーバーがすでにこのグループに含まれています。",
                     "toast": {
                       "added": "{servers} をグループに追加しました。"
                     }
                   },
                   "removeServerFromGroup": {
                     "title": "サーバーの削除の確認",
-                    "content": "**{group}** から **{server}** を削除してもよろしいですか？",
                     "toast": {
                       "removed": "サーバーをグループから削除しました。"
                     }
@@ -1531,8 +1500,7 @@
                       "description": "このサーバーはすでに {group} に含まれています。"
                     },
                     "groupFull": {
-                      "title": "グループが満杯です",
-                      "description": "グループには最大 {max} 台のサーバーしか登録できません。"
+                      "title": "グループが満杯です"
                     }
                   },
                   "toast": {
@@ -1559,11 +1527,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "選択モード",
             "select": "サーバーを選択",
             "deselect": "サーバーの選択を解除",
-            "success": "{servers} を正常に{action}しました。",
-            "partial": "{successfulServers} を正常に{action}しました。{failedServers} が失敗しました。",
             "groupActions": "グループアクション"
           }
         },
@@ -1726,7 +1691,6 @@
         },
         "securityKeys": {
           "title": "セキュリティキー",
-          "subtitle": "最大 {max} 個中 {current} 個のセキュリティキーが作成されています。",
           "table": {
             "columns": {
               "credentialId": "認証情報ID"
@@ -1734,7 +1698,6 @@
           },
           "tooltip": {
             "secureContextRequired": "セキュリティキーを使用するにはセキュアなコンテキスト (HTTPS) が必要です。",
-            "limitReached": "登録できるセキュリティキーは最大{max}個です。",
             "disabled": "セキュリティキーは管理者によって無効化されています。"
           },
           "alert": {
@@ -1758,7 +1721,6 @@
             },
             "deleteSecurityKey": {
               "title": "セキュリティキーの削除の確認",
-              "content": "アカウントから **{key}** を削除してもよろしいですか？",
               "toast": {
                 "deleted": "セキュリティキーを削除しました。"
               }
@@ -1856,17 +1818,10 @@
             "searchContent": "コンソール出力内を検索",
             "previousCommand": "履歴の前のコマンド",
             "nextCommand": "履歴の次のコマンド"
-          },
-          "serverList": {
-            "selectServer": "Sキーを押しながらクリックしてサーバーを選択/解除"
           }
         },
         "sshKeys": {
           "title": "SSHキー",
-          "subtitle": "最大 {max} 個中 {current} 個のSSHキーが作成されています。",
-          "tooltip": {
-            "limitReached": "登録できるSSHキーは最大{max}個です。"
-          },
           "table": {
             "columns": {
               "fingerprint": "フィンガープリント"
@@ -1898,12 +1853,10 @@
               }
             },
             "deleteSshKeys": {
-              "title": "SSHキーの削除の確認",
-              "content": "アカウントから **{sshKeys}** を削除してもよろしいですか？"
+              "title": "SSHキーの削除の確認"
             },
             "deleteSshKey": {
               "title": "SSHキーの削除の確認",
-              "content": "アカウントから **{name}** を削除してもよろしいですか？",
               "toast": {
                 "removed": "SSHキーを削除しました。"
               }
@@ -1912,10 +1865,6 @@
         },
         "commandSnippets": {
           "title": "コマンドスニペット",
-          "subtitle": "最大 {max} 個中 {current} 個のコマンドスニペットが作成されています。",
-          "tooltip": {
-            "limitReached": "登録できるコマンドスニペットは最大{max}個です。"
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "コマンドスニペットを作成",
@@ -1930,12 +1879,10 @@
               }
             },
             "deleteCommandSnippets": {
-              "title": "コマンドスニペットの削除の確認",
-              "content": "アカウントから **{commandSnippets}** を削除してもよろしいですか？"
+              "title": "コマンドスニペットの削除の確認"
             },
             "deleteCommandSnippet": {
               "title": "コマンドスニペットの削除の確認",
-              "content": "アカウントから **{name}** を削除してもよろしいですか？",
               "toast": {
                 "removed": "コマンドスニペットを削除しました。"
               }
@@ -1962,7 +1909,6 @@
           "modal": {
             "deleteOAuthLinks": {
               "title": "連携アカウントの解除の確認",
-              "content": "アカウントから **{oauthLinks}** の連携を解除してもよろしいですか？",
               "alert": {
                 "skipped": "{oauthLinks} はスキップされます。連携解除が許可されていないプロバイダーのリンクは削除できません。"
               }
@@ -1978,13 +1924,11 @@
         },
         "apiKeys": {
           "title": "APIキー",
-          "subtitle": "最大 {max} 個中 {current} 個のAPIキーが作成されています。",
           "button": {
             "apiDocumentation": "APIドキュメント",
             "copyUuid": "UUIDをコピー"
           },
           "tooltip": {
-            "limitReached": "登録できるAPIキーは最大{max}個です。",
             "keyStartOnly": "キーの先頭のみが表示されます。完全なキーは(再)作成後に一度のみ表示されます。"
           },
           "table": {
@@ -2025,12 +1969,10 @@
               }
             },
             "deleteApiKeys": {
-              "title": "APIキーの削除の確認",
-              "content": "アカウントから **{apiKeys}** を削除してもよろしいですか？"
+              "title": "APIキーの削除の確認"
             },
             "deleteApiKey": {
               "title": "APIキーの削除の確認",
-              "content": "アカウントから **{name}** を削除してもよろしいですか？",
               "toast": {
                 "removed": "APIキーを削除しました。"
               }
@@ -2181,7 +2123,6 @@
                 "nodesOutdatedSummary": "いくつかのノードが古くなっています。({outdated} が古くなっています。 {failed} はチェックに失敗しました)",
                 "databaseAgentHostsUpToDate": "すべてのデータベースエージェントホストが最新のようです。({failed} 件の確認に失敗)",
                 "table": {
-                  "version": "バージョン",
                   "installed": "インストール日時",
                   "packageName": "パッケージ名",
                   "latestVersion": "最新バージョン",
@@ -2235,7 +2176,6 @@
                 "form": {
                   "additionalUrls": "追加のURL",
                   "additionalUrlsDescription": "パネルにアクセス可能な他のアドレス。ログイン、OAuth、およびセルフサービスメールはリクエストが届いたURLを使用し、その他はすべてメインURLを使用します。セキュリティキーはWebAuthn RP ID配下のURLでのみ機能します。",
-                  "icon": "アイコン",
                   "iconLight": "アイコン (ライトモード)",
                   "banner": "バナー",
                   "bannerLight": "バナー (ライトモード)",
@@ -2302,7 +2242,6 @@
               "page": {
                 "title": "メタデータ設定",
                 "form": {
-                  "description": "説明文",
                   "descriptionDescription": "検索結果やリンクプレビューのタイトルの下に表示されます。",
                   "ogImage": "プレビュー画像",
                   "ogImageDescription": "リンクプレビューに表示されます。SVGではなくPNGまたはJPEG形式である必要があります。",
@@ -2657,8 +2596,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "お知らせ削除の確認",
-                    "content": "**{title}** を削除してもよろしいですか？"
+                    "title": "お知らせ削除の確認"
                   },
                   "duplicate": {
                     "content": "**{title}** を複製してもよろしいですか？"
@@ -2704,8 +2642,7 @@
             "deleteSelection": "選択項目を削除"
           },
           "dropzone": {
-            "title": "ここにファイルまたはフォルダーをドロップしてアップロード",
-            "subtitle": "離すとアップロードを開始します"
+            "title": "ここにファイルまたはフォルダーをドロップしてアップロード"
           },
           "toast": {
             "assetDeleted": "アセットを削除しました。",
@@ -2713,12 +2650,10 @@
           },
           "modal": {
             "createDirectory": {
-              "title": "新規ディレクトリ",
-              "createdAs": "次の場所に作成されます "
+              "title": "新規ディレクトリ"
             },
             "deleteAssets": {
-              "title": "アセット削除の確認",
-              "content": "`{count}` 個のアセットを削除してもよろしいですか？"
+              "title": "アセット削除の確認"
             },
             "deleteAsset": {
               "title": "アセットの削除",
@@ -2781,18 +2716,6 @@
             "enableExtension": "拡張機能を有効化",
             "disableExtension": "拡張機能を無効化"
           },
-          "phase": {
-            "queued": "キュー追加済み…",
-            "preparing": "準備中…",
-            "clearing": "拡張機能をクリア中…",
-            "adding": "拡張機能を追加中 ({done}/{total})…",
-            "resync": "依存関係を解決中…",
-            "stagingTranslations": "翻訳をステージング中…",
-            "compiling": "コンパイル中…",
-            "verifying": "検証中…",
-            "installing": "インストール中…",
-            "restarting": "パネルを再起動中…"
-          },
           "badge": {
             "frontendMissing": "フロントエンド欠落",
             "backendMissing": "バックエンド欠落",
@@ -2801,7 +2724,6 @@
             "startFailed": "起動失敗",
             "pendingRemoval": "削除保留中",
             "pendingRestart": "再起動待ち",
-            "disabled": "無効",
             "processing": "処理中"
           },
           "card": {
@@ -2906,8 +2828,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "ユーザー削除の確認",
-                    "content": "**{username}** を削除してもよろしいですか？"
+                    "title": "ユーザー削除の確認"
                   },
                   "grantAdmin": {
                     "title": "管理者権限付与の確認",
@@ -3064,7 +2985,6 @@
             },
             "probe": {
               "title": "Wings {version} がペアリング待機中です",
-              "resources": "{cores} CPUコア、メモリ {memory}、ディスク {disk} ({architecture})",
               "dockerAvailable": "Docker {version} に接続可能です。",
               "dockerUnavailable": "Dockerに接続できません。接続できるようになるまで、Wingsはサーバーを起動できません。",
               "container": "Wingsがコンテナ内で実行されているため、ホストのネットワークインターフェースを検出できません。割り当てIPをご自身で入力してください。"
@@ -3102,16 +3022,12 @@
                   "sftpAddress": "SFTPアドレス",
                   "createdAt": "作成日時",
                   "inheritedFromLocation": "ロケーションから継承",
-                  "none": "なし",
                   "wingsVersion": "Wingsバージョン",
                   "memory": "メモリ",
                   "servers": "サーバー数",
                   "architecture": "アーキテクチャ",
                   "kernelVersion": "カーネルバージョン",
                   "unavailable": "利用不可"
-                },
-                "badge": {
-                  "updateAvailable": "アップデートあり"
                 }
               }
             },
@@ -3128,8 +3044,7 @@
                   "publicUrlDescription": "WebSocket接続およびダウンロードに使用されます。",
                   "backupConfigurationPlaceholder": "ロケーションから継承",
                   "memoryDescription": "このノード上のサーバーで利用可能な合計メモリ。",
-                  "diskDescription": "このノード上のサーバーで利用可能な合計ディスク容量。",
-                  "unlimitedTooltip": "0 に設定すると上限なしになります。"
+                  "diskDescription": "このノード上のサーバーで利用可能な合計ディスク容量。"
                 },
                 "section": {
                   "connection": "接続",
@@ -3180,8 +3095,7 @@
                 },
                 "button": {
                   "save": "構成を保存",
-                  "reveal": "構成を表示",
-                  "verify": "接続を確認"
+                  "reveal": "構成を表示"
                 },
                 "alert": {
                   "couldNotReach": "ノードに接続できませんでした: {error}",
@@ -3197,8 +3111,7 @@
                 },
                 "toast": {
                   "applied": "構成を正常に適用しました。",
-                  "submittedNotApplied": "構成は送信されましたが、適用されませんでした。",
-                  "invalidYaml": "無効なYAML形式です: {error}"
+                  "submittedNotApplied": "構成は送信されましたが、適用されませんでした。"
                 }
               }
             },
@@ -3215,7 +3128,6 @@
                 "label": {
                   "memory": "メモリ",
                   "disk": "ディスク",
-                  "cpuThreads": "{model} ({threads} スレッド)",
                   "usedByWings": "Wings使用量: {size}",
                   "networkIn": "受信: {in}",
                   "networkOut": "送信: {out}"
@@ -3224,25 +3136,15 @@
                   "diskIo": "ディスク I/O",
                   "networkTraffic": "ネットワークトラフィック",
                   "diskRead": "ディスク読み取り",
-                  "diskWrite": "ディスク書き込み",
-                  "networkInLabel": "ネットワーク受信",
-                  "networkOutLabel": "ネットワーク送信"
+                  "diskWrite": "ディスク書き込み"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "デプロイ容量",
-                "subtitle": "このノード上のサーバーに割り当てられたリソースです。物理マシンの容量ではなく、ノード設定で構成された上限に対して測定されます。デプロイチェックはメモリとディスクのみを対象とします。",
                 "card": {
                   "resources": "割り当て済みリソース",
                   "breakdown": "割り当て内訳"
-                },
-                "status": {
-                  "deploymentEnabled": "デプロイ有効",
-                  "deploymentDisabled": "デプロイ無効",
-                  "maintenanceEnabled": "メンテナンス中",
-                  "maintenanceDisabled": "通常稼働中"
                 },
                 "label": {
                   "memory": "メモリ",
@@ -3349,8 +3251,7 @@
                     "title": "ノードマウントを追加"
                   },
                   "remove": {
-                    "title": "ノードマウント削除の確認",
-                    "content": "**{name}** からマウント **{mount}** を削除してもよろしいですか？"
+                    "title": "ノードマウント削除の確認"
                   }
                 }
               }
@@ -3368,8 +3269,7 @@
                     "title": "ノードデバイスを追加"
                   },
                   "remove": {
-                    "title": "ノードデバイス削除の確認",
-                    "content": "**{name}** からデバイス **{device}** を削除してもよろしいですか？"
+                    "title": "ノードデバイス削除の確認"
                   }
                 }
               }
@@ -3423,7 +3323,6 @@
                   "backupNotOnSameNode": "このバックアップはサーバーと同じノードに存在しません。クライアントAPIからは閲覧できません。"
                 },
                 "toast": {
-                  "downloadStarted": "ダウンロードを開始しました。",
                   "detached": "バックアップを正常に切り離しました。",
                   "reattached": "バックアップを {name} に再アタッチしました。",
                   "reassigned": "バックアップを再割り当てしました。",
@@ -3481,8 +3380,7 @@
                       "started": "{servers} の転送を開始しました。"
                     },
                     "confirm": {
-                      "title": "サーバー転送の確認",
-                      "content": "`{count}` 台のサーバーを **{from}** から **{to}** に転送してもよろしいですか？この操作は取り消せません。"
+                      "title": "サーバー転送の確認"
                     },
                     "enum": {
                       "allocationMode": {
@@ -3529,9 +3427,7 @@
                   "noCertificate": "このノードは **証明書を報告していません**。そのためピアから接続を開くことができません。ノードのトンネルデーモンを再起動して再登録してください。"
                 },
                 "form": {
-                  "host": "ホスト",
                   "hostDescription": "他のノードがこのノードに接続する際に使用するホスト名またはIP。接続時に名前解決されます。",
-                  "port": "ポート",
                   "portDescription": "ノードが他のノードからの通信をリッスンするUDPポート。他のノードから到達可能である必要があります。"
                 },
                 "section": {
@@ -3556,14 +3452,11 @@
                     "uptime": "デーモン稼働時間",
                     "controlLink": "コントロールリンク",
                     "frontends": "バインドされたフロントエンド",
-                    "flowsOpen": "{count} 個のフローが開いています",
-                    "localDrops": "同一ノード内ドロップ",
-                    "frozenFlows": "{count} 個のフローが凍結中"
+                    "localDrops": "同一ノード内ドロップ"
                   },
                   "column": {
                     "peer": "ピア",
                     "role": "役割",
-                    "address": "アドレス",
                     "path": "パス",
                     "loss": "パケットロス",
                     "transferred": "転送量",
@@ -3602,8 +3495,6 @@
                   }
                 },
                 "button": {
-                  "enable": "有効化",
-                  "disable": "無効化",
                   "rotate": "識別情報を更新"
                 },
                 "toast": {
@@ -3637,9 +3528,6 @@
               },
               "toast": {
                 "applied": "{nodes} に構成を適用しました。"
-              },
-              "error": {
-                "invalidYaml": "無効なYAML形式です: {error}"
               }
             }
           }
@@ -3673,7 +3561,6 @@
                 "forceWarning": "強制削除を行うと、ノードに接続できない場合でもパネルからサーバーを削除します。ファイルやデータベースが完全にクリーンアップされず、孤立したデータが残る可能性があります。"
               }
             },
-            "successWithSkipped": "{servers} を正常に{action}しました。{skippedServers} をスキップしました。",
             "nothingToDo": "選択されたすべてのサーバーがすでにその状態です。"
           },
           "externalIdLookup": {
@@ -3720,7 +3607,6 @@
                   "swap": "スワップ",
                   "allocations": "割り当て",
                   "databases": "データベース",
-                  "databaseAgents": "エージェントDB",
                   "backups": "バックアップ",
                   "schedules": "スケジュール",
                   "unlimited": "無制限",
@@ -3778,7 +3664,6 @@
                   "swapDescription": "このサーバーに割り当てるスワップ容量。",
                   "swapTooltip": "-1 は制限なし。",
                   "memoryDescription": "サーバーコンテナのメモリ制限。",
-                  "memoryTooltip": "0 は制限なし。",
                   "memoryOverhead": "メモリオーバーヘッド",
                   "memoryOverheadDescription": "コンテナに追加される不可視のメモリ枠。",
                   "diskSpace": "ディスク容量",
@@ -3790,7 +3675,6 @@
                   "bandwidth": {
                     "upload": "アップロード制限",
                     "download": "ダウンロード制限",
-                    "description": "0 は制限なし。",
                     "unavailable": "ノードが帯域制限をサポートしていません。",
                     "disabled": "ノード構成で帯域制限が無効化されています。"
                   },
@@ -3813,7 +3697,6 @@
                   "kvmPassthroughEnabledDescription": "サーバーのKVMパススルーを有効にします (コンテナ内から /dev/kvm へのアクセスを許可)。",
                   "allocationsLimit": "割り当て上限",
                   "databasesLimit": "データベース上限",
-                  "databaseAgentsLimit": "エージェントDB上限",
                   "backupsLimit": "バックアップ上限",
                   "schedulesLimit": "スケジュール上限"
                 },
@@ -3844,8 +3727,7 @@
                   "updated": "割り当てを更新しました。",
                   "setPrimary": "割り当てをプライマリに設定しました。",
                   "unsetPrimary": "割り当てのプライマリ設定を解除しました。",
-                  "removed": "割り当てを削除しました。",
-                  "added": "{count} 個の割り当てを追加しました。"
+                  "removed": "割り当てを削除しました。"
                 },
                 "modal": {
                   "add": {
@@ -3886,8 +3768,7 @@
                     "title": "サーバーマウントを追加"
                   },
                   "remove": {
-                    "title": "サーバーマウント削除の確認",
-                    "content": "**{name}** からマウント **{mount}** を削除してもよろしいですか？"
+                    "title": "サーバーマウント削除の確認"
                   }
                 }
               }
@@ -3905,8 +3786,7 @@
                     "title": "サーバーデバイスを追加"
                   },
                   "remove": {
-                    "title": "サーバーデバイス削除の確認",
-                    "content": "**{name}** からデバイス **{device}** を削除してもよろしいですか？"
+                    "title": "サーバーデバイス削除の確認"
                   }
                 }
               }
@@ -4062,8 +3942,7 @@
               "page": {
                 "title": "Egg",
                 "dropzone": {
-                  "title": "ここにファイルをドロップしてEggとしてインポート",
-                  "subtitle": "離すとインポートを開始します"
+                  "title": "ここにファイルをドロップしてEggとしてインポート"
                 },
                 "button": {
                   "updateFromRepository": "リポジトリから更新",
@@ -4093,14 +3972,6 @@
                   },
                   "move": {
                     "title": "Eggを移動"
-                  },
-                  "moveBulk": {
-                    "title": "Eggを移動",
-                    "confirm": "{eggs} を移動"
-                  },
-                  "deleteBulk": {
-                    "title": "Egg削除の確認",
-                    "content": "本当に `{count}` 個のEggを削除しますか？"
                   }
                 },
                 "tabs": {
@@ -4229,8 +4100,7 @@
                           "title": "Eggマウントを追加"
                         },
                         "delete": {
-                          "title": "Eggマウント削除の確認",
-                          "content": "本当に **{egg}** からマウント **{mount}** を削除しますか？"
+                          "title": "Eggマウント削除の確認"
                         }
                       }
                     }
@@ -4248,8 +4118,7 @@
                           "title": "Eggデバイスを追加"
                         },
                         "delete": {
-                          "title": "Eggデバイス削除の確認",
-                          "content": "本当に **{egg}** からデバイス **{device}** を削除しますか？"
+                          "title": "Eggデバイス削除の確認"
                         }
                       }
                     }
@@ -4287,24 +4156,12 @@
                   "nodesPlaceholder": "ノードを選択",
                   "locationsPlaceholder": "ロケーションを選択",
                   "matcher": "適用対象",
-                  "matcherDescription": "この設定を適用するサーバーを、Egg、Nest、ノード、またはロケーションによって決定します。複数の設定が同じサーバーに適用される場合、順序が高いものが低いものを上書きします。",
-                  "matcherType": "マッチャータイプ"
-                },
-                "matcher": {
-                  "allMustMatch": "すべてのマッチャーに一致:",
-                  "anyMustMatch": "いずれかのマッチャーに一致:",
-                  "mustNotMatch": "マッチャーに一致しない:"
-                },
-                "button": {
-                  "addMatcher": "マッチャーを追加"
+                  "matcherDescription": "この設定を適用するサーバーを、Egg、Nest、ノード、またはロケーションによって決定します。複数の設定が同じサーバーに適用される場合、順序が高いものが低いものを上書きします。"
                 },
                 "enum": {
                   "matcherType": {
                     "never": "なし (何にも適用しない)",
                     "all": "すべて (常に適用)",
-                    "and": "AND (すべて一致)",
-                    "or": "OR (いずれか一致)",
-                    "not": "NOT (一致しない)",
                     "eggs": "Egg",
                     "nests": "Nest",
                     "nodes": "ノード",
@@ -4482,9 +4339,7 @@
                 "title": "EggリポジトリのEgg",
                 "table": {
                   "columns": {
-                    "path": "パス",
-                    "repository": "リポジトリ",
-                    "installedIn": "インストール先"
+                    "path": "パス"
                   }
                 },
                 "toast": {
@@ -4497,13 +4352,11 @@
                     "button": "{eggs} をインストール"
                   },
                   "catalog": {
-                    "title": "リポジトリからEggをインストール",
                     "searchPlaceholder": "すべてのリポジトリからEggを検索…",
                     "selected": "選択中: **{egg}**",
                     "moreResults": "{total} 個中 {shown} 個のEggを表示しています。絞り込むには入力を続けてください。",
                     "installingInto": "Eggは **{nest}** にインストールされます。",
                     "noEggs": "まだ利用可能なEggがありません。「Eggリポジトリ」でリポジトリを追加すると、自動的に同期されます。",
-                    "button": "インストール",
                     "buttonSelect": "インストールして選択"
                   }
                 },
@@ -4589,8 +4442,7 @@
                   "typePublicHost": "パブリックホスト",
                   "typePublicPort": "パブリックポート",
                   "memoryDescription": "このホスト上のデータベースインスタンスが利用できる総メモリ容量。",
-                  "diskDescription": "このホスト上のデータベースインスタンスが利用できる総ディスク容量。",
-                  "unlimitedTooltip": "0 に設定すると無制限になります。"
+                  "diskDescription": "このホスト上のデータベースインスタンスが利用できる総ディスク容量。"
                 },
                 "alert": {
                   "urlMissingPort": "ポートが指定されていません。パネルはポート {port} でこのホストに接続します。データベースエージェントはデフォルトでポート {agentPort} をリッスンするため、ポート {port} のリバースプロキシがエージェントに転送する場合を除き、URLにポート番号を追加してください。"
@@ -4645,10 +4497,7 @@
             "backups": {
               "title": "バックアップ",
               "page": {
-                "title": "データベースエージェントホストのバックアップ",
-                "toast": {
-                  "downloadStarted": "ダウンロードを開始しました。"
-                }
+                "title": "データベースエージェントホストのバックアップ"
               }
             },
             "configuration": {
@@ -4678,8 +4527,7 @@
                 },
                 "button": {
                   "save": "設定を保存",
-                  "reveal": "設定を表示",
-                  "verify": "接続を検証"
+                  "reveal": "設定を表示"
                 },
                 "alert": {
                   "couldNotReach": "データベースエージェントホストと通信できませんでした: {error}",
@@ -4692,8 +4540,7 @@
                 },
                 "toast": {
                   "applied": "設定が正常に適用されました。",
-                  "submittedNotApplied": "設定は送信されましたが、適用されませんでした。",
-                  "invalidYaml": "無効なYAMLです: {error}"
+                  "submittedNotApplied": "設定は送信されましたが、適用されませんでした。"
                 }
               }
             },
@@ -4701,12 +4548,6 @@
               "title": "概要",
               "page": {
                 "title": "データベースエージェントホストの概要",
-                "status": {
-                  "deploymentEnabled": "デプロイ有効",
-                  "deploymentDisabled": "デプロイ無効",
-                  "maintenanceEnabled": "メンテナンス有効",
-                  "maintenanceDisabled": "メンテナンス無効"
-                },
                 "card": {
                   "hostDetails": "ホストの詳細",
                   "systemInfo": "システム情報",
@@ -4729,9 +4570,6 @@
                   "unlimitedInstances": "{instances}、上限なし",
                   "overallocated": "{size} 超過割り当て",
                   "noAllocations": "このリソースを割り当てているインスタンスはありません。"
-                },
-                "badge": {
-                  "updateAvailable": "アップデート可能"
                 }
               }
             },
@@ -4743,7 +4581,6 @@
                   "graphs": "グラフ"
                 },
                 "label": {
-                  "cpuThreads": "{model} ({threads} スレッド)",
                   "memory": "メモリ",
                   "usedByAgent": "エージェント使用量: {size}",
                   "disk": "ディスク",
@@ -4754,9 +4591,7 @@
                   "diskIo": "ディスク I/O",
                   "diskRead": "ディスク読み込み",
                   "diskWrite": "ディスク書き込み",
-                  "networkTraffic": "ネットワークトラフィック",
-                  "inbound": "受信",
-                  "outbound": "送信"
+                  "networkTraffic": "ネットワークトラフィック"
                 },
                 "toast": {
                   "connectionLost": "データベースエージェントホストへの接続が切断されました。"
@@ -4772,9 +4607,6 @@
               },
               "toast": {
                 "applied": "{hosts} に設定を適用しました。"
-              },
-              "error": {
-                "invalidYaml": "無効なYAMLです: {error}"
               }
             }
           }
@@ -4783,8 +4615,7 @@
           "title": "データベースエージェントテンプレート",
           "resourceName": "データベースエージェントテンプレート",
           "dropzone": {
-            "title": "ここにファイルをドロップしてデータベースエージェントテンプレートとしてインポート",
-            "subtitle": "離すとインポートを開始します"
+            "title": "ここにファイルをドロップしてデータベースエージェントテンプレートとしてインポート"
           },
           "toast": {
             "imported": "データベースエージェントテンプレートをインポートしました。",
@@ -4808,7 +4639,6 @@
                   "imageUid": "イメージ UID",
                   "imageGid": "イメージ GID",
                   "memoryDescription": "データベースコンテナのメモリ上限。",
-                  "memoryTooltip": "0 に設定すると無制限になります。",
                   "swap": "スワップ",
                   "swapDescription": "このデータベースに割り当てるスワップ容量。",
                   "swapTooltip": "-1 に設定すると無制限になります。",
@@ -4843,7 +4673,6 @@
                 "modal": {
                   "applyUpdates": {
                     "title": "テンプレート更新の適用",
-                    "content": "選択した {count} 個のインスタンスに **{name}** の現在の設定をプッシュします。新しい設定を適用するため、インスタンスは再起動されます。ロックされているインスタンスおよびメンテナンスモードのホスト上のインスタンスはスキップされます。",
                     "contentAll": "現在の検索で表示されていないインスタンスを含め、古いバージョンのすべてのインスタンスに **{name}** の現在の設定をプッシュします。新しい設定を適用するため、インスタンスは再起動されます。ロックされているインスタンスおよびメンテナンスモードのホスト上のインスタンスはスキップされます。"
                   }
                 }
@@ -4855,8 +4684,7 @@
           "title": "OAuthプロバイダー",
           "resourceName": "OAuthプロバイダー",
           "dropzone": {
-            "title": "ここにファイルをドロップしてOAuthプロバイダーとしてインポート",
-            "subtitle": "離すとインポートを開始します"
+            "title": "ここにファイルをドロップしてOAuthプロバイダーとしてインポート"
           },
           "table": {
             "columns": {
@@ -4952,9 +4780,6 @@
                   "matcherType": {
                     "none": "なし (常に適用)",
                     "never": "なし (何にも適用しない)",
-                    "and": "AND (すべて一致)",
-                    "or": "OR (いずれか一致)",
-                    "not": "NOT (一致しない)",
                     "scopes": "付与されたスコープ",
                     "fieldExists": "フィールドが存在する",
                     "fieldEquals": "フィールドが一致する",
@@ -4968,18 +4793,9 @@
                   "updated": "OAuthプロバイダーマッピングを更新しました。",
                   "deleted": "OAuthプロバイダーマッピングを削除しました。"
                 },
-                "button": {
-                  "addMatcher": "マッチャーを追加"
-                },
-                "matcher": {
-                  "allMustMatch": "すべてのマッチャーに一致:",
-                  "anyMustMatch": "いずれかのマッチャーに一致:",
-                  "mustNotMatch": "マッチャーに一致しない:"
-                },
                 "form": {
                   "matcher": "マッチャー",
                   "matcherDescription": "このプロバイダーでログインするユーザーにこのマッピングを適用するかどうかを決定します。",
-                  "matcherType": "マッチャータイプ",
                   "scopes": "スコープ",
                   "scopesDescription": "このマッチャーが一致するために、すべて付与されている必要があるOAuthスコープ。",
                   "source": "ソース",
@@ -4991,7 +4807,6 @@
                   "startsWith": "前方一致",
                   "endsWith": "後方一致",
                   "revokeUnmatched": "不一致時に取り消す",
-                  "revokeUnmatchedDescription": "以降のログインでマッチャーが一致しなくなった場合、割り当てられたロールまたはサーバーサブユーザーを再度削除します。",
                   "mappingType": "マッピングタイプ",
                   "role": "ロール",
                   "permissions": "権限"
@@ -5167,10 +4982,7 @@
             "backups": {
               "title": "バックアップ",
               "page": {
-                "title": "バックアップ設定のバックアップ",
-                "toast": {
-                  "downloadStarted": "ダウンロードを開始しました。"
-                }
+                "title": "バックアップ設定のバックアップ"
               }
             },
             "locations": {
@@ -5245,10 +5057,7 @@
             "backups": {
               "title": "バックアップ",
               "page": {
-                "title": "システムバックアップポリシーのバックアップ",
-                "toast": {
-                  "downloadStarted": "ダウンロードを開始しました。"
-                }
+                "title": "システムバックアップポリシーのバックアップ"
               }
             },
             "locations": {
@@ -5264,8 +5073,7 @@
                     "title": "ロケーションを追加"
                   },
                   "remove": {
-                    "title": "ロケーション削除の確認",
-                    "content": "本当に **{policy}** から **{name}** を削除しますか？"
+                    "title": "ロケーション削除の確認"
                   }
                 }
               }
@@ -5283,8 +5091,7 @@
                     "title": "ノードを追加"
                   },
                   "remove": {
-                    "title": "ノード削除の確認",
-                    "content": "本当に **{policy}** から **{name}** を削除しますか？"
+                    "title": "ノード削除の確認"
                   }
                 }
               }
@@ -5302,8 +5109,7 @@
                     "title": "データベースエージェントホストを追加"
                   },
                   "remove": {
-                    "title": "データベースエージェントホスト削除の確認",
-                    "content": "本当に **{policy}** から **{name}** を削除しますか？"
+                    "title": "データベースエージェントホスト削除の確認"
                   }
                 }
               }
@@ -5321,8 +5127,7 @@
                     "title": "サーバーを追加"
                   },
                   "remove": {
-                    "title": "サーバー削除の確認",
-                    "content": "本当に **{policy}** から **{name}** を削除しますか？"
+                    "title": "サーバー削除の確認"
                   }
                 }
               }
@@ -5361,8 +5166,7 @@
                     "title": "マウントEggを追加"
                   },
                   "remove": {
-                    "title": "マウントEgg削除の確認",
-                    "content": "本当に **{name}** からマウント **{mount}** を削除しますか？"
+                    "title": "マウントEgg削除の確認"
                   }
                 }
               }
@@ -5380,8 +5184,7 @@
                     "title": "マウントノードを追加"
                   },
                   "remove": {
-                    "title": "マウントノード削除の確認",
-                    "content": "本当に **{name}** からマウント **{mount}** を削除しますか？"
+                    "title": "マウントノード削除の確認"
                   }
                 }
               }
@@ -5428,8 +5231,7 @@
                     "title": "デバイスEggを追加"
                   },
                   "remove": {
-                    "title": "デバイスEgg削除の確認",
-                    "content": "本当に **{name}** からデバイス **{device}** を削除しますか？"
+                    "title": "デバイスEgg削除の確認"
                   }
                 }
               }
@@ -5447,8 +5249,7 @@
                     "title": "デバイスノードを追加"
                   },
                   "remove": {
-                    "title": "デバイスノード削除の確認",
-                    "content": "本当に **{name}** からデバイス **{device}** を削除しますか？"
+                    "title": "デバイスノード削除の確認"
                   }
                 }
               }
@@ -5621,8 +5422,7 @@
             }
           },
           "stats": {
-            "offline": "サーバーはオフラインです",
-            "connecting": "接続中…"
+            "offline": "サーバーはオフラインです"
           },
           "socketConnected": "接続済み (ping: {ping}ms)",
           "socketDisconnected": "切断されました"
@@ -5663,19 +5463,12 @@
             "searchPlaceholder": "ファイルを検索…",
             "noSearchResults": "一致するファイルがありません",
             "upload": "アップロード",
-            "uploadFromComputer": "コンピューターからアップロード",
-            "uploadFromUrl": "URLからアップロード",
             "selectItem": "{name} を選択",
             "deselectItem": "{name} の選択を解除",
             "selectFileToOpen": "ツリーからファイルを選択して開きます。",
             "noEditorAvailable": "このファイルタイプで利用可能なエディタがありません。",
             "editorTabsLabel": "開いているファイル",
             "closeEditorTab": "{name} を閉じる",
-            "closeOtherTabs": "他のタブを閉じる",
-            "closeTabsToRight": "右側のタブを閉じる",
-            "closeSavedTabs": "保存済みのタブを閉じる",
-            "closeAllTabs": "すべてのタブを閉じる",
-            "revealInTree": "ツリー内で表示",
             "revealNotFound": "ファイルツリー内に {path} が見つかりませんでした。",
             "unsavedTab": "{name} には未保存の変更があります",
             "resizeEditorPanes": "エディタペインのサイズを変更",
@@ -5810,8 +5603,7 @@
             "cancelAllOperations": "すべての操作をキャンセル"
           },
           "dropzone": {
-            "title": "ここにファイルまたはフォルダーをドロップしてアップロード",
-            "subtitle": "離すとアップロードを開始します"
+            "title": "ここにファイルまたはフォルダーをドロップしてアップロード"
           },
           "settings": {
             "clickOnce": "シングルクリックでファイルまたはフォルダーを開く",
@@ -5839,7 +5631,6 @@
             "filesMoved": "{files} を移動しました。",
             "moveUndone": "{files} の移動を取り消しました。",
             "moveCouldNotBeUndone": "移動を取り消せませんでした。",
-            "downloadStarted": "ダウンロードを開始しました。",
             "filesDeleted": "ファイルを削除しました。",
             "filesTrashed": "{files} をごみ箱へ移動しました。",
             "filesTrashedPartiallyDeleted": "{files} をごみ箱へ移動し、{deleted} 件を完全に削除しました。",
@@ -5897,10 +5688,6 @@
                 "restore": "このリビジョンをエディタに復元",
                 "viewDiff": "現在のファイルとの差分を表示",
                 "compareToPrevious": "前のリビジョンと比較"
-              },
-              "diff": {
-                "original": "リビジョン",
-                "current": "現在"
               }
             }
           },
@@ -5933,8 +5720,7 @@
               },
               "restoreTo": {
                 "title": "ディレクトリを指定して復元",
-                "destination": "復元先ディレクトリ",
-                "restoredAs": "このファイルは次の名前で復元されます "
+                "destination": "復元先ディレクトリ"
               },
               "restoreConflict": {
                 "title": "復元の競合を解決",
@@ -5973,28 +5759,22 @@
               "contentHashMismatch": "下書きが保存されてから、サーバー上のファイルが更新されています。下書きを復元するとそれらの変更が上書きされる可能性があります。"
             },
             "extractFile": {
-              "title": "アーカイブを展開",
-              "extractedTo": "{file} の内容は次の場所に展開されます "
+              "title": "アーカイブを展開"
             },
             "createArchive": {
               "title": "アーカイブを作成",
               "form": {
                 "format": "形式"
-              },
-              "createdAs": "このアーカイブは次の名前で作成されます "
+              }
             },
             "createDirectory": {
-              "title": "ディレクトリを作成",
-              "createdAs": "このディレクトリは次の名前で作成されます "
+              "title": "ディレクトリを作成"
             },
             "createSymlink": {
-              "title": "シンボリックリンクを作成",
-              "createdAs": "このシンボリックリンクは次の名前で作成されます ",
-              "pointsTo": "リンク先: "
+              "title": "シンボリックリンクを作成"
             },
             "copyFile": {
               "title": "ファイルをコピー",
-              "createdAs": "このファイルは次の名前で作成されます ",
               "conflict": "コピー先に同名のファイルがすでに存在します。"
             },
             "copyConflict": {
@@ -6014,8 +5794,7 @@
               "servers": "コピー先サーバー",
               "addFromGroup": "グループからサーバーを追加",
               "browsingOn": "{server} を閲覧中。選択したパスが各コピー先サーバーで使用されます。",
-              "noCreatePermission": "{servers} 上にファイルを作成する権限がありません。",
-              "createdAs": "これらのファイルは {servers} の次の場所に作成されます "
+              "noCreatePermission": "{servers} 上にファイルを作成する権限がありません。"
             },
             "fileFingerprints": {
               "title": "ファイルのフィンガープリント",
@@ -6125,7 +5904,6 @@
               "title": "大容量ディレクトリ",
               "empty": "ディレクトリが見つかりませんでした。",
               "files": "このフォルダー内のファイル",
-              "smallerFolders": "{count} 個の小さなフォルダー",
               "inaccessible": "アクセス不可",
               "openFolder": "フォルダーを開く",
               "noSubdirectories": "このフォルダーは {size} を使用しており、大きなサブディレクトリはありません。"
@@ -6155,7 +5933,6 @@
                 "fileUrl": "ファイルのURL",
                 "query": "クエリ"
               },
-              "createdAs": "このファイルは次の名前で作成されます ",
               "pull": "取得"
             },
             "sftpDetails": {
@@ -6172,15 +5949,11 @@
         },
         "databases": {
           "title": "データベース",
-          "subtitle": "最大 {max} 個中 {current} 個のデータベースが作成されています。",
           "empty": {
             "title": "データベースがありません",
             "description": "このサーバーにはデータを保存するデータベースがありません。データベースを作成すると、接続先のアドレス、ユーザー名、パスワードが取得できます。",
             "descriptionReadOnly": "このサーバーにはデータを保存するデータベースがありません。",
             "descriptionUnavailable": "このサーバーにはデータを保存するデータベースがありません。利用可能なデータベースホストがないため、現時点では作成できません。"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに作成できるデータベースは最大{max}個です。"
           },
           "table": {
             "columns": {
@@ -6354,7 +6127,6 @@
           },
           "instance": {
             "title": "マネージドデータベース",
-            "updateAvailable": "アップデートあり",
             "empty": {
               "title": "マネージドデータベースがありません",
               "description": "このサーバーでは専用のデータベースが稼働していません。マネージドデータベースを作成すると、専用のリソース、ユーザー、バックアップを備えたデータベースを利用できます。",
@@ -6365,9 +6137,6 @@
               "applyUpdate": "アップデートを適用",
               "createFirstInstance": "マネージドデータベースを作成"
             },
-            "tooltip": {
-              "limitReached": "このサーバーに作成できるマネージドデータベースは最大{max}個です。"
-            },
             "view": {
               "tabs": {
                 "databases": "データベース",
@@ -6376,18 +6145,15 @@
                 "logs": "ログ"
               },
               "stats": {
-                "connecting": "接続中…",
                 "offline": "インスタンスはオフラインです"
               },
               "connectionLost": "データベースインスタンスへの接続が切断されました。"
             },
             "databases": {
               "title": "データベース",
-              "subtitle": "最大 {max} 個中 {current} 個のデータベースが作成されています。",
               "tooltip": {
                 "offline": "データベースを作成するにはインスタンスが実行中である必要があります。",
-                "noUser": "このデータベースにはまだユーザーが関連付けられていません。アクセスするにはユーザーを作成してください。",
-                "limitReached": "このインスタンスに作成できるデータベースは最大{max}個です。"
+                "noUser": "このデータベースにはまだユーザーが関連付けられていません。アクセスするにはユーザーを作成してください。"
               },
               "button": {
                 "remoteImport": "リモートからインポート"
@@ -6434,11 +6200,6 @@
                   "content": "データベースを再作成すると、**{name}** データベース内のすべてのデータが完全に削除され、同じ名前とユーザー権限を持つ新しい空のデータベースが作成されます。"
                 }
               },
-              "table": {
-                "columns": {
-                  "database": "データベース"
-                }
-              },
               "toast": {
                 "created": "データベースを作成しました。",
                 "deleted": "データベースを削除しました。",
@@ -6450,13 +6211,11 @@
             },
             "users": {
               "title": "ユーザー",
-              "subtitle": "最大 {max} 人中 {current} 人のユーザーが作成されています。",
               "button": {
                 "permissions": "権限"
               },
               "tooltip": {
-                "offline": "ユーザーを作成するにはインスタンスが実行中である必要があります。",
-                "limitReached": "このインスタンスのユーザー数は最大{max}人です。"
+                "offline": "ユーザーを作成するにはインスタンスが実行中である必要があります。"
               },
               "enum": {
                 "permission": {
@@ -6468,11 +6227,6 @@
               "form": {
                 "databases": "データベースアクセス権",
                 "noDatabases": "このインスタンスにはまだデータベースがありません。"
-              },
-              "table": {
-                "columns": {
-                  "databases": "データベース"
-                }
               },
               "modal": {
                 "createUser": {
@@ -6534,7 +6288,6 @@
             },
             "backups": {
               "title": "バックアップ",
-              "subtitle": "このサーバーの最大 {max} 個中 {current} 個のバックアップが作成されています。上限はサーバーバックアップと共有されます。",
               "badge": {
                 "restoring": "バックアップ復元中"
               },
@@ -6542,7 +6295,6 @@
                 "restoring": "このマネージドデータベースにバックアップを復元中です。しばらくお待ちください…"
               },
               "tooltip": {
-                "limitReached": "このサーバーに保存できるバックアップは最大{max}個で、サーバーとデータベースのバックアップで上限を共有します。",
                 "offline": "バックアップを取得するにはマネージドデータベースが実行中である必要があります。",
                 "restoring": "このマネージドデータベースにバックアップを復元中です。"
               },
@@ -6675,18 +6427,10 @@
         },
         "schedules": {
           "title": "スケジュール",
-          "subtitle": "最大 {max} 個中 {current} 個のスケジュールが作成されています。",
-          "dropzone": {
-            "title": "ここにファイルをドロップしてスケジュールとしてインポート",
-            "subtitle": "離すとインポートを開始します"
-          },
           "empty": {
             "title": "スケジュールがありません",
             "description": "このサーバーでは自動実行されるタスクはありません。スケジュールを追加すると、タイマーまたはイベントに応じてコマンドやバックアップなどを自動実行できます。",
             "descriptionReadOnly": "このサーバーでは自動実行されるタスクはありません。"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに登録できるスケジュールは最大{max}個です。"
           },
           "table": {
             "columns": {
@@ -6767,12 +6511,10 @@
               "truncatedWarning": "カレンダーの応答性を維持するため、一部の予定は省略されています。"
             },
             "deleteSchedules": {
-              "title": "スケジュール削除の確認",
-              "content": "このサーバーから **{schedules}** を削除してもよろしいですか？"
+              "title": "スケジュール削除の確認"
             },
             "deleteSchedule": {
-              "title": "スケジュール削除の確認",
-              "content": "このサーバーから **{name}** を削除してもよろしいですか？"
+              "title": "スケジュール削除の確認"
             },
             "createStep": {
               "title": "スケジュールステップを作成"
@@ -6966,9 +6708,6 @@
             }
           },
           "steps": {
-            "tooltip": {
-              "limitReached": "このスケジュールに設定できるステップは最大{max}個です。"
-            },
             "empty": {
               "descriptionReadOnly": "このスケジュールは実行時に何もしません。",
               "title": "ステップが設定されていません",
@@ -7236,8 +6975,7 @@
               "renderer": {
                 "compact": "{root} 内に {name} を作成",
                 "detail": {
-                  "directory": "ディレクトリ: {name}",
-                  "root": "ルート: {root}"
+                  "directory": "ディレクトリ: {name}"
                 }
               }
             },
@@ -7250,7 +6988,6 @@
               "renderer": {
                 "compact": "{file} に書き込み",
                 "detail": {
-                  "file": "ファイル: {file}",
                   "append": "追記: {value}"
                 }
               }
@@ -7281,8 +7018,6 @@
                 "compact": "{files} を削除",
                 "compactTrash": "{files} をごみ箱へ移動",
                 "detail": {
-                  "root": "ルート: {root}",
-                  "files": "ファイル: {files}",
                   "trash": "ごみ箱へ移動: {value}"
                 }
               }
@@ -7296,11 +7031,7 @@
                 "to": "変更後"
               },
               "renderer": {
-                "compact": "{files} の名前を変更",
-                "detail": {
-                  "root": "ルート: {root}",
-                  "files": "ファイル: {files}"
-                }
+                "compact": "{files} の名前を変更"
               }
             },
             "compressFiles": {
@@ -7313,9 +7044,7 @@
                 "compact": "{root} 内の {files} を {name} に圧縮",
                 "detail": {
                   "output": "出力先: {name}",
-                  "root": "ルート: {root}",
-                  "format": "形式: {format}",
-                  "files": "ファイル: {files}"
+                  "format": "形式: {format}"
                 }
               }
             },
@@ -7326,11 +7055,7 @@
                 "file": "ファイル"
               },
               "renderer": {
-                "compact": "{file} を {root} に展開",
-                "detail": {
-                  "file": "ファイル: {file}",
-                  "root": "ルート: {root}"
-                }
+                "compact": "{file} を {root} に展開"
               }
             },
             "pullFile": {
@@ -7343,7 +7068,6 @@
               "renderer": {
                 "compact": "{url} を {root} に取得",
                 "detail": {
-                  "root": "ルート: {root}",
                   "fileName": "ファイル名: {fileName}",
                   "useHeader": "レスポンスのファイル名を使用: {value}"
                 }
@@ -7411,7 +7135,6 @@
         },
         "subusers": {
           "title": "サブユーザー",
-          "subtitle": "最大 {max} 人中 {current} 人のサブユーザーが作成されています。",
           "empty": {
             "title": "サブユーザーはいません",
             "description": "他のユーザーにはこのサーバーへのアクセス権が付与されていません。サブユーザーを追加して、指定した権限のみを共有できます。",
@@ -7419,9 +7142,6 @@
           },
           "button": {
             "createFirstSubuser": "サブユーザーを作成"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに登録できるサブユーザーは最大{max}人です。"
           },
           "table": {
             "columns": {
@@ -7450,12 +7170,10 @@
               }
             },
             "removeSubusers": {
-              "title": "サブユーザー削除の確認",
-              "content": "このサーバーから **{subusers}** を削除してもよろしいですか？"
+              "title": "サブユーザー削除の確認"
             },
             "removeSubuser": {
               "title": "サブユーザー削除の確認",
-              "content": "このサーバーから **{username}** を削除してもよろしいですか？",
               "toast": {
                 "removed": "サブユーザーを削除しました。"
               }
@@ -7464,15 +7182,10 @@
         },
         "backups": {
           "title": "バックアップ",
-          "subtitle": "最大 {max} 個中 {current} 個のバックアップが作成されています。",
-          "subtitleWithDatabase": "最大 {max} 個中 {current} 個のバックアップが作成されています (サーバー {server} 個、データベース {database} 個)。",
           "empty": {
             "title": "バックアップがありません",
             "description": "トラブルが発生した場合、復元できるものがありません。バックアップを作成して、後で復元できるコピーを保持してください。",
             "descriptionReadOnly": "トラブルが発生した場合、復元できるものがありません。"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに保存できるバックアップは最大{max}個です。"
           },
           "table": {
             "columns": {
@@ -7482,7 +7195,6 @@
             }
           },
           "badge": {
-            "deleting": "削除中…",
             "deleteFailed": "削除失敗",
             "sourceDeleted": "{name} (削除済み)"
           },
@@ -7497,7 +7209,6 @@
             "unlock": "ロック解除"
           },
           "toast": {
-            "downloadStarted": "ダウンロードを開始しました。",
             "restoringBackup": "バックアップを復元中…",
             "exportStarted": "バックアップのエクスポートを開始しました。",
             "locked": "バックアップをロックしました。",
@@ -7529,14 +7240,12 @@
             },
             "deleteBackups": {
               "title": "バックアップ削除の確認",
-              "content": "このサーバーから **{backups}** を削除してもよろしいですか？",
               "alert": {
                 "skipped": "{backups} はスキップされます。ロックされているバックアップ、完了していないバックアップ、およびすでに削除中のバックアップは削除できません。"
               }
             },
             "deleteBackup": {
               "title": "バックアップ削除の確認",
-              "content": "このサーバーから **{name}** を削除してもよろしいですか？",
               "toast": {
                 "started": "バックアップの削除を開始しました。",
                 "deleted": "バックアップを削除しました。"
@@ -7586,12 +7295,8 @@
         },
         "network": {
           "title": "ネットワーク",
-          "subtitle": "最大 {max} 個中 {current} 個の割り当てが設定されています。",
           "allocations": {
             "title": "割り当て"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに設定できる割り当ては最大{max}個です。"
           },
           "table": {
             "columns": {
@@ -7609,14 +7314,12 @@
           "modal": {
             "removeAllocations": {
               "title": "割り当て削除の確認",
-              "content": "このサーバーから **{allocations}** を削除してもよろしいですか？",
               "alert": {
                 "skipped": "{allocations} はスキップされます。プライマリ割り当ては削除できません。"
               }
             },
             "removeAllocation": {
-              "title": "割り当て削除の確認",
-              "content": "このサーバーから **{allocation}** を削除してもよろしいですか？"
+              "title": "割り当て削除の確認"
             }
           }
         },
@@ -7624,8 +7327,7 @@
           "title": "ファイアウォール",
           "subtitle": "ルールは上から下へ順に評価され、最初に一致したルールが適用されます。",
           "dropzone": {
-            "title": "ここにファイルをドロップしてファイアウォールルールとしてインポート",
-            "subtitle": "離すとインポートを開始します"
+            "title": "ここにファイルをドロップしてファイアウォールルールとしてインポート"
           },
           "empty": {
             "title": "ファイアウォールルールがありません",
@@ -7636,9 +7338,6 @@
             "createFirstRule": "ルールを作成",
             "addRule": "ルールを追加",
             "addDenyAll": "その他すべてを拒否"
-          },
-          "tooltip": {
-            "limitReached": "このサーバーに登録できるファイアウォールルールは最大{max}個です。"
           },
           "rule": {
             "anySource": "すべての送信元",
@@ -7727,16 +7426,7 @@
             "join": "プライベートネットワークに参加",
             "leave": "プライベートネットワークから離脱",
             "connect": "サーバーを接続",
-            "addPort": "ポートを追加",
-            "editPorts": "提供ポート"
-          },
-          "action": {
-            "rename": "ホスト名を変更",
-            "editPorts": "提供ポートを編集",
-            "removeOutgoing": "このサーバーへの接続を停止",
-            "removeIncoming": "このサーバーからの接続を停止",
-            "grantOutgoing": "このサーバーからの接続を許可",
-            "grantIncoming": "このサーバーへの接続を許可"
+            "addPort": "ポートを追加"
           },
           "canvas": {
             "hint": "接続をクリックして方向の有効/無効を切り替えます。ドラッグして移動、Ctrlを押しながらスクロールでズーム、またはタッチスクリーンでピンチ操作できます。",
@@ -7765,8 +7455,7 @@
             }
           },
           "tooltip": {
-            "nodeNotOnNetwork": "このサーバーが稼働しているノードはプライベートネットワークに参加していません。",
-            "connectionLimitReached": "このサーバーからの発信接続は最大{max}件です。"
+            "nodeNotOnNetwork": "このサーバーが稼働しているノードはプライベートネットワークに参加していません。"
           },
           "alert": {
             "nodeNotOnNetwork": "このサーバーが稼働しているノードは **プライベートネットワークに参加していない** ため、参加できません。管理者にノードの有効化を依頼してください。",
@@ -7777,9 +7466,7 @@
             "name": "ホスト名",
             "nameDescription": "英小文字、数字、ハイフンのみ、最大63文字。一つのサーバーから、同じホスト名を持つ二つのサーバーに接続することはできません。",
             "namePlaceholder": "空にしてサーバー名から自動生成",
-            "port": "ポート",
             "protocols": "プロトコル",
-            "server": "サーバー",
             "serverDescription": "プライベートネットワークにすでに参加しているサーバーのみが一覧表示されます。"
           },
           "toast": {

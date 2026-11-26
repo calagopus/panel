@@ -161,8 +161,7 @@
       "alert": {
         "error": "Erreur",
         "warning": "Avertissement",
-        "success": "Succès",
-        "clockOffset": "L'horloge de votre système est désynchronisée de plus de 5 secondes par rapport au serveur. Cela peut causer des problèmes avec l'authentification par clé d'accès et l'authentification à deux facteurs. Veuillez synchroniser votre horloge si des problèmes surviennent. Décalage actuel : {offset} seconde(s)."
+        "success": "Succès"
       },
       "divider": {
         "or": "OU"
@@ -426,12 +425,6 @@
           "unlessStopped": "Sauf si arrêté",
           "never": "Jamais"
         },
-        "bulkActionServerAction": {
-          "started": "Démarré",
-          "stopped": "Arrêté",
-          "restarted": "Redémarré",
-          "killed": "Tué"
-        },
         "compressionLevel": {
           "bestSpeed": "Vitesse maximale",
           "goodSpeed": "Bonne vitesse",
@@ -478,7 +471,6 @@
         "dividerPlaceholder": "Libellé du séparateur (optionnel)",
         "redirectNamePlaceholder": "Nom de la redirection",
         "destinationPlaceholder": "URL de destination (ex. https://...)",
-        "selectRoutePlaceholder": "Sélectionner une route…",
         "button": {
           "addDivider": "Ajouter un séparateur",
           "addRedirect": "Ajouter une redirection"
@@ -676,8 +668,6 @@
         }
       },
       "fileUpload": {
-        "waiting": "En attente : {file}",
-        "uploading": "Téléversement : {file}",
         "uploadingFolder": "Téléversement du dossier : {folder} ({files} fichiers)",
         "badge": {
           "uploading": "Téléversement",
@@ -776,10 +766,7 @@
             "connectionError": "Quelque chose s'est mal passé. Erreur de connexion."
           },
           "successMessage": "La connexion à votre nœud a été vérifiée avec succès. Vous pouvez maintenant continuer.",
-          "configurationDescription": "Placez ceci dans le fichier de configuration à `{file}` ou exécutez :",
-          "button": {
-            "verify": "Vérifier la connexion"
-          }
+          "configurationDescription": "Placez ceci dans le fichier de configuration à `{file}` ou exécutez :"
         },
         "configuration": {
           "title": "Paramètres d'application",
@@ -820,8 +807,7 @@
             "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
           },
           "server": {
-            "title": "Serveur",
-            "nestDescription": "Pour commencer à utiliser cet Egg, vous devrez créer un Nest ; les Nests sont des collections d'Eggs. Donnez-lui un nom :"
+            "title": "Serveur"
           },
           "error": {
             "noNodes": "Quelque chose s'est mal passé. Aucun nœud trouvé."
@@ -841,8 +827,7 @@
               "subtitle": "Paramètres et préférences du panel configurés"
             },
             "eggRepositories": {
-              "title": "Dépôts d'Eggs",
-              "subtitle": "{count} dépôts"
+              "title": "Dépôts d'Eggs"
             },
             "location": "Emplacement",
             "node": "Nœud",
@@ -1011,17 +996,12 @@
                   },
                   "deleteServerGroup": {
                     "title": "Confirmer la suppression du groupe de serveur",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{group}** de votre compte ?",
                     "toast": {
                       "deleted": "Groupe de serveur supprimé."
                     }
                   },
-                  "addServerToGroup": {
-                    "noServers": "Tous les serveurs sont déjà dans ce groupe."
-                  },
                   "removeServerFromGroup": {
                     "title": "Confirmer le retrait du serveur",
-                    "content": "Êtes-vous sûr de vouloir retirer **{server}** de **{group}** ?",
                     "toast": {
                       "removed": "Serveur retiré du groupe."
                     }
@@ -1034,8 +1014,7 @@
                       "description": "Ce serveur fait déjà partie de {group}."
                     },
                     "groupFull": {
-                      "title": "Groupe plein",
-                      "description": "Un groupe ne peut pas tenir plus de {max} serveurs."
+                      "title": "Groupe plein"
                     }
                   },
                   "toast": {
@@ -1062,11 +1041,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Mode de sélection",
             "select": "Sélectionner serveur",
             "deselect": "Désélectionner serveur",
-            "success": "{action} {servers} avec succès.",
-            "partial": "{action} {successfulServers} avec succès. {failedServers} ont échoué.",
             "groupActions": "Actions de groupe"
           }
         },
@@ -1153,15 +1129,13 @@
         },
         "securityKeys": {
           "title": "Clés de sécurité",
-          "subtitle": "{current} sur {max} clés de sécurité maximum créées.",
           "table": {
             "columns": {
               "credentialId": "ID d'identifiant"
             }
           },
           "tooltip": {
-            "secureContextRequired": "Un contexte sécurisé (HTTPS) est requis pour utiliser les clés de sécurité.",
-            "limitReached": "Vous êtes limité à {max} clés de sécurité."
+            "secureContextRequired": "Un contexte sécurisé (HTTPS) est requis pour utiliser les clés de sécurité."
           },
           "modal": {
             "createSecurityKey": {
@@ -1179,7 +1153,6 @@
             },
             "deleteSecurityKey": {
               "title": "Confirmer la suppression de la clé de sécurité",
-              "content": "Êtes-vous sûr de vouloir supprimer **{key}** de votre compte ?",
               "toast": {
                 "deleted": "Clé de sécurité supprimée avec succès."
               }
@@ -1256,17 +1229,10 @@
             "searchContent": "Rechercher dans la sortie console",
             "previousCommand": "Commande précédente dans l'historique",
             "nextCommand": "Commande suivante dans l'historique"
-          },
-          "serverList": {
-            "selectServer": "Gardez appuyé S et cliquez pour (dé)sélectionner serveur"
           }
         },
         "sshKeys": {
           "title": "Clés SSH",
-          "subtitle": "{current} sur {max} clés SSH maximum créées.",
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} clés SSH."
-          },
           "table": {
             "columns": {
               "fingerprint": "Empreinte"
@@ -1299,7 +1265,6 @@
             },
             "deleteSshKey": {
               "title": "Confirmer la suppression de la clé SSH",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
               "toast": {
                 "removed": "Clé SSH supprimée."
               }
@@ -1308,10 +1273,6 @@
         },
         "commandSnippets": {
           "title": "Extraits de commande",
-          "subtitle": "{current} sur {max} extraits de commande maximum créés.",
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} extraits de commande."
-          },
           "modal": {
             "createCommandSnippet": {
               "title": "Créer un extrait de commande",
@@ -1327,7 +1288,6 @@
             },
             "deleteCommandSnippet": {
               "title": "Confirmer la suppression de l'extrait de commande",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
               "toast": {
                 "removed": "Extrait de commande supprimé."
               }
@@ -1357,13 +1317,9 @@
         },
         "apiKeys": {
           "title": "Clés API",
-          "subtitle": "{current} sur {max} clés API maximum créées.",
           "button": {
             "apiDocumentation": "Documentation API",
             "copyUuid": "Copier l'UUID"
-          },
-          "tooltip": {
-            "limitReached": "Vous êtes limité à {max} clés API."
           },
           "table": {
             "columns": {
@@ -1394,7 +1350,6 @@
             },
             "deleteApiKey": {
               "title": "Confirmer la suppression de la clé API",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de votre compte ?",
               "toast": {
                 "removed": "Clé API supprimée."
               }
@@ -1521,7 +1476,6 @@
                 "table": {
                   "packageName": "Nom du paquet",
                   "applied": "Appliquées",
-                  "id": "Identifiant",
                   "desync": "Désync"
                 },
                 "button": {
@@ -1543,7 +1497,6 @@
               "page": {
                 "title": "Paramètres de l'application",
                 "form": {
-                  "icon": "Icône",
                   "iconLight": "Icône (mode clair)",
                   "banner": "Bannière",
                   "bannerLight": "Bannière (mode clair)",
@@ -1799,8 +1752,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Confirmer la suppression de l'annonce",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{title}** ?"
+                    "title": "Confirmer la suppression de l'annonce"
                   }
                 },
                 "form": {
@@ -1836,21 +1788,16 @@
             "upload": "Téléverser",
             "copyLink": "Copier le lien"
           },
-          "dropzone": {
-            "subtitle": "Relâchez pour démarrer le téléversement"
-          },
           "toast": {
             "assetDeleted": "Asset supprimé.",
             "assetsDeleted": "{assets} supprimés."
           },
           "modal": {
             "createDirectory": {
-              "title": "Nouveau répertoire",
-              "createdAs": "Sera créé à "
+              "title": "Nouveau répertoire"
             },
             "deleteAssets": {
-              "title": "Confirmer la suppression des assets",
-              "content": "Êtes-vous sûr de vouloir supprimer `{count}` assets ?"
+              "title": "Confirmer la suppression des assets"
             },
             "deleteAsset": {
               "title": "Supprimer l'asset",
@@ -1962,8 +1909,7 @@
                 },
                 "modal": {
                   "delete": {
-                    "title": "Confirmer la suppression de l'utilisateur",
-                    "content": "Êtes-vous sûr de vouloir supprimer **{username}** ?"
+                    "title": "Confirmer la suppression de l'utilisateur"
                   },
                   "disableTwoFactor": {
                     "title": "Désactiver l'authentification à deux facteurs de l'utilisateur",
@@ -2076,13 +2022,9 @@
             "overview": {
               "page": {
                 "label": {
-                  "none": "Aucun",
                   "memory": "Mémoire",
                   "servers": "Serveurs",
                   "kernelVersion": "Version du Noyau"
-                },
-                "badge": {
-                  "updateAvailable": "Mise à jour disponible"
                 }
               }
             },
@@ -2145,8 +2087,7 @@
                 },
                 "toast": {
                   "applied": "Configuration appliquée avec succès.",
-                  "submittedNotApplied": "La configuration a été soumise mais pas appliquée.",
-                  "invalidYaml": "YAML invalide : {error}"
+                  "submittedNotApplied": "La configuration a été soumise mais pas appliquée."
                 }
               }
             },
@@ -2171,24 +2112,14 @@
                   "diskIo": "E/S disque",
                   "networkTraffic": "Trafic réseau",
                   "diskRead": "Lecture disque",
-                  "diskWrite": "Écriture disque",
-                  "networkInLabel": "Réseau entrant",
-                  "networkOutLabel": "Réseau sortant"
+                  "diskWrite": "Écriture disque"
                 }
               }
             },
             "capacity": {
               "page": {
-                "title": "Capacité de déploiement",
-                "subtitle": "Ressources allouées aux serveurs de ce nœud, mesurées par rapport aux limites configurées dans les paramètres du nœud, et non à la capacité physique de la machine. Le déploiement ne vérifie que la mémoire et le disque.",
                 "card": {
                   "resources": "Ressources allouées"
-                },
-                "status": {
-                  "deploymentEnabled": "Déploiement activé",
-                  "deploymentDisabled": "Déploiement désactivé",
-                  "maintenanceEnabled": "En maintenance",
-                  "maintenanceDisabled": "Pas en maintenance"
                 },
                 "label": {
                   "memory": "Mémoire",
@@ -2270,8 +2201,7 @@
                     "title": "Ajouter un montage au nœud"
                   },
                   "remove": {
-                    "title": "Confirmer le retrait du montage du nœud",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                    "title": "Confirmer le retrait du montage du nœud"
                   }
                 }
               }
@@ -2287,7 +2217,6 @@
                   "backupNotOnSameNode": "Cette sauvegarde n'est pas sur le même nœud que le serveur. Elle n'est pas consultable depuis l'API client."
                 },
                 "toast": {
-                  "downloadStarted": "Téléchargement commencé.",
                   "detached": "Sauvegarde détachée avec succès.",
                   "reattached": "Sauvegarde rattachée à {name} avec succès.",
                   "restoring": "Restauration de la sauvegarde vers {name}..."
@@ -2329,8 +2258,7 @@
                       "started": "Transfert de {servers} démarré."
                     },
                     "confirm": {
-                      "title": "Confirmer les transferts de serveurs",
-                      "content": "Êtes-vous sûr de vouloir transférer `{count}` serveurs de **{from}** vers **{to}** ? Cette action est irréversible."
+                      "title": "Confirmer les transferts de serveurs"
                     },
                     "enum": {
                       "allocationMode": {
@@ -2374,9 +2302,6 @@
               },
               "toast": {
                 "applied": "Configuration appliquée à {nodes}."
-              },
-              "error": {
-                "invalidYaml": "YAML invalide : {error}"
               }
             }
           }
@@ -2459,8 +2384,7 @@
                   "updated": "Allocation mise à jour.",
                   "setPrimary": "Allocation définie comme primaire.",
                   "unsetPrimary": "Statut primaire de l'allocation retiré.",
-                  "removed": "Allocation supprimée.",
-                  "added": "{count} allocations ajoutées."
+                  "removed": "Allocation supprimée."
                 },
                 "modal": {
                   "add": {
@@ -2497,8 +2421,7 @@
                     "title": "Ajouter un montage au serveur"
                   },
                   "remove": {
-                    "title": "Confirmer le retrait du montage du serveur",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                    "title": "Confirmer le retrait du montage du serveur"
                   }
                 }
               }
@@ -2630,8 +2553,7 @@
             "eggs": {
               "page": {
                 "dropzone": {
-                  "title": "Déposez des fichiers ici pour les importer en tant qu'Eggs",
-                  "subtitle": "Relâchez pour démarrer l'importation"
+                  "title": "Déposez des fichiers ici pour les importer en tant qu'Eggs"
                 },
                 "button": {
                   "updateFromRepository": "Mettre à jour depuis le dépôt"
@@ -2647,14 +2569,6 @@
                 "modal": {
                   "move": {
                     "title": "Déplacer l'Egg"
-                  },
-                  "moveBulk": {
-                    "title": "Déplacer les Eggs",
-                    "confirm": "Déplacer {eggs}"
-                  },
-                  "deleteBulk": {
-                    "title": "Confirmer la suppression des Eggs",
-                    "content": "Êtes-vous sûr de vouloir supprimer `{count}` Eggs ?"
                   }
                 },
                 "tabs": {
@@ -2770,8 +2684,7 @@
                           "title": "Ajouter un montage à l'Egg"
                         },
                         "delete": {
-                          "title": "Confirmer le retrait du montage de l'Egg",
-                          "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{egg}** ?"
+                          "title": "Confirmer le retrait du montage de l'Egg"
                         }
                       }
                     }
@@ -2957,8 +2870,7 @@
           "title": "Fournisseurs OAuth",
           "resourceName": "Fournisseur OAuth",
           "dropzone": {
-            "title": "Déposez des fichiers ici pour les importer en tant que fournisseurs OAuth",
-            "subtitle": "Relâchez pour démarrer l'importation"
+            "title": "Déposez des fichiers ici pour les importer en tant que fournisseurs OAuth"
           },
           "table": {
             "columns": {
@@ -3169,10 +3081,7 @@
             "backups": {
               "title": "Sauvegardes",
               "page": {
-                "title": "Sauvegardes de la configuration de sauvegarde",
-                "toast": {
-                  "downloadStarted": "Téléchargement commencé."
-                }
+                "title": "Sauvegardes de la configuration de sauvegarde"
               }
             },
             "locations": {
@@ -3226,8 +3135,7 @@
                     "title": "Ajouter un Egg au montage"
                   },
                   "remove": {
-                    "title": "Confirmer le retrait de l'Egg du montage",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                    "title": "Confirmer le retrait de l'Egg du montage"
                   }
                 }
               }
@@ -3245,8 +3153,7 @@
                     "title": "Ajouter un nœud au montage"
                   },
                   "remove": {
-                    "title": "Confirmer le retrait du nœud du montage",
-                    "content": "Êtes-vous sûr de vouloir retirer le montage **{mount}** de **{name}** ?"
+                    "title": "Confirmer le retrait du nœud du montage"
                   }
                 }
               }
@@ -3450,9 +3357,6 @@
             "receivingRemote": "Réception de {files} depuis serveur distant",
             "sendingRemote": "Envoi de {files} vers serveur distant"
           },
-          "dropzone": {
-            "subtitle": "Relâchez pour démarrer le téléversement"
-          },
           "settings": {
             "clickOnce": "Cliquez une fois pour ouvrir fichier ou dossier",
             "preferPhysicalSize": "Afficher la taille physique au lieu de la taille logique",
@@ -3467,7 +3371,6 @@
             "copyingStarted": "Copie de {files} commencée.",
             "filesCouldNotBeMoved": "Les fichiers n'ont pas pu être déplacés.",
             "filesMoved": "{files} déplacés.",
-            "downloadStarted": "Téléchargement démarré.",
             "filesDeleted": "Les fichiers ont été supprimés.",
             "archiveCreationStarted": "La création de l'archive a commencé.",
             "fileCopyingStarted": "La copie de fichier a commencé.",
@@ -3503,10 +3406,6 @@
                 "restore": "Restaurer cette révision dans l'éditeur",
                 "viewDiff": "Voir les différences avec le fichier actuel",
                 "compareToPrevious": "Comparer à la révision précédente"
-              },
-              "diff": {
-                "original": "Révision",
-                "current": "Actuel"
               }
             }
           },
@@ -3521,16 +3420,13 @@
               "contentHashMismatch": "Le fichier a été modifié sur le serveur depuis l'enregistrement de ce brouillon. Restaurer le brouillon pourrait écraser ces changements."
             },
             "createArchive": {
-              "title": "Créer archive",
-              "createdAs": "Cette archive sera créée en tant que "
+              "title": "Créer archive"
             },
             "createDirectory": {
-              "title": "Créer répertoire",
-              "createdAs": "Ce répertoire sera créé en tant que "
+              "title": "Créer répertoire"
             },
             "copyFile": {
-              "title": "Copier fichier",
-              "createdAs": "Ce fichier sera créé en tant que "
+              "title": "Copier fichier"
             },
             "copyRemote": {
               "title": "Copier des fichiers à distance"
@@ -3655,7 +3551,6 @@
                 "fileUrl": "URL du fichier",
                 "query": "Requête"
               },
-              "createdAs": "Ce fichier sera créé en tant que ",
               "pull": "Récupérer"
             },
             "sftpDetails": {
@@ -3666,10 +3561,6 @@
         },
         "databases": {
           "title": "Bases de données",
-          "subtitle": "{current} de {max} base de données maximum créées.",
-          "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} base de données."
-          },
           "table": {
             "columns": {
               "locked": "Verrouillé ?"
@@ -3724,14 +3615,6 @@
         },
         "schedules": {
           "title": "Planifications",
-          "subtitle": "{current} sur {max} planifications maximum créées.",
-          "dropzone": {
-            "title": "Déposez des fichiers ici pour les importer en tant que planifications",
-            "subtitle": "Relâchez pour démarrer l'importation"
-          },
-          "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} planifications."
-          },
           "table": {
             "columns": {
               "lastRun": "Dernière exécution",
@@ -3976,8 +3859,7 @@
               "renderer": {
                 "compact": "Créer {name} dans {root}",
                 "detail": {
-                  "directory": "Répertoire : {name}",
-                  "root": "Racine : {root}"
+                  "directory": "Répertoire : {name}"
                 }
               }
             },
@@ -3989,7 +3871,6 @@
               "renderer": {
                 "compact": "Écrire dans {file}",
                 "detail": {
-                  "file": "Fichier : {file}",
                   "append": "Ajout : {value}"
                 }
               }
@@ -4013,11 +3894,7 @@
                 "filesToDelete": "Fichiers à supprimer"
               },
               "renderer": {
-                "compact": "Supprimer {files}",
-                "detail": {
-                  "root": "Racine : {root}",
-                  "files": "Fichiers : {files}"
-                }
+                "compact": "Supprimer {files}"
               }
             },
             "renameFiles": {
@@ -4028,11 +3905,7 @@
                 "to": "vers"
               },
               "renderer": {
-                "compact": "Renommer {files}",
-                "detail": {
-                  "root": "Racine : {root}",
-                  "files": "Fichiers : {files}"
-                }
+                "compact": "Renommer {files}"
               }
             },
             "compressFiles": {
@@ -4044,9 +3917,7 @@
                 "compact": "Compresser {files} dans {root} vers {name}",
                 "detail": {
                   "output": "Sortie : {name}",
-                  "root": "Racine : {root}",
-                  "format": "Format : {format}",
-                  "files": "Fichiers : {files}"
+                  "format": "Format : {format}"
                 }
               }
             },
@@ -4056,11 +3927,7 @@
                 "file": "Fichier"
               },
               "renderer": {
-                "compact": "Décompresser {file} vers {root}",
-                "detail": {
-                  "file": "Fichier : {file}",
-                  "root": "Racine : {root}"
-                }
+                "compact": "Décompresser {file} vers {root}"
               }
             },
             "updateStartupVariable": {
@@ -4095,10 +3962,6 @@
         },
         "subusers": {
           "title": "Sous-utilisateurs",
-          "subtitle": "{current} sur {max} sous-utilisateurs maximum créés.",
-          "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} sous-utilisateurs."
-          },
           "table": {
             "columns": {
               "twoFactorEnabled": "2FA activé",
@@ -4124,7 +3987,6 @@
             },
             "removeSubuser": {
               "title": "Confirmer la suppression du sous-utilisateur",
-              "content": "Êtes-vous sûr de vouloir supprimer **{username}** de ce serveur ?",
               "toast": {
                 "removed": "Sous-utilisateur supprimé."
               }
@@ -4133,10 +3995,6 @@
         },
         "backups": {
           "title": "Sauvegardes",
-          "subtitle": "{current} de {max} sauvegardes maximum créées.",
-          "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} sauvegardes."
-          },
           "table": {
             "columns": {
               "locked": "Verrouillé ?"
@@ -4146,7 +4004,6 @@
             "browse": "Parcourir"
           },
           "toast": {
-            "downloadStarted": "Téléchargement commencé.",
             "restoringBackup": "Restauration de la sauvegarde..."
           },
           "modal": {
@@ -4167,7 +4024,6 @@
             },
             "deleteBackup": {
               "title": "Confirmer la suppression de la sauvegarde",
-              "content": "Êtes-vous sûr de vouloir supprimer **{name}** de ce serveur ?",
               "toast": {
                 "deleted": "Sauvegarde supprimée."
               }
@@ -4179,10 +4035,6 @@
         },
         "network": {
           "title": "Réseau",
-          "subtitle": "{current} de {max} allocations maximum assignées.",
-          "tooltip": {
-            "limitReached": "Ce serveur est limité à {max} allocations."
-          },
           "table": {
             "columns": {
               "hostname": "Nom d'hôte"
@@ -4197,8 +4049,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Confirmer la suppression de l'allocation",
-              "content": "Êtes-vous sûr de vouloir supprimer **{allocation}** de ce serveur ?"
+              "title": "Confirmer la suppression de l'allocation"
             }
           }
         },

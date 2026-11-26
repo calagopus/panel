@@ -222,15 +222,13 @@
         },
         "deleteFailedBackups": {
           "title": "Potvrzení smazání neúspěšných záloh",
-          "content": "Opravdu chcete smazat neúspěšné zálohy v počtu `{count}`? Uzamčené zálohy a zálohy, jejichž konfigurace je v režimu údržby, budou zachovány. Mazání probíhá na pozadí a může chvíli trvat.",
           "alert": {
             "forceWarning": "Vynucené smazání odstraní tyto zálohy i v případě, že jejich konfigurace chybí nebo vzdálené úložiště není dostupné. Samotné soubory záloh se nemusí podařit zcela smazat a na úložišti mohou zůstat osiřelá data."
           }
         }
       },
       "toast": {
-        "duplicated": "Duplikování dokončeno: {resource}.",
-        "failedBackupDeletionStarted": "Na pozadí probíhá mazání neúspěšných záloh v počtu {count}."
+        "duplicated": "Duplikování dokončeno: {resource}."
       },
       "settingScope": {
         "account": "Synchronizovat s účtem",

@@ -123,8 +123,7 @@
       "alert": {
         "error": "Fel",
         "warning": "Varning",
-        "success": "Succé",
-        "clockOffset": "Din systemklocka är mer än 5 sekunder osynkroniserad med servern. Detta kan orsaka problem med nyckelautentisering och tvåfaktorsautentisering. Synkronisera din klocka om problem uppstår. Nuvarande förskjutning: {offset} sekund(er)."
+        "success": "Succé"
       },
       "divider": {
         "or": "ELLER"
@@ -243,12 +242,6 @@
           "always": "Alltid",
           "unlessStopped": "Om Inte Stoppad",
           "never": "Aldrig"
-        },
-        "bulkActionServerAction": {
-          "started": "Startad",
-          "stopped": "Stoppad",
-          "restarted": "Omstartad",
-          "killed": "Dödad"
         }
       },
       "unlimited": "Obegränsad",
@@ -391,8 +384,6 @@
         }
       },
       "fileUpload": {
-        "waiting": "Väntar: {file}",
-        "uploading": "Laddar upp: {file}",
         "uploadingFolder": "Laddar upp mapp: {folder} ({files})",
         "toast": {
           "uploading": "Började ladda upp {files}...",
@@ -477,10 +468,7 @@
             "connectionError": "Något gick fel. Anslutningsfel."
           },
           "successMessage": "Anslutningen till din nod har verifierats. Du kan nu fortsätta.",
-          "configurationDescription": "Placera detta i konfigurationsfilen på `{file}` eller kör:",
-          "button": {
-            "verify": "Verifiera Anslutning"
-          }
+          "configurationDescription": "Placera detta i konfigurationsfilen på `{file}` eller kör:"
         },
         "configuration": {
           "title": "Applikationsinställningar",
@@ -518,9 +506,6 @@
             "description": "Nu får vi igång din första server. Vilket ägg vill du använda?",
             "nestDescription": "För att börja använda detta ägg måste du skapa ett nest, nest är samlingar av ägg. Ge det ett namn:"
           },
-          "server": {
-            "nestDescription": "För att börja använda detta ägg måste du skapa ett nest, nest är samlingar av ägg. Ge det ett namn:"
-          },
           "error": {
             "noNodes": "Något gick fel. Inga noder hittades."
           },
@@ -539,8 +524,7 @@
               "subtitle": "Panelinställningar och konfigurerade preferenser"
             },
             "eggRepositories": {
-              "title": "Egg Förråd",
-              "subtitle": "{count} förråd"
+              "title": "Egg Förråd"
             },
             "location": "Plats"
           },
@@ -685,13 +669,9 @@
                   },
                   "deleteServerGroup": {
                     "title": "Bekräfta borttagning av servergrupp",
-                    "content": "Är du säker på att du vill ta bort **{group}** från ditt konto?",
                     "toast": {
                       "deleted": "Servergrupp borttagen."
                     }
-                  },
-                  "addServerToGroup": {
-                    "noServers": "Alla servrar finns redan i den här gruppen."
                   }
                 }
               }
@@ -714,11 +694,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Valläge",
             "select": "Välj server",
             "deselect": "Avmarkera server",
-            "success": "Lyckades {action} {servers}.",
-            "partial": "Lyckades {action} {successfulServers}. {failedServers} misslyckades.",
             "groupActions": "Gruppåtgärder"
           }
         },
@@ -815,7 +792,6 @@
             },
             "deleteSecurityKey": {
               "title": "Bekräfta borttagning av säkerhetsnyckel",
-              "content": "Är du säker på att du vill ta bort **{key}** från ditt konto?",
               "toast": {
                 "deleted": "Säkerhetsnyckel borttagen framgångsrikt."
               }
@@ -871,9 +847,6 @@
             "searchContent": "Sök i konsolens utdata",
             "previousCommand": "Föregående kommando i historik",
             "nextCommand": "Nästa kommando i historik"
-          },
-          "serverList": {
-            "selectServer": "Håll S nedtryckt och klicka för att välja/avmarkera server"
           }
         },
         "sshKeys": {
@@ -910,7 +883,6 @@
             },
             "deleteSshKey": {
               "title": "Bekräfta borttagning av SSH-nyckel",
-              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
               "toast": {
                 "removed": "SSH-nyckel borttagen."
               }
@@ -934,7 +906,6 @@
             },
             "deleteCommandSnippet": {
               "title": "Bekräfta borttagning av kommandosnutt",
-              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
               "toast": {
                 "removed": "Kommandosnutt borttagen."
               }
@@ -996,7 +967,6 @@
             },
             "deleteApiKey": {
               "title": "Bekräfta borttagning av API-nyckel",
-              "content": "Är du säker på att du vill ta bort **{name}** från ditt konto?",
               "toast": {
                 "removed": "API-nyckel borttagen."
               }
@@ -1148,9 +1118,6 @@
             "receivingRemote": "Tar emot {files} från remote server",
             "sendingRemote": "Skickar {files} till remote server"
           },
-          "dropzone": {
-            "subtitle": "Släpp för att börja ladda upp"
-          },
           "settings": {
             "clickOnce": "Klicka en gång för att öppna filen eller mappen",
             "preferPhysicalSize": "Visa fysisk storlek istället för logisk storlek",
@@ -1163,7 +1130,6 @@
             "copyingStarted": "{files} har börjat kopieras.",
             "filesCouldNotBeMoved": "Filer kunde inte flyttas.",
             "filesMoved": "{files} har flyttats.",
-            "downloadStarted": "Nedladdning har börjat.",
             "filesDeleted": "Filer har tagits bort.",
             "archiveCreationStarted": "Arkivering har börjat.",
             "fileCopyingStarted": "Filkopiering har börjat.",
@@ -1180,16 +1146,13 @@
               "content": "Du har osparade ändringar i filredigeringen. Är du säker på att du vill lämna den här sidan? Om du lämnar sidan kommer dina ändringar att förloras."
             },
             "createArchive": {
-              "title": "Skapa arkiv",
-              "createdAs": "Detta arkiv kommer att skapas som "
+              "title": "Skapa arkiv"
             },
             "createDirectory": {
-              "title": "Skapa katalog",
-              "createdAs": "Denna katalog kommer att skapas som "
+              "title": "Skapa katalog"
             },
             "copyFile": {
-              "title": "Kopiera fil",
-              "createdAs": "Denna fil kommer att skapas som "
+              "title": "Kopiera fil"
             },
             "copyRemote": {
               "title": "Fjärrkopiera filer"
@@ -1253,8 +1216,7 @@
               "title": "Pull Fil",
               "form": {
                 "fileUrl": "Fil URL"
-              },
-              "createdAs": "Denna fil kommer att skapas som "
+              }
             },
             "sftpDetails": {
               "title": "SFTP-detaljer",
@@ -1264,10 +1226,6 @@
         },
         "databases": {
           "title": "Databaser",
-          "subtitle": "{current} av maximalt {max} databaser skapade.",
-          "tooltip": {
-            "limitReached": "Denna server är begränsad till {max} databaser."
-          },
           "table": {
             "columns": {
               "locked": "Låst?"
@@ -1322,14 +1280,6 @@
         },
         "schedules": {
           "title": "Scheman",
-          "subtitle": "{current} av {max} maximala scheman skapade.",
-          "dropzone": {
-            "title": "Släpp några filer här för att importera dem som scheman",
-            "subtitle": "Släpp för att börja importera"
-          },
-          "tooltip": {
-            "limitReached": "Den här servern är begränsad till {max} scheman."
-          },
           "table": {
             "columns": {
               "lastRun": "Senaste körning",
@@ -1565,8 +1515,7 @@
               "renderer": {
                 "compact": "Skapa {name} i {root}",
                 "detail": {
-                  "directory": "Katalog: {name}",
-                  "root": "Rot: {root}"
+                  "directory": "Katalog: {name}"
                 }
               }
             },
@@ -1578,7 +1527,6 @@
               "renderer": {
                 "compact": "Skriv till {file}",
                 "detail": {
-                  "file": "Fil: {file}",
                   "append": "Lägg till: {value}"
                 }
               }
@@ -1602,10 +1550,7 @@
                 "filesToDelete": "Filer att Ta Bort"
               },
               "renderer": {
-                "compact": "Ta Bort {files}",
-                "detail": {
-                  "files": "Filer: {files}"
-                }
+                "compact": "Ta Bort {files}"
               }
             },
             "renameFiles": {
@@ -1616,10 +1561,7 @@
                 "to": "till"
               },
               "renderer": {
-                "compact": "Döp om {files}",
-                "detail": {
-                  "files": "Filer: {files}"
-                }
+                "compact": "Döp om {files}"
               }
             },
             "compressFiles": {
@@ -1630,8 +1572,7 @@
               "renderer": {
                 "compact": "Komprimera {files} i {root} till {name}",
                 "detail": {
-                  "output": "Produktion: {name}",
-                  "files": "Filer: {files}"
+                  "output": "Produktion: {name}"
                 }
               }
             },
@@ -1641,10 +1582,7 @@
                 "file": "Fil"
               },
               "renderer": {
-                "compact": "Dekomprimera {file} till {root}",
-                "detail": {
-                  "file": "Fil: {file}"
-                }
+                "compact": "Dekomprimera {file} till {root}"
               }
             },
             "updateStartupVariable": {
@@ -1701,7 +1639,6 @@
             },
             "removeSubuser": {
               "title": "Bekräfta Borttagning av Underanvändare",
-              "content": "Är du säker på att du vill ta bort **{username}** från den här servern?",
               "toast": {
                 "removed": "Underanvändare borttagen."
               }
@@ -1710,10 +1647,6 @@
         },
         "backups": {
           "title": "Säkerhetskopieringar",
-          "subtitle": "{current} av maximalt {max} säkerhetskopior skapade.",
-          "tooltip": {
-            "limitReached": "Den här servern är begränsad till {max} säkerhetskopior."
-          },
           "table": {
             "columns": {
               "locked": "Låst?"
@@ -1723,7 +1656,6 @@
             "browse": "Bläddra"
           },
           "toast": {
-            "downloadStarted": "Nedladdningen startade.",
             "restoringBackup": "Återställer säkerhetskopia..."
           },
           "modal": {
@@ -1744,7 +1676,6 @@
             },
             "deleteBackup": {
               "title": "Bekräfta Borttagning av Säkerhetskopia",
-              "content": "Är du säker på att du vill ta bort **{name}** från den här servern?",
               "toast": {
                 "deleted": "Säkerhetskopia borttagen."
               }
@@ -1753,10 +1684,6 @@
         },
         "network": {
           "title": "Nätverk",
-          "subtitle": "{current} av {max} maximala allokeringar tilldelade.",
-          "tooltip": {
-            "limitReached": "Den här servern är begränsad till {max} allokeringar."
-          },
           "table": {
             "columns": {
               "hostname": "Värdnamn"
@@ -1771,8 +1698,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Bekräfta Borttagning av Tilldelning",
-              "content": "Är du säker på att du vill ta bort **{allocation}** från den här servern?"
+              "title": "Bekräfta Borttagning av Tilldelning"
             }
           }
         },

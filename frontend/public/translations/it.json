@@ -176,8 +176,7 @@
       "alert": {
         "error": "Errore",
         "warning": "Avviso",
-        "success": "Successo",
-        "clockOffset": "Il tuo orologio di sistema non è sincronizzato con il server per più di 5 secondi. Questo potrebbe causare problemi con l'autenticazione della chiave di accesso e l'autenticazione a due fattori. Sincronizza il tuo orologio se si verificano problemi. Differenza attuale: {offset} secondo(i)."
+        "success": "Successo"
       },
       "divider": {
         "or": "O"
@@ -429,7 +428,6 @@
                   },
                   "deleteServerGroup": {
                     "title": "Conferma eliminazione gruppo di server",
-                    "content": "Sei sicuro di voler eliminare **{group}** dal tuo account?",
                     "toast": {
                       "deleted": "Gruppo di server eliminato."
                     }
@@ -535,7 +533,6 @@
             },
             "deleteSecurityKey": {
               "title": "Conferma eliminazione chiave di sicurezza",
-              "content": "Sei sicuro di voler eliminare **{key}** dal tuo account?",
               "toast": {
                 "deleted": "Chiave di sicurezza eliminata con successo."
               }
@@ -590,7 +587,6 @@
             },
             "deleteSshKey": {
               "title": "Conferma eliminazione chiave SSH",
-              "content": "Sei sicuro di voler eliminare **{name}** dal tuo account?",
               "toast": {
                 "removed": "Chiave SSH rimossa."
               }
@@ -642,7 +638,6 @@
             },
             "deleteApiKey": {
               "title": "Conferma eliminazione chiave API",
-              "content": "Sei sicuro di voler eliminare **{name}** dal tuo account?",
               "toast": {
                 "removed": "Chiave API rimossa."
               }
@@ -690,10 +685,6 @@
         },
         "databases": {
           "title": "Database",
-          "subtitle": "{current} di {max} database massimi creati.",
-          "tooltip": {
-            "limitReached": "Questo server è limitato a {max} database."
-          },
           "table": {
             "columns": {
               "locked": "Bloccato?"
@@ -767,7 +758,6 @@
             },
             "removeSubuser": {
               "title": "Conferma rimozione sottoutente",
-              "content": "Sei sicuro di voler rimuovere **{username}** da questo server?",
               "toast": {
                 "removed": "Sottoutente rimosso."
               }
@@ -776,10 +766,6 @@
         },
         "backups": {
           "title": "Backup",
-          "subtitle": "{current} di {max} backup massimi creati.",
-          "tooltip": {
-            "limitReached": "Questo server è limitato a {max} backup."
-          },
           "table": {
             "columns": {
               "locked": "Bloccato?"
@@ -789,7 +775,6 @@
             "browse": "Sfoglia"
           },
           "toast": {
-            "downloadStarted": "Download avviato.",
             "restoringBackup": "Ripristino backup..."
           },
           "modal": {
@@ -810,7 +795,6 @@
             },
             "deleteBackup": {
               "title": "Conferma eliminazione backup",
-              "content": "Sei sicuro di voler eliminare **{name}** da questo server?",
               "toast": {
                 "deleted": "Backup eliminato."
               }
@@ -819,10 +803,6 @@
         },
         "network": {
           "title": "Rete",
-          "subtitle": "{current} di {max} allocazioni massime assegnate.",
-          "tooltip": {
-            "limitReached": "Questo server è limitato a {max} allocazioni."
-          },
           "table": {
             "columns": {
               "port": "Porta"
@@ -837,8 +817,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Conferma rimozione allocazione",
-              "content": "Sei sicuro di voler rimuovere **{allocation}** da questo server?"
+              "title": "Conferma rimozione allocazione"
             }
           }
         },

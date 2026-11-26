@@ -288,14 +288,12 @@
         "viewDocumentation": "Dokumentáció Megtekintése",
         "undo": "Visszavonás",
         "clearUserFilter": "Felhasználó Szűrő Törlése",
-        "deleteFailedBackups": "{count} Törlése Sikertelen",
-        "retryFailedDeletions": "{count} Sikertelen Törlési Kísérlet Ismétlése"
+        "deleteFailedBackups": "{count} Törlése Sikertelen"
       },
       "alert": {
         "error": "Hiba",
         "warning": "Figyelmeztetés",
         "success": "Sikerült",
-        "clockOffset": "A rendszer órája több mint 5 másodperccel eltér a szerver órájától. Ez problémákat okozhat a jelszóval történő hitelesítés és a kétfaktoros hitelesítés során. Ha problémák merülnek fel, kérjük, szinkronizálja az óráját. Jelenlegi eltérés: {offset} másodperc(ek).",
         "passwordAuthUnavailable": "A jelszavad nem fog működni ehhez a kapcsolathoz. Helyette használj SSH-kulcsot; ezt a fiókod „SSH-kulcsok” oldalán adhatod hozzá."
       },
       "divider": {
@@ -322,6 +320,18 @@
           "copyAll": "Összes másolása",
           "pasteReplace": "Beillesztés (Csere)"
         },
+        "eggVariableRulesInput": {
+          "editorMode": "Szerkesztő",
+          "textMode": "Szöveg",
+          "addRule": "Szabály Hozzáadása...",
+          "value": "Érték",
+          "version": "Verzió",
+          "variable": "Változó",
+          "variables": "Változók",
+          "values": "Érték",
+          "formats": "Formátumok",
+          "pattern": "Minta"
+        },
         "serverFileInput": {
           "notFound": "Még nem létezik ilyen nevű fájl.",
           "isDirectory": "Ez egy könyvtár, nem pedig egy fájl."
@@ -339,7 +349,6 @@
           "exception": "Kivétel",
           "invalid": "Érvénytelen minta",
           "unavailable": "Nem elérhető darabszám",
-          "tooManyPatterns": "{max} mintánál több esetén az egyezés nem kerül automatikusan figyelembevételre.",
           "unanchoredException": "A(z) `{pattern}` bármilyen mélységben illeszkedik. Csak a gyökérkönyvtárban való illesztéshez használd a(z) `{anchored}` mintát."
         },
         "cronInput": {
@@ -355,7 +364,6 @@
         },
         "iconInput": {
           "defaultIcon": "Alapértelmezett ikon",
-          "searchPlaceholder": "Ikonok keresése…",
           "noResults": "A keresésnek nem felel meg egyetlen ikon sem.",
           "moreResults": "Az első {count} találat jelenik meg; a továbbiak megtekintéséhez szűkítse le a keresést.",
           "button": {
@@ -404,14 +412,12 @@
         },
         "deleteFailedBackups": {
           "title": "Sikertelen Biztonsági Mentés Törlésének Megerősítése",
-          "content": "Biztosan törölni szeretné a(z) `{count}` sikertelen biztonsági másolatot? A zárolt biztonsági másolatok és azok, amelyek konfigurációja karbantartás alatt áll, megmaradnak. A törlés háttérben fut, és eltarthat egy ideig, mire befejeződik.",
           "alert": {
             "forceWarning": "A kényszerű törlés akkor is eltávolítja ezeket a biztonsági másolatokat, ha azok konfigurációja hiányzik, vagy a távoli tároló nem érhető el. Előfordulhat, hogy maguk a biztonsági másolatfájlok nem kerülnek teljes mértékben eltávolításra, így elhagyott adatok maradhatnak hátra."
           }
         },
         "retryFailedDeletions": {
-          "title": "Törlés Sikertelenségének Megerősítése Újrapróbálás",
-          "content": "Biztosan újra meg akarja próbálni a törlésüket a(z) `{count}` olyan biztonsági másolatnak, amelyek törlése sikertelen volt? Azok a biztonsági másolatok, amelyek konfigurációja karbantartás alatt áll, kihagyásra kerülnek. A törlés háttérben fut, és befejezése egy ideig eltarthat."
+          "title": "Törlés Sikertelenségének Megerősítése Újrapróbálás"
         }
       },
       "toast": {
@@ -419,8 +425,6 @@
         "preparingDownload": "Letöltés előkészítése...",
         "downloadFailed": "A letöltés nem indult el.",
         "importing": "{file} importálása...",
-        "failedBackupDeletionStarted": "{count} sikertelen biztonsági mentés törlése háttérben.",
-        "failedDeletionRetryStarted": "A háttérben újra megpróbálja a {count} sikertelen biztonsági mentés-törlést.",
         "requestBlockedByExtension": "Ezt a kérést egy bővítmény blokkolta."
       },
       "settingScope": {
@@ -747,15 +751,6 @@
           "always": "Mindig",
           "unlessStopped": "Amíg nincs leállítva",
           "never": "Soha"
-        },
-        "bulkActionServerAction": {
-          "started": "Elindítva",
-          "stopped": "Leállítva",
-          "restarted": "Újraindítva",
-          "killed": "Kilőve",
-          "suspended": "Felfüggesztve",
-          "unsuspended": "Nincs felfüggesztve",
-          "deleted": "Törölve"
         },
         "compressionLevel": {
           "bestSpeed": "Legjobb Sebesség",

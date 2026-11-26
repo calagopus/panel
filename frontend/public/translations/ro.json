@@ -245,7 +245,6 @@
                   },
                   "deleteServerGroup": {
                     "title": "Confirmă ștergerea grupului de servere",
-                    "content": "Ești sigur că vrei să ștergi **{group}** din contul tău?",
                     "toast": {
                       "deleted": "Grup de servere șters."
                     }
@@ -353,7 +352,6 @@
             },
             "deleteSecurityKey": {
               "title": "Confirmă ștergerea cheii de securitate",
-              "content": "Ești sigur că vrei să ștergi **{key}** din contul tău?",
               "toast": {
                 "deleted": "Cheie de securitate ștearsă cu succes."
               }
@@ -408,7 +406,6 @@
             },
             "deleteSshKey": {
               "title": "Confirmă ștergerea cheii SSH",
-              "content": "Ești sigur că vrei să ștergi **{name}** din contul tău?",
               "toast": {
                 "removed": "Cheie SSH eliminată."
               }
@@ -460,7 +457,6 @@
             },
             "deleteApiKey": {
               "title": "Confirmă ștergerea cheii API",
-              "content": "Ești sigur că vrei să ștergi **{name}** din contul tău?",
               "toast": {
                 "removed": "Cheie API eliminată."
               }
@@ -508,10 +504,6 @@
         },
         "databases": {
           "title": "Baze de date",
-          "subtitle": "{current} din {max} baze de date maxime create.",
-          "tooltip": {
-            "limitReached": "Acest server este limitat la {max} baze de date."
-          },
           "table": {
             "columns": {
               "locked": "Blocat?"
@@ -585,7 +577,6 @@
             },
             "removeSubuser": {
               "title": "Confirmă eliminarea subutilizatorului",
-              "content": "Ești sigur că vrei să elimini pe **{username}** de la acest server?",
               "toast": {
                 "removed": "Subutilizator eliminat."
               }
@@ -594,10 +585,6 @@
         },
         "backups": {
           "title": "Backup-uri",
-          "subtitle": "{current} din {max} backup-uri maxime create.",
-          "tooltip": {
-            "limitReached": "Acest server este limitat la {max} backup-uri."
-          },
           "table": {
             "columns": {
               "locked": "Blocat?"
@@ -607,7 +594,6 @@
             "browse": "Răsfoiește"
           },
           "toast": {
-            "downloadStarted": "Descărcare începută.",
             "restoringBackup": "Restaurare backup..."
           },
           "modal": {
@@ -628,7 +614,6 @@
             },
             "deleteBackup": {
               "title": "Confirmă ștergerea backup-ului",
-              "content": "Ești sigur că vrei să ștergi **{name}** de la acest server?",
               "toast": {
                 "deleted": "Backup șters."
               }
@@ -637,10 +622,6 @@
         },
         "network": {
           "title": "Rețea",
-          "subtitle": "{current} din {max} alocări maxime atribuite.",
-          "tooltip": {
-            "limitReached": "Acest server este limitat la {max} alocări."
-          },
           "table": {
             "columns": {
               "hostname": "Nume gazdă"
@@ -655,8 +636,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Confirmă eliminarea alocării",
-              "content": "Ești sigur că vrei să elimini **{allocation}** de la acest server?"
+              "title": "Confirmă eliminarea alocării"
             }
           }
         },

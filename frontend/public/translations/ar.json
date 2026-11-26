@@ -79,8 +79,7 @@
       "alert": {
         "error": "خطأ",
         "warning": "تحذير",
-        "success": "نجح",
-        "clockOffset": "ساعة نظامك غير متزامنة مع الخادم بأكثر من 5 ثوانٍ. قد يسبب هذا مشاكل مع مصادقة مفتاح المرور والمصادقة الثنائية. يرجى مزامنة ساعتك إذا ظهرت مشاكل. الانحراف الحالي: {offset} ثانية/ثوانٍ."
+        "success": "نجح"
       },
       "divider": {
         "or": "أو"
@@ -208,12 +207,6 @@
           "always": "دائماً",
           "unlessStopped": "ما لم يتم إيقافه",
           "never": "أبداً"
-        },
-        "bulkActionServerAction": {
-          "started": "تم التشغيل",
-          "stopped": "تم الإيقاف",
-          "restarted": "تم إعادة التشغيل",
-          "killed": "تم الإنهاء"
         }
       },
       "unlimited": "غير محدود",
@@ -362,8 +355,6 @@
         }
       },
       "fileUpload": {
-        "waiting": "انتظار: {file}",
-        "uploading": "جاري الرفع: {file}",
         "uploadingFolder": "جاري رفع المجلد: {folder} ({files})",
         "toast": {
           "uploading": "بدأ رفع {files}...",
@@ -448,10 +439,7 @@
             "connectionError": "حدث خطأ ما. خطأ في الاتصال."
           },
           "successMessage": "تم التحقق من الاتصال بالعقدة بنجاح. يمكنك الآن المتابعة.",
-          "configurationDescription": "ضع هذا في ملف التكوين في `{file}` أو قم بتشغيل:",
-          "button": {
-            "verify": "التحقق من الاتصال"
-          }
+          "configurationDescription": "ضع هذا في ملف التكوين في `{file}` أو قم بتشغيل:"
         },
         "configuration": {
           "title": "إعدادات التطبيق",
@@ -491,8 +479,7 @@
             "nestDescription": "للبدء في استخدام هذه البيضة، ستحتاج إلى إنشاء عش، الأعش هي مجموعات من البيض. أعطها اسماً:"
           },
           "server": {
-            "title": "الخادم",
-            "nestDescription": "للبدء في استخدام هذه البيضة، ستحتاج إلى إنشاء عش، الأعش هي مجموعات من البيض. أعطها اسماً:"
+            "title": "الخادم"
           },
           "error": {
             "noNodes": "حدث خطأ ما. لم يتم العثور على عقد."
@@ -512,8 +499,7 @@
               "subtitle": "تم تكوين إعدادات اللوحة والتفضيلات"
             },
             "eggRepositories": {
-              "title": "مستودعات البيض",
-              "subtitle": "{count} مستودع"
+              "title": "مستودعات البيض"
             },
             "location": "الموقع",
             "node": "العقدة",
@@ -659,13 +645,9 @@
                   },
                   "deleteServerGroup": {
                     "title": "تأكيد حذف مجموعة الخوادم",
-                    "content": "هل أنت متأكد أنك تريد حذف **{group}** من حسابك؟",
                     "toast": {
                       "deleted": "تم حذف مجموعة الخوادم."
                     }
-                  },
-                  "addServerToGroup": {
-                    "noServers": "جميع الخوادم موجودة بالفعل في هذه المجموعة."
                   }
                 }
               }
@@ -688,11 +670,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "وضع التحديد",
             "select": "تحديد الخادم",
             "deselect": "إلغاء تحديد الخادم",
-            "success": "تم {action} {servers} بنجاح.",
-            "partial": "تم {action} {successfulServers} بنجاح. فشل {failedServers}.",
             "groupActions": "إجراءات المجموعة"
           }
         },
@@ -796,7 +775,6 @@
             },
             "deleteSecurityKey": {
               "title": "تأكيد حذف مفتاح الأمان",
-              "content": "هل أنت متأكد أنك تريد حذف **{key}** من حسابك؟",
               "toast": {
                 "deleted": "تم حذف مفتاح الأمان بنجاح."
               }
@@ -853,9 +831,6 @@
             "searchContent": "البحث في مخرجات وحدة التحكم",
             "previousCommand": "الأمر السابق في السجل",
             "nextCommand": "الأمر التالي في السجل"
-          },
-          "serverList": {
-            "selectServer": "اضغط على S وانقر لتحديد/إلغاء تحديد الخادم"
           }
         },
         "sshKeys": {
@@ -892,7 +867,6 @@
             },
             "deleteSshKey": {
               "title": "تأكيد حذف مفتاح SSH",
-              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
               "toast": {
                 "removed": "تم إزالة مفتاح SSH."
               }
@@ -916,7 +890,6 @@
             },
             "deleteCommandSnippet": {
               "title": "تأكيد حذف قصاصة الأوامر",
-              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
               "toast": {
                 "removed": "تم إزالة قصاصة الأوامر."
               }
@@ -978,7 +951,6 @@
             },
             "deleteApiKey": {
               "title": "تأكيد حذف مفتاح API",
-              "content": "هل أنت متأكد أنك تريد حذف **{name}** من حسابك؟",
               "toast": {
                 "removed": "تم إزالة مفتاح API."
               }
@@ -1130,9 +1102,6 @@
             "receivingRemote": "جاري استلام {files} من الخادم البعيد",
             "sendingRemote": "جاري إرسال {files} إلى الخادم البعيد"
           },
-          "dropzone": {
-            "subtitle": "أفلت لبدء الرفع"
-          },
           "settings": {
             "clickOnce": "انقر مرة واحدة لفتح ملف أو مجلد",
             "preferPhysicalSize": "إظهار الحجم الفعلي بدلاً من الحجم المنطقي",
@@ -1145,7 +1114,6 @@
             "copyingStarted": "بدأ نسخ {files}.",
             "filesCouldNotBeMoved": "لم يمكن نقل الملفات.",
             "filesMoved": "تم نقل {files}.",
-            "downloadStarted": "بدأ التنزيل.",
             "filesDeleted": "تم حذف الملفات.",
             "archiveCreationStarted": "بدأ إنشاء الأرشيف.",
             "fileCopyingStarted": "بدأ نسخ الملف.",
@@ -1165,16 +1133,13 @@
               "title": "إنشاء أرشيف",
               "form": {
                 "format": "التنسيق"
-              },
-              "createdAs": "سيتم إنشاء هذا الأرشيف كـ "
+              }
             },
             "createDirectory": {
-              "title": "إنشاء مجلد",
-              "createdAs": "سيتم إنشاء هذا المجلد كـ "
+              "title": "إنشاء مجلد"
             },
             "copyFile": {
-              "title": "نسخ ملف",
-              "createdAs": "سيتم إنشاء هذا الملف كـ "
+              "title": "نسخ ملف"
             },
             "copyRemote": {
               "title": "نسخ الملفات عن بعد"
@@ -1243,7 +1208,6 @@
                 "fileUrl": "URL الملف",
                 "query": "الاستعلام"
               },
-              "createdAs": "سيتم إنشاء هذا الملف كـ ",
               "pull": "سحب"
             },
             "sftpDetails": {
@@ -1254,10 +1218,6 @@
         },
         "databases": {
           "title": "قواعد البيانات",
-          "subtitle": "{current} من {max} قاعدة بيانات كحد أقصى تم إنشاؤها.",
-          "tooltip": {
-            "limitReached": "هذا الخادم محدود بـ {max} قواعد بيانات."
-          },
           "table": {
             "columns": {
               "locked": "مقفل؟"
@@ -1312,14 +1272,6 @@
         },
         "schedules": {
           "title": "الجداول",
-          "subtitle": "{current} من {max} جدول كحد أقصى تم إنشاؤه.",
-          "dropzone": {
-            "title": "أفلت بعض الملفات هنا لاستيرادها كجداول",
-            "subtitle": "أفلت لبدء الاستيراد"
-          },
-          "tooltip": {
-            "limitReached": "هذا الخادم محدود بـ {max} جداول."
-          },
           "table": {
             "columns": {
               "lastRun": "آخر تشغيل",
@@ -1566,8 +1518,7 @@
               "renderer": {
                 "compact": "إنشاء {name} في {root}",
                 "detail": {
-                  "directory": "المجلد: {name}",
-                  "root": "الجذر: {root}"
+                  "directory": "المجلد: {name}"
                 }
               }
             },
@@ -1579,7 +1530,6 @@
               "renderer": {
                 "compact": "الكتابة إلى {file}",
                 "detail": {
-                  "file": "الملف: {file}",
                   "append": "إلحاق: {value}"
                 }
               }
@@ -1603,11 +1553,7 @@
                 "filesToDelete": "الملفات للحذف"
               },
               "renderer": {
-                "compact": "حذف {files}",
-                "detail": {
-                  "root": "الجذر: {root}",
-                  "files": "الملفات: {files}"
-                }
+                "compact": "حذف {files}"
               }
             },
             "renameFiles": {
@@ -1618,11 +1564,7 @@
                 "to": "إلى"
               },
               "renderer": {
-                "compact": "إعادة تسمية {files}",
-                "detail": {
-                  "root": "الجذر: {root}",
-                  "files": "الملفات: {files}"
-                }
+                "compact": "إعادة تسمية {files}"
               }
             },
             "compressFiles": {
@@ -1634,9 +1576,7 @@
                 "compact": "ضغط {files} في {root} إلى {name}",
                 "detail": {
                   "output": "المخرجات: {name}",
-                  "root": "الجذر: {root}",
-                  "format": "التنسيق: {format}",
-                  "files": "الملفات: {files}"
+                  "format": "التنسيق: {format}"
                 }
               }
             },
@@ -1646,11 +1586,7 @@
                 "file": "الملف"
               },
               "renderer": {
-                "compact": "فك ضغط {file} إلى {root}",
-                "detail": {
-                  "file": "الملف: {file}",
-                  "root": "الجذر: {root}"
-                }
+                "compact": "فك ضغط {file} إلى {root}"
               }
             },
             "updateStartupVariable": {
@@ -1711,7 +1647,6 @@
             },
             "removeSubuser": {
               "title": "تأكيد إزالة المستخدم الفرعي",
-              "content": "هل أنت متأكد أنك تريد إزالة **{username}** من هذا الخادم؟",
               "toast": {
                 "removed": "تم إزالة المستخدم الفرعي."
               }
@@ -1720,10 +1655,6 @@
         },
         "backups": {
           "title": "النسخ الاحتياطية",
-          "subtitle": "{current} من {max} نسخة احتياطية كحد أقصى تم إنشاؤها.",
-          "tooltip": {
-            "limitReached": "هذا الخادم محدود بـ {max} نسخ احتياطية."
-          },
           "table": {
             "columns": {
               "locked": "مقفل؟"
@@ -1733,7 +1664,6 @@
             "browse": "تصفح"
           },
           "toast": {
-            "downloadStarted": "بدأ التنزيل.",
             "restoringBackup": "جاري استعادة النسخة الاحتياطية..."
           },
           "modal": {
@@ -1754,7 +1684,6 @@
             },
             "deleteBackup": {
               "title": "تأكيد حذف النسخة الاحتياطية",
-              "content": "هل أنت متأكد أنك تريد حذف **{name}** من هذا الخادم؟",
               "toast": {
                 "deleted": "تم حذف النسخة الاحتياطية."
               }
@@ -1763,10 +1692,6 @@
         },
         "network": {
           "title": "الشبكة",
-          "subtitle": "{current} من {max} تخصيص كحد أقصى تم تعيينه.",
-          "tooltip": {
-            "limitReached": "هذا الخادم محدود بـ {max} تخصيصات."
-          },
           "table": {
             "columns": {
               "hostname": "اسم المضيف",
@@ -1782,8 +1707,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "تأكيد إزالة التخصيص",
-              "content": "هل أنت متأكد أنك تريد إزالة **{allocation}** من هذا الخادم؟"
+              "title": "تأكيد إزالة التخصيص"
             }
           }
         },

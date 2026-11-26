@@ -273,14 +273,12 @@
         "viewDocumentation": "Ver Documentação",
         "undo": "Desfazer",
         "clearUserFilter": "Limpar Filtro de Usuário",
-        "deleteFailedBackups": "Falha ao excluir {count}",
-        "retryFailedDeletions": "Repetir {count} Exclusões com Falha"
+        "deleteFailedBackups": "Falha ao excluir {count}"
       },
       "alert": {
         "error": "Erro",
         "warning": "Aviso",
         "success": "Sucesso",
-        "clockOffset": "O relógio do seu sistema está fora de sincronia com o servidor em {offset} segundos, isso poderá causar problema com a autenticação. Por favor, corrija seu relógio caso tenha problemas.",
         "passwordAuthUnavailable": "Sua senha não vai funcionar para esta conexão. Use uma Chave SSH, você pode criar uma na página de Chaves SSH da sua conta."
       },
       "divider": {
@@ -339,7 +337,6 @@
         },
         "iconInput": {
           "defaultIcon": "Ícone padrão",
-          "searchPlaceholder": "Buscar ícones...",
           "noResults": "Nenhum ícone corresponde à sua busca.",
           "button": {
             "reset": "Usar ícone padrão"
@@ -396,14 +393,12 @@
         },
         "deleteFailedBackups": {
           "title": "Confirmar Exclusão do Backup falhou",
-          "content": "Tem certeza que deseja excluir `{count}` Backups falhados? Backups Trancados e backups cuja a configuração está em manutenção serão mantidos. A exclusão é executada em segundo plano e pode demorar um pouco para terminar.",
           "alert": {
             "forceWarning": "Força a exclusão remove esses backups mesmo que sua configuração esteja ausente ou o armazenamento remoto não possa ser alcançado. Os próprios arquivos de backup podem não ser totalmente limpos, deixando os dados órfãos para trás."
           }
         },
         "retryFailedDeletions": {
-          "title": "Confirmar Tentativa de Exclusão Falhada",
-          "content": "Tem certeza que deseja tentar excluir `{count}` Backups que tiveram a exclusão falhada? Backups Trancados e backups cuja a configuração está em manutenção serão mantidos. A exclusão é executada em segundo plano e pode demorar um pouco para terminar."
+          "title": "Confirmar Tentativa de Exclusão Falhada"
         }
       },
       "toast": {
@@ -411,8 +406,6 @@
         "preparingDownload": "Preparando o download...",
         "downloadFailed": "Não foi possível iniciar o download.",
         "importing": "Importando {file}...",
-        "failedBackupDeletionStarted": "Excluindo {count} backups falhados em segundo plano.",
-        "failedDeletionRetryStarted": "Tentar novamente {count} exclusões de backup falhadas em segundo plano.",
         "requestBlockedByExtension": "Este pedido foi bloqueado por uma extensão."
       },
       "settingScope": {
@@ -709,16 +702,6 @@
           "unlessStopped": "A menos que seja parado",
           "never": "Nunca"
         },
-        "bulkActionServerAction": {
-          "started": "Iniciado",
-          "stopped": "Parado",
-          "restarted": "Reiniciado",
-          "killed": "Finalizado",
-          "suspended": "Suspenso",
-          "unsuspended": "Dessuspenso",
-          "clearedState": "Limpou o estado de",
-          "deleted": "Excluído"
-        },
         "compressionLevel": {
           "bestSpeed": "Melhor Velocidade",
           "goodSpeed": "Boa Velocidade",
@@ -993,12 +976,8 @@
       "fileUpload": {
         "title": "Enviando {files}",
         "adminAssets": "Mídias Administrativas",
-        "waiting": "Aguardando: {file}",
-        "uploading": "Enviando: {file}",
         "uploadingFolder": "Enviando pasta: {folder} ({files})",
-        "failed": "Falha: {file}",
         "failedFolder": "Falha no envio: {folder} ({files})",
-        "paused": "Pausado: {file}",
         "pause": "Pausar envio",
         "resume": "Retomar envio",
         "cancel": "Cancelar Envio",
@@ -1066,10 +1045,7 @@
             "connectionError": "O painel não pôde alcançar a instância. Verifique se as asas estão sendo executadas e se o URL (incluindo a porta) está correto.",
             "frontendConnectionError": "Seu navegador não pôde alcançar a instanância. Verifique a URL pública, certificado TLS e firewall. Os websockets e downloads dependem desta conexão."
           },
-          "configurationDescription": "Coloque isso no arquivo de configuração '{file}' ou execute:",
-          "button": {
-            "verify": "Verificar conexão"
-          }
+          "configurationDescription": "Coloque isso no arquivo de configuração '{file}' ou execute:"
         },
         "configuration": {
           "title": "Configurações da aplicação",
@@ -1132,8 +1108,7 @@
               "subtitle": "Configurações e preferências do painel configuradas"
             },
             "eggRepositories": {
-              "title": "Repositórios de Ovos",
-              "subtitle": "{count} Diretórios"
+              "title": "Repositórios de Ovos"
             },
             "location": "Localização",
             "node": "Nó",
@@ -1268,10 +1243,7 @@
         "verifyEmail": {
           "title": "Verificar E-mail",
           "success": "Seu endereço de e-mail **{email}** foi verificado.",
-          "failed": "Este link de verificação é inválido ou expirou. Solicite um novo e tente novamente.",
-          "button": {
-            "continue": "Continuar"
-          }
+          "failed": "Este link de verificação é inválido ou expirou. Solicite um novo e tente novamente."
         },
         "resetPassword": {
           "title": "Redefinir senha",
@@ -1439,7 +1411,6 @@
         },
         "securityKeys": {
           "title": "Chaves de segurança",
-          "subtitle": "{current} de {max} chaves de segurança criadas.",
           "table": {
             "columns": {
               "credentialId": "ID da Credencial"
@@ -1447,7 +1418,6 @@
           },
           "tooltip": {
             "secureContextRequired": "Um contexto seguro (HTTPS) é necessário para usar as chaves de segurança.",
-            "limitReached": "Você tem o limite de {max} chaves de segurança.",
             "disabled": "As chaves de segurança foram desativadas por um administrador."
           },
           "alert": {
@@ -1471,7 +1441,6 @@
             },
             "deleteSecurityKey": {
               "title": "Confirmar Exclusão de Chave de Segurança",
-              "content": "Tem certeza que deseja excluir **{key}** da sua conta?",
               "toast": {
                 "deleted": "Chave de segurança excluída com sucesso."
               }
@@ -1575,17 +1544,10 @@
             "increaseFontSize": "Aumentar o tamanho da fonte do console",
             "decreaseFontSize": "Diminuir o tamanho da fonte do console",
             "resetFontSize": "Redefinir o tamanho da fonte do console"
-          },
-          "serverList": {
-            "selectServer": "Segure S e clique para selecionar/desselecionar servidor"
           }
         },
         "sshKeys": {
           "title": "Chaves SSH",
-          "subtitle": "{current} de {max} chaves SSH criadas.",
-          "tooltip": {
-            "limitReached": "Você tem o limite de {max} chaves SSH."
-          },
           "table": {
             "columns": {
               "fingerprint": "Assinatura"
@@ -1617,12 +1579,10 @@
               }
             },
             "deleteSshKeys": {
-              "title": "Confirmar a exclusão da chave SSH",
-              "content": "Tem certeza que deseja excluir **{sshKeys}** da sua conta?"
+              "title": "Confirmar a exclusão da chave SSH"
             },
             "deleteSshKey": {
-              "title": "Confirmar a exclusão da chave SSH",
-              "content": "Tem certeza que deseja excluir **{name}** da sua conta?"
+              "title": "Confirmar a exclusão da chave SSH"
             }
           }
         },
@@ -1630,7 +1590,6 @@
           "modal": {
             "deleteApiKey": {
               "title": "Confirmar Exclusão da Chave API",
-              "content": "Tem certeza que deseja excluir **{name}** da sua conta?",
               "toast": {
                 "removed": "Chave de API removida."
               }
@@ -1781,7 +1740,6 @@
                   "latestVersion": "Última {version}"
                 },
                 "table": {
-                  "version": "Versão",
                   "installed": "Instalado",
                   "packageName": "Nome do Pacote",
                   "latestVersion": "Ultima versão",
@@ -1834,7 +1792,6 @@
                 "form": {
                   "additionalUrls": "URLs adicionais",
                   "additionalUrlsDescription": "O painel é acessível a outros endereços. Logins, OAuth e e-mails de auto-serviço usam qualquer URL em que a solicitação apareça; todo o resto usa a URL principal. Chaves de segurança só funcionam em URLs sob o ID RP WebAuthn.",
-                  "icon": "Ícone",
                   "iconLight": "Ícone (Modo claro)",
                   "bannerLight": "Banner (Modo Claro)",
                   "sessionCookie": "Cookies de Sessão",
@@ -2077,8 +2034,7 @@
               "page": {
                 "modal": {
                   "delete": {
-                    "title": "Confirmar exclusão do aviso",
-                    "content": "Tem certeza que deseja excluir **{title}**?"
+                    "title": "Confirmar exclusão do aviso"
                   },
                   "duplicate": {
                     "content": "Tem certeza que deseja duplicar **{title}**?"
@@ -2124,8 +2080,7 @@
             "deleteSelection": "Excluir seleção"
           },
           "dropzone": {
-            "title": "Solte arquivos ou pastas aqui para fazer o upload",
-            "subtitle": "Solte para começar a enviar"
+            "title": "Solte arquivos ou pastas aqui para fazer o upload"
           },
           "toast": {
             "assetDeleted": "Recurso excluído.",
@@ -2133,12 +2088,10 @@
           },
           "modal": {
             "createDirectory": {
-              "title": "Novo diretório",
-              "createdAs": "Será criado em "
+              "title": "Novo diretório"
             },
             "deleteAssets": {
-              "title": "Confirmar a exclusão do recurso",
-              "content": "Tem certeza que deseja excluir **{count}** recursos?"
+              "title": "Confirmar a exclusão do recurso"
             },
             "deleteAsset": {
               "title": "Excluir Recurso"
@@ -2154,7 +2107,6 @@
             "startFailed": "Falha ao iniciar",
             "pendingRemoval": "Removação pendente",
             "pendingRestart": "Reinício pendente",
-            "disabled": "Desabilitado",
             "processing": "Processando"
           },
           "card": {

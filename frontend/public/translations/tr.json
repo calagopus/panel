@@ -153,8 +153,7 @@
       "alert": {
         "error": "Hata",
         "warning": "Uyarı",
-        "success": "Başarılı",
-        "clockOffset": "Sistem saatiniz sunucu ile 5 saniyeden fazla uyumsuz. Bu durum geçiş anahtarı ve iki faktörlü kimlik doğrulama ile sorunlara neden olabilir. Lütfen saatinizi senkronize edin. Mevcut fark: {offset} saniye."
+        "success": "Başarılı"
       },
       "divider": {
         "or": "VEYA"
@@ -303,12 +302,6 @@
           "always": "Her Zaman",
           "unlessStopped": "Durdurulmadığı Sürece",
           "never": "Asla"
-        },
-        "bulkActionServerAction": {
-          "started": "Başlatıldı",
-          "stopped": "Durduruldu",
-          "restarted": "Yeniden Başlatıldı",
-          "killed": "Zorla Durduruldu"
         }
       },
       "unlimited": "Sınırsız",
@@ -455,8 +448,6 @@
         }
       },
       "fileUpload": {
-        "waiting": "Bekliyor: {file}",
-        "uploading": "Yükleniyor: {file}",
         "uploadingFolder": "Klasör yükleniyor: {folder} ({files})",
         "toast": {
           "uploading": "{files} yüklenmeye başlandı...",
@@ -543,10 +534,7 @@
             "connectionError": "Bir şeyler ters gitti. Bağlantı hatası."
           },
           "successMessage": "Node bağlantınız başarıyla doğrulandı. Artık devam edebilirsiniz.",
-          "configurationDescription": "Bunu `{file}` adresindeki yapılandırma dosyasına yerleştirin veya çalıştırın:",
-          "button": {
-            "verify": "Bağlantıyı Doğrula"
-          }
+          "configurationDescription": "Bunu `{file}` adresindeki yapılandırma dosyasına yerleştirin veya çalıştırın:"
         },
         "configuration": {
           "title": "Uygulama Ayarları",
@@ -585,8 +573,7 @@
             "nestDescription": "Bu Egg'i kullanmaya başlamak için bir Nest oluşturmanız gerekir. Nest'ler Egg koleksiyonlarıdır. Bir isim verin:"
           },
           "server": {
-            "title": "Sunucu",
-            "nestDescription": "Bu Egg'i kullanmaya başlamak için bir Nest oluşturmanız gerekir. Nest'ler Egg koleksiyonlarıdır. Bir isim verin:"
+            "title": "Sunucu"
           },
           "error": {
             "noNodes": "Bir şeyler ters gitti. Node bulunamadı."
@@ -606,8 +593,7 @@
               "subtitle": "Panel ayarları ve tercihleri yapılandırıldı"
             },
             "eggRepositories": {
-              "title": "Egg Repoları",
-              "subtitle": "{count} depo"
+              "title": "Egg Repoları"
             },
             "location": "Lokasyon",
             "server": "Sunucu"
@@ -752,13 +738,9 @@
                   },
                   "deleteServerGroup": {
                     "title": "Sunucu Grubu Silme Onayı",
-                    "content": "**{group}** grubunu hesabınızdan silmek istediğinize emin misiniz?",
                     "toast": {
                       "deleted": "Sunucu grubu silindi."
                     }
-                  },
-                  "addServerToGroup": {
-                    "noServers": "Tüm sunucular zaten bu grupta."
                   }
                 }
               }
@@ -781,11 +763,8 @@
             }
           },
           "bulkActions": {
-            "selectionMode": "Seçim Modu",
             "select": "Sunucu seç",
             "deselect": "Seçimi kaldır",
-            "success": "{servers} üzerinde {action} işlemi başarıyla tamamlandı.",
-            "partial": "{successfulServers} üzerinde {action} başarılı. {failedServers} başarısız.",
             "groupActions": "Grup Eylemleri"
           }
         },
@@ -885,7 +864,6 @@
             },
             "deleteSecurityKey": {
               "title": "Güvenlik Anahtarı Silme Onayı",
-              "content": "**{key}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
               "toast": {
                 "deleted": "Güvenlik anahtarı başarıyla silindi."
               }
@@ -942,9 +920,6 @@
             "searchContent": "Konsol çıktısında ara",
             "previousCommand": "Geçmişteki önceki komut",
             "nextCommand": "Geçmişteki sonraki komut"
-          },
-          "serverList": {
-            "selectServer": "S tuşuna basılı tutun ve sunucu seçmek/kaldırmak için tıklayın"
           }
         },
         "sshKeys": {
@@ -978,7 +953,6 @@
             },
             "deleteSshKey": {
               "title": "SSH Anahtarı Silme Onayı",
-              "content": "**{name}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
               "toast": {
                 "removed": "SSH anahtarı kaldırıldı."
               }
@@ -1002,7 +976,6 @@
             },
             "deleteCommandSnippet": {
               "title": "Komut Parçacığı Silme Onayı",
-              "content": "**{name}** parçasını hesabınızdan silmek istediğinize emin misiniz?",
               "toast": {
                 "removed": "Komut parçacığı kaldırıldı."
               }
@@ -1057,7 +1030,6 @@
             },
             "deleteApiKey": {
               "title": "API Anahtarı Silme Onayı",
-              "content": "**{name}** anahtarını hesabınızdan silmek istediğinize emin misiniz?",
               "toast": {
                 "removed": "API anahtarı kaldırıldı."
               }
@@ -1206,9 +1178,6 @@
             "receivingRemote": "Uzak sunucudan {files} alınıyor",
             "sendingRemote": "{files} uzak sunucuya gönderiliyor"
           },
-          "dropzone": {
-            "subtitle": "Yüklemeyi başlatmak için bırakın"
-          },
           "settings": {
             "clickOnce": "Dosya veya klasörü açmak için tek tıkla",
             "preferPhysicalSize": "Mantıksal boyut yerine fiziksel boyutu göster",
@@ -1221,7 +1190,6 @@
             "copyingStarted": "{files} kopyalanmaya başlandı.",
             "filesCouldNotBeMoved": "Dosyalar taşınamadı.",
             "filesMoved": "{files} taşındı.",
-            "downloadStarted": "İndirme başlatıldı.",
             "filesDeleted": "Dosyalar silindi.",
             "archiveCreationStarted": "Arşiv oluşturma başladı.",
             "fileCopyingStarted": "Dosya kopyalama başladı.",
@@ -1238,16 +1206,13 @@
               "content": "Dosya editöründe kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinize emin misiniz? Ayrılırsanız değişiklikleriniz kaybolacaktır."
             },
             "createArchive": {
-              "title": "Arşiv Oluştur",
-              "createdAs": "Bu arşiv şu isimle oluşturulacak: "
+              "title": "Arşiv Oluştur"
             },
             "createDirectory": {
-              "title": "Dizin Oluştur",
-              "createdAs": "Bu dizin şu isimle oluşturulacak: "
+              "title": "Dizin Oluştur"
             },
             "copyFile": {
-              "title": "Dosyayı Kopyala",
-              "createdAs": "Bu dosya şu isimle oluşturulacak: "
+              "title": "Dosyayı Kopyala"
             },
             "copyRemote": {
               "title": "Dosyaları Uzaktan Kopyala"
@@ -1315,7 +1280,6 @@
                 "fileUrl": "Dosya URL'si",
                 "query": "Sorgu"
               },
-              "createdAs": "Bu dosya şu isimle oluşturulacak: ",
               "pull": "Çek (Pull)"
             },
             "sftpDetails": {
@@ -1326,10 +1290,6 @@
         },
         "databases": {
           "title": "Veritabanları",
-          "subtitle": "Maksimum {max} veritabanından {current} tanesi oluşturuldu.",
-          "tooltip": {
-            "limitReached": "Bu sunucu {max} veritabanı ile sınırlıdır."
-          },
           "table": {
             "columns": {
               "locked": "Kilitli?"
@@ -1384,14 +1344,6 @@
         },
         "schedules": {
           "title": "Zamanlayıcılar",
-          "subtitle": "Maksimum {max} zamanlayıcıdan {current} tanesi oluşturuldu.",
-          "dropzone": {
-            "title": "Zamanlayıcı olarak içe aktarmak için dosyaları buraya bırakın",
-            "subtitle": "İçe aktarmayı başlatmak için bırakın"
-          },
-          "tooltip": {
-            "limitReached": "Bu sunucu {max} zamanlayıcı ile sınırlıdır."
-          },
           "table": {
             "columns": {
               "lastRun": "Son Çalışma",
@@ -1638,8 +1590,7 @@
               "renderer": {
                 "compact": "{root} içinde {name} oluştur",
                 "detail": {
-                  "directory": "Dizin: {name}",
-                  "root": "Kök: {root}"
+                  "directory": "Dizin: {name}"
                 }
               }
             },
@@ -1651,7 +1602,6 @@
               "renderer": {
                 "compact": "{file} dosyasına yaz",
                 "detail": {
-                  "file": "Dosya: {file}",
                   "append": "Sonuna ekle: {value}"
                 }
               }
@@ -1675,11 +1625,7 @@
                 "filesToDelete": "Silinecek Dosyalar"
               },
               "renderer": {
-                "compact": "{files} dosyalarını sil",
-                "detail": {
-                  "root": "Kök: {root}",
-                  "files": "Dosyalar: {files}"
-                }
+                "compact": "{files} dosyalarını sil"
               }
             },
             "renameFiles": {
@@ -1690,11 +1636,7 @@
                 "to": "Hedef"
               },
               "renderer": {
-                "compact": "{files} dosyalarını yeniden adlandır",
-                "detail": {
-                  "root": "Kök: {root}",
-                  "files": "Dosyalar: {files}"
-                }
+                "compact": "{files} dosyalarını yeniden adlandır"
               }
             },
             "compressFiles": {
@@ -1705,9 +1647,7 @@
               "renderer": {
                 "compact": "{root} içindeki {files} dosyalarını {name} olarak sıkıştır",
                 "detail": {
-                  "output": "Çıktı: {name}",
-                  "root": "Kök: {root}",
-                  "files": "Dosyalar: {files}"
+                  "output": "Çıktı: {name}"
                 }
               }
             },
@@ -1717,11 +1657,7 @@
                 "file": "Dosya"
               },
               "renderer": {
-                "compact": "{file} arşivini {root} içine aç",
-                "detail": {
-                  "file": "Dosya: {file}",
-                  "root": "Kök: {root}"
-                }
+                "compact": "{file} arşivini {root} içine aç"
               }
             },
             "updateStartupVariable": {
@@ -1782,7 +1718,6 @@
             },
             "removeSubuser": {
               "title": "Alt Kullanıcı Kaldırma Onayı",
-              "content": "**{username}** kullanıcısını bu sunucudan kaldırmak istediğinize emin misiniz?",
               "toast": {
                 "removed": "Alt kullanıcı kaldırıldı."
               }
@@ -1791,10 +1726,6 @@
         },
         "backups": {
           "title": "Yedekler",
-          "subtitle": "Maksimum {max} yedekten {current} tanesi oluşturuldu.",
-          "tooltip": {
-            "limitReached": "Bu sunucu {max} yedek ile sınırlıdır."
-          },
           "table": {
             "columns": {
               "locked": "Kilitli?"
@@ -1804,7 +1735,6 @@
             "browse": "Göz At"
           },
           "toast": {
-            "downloadStarted": "İndirme başlatıldı.",
             "restoringBackup": "Yedek geri yükleniyor..."
           },
           "modal": {
@@ -1825,7 +1755,6 @@
             },
             "deleteBackup": {
               "title": "Yedek Silme Onayı",
-              "content": "**{name}** yedeğini bu sunucudan silmek istediğinize emin misiniz?",
               "toast": {
                 "deleted": "Yedek silindi."
               }
@@ -1834,10 +1763,6 @@
         },
         "network": {
           "title": "Ağ",
-          "subtitle": "Maksimum {max} tahsisten {current} tanesi atandı.",
-          "tooltip": {
-            "limitReached": "Bu sunucu {max} tahsis ile sınırlıdır."
-          },
           "toast": {
             "created": "Tahsis oluşturuldu.",
             "updated": "Tahsis güncellendi.",
@@ -1847,8 +1772,7 @@
           },
           "modal": {
             "removeAllocation": {
-              "title": "Tahsis Kaldırma Onayı",
-              "content": "**{allocation}** tahsisini bu sunucudan kaldırmak istediğinize emin misiniz?"
+              "title": "Tahsis Kaldırma Onayı"
             }
           }
         },
