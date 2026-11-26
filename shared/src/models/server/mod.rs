@@ -2251,7 +2251,7 @@ impl Server {
             firewall_rules,
         ) = tokio::try_join!(
             sqlx::query!(
-                "SELECT nest_egg_variables.env_variable, COALESCE(server_variables.value, nest_egg_variables.default_value) AS value
+                "SELECT nest_egg_variables.env_variable AS \"env_variable!\", COALESCE(server_variables.value, nest_egg_variables.default_value) AS value
                 FROM nest_egg_variables
                 LEFT JOIN server_variables ON server_variables.variable_uuid = nest_egg_variables.uuid AND server_variables.server_uuid = $1
                 WHERE nest_egg_variables.egg_uuid = $2",

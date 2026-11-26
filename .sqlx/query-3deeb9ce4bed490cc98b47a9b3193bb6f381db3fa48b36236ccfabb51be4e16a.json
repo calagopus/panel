@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n                    server_database_instances.uuid,\n                    server_database_instances.name,\n                    servers.uuid AS server_uuid,\n                    servers.name AS server_name,\n                    COALESCE(server_database_instances.cpu, database_agent_templates.cpu) AS cpu,\n                    COALESCE(server_database_instances.memory, database_agent_templates.memory) AS memory,\n                    COALESCE(server_database_instances.disk, database_agent_templates.disk) AS disk\n                FROM server_database_instances\n                JOIN servers ON servers.uuid = server_database_instances.server_uuid\n                LEFT JOIN database_agent_templates ON database_agent_templates.uuid = server_database_instances.database_agent_template_uuid\n                WHERE server_database_instances.database_agent_host_uuid = $1",
+  "query": "SELECT\n                    server_database_instances.uuid AS \"uuid!\",\n                    server_database_instances.name AS \"name!\",\n                    servers.uuid AS \"server_uuid!\",\n                    servers.name AS \"server_name!\",\n                    COALESCE(server_database_instances.cpu, database_agent_templates.cpu) AS cpu,\n                    COALESCE(server_database_instances.memory, database_agent_templates.memory) AS memory,\n                    COALESCE(server_database_instances.disk, database_agent_templates.disk) AS disk\n                FROM server_database_instances\n                JOIN servers ON servers.uuid = server_database_instances.server_uuid\n                LEFT JOIN database_agent_templates ON database_agent_templates.uuid = server_database_instances.database_agent_template_uuid\n                WHERE server_database_instances.database_agent_host_uuid = $1",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "uuid",
+        "name": "uuid!",
         "type_info": "Uuid",
         "origin": {
           "Table": {
@@ -16,7 +16,7 @@
       },
       {
         "ordinal": 1,
-        "name": "name",
+        "name": "name!",
         "type_info": "Varchar",
         "origin": {
           "Table": {
@@ -27,7 +27,7 @@
       },
       {
         "ordinal": 2,
-        "name": "server_uuid",
+        "name": "server_uuid!",
         "type_info": "Uuid",
         "origin": {
           "Table": {
@@ -38,7 +38,7 @@
       },
       {
         "ordinal": 3,
-        "name": "server_name",
+        "name": "server_name!",
         "type_info": "Varchar",
         "origin": {
           "Table": {
@@ -81,5 +81,5 @@
       null
     ]
   },
-  "hash": "8c3b9d22b815b20e5d6e76fb94515a7669eb28145badc24c99b48695a7772262"
+  "hash": "3deeb9ce4bed490cc98b47a9b3193bb6f381db3fa48b36236ccfabb51be4e16a"
 }

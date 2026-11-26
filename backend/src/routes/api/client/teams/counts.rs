@@ -41,7 +41,7 @@ mod get {
                 || async {
                     let rows = sqlx::query!(
                         r#"SELECT
-                            teams.uuid,
+                            teams.uuid AS "uuid!",
                             COALESCE(team_servers.count, 0) AS "team_servers!",
                             COALESCE(team_members.count, 0) AS "team_members!"
                         FROM teams

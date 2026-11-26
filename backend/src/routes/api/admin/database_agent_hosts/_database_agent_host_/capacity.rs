@@ -79,10 +79,10 @@ mod get {
             .fetch_one(state.database.read()),
             sqlx::query!(
                 "SELECT
-                    server_database_instances.uuid,
-                    server_database_instances.name,
-                    servers.uuid AS server_uuid,
-                    servers.name AS server_name,
+                    server_database_instances.uuid AS \"uuid!\",
+                    server_database_instances.name AS \"name!\",
+                    servers.uuid AS \"server_uuid!\",
+                    servers.name AS \"server_name!\",
                     COALESCE(server_database_instances.cpu, database_agent_templates.cpu) AS cpu,
                     COALESCE(server_database_instances.memory, database_agent_templates.memory) AS memory,
                     COALESCE(server_database_instances.disk, database_agent_templates.disk) AS disk

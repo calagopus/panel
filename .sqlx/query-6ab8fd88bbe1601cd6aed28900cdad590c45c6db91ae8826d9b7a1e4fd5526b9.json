@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n                        teams.uuid AS \"uuid!\",\n                        COALESCE(team_servers.count, 0) AS \"team_servers!\",\n                        COALESCE(team_members.count, 0) AS \"team_members!\"\n                    FROM teams\n                    LEFT JOIN (\n                        SELECT servers.team_uuid, COUNT(*) AS count\n                        FROM servers\n                        WHERE servers.team_uuid IS NOT NULL\n                        GROUP BY servers.team_uuid\n                    ) AS team_servers ON team_servers.team_uuid = teams.uuid\n                    LEFT JOIN (\n                        SELECT team_members.team_uuid, COUNT(*) AS count\n                        FROM team_members\n                        GROUP BY team_members.team_uuid\n                    ) AS team_members ON team_members.team_uuid = teams.uuid\n                    WHERE team_servers.count IS NOT NULL OR team_members.count IS NOT NULL",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "uuid!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "teams",
+            "name": "uuid"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "team_servers!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "team_members!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "6ab8fd88bbe1601cd6aed28900cdad590c45c6db91ae8826d9b7a1e4fd5526b9"
+}

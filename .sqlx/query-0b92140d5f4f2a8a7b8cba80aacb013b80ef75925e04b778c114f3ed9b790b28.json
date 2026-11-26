@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT nest_egg_variables.env_variable, COALESCE(server_variables.value, nest_egg_variables.default_value) AS value\n                FROM nest_egg_variables\n                LEFT JOIN server_variables ON server_variables.variable_uuid = nest_egg_variables.uuid AND server_variables.server_uuid = $1\n                WHERE nest_egg_variables.egg_uuid = $2",
+  "query": "SELECT nest_egg_variables.env_variable AS \"env_variable!\", COALESCE(server_variables.value, nest_egg_variables.default_value) AS value\n                FROM nest_egg_variables\n                LEFT JOIN server_variables ON server_variables.variable_uuid = nest_egg_variables.uuid AND server_variables.server_uuid = $1\n                WHERE nest_egg_variables.egg_uuid = $2",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "env_variable",
+        "name": "env_variable!",
         "type_info": "Varchar",
         "origin": {
           "Table": {
@@ -32,5 +32,5 @@
       null
     ]
   },
-  "hash": "c8f3552929be339f91affdd663eeaf3832046e3918e8901b7024e0a111effc4a"
+  "hash": "0b92140d5f4f2a8a7b8cba80aacb013b80ef75925e04b778c114f3ed9b790b28"
 }
