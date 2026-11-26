@@ -2778,24 +2778,6 @@
         "users": {
           "title": "ユーザー",
           "resourceName": "ユーザー",
-          "externalIdLookup": {
-            "button": "外部IDで検索",
-            "modal": {
-              "title": "外部IDでユーザーを検索",
-              "form": {
-                "externalIdPlaceholder": "例: my-user-001",
-                "search": "検索"
-              },
-              "result": {
-                "title": "ユーザーが見つかりました",
-                "username": "ユーザー名",
-                "email": "メールアドレス",
-                "role": "ロール",
-                "viewUser": "ユーザーを表示"
-              },
-              "notFound": "その外部IDを持つユーザーは見つかりませんでした。"
-            }
-          },
           "tooltip": {
             "admin": "管理者",
             "twoFactorEnabled": "2FA有効",
@@ -3562,24 +3544,6 @@
               }
             },
             "nothingToDo": "選択されたすべてのサーバーがすでにその状態です。"
-          },
-          "externalIdLookup": {
-            "button": "外部IDで検索",
-            "modal": {
-              "title": "外部IDでサーバーを検索",
-              "form": {
-                "externalIdPlaceholder": "例: my-server-001",
-                "search": "検索"
-              },
-              "result": {
-                "title": "サーバーが見つかりました",
-                "name": "名前",
-                "owner": "所有者",
-                "node": "ノード",
-                "viewServer": "サーバーを表示"
-              },
-              "notFound": "その外部IDを持つサーバーは見つかりませんでした。"
-            }
           },
           "tabs": {
             "overview": {
@@ -5408,8 +5372,6 @@
           "details": {
             "address": "アドレス",
             "port": "ポート",
-            "networkIn": "ネットワーク (受信)",
-            "networkOut": "ネットワーク (送信)",
             "networkDetails": "合計 {total} · {packets} pps",
             "normalizeCpuLoad": "CPU負荷を正規化 (最大100%に調整)"
           },
@@ -5420,9 +5382,6 @@
                 "content": "サーバーを強制停止すると、データの破損につながる可能性があります。"
               }
             }
-          },
-          "stats": {
-            "offline": "サーバーはオフラインです"
           },
           "socketConnected": "接続済み (ping: {ping}ms)",
           "socketDisconnected": "切断されました"

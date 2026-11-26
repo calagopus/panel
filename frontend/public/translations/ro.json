@@ -489,8 +489,6 @@
           },
           "details": {
             "address": "Adresă",
-            "networkIn": "Rețea (Intrare)",
-            "networkOut": "Rețea (Ieșire)",
             "normalizeCpuLoad": "Normalizează încărcarea CPU (schimbat la maxim 100%)"
           },
           "power": {

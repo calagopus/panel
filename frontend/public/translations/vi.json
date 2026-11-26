@@ -576,7 +576,6 @@
         "truncateDirectory": "Bạn có chắc muốn xóa tất cả các tệp trong thư mục này không? Hành động này không thể hoàn tác.",
         "rule": {
           "invalidCharacters": "Chứa các ký tự không được phép sử dụng ở đây.",
-          "username": "Từ 3 đến 48 ký tự, chỉ gồm chữ cái, chữ số và dấu gạch dưới.",
           "databaseName": "Tối đa 31 ký tự, chỉ bao gồm chữ cái, chữ số và dấu gạch dưới.",
           "databaseInstanceIdentifier": "Từ 2 đến 23 ký tự, chỉ bao gồm chữ cái và chữ số.",
           "captchaSiteKey": "Chỉ chấp nhận chữ cái, chữ số, dấu gạch ngang và dấu gạch dưới.",
@@ -3037,23 +3036,6 @@
         "users": {
           "title": "Người Dùng",
           "resourceName": "Người Dùng",
-          "externalIdLookup": {
-            "button": "Tìm bằng ID Bên Ngoài",
-            "modal": {
-              "title": "Tra cứu bằng ID Bên Ngoài",
-              "form": {
-                "externalIdPlaceholder": "ví dụ: my-user-001",
-                "search": "Tìm kiếm"
-              },
-              "result": {
-                "title": "Đã tìm thấy người dùng",
-                "username": "Tên người dùng",
-                "role": "Vai trò",
-                "viewUser": "Xem người dùng"
-              },
-              "notFound": "Không tìm thấy người dùng nào với ID bên ngoài đó."
-            }
-          },
           "tooltip": {
             "admin": "Quản Trị Viên",
             "twoFactorEnabled": "2FA Đã Bật",
@@ -3870,23 +3852,6 @@
             },
             "nothingToDo": "Mọi máy chủ được chọn đều đã ở trạng thái đó.",
             "transferMixedNodes": "Chỉ có thể chuyển cùng lúc các máy chủ trên cùng một node."
-          },
-          "externalIdLookup": {
-            "button": "Tìm bằng ID Bên Ngoài",
-            "modal": {
-              "title": "Tra cứu bằng ID Bên Ngoài",
-              "form": {
-                "externalIdPlaceholder": "ví dụ: my-server-001",
-                "search": "Tìm kiếm"
-              },
-              "result": {
-                "title": "Đã tìm thấy máy chủ",
-                "name": "Tên",
-                "owner": "Chủ sở hữu",
-                "viewServer": "Xem máy chủ"
-              },
-              "notFound": "Không tìm thấy máy chủ nào với ID bên ngoài đó."
-            }
           },
           "tabs": {
             "overview": {
@@ -5874,8 +5839,6 @@
           "details": {
             "address": "Địa Chỉ",
             "port": "Cổng",
-            "networkIn": "Mạng (Vào)",
-            "networkOut": "Mạng (Ra)",
             "networkDetails": "{total} tổng · {packets} pps",
             "normalizeCpuLoad": "Chuẩn Hóa Tải CPU (gom tất cả nhân thành chuẩn 100%)"
           },
@@ -5886,9 +5849,6 @@
                 "content": "Buộc dừng máy chủ có thể dẫn đến hỏng dữ liệu."
               }
             }
-          },
-          "stats": {
-            "offline": "Máy chủ đang ngoại tuyến."
           },
           "history": {
             "title": "Lịch sử tài nguyên",

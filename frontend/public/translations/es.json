@@ -2682,24 +2682,6 @@
         "users": {
           "title": "Usuarios",
           "resourceName": "Usuario",
-          "externalIdLookup": {
-            "button": "Buscar por ID externo",
-            "modal": {
-              "title": "Buscar por ID externo",
-              "form": {
-                "externalIdPlaceholder": "p. ej., my-user-001",
-                "search": "Buscar"
-              },
-              "result": {
-                "title": "Usuario encontrado",
-                "username": "Nombre de usuario",
-                "email": "Correo electrónico",
-                "role": "Rol",
-                "viewUser": "Ver usuario"
-              },
-              "notFound": "No se ha encontrado ningún usuario con esa ID externa."
-            }
-          },
           "tooltip": {
             "admin": "Administrador",
             "twoFactorEnabled": "Autenticación de dos factores habilitada",
@@ -3462,24 +3444,6 @@
               }
             },
             "nothingToDo": "Todos los servidores seleccionados ya están en ese estado."
-          },
-          "externalIdLookup": {
-            "button": "Buscar por ID externo",
-            "modal": {
-              "title": "Buscar por ID externo",
-              "form": {
-                "externalIdPlaceholder": "p. ej., my-server-001",
-                "search": "Buscar"
-              },
-              "result": {
-                "title": "Servidor encontrado",
-                "name": "Nombre",
-                "owner": "Dueño",
-                "node": "Nodo",
-                "viewServer": "Ver servidor"
-              },
-              "notFound": "No se ha encontrado ningún servidor con esa ID externa."
-            }
           },
           "tabs": {
             "overview": {
@@ -5233,8 +5197,6 @@
           "details": {
             "address": "Dirección",
             "port": "Puerto",
-            "networkIn": "Red (entrada)",
-            "networkOut": "Red (salida)",
             "normalizeCpuLoad": "Normalizar carga de CPU (ajustada a un máximo de 100%)"
           },
           "power": {
@@ -5244,9 +5206,6 @@
                 "content": "Detener un servidor a la fuerza puede provocar corrupción de datos."
               }
             }
-          },
-          "stats": {
-            "offline": "El servidor está apagado"
           },
           "socketConnected": "Conectado (ping {ping}ms)",
           "socketDisconnected": "Desconectado"

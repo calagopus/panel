@@ -2162,24 +2162,6 @@
         "users": {
           "title": "Usuários",
           "resourceName": "Usuário",
-          "externalIdLookup": {
-            "button": "Localizar por ID Externo",
-            "modal": {
-              "title": "Procurar por ID Externo",
-              "form": {
-                "externalIdPlaceholder": "ex. meu-usuário-001",
-                "search": "Pesquisar"
-              },
-              "result": {
-                "title": "Usuário Encontrado",
-                "username": "Nome de usuário",
-                "email": "E-mail",
-                "role": "Função",
-                "viewUser": "Visualizar usuário"
-              },
-              "notFound": "Nenhum usuário encontrado com esse ID externo."
-            }
-          },
           "tooltip": {
             "admin": "Administrador",
             "twoFactorEnabled": "2FA Habilitada"

@@ -3046,8 +3046,6 @@
           },
           "details": {
             "address": "Adresa",
-            "networkIn": "Sieť (príjem)",
-            "networkOut": "Sieť (odosielanie)",
             "normalizeCpuLoad": "Normalizovať zaťaženie procesora (škálované na maximum 100 %)"
           },
           "power": {
