@@ -71,11 +71,7 @@ function EggConfigurationsContainer() {
         </AdminCan>
       }
     >
-      <ImportOverlay
-        visible={isDragging}
-        title={t('pages.admin.eggConfigurations.dropzone.title', {})}
-        subtitle={t('pages.admin.eggConfigurations.dropzone.subtitle', {})}
-      />
+      <ImportOverlay visible={isDragging} title={t('pages.admin.eggConfigurations.dropzone.title', {})} />
 
       <Table
         columns={eggConfigurationTableColumns()}

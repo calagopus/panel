@@ -63,8 +63,8 @@ export default function AllocationActionBar({
         onConfirmed={doRemove}
       >
         <Stack>
-          {t('pages.server.network.modal.removeAllocations.content', {
-            allocations: tItem('serverAllocation', removable.length),
+          {t('common.modal.removeFromServer.content', {
+            name: tItem('serverAllocation', removable.length),
           }).md()}
 
           {skippedRemovals > 0 && (

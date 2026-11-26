@@ -148,7 +148,7 @@ export function useDatabaseAgentTemplateFormFields(isUpdate: boolean): FieldDef<
         label: t('common.form.memory', {}),
         required: true,
         description: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryDescription', {}),
-        tooltip: t('pages.admin.databaseAgentTemplates.tabs.general.page.form.memoryTooltip', {}),
+        tooltip: t('common.form.unlimitedHint', {}),
         mode: 'mb',
         min: 0,
       },

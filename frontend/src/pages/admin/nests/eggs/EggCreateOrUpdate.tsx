@@ -63,7 +63,7 @@ export default function EggCreateOrUpdate({
   contextEgg?: z.infer<typeof adminEggSchema>;
 }) {
   const { addToast } = useToast();
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
 
   const [isValid, setIsValid] = useState(false);
   const [openModal, setOpenModal] = useState<'move' | 'delete' | 'duplicate' | 'updateUrl' | null>(null);
@@ -426,7 +426,7 @@ export default function EggCreateOrUpdate({
               <ConditionalTooltip
                 enabled={eggServers > 0}
                 label={t('pages.admin.nests.tabs.eggs.page.tabs.general.page.tooltip.deleteBlocked', {
-                  count: String(eggServers),
+                  items: tItem('server', eggServers),
                 })}
               >
                 <Button color='red' onClick={() => setOpenModal('delete')} loading={loading} disabled={eggServers > 0}>

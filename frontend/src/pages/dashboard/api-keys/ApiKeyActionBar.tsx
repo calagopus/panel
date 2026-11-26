@@ -75,8 +75,8 @@ export default function ApiKeyActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.account.apiKeys.modal.deleteApiKeys.content', {
-            apiKeys: tItem('apiKey', apiKeys.length),
+          {t('common.modal.deleteFromAccount.content', {
+            name: tItem('apiKey', apiKeys.length),
           }).md()}
 
           <ItemPreviewList

@@ -87,11 +87,7 @@ function OAuthProvidersContainer() {
         </AdminCan>
       }
     >
-      <ImportOverlay
-        visible={isDragging}
-        title={t('pages.admin.oAuthProviders.dropzone.title', {})}
-        subtitle={t('pages.admin.oAuthProviders.dropzone.subtitle', {})}
-      />
+      <ImportOverlay visible={isDragging} title={t('pages.admin.oAuthProviders.dropzone.title', {})} />
 
       <Table
         columns={oauthProviderTableColumns()}

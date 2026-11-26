@@ -48,7 +48,7 @@ export default function EggUpdateUrlModal({
       <Stack>
         <TextInput
           withAsterisk
-          label={t('pages.admin.nests.tabs.eggs.page.modal.updateUrl.url', {})}
+          label={t('common.form.url', {})}
           description={t('pages.admin.nests.tabs.eggs.page.modal.updateUrl.urlDescription', {})}
           placeholder='https://example.com/egg.json'
           key={form.key('url')}

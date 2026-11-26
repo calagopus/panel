@@ -41,7 +41,7 @@ function initialValues(
 }
 
 export default function FilePatchModal({ file, ...props }: Props) {
-  const { t, tItem } = useTranslations();
+  const { t, tItem, tReact } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
@@ -126,7 +126,7 @@ export default function FilePatchModal({ file, ...props }: Props) {
       </Stack>
 
       <FilePathPreview
-        label={t('pages.server.files.modal.patchFile.appliedIn', { file: file?.name ?? '' })}
+        label={(path) => tReact('pages.server.files.modal.patchFile.appliedIn', { file: <>{file?.name}</>, path })}
         path={
           form.values.format === 'bsdiff' && form.values.file
             ? join(form.values.root, form.values.file)

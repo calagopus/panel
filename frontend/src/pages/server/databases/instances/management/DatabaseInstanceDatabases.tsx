@@ -35,7 +35,7 @@ export default function DatabaseInstanceDatabases({
   instance: z.infer<typeof serverDatabaseInstanceSchema>;
   offline: boolean;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
   const maxDatabaseCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceDatabaseCount);
   const canReadUsers = useServerCan('database-instances.users');
@@ -98,7 +98,7 @@ export default function DatabaseInstanceDatabases({
         <div>
           <Title order={2}>{t('pages.server.databases.instance.databases.title', {})}</Title>
           <Text size='xs' c='dimmed'>
-            {t('pages.server.databases.instance.databases.subtitle', {
+            {t('common.label.limitUsage.created', {
               current: pagination.total,
               max: maxDatabaseCount,
             })}
@@ -109,7 +109,7 @@ export default function DatabaseInstanceDatabases({
             enabled={offline || limitReached}
             label={
               limitReached
-                ? t('pages.server.databases.instance.databases.tooltip.limitReached', { max: maxDatabaseCount })
+                ? t('common.tooltip.limitReached.databaseInstance', { items: tItem('database', maxDatabaseCount) })
                 : t('pages.server.databases.instance.databases.tooltip.offline', {})
             }
           >

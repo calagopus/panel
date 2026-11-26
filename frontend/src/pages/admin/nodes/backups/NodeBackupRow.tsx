@@ -56,10 +56,7 @@ export default function NodeBackupRow({
   const queryClient = useQueryClient();
   const canBackups = useAdminCan('nodes.backups');
   const canReadDatabaseInstances = useAdminCan('database-agent-hosts.read');
-  const { downloadMenuItem } = useBackupDownload(
-    node.uuid,
-    t('pages.admin.nodes.tabs.backups.page.toast.downloadStarted', {}),
-  );
+  const { downloadMenuItem } = useBackupDownload(node.uuid);
 
   const [openModal, setOpenModal] = useState<
     'restore' | 'export' | 'reattach' | 'reassign' | 'detach' | 'delete' | 'metadata' | null
@@ -192,7 +189,7 @@ export default function NodeBackupRow({
           {
             type: 'action',
             icon: faInfo,
-            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            label: t('pages.server.backups.button.viewMetadata', {}),
             hidden: Object.keys(backup.metadata).length === 0,
             onClick: () => setOpenModal('metadata'),
             color: 'gray',

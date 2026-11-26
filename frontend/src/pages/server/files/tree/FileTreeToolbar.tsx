@@ -194,7 +194,7 @@ export default function FileTreeToolbar({
                 {
                   type: 'action',
                   icon: faFileUpload,
-                  label: t('pages.server.files.tree.uploadFromComputer', {}),
+                  label: t('pages.server.files.tree.button.uploadFromComputer', {}),
                   color: 'gray',
                   items: [
                     {
@@ -216,7 +216,7 @@ export default function FileTreeToolbar({
                 {
                   type: 'action',
                   icon: faLink,
-                  label: t('pages.server.files.tree.uploadFromUrl', {}),
+                  label: t('pages.server.files.tree.button.uploadFromUrl', {}),
                   onClick: onUploadUrl,
                   color: 'gray',
                 },

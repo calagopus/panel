@@ -34,7 +34,7 @@ export default function BackupCreateModal({
   createDefaults,
   ...props
 }: ModalProps & { groupUuid?: string; createDefaults?: { databaseInstanceUuid: string | null } }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const queryClient = useQueryClient();
@@ -168,7 +168,7 @@ export default function BackupCreateModal({
           <Alert color='yellow'>
             <Text size='sm'>
               {t('pages.server.backups.tooltip.evicts', {
-                max: server.featureLimits.backups,
+                items: tItem('backup', server.featureLimits.backups),
                 name: createGate.expendable.name,
               })}
             </Text>

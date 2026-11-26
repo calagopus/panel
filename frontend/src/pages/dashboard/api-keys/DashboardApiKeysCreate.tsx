@@ -33,7 +33,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function DashboardApiKeysCreate() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const { user } = useAuth();
   const {
@@ -136,7 +136,7 @@ export default function DashboardApiKeysCreate() {
           <Stack>
             {atLimit && (
               <Alert color='red' icon={faExclamationTriangle}>
-                {t('pages.account.apiKeys.create.alert.limitReached', { max: maxApiKeyCount }).md()}
+                {t('pages.account.apiKeys.create.alert.limitReached', { items: tItem('apiKey', maxApiKeyCount) }).md()}
               </Alert>
             )}
             {droppedPermissions.length > 0 && (

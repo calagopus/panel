@@ -126,14 +126,12 @@ export default function NodeOverview({ node }: { node: Node }) {
 
       <Group mb='md' gap='xs'>
         <Badge color={node.deploymentEnabled ? 'green' : 'red'} variant='light'>
-          {node.deploymentEnabled
-            ? t('pages.admin.nodes.tabs.capacity.page.status.deploymentEnabled', {})
-            : t('pages.admin.nodes.tabs.capacity.page.status.deploymentDisabled', {})}
+          {node.deploymentEnabled ? t('common.badge.deploymentEnabled', {}) : t('common.badge.deploymentDisabled', {})}
         </Badge>
         <Badge color={node.maintenanceEnabled ? 'red' : 'gray'} variant='light'>
           {node.maintenanceEnabled
-            ? t('pages.admin.nodes.tabs.capacity.page.status.maintenanceEnabled', {})
-            : t('pages.admin.nodes.tabs.capacity.page.status.maintenanceDisabled', {})}
+            ? t('common.badge.maintenanceEnabled', {})
+            : t('common.badge.maintenanceDisabled', {})}
         </Badge>
       </Group>
 
@@ -224,7 +222,7 @@ export default function NodeOverview({ node }: { node: Node }) {
                     </Text>
                     {upgradeAvailability === 'available' && (
                       <Badge color='yellow' variant='light' size='sm'>
-                        {t('pages.admin.nodes.tabs.overview.page.badge.updateAvailable', {})}
+                        {t('common.badge.updateAvailable', {})}
                       </Badge>
                     )}
                     {upgradeAvailability === 'unknown' && (

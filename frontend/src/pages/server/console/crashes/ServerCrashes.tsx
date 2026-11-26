@@ -246,11 +246,11 @@ export default function ServerCrashes() {
         <ConfirmationModal
           opened={deleting}
           onClose={() => setDeleting(false)}
-          title={t('pages.server.console.crashes.modal.delete.title', {})}
+          title={t('common.modal.deleteCrash.title', {})}
           confirm={t('common.button.delete', {})}
           onConfirmed={doDelete}
         >
-          {t('pages.server.console.crashes.modal.delete.content', {
+          {t('common.modal.deleteCrash.content', {
             timestamp: formatDateTime(selected.timestamp),
           }).md()}
         </ConfirmationModal>

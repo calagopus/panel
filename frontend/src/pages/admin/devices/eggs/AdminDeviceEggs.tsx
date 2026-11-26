@@ -67,7 +67,7 @@ function DeviceEggRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.devices.tabs.eggs.page.modal.remove.content', { device: device.name, name: egg.name }).md()}
+        {t('common.modal.removeDevice.content', { name: device.name, parent: egg.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu

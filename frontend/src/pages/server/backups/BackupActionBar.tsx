@@ -124,8 +124,8 @@ export default function BackupActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.server.backups.modal.deleteBackups.content', {
-            backups: tItem('backup', deletable.length),
+          {t('common.modal.deleteFromServer.content', {
+            name: tItem('backup', deletable.length),
           }).md()}
 
           <ItemPreviewList

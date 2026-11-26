@@ -23,7 +23,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
 export default function PullFileModal({ ...props }: ModalProps) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const server = useServerStore((state) => state.server);
@@ -108,7 +108,7 @@ export default function PullFileModal({ ...props }: ModalProps) {
       />
 
       <FilePathPreview
-        label={t('pages.server.files.modal.pullFile.createdAs', {})}
+        label={(path) => tReact('pages.server.files.modal.pullFile.createdAs', { path })}
         path={resolve(browsingDirectory, form.values.name ?? '')}
       />
 

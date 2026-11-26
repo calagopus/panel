@@ -58,8 +58,8 @@ export default function CommandSnippetActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.account.commandSnippets.modal.deleteCommandSnippets.content', {
-            commandSnippets: tItem('commandSnippet', commandSnippets.length),
+          {t('common.modal.deleteFromAccount.content', {
+            name: tItem('commandSnippet', commandSnippets.length),
           }).md()}
 
           <ItemPreviewList

@@ -50,9 +50,9 @@ export default function ServerMountRow({ server, mount }: { server: AdminServer;
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.servers.tabs.mounts.page.modal.remove.content', {
-          mount: mount.mount.name,
-          name: server.name,
+        {t('common.modal.removeMount.content', {
+          name: mount.mount.name,
+          parent: server.name,
         }).md()}
       </ConfirmationModal>
 

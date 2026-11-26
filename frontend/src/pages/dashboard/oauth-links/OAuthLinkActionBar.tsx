@@ -80,8 +80,8 @@ export default function OAuthLinkActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.account.oauthLinks.modal.deleteOAuthLinks.content', {
-            oauthLinks: tItem('oauthLink', removable.length),
+          {t('common.modal.deleteFromAccount.content', {
+            name: tItem('oauthLink', removable.length),
           }).md()}
 
           <ItemPreviewList

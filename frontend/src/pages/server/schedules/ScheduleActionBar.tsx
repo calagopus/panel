@@ -88,8 +88,8 @@ export default function ScheduleActionBar({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.server.schedules.modal.deleteSchedules.content', {
-          schedules: tItem('schedule', schedules.length),
+        {t('common.modal.deleteFromServer.content', {
+          name: tItem('schedule', schedules.length),
         }).md()}
       </ConfirmationModal>
 

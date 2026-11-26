@@ -404,7 +404,7 @@ export default function DatabaseInstanceView() {
                   )}
                   {instance.updateAvailable && (
                     <Badge color='yellow' size='lg'>
-                      {t('pages.server.databases.instance.updateAvailable', {})}
+                      {t('common.badge.updateAvailable', {})}
                     </Badge>
                   )}
                   {restoring && (

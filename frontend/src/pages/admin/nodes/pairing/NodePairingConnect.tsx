@@ -33,7 +33,7 @@ export default function NodePairingConnect({
   onConnected: (target: NodePairingTarget) => void;
   onReset: () => void;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
   const [url, setUrl] = useState('');
@@ -68,7 +68,7 @@ export default function NodePairingConnect({
           </Text>
           <Text size='sm'>
             {t('pages.admin.nodes.pairing.probe.resources', {
-              cores: String(probe.cpuCount),
+              cores: tItem('core', probe.cpuCount),
               memory: bytesToString(probe.memoryBytes),
               disk: bytesToString(probe.diskBytes),
               architecture: probe.architecture,

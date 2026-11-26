@@ -276,10 +276,9 @@ export default function IgnoredFilesInput({ serverUuid, label, description, valu
 
         <Group justify='space-between' gap='xs' align='center' wrap='nowrap'>
           <Input.Description>
-            {t('common.elements.ignoredFilesInput.onePatternPerLine', {})}
-            {serverUuid &&
-              needsManualCount &&
-              ` ${t('common.elements.ignoredFilesInput.tooManyPatterns', { max: MAX_AUTO_COUNTED_PATTERNS })}`}
+            {serverUuid && needsManualCount
+              ? t('common.elements.ignoredFilesInput.tooManyPatterns', { max: MAX_AUTO_COUNTED_PATTERNS })
+              : t('common.elements.ignoredFilesInput.onePatternPerLine', {})}
           </Input.Description>
           {serverUuid && needsManualCount && <CountMatchesButton onClick={() => setCountingRequested(true)} />}
         </Group>

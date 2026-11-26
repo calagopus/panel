@@ -19,7 +19,7 @@ import SshKeyActionBar from './SshKeyActionBar.tsx';
 import SshKeyRow from './SshKeyRow.tsx';
 
 export default function DashboardSshKeys() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'create' | 'import' | null>(null);
@@ -50,7 +50,7 @@ export default function DashboardSshKeys() {
   return (
     <AccountContentContainer
       title={t('pages.account.sshKeys.title', {})}
-      subtitle={t('pages.account.sshKeys.subtitle', {
+      subtitle={t('common.label.limitUsage.created', {
         current: sshKeys?.total ?? 0,
         max: settings.user.maxSshKeyCount,
       })}
@@ -60,7 +60,7 @@ export default function DashboardSshKeys() {
         <Group>
           <ConditionalTooltip
             enabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
-            label={t('pages.account.sshKeys.tooltip.limitReached', { max: settings.user.maxSshKeyCount })}
+            label={t('common.tooltip.limitReached.account', { items: tItem('sshKey', settings.user.maxSshKeyCount) })}
           >
             <Button
               onClick={() => setOpenModal('import')}
@@ -73,7 +73,7 @@ export default function DashboardSshKeys() {
           </ConditionalTooltip>
           <ConditionalTooltip
             enabled={(sshKeys?.total ?? 0) >= settings.user.maxSshKeyCount}
-            label={t('pages.account.sshKeys.tooltip.limitReached', { max: settings.user.maxSshKeyCount })}
+            label={t('common.tooltip.limitReached.account', { items: tItem('sshKey', settings.user.maxSshKeyCount) })}
           >
             <Button
               onClick={() => setOpenModal('create')}

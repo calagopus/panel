@@ -97,11 +97,11 @@ export default function AdminServerLogs({ server }: { server: AdminServer }) {
         <ConfirmationModal
           opened={deleting}
           onClose={() => setDeleting(false)}
-          title={t('pages.admin.servers.tabs.logs.page.modal.deleteCrash.title', {})}
+          title={t('common.modal.deleteCrash.title', {})}
           confirm={t('common.button.delete', {})}
           onConfirmed={doDelete}
         >
-          {t('pages.admin.servers.tabs.logs.page.modal.deleteCrash.content', {
+          {t('common.modal.deleteCrash.content', {
             timestamp: formatDateTime(selectedCrash.timestamp),
           }).md()}
         </ConfirmationModal>

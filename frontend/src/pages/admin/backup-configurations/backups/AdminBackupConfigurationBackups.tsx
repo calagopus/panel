@@ -84,7 +84,6 @@ export default function AdminBackupConfigurationBackups({
             backup={backup}
             showKind
             showSource
-            downloadStartedMessage={t('pages.admin.backupConfigurations.tabs.backups.page.toast.downloadStarted', {})}
             registry={
               window.extensionContext.extensionRegistry.pages.admin.backupConfigurations.view.backups.contextMenu
             }

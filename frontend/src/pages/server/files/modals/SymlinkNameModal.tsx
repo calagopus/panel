@@ -21,7 +21,7 @@ type Props = ModalProps & {
 };
 
 export default function SymlinkNameModal({ file, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
   const invalidateFilemanager = useFileManager((state) => state.invalidateFilemanager);
@@ -74,9 +74,15 @@ export default function SymlinkNameModal({ file, ...props }: Props) {
         {...form.getInputProps('target')}
       />
 
-      <FilePathPreview label={t('pages.server.files.modal.createSymlink.createdAs', {})} path={linkPath} />
+      <FilePathPreview
+        label={(path) => tReact('pages.server.files.modal.createSymlink.createdAs', { path })}
+        path={linkPath}
+      />
 
-      <FilePathPreview label={t('pages.server.files.modal.createSymlink.pointsTo', {})} path={targetPath} />
+      <FilePathPreview
+        label={(path) => tReact('pages.server.files.modal.createSymlink.pointsTo', { path })}
+        path={targetPath}
+      />
 
       <ModalFooter>
         <Button type='submit' loading={loading} disabled={!form.isValid()}>

@@ -47,7 +47,7 @@ export function useMetadataFormFields({
     {
       type: 'textarea',
       name: 'description',
-      label: t('pages.admin.settings.tabs.metadata.page.form.description', {}),
+      label: t('common.form.description', {}),
       description: t('pages.admin.settings.tabs.metadata.page.form.descriptionDescription', {}),
       rows: 3,
       colSpan: 'full',

@@ -42,10 +42,7 @@ export default function AdminServerBackupRow({
   const [openModal, setOpenModal] = useState<'restore' | 'export' | 'delete' | 'metadata' | null>(null);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
 
-  const { downloadMenuItem } = useBackupDownload(
-    backup.node.uuid,
-    t('pages.admin.nodes.tabs.backups.page.toast.downloadStarted', {}),
-  );
+  const { downloadMenuItem } = useBackupDownload(backup.node.uuid);
 
   const { isFailed, isDeleting, isDeleteFailed } = getBackupState(backup);
   const actionsHidden = !backup.completed || isFailed || isDeleting || isDeleteFailed;
@@ -112,7 +109,7 @@ export default function AdminServerBackupRow({
           {
             type: 'action',
             icon: faInfo,
-            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            label: t('pages.server.backups.button.viewMetadata', {}),
             hidden: Object.keys(backup.metadata).length === 0,
             onClick: () => setOpenModal('metadata'),
             color: 'gray',

@@ -30,7 +30,7 @@ export default function DatabaseInstanceUsers({
   instance: z.infer<typeof serverDatabaseInstanceSchema>;
   offline: boolean;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
   const maxUserCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceUserCount);
 
@@ -78,7 +78,7 @@ export default function DatabaseInstanceUsers({
         <div>
           <Title order={2}>{t('pages.server.databases.instance.users.title', {})}</Title>
           <Text size='xs' c='dimmed'>
-            {t('pages.server.databases.instance.users.subtitle', {
+            {t('common.label.limitUsage.created', {
               current: pagination.total,
               max: maxUserCount,
             })}
@@ -93,7 +93,7 @@ export default function DatabaseInstanceUsers({
             enabled={createDisabled}
             label={
               limitReached
-                ? t('pages.server.databases.instance.users.tooltip.limitReached', { max: maxUserCount })
+                ? t('common.tooltip.limitReached.databaseInstance', { items: tItem('user', maxUserCount) })
                 : t('pages.server.databases.instance.users.tooltip.offline', {})
             }
           >
@@ -109,11 +109,7 @@ export default function DatabaseInstanceUsers({
       </Group>
 
       <Table
-        columns={[
-          t('common.table.columns.username', {}),
-          t('pages.server.databases.instance.users.table.columns.databases', {}),
-          '',
-        ]}
+        columns={[t('common.table.columns.username', {}), t('common.table.columns.databases', {}), '']}
         loading={loading}
         error={error ? httpErrorToHuman(error) : null}
         pagination={pagination}

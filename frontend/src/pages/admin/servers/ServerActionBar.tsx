@@ -109,7 +109,7 @@ const PAST_TENSE = {
   stop: 'stopped',
   suspend: 'suspended',
   unsuspend: 'unsuspended',
-  clearState: 'clearedState',
+  clearState: 'stateCleared',
   delete: 'deleted',
 } as const satisfies Record<ConfirmableAction, string>;
 
@@ -183,7 +183,7 @@ export default function ServerActionBar({
     skipped: number,
     firstError?: PromiseRejectedResult,
   ) => {
-    const performed = t(`common.enum.bulkActionServerAction.${PAST_TENSE[action]}`, {});
+    const performed = t(`common.bulkActions.verb.${PAST_TENSE[action]}`, {});
 
     if (failed > 0) {
       if (successful === 0 && firstError) {
@@ -192,10 +192,10 @@ export default function ServerActionBar({
       }
 
       addToast(
-        t('pages.account.home.bulkActions.partial', {
+        t('common.bulkActions.partial', {
           action: performed,
-          successfulServers: tItem('server', successful),
-          failedServers: tItem('server', failed),
+          successfulItems: tItem('server', successful),
+          failedItems: tItem('server', failed),
         }),
         'warning',
       );
@@ -204,20 +204,17 @@ export default function ServerActionBar({
 
     if (skipped > 0) {
       addToast(
-        t('pages.admin.servers.bulkActions.successWithSkipped', {
+        t('common.bulkActions.successWithSkipped', {
           action: performed,
-          servers: tItem('server', successful),
-          skippedServers: tItem('server', skipped),
+          items: tItem('server', successful),
+          skippedItems: tItem('server', skipped),
         }),
         'success',
       );
       return;
     }
 
-    addToast(
-      t('pages.account.home.bulkActions.success', { action: performed, servers: tItem('server', successful) }),
-      'success',
-    );
+    addToast(t('common.bulkActions.success', { action: performed, items: tItem('server', successful) }), 'success');
   };
 
   const runPower = async (action: PowerAction) => {

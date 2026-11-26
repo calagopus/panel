@@ -64,7 +64,7 @@ function MountNodeRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.mounts.tabs.nodes.page.modal.remove.content', { mount: mount.name, name: node.name }).md()}
+        {t('common.modal.removeMount.content', { name: mount.name, parent: node.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu

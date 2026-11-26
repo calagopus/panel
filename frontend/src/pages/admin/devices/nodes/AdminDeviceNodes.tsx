@@ -65,7 +65,7 @@ function DeviceNodeRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.devices.tabs.nodes.page.modal.remove.content', { device: device.name, name: node.name }).md()}
+        {t('common.modal.removeDevice.content', { name: device.name, parent: node.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu

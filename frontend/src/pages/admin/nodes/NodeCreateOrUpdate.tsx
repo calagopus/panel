@@ -53,7 +53,7 @@ const MEMORY_RESERVE_RATIO = 0.9;
 const bytesToReservedMib = (bytes: number) => Math.floor((bytes / 1024 / 1024) * MEMORY_RESERVE_RATIO);
 
 export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.infer<typeof adminNodeSchema> }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -316,7 +316,7 @@ export default function NodeCreateOrUpdate({ contextNode }: { contextNode?: z.in
                 <ConditionalTooltip
                   enabled={nodeServers > 0}
                   label={t('pages.admin.nodes.tabs.general.page.tooltip.deleteBlocked', {
-                    count: String(nodeServers),
+                    items: tItem('server', nodeServers),
                   })}
                 >
                   <Button

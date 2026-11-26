@@ -22,7 +22,7 @@ import SubuserRow from './SubuserRow.tsx';
 import SubuserTeamMembers from './SubuserTeamMembers.tsx';
 
 export default function ServerSubusers() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
   const settings = useGlobalStore((state) => state.settings);
 
@@ -65,8 +65,8 @@ export default function ServerSubusers() {
   return (
     <ServerContentContainer
       title={t('pages.server.subusers.title', {})}
-      subtitle={t('pages.server.subusers.subtitle', {
-        current: subusers?.total ?? '…',
+      subtitle={t('common.label.limitUsage.created', {
+        current: subusers?.total ?? '...',
         max: settings.server.maxSubuserCount,
       })}
       search={search}
@@ -76,7 +76,9 @@ export default function ServerSubusers() {
           <ServerCan action='subusers.create'>
             <ConditionalTooltip
               enabled={atLimit}
-              label={t('pages.server.subusers.tooltip.limitReached', { max: settings.server.maxSubuserCount })}
+              label={t('common.tooltip.limitReached.server', {
+                items: tItem('subuser', settings.server.maxSubuserCount),
+              })}
             >
               <Button
                 onClick={() => setOpenModal('create')}
@@ -135,7 +137,9 @@ export default function ServerSubusers() {
                 <ServerCan action='subusers.create'>
                   <ConditionalTooltip
                     enabled={atLimit}
-                    label={t('pages.server.subusers.tooltip.limitReached', { max: settings.server.maxSubuserCount })}
+                    label={t('common.tooltip.limitReached.server', {
+                      items: tItem('subuser', settings.server.maxSubuserCount),
+                    })}
                   >
                     <Button
                       onClick={() => setOpenModal('create')}

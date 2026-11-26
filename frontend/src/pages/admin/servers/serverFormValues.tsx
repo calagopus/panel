@@ -216,7 +216,7 @@ function buildResourceLimitsFields<T extends Record<string, unknown>>(
 ): FieldDef<T>[] {
   const bandwidthDescription =
     !bandwidth || (bandwidth.enabled && bandwidth.ready)
-      ? t('pages.admin.servers.tabs.general.page.form.bandwidth.description', {})
+      ? t('common.form.unlimitedHint', {})
       : bandwidth.ready
         ? t('pages.admin.servers.tabs.general.page.form.bandwidth.disabled', {})
         : (bandwidth.reason ?? t('pages.admin.servers.tabs.general.page.form.bandwidth.unavailable', {}));
@@ -248,7 +248,7 @@ function buildResourceLimitsFields<T extends Record<string, unknown>>(
       label: t('common.form.memory', {}),
       required: true,
       description: t('pages.admin.servers.tabs.general.page.form.memoryDescription', {}),
-      tooltip: t('pages.admin.servers.tabs.general.page.form.memoryTooltip', {}),
+      tooltip: t('common.form.unlimitedHint', {}),
       mode: 'mb',
       min: 0,
     },
@@ -619,7 +619,7 @@ function buildServerAssignmentFields<T extends ServerEggAssignmentFormValues>(
       <div className='flex flex-col gap-1'>
         <Select
           withAsterisk
-          label={t('pages.admin.servers.tabs.general.page.form.egg', {})}
+          label={t('common.form.egg', {})}
           data={
             eggNests
               ? groupEggOptions(eggs.items, eggNests)

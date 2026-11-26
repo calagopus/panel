@@ -128,10 +128,7 @@ export default function AdminNodeConfiguration({ node }: { node: z.infer<typeof 
     try {
       parsed = load(yaml) as object;
     } catch (err) {
-      addToast(
-        t('pages.admin.nodes.tabs.configuration.page.toast.invalidYaml', { error: (err as Error).message }),
-        'error',
-      );
+      addToast(t('common.toast.invalidYaml', { error: (err as Error).message }), 'error');
       return;
     }
 

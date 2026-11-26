@@ -36,18 +36,18 @@ export function useBulkPowerActions() {
 
     if (failed === 0) {
       addToast(
-        t('pages.account.home.bulkActions.success', {
-          servers: tItem('server', successful),
-          action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
+        t('common.bulkActions.success', {
+          items: tItem('server', successful),
+          action: t(`common.bulkActions.verb.${actionPastTense}`, {}),
         }),
         'success',
       );
     } else {
       addToast(
-        t('pages.account.home.bulkActions.partial', {
-          successfulServers: tItem('server', successful),
-          failedServers: tItem('server', failed),
-          action: t(`common.enum.bulkActionServerAction.${actionPastTense}`, {}),
+        t('common.bulkActions.partial', {
+          successfulItems: tItem('server', successful),
+          failedItems: tItem('server', failed),
+          action: t(`common.bulkActions.verb.${actionPastTense}`, {}),
         }),
         'warning',
       );

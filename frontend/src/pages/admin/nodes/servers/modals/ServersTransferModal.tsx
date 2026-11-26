@@ -96,7 +96,7 @@ export default function ServersTransferModal({
         onConfirmed={doTransfer}
       >
         {t('pages.admin.nodes.tabs.servers.page.modal.transfer.confirm.content', {
-          count,
+          items: tItem('server', count),
           from: contextNode.name,
           to: nodes.items.find((n) => n.uuid === selectedNodeUuid)?.name ?? '',
         }).md()}

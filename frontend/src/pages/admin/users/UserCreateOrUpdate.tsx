@@ -197,7 +197,7 @@ export default function UserCreateOrUpdate({ contextUser }: { contextUser?: z.in
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.users.tabs.general.page.modal.delete.content', { username: form.getValues().username }).md()}
+        {t('common.modal.delete.content', { name: form.getValues().username }).md()}
       </ConfirmationModal>
       <ConfirmationModal
         opened={openModal === 'disable_two_factor'}

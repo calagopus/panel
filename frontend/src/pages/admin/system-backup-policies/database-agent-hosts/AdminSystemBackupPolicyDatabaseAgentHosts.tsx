@@ -62,8 +62,8 @@ function SystemBackupPolicyDatabaseAgentHostRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.systemBackupPolicies.tabs.databaseAgentHosts.page.modal.remove.content', {
-          policy: systemBackupPolicy.name,
+        {t('common.modal.removeFrom.content', {
+          parent: systemBackupPolicy.name,
           name: databaseAgentHost.name,
         }).md()}
       </ConfirmationModal>

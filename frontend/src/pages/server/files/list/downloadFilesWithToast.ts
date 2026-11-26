@@ -22,7 +22,7 @@ export function downloadFilesWithToast(
 
   return request
     .then(({ url }) => {
-      pendingToast.settle(t('pages.server.files.toast.downloadStarted', {}), 'success');
+      pendingToast.settle(t('common.toast.downloadStarted', {}), 'success');
       downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
     })
     .catch((msg) => {

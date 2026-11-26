@@ -121,7 +121,7 @@ export function getExtensionBadges(t: TFunc, flags: ExtensionCardFlags): Extensi
     badges.push({ key: 'startFailed', color: 'red', label: t('pages.admin.extensions.badge.startFailed', {}) });
   }
   if (flags.isDisabled) {
-    badges.push({ key: 'disabled', color: 'gray', label: t('pages.admin.extensions.badge.disabled', {}) });
+    badges.push({ key: 'disabled', color: 'gray', label: t('common.badge.disabled', {}) });
   }
   if (isPendingRestart(flags.isDisabled, flags.isPendingDisabled)) {
     badges.push({

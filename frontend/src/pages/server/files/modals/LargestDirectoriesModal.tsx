@@ -106,7 +106,7 @@ function TreemapCell({
 type DirectorySizes = z.infer<typeof serverDirectorySizesSchema>;
 
 export default function LargestDirectoriesModal({ onClose, ...props }: ModalProps) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
@@ -176,7 +176,9 @@ export default function LargestDirectoriesModal({ onClose, ...props }: ModalProp
         ...(current.otherSize > 0
           ? [
               bucket(
-                t('pages.server.files.modal.largestDirectories.smallerFolders', { count: current.otherCount }),
+                t('pages.server.files.modal.largestDirectories.smallerFolders', {
+                  items: tItem('directory', current.otherCount),
+                }),
                 current.otherSize,
                 'gray.8',
               ),

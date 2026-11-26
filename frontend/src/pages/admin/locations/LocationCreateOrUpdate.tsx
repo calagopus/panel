@@ -27,7 +27,7 @@ import { locationEmptyFormValues, locationToFormValues, useLocationFormFields } 
 type LocationFormValues = z.infer<typeof adminLocationUpdateSchema>;
 
 export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLocationSchema> }) => {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
 
   const canReadBackupConfigurations = useAdminCan('backup-configurations.read');
   const [openModal, setOpenModal] = useState<'delete' | 'duplicate' | null>(null);
@@ -124,7 +124,7 @@ export default ({ contextLocation }: { contextLocation?: z.infer<typeof adminLoc
               <ConditionalTooltip
                 enabled={locationNodes > 0}
                 label={t('pages.admin.locations.tabs.general.page.tooltip.deleteBlocked', {
-                  count: String(locationNodes),
+                  items: tItem('node', locationNodes),
                 })}
               >
                 <Button

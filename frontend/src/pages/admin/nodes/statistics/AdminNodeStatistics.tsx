@@ -5,7 +5,7 @@ import { adminNodeSchema } from '@/lib/schemas/admin/nodes.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adminNodeSchema> }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
 
   return (
     <AdminSubContentContainer
@@ -33,7 +33,7 @@ export default function AdminNodeStatistics({ node }: { node: z.infer<typeof adm
           outbound: t('common.stat.outbound', {}),
           connectionLost: t('pages.admin.nodes.tabs.statistics.page.toast.connectionLost', {}),
           cpuThreads: (model, threads) =>
-            t('pages.admin.nodes.tabs.statistics.page.label.cpuThreads', { model, threads }),
+            t('pages.admin.nodes.tabs.statistics.page.label.cpuThreads', { model, threads: tItem('thread', threads) }),
           memoryUsedByProcess: (size) => t('pages.admin.nodes.tabs.statistics.page.label.usedByWings', { size }),
           networkIn: (in_) => t('pages.admin.nodes.tabs.statistics.page.label.networkIn', { in: in_ }),
           networkOut: (out) => t('pages.admin.nodes.tabs.statistics.page.label.networkOut', { out }),

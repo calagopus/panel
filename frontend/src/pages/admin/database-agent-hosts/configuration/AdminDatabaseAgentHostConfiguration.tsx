@@ -107,7 +107,7 @@ export default function AdminDatabaseAgentHostConfiguration({
       parsed = load(yaml) as object;
     } catch (err) {
       addToast(
-        t('pages.admin.databaseAgentHosts.tabs.configuration.page.toast.invalidYaml', {
+        t('common.toast.invalidYaml', {
           error: (err as Error).message,
         }),
         'error',

@@ -37,7 +37,7 @@ type Props = ModalProps & {
 };
 
 export default function DatabaseInstanceDatabaseCreateModal({ instance, userCount, onUserCreated, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const maxUserCount = useGlobalStore((state) => state.settings.server.maxDatabaseInstanceUserCount);
@@ -105,7 +105,7 @@ export default function DatabaseInstanceDatabaseCreateModal({ instance, userCoun
         {canCreateUser && (
           <ConditionalTooltip
             enabled={userLimitReached}
-            label={t('pages.server.databases.instance.users.tooltip.limitReached', { max: maxUserCount })}
+            label={t('common.tooltip.limitReached.databaseInstance', { items: tItem('user', maxUserCount) })}
           >
             <Switch
               label={t('pages.server.databases.instance.databases.modal.createDatabase.form.createUser', {})}

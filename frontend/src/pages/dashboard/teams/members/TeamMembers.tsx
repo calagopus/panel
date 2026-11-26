@@ -21,7 +21,7 @@ import TeamMemberActionBar from './TeamMemberActionBar.tsx';
 import TeamMemberRow from './TeamMemberRow.tsx';
 
 export default function TeamMembers({ team }: { team: z.infer<typeof userTeamSchema> }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const maxTeamMemberCount = useGlobalStore((state) => state.settings.user.maxTeamMemberCount);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -62,7 +62,7 @@ export default function TeamMembers({ team }: { team: z.infer<typeof userTeamSch
   const inviteButton = (
     <ConditionalTooltip
       enabled={atLimit}
-      label={t('pages.account.teams.tabs.members.tooltip.limitReached', { max: maxTeamMemberCount })}
+      label={t('common.tooltip.limitReached.team', { items: tItem('teamMember', maxTeamMemberCount) })}
     >
       <Button
         onClick={() => setOpenModal('create')}
@@ -78,8 +78,8 @@ export default function TeamMembers({ team }: { team: z.infer<typeof userTeamSch
   return (
     <AccountSubContentContainer
       title={t('pages.account.teams.tabs.members.title', {})}
-      subtitle={t('pages.account.teams.tabs.members.subtitle', {
-        current: members?.total ?? '…',
+      subtitle={t('common.label.limitUsage.invited', {
+        current: members?.total ?? '...',
         max: maxTeamMemberCount,
       })}
       titleOrder={2}

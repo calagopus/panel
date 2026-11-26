@@ -84,7 +84,6 @@ export default function AdminSystemBackupPolicyBackups({
             backup={backup}
             showSource={isDatabaseKind}
             showFiles={!isDatabaseKind}
-            downloadStartedMessage={t('pages.admin.systemBackupPolicies.tabs.backups.page.toast.downloadStarted', {})}
             registry={
               window.extensionContext.extensionRegistry.pages.admin.systemBackupPolicies.view.backups.contextMenu
             }

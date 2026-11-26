@@ -58,8 +58,8 @@ export default function SubuserActionBar({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.server.subusers.modal.removeSubusers.content', {
-          subusers: tItem('subuser', subusers.length),
+        {t('common.modal.removeFromServer.content', {
+          name: tItem('subuser', subusers.length),
         }).md()}
       </ConfirmationModal>
 

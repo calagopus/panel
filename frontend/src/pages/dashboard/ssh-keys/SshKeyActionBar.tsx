@@ -58,7 +58,7 @@ export default function SshKeyActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.account.sshKeys.modal.deleteSshKeys.content', { sshKeys: tItem('sshKey', sshKeys.length) }).md()}
+          {t('common.modal.deleteFromAccount.content', { name: tItem('sshKey', sshKeys.length) }).md()}
 
           <ItemPreviewList
             items={sshKeys}

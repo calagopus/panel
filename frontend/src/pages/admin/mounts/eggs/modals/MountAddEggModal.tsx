@@ -38,7 +38,7 @@ export default function MountAddEggModal({
       nothingFoundMessage={t('elements.resourceSelectModal.empty.eggs', {})}
       createAction={{ to: '/admin/nests', permission: 'eggs.create' }}
       title={t('pages.admin.mounts.tabs.eggs.page.modal.add.title', {})}
-      label={t('pages.admin.mounts.tabs.eggs.page.modal.add.form.egg', {})}
+      label={t('common.form.egg', {})}
       loading={loading}
       data={eggs
         .filter((group) => group.eggs.length > 0)

@@ -2,16 +2,19 @@ import { faBan, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { memo } from 'react';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 interface UploadDropOverlayProps {
   visible: boolean;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   blur?: boolean;
   blocked?: boolean;
 }
 
 function UploadDropOverlay({ visible, title, subtitle, blur = false, blocked = false }: UploadDropOverlayProps) {
+  const { t } = useTranslations();
+
   if (!visible) return null;
 
   return (
@@ -34,7 +37,9 @@ function UploadDropOverlay({ visible, title, subtitle, blur = false, blocked = f
             <FontAwesomeIcon icon={faUpload} className='text-6xl text-(--mantine-color-blue-5) animate-bounce' />
           )}
           <p className='text-xl font-semibold'>{title}</p>
-          <p className='text-sm text-(--mantine-color-dimmed)'>{subtitle}</p>
+          <p className='text-sm text-(--mantine-color-dimmed)'>
+            {subtitle ?? t('elements.uploadDropOverlay.subtitle', {})}
+          </p>
         </div>
       </div>
     </div>

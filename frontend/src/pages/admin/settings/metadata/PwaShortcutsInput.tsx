@@ -34,7 +34,7 @@ export default function PwaShortcutsInput({ form }: { form: UseFormReturnType<Me
               <Stack gap='xs' className='flex-1'>
                 <TextInput
                   withAsterisk
-                  label={t('pages.admin.settings.tabs.metadata.page.form.shortcutName', {})}
+                  label={t('common.form.name', {})}
                   key={form.key(`pwaShortcuts.${index}.name`)}
                   {...form.getInputProps(`pwaShortcuts.${index}.name`)}
                 />
@@ -51,7 +51,7 @@ export default function PwaShortcutsInput({ form }: { form: UseFormReturnType<Me
                   {...form.getInputProps(`pwaShortcuts.${index}.url`)}
                 />
                 <TextInput
-                  label={t('pages.admin.settings.tabs.metadata.page.form.shortcutDescription', {})}
+                  label={t('common.form.description', {})}
                   key={form.key(`pwaShortcuts.${index}.description`)}
                   {...form.getInputProps(`pwaShortcuts.${index}.description`)}
                 />

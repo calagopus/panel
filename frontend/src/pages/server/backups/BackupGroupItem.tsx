@@ -89,10 +89,10 @@ export default function BackupGroupItem({
   const createGate = useBackupCreateGate(canCreateBackup && backups.total === 0);
   const createDisabled = !createGate.countKnown || createGate.blocked;
   const createTooltip = createGate.blocked
-    ? t('pages.server.backups.tooltip.limitReached', { max: server.featureLimits.backups })
+    ? t('common.tooltip.limitReached.server', { items: tItem('backup', server.featureLimits.backups) })
     : createGate.atLimit && createGate.expendable
       ? t('pages.server.backups.tooltip.evicts', {
-          max: server.featureLimits.backups,
+          items: tItem('backup', server.featureLimits.backups),
           name: createGate.expendable.name,
         })
       : '';

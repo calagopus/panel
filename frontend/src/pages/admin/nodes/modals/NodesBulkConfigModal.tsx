@@ -26,7 +26,6 @@ export default function NodesBulkConfigModal({
         applyButton: t('pages.admin.nodes.modal.bulkConfig.button.apply', {
           nodes: tItem('node', selectedNodes.size),
         }),
-        invalidYaml: (error) => t('pages.admin.nodes.modal.bulkConfig.error.invalidYaml', { error }),
         applied: (applied) => t('pages.admin.nodes.modal.bulkConfig.toast.applied', { nodes: tItem('node', applied) }),
       }}
     />

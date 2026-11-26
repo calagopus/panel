@@ -47,7 +47,7 @@ type Peer = z.infer<typeof serverTunnelPeerSchema>;
 type Disconnecting = { peer: Peer; incoming: boolean };
 
 export default function ServerTunnel() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const canCreate = useServerCan('connections.create');
@@ -101,7 +101,7 @@ export default function ServerTunnel() {
       {
         type: 'action',
         icon: faPen,
-        label: t('pages.server.tunnel.action.rename', {}),
+        label: t('pages.server.tunnel.button.rename', {}),
         onClick: () => setRenaming(true),
         color: 'gray',
         canAccess: canUpdate,
@@ -109,7 +109,7 @@ export default function ServerTunnel() {
       {
         type: 'action',
         icon: faPlug,
-        label: t('pages.server.tunnel.action.editPorts', {}),
+        label: t('pages.server.tunnel.button.editPorts', {}),
         onClick: () => setEditingPorts(true),
         color: 'gray',
         canAccess: canUpdate,
@@ -158,7 +158,7 @@ export default function ServerTunnel() {
     const menuAction = (peer: Peer, incoming: boolean, active: boolean): ContextMenuItem => ({
       type: 'action',
       icon: active ? faTrash : faPlus,
-      label: t(`pages.server.tunnel.action.${active ? 'remove' : 'grant'}${incoming ? 'Incoming' : 'Outgoing'}`, {}),
+      label: t(`pages.server.tunnel.button.${active ? 'remove' : 'grant'}${incoming ? 'Incoming' : 'Outgoing'}`, {}),
       onClick: () =>
         active ? setDisconnecting({ peer, incoming }) : setConnecting({ serverUuid: peer.serverUuid, incoming }),
       color: active ? 'red' : 'gray',
@@ -224,7 +224,7 @@ export default function ServerTunnel() {
       {
         type: 'action',
         icon: faPlug,
-        label: t('pages.server.tunnel.action.editPorts', {}),
+        label: t('pages.server.tunnel.button.editPorts', {}),
         onClick: () => setEditingPorts(true),
         color: 'gray',
         canAccess: canUpdate,
@@ -232,7 +232,7 @@ export default function ServerTunnel() {
       {
         type: 'action',
         icon: faPen,
-        label: t('pages.server.tunnel.action.rename', {}),
+        label: t('pages.server.tunnel.button.rename', {}),
         onClick: () => setRenaming(true),
         color: 'gray',
         canAccess: canUpdate,
@@ -256,13 +256,15 @@ export default function ServerTunnel() {
                     leftSection={<FontAwesomeIcon icon={faPlug} />}
                     onClick={() => setEditingPorts(true)}
                   >
-                    {t('pages.server.tunnel.button.editPorts', {})}
+                    {t('pages.server.tunnel.button.offeredPorts', {})}
                   </Button>
                 </ServerCan>
                 <ServerCan action='connections.create'>
                   <ConditionalTooltip
                     enabled={view.outgoing.length >= maxConnections}
-                    label={t('pages.server.tunnel.tooltip.connectionLimitReached', { max: maxConnections })}
+                    label={t('common.tooltip.limitReached.server', {
+                      items: tItem('outgoingConnection', maxConnections),
+                    })}
                   >
                     <Button
                       disabled={view.outgoing.length >= maxConnections}

@@ -59,9 +59,9 @@ export default function EggDeviceRow({
         confirm={t('common.button.delete', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.nests.tabs.eggs.page.tabs.devices.page.modal.delete.content', {
-          device: device.device.name,
-          egg: egg.name,
+        {t('common.modal.removeDevice.content', {
+          name: device.device.name,
+          parent: egg.name,
         }).md()}
       </ConfirmationModal>
 

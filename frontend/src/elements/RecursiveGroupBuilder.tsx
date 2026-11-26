@@ -7,6 +7,7 @@ import Select from '@/elements/input/Select.tsx';
 import Group from '@/elements/layout/Group.tsx';
 import Stack from '@/elements/layout/Stack.tsx';
 import Text from '@/elements/typography/Text.tsx';
+import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 /**
  * The combinator node types this builder knows how to nest. They are hidden from the type picker
@@ -41,7 +42,7 @@ export interface RecursiveGroupBuilderProps<T extends { type: string }> {
   emptyNode: T;
   /** Renders the editors for a leaf (non-combinator) node. */
   renderLeaf: (node: T, onChange: (node: T) => void) => ReactNode;
-  labels: {
+  labels?: {
     type: string;
     allMustMatch: string;
     anyMustMatch: string;
@@ -71,6 +72,8 @@ export default function RecursiveGroupBuilder<T extends { type: string }>({
   renderLeaf,
   labels,
 }: RecursiveGroupBuilderProps<T>) {
+  const { t } = useTranslations();
+
   const forward = {
     maxDepth,
     typeData,
@@ -92,7 +95,7 @@ export default function RecursiveGroupBuilder<T extends { type: string }>({
       <Stack>
         <Select
           withAsterisk
-          label={labels.type}
+          label={labels?.type ?? t('elements.recursiveGroupBuilder.matcherType', {})}
           value={node.type}
           onChange={(value) => value && onChange(makeDefault(value))}
           data={typeData.filter((option) => depth < maxDepth || !GROUP_TYPES.includes(option.value))}
@@ -104,14 +107,18 @@ export default function RecursiveGroupBuilder<T extends { type: string }>({
           <>
             {depth < maxDepth && (
               <Group>
-                <Text size='sm'>{node.type === 'and' ? labels.allMustMatch : labels.anyMustMatch}</Text>
+                <Text size='sm'>
+                  {node.type === 'and'
+                    ? (labels?.allMustMatch ?? t('elements.recursiveGroupBuilder.allMustMatch', {}))
+                    : (labels?.anyMustMatch ?? t('elements.recursiveGroupBuilder.anyMustMatch', {}))}
+                </Text>
                 <Button
                   size='xs'
                   variant='light'
                   leftSection={<FontAwesomeIcon icon={faPlus} />}
                   onClick={() => onChange(withChildren(node, [...children, emptyNode]))}
                 >
-                  {labels.addChild}
+                  {labels?.addChild ?? t('elements.recursiveGroupBuilder.button.addMatcher', {})}
                 </Button>
               </Group>
             )}
@@ -154,7 +161,7 @@ export default function RecursiveGroupBuilder<T extends { type: string }>({
 
         {notChild && (
           <>
-            <Text size='sm'>{labels.mustNotMatch}</Text>
+            <Text size='sm'>{labels?.mustNotMatch ?? t('elements.recursiveGroupBuilder.mustNotMatch', {})}</Text>
             <div style={{ flex: 1 }}>
               <RecursiveGroupBuilder
                 {...forward}

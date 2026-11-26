@@ -323,7 +323,7 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
             })}
           </Text>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.createDirectory.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
@@ -334,7 +334,7 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
       return (
         <Stack gap='xs'>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.writeFile.renderer.detail.file', {
+            {tReact('pages.server.schedules.steps.renderer.detail.file', {
               file: <ScheduleDynamicParameterRenderer value={action.file} />,
             })}
           </Text>
@@ -367,12 +367,12 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
       return (
         <Stack gap='xs'>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.deleteFiles.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
           <Text size='xs' c='dimmed'>
-            {t('pages.server.schedules.steps.deleteFiles.renderer.detail.files', { files: action.files.join(', ') })}
+            {t('pages.server.schedules.steps.renderer.detail.files', { files: action.files.join(', ') })}
           </Text>
           <Text size='xs' c='dimmed'>
             {t('pages.server.schedules.steps.deleteFiles.renderer.detail.trash', { value: yesNo(action.trash) })}
@@ -384,12 +384,12 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
       return (
         <Stack gap='xs'>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.renameFiles.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
           <Text size='xs' c='dimmed'>
-            {t('pages.server.schedules.steps.renameFiles.renderer.detail.files', {
+            {t('pages.server.schedules.steps.renderer.detail.files', {
               files: tItem('file', action.files.length),
             })}
           </Text>
@@ -405,12 +405,12 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
             })}
           </Text>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.compressFiles.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
           <Text size='xs' c='dimmed'>
-            {t('pages.server.schedules.steps.compressFiles.renderer.detail.files', {
+            {t('pages.server.schedules.steps.renderer.detail.files', {
               files: tItem('file', action.files.length),
             })}
           </Text>
@@ -427,12 +427,12 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
       return (
         <Stack gap='xs'>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.decompressFile.renderer.detail.file', {
+            {tReact('pages.server.schedules.steps.renderer.detail.file', {
               file: <ScheduleDynamicParameterRenderer value={action.file} />,
             })}
           </Text>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.decompressFile.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
@@ -449,13 +449,13 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
             })}
           </Text>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.patchFiles.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>
           {action.file && (
             <Text size='sm'>
-              {tReact('pages.server.schedules.steps.patchFiles.renderer.detail.file', {
+              {tReact('pages.server.schedules.steps.renderer.detail.file', {
                 file: <ScheduleDynamicParameterRenderer value={action.file} />,
               })}
             </Text>
@@ -477,7 +477,7 @@ export function renderDetailed(action: Action, { t, tReact, tItem }: Translation
             })}
           </Text>
           <Text size='sm'>
-            {tReact('pages.server.schedules.steps.pullFile.renderer.detail.root', {
+            {tReact('pages.server.schedules.steps.renderer.detail.root', {
               root: <ScheduleDynamicParameterRenderer value={action.root} />,
             })}
           </Text>

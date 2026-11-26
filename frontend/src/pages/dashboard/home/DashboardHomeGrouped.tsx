@@ -32,7 +32,7 @@ const MemoizedServerGroupItem = memo(ServerGroupItem);
 const MemoizedServerItem = memo(ServerItem);
 
 export default function DashboardHomeGrouped() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const serverGroups = useUserStore((state) => state.serverGroups);
   const setServerGroups = useUserStore((state) => state.setServerGroups);
   const maxServerGroupCount = useGlobalStore((state) => state.settings.user.maxServerGroupCount);
@@ -148,7 +148,7 @@ export default function DashboardHomeGrouped() {
   const createGroupButton = (
     <ConditionalTooltip
       enabled={atGroupLimit}
-      label={t('pages.account.home.tabs.groupedServers.page.tooltip.limitReached', { max: maxServerGroupCount })}
+      label={t('common.tooltip.limitReached.account', { items: tItem('serverGroup', maxServerGroupCount) })}
     >
       <Button
         onClick={() => setOpenModal('create')}

@@ -97,7 +97,7 @@ export function useApplicationFormFields({
     {
       type: 'autocomplete',
       name: 'icon',
-      label: t('pages.admin.settings.tabs.application.page.form.icon', {}),
+      label: t('common.form.icon', {}),
       required: true,
       options: assetUrls,
     },

@@ -268,8 +268,8 @@ export default function ServerGroupItem({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.home.tabs.groupedServers.page.modal.deleteServerGroup.content', {
-          group: serverGroup.name,
+        {t('common.modal.deleteFromAccount.content', {
+          name: serverGroup.name,
         }).md()}
       </ConfirmationModal>
       <ConfirmationModal
@@ -279,9 +279,9 @@ export default function ServerGroupItem({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemoveServer}
       >
-        {t('pages.account.home.tabs.groupedServers.page.modal.removeServerFromGroup.content', {
-          server: serverToRemove?.server.name ?? '',
-          group: serverGroup.name,
+        {t('common.modal.removeFrom.content', {
+          name: serverToRemove?.server.name ?? '',
+          parent: serverGroup.name,
         }).md()}
       </ConfirmationModal>
 
@@ -306,7 +306,7 @@ export default function ServerGroupItem({
           icon={faCircleExclamation}
           title={t('pages.account.home.tabs.groupedServers.page.drag.blocked.groupFull.title', {})}
           description={t('pages.account.home.tabs.groupedServers.page.drag.blocked.groupFull.description', {
-            max: MAX_SERVERS_PER_GROUP,
+            items: tItem('server', MAX_SERVERS_PER_GROUP),
           })}
         />
 

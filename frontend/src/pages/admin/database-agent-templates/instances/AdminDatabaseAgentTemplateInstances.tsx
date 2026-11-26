@@ -133,7 +133,7 @@ export default function AdminDatabaseAgentTemplateInstances({
         ) : (
           <Stack>
             {t('pages.admin.databaseAgentTemplates.tabs.instances.page.modal.applyUpdates.content', {
-              count: selected.size,
+              items: tItem('instance', selected.size),
               name: databaseAgentTemplate.name,
             }).md()}
 

@@ -105,7 +105,7 @@ export function BackupRetentionCell({ backup }: { backup: ServerBackup }) {
   );
 }
 
-export function useBackupDownload(nodeUuid: string, downloadStartedMessage: string) {
+export function useBackupDownload(nodeUuid: string) {
   const { t } = useTranslations();
   const { addToast, addPendingToast } = useToast();
 
@@ -114,7 +114,7 @@ export function useBackupDownload(nodeUuid: string, downloadStartedMessage: stri
 
     return downloadNodeBackup(nodeUuid, backupUuid, archiveFormat)
       .then(({ url }) => {
-        pendingToast.settle(downloadStartedMessage, 'success');
+        pendingToast.settle(t('common.toast.downloadStarted', {}), 'success');
         downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
       })
       .catch((msg) => {

@@ -133,13 +133,13 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
       <Group mb='md' gap='xs'>
         <Badge color={databaseAgentHost.deploymentEnabled ? 'green' : 'red'} variant='light'>
           {databaseAgentHost.deploymentEnabled
-            ? t('pages.admin.databaseAgentHosts.tabs.overview.page.status.deploymentEnabled', {})
-            : t('pages.admin.databaseAgentHosts.tabs.overview.page.status.deploymentDisabled', {})}
+            ? t('common.badge.deploymentEnabled', {})
+            : t('common.badge.deploymentDisabled', {})}
         </Badge>
         <Badge color={databaseAgentHost.maintenanceEnabled ? 'red' : 'gray'} variant='light'>
           {databaseAgentHost.maintenanceEnabled
-            ? t('pages.admin.databaseAgentHosts.tabs.overview.page.status.maintenanceEnabled', {})
-            : t('pages.admin.databaseAgentHosts.tabs.overview.page.status.maintenanceDisabled', {})}
+            ? t('common.badge.maintenanceEnabled', {})
+            : t('common.badge.maintenanceDisabled', {})}
         </Badge>
       </Group>
 
@@ -203,7 +203,7 @@ export default function DatabaseAgentHostOverview({ databaseAgentHost }: { datab
                     </Text>
                     {upgradeAvailability === 'available' && (
                       <Badge color='yellow' variant='light' size='sm'>
-                        {t('pages.admin.databaseAgentHosts.tabs.overview.page.badge.updateAvailable', {})}
+                        {t('common.badge.updateAvailable', {})}
                       </Badge>
                     )}
                     {upgradeAvailability === 'unknown' && (

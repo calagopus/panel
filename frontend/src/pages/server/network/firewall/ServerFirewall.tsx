@@ -76,7 +76,7 @@ function shadowedRulePositions(rules: Rule[]): number[] {
 }
 
 export default function ServerFirewall() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const canUpdate = useServerCan('firewall.update');
@@ -179,7 +179,7 @@ export default function ServerFirewall() {
     schema: serverFirewallEditSchema,
     create: async (data) => {
       if (data.rules.length > maxRuleCount) {
-        throw new Error(t('pages.server.firewall.tooltip.limitReached', { max: maxRuleCount }));
+        throw new Error(t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) }));
       }
       if (data.rules.some((rule) => rule.sources.length > maxSourceCount)) {
         throw new Error(t('pages.server.firewall.form.tooManySources', { max: maxSourceCount }));
@@ -274,11 +274,7 @@ export default function ServerFirewall() {
             {t('pages.server.firewall.modal.unsavedChanges.content', {}).md()}
           </ConfirmationModal>
 
-          <ImportOverlay
-            visible={isDragging}
-            title={t('pages.server.firewall.dropzone.title', {})}
-            subtitle={t('pages.server.firewall.dropzone.subtitle', {})}
-          />
+          <ImportOverlay visible={isDragging} title={t('pages.server.firewall.dropzone.title', {})} />
 
           <NetworkSubNavigation />
 
@@ -347,7 +343,7 @@ export default function ServerFirewall() {
                 <ServerCan action='firewall.update'>
                   <ConditionalTooltip
                     enabled={rules.length >= maxRuleCount}
-                    label={t('pages.server.firewall.tooltip.limitReached', { max: maxRuleCount })}
+                    label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
                   >
                     <Button
                       disabled={rules.length >= maxRuleCount}
@@ -403,7 +399,7 @@ export default function ServerFirewall() {
                 <Group justify='center'>
                   <ConditionalTooltip
                     enabled={rules.length >= maxRuleCount}
-                    label={t('pages.server.firewall.tooltip.limitReached', { max: maxRuleCount })}
+                    label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
                   >
                     <Button
                       disabled={rules.length >= maxRuleCount}

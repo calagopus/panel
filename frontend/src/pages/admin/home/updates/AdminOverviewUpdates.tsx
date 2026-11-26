@@ -173,7 +173,7 @@ export default function AdminOverviewUpdates() {
             {(history) => (
               <Table
                 columns={[
-                  t('pages.admin.home.tabs.updates.page.table.version', {}),
+                  t('common.table.columns.version', {}),
                   t('pages.admin.home.tabs.updates.page.table.installed', {}),
                 ]}
               >
@@ -212,7 +212,7 @@ export default function AdminOverviewUpdates() {
                   <Table
                     columns={[
                       t('pages.admin.home.tabs.updates.page.table.packageName', {}),
-                      t('pages.admin.home.tabs.updates.page.table.version', {}),
+                      t('common.table.columns.version', {}),
                       t('pages.admin.home.tabs.updates.page.table.latestVersion', {}),
                       t('pages.admin.home.tabs.updates.page.table.changes', {}),
                     ]}

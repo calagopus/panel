@@ -24,7 +24,7 @@ import DatabaseInstanceRow from './DatabaseInstanceRow.tsx';
 import DatabaseInstanceCreateModal from './modals/DatabaseInstanceCreateModal.tsx';
 
 export default function ServerDatabaseInstances() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
 
   const canCreate = useServerCan('database-instances.create');
@@ -65,8 +65,8 @@ export default function ServerDatabaseInstances() {
   return (
     <ServerContentContainer
       title={t('pages.server.databases.title', {})}
-      subtitle={t('pages.server.databases.subtitle', {
-        current: settled ? used : '…',
+      subtitle={t('common.label.limitUsage.created', {
+        current: settled ? used : '...',
         max: server.featureLimits.databases,
       })}
       search={search}
@@ -78,8 +78,8 @@ export default function ServerDatabaseInstances() {
               enabled={settled && disabled}
               label={
                 full
-                  ? t('pages.server.databases.tooltip.limitReached', {
-                      max: server.featureLimits.databases,
+                  ? t('common.tooltip.limitReached.server', {
+                      items: tItem('database', server.featureLimits.databases),
                     })
                   : t('pages.server.databases.instance.modal.createDatabaseInstance.form.noTemplatesFound', {})
               }
@@ -151,7 +151,9 @@ export default function ServerDatabaseInstances() {
                   <ServerCan action='database-instances.create'>
                     <ConditionalTooltip
                       enabled={full}
-                      label={t('pages.server.databases.tooltip.limitReached', { max: server.featureLimits.databases })}
+                      label={t('common.tooltip.limitReached.server', {
+                        items: tItem('database', server.featureLimits.databases),
+                      })}
                     >
                       <Button
                         disabled={full}

@@ -90,7 +90,7 @@ export default function VerifyEmail() {
                   size='md'
                   fullWidth
                 >
-                  {user ? t('pages.auth.verifyEmail.button.continue', {}) : t('pages.auth.button.login', {})}
+                  {user ? t('common.button.continue', {}) : t('pages.auth.button.login', {})}
                 </Button>
               </>
             ) : (
@@ -102,7 +102,7 @@ export default function VerifyEmail() {
                   {t('pages.auth.verifyEmail.success', { email }).md()}
                 </Text>
                 <Button onClick={() => navigate(user ? '/' : '/auth/login')} size='md' fullWidth>
-                  {user ? t('pages.auth.verifyEmail.button.continue', {}) : t('pages.auth.button.login', {})}
+                  {user ? t('common.button.continue', {}) : t('pages.auth.button.login', {})}
                 </Button>
               </>
             )}

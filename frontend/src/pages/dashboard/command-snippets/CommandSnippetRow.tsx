@@ -64,7 +64,7 @@ const CommandSnippetRow = forwardRef<HTMLTableRowElement, CommandSnippetRowProps
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.commandSnippets.modal.deleteCommandSnippet.content', {
+        {t('common.modal.deleteFromAccount.content', {
           name: commandSnippet.name,
         }).md()}
       </ConfirmationModal>

@@ -105,13 +105,6 @@ export default function EggConfigurationMatcherBuilder({
       withNotChild={(node, child) => ({ ...node, matcher: child }) as Matcher}
       emptyNode={{ type: 'eggs', eggs: [] }}
       renderLeaf={renderLeaf}
-      labels={{
-        type: t(`${page}.form.matcherType`, {}),
-        allMustMatch: t(`${page}.matcher.allMustMatch`, {}),
-        anyMustMatch: t(`${page}.matcher.anyMustMatch`, {}),
-        mustNotMatch: t(`${page}.matcher.mustNotMatch`, {}),
-        addChild: t(`${page}.button.addMatcher`, {}),
-      }}
     />
   );
 }

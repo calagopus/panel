@@ -79,13 +79,13 @@ export default function DatabaseHostOverview({ databaseHost }: { databaseHost: D
       <Group mb='md' gap='xs'>
         <Badge color={databaseHost.deploymentEnabled ? 'green' : 'red'} variant='light'>
           {databaseHost.deploymentEnabled
-            ? t('pages.admin.databaseHosts.tabs.overview.page.status.deploymentEnabled', {})
-            : t('pages.admin.databaseHosts.tabs.overview.page.status.deploymentDisabled', {})}
+            ? t('common.badge.deploymentEnabled', {})
+            : t('common.badge.deploymentDisabled', {})}
         </Badge>
         <Badge color={databaseHost.maintenanceEnabled ? 'red' : 'gray'} variant='light'>
           {databaseHost.maintenanceEnabled
-            ? t('pages.admin.databaseHosts.tabs.overview.page.status.maintenanceEnabled', {})
-            : t('pages.admin.databaseHosts.tabs.overview.page.status.maintenanceDisabled', {})}
+            ? t('common.badge.maintenanceEnabled', {})
+            : t('common.badge.maintenanceDisabled', {})}
         </Badge>
       </Group>
 

@@ -59,9 +59,9 @@ export default function EggMountRow({
         confirm={t('common.button.delete', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.nests.tabs.eggs.page.tabs.mounts.page.modal.delete.content', {
-          mount: mount.mount.name,
-          egg: egg.name,
+        {t('common.modal.removeMount.content', {
+          name: mount.mount.name,
+          parent: egg.name,
         }).md()}
       </ConfirmationModal>
 

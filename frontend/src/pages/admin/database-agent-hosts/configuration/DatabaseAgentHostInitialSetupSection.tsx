@@ -123,7 +123,7 @@ export default function DatabaseAgentHostInitialSetupSection({
             </Text>
             <Stack gap='sm' align='flex-start'>
               <Button onClick={onVerify} loading={verifying} leftSection={<FontAwesomeIcon icon={faCheck} />}>
-                {t('pages.admin.databaseAgentHosts.tabs.configuration.page.button.verify', {})}
+                {t('common.button.verifyConnection', {})}
               </Button>
               <Alert
                 color={verifyResult ? (verifyResult.ok ? 'green' : 'red') : 'gray'}

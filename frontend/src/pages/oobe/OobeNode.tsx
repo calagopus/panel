@@ -236,7 +236,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
               <SizeInput
                 withAsterisk
                 label={t('common.form.memory', {})}
-                description={t('pages.admin.nodes.tabs.general.page.form.unlimitedTooltip', {})}
+                description={t('common.form.unlimitedHint', {})}
                 mode='mb'
                 min={0}
                 className='flex-1'
@@ -246,7 +246,7 @@ export default function OobeNode({ onNext, onBack, canGoBack, skipFrom, data }: 
               <SizeInput
                 withAsterisk
                 label={t('common.form.disk', {})}
-                description={t('pages.admin.nodes.tabs.general.page.form.unlimitedTooltip', {})}
+                description={t('common.form.unlimitedHint', {})}
                 mode='mb'
                 min={0}
                 className='flex-1'

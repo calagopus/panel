@@ -74,7 +74,7 @@ function stepBlockIssues(steps: z.infer<typeof serverScheduleStepSchema>[]): {
 }
 
 export default function StepsEditor({ schedule }: { schedule: z.infer<typeof serverScheduleSchema> }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
   const server = useServerStore((state) => state.server);
   const scheduleSteps = useServerStore((state) => state.scheduleSteps);
@@ -89,8 +89,8 @@ export default function StepsEditor({ schedule }: { schedule: z.infer<typeof ser
 
   const remainingSteps = settings.server.maxScheduleStepCount - scheduleSteps.length;
   const atLimit = remainingSteps <= 0;
-  const limitTooltip = t('pages.server.schedules.steps.tooltip.limitReached', {
-    max: settings.server.maxScheduleStepCount,
+  const limitTooltip = t('common.tooltip.limitReached.schedule', {
+    items: tItem('scheduleStep', settings.server.maxScheduleStepCount),
   });
 
   const nextStepOrder = useMemo(

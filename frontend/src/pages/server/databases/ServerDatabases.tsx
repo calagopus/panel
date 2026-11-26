@@ -23,7 +23,7 @@ import DatabaseCreateModal from './modals/DatabaseCreateModal.tsx';
 import { useDatabaseRelevance } from './useDatabaseRelevance.ts';
 
 export default function ServerDatabases() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const server = useServerStore((state) => state.server);
 
   const canCreate = useServerCan('databases.create');
@@ -60,8 +60,8 @@ export default function ServerDatabases() {
   return (
     <ServerContentContainer
       title={t('pages.server.databases.title', {})}
-      subtitle={t('pages.server.databases.subtitle', {
-        current: settled ? used : '…',
+      subtitle={t('common.label.limitUsage.created', {
+        current: settled ? used : '...',
         max: server.featureLimits.databases,
       })}
       search={search}
@@ -73,8 +73,8 @@ export default function ServerDatabases() {
               enabled={settled && disabled}
               label={
                 full
-                  ? t('pages.server.databases.tooltip.limitReached', {
-                      max: server.featureLimits.databases,
+                  ? t('common.tooltip.limitReached.server', {
+                      items: tItem('database', server.featureLimits.databases),
                     })
                   : t('pages.server.databases.modal.createDatabase.form.noHostsFound', {})
               }
@@ -142,7 +142,9 @@ export default function ServerDatabases() {
                   <ServerCan action='databases.create'>
                     <ConditionalTooltip
                       enabled={full}
-                      label={t('pages.server.databases.tooltip.limitReached', { max: server.featureLimits.databases })}
+                      label={t('common.tooltip.limitReached.server', {
+                        items: tItem('database', server.featureLimits.databases),
+                      })}
                     >
                       <Button
                         disabled={full}

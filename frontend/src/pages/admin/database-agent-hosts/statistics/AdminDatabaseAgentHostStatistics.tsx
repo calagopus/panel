@@ -9,7 +9,7 @@ export default function AdminDatabaseAgentHostStatistics({
 }: {
   databaseAgentHost: z.infer<typeof adminDatabaseAgentHostSchema>;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
 
   return (
     <AdminSubContentContainer
@@ -39,7 +39,7 @@ export default function AdminDatabaseAgentHostStatistics({
           cpuThreads: (model, threads) =>
             t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.cpuThreads', {
               model,
-              threads,
+              threads: tItem('thread', threads),
             }),
           memoryUsedByProcess: (size) =>
             t('pages.admin.databaseAgentHosts.tabs.statistics.page.label.usedByAgent', { size }),

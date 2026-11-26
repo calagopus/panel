@@ -50,9 +50,9 @@ export default function NodeMountRow({ node, mount }: { node: AdminNode; mount: 
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.nodes.tabs.mounts.page.modal.remove.content', {
-          mount: mount.mount.name,
-          name: node.name,
+        {t('common.modal.removeMount.content', {
+          name: mount.mount.name,
+          parent: node.name,
         }).md()}
       </ConfirmationModal>
 

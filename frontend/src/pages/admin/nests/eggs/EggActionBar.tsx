@@ -90,12 +90,12 @@ export default function EggActionBar({
       <ConfirmationModal
         opened={openModal === 'delete'}
         onClose={() => setOpenModal(null)}
-        title={t('pages.admin.nests.tabs.eggs.page.modal.deleteBulk.title', {})}
+        title={t('pages.admin.nests.tabs.eggs.page.modal.deleteEggs.title', {})}
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.admin.nests.tabs.eggs.page.modal.deleteBulk.content', { count: selectedEggs.size }).md()}
+          {t('common.modal.delete.content', { name: tItem('egg', selectedEggs.size) }).md()}
 
           <ItemPreviewList
             items={selectedEggs.values()}

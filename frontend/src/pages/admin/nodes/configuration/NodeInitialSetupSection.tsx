@@ -160,7 +160,7 @@ export default function NodeInitialSetupSection({
                 disabled={!nodeToken}
                 leftSection={<FontAwesomeIcon icon={faCheck} />}
               >
-                {t('pages.admin.nodes.tabs.configuration.page.button.verify', {})}
+                {t('common.button.verifyConnection', {})}
               </Button>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 w-full'>
                 <VerifyStatusAlert

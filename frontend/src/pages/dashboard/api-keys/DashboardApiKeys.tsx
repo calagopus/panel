@@ -20,7 +20,7 @@ import ApiKeyActionBar from './ApiKeyActionBar.tsx';
 import ApiKeyRow from './ApiKeyRow.tsx';
 
 export default function DashboardApiKeys() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -54,7 +54,7 @@ export default function DashboardApiKeys() {
   return (
     <AccountContentContainer
       title={t('pages.account.apiKeys.title', {})}
-      subtitle={t('pages.account.apiKeys.subtitle', {
+      subtitle={t('common.label.limitUsage.created', {
         current: apiKeys?.total ?? 0,
         max: settings.user.maxApiKeyCount,
       })}
@@ -69,7 +69,7 @@ export default function DashboardApiKeys() {
           </Anchor>
           <ConditionalTooltip
             enabled={atLimit}
-            label={t('pages.account.apiKeys.tooltip.limitReached', { max: settings.user.maxApiKeyCount })}
+            label={t('common.tooltip.limitReached.account', { items: tItem('apiKey', settings.user.maxApiKeyCount) })}
           >
             <Button
               onClick={() => setOpenModal('create')}

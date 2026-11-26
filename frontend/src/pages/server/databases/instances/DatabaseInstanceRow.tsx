@@ -171,9 +171,7 @@ const DatabaseInstanceRow = forwardRef<HTMLTableRowElement, DatabaseInstanceRowP
                 ) : (
                   <FontAwesomeIcon className='text-(--mantine-color-red-text)' icon={faLockOpen} />
                 )}
-                {instance.updateAvailable && (
-                  <Badge color='yellow'>{t('pages.server.databases.instance.updateAvailable', {})}</Badge>
-                )}
+                {instance.updateAvailable && <Badge color='yellow'>{t('common.badge.updateAvailable', {})}</Badge>}
               </Group>
             </TableData>
 

@@ -28,7 +28,6 @@ export default function DatabaseAgentHostsBulkConfigModal({
         applyButton: t('pages.admin.databaseAgentHosts.modal.bulkConfig.button.apply', {
           hosts: tItem('databaseAgentHost', selectedHosts.size),
         }),
-        invalidYaml: (error) => t('pages.admin.databaseAgentHosts.modal.bulkConfig.error.invalidYaml', { error }),
         applied: (applied) =>
           t('pages.admin.databaseAgentHosts.modal.bulkConfig.toast.applied', {
             hosts: tItem('databaseAgentHost', applied),

@@ -40,6 +40,16 @@ const baseTranslations = defineTranslations({
     apiKey: defineEnglishItem('API Key', 'API Keys'),
     oauthLink: defineEnglishItem('Linked Account', 'Linked Accounts'),
     commandSnippet: defineEnglishItem('Command Snippet', 'Command Snippets'),
+    serverGroup: defineEnglishItem('Server Group', 'Server Groups'),
+    securityKey: defineEnglishItem('Security Key', 'Security Keys'),
+    scheduleStep: defineEnglishItem('Step', 'Steps'),
+    backupGroup: defineEnglishItem('Backup Group', 'Backup Groups'),
+    firewallRule: defineEnglishItem('Firewall Rule', 'Firewall Rules'),
+    outgoingConnection: defineEnglishItem('Outgoing Connection', 'Outgoing Connections'),
+    repository: defineEnglishItem('Repository', 'Repositories'),
+    core: defineEnglishItem('CPU Core', 'CPU Cores'),
+    thread: defineEnglishItem('Thread', 'Threads'),
+    flow: defineEnglishItem('Flow', 'Flows'),
   },
   translations: {
     common: {
@@ -98,14 +108,15 @@ const baseTranslations = defineTranslations({
         undo: 'Undo',
         clearUserFilter: 'Clear User Filter',
         deleteFailedBackups: 'Delete {count} Failed',
-        retryFailedDeletions: 'Retry {count} Failed Deletions',
+        retryFailedDeletions: 'Retry Failed Deletions ({count})',
+        verifyConnection: 'Verify Connection',
       },
       alert: {
         error: 'Error',
         warning: 'Warning',
         success: 'Success',
         clockOffset:
-          'Your system clock is out of sync with the server by more than 5 seconds. This may cause issues with passkey authentication and two-factor authentication. Please sync your clock if issues arise. Current offset: {offset} second(s).',
+          'Your system clock is out of sync with the server by more than 5 seconds. This may cause issues with passkey authentication and two-factor authentication. Please sync your clock if issues arise. Current offset: {offset} seconds.',
         passwordAuthUnavailable:
           'Your password will not work for this connection. Use an SSH key instead, you can add one on the SSH Keys page of your account.',
       },
@@ -170,7 +181,7 @@ const baseTranslations = defineTranslations({
           exception: 'Exception',
           invalid: 'Invalid pattern',
           unavailable: 'Count unavailable',
-          tooManyPatterns: 'Matching is not counted automatically for more than {max} patterns.',
+          tooManyPatterns: 'One pattern per line. Matching is not counted automatically for more than {max} patterns.',
           unanchoredException:
             '`{pattern}` matches at any depth, use `{anchored}` to only match it in the root directory.',
         },
@@ -201,7 +212,7 @@ const baseTranslations = defineTranslations({
         },
         iconInput: {
           defaultIcon: 'Default icon',
-          searchPlaceholder: 'Search icons…',
+          searchPlaceholder: 'Search icons...',
           noResults: 'No icons match your search.',
           moreResults: 'Showing the first {count} matches, refine your search to see more.',
           button: {
@@ -269,10 +280,32 @@ const baseTranslations = defineTranslations({
         delete: {
           content: 'Are you sure you want to delete **{name}**?',
         },
+        deleteFromAccount: {
+          content: 'Are you sure you want to delete **{name}** from your account?',
+        },
+        deleteFromServer: {
+          content: 'Are you sure you want to delete **{name}** from this server?',
+        },
+        removeFromServer: {
+          content: 'Are you sure you want to remove **{name}** from this server?',
+        },
+        removeFrom: {
+          content: 'Are you sure you want to remove **{name}** from **{parent}**?',
+        },
+        removeMount: {
+          content: 'Are you sure you want to remove the mount **{name}** from **{parent}**?',
+        },
+        removeDevice: {
+          content: 'Are you sure you want to remove the device **{name}** from **{parent}**?',
+        },
+        deleteCrash: {
+          title: 'Delete Crash',
+          content: 'Are you sure you want to delete the crash from **{timestamp}** and its console output?',
+        },
         deleteFailedBackups: {
           title: 'Confirm Failed Backup Deletion',
           content:
-            'Are you sure you want to delete `{count}` failed backups? Locked backups and backups whose configuration is in maintenance are kept. Deletion runs in the background and may take a while to finish.',
+            'Are you sure you want to delete **{items}** that failed? Locked backups and backups whose configuration is in maintenance are kept. Deletion runs in the background and may take a while to finish.',
           alert: {
             forceWarning:
               'Force deletion removes these backups even if their configuration is missing or the remote storage cannot be reached. The backup files themselves may not be fully cleaned up, leaving orphaned data behind.',
@@ -281,7 +314,7 @@ const baseTranslations = defineTranslations({
         retryFailedDeletions: {
           title: 'Confirm Failed Deletion Retry',
           content:
-            'Are you sure you want to retry deleting `{count}` backups whose deletion failed? Backups whose configuration is in maintenance are skipped. Deletion runs in the background and may take a while to finish.',
+            'Are you sure you want to retry deleting **{items}** whose deletion failed? Backups whose configuration is in maintenance are skipped. Deletion runs in the background and may take a while to finish.',
         },
       },
       toast: {
@@ -289,9 +322,11 @@ const baseTranslations = defineTranslations({
         preparingDownload: 'Preparing download...',
         downloadFailed: 'The download could not be started.',
         importing: 'Importing {file}...',
-        failedBackupDeletionStarted: 'Deleting {count} failed backups in the background.',
-        failedDeletionRetryStarted: 'Retrying {count} failed backup deletions in the background.',
+        failedBackupDeletionStarted: 'Deleting {items} that failed in the background.',
+        failedDeletionRetryStarted: 'Retrying the deletion of {items} in the background.',
         requestBlockedByExtension: 'This request was blocked by an extension.',
+        downloadStarted: 'Download started.',
+        invalidYaml: 'Invalid YAML: {error}',
       },
       settingScope: {
         account: 'Sync With Account',
@@ -317,6 +352,13 @@ const baseTranslations = defineTranslations({
         primary: 'Primary',
         backupOnDifferentNode:
           'This backup is on a different node than the server. It is not viewable from the Client API.',
+        limitReached: {
+          account: 'You are limited to {items}.',
+          team: 'This team is limited to {items}.',
+          server: 'This server is limited to {items}.',
+          databaseInstance: 'This instance is limited to {items}.',
+          schedule: 'This schedule is limited to {items}.',
+        },
       },
       form: {
         force: 'Do you want to execute this deletion forcefully?',
@@ -382,6 +424,7 @@ const baseTranslations = defineTranslations({
         device: 'Device',
         nest: 'Nest',
         nestCreateHint: "Can't find one? Create a new nest",
+        egg: 'Egg',
         locationCreateHint: "Can't find one? Create a new location",
         lines: 'Lines',
         databaseHost: 'Database Host',
@@ -414,6 +457,7 @@ const baseTranslations = defineTranslations({
         yourControlPanelPassword: 'Your Control Panel Password',
         deploymentEnabled: 'Deployment Enabled',
         maintenanceEnabled: 'Maintenance Enabled',
+        unlimitedHint: '0 will not set a limit.',
         source: 'Source',
         target: 'Target',
         replaceWith: 'Replace With',
@@ -508,6 +552,9 @@ const baseTranslations = defineTranslations({
           stopped: 'stopped',
           restarted: 'restarted',
           killed: 'killed',
+          suspended: 'suspended',
+          unsuspended: 'unsuspended',
+          stateCleared: 'cleared the state of',
         },
       },
       tabs: {
@@ -537,6 +584,10 @@ const baseTranslations = defineTranslations({
         updateAvailable: 'Update Available',
         systemBackup: 'System',
         restarting: 'Restarting',
+        deploymentEnabled: 'Deployment Enabled',
+        deploymentDisabled: 'Deployment Disabled',
+        maintenanceEnabled: 'Maintenance Enabled',
+        maintenanceDisabled: 'Maintenance Disabled',
       },
       label: {
         noSubdirectories: 'No subdirectories',
@@ -545,6 +596,11 @@ const baseTranslations = defineTranslations({
         ignored: 'Ignored',
         partiallyIgnored: 'Partially ignored',
         showingFirstEntries: 'Showing the first {count} entries',
+        limitUsage: {
+          created: '{current} of {max} created.',
+          invited: '{current} of {max} invited.',
+          assigned: '{current} of {max} assigned.',
+        },
       },
       databaseAgentHost: {
         deployment: {
@@ -688,21 +744,16 @@ const baseTranslations = defineTranslations({
           unlessStopped: 'Unless Stopped',
           never: 'Never',
         },
-        bulkActionServerAction: {
-          started: 'Started',
-          stopped: 'Stopped',
-          restarted: 'Restarted',
-          killed: 'Killed',
-          suspended: 'Suspended',
-          unsuspended: 'Unsuspended',
-          clearedState: 'Cleared the state of',
-          deleted: 'Deleted',
-        },
         compressionLevel: {
           bestSpeed: 'Best Speed',
           goodSpeed: 'Good Speed',
           goodCompression: 'Good Compression',
           bestCompression: 'Best Compression',
+        },
+        matcherType: {
+          and: 'AND (All must match)',
+          or: 'OR (Any must match)',
+          not: 'NOT (Must not match)',
         },
       },
       unit: {
@@ -778,7 +829,7 @@ const baseTranslations = defineTranslations({
         dividerPlaceholder: 'Divider label (optional)',
         redirectNamePlaceholder: 'Redirect name',
         destinationPlaceholder: 'Destination URL (e.g. https://...)',
-        selectRoutePlaceholder: 'Select a route…',
+        selectRoutePlaceholder: 'Select a route...',
         button: {
           addDivider: 'Add Divider',
           addRedirect: 'Add Redirect',
@@ -893,6 +944,15 @@ const baseTranslations = defineTranslations({
       },
       selectInput: {
         noResults: 'No Results found.',
+      },
+      recursiveGroupBuilder: {
+        matcherType: 'Matcher Type',
+        allMustMatch: 'All matchers must match:',
+        anyMustMatch: 'Any matcher must match:',
+        mustNotMatch: 'Matcher must not match:',
+        button: {
+          addMatcher: 'Add Matcher',
+        },
       },
       resourceSelectModal: {
         empty: {
@@ -1074,15 +1134,17 @@ const baseTranslations = defineTranslations({
           },
         },
       },
+      importOverlay: {
+        subtitle: 'Release to start importing',
+      },
+      uploadDropOverlay: {
+        subtitle: 'Release to start uploading',
+      },
       fileUpload: {
         title: 'Uploading {files}',
         adminAssets: 'Admin Assets',
-        waiting: 'Waiting: {file}',
-        uploading: 'Uploading: {file}',
         uploadingFolder: 'Uploading folder: {folder} ({files})',
-        failed: 'Failed: {file}',
         failedFolder: 'Upload failed: {folder} ({files})',
-        paused: 'Paused: {file}',
         pause: 'Pause upload',
         resume: 'Resume upload',
         cancel: 'Cancel upload',
@@ -1233,9 +1295,6 @@ const baseTranslations = defineTranslations({
           successMessage: 'The connection to your node was successfully verified. You may now continue.',
           skipHint: 'Skipping verification goes straight to the end of the setup, so no server will be created.',
           configurationDescription: 'Place this into the configuration file at `{file}` or run:',
-          button: {
-            verify: 'Verify Connection',
-          },
         },
         configuration: {
           title: 'Application Settings',
@@ -1289,8 +1348,6 @@ const baseTranslations = defineTranslations({
           },
           server: {
             title: 'Server',
-            nestDescription:
-              'To start using this egg, you will need to create a nest, nests are collections of eggs. Give it a name:',
           },
           error: {
             noNodes: 'Something went wrong. No nodes were found.',
@@ -1314,7 +1371,6 @@ const baseTranslations = defineTranslations({
             },
             eggRepositories: {
               title: 'Egg Repositories',
-              subtitle: '{count} repositories',
             },
             location: 'Location',
             node: 'Node',
@@ -1461,9 +1517,6 @@ const baseTranslations = defineTranslations({
           title: 'Verify Email',
           success: 'Your email address **{email}** has been verified.',
           failed: 'This verification link is invalid or has expired. Request a new one and try again.',
-          button: {
-            continue: 'Continue',
-          },
         },
         resetPassword: {
           title: 'Reset Password',
@@ -1517,9 +1570,6 @@ const baseTranslations = defineTranslations({
                 button: {
                   createGroup: 'Create Group',
                 },
-                tooltip: {
-                  limitReached: 'You are limited to {max} server groups.',
-                },
                 modal: {
                   createServerGroup: {
                     title: 'Create Server Group',
@@ -1535,21 +1585,18 @@ const baseTranslations = defineTranslations({
                   },
                   deleteServerGroup: {
                     title: 'Confirm Server Group Deletion',
-                    content: 'Are you sure you want to delete **{group}** from your account?',
                     toast: {
                       deleted: 'Server group deleted.',
                     },
                   },
                   addServerToGroup: {
                     title: 'Add Servers to {group}',
-                    noServers: 'All servers are already in this group.',
                     toast: {
                       added: '{servers} added to group.',
                     },
                   },
                   removeServerFromGroup: {
                     title: 'Confirm Server Removal',
-                    content: 'Are you sure you want to remove **{server}** from **{group}**?',
                     toast: {
                       removed: 'Server removed from group.',
                     },
@@ -1563,7 +1610,7 @@ const baseTranslations = defineTranslations({
                     },
                     groupFull: {
                       title: 'Group is full',
-                      description: 'A group cannot hold more than {max} servers.',
+                      description: 'A group cannot hold more than {items}.',
                     },
                   },
                   toast: {
@@ -1590,11 +1637,8 @@ const baseTranslations = defineTranslations({
             },
           },
           bulkActions: {
-            selectionMode: 'Selection Mode',
             select: 'Select server',
             deselect: 'Deselect server',
-            success: 'Successfully {action} {servers}.',
-            partial: 'Successfully {action} {successfulServers}. {failedServers} failed.',
             groupActions: 'Group Actions',
           },
         },
@@ -1776,7 +1820,6 @@ const baseTranslations = defineTranslations({
         },
         securityKeys: {
           title: 'Security Keys',
-          subtitle: '{current} of {max} maximum security keys created.',
           table: {
             columns: {
               credentialId: 'Credential ID',
@@ -1784,7 +1827,6 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             secureContextRequired: 'A secure context (HTTPS) is required to use security keys.',
-            limitReached: 'You are limited to {max} security keys.',
             disabled: 'Security keys have been disabled by an administrator.',
             lastKeyPasswordLoginOff:
               'This is your last security key and password login is turned off. Re-enable password login on the Account page before removing it.',
@@ -1814,7 +1856,6 @@ const baseTranslations = defineTranslations({
             },
             deleteSecurityKey: {
               title: 'Confirm Security Key Deletion',
-              content: 'Are you sure you want to delete **{key}** from your account?',
               toast: {
                 deleted: 'Security key deleted successfully.',
               },
@@ -1921,16 +1962,9 @@ const baseTranslations = defineTranslations({
             decreaseFontSize: 'Decrease the console font size',
             resetFontSize: 'Reset the console font size',
           },
-          serverList: {
-            selectServer: 'Hold S and click to select/deselect server',
-          },
         },
         sshKeys: {
           title: 'SSH Keys',
-          subtitle: '{current} of {max} maximum ssh keys created.',
-          tooltip: {
-            limitReached: 'You are limited to {max} ssh keys.',
-          },
           table: {
             columns: {
               fingerprint: 'Fingerprint',
@@ -1963,11 +1997,9 @@ const baseTranslations = defineTranslations({
             },
             deleteSshKeys: {
               title: 'Confirm SSH Key Deletion',
-              content: 'Are you sure you want to delete **{sshKeys}** from your account?',
             },
             deleteSshKey: {
               title: 'Confirm SSH Key Deletion',
-              content: 'Are you sure you want to delete **{name}** from your account?',
               toast: {
                 removed: 'SSH key removed.',
               },
@@ -2075,7 +2107,6 @@ const baseTranslations = defineTranslations({
             },
             members: {
               title: 'Members',
-              subtitle: '{current} of {max} maximum members invited.',
               empty: {
                 title: 'No Members',
                 description:
@@ -2083,9 +2114,6 @@ const baseTranslations = defineTranslations({
               },
               button: {
                 invite: 'Invite Member',
-              },
-              tooltip: {
-                limitReached: 'This team is limited to {max} members.',
               },
               form: {
                 management: 'Management',
@@ -2138,9 +2166,6 @@ const baseTranslations = defineTranslations({
               },
               button: {
                 createFirstPreset: 'Create Preset',
-              },
-              tooltip: {
-                limitReached: 'This team is limited to {max} presets.',
               },
               form: {
                 weight: 'Weight',
@@ -2204,10 +2229,6 @@ const baseTranslations = defineTranslations({
         },
         commandSnippets: {
           title: 'Command Snippets',
-          subtitle: '{current} of {max} maximum command snippets created.',
-          tooltip: {
-            limitReached: 'You are limited to {max} command snippets.',
-          },
           table: {
             columns: {
               appliesTo: 'Applies To',
@@ -2217,23 +2238,11 @@ const baseTranslations = defineTranslations({
             eggsPlaceholder: 'Select Eggs',
             matcher: 'Applies To',
             matcherDescription: 'Decides on which servers this snippet is available, by their egg.',
-            matcherType: 'Matcher Type',
-          },
-          matcher: {
-            allMustMatch: 'All matchers must match:',
-            anyMustMatch: 'Any matcher must match:',
-            mustNotMatch: 'Matcher must not match:',
-          },
-          button: {
-            addMatcher: 'Add Matcher',
           },
           enum: {
             matcherType: {
               never: 'Never (Available nowhere)',
               all: 'All (Available on every server)',
-              and: 'AND (All must match)',
-              or: 'OR (Any must match)',
-              not: 'NOT (Must not match)',
               eggs: 'Eggs',
             },
           },
@@ -2252,11 +2261,9 @@ const baseTranslations = defineTranslations({
             },
             deleteCommandSnippets: {
               title: 'Confirm Command Snippet Deletion',
-              content: 'Are you sure you want to delete **{commandSnippets}** from your account?',
             },
             deleteCommandSnippet: {
               title: 'Confirm Command Snippet Deletion',
-              content: 'Are you sure you want to delete **{name}** from your account?',
               toast: {
                 removed: 'Command snippet removed.',
               },
@@ -2297,7 +2304,6 @@ const baseTranslations = defineTranslations({
           modal: {
             deleteOAuthLinks: {
               title: 'Confirm OAuth Link Deletion',
-              content: 'Are you sure you want to delete **{oauthLinks}** from your account?',
               alert: {
                 skipped:
                   '{oauthLinks} will be skipped. Links to providers that do not allow unlinking cannot be removed.',
@@ -2316,7 +2322,6 @@ const baseTranslations = defineTranslations({
         },
         apiKeys: {
           title: 'API Keys',
-          subtitle: '{current} of {max} maximum api keys created.',
           button: {
             apiDocumentation: 'API Documentation',
             copyUuid: 'Copy UUID',
@@ -2329,7 +2334,6 @@ const baseTranslations = defineTranslations({
               'This API key will act as a **full administrator signed in with a session** wherever the panel normally refuses API keys. As long as your account is an administrator, anyone holding it can grant and revoke admin status, create, modify and impersonate other administrators, change the password and email of any account including your own, link any identity to any account, change how OAuth providers identify users, and change mail delivery, storage, panel URL, two-factor, password login and WebAuthn settings. That is enough to take over this panel entirely. The permissions you select for it still apply, so only grant the ones it needs, and only enable this for automation you fully control.',
           },
           tooltip: {
-            limitReached: 'You are limited to {max} api keys.',
             keyStartOnly: 'Only the start of the key is shown, the full key is only visible once after (re)creation.',
           },
           table: {
@@ -2376,11 +2380,9 @@ const baseTranslations = defineTranslations({
             },
             deleteApiKeys: {
               title: 'Confirm API Key Deletion',
-              content: 'Are you sure you want to delete **{apiKeys}** from your account?',
             },
             deleteApiKey: {
               title: 'Confirm API Key Deletion',
-              content: 'Are you sure you want to delete **{name}** from your account?',
               toast: {
                 removed: 'API key removed.',
               },
@@ -2411,7 +2413,7 @@ const baseTranslations = defineTranslations({
                 'This API key requests **admin permissions**. Anyone in possession of this key will be able to perform administrative actions on this panel in your name. Only continue if you absolutely trust the requesting application.',
               callbackUrl: 'After creation, the new API key will be sent to **{url}**.',
               limitReached:
-                'You already have the maximum of **{max}** API keys. Delete one under API Keys before creating a new one.',
+                'You already have the maximum of **{items}**. Delete one under API Keys before creating a new one.',
               droppedPermissions:
                 'The application also asked for these permissions, which are unknown or not available to your account and will not be granted: {permissions}',
             },
@@ -2546,7 +2548,6 @@ const baseTranslations = defineTranslations({
                   'Some database agent hosts are outdated. ({outdated} outdated, {failed} failed to check)',
                 badge: { latestVersion: 'Latest {version}' },
                 table: {
-                  version: 'Version',
                   installed: 'Installed',
                   packageName: 'Package Name',
                   latestVersion: 'Latest Version',
@@ -2591,10 +2592,7 @@ const baseTranslations = defineTranslations({
                   packageName: 'Package Name',
                   applied: 'Applied',
                   total: 'Total',
-                  id: 'ID',
                   desync: 'Desync',
-                  ip: 'IP',
-                  users: 'Users',
                   sessions: 'Sessions',
                   hint: 'Hint',
                   appliedValue: '{applied} ({percent}%)',
@@ -2622,7 +2620,6 @@ const baseTranslations = defineTranslations({
                   additionalUrls: 'Additional URLs',
                   additionalUrlsDescription:
                     'Other addresses the panel is reachable at. Logins, OAuth and self-service emails use whichever URL the request came in on; everything else uses the main URL. Security keys only work on URLs under the WebAuthn RP ID.',
-                  icon: 'Icon',
                   iconLight: 'Icon (Light Mode)',
                   banner: 'Banner',
                   bannerLight: 'Banner (Light Mode)',
@@ -2727,7 +2724,6 @@ const baseTranslations = defineTranslations({
               page: {
                 title: 'Metadata Settings',
                 form: {
-                  description: 'Description',
                   descriptionDescription: 'Shown under the title in search results and link previews.',
                   ogImage: 'Preview Image',
                   ogImageDescription: 'Shown in link previews. Must be a PNG or JPEG, not SVG.',
@@ -2755,14 +2751,11 @@ const baseTranslations = defineTranslations({
                   imageUrl: 'Image URL',
                   imageSizes: 'Sizes',
                   imageSizesDescription: 'Filled in from the image once it loads.',
-                  imageType: 'Type',
                   iconPurpose: 'Purpose',
                   screenshotFormFactor: 'Form Factor',
                   screenshotLabel: 'Label',
-                  shortcutName: 'Name',
                   shortcutShortName: 'Short Name',
                   shortcutUrl: 'Path',
-                  shortcutDescription: 'Description',
                   pwaDisplay: 'Display Mode',
                   pwaBackgroundColor: 'Splash Screen Color',
                   pwaBackgroundColorDescription: 'Background of the splash screen shown while the app opens.',
@@ -3213,7 +3206,6 @@ const baseTranslations = defineTranslations({
                 modal: {
                   delete: {
                     title: 'Confirm Announcement Deletion',
-                    content: 'Are you sure you want to delete **{title}**?',
                   },
                   duplicate: {
                     content: 'Are you sure you want to duplicate **{title}**?',
@@ -3260,7 +3252,6 @@ const baseTranslations = defineTranslations({
           },
           dropzone: {
             title: 'Drop files or folders here to upload',
-            subtitle: 'Release to start uploading',
           },
           toast: {
             assetDeleted: 'Asset deleted.',
@@ -3269,11 +3260,10 @@ const baseTranslations = defineTranslations({
           modal: {
             createDirectory: {
               title: 'New Directory',
-              createdAs: 'Will be created at ',
+              createdAs: 'Will be created at {path}',
             },
             deleteAssets: {
               title: 'Confirm Asset Deletion',
-              content: 'Are you sure you want to delete `{count}` assets?',
             },
             deleteAsset: {
               title: 'Delete Asset',
@@ -3344,16 +3334,16 @@ const baseTranslations = defineTranslations({
             disableExtension: 'Disable extension',
           },
           phase: {
-            queued: 'Queued…',
-            preparing: 'Preparing…',
-            clearing: 'Clearing extensions…',
-            adding: 'Adding extensions ({done}/{total})…',
-            resync: 'Resolving dependencies…',
-            stagingTranslations: 'Staging translations…',
-            compiling: 'Compiling…',
-            verifying: 'Verifying…',
-            installing: 'Installing…',
-            restarting: 'Restarting the panel…',
+            queued: 'Queued...',
+            preparing: 'Preparing...',
+            clearing: 'Clearing extensions...',
+            adding: 'Adding extensions ({done}/{total})...',
+            resync: 'Resolving dependencies...',
+            stagingTranslations: 'Staging translations...',
+            compiling: 'Compiling...',
+            verifying: 'Verifying...',
+            installing: 'Installing...',
+            restarting: 'Restarting the panel...',
           },
           badge: {
             frontendMissing: 'Frontend missing',
@@ -3363,7 +3353,6 @@ const baseTranslations = defineTranslations({
             startFailed: 'Failed to start',
             pendingRemoval: 'Pending removal',
             pendingRestart: 'Pending restart',
-            disabled: 'Disabled',
             processing: 'Processing',
           },
           card: {
@@ -3474,7 +3463,6 @@ const baseTranslations = defineTranslations({
                 modal: {
                   delete: {
                     title: 'Confirm User Deletion',
-                    content: 'Are you sure you want to delete **{username}**?',
                   },
                   grantAdmin: {
                     title: 'Confirm Admin Access',
@@ -3571,8 +3559,7 @@ const baseTranslations = defineTranslations({
                   },
                 },
                 tooltip: {
-                  deleteBlocked:
-                    '{count} nodes are still in this location. Move or delete them first (see the Nodes tab).',
+                  deleteBlocked: 'This location still has {items}. Move or delete them first (see the Nodes tab).',
                 },
                 titleCreate: 'Create Location',
                 titleUpdate: 'Update Location',
@@ -3649,7 +3636,7 @@ const baseTranslations = defineTranslations({
             },
             probe: {
               title: 'Wings {version} is waiting to be paired',
-              resources: '{cores} CPU cores, {memory} memory, {disk} disk ({architecture})',
+              resources: '{cores}, {memory} memory, {disk} disk ({architecture})',
               dockerAvailable: 'Docker {version} is reachable.',
               dockerUnavailable: 'Docker is not reachable. Wings will not be able to start servers until it is.',
               container:
@@ -3688,7 +3675,6 @@ const baseTranslations = defineTranslations({
                   sftpAddress: 'SFTP Address',
                   createdAt: 'Created',
                   inheritedFromLocation: 'Inherited from Location',
-                  none: 'None',
                   wingsVersion: 'Wings Version',
                   memory: 'Memory',
                   servers: 'Servers',
@@ -3697,7 +3683,6 @@ const baseTranslations = defineTranslations({
                   unavailable: 'Unavailable',
                 },
                 badge: {
-                  updateAvailable: 'Update Available',
                   latestVersionUnknown: 'Latest Version Unknown',
                 },
               },
@@ -3711,7 +3696,7 @@ const baseTranslations = defineTranslations({
                   latestVersionUnknown: '{version} (Latest Version Unknown)',
                   useWingsProxyUrl: 'Use Wings Proxy URL',
                   deleteBlocked:
-                    '{count} servers still use this node. Delete or transfer them first (see the Servers tab).',
+                    'This node is still used by {items}. Delete or transfer them first (see the Servers tab).',
                 },
                 form: {
                   urlDescription: 'Used for internal communication with the node.',
@@ -3719,7 +3704,6 @@ const baseTranslations = defineTranslations({
                   backupConfigurationPlaceholder: 'Inherit from Location',
                   memoryDescription: 'The total memory available for servers on this node.',
                   diskDescription: 'The total disk available for servers on this node.',
-                  unlimitedTooltip: '0 will not set a limit.',
                 },
                 section: {
                   connection: 'Connection',
@@ -3773,7 +3757,6 @@ const baseTranslations = defineTranslations({
                 button: {
                   save: 'Save Configuration',
                   reveal: 'Reveal Configuration',
-                  verify: 'Verify Connection',
                 },
                 alert: {
                   couldNotReach: 'Could not reach the node: {error}',
@@ -3793,7 +3776,6 @@ const baseTranslations = defineTranslations({
                 toast: {
                   applied: 'Configuration applied successfully.',
                   submittedNotApplied: 'Configuration was submitted but not applied.',
-                  invalidYaml: 'Invalid YAML: {error}',
                 },
               },
             },
@@ -3810,7 +3792,7 @@ const baseTranslations = defineTranslations({
                 label: {
                   memory: 'Memory',
                   disk: 'Disk',
-                  cpuThreads: '{model} ({threads} threads)',
+                  cpuThreads: '{model} ({threads})',
                   usedByWings: '{size} used by Wings',
                   networkIn: 'In: {in}',
                   networkOut: 'Out: {out}',
@@ -3820,25 +3802,14 @@ const baseTranslations = defineTranslations({
                   networkTraffic: 'Network Traffic',
                   diskRead: 'Disk Read',
                   diskWrite: 'Disk Write',
-                  networkInLabel: 'Network In',
-                  networkOutLabel: 'Network Out',
                 },
               },
             },
             capacity: {
               page: {
-                title: 'Deployment Capacity',
-                subtitle:
-                  'Resources allocated to servers on this node, measured against the limits configured in node settings, not the physical machine capacity. Deployment only checks memory and disk.',
                 card: {
                   resources: 'Allocated Resources',
                   breakdown: 'Allocation Breakdown',
-                },
-                status: {
-                  deploymentEnabled: 'Deployment Enabled',
-                  deploymentDisabled: 'Deployment Disabled',
-                  maintenanceEnabled: 'Under Maintenance',
-                  maintenanceDisabled: 'Not Under Maintenance',
                 },
                 label: {
                   memory: 'Memory',
@@ -3963,7 +3934,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Node Mount Removal',
-                    content: 'Are you sure you want to remove the mount **{mount}** from **{name}**?',
                   },
                 },
               },
@@ -3982,7 +3952,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Node Device Removal',
-                    content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
                 },
               },
@@ -4037,7 +4006,6 @@ const baseTranslations = defineTranslations({
                     'This backup is not on the same node as the server. It is not viewable from the Client API.',
                 },
                 toast: {
-                  downloadStarted: 'Download started.',
                   detached: 'Backup detached successfully.',
                   reattached: 'Reattached backup to {name} successfully.',
                   reassigned: 'Backup reassigned successfully.',
@@ -4109,7 +4077,7 @@ const baseTranslations = defineTranslations({
                     confirm: {
                       title: 'Confirm Server Transfers',
                       content:
-                        'Are you sure you want to transfer `{count}` servers from **{from}** to **{to}**? This action cannot be undone.',
+                        'Are you sure you want to transfer **{items}** from **{from}** to **{to}**? This action cannot be undone.',
                     },
                     enum: {
                       allocationMode: {
@@ -4166,9 +4134,7 @@ const baseTranslations = defineTranslations({
                     "This node has **not reported a certificate**, so no peer can open a connection to it. Restart the node's tunnel daemon to re-enrol it.",
                 },
                 form: {
-                  host: 'Host',
                   hostDescription: 'The hostname or IP other nodes dial this one on. Resolved at connection time.',
-                  port: 'Port',
                   portDescription: 'The UDP port the node listens on for other nodes. Must be reachable from them.',
                 },
                 section: {
@@ -4193,14 +4159,13 @@ const baseTranslations = defineTranslations({
                     uptime: 'Daemon Uptime',
                     controlLink: 'Control Link',
                     frontends: 'Bound Frontends',
-                    flowsOpen: '{count} flows open',
+                    flowsOpen: '{flows} open',
                     localDrops: 'Same-Node Drops',
-                    frozenFlows: '{count} flows frozen',
+                    frozenFlows: '{flows} frozen',
                   },
                   column: {
                     peer: 'Peer',
                     role: 'Role',
-                    address: 'Address',
                     path: 'Path',
                     loss: 'Loss',
                     transferred: 'Transferred',
@@ -4241,8 +4206,6 @@ const baseTranslations = defineTranslations({
                   },
                 },
                 button: {
-                  enable: 'Enable',
-                  disable: 'Disable',
                   rotate: 'Rotate Identity',
                 },
                 toast: {
@@ -4278,9 +4241,6 @@ const baseTranslations = defineTranslations({
               },
               toast: {
                 applied: 'Configuration applied to {nodes}.',
-              },
-              error: {
-                invalidYaml: 'Invalid YAML: {error}',
               },
             },
             upgrade: {
@@ -4334,7 +4294,6 @@ const baseTranslations = defineTranslations({
                 skipped: '{servers} will be skipped because they are already in that state.',
               },
             },
-            successWithSkipped: 'Successfully {action} {servers}. {skippedServers} skipped.',
             nothingToDo: 'Every selected server is already in that state.',
             transferMixedNodes: 'Only servers on the same node can be transferred together.',
           },
@@ -4383,7 +4342,6 @@ const baseTranslations = defineTranslations({
                   swap: 'Swap',
                   allocations: 'Allocations',
                   databases: 'Databases',
-                  databaseAgents: 'Agent Databases',
                   backups: 'Backups',
                   schedules: 'Schedules',
                   unlimited: 'Unlimited',
@@ -4437,7 +4395,6 @@ const baseTranslations = defineTranslations({
                   owner: 'Owner',
                   ownerCreateHint: "Can't find them? Create a new user",
                   eggInstallHint: "Can't find it? Install one from a repository",
-                  egg: 'Egg',
                   backupConfigurationPlaceholder: 'Inherit from Node/Location',
                   cpuLimit: 'CPU Limit (%)',
                   cpuLimitDescription: 'The CPU limit in % that the server can use.',
@@ -4446,7 +4403,6 @@ const baseTranslations = defineTranslations({
                   swapDescription: 'The amount of swap to give this server.',
                   swapTooltip: '-1 will not set a limit.',
                   memoryDescription: 'The Memory limit of the server container.',
-                  memoryTooltip: '0 will not set a limit.',
                   memoryOverhead: 'Memory Overhead',
                   memoryOverheadDescription: 'Hidden Memory that will be added to the container.',
                   diskSpace: 'Disk Space',
@@ -4459,7 +4415,6 @@ const baseTranslations = defineTranslations({
                   bandwidth: {
                     upload: 'Upload Limit',
                     download: 'Download Limit',
-                    description: '0 will not set a limit.',
                     unavailable: 'The node does not support bandwidth limits.',
                     disabled: 'Bandwidth limits are disabled in the node configuration.',
                   },
@@ -4502,7 +4457,6 @@ const baseTranslations = defineTranslations({
                     'Enable KVM passthrough for the server (allows access to /dev/kvm inside the container).',
                   allocationsLimit: 'Allocations',
                   databasesLimit: 'Databases',
-                  databaseAgentsLimit: 'Agent Databases',
                   backupsLimit: 'Backups',
                   schedulesLimit: 'Schedules',
                 },
@@ -4530,15 +4484,12 @@ const baseTranslations = defineTranslations({
                 form: {
                   notesPlaceholder: 'Notes',
                 },
-                button: {
-                  reassign: 'Reassign',
-                },
                 toast: {
                   updated: 'Allocation updated.',
                   setPrimary: 'Allocation set as primary.',
                   unsetPrimary: 'Allocation unset as primary.',
                   removed: 'Allocation removed.',
-                  added: '{count} allocations added.',
+                  added: '{items} added.',
                   reassigned: 'Allocations reassigned.',
                 },
                 modal: {
@@ -4586,7 +4537,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Server Mount Removal',
-                    content: 'Are you sure you want to remove the mount **{mount}** from **{name}**?',
                   },
                 },
               },
@@ -4605,7 +4555,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Server Device Removal',
-                    content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
                 },
               },
@@ -4649,12 +4598,6 @@ const baseTranslations = defineTranslations({
                 crashOptionOom: '{timestamp} - Exit Code {exitCode} (Out of Memory)',
                 noCrashes: 'No crashes recorded',
                 crashesUnavailable: 'Crash history unavailable',
-                modal: {
-                  deleteCrash: {
-                    title: 'Delete Crash',
-                    content: 'Are you sure you want to delete the crash from **{timestamp}** and its console output?',
-                  },
-                },
                 toast: {
                   crashDeleted: 'Crash deleted.',
                 },
@@ -4775,7 +4718,7 @@ const baseTranslations = defineTranslations({
                 titleUpdate: 'Update Nest',
                 tooltip: {
                   deleteBlocked:
-                    '{count} servers still use eggs in this nest. Delete them or change their egg first (see the Servers tab of each egg).',
+                    'Eggs in this nest are still used by {items}. Delete them or change their egg first (see the Servers tab of each egg).',
                 },
                 modal: {
                   delete: {
@@ -4794,7 +4737,6 @@ const baseTranslations = defineTranslations({
                 resourceName: 'Egg',
                 dropzone: {
                   title: 'Drop some files here to import as Eggs',
-                  subtitle: 'Release to start importing',
                 },
                 button: {
                   updateFromRepository: 'Update from Repository',
@@ -4820,19 +4762,17 @@ const baseTranslations = defineTranslations({
                   },
                   updateUrl: {
                     title: 'Update Egg from URL',
-                    url: 'URL',
                     urlDescription: 'Direct link to an exported egg in JSON or YAML format.',
                   },
                   move: {
                     title: 'Move Egg',
                   },
-                  moveBulk: {
+                  moveEggs: {
                     title: 'Move Eggs',
                     confirm: 'Move {eggs}',
                   },
-                  deleteBulk: {
+                  deleteEggs: {
                     title: 'Confirm Egg Deletion',
-                    content: 'Are you sure you want to delete `{count}` eggs?',
                   },
                 },
                 tabs: {
@@ -4842,7 +4782,7 @@ const baseTranslations = defineTranslations({
                       titleUpdate: 'Update Egg',
                       tooltip: {
                         deleteBlocked:
-                          '{count} servers still use this egg. Delete them or change their egg first (see the Servers tab).',
+                          'This egg is still used by {items}. Delete them or change their egg first (see the Servers tab).',
                       },
                       card: {
                         startupConfiguration: 'Startup Configuration',
@@ -4991,7 +4931,6 @@ const baseTranslations = defineTranslations({
                         },
                         delete: {
                           title: 'Confirm Egg Mount Removal',
-                          content: 'Are you sure you want to remove the mount **{mount}** from **{egg}**?',
                         },
                       },
                     },
@@ -5010,7 +4949,6 @@ const baseTranslations = defineTranslations({
                         },
                         delete: {
                           title: 'Confirm Egg Device Removal',
-                          content: 'Are you sure you want to remove the device **{device}** from **{egg}**?',
                         },
                       },
                     },
@@ -5031,7 +4969,6 @@ const baseTranslations = defineTranslations({
           resourceName: 'Egg Configuration',
           dropzone: {
             title: 'Drop some files here to import as Egg Configurations',
-            subtitle: 'Release to start importing',
           },
           table: {
             columns: {
@@ -5059,23 +4996,11 @@ const baseTranslations = defineTranslations({
                   matcher: 'Applies To',
                   matcherDescription:
                     'Decides which servers this configuration applies to, by their egg, nest, node or location. When several configurations apply to a server, those with a higher order override those with a lower one.',
-                  matcherType: 'Matcher Type',
-                },
-                matcher: {
-                  allMustMatch: 'All matchers must match:',
-                  anyMustMatch: 'Any matcher must match:',
-                  mustNotMatch: 'Matcher must not match:',
-                },
-                button: {
-                  addMatcher: 'Add Matcher',
                 },
                 enum: {
                   matcherType: {
                     never: 'Never (Applies to nothing)',
                     all: 'All (Always applies)',
-                    and: 'AND (All must match)',
-                    or: 'OR (Any must match)',
-                    not: 'NOT (Must not match)',
                     eggs: 'Eggs',
                     nests: 'Nests',
                     nodes: 'Nodes',
@@ -5283,8 +5208,6 @@ const baseTranslations = defineTranslations({
                 table: {
                   columns: {
                     path: 'Path',
-                    repository: 'Repository',
-                    installedIn: 'Installed In',
                   },
                 },
                 toast: {
@@ -5297,14 +5220,12 @@ const baseTranslations = defineTranslations({
                     button: 'Install {eggs}',
                   },
                   catalog: {
-                    title: 'Install Egg from Repository',
                     searchPlaceholder: 'Search eggs in every repository...',
                     selected: 'Selected: **{egg}**',
                     moreResults: 'Showing {shown} of {total} eggs, keep typing to narrow it down.',
                     installingInto: 'The egg will be installed into **{nest}**.',
                     noEggs:
                       'No eggs are available yet. Add an egg repository under Egg Repositories, it is synced automatically.',
-                    button: 'Install',
                     buttonSelect: 'Install & Select',
                   },
                 },
@@ -5360,12 +5281,6 @@ const baseTranslations = defineTranslations({
               title: 'Overview',
               page: {
                 title: 'Database Host Overview',
-                status: {
-                  deploymentEnabled: 'Deployment Enabled',
-                  deploymentDisabled: 'Deployment Disabled',
-                  maintenanceEnabled: 'Maintenance Enabled',
-                  maintenanceDisabled: 'Maintenance Disabled',
-                },
                 card: {
                   hostDetails: 'Host Details',
                   systemInfo: 'System Information',
@@ -5427,7 +5342,6 @@ const baseTranslations = defineTranslations({
                   backupConfigurationPlaceholder: 'Inherit from Node/Location',
                   memoryDescription: 'The total memory available for database instances on this host.',
                   diskDescription: 'The total disk available for database instances on this host.',
-                  unlimitedTooltip: '0 will not set a limit.',
                 },
                 alert: {
                   urlMissingPort:
@@ -5487,9 +5401,6 @@ const baseTranslations = defineTranslations({
               title: 'Backups',
               page: {
                 title: 'Database Agent Host Backups',
-                toast: {
-                  downloadStarted: 'Download started.',
-                },
               },
             },
             configuration: {
@@ -5520,7 +5431,6 @@ const baseTranslations = defineTranslations({
                 button: {
                   save: 'Save Configuration',
                   reveal: 'Reveal Configuration',
-                  verify: 'Verify Connection',
                 },
                 alert: {
                   couldNotReach: 'Could not reach the database agent host: {error}',
@@ -5535,7 +5445,6 @@ const baseTranslations = defineTranslations({
                 toast: {
                   applied: 'Configuration applied successfully.',
                   submittedNotApplied: 'Configuration was submitted but not applied.',
-                  invalidYaml: 'Invalid YAML: {error}',
                 },
               },
             },
@@ -5543,12 +5452,6 @@ const baseTranslations = defineTranslations({
               title: 'Overview',
               page: {
                 title: 'Database Agent Host Overview',
-                status: {
-                  deploymentEnabled: 'Deployment Enabled',
-                  deploymentDisabled: 'Deployment Disabled',
-                  maintenanceEnabled: 'Maintenance Enabled',
-                  maintenanceDisabled: 'Maintenance Disabled',
-                },
                 card: {
                   hostDetails: 'Host Details',
                   systemInfo: 'System Information',
@@ -5573,7 +5476,6 @@ const baseTranslations = defineTranslations({
                   noAllocations: 'No instances allocate this resource.',
                 },
                 badge: {
-                  updateAvailable: 'Update Available',
                   latestVersionUnknown: 'Latest Version Unknown',
                 },
               },
@@ -5586,7 +5488,7 @@ const baseTranslations = defineTranslations({
                   graphs: 'Graphs',
                 },
                 label: {
-                  cpuThreads: '{model} ({threads} threads)',
+                  cpuThreads: '{model} ({threads})',
                   memory: 'Memory',
                   usedByAgent: '{size} used by the agent',
                   disk: 'Disk',
@@ -5598,8 +5500,6 @@ const baseTranslations = defineTranslations({
                   diskRead: 'Disk Read',
                   diskWrite: 'Disk Write',
                   networkTraffic: 'Network Traffic',
-                  inbound: 'Inbound',
-                  outbound: 'Outbound',
                 },
                 toast: {
                   connectionLost: 'Connection to the database agent host was lost.',
@@ -5615,9 +5515,6 @@ const baseTranslations = defineTranslations({
               },
               toast: {
                 applied: 'Configuration applied to {hosts}.',
-              },
-              error: {
-                invalidYaml: 'Invalid YAML: {error}',
               },
             },
             upgrade: {
@@ -5641,7 +5538,6 @@ const baseTranslations = defineTranslations({
           resourceName: 'Database Agent Template',
           dropzone: {
             title: 'Drop some files here to import as Database Agent Templates',
-            subtitle: 'Release to start importing',
           },
           toast: {
             imported: 'Database Agent Template imported.',
@@ -5669,7 +5565,6 @@ const baseTranslations = defineTranslations({
                   imageUid: 'Image UID',
                   imageGid: 'Image GID',
                   memoryDescription: 'The Memory limit of the database container.',
-                  memoryTooltip: '0 will not set a limit.',
                   swap: 'Swap',
                   swapDescription: 'The amount of swap to give this database.',
                   swapTooltip: '-1 will not set a limit.',
@@ -5706,7 +5601,7 @@ const baseTranslations = defineTranslations({
                   applyUpdates: {
                     title: 'Apply Template Updates',
                     content:
-                      'This will push the current configuration of **{name}** to the {count} selected instances. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.',
+                      'This will push the current configuration of **{name}** to {items}. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.',
                     contentAll:
                       'This will push the current configuration of **{name}** to every outdated instance, including instances not shown by the current search. Instances will be restarted to apply the new configuration. Locked instances and instances on hosts in maintenance mode are skipped.',
                   },
@@ -5720,7 +5615,6 @@ const baseTranslations = defineTranslations({
           resourceName: 'OAuth Provider',
           dropzone: {
             title: 'Drop some files here to import as OAuth Providers',
-            subtitle: 'Release to start importing',
           },
           table: {
             columns: {
@@ -5842,9 +5736,6 @@ const baseTranslations = defineTranslations({
                   matcherType: {
                     none: 'None (Always applies)',
                     never: 'Never (Applies to nothing)',
-                    and: 'AND (All must match)',
-                    or: 'OR (Any must match)',
-                    not: 'NOT (Must not match)',
                     scopes: 'Granted Scopes',
                     fieldExists: 'Field Exists',
                     fieldEquals: 'Field Equals',
@@ -5858,18 +5749,9 @@ const baseTranslations = defineTranslations({
                   updated: 'OAuth provider mapping updated.',
                   deleted: 'OAuth provider mapping deleted.',
                 },
-                button: {
-                  addMatcher: 'Add Matcher',
-                },
-                matcher: {
-                  allMustMatch: 'All matchers must match:',
-                  anyMustMatch: 'Any matcher must match:',
-                  mustNotMatch: 'Matcher must not match:',
-                },
                 form: {
                   matcher: 'Matcher',
                   matcherDescription: 'Decides whether this mapping applies to a user logging in with this provider.',
-                  matcherType: 'Matcher Type',
                   scopes: 'Scopes',
                   scopesDescription: 'OAuth scopes that must all have been granted for this matcher to match.',
                   source: 'Source',
@@ -6073,9 +5955,6 @@ const baseTranslations = defineTranslations({
               title: 'Backups',
               page: {
                 title: 'Backup Configuration Backups',
-                toast: {
-                  downloadStarted: 'Download started.',
-                },
               },
             },
             locations: {
@@ -6162,9 +6041,6 @@ const baseTranslations = defineTranslations({
               title: 'Backups',
               page: {
                 title: 'System Backup Policy Backups',
-                toast: {
-                  downloadStarted: 'Download started.',
-                },
               },
             },
             runs: {
@@ -6221,7 +6097,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Location Removal',
-                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
                   },
                 },
               },
@@ -6240,7 +6115,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Node Removal',
-                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
                   },
                 },
               },
@@ -6259,7 +6133,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Database Agent Host Removal',
-                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
                   },
                 },
               },
@@ -6278,7 +6151,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Server Removal',
-                    content: 'Are you sure you want to remove **{name}** from **{policy}**?',
                   },
                 },
               },
@@ -6316,13 +6188,9 @@ const baseTranslations = defineTranslations({
                 modal: {
                   add: {
                     title: 'Add Mount Egg',
-                    form: {
-                      egg: 'Egg',
-                    },
                   },
                   remove: {
                     title: 'Confirm Mount Egg Removal',
-                    content: 'Are you sure you want to remove the mount **{mount}** from **{name}**?',
                   },
                 },
               },
@@ -6341,7 +6209,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Mount Node Removal',
-                    content: 'Are you sure you want to remove the mount **{mount}** from **{name}**?',
                   },
                 },
               },
@@ -6387,13 +6254,9 @@ const baseTranslations = defineTranslations({
                 modal: {
                   add: {
                     title: 'Add Device Egg',
-                    form: {
-                      egg: 'Egg',
-                    },
                   },
                   remove: {
                     title: 'Confirm Device Egg Removal',
-                    content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
                 },
                 tooltip: {
@@ -6415,7 +6278,6 @@ const baseTranslations = defineTranslations({
                   },
                   remove: {
                     title: 'Confirm Device Node Removal',
-                    content: 'Are you sure you want to remove the device **{device}** from **{name}**?',
                   },
                 },
                 tooltip: {
@@ -6678,7 +6540,6 @@ const baseTranslations = defineTranslations({
           },
           stats: {
             offline: 'Server is offline',
-            connecting: 'Connecting...',
           },
           history: {
             title: 'Resource History',
@@ -6746,12 +6607,6 @@ const baseTranslations = defineTranslations({
               description:
                 "The node this server runs on doesn't keep crash history, either because it is turned off or because the node needs an update.",
             },
-            modal: {
-              delete: {
-                title: 'Delete Crash',
-                content: 'Are you sure you want to delete the crash from **{timestamp}** and its console output?',
-              },
-            },
             toast: {
               deleted: 'Crash deleted.',
             },
@@ -6799,25 +6654,27 @@ const baseTranslations = defineTranslations({
             searchPlaceholder: 'Search files...',
             noSearchResults: 'No matching files',
             upload: 'Upload',
-            uploadFromComputer: 'Upload from computer',
-            uploadFromUrl: 'Upload from URL',
             selectItem: 'Select {name}',
             deselectItem: 'Deselect {name}',
             selectFileToOpen: 'Select a file from the tree to open it.',
             noEditorAvailable: 'No editor is available for this file type.',
             editorTabsLabel: 'Open files',
             closeEditorTab: 'Close {name}',
-            closeOtherTabs: 'Close Others',
-            closeTabsToRight: 'Close to the Right',
-            closeSavedTabs: 'Close Saved',
-            closeAllTabs: 'Close All',
-            revealInTree: 'Reveal in Tree',
             revealNotFound: 'Could not find {path} in the file tree.',
             unsavedTab: '{name} has unsaved changes',
             resizeEditorPanes: 'Resize editor panes',
             resizeFileTree: 'Resize file tree',
             selectPane: 'Select editor pane',
             editorPane: 'Editor pane {number}',
+            button: {
+              uploadFromComputer: 'Upload from computer',
+              uploadFromUrl: 'Upload from URL',
+              closeOtherTabs: 'Close Others',
+              closeTabsToRight: 'Close to the Right',
+              closeSavedTabs: 'Close Saved',
+              closeAllTabs: 'Close All',
+              revealInTree: 'Reveal in Tree',
+            },
           },
           titleEditorViewing: 'Viewing {file}',
           titleEditorPlaying: 'Playing {file}',
@@ -6953,7 +6810,6 @@ const baseTranslations = defineTranslations({
           },
           dropzone: {
             title: 'Drop files or folders here to upload',
-            subtitle: 'Release to start uploading',
             readOnly: 'This directory is read-only',
             noPermission: 'You do not have permission to upload files',
             blockedSubtitle: 'Dropped files will not be uploaded',
@@ -6984,7 +6840,6 @@ const baseTranslations = defineTranslations({
             filesMoved: '{files} moved.',
             moveUndone: 'Move of {files} undone.',
             moveCouldNotBeUndone: 'Move could not be undone.',
-            downloadStarted: 'Download started.',
             filesDeleted: 'Files have been deleted.',
             filesTrashed: '{files} moved to the trash.',
             filesTrashedPartiallyDeleted: '{files} moved to the trash, {deleted} deleted permanently.',
@@ -7047,10 +6902,6 @@ const baseTranslations = defineTranslations({
                 viewDiff: 'View diff against current file',
                 compareToPrevious: 'Compare to previous revision',
               },
-              diff: {
-                original: 'Revision',
-                current: 'Current',
-              },
             },
           },
           trash: {
@@ -7088,7 +6939,7 @@ const baseTranslations = defineTranslations({
               restoreTo: {
                 title: 'Restore to Directory',
                 destination: 'Destination Directory',
-                restoredAs: 'This file will be restored as ',
+                restoredAs: 'This file will be restored as {path}',
               },
               restoreConflict: {
                 title: 'Resolve Restore Conflicts',
@@ -7132,7 +6983,7 @@ const baseTranslations = defineTranslations({
             },
             extractFile: {
               title: 'Extract Archive',
-              extractedTo: 'The contents of {file} will be extracted into ',
+              extractedTo: 'The contents of {file} will be extracted into {path}',
             },
             patchFile: {
               title: 'Apply Patch',
@@ -7144,29 +6995,29 @@ const baseTranslations = defineTranslations({
                 file: 'File to Patch',
                 fileDescription: 'Relative to the directory the patch is applied in.',
               },
-              appliedIn: '{file} will be applied to ',
+              appliedIn: '{file} will be applied to {path}',
             },
             createArchive: {
               title: 'Create Archive',
               form: {
                 format: 'Format',
               },
-              createdAs: 'This archive will be created as ',
+              createdAs: 'This archive will be created as {path}',
             },
             createDirectory: {
               title: 'Create Directory',
-              createdAs: 'This directory will be created as ',
+              createdAs: 'This directory will be created as {path}',
             },
             createSymlink: {
               title: 'Create Symlink',
               targetDescription:
                 'Relative to the directory the symlink is created in, or to the server root when starting with /.',
-              createdAs: 'This symlink will be created as ',
-              pointsTo: 'It will point to ',
+              createdAs: 'This symlink will be created as {path}',
+              pointsTo: 'It will point to {path}',
             },
             copyFile: {
               title: 'Copy File',
-              createdAs: 'This file will be created as ',
+              createdAs: 'This file will be created as {path}',
               conflict: 'A file with that name already exists at the destination.',
             },
             copyConflict: {
@@ -7189,7 +7040,7 @@ const baseTranslations = defineTranslations({
               noCreatePermission: 'You do not have permission to create files on {servers}.',
               unavailableServers:
                 '{servers} cannot receive files right now because they are suspended, installing, restoring a backup or being transferred. Remove them to continue.',
-              createdAs: 'These files will be created on {servers} under ',
+              createdAs: 'These files will be created on {servers} under {path}',
             },
             fileFingerprints: {
               title: 'File Fingerprint',
@@ -7301,7 +7152,7 @@ const baseTranslations = defineTranslations({
               title: 'Largest Directories',
               empty: 'No directories found.',
               files: 'Files in this folder',
-              smallerFolders: '{count} smaller folders',
+              smallerFolders: '{items} (smaller)',
               inaccessible: 'Inaccessible',
               openFolder: 'Open folder',
               noSubdirectories: 'This folder uses {size} and has no large subdirectories of its own.',
@@ -7331,7 +7182,7 @@ const baseTranslations = defineTranslations({
                 fileUrl: 'File URL',
                 query: 'Query',
               },
-              createdAs: 'This file will be created as ',
+              createdAs: 'This file will be created as {path}',
               pull: 'Pull',
               insufficientDisk:
                 'This file is {size}, but only {free} of disk space is free. The pull may fail part way.',
@@ -7351,7 +7202,6 @@ const baseTranslations = defineTranslations({
         },
         databases: {
           title: 'Databases',
-          subtitle: '{current} of {max} maximum databases created.',
           empty: {
             title: 'No Databases',
             description:
@@ -7361,7 +7211,6 @@ const baseTranslations = defineTranslations({
               'This server has no database to store data in. No database host has been made available to it, so none can be created yet.',
           },
           tooltip: {
-            limitReached: 'This server is limited to {max} databases.',
             locked: 'This database is locked. Unlock it first.',
           },
           table: {
@@ -7550,7 +7399,6 @@ const baseTranslations = defineTranslations({
           },
           instance: {
             title: 'Managed Databases',
-            updateAvailable: 'Update Available',
             empty: {
               title: 'No Managed Databases',
               description:
@@ -7564,7 +7412,6 @@ const baseTranslations = defineTranslations({
               createFirstInstance: 'Create Managed Database',
             },
             tooltip: {
-              limitReached: 'This server is limited to {max} managed databases.',
               locked: 'This managed database is locked. Unlock it in Edit first.',
               offline: 'The managed database must be running.',
             },
@@ -7576,18 +7423,15 @@ const baseTranslations = defineTranslations({
                 logs: 'Logs',
               },
               stats: {
-                connecting: 'Connecting...',
                 offline: 'Instance is offline',
               },
               connectionLost: 'Lost connection to the database instance.',
             },
             databases: {
               title: 'Databases',
-              subtitle: '{current} of {max} maximum databases created.',
               tooltip: {
                 offline: 'The instance must be running to create databases.',
                 noUser: 'This database has no user attached yet. Create a user to access it.',
-                limitReached: 'This instance is limited to {max} databases.',
               },
               button: {
                 remoteImport: 'Import from Remote',
@@ -7638,11 +7482,6 @@ const baseTranslations = defineTranslations({
                     'Recreating a database will permanently delete all data in the **{name}** database and create a new empty one with the same name and user access.',
                 },
               },
-              table: {
-                columns: {
-                  database: 'Database',
-                },
-              },
               toast: {
                 created: 'Database created.',
                 deleted: 'Database deleted.',
@@ -7654,13 +7493,11 @@ const baseTranslations = defineTranslations({
             },
             users: {
               title: 'Users',
-              subtitle: '{current} of {max} maximum users created.',
               button: {
                 permissions: 'Permissions',
               },
               tooltip: {
                 offline: 'The instance must be running to create users.',
-                limitReached: 'This instance is limited to {max} users.',
               },
               enum: {
                 permission: {
@@ -7672,11 +7509,6 @@ const baseTranslations = defineTranslations({
               form: {
                 databases: 'Database Access',
                 noDatabases: 'This instance has no databases yet.',
-              },
-              table: {
-                columns: {
-                  databases: 'Databases',
-                },
               },
               modal: {
                 createUser: {
@@ -7739,7 +7571,7 @@ const baseTranslations = defineTranslations({
             },
             backups: {
               title: 'Backups',
-              subtitle: '{current} of {max} maximum backups created on this server, shared with server backups.',
+              subtitle: '{current} of {max} created on this server, shared with server backups.',
               badge: {
                 restoring: 'Restoring backup',
               },
@@ -7747,7 +7579,7 @@ const baseTranslations = defineTranslations({
                 restoring: 'A backup is currently being restored into this managed database. Please wait...',
               },
               tooltip: {
-                limitReached: 'This server is limited to {max} backups, shared between server and database backups.',
+                limitReached: 'This server is limited to {items}, shared between server and database backups.',
                 offline: 'The managed database must be running to take a backup.',
                 restoring: 'A backup is currently being restored into this managed database.',
               },
@@ -7895,19 +7727,14 @@ const baseTranslations = defineTranslations({
         },
         schedules: {
           title: 'Schedules',
-          subtitle: '{current} of {max} maximum schedules created.',
           dropzone: {
-            title: 'Drop some files here to import them as Schedules',
-            subtitle: 'Release to start importing',
+            title: 'Drop some files here to import as Schedules',
           },
           empty: {
             title: 'No Schedules',
             description:
               'Nothing runs on this server automatically. Add a schedule to run commands, backups and more on a timer or in reaction to an event.',
             descriptionReadOnly: 'Nothing runs on this server automatically.',
-          },
-          tooltip: {
-            limitReached: 'This server is limited to {max} schedules.',
           },
           table: {
             columns: {
@@ -7989,11 +7816,9 @@ const baseTranslations = defineTranslations({
             },
             deleteSchedules: {
               title: 'Confirm Schedule Deletion',
-              content: 'Are you sure you want to delete **{schedules}** from this server?',
             },
             deleteSchedule: {
               title: 'Confirm Schedule Deletion',
-              content: 'Are you sure you want to delete **{name}** from this server?',
             },
             createStep: {
               title: 'Create Schedule Step',
@@ -8211,9 +8036,6 @@ const baseTranslations = defineTranslations({
             },
           },
           steps: {
-            tooltip: {
-              limitReached: 'This schedule is limited to {max} steps.',
-            },
             empty: {
               descriptionReadOnly: 'This schedule does nothing when it runs.',
               title: 'No Steps Configured',
@@ -8235,6 +8057,13 @@ const baseTranslations = defineTranslations({
               files: 'Files',
               startup: 'Startup Settings',
               advanced: 'Advanced Logic',
+            },
+            renderer: {
+              detail: {
+                root: 'Root: {root}',
+                file: 'File: {file}',
+                files: 'Files: {files}',
+              },
             },
             sleep: {
               title: 'Sleep',
@@ -8490,7 +8319,6 @@ const baseTranslations = defineTranslations({
                 compact: 'Create {name} in {root}',
                 detail: {
                   directory: 'Directory: {name}',
-                  root: 'Root: {root}',
                 },
               },
             },
@@ -8503,7 +8331,6 @@ const baseTranslations = defineTranslations({
               renderer: {
                 compact: 'Write to {file}',
                 detail: {
-                  file: 'File: {file}',
                   append: 'Append: {value}',
                 },
               },
@@ -8535,8 +8362,6 @@ const baseTranslations = defineTranslations({
                 compact: 'Delete {files}',
                 compactTrash: 'Move {files} to the trash',
                 detail: {
-                  root: 'Root: {root}',
-                  files: 'Files: {files}',
                   trash: 'Move to Trash: {value}',
                 },
               },
@@ -8551,10 +8376,6 @@ const baseTranslations = defineTranslations({
               },
               renderer: {
                 compact: 'Rename {files}',
-                detail: {
-                  root: 'Root: {root}',
-                  files: 'Files: {files}',
-                },
               },
             },
             compressFiles: {
@@ -8567,9 +8388,7 @@ const baseTranslations = defineTranslations({
                 compact: 'Compress {files} in {root} to {name}',
                 detail: {
                   output: 'Output: {name}',
-                  root: 'Root: {root}',
                   format: 'Format: {format}',
-                  files: 'Files: {files}',
                 },
               },
             },
@@ -8581,10 +8400,6 @@ const baseTranslations = defineTranslations({
               },
               renderer: {
                 compact: 'Decompress {file} to {root}',
-                detail: {
-                  file: 'File: {file}',
-                  root: 'Root: {root}',
-                },
               },
             },
             patchFiles: {
@@ -8597,8 +8412,6 @@ const baseTranslations = defineTranslations({
                 compact: 'Apply {patch} in {root}',
                 detail: {
                   patch: 'Patch: {patch}',
-                  root: 'Root: {root}',
-                  file: 'File: {file}',
                   format: 'Format: {format}',
                 },
               },
@@ -8614,7 +8427,6 @@ const baseTranslations = defineTranslations({
                 compact: 'Pull {url} into {root}',
                 detail: {
                   url: 'URL: {url}',
-                  root: 'Root: {root}',
                   fileName: 'File Name: {fileName}',
                   useHeader: 'Use Response File Name: {value}',
                 },
@@ -8682,7 +8494,6 @@ const baseTranslations = defineTranslations({
         },
         subusers: {
           title: 'Subusers',
-          subtitle: '{current} of {max} maximum subusers created.',
           empty: {
             title: 'No Subusers',
             description:
@@ -8691,9 +8502,6 @@ const baseTranslations = defineTranslations({
           },
           button: {
             createFirstSubuser: 'Create Subuser',
-          },
-          tooltip: {
-            limitReached: 'This server is limited to {max} subusers.',
           },
           team: {
             title: 'Team Members',
@@ -8738,11 +8546,9 @@ const baseTranslations = defineTranslations({
             },
             removeSubusers: {
               title: 'Confirm Subuser Removal',
-              content: 'Are you sure you want to remove **{subusers}** from this server?',
             },
             removeSubuser: {
               title: 'Confirm Subuser Removal',
-              content: 'Are you sure you want to remove **{username}** from this server?',
               toast: {
                 removed: 'Subuser removed.',
               },
@@ -8751,8 +8557,7 @@ const baseTranslations = defineTranslations({
         },
         backups: {
           title: 'Backups',
-          subtitle: '{current} of {max} maximum backups created.',
-          subtitleWithDatabase: '{current} of {max} maximum backups created ({server} server, {database} database).',
+          subtitleWithDatabase: '{current} of {max} created ({server} server, {database} database).',
           empty: {
             title: 'No Backups',
             description:
@@ -8760,9 +8565,7 @@ const baseTranslations = defineTranslations({
             descriptionReadOnly: 'Nothing on this server can be restored if something goes wrong.',
           },
           tooltip: {
-            limitReached: 'This server is limited to {max} backups.',
-            evicts: 'This server is at its limit of {max} backups. Creating one deletes {name} to make room.',
-            groupLimitReached: 'This server is limited to {max} backup groups.',
+            evicts: 'This server is at its limit of {items}. Creating one deletes {name} to make room.',
           },
           table: {
             columns: {
@@ -8772,7 +8575,7 @@ const baseTranslations = defineTranslations({
             },
           },
           badge: {
-            deleting: 'Deleting…',
+            deleting: 'Deleting...',
             deleteFailed: 'Deletion failed',
             sourceDeleted: '{name} (deleted)',
           },
@@ -8785,9 +8588,9 @@ const baseTranslations = defineTranslations({
             removeFromGroup: 'Remove from Group',
             lock: 'Lock',
             unlock: 'Unlock',
+            viewMetadata: 'View Metadata',
           },
           toast: {
-            downloadStarted: 'Download started.',
             restoringBackup: 'Restoring backup...',
             exportStarted: 'Backup export started.',
             locked: 'Backup locked.',
@@ -8820,7 +8623,6 @@ const baseTranslations = defineTranslations({
             },
             deleteBackups: {
               title: 'Confirm Backup Deletion',
-              content: 'Are you sure you want to delete **{backups}** from this server?',
               alert: {
                 skipped:
                   '{backups} will be skipped. Locked backups, backups that have not finished, and backups already being deleted cannot be deleted.',
@@ -8828,7 +8630,6 @@ const baseTranslations = defineTranslations({
             },
             deleteBackup: {
               title: 'Confirm Backup Deletion',
-              content: 'Are you sure you want to delete **{name}** from this server?',
               toast: {
                 started: 'Backup deletion started.',
                 deleted: 'Backup deleted.',
@@ -8881,7 +8682,6 @@ const baseTranslations = defineTranslations({
         },
         network: {
           title: 'Network',
-          subtitle: '{current} of {max} maximum allocations assigned.',
           allocations: {
             title: 'Allocations',
           },
@@ -8893,7 +8693,6 @@ const baseTranslations = defineTranslations({
               'This server has no allocations. Allocations on this server are assigned by an administrator, so ask them if you need one.',
           },
           tooltip: {
-            limitReached: 'This server is limited to {max} allocations.',
             selfAssignDisabled: 'Allocations on this server are assigned by an administrator.',
             primaryLocked: 'This server needs a primary allocation. Set another allocation as primary first.',
           },
@@ -8913,14 +8712,12 @@ const baseTranslations = defineTranslations({
           modal: {
             removeAllocations: {
               title: 'Confirm Allocation Removal',
-              content: 'Are you sure you want to remove **{allocations}** from this server?',
               alert: {
                 skipped: '{allocations} will be skipped. The primary allocation cannot be removed.',
               },
             },
             removeAllocation: {
               title: 'Confirm Allocation Removal',
-              content: 'Are you sure you want to remove **{allocation}** from this server?',
             },
           },
         },
@@ -8929,7 +8726,6 @@ const baseTranslations = defineTranslations({
           subtitle: 'Rules are checked from top to bottom, the first one that matches decides.',
           dropzone: {
             title: 'Drop some files here to import as Firewall Rules',
-            subtitle: 'Release to start importing',
           },
           empty: {
             title: 'No Firewall Rules',
@@ -8941,9 +8737,6 @@ const baseTranslations = defineTranslations({
             createFirstRule: 'Create Rule',
             addRule: 'Add Rule',
             addDenyAll: 'Deny Everything Else',
-          },
-          tooltip: {
-            limitReached: 'This server is limited to {max} firewall rules.',
           },
           rule: {
             anySource: 'any source',
@@ -9046,9 +8839,7 @@ const baseTranslations = defineTranslations({
             leave: 'Leave Private Network',
             connect: 'Connect a Server',
             addPort: 'Add Port',
-            editPorts: 'Offered Ports',
-          },
-          action: {
+            offeredPorts: 'Offered Ports',
             rename: 'Change Hostname',
             editPorts: 'Edit Offered Ports',
             removeOutgoing: 'Stop Reaching This Server',
@@ -9084,7 +8875,6 @@ const baseTranslations = defineTranslations({
           },
           tooltip: {
             nodeNotOnNetwork: 'The node this server runs on is not on the private network.',
-            connectionLimitReached: 'This server is limited to {max} outgoing connections.',
           },
           alert: {
             nodeNotOnNetwork:
@@ -9099,9 +8889,7 @@ const baseTranslations = defineTranslations({
             nameDescription:
               'Lowercase letters, digits and dashes, up to 63 characters. A server cannot reach two servers with the same hostname.',
             namePlaceholder: 'Leave empty to derive one from the server name',
-            port: 'Port',
             protocols: 'Protocols',
-            server: 'Server',
             serverDescription: 'Only servers already on the private network are listed.',
           },
           toast: {
@@ -9330,7 +9118,7 @@ const baseTranslations = defineTranslations({
               noBackups: 'This server has no backups yet.',
               backupFirst: 'Create a backup first',
               backupFirstDescription: 'The reinstall starts once the backup has finished.',
-              waitingForBackup: 'Waiting for the backup to finish…',
+              waitingForBackup: 'Waiting for the backup to finish...',
               backupFailed: 'The backup failed, so the server was not reinstalled.',
               truncateWarning:
                 'Every file of this server is deleted before the installation script runs. This cannot be undone.',

@@ -69,7 +69,7 @@ export default function EggMoveModal({
     <FormModal
       title={t(
         isBulk
-          ? 'pages.admin.nests.tabs.eggs.page.modal.moveBulk.title'
+          ? 'pages.admin.nests.tabs.eggs.page.modal.moveEggs.title'
           : 'pages.admin.nests.tabs.eggs.page.modal.move.title',
         {},
       )}
@@ -98,7 +98,7 @@ export default function EggMoveModal({
         <ModalFooter>
           <Button type='submit' loading={loading} disabled={!selectedNest}>
             {isBulk
-              ? t('pages.admin.nests.tabs.eggs.page.modal.moveBulk.confirm', { eggs: tItem('egg', eggs.length) })
+              ? t('pages.admin.nests.tabs.eggs.page.modal.moveEggs.confirm', { eggs: tItem('egg', eggs.length) })
               : t('common.button.move', {})}
           </Button>
           <Button variant='default' onClick={props.onClose}>

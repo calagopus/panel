@@ -62,22 +62,27 @@ export default function useFileTreeTabQuickActions({
     {
       action: 'others',
       icon: faWindowRestore,
-      label: () => t('pages.server.files.tree.closeOtherTabs', {}),
+      label: () => t('pages.server.files.tree.button.closeOtherTabs', {}),
       visible: tabs.length > 1,
     },
     {
       action: 'right',
       icon: faArrowRight,
-      label: () => t('pages.server.files.tree.closeTabsToRight', {}),
+      label: () => t('pages.server.files.tree.button.closeTabsToRight', {}),
       visible: index < tabs.length - 1,
     },
     {
       action: 'saved',
       icon: faCheck,
-      label: () => t('pages.server.files.tree.closeSavedTabs', {}),
+      label: () => t('pages.server.files.tree.button.closeSavedTabs', {}),
       visible: tabs.some((entry) => entry.action !== 'new' && !dirtyTabIds.has(getFileTreeEditorTabId(entry))),
     },
-    { action: 'all', icon: faXmarksLines, label: () => t('pages.server.files.tree.closeAllTabs', {}), visible: true },
+    {
+      action: 'all',
+      icon: faXmarksLines,
+      label: () => t('pages.server.files.tree.button.closeAllTabs', {}),
+      visible: true,
+    },
   ] as const;
 
   useQuickActions(
@@ -113,7 +118,7 @@ export default function useFileTreeTabQuickActions({
       {
         id: 'files.tree.reveal',
         category,
-        label: () => t('pages.server.files.tree.revealInTree', {}),
+        label: () => t('pages.server.files.tree.button.revealInTree', {}),
         icon: faFolderOpen,
         keywords: ['locate', 'active', 'file'],
         permission: 'files.read',

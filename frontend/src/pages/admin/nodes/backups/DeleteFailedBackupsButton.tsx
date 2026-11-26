@@ -22,7 +22,7 @@ export default function DeleteFailedBackupsButton({
   onDelete: (force: boolean) => Promise<number>;
   action?: string;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,7 +37,7 @@ export default function DeleteFailedBackupsButton({
   const doDelete = async () => {
     const queued = await onDelete(force);
 
-    addToast(t('common.toast.failedBackupDeletionStarted', { count: queued }), 'success');
+    addToast(t('common.toast.failedBackupDeletionStarted', { items: tItem('backup', queued) }), 'success');
     doClose();
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.backups.all() });
   };
@@ -56,7 +56,9 @@ export default function DeleteFailedBackupsButton({
         onConfirmed={doDelete}
       >
         <Stack>
-          <Text size='sm'>{t('common.modal.deleteFailedBackups.content', { count: failed }).md()}</Text>
+          <Text size='sm'>
+            {t('common.modal.deleteFailedBackups.content', { items: tItem('backup', failed) }).md()}
+          </Text>
 
           <Switch
             label={t('common.form.force', {})}

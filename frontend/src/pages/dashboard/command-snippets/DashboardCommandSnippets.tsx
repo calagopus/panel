@@ -17,7 +17,7 @@ import CommandSnippetRow from './CommandSnippetRow.tsx';
 import CommandSnippetCreateModal from './modals/CommandSnippetCreateModal.tsx';
 
 export default function DashboardCommandSnippets() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -50,7 +50,7 @@ export default function DashboardCommandSnippets() {
   return (
     <AccountContentContainer
       title={t('pages.account.commandSnippets.title', {})}
-      subtitle={t('pages.account.commandSnippets.subtitle', {
+      subtitle={t('common.label.limitUsage.created', {
         current: commandSnippets?.total ?? 0,
         max: settings.user.maxCommandSnippetCount,
       })}
@@ -59,7 +59,9 @@ export default function DashboardCommandSnippets() {
       contentRight={
         <ConditionalTooltip
           enabled={atLimit}
-          label={t('pages.account.commandSnippets.tooltip.limitReached', { max: settings.user.maxCommandSnippetCount })}
+          label={t('common.tooltip.limitReached.account', {
+            items: tItem('commandSnippet', settings.user.maxCommandSnippetCount),
+          })}
         >
           <Button
             onClick={() => setOpenModal('create')}

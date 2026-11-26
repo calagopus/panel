@@ -25,7 +25,7 @@ export default function AssetActionBar({
   currentDirectory: string;
   onDeleted: () => void;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const canDeleteAssets = useAdminCan('assets.delete');
   const deleteAssets = useDeleteAssets();
 
@@ -72,7 +72,7 @@ export default function AssetActionBar({
         onConfirmed={doDelete}
       >
         <Stack>
-          {t('pages.admin.assets.modal.deleteAssets.content', { count: selectedAssets.size }).md()}
+          {t('common.modal.delete.content', { name: tItem('asset', selectedAssets.size) }).md()}
 
           <ItemPreviewList
             items={selectedAssets.values()}

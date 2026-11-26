@@ -119,7 +119,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
             opened={disabling}
             onClose={() => setDisabling(false)}
             title={t('pages.admin.nodes.tabs.tunnel.page.modal.disable.title', {})}
-            confirm={t('pages.admin.nodes.tabs.tunnel.page.button.disable', {})}
+            confirm={t('common.button.disable', {})}
             onConfirmed={doDisable}
           >
             {t('pages.admin.nodes.tabs.tunnel.page.modal.disable.content', {}).md()}
@@ -162,7 +162,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                   <TextInput
-                    label={t('pages.admin.nodes.tabs.tunnel.page.form.host', {})}
+                    label={t('common.form.host', {})}
                     description={t('pages.admin.nodes.tabs.tunnel.page.form.hostDescription', {})}
                     value={host}
                     onChange={(event) => setHost(event.target.value)}
@@ -171,7 +171,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
                   <NumberInput
                     min={1}
                     max={65535}
-                    label={t('pages.admin.nodes.tabs.tunnel.page.form.port', {})}
+                    label={t('common.form.port', {})}
                     description={t('pages.admin.nodes.tabs.tunnel.page.form.portDescription', {})}
                     value={port}
                     onChange={(value) => setPort(Number(value))}
@@ -180,9 +180,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
 
                 <Group justify='space-between'>
                   <Button loading={saving} onClick={() => doSave(data.tunnel !== null)}>
-                    {data.tunnel
-                      ? t('common.button.save', {})
-                      : t('pages.admin.nodes.tabs.tunnel.page.button.enable', {})}
+                    {data.tunnel ? t('common.button.save', {}) : t('common.button.enable', {})}
                   </Button>
 
                   {data.tunnel && (
@@ -191,7 +189,7 @@ export default function AdminNodeTunnel({ node }: { node: z.infer<typeof adminNo
                         {t('pages.admin.nodes.tabs.tunnel.page.button.rotate', {})}
                       </Button>
                       <Button color='red' loading={saving} onClick={() => setDisabling(true)}>
-                        {t('pages.admin.nodes.tabs.tunnel.page.button.disable', {})}
+                        {t('common.button.disable', {})}
                       </Button>
                     </Group>
                   )}

@@ -38,7 +38,7 @@ export default function DeviceAddEggModal({
     <ResourceSelectModal
       {...props}
       title={t('pages.admin.devices.tabs.eggs.page.modal.add.title', {})}
-      label={t('pages.admin.devices.tabs.eggs.page.modal.add.form.egg', {})}
+      label={t('common.form.egg', {})}
       loading={loading}
       data={eggs.map((group) => ({
         group: group.nest.name,

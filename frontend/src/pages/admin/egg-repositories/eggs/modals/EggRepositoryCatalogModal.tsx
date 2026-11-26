@@ -283,7 +283,7 @@ export default function EggRepositoryCatalogModal({
 
             <ModalFooter>
               <Button onClick={doInstall} loading={installing} disabled={!selected || !targetNest}>
-                {confirmLabel ?? t('pages.admin.eggRepositories.tabs.eggs.page.modal.catalog.button', {})}
+                {confirmLabel ?? t('common.button.install', {})}
               </Button>
               <Button variant='default' onClick={props.onClose}>
                 {t('common.button.close', {})}

@@ -86,7 +86,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
 
     return downloadBackup(server.uuid, backup.uuid, archiveFormat)
       .then(({ url }) => {
-        pendingToast.settle(t('pages.server.backups.toast.downloadStarted', {}), 'success');
+        pendingToast.settle(t('common.toast.downloadStarted', {}), 'success');
         downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
       })
       .catch((msg) => {
@@ -211,7 +211,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.server.backups.modal.deleteBackup.content', {
+        {t('common.modal.deleteFromServer.content', {
           name: backup.name,
         }).md()}
       </ConfirmationModal>
@@ -302,7 +302,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
           {
             type: 'action',
             icon: faInfo,
-            label: t('pages.server.backups.modal.viewMetadata.title', {}),
+            label: t('pages.server.backups.button.viewMetadata', {}),
             hidden: backup.kind !== 'server' || Object.keys(backup.metadata).length === 0,
             onClick: () => setOpenModal('metadata'),
             color: 'gray',

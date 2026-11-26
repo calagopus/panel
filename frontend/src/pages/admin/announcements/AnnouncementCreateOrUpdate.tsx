@@ -40,7 +40,7 @@ export default function AnnouncementCreateOrUpdate({
   contextAnnouncement?: z.infer<typeof adminAnnouncementSchema>;
 }) {
   const languages = useGlobalStore((state) => state.languages);
-  const { t, tReact } = useTranslations();
+  const { t } = useTranslations();
 
   const canReadLocations = useAdminCan('locations.read');
   const canReadNodes = useAdminCan('nodes.read');
@@ -122,7 +122,7 @@ export default function AnnouncementCreateOrUpdate({
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {tReact('pages.admin.announcements.tabs.general.page.modal.delete.content', { title: form.getValues().title })}
+        {t('common.modal.delete.content', { name: form.getValues().title }).md()}
       </ConfirmationModal>
 
       {contextAnnouncement && (

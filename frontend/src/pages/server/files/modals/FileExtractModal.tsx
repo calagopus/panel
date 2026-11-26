@@ -23,7 +23,7 @@ type Props = ModalProps & {
 };
 
 export default function FileExtractModal({ file, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
@@ -73,7 +73,7 @@ export default function FileExtractModal({ file, ...props }: Props) {
       </Stack>
 
       <FilePathPreview
-        label={t('pages.server.files.modal.extractFile.extractedTo', { file: file?.name ?? '' })}
+        label={(path) => tReact('pages.server.files.modal.extractFile.extractedTo', { file: <>{file?.name}</>, path })}
         path={form.values.destination}
       />
 

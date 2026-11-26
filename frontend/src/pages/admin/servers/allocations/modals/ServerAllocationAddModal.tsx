@@ -19,7 +19,7 @@ import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
 export default function ServerAllocationAddModal({ server, ...props }: ModalProps & { server: AdminServer }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -54,7 +54,10 @@ export default function ServerAllocationAddModal({ server, ...props }: ModalProp
     ]);
 
     if (added > 0) {
-      addToast(t('pages.admin.servers.tabs.allocations.page.toast.added', { count: added }), 'success');
+      addToast(
+        t('pages.admin.servers.tabs.allocations.page.toast.added', { items: tItem('serverAllocation', added) }),
+        'success',
+      );
     }
 
     const firstFailure = results.find((result) => result.status === 'rejected');

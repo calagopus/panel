@@ -138,8 +138,8 @@ const AllocationRow = forwardRef<HTMLTableRowElement, AllocationRowProps>(functi
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.server.network.modal.removeAllocation.content', {
-          allocation: displayAllocation,
+        {t('common.modal.removeFromServer.content', {
+          name: displayAllocation,
         }).md()}
       </ConfirmationModal>
 

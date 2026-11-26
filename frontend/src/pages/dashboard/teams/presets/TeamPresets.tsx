@@ -21,7 +21,7 @@ import TeamPresetActionBar from './TeamPresetActionBar.tsx';
 import TeamPresetRow from './TeamPresetRow.tsx';
 
 export default function TeamPresets({ team }: { team: z.infer<typeof userTeamSchema> }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const maxTeamPresetCount = useGlobalStore((state) => state.settings.user.maxTeamPresetCount);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -58,7 +58,7 @@ export default function TeamPresets({ team }: { team: z.infer<typeof userTeamSch
   const createButton = (label: string) => (
     <ConditionalTooltip
       enabled={atLimit}
-      label={t('pages.account.teams.tabs.presets.tooltip.limitReached', { max: maxTeamPresetCount })}
+      label={t('common.tooltip.limitReached.team', { items: tItem('teamPreset', maxTeamPresetCount) })}
     >
       <Button
         onClick={() => setOpenModal('create')}

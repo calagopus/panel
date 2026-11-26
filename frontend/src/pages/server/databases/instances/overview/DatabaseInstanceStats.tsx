@@ -49,7 +49,7 @@ export default function DatabaseInstanceStats() {
 
   const overlayIcon = statsPending ? <Spinner size={24} /> : <FontAwesomeIcon icon={faPowerOff} className='text-2xl' />;
   const overlayLabel = statsPending
-    ? t('pages.server.databases.instance.view.stats.connecting', {})
+    ? t('common.enum.connectionStatus.connecting', {})
     : offline
       ? t('pages.server.databases.instance.view.stats.offline', {})
       : undefined;

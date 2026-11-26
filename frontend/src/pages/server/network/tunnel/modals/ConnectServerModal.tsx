@@ -43,7 +43,7 @@ type Props = ModalProps & {
 };
 
 export default function ConnectServerModal({ initial, tunnel, onCreated, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const maxConnections = useGlobalStore((state) => state.settings.server.maxTunnelConnectionCount);
@@ -112,7 +112,7 @@ export default function ConnectServerModal({ initial, tunnel, onCreated, ...prop
             server: peerName,
           })
         : atLimit
-          ? t('pages.server.tunnel.tooltip.connectionLimitReached', { max: maxConnections })
+          ? t('common.tooltip.limitReached.server', { items: tItem('outgoingConnection', maxConnections) })
           : peerBlocked
             ? t('pages.server.tunnel.modal.connect.noPermissionTo', { server: peerName })
             : undefined;
@@ -191,7 +191,7 @@ export default function ConnectServerModal({ initial, tunnel, onCreated, ...prop
     <Modal title={t('pages.server.tunnel.modal.connect.title', {})} {...props}>
       <Stack gap='md'>
         <ServerSelect<Server>
-          label={t('pages.server.tunnel.form.server', {})}
+          label={t('common.form.server', {})}
           description={t('pages.server.tunnel.form.serverDescription', {})}
           nothingFoundMessage={t('pages.server.tunnel.modal.connect.empty', {})}
           withOthersSwitch

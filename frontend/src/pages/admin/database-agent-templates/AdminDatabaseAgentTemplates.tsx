@@ -72,11 +72,7 @@ function DatabaseAgentTemplatesContainer() {
         </AdminCan>
       }
     >
-      <ImportOverlay
-        visible={isDragging}
-        title={t('pages.admin.databaseAgentTemplates.dropzone.title', {})}
-        subtitle={t('pages.admin.databaseAgentTemplates.dropzone.subtitle', {})}
-      />
+      <ImportOverlay visible={isDragging} title={t('pages.admin.databaseAgentTemplates.dropzone.title', {})} />
 
       <Table
         columns={databaseAgentTemplateTableColumns()}

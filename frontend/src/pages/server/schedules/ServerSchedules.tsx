@@ -32,7 +32,7 @@ import ScheduleRow from './ScheduleRow.tsx';
 const ScheduleCalendarModal = lazy(() => import('./modals/ScheduleCalendarModal.tsx'));
 
 export default function ServerSchedules() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast, addPendingToast } = useToast();
   const server = useServerStore((state) => state.server);
   const serverStoreApi = useServerStoreApi();
@@ -131,8 +131,8 @@ export default function ServerSchedules() {
     <ServerContentContainer
       title={t('pages.server.schedules.title', {})}
       registry={window.extensionContext.extensionRegistry.pages.server.schedules.container}
-      subtitle={t('pages.server.schedules.subtitle', {
-        current: schedules?.total ?? '…',
+      subtitle={t('common.label.limitUsage.created', {
+        current: schedules?.total ?? '...',
         max: server.featureLimits.schedules,
       })}
       search={search}
@@ -150,7 +150,9 @@ export default function ServerSchedules() {
             <ServerCan action='schedules.create'>
               <ConditionalTooltip
                 enabled={atLimit}
-                label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
+                label={t('common.tooltip.limitReached.server', {
+                  items: tItem('schedule', server.featureLimits.schedules),
+                })}
               >
                 <Button onClick={() => fileInputRef.current?.click()} color='blue' disabled={!schedules || atLimit}>
                   <FontAwesomeIcon icon={faUpload} className='mr-2' />
@@ -159,7 +161,9 @@ export default function ServerSchedules() {
               </ConditionalTooltip>
               <ConditionalTooltip
                 enabled={atLimit}
-                label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
+                label={t('common.tooltip.limitReached.server', {
+                  items: tItem('schedule', server.featureLimits.schedules),
+                })}
               >
                 <Button
                   disabled={!schedules || atLimit}
@@ -183,11 +187,7 @@ export default function ServerSchedules() {
           <ScheduleCalendarModal opened={openModal === 'calendar'} onClose={() => setOpenModal(null)} />
         </Suspense>
       )}
-      <ImportOverlay
-        visible={canCreate && isDragging}
-        title={t('pages.server.schedules.dropzone.title', {})}
-        subtitle={t('pages.server.schedules.dropzone.subtitle', {})}
-      />
+      <ImportOverlay visible={canCreate && isDragging} title={t('pages.server.schedules.dropzone.title', {})} />
 
       <ScheduleActionBar selectedSchedules={selectedSchedules} clearSelection={clearSelection} onFinished={refetch} />
 
@@ -231,7 +231,9 @@ export default function ServerSchedules() {
                   <Group justify='center'>
                     <ConditionalTooltip
                       enabled={atLimit}
-                      label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
+                      label={t('common.tooltip.limitReached.server', {
+                        items: tItem('schedule', server.featureLimits.schedules),
+                      })}
                     >
                       <Button
                         variant='default'
@@ -244,7 +246,9 @@ export default function ServerSchedules() {
                     </ConditionalTooltip>
                     <ConditionalTooltip
                       enabled={atLimit}
-                      label={t('pages.server.schedules.tooltip.limitReached', { max: server.featureLimits.schedules })}
+                      label={t('common.tooltip.limitReached.server', {
+                        items: tItem('schedule', server.featureLimits.schedules),
+                      })}
                     >
                       <Button
                         disabled={!schedules || atLimit}

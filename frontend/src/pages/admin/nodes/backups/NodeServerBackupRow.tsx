@@ -27,7 +27,6 @@ import NodeBackupsRestoreModal from './modals/NodeBackupsRestoreModal.tsx';
 
 type Props<P> = {
   backup: z.infer<typeof adminNodeServerBackupSchema>;
-  downloadStartedMessage: string;
   showKind?: boolean;
   showSource?: boolean;
   showFiles?: boolean;
@@ -35,7 +34,6 @@ type Props<P> = {
 
 export default function NodeServerBackupRow<P>({
   backup,
-  downloadStartedMessage,
   showKind = false,
   showSource = false,
   showFiles = true,
@@ -44,7 +42,7 @@ export default function NodeServerBackupRow<P>({
   const { t } = useTranslations();
   const canBackups = useAdminCan('nodes.backups');
   const canReadDatabaseInstances = useAdminCan('database-agent-hosts.read');
-  const { downloadMenuItem } = useBackupDownload(backup.node.uuid, downloadStartedMessage);
+  const { downloadMenuItem } = useBackupDownload(backup.node.uuid);
 
   const [openModal, setOpenModal] = useState<'restore' | 'export' | 'reassign' | 'delete' | null>(null);
 

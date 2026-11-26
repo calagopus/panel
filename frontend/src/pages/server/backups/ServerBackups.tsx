@@ -219,12 +219,15 @@ export default function ServerBackups({
     (blockedByLimit
       ? t(
           variant === 'page'
-            ? 'pages.server.backups.tooltip.limitReached'
+            ? 'common.tooltip.limitReached.server'
             : 'pages.server.databases.instance.backups.tooltip.limitReached',
-          { max: server.featureLimits.backups },
+          { items: tItem('backup', server.featureLimits.backups) },
         )
       : atBackupLimit && expendable
-        ? t('pages.server.backups.tooltip.evicts', { max: server.featureLimits.backups, name: expendable.name })
+        ? t('pages.server.backups.tooltip.evicts', {
+            items: tItem('backup', server.featureLimits.backups),
+            name: expendable.name,
+          })
         : '');
 
   const groupsSettled = !canReadGroups || groups !== undefined;
@@ -244,17 +247,17 @@ export default function ServerBackups({
     variant === 'page'
       ? usage && usage.databaseInstance > 0
         ? t('pages.server.backups.subtitleWithDatabase', {
-            current: countKnown ? totalBackupCount : '…',
+            current: countKnown ? totalBackupCount : '...',
             max: server.featureLimits.backups,
             server: usage.server,
             database: usage.databaseInstance,
           })
-        : t('pages.server.backups.subtitle', {
-            current: countKnown ? totalBackupCount : '…',
+        : t('common.label.limitUsage.created', {
+            current: countKnown ? totalBackupCount : '...',
             max: server.featureLimits.backups,
           })
       : t('pages.server.databases.instance.backups.subtitle', {
-          current: countKnown ? totalBackupCount : '…',
+          current: countKnown ? totalBackupCount : '...',
           max: server.featureLimits.backups,
         });
 
@@ -291,7 +294,7 @@ export default function ServerBackups({
               onClick: () => setOpenModal('createGroup'),
               disabled: groupLimitReached,
               tooltip: groupLimitReached
-                ? t('pages.server.backups.tooltip.groupLimitReached', { max: maxBackupGroupCount })
+                ? t('common.tooltip.limitReached.server', { items: tItem('backupGroup', maxBackupGroupCount) })
                 : undefined,
               color: 'gray',
               canAccess: showCreateGroup,

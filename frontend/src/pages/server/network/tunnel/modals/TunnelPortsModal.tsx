@@ -86,7 +86,7 @@ export default function TunnelPortsModal({ ports, allocationPorts, onSaved, ...p
                   min={1}
                   max={65535}
                   className='w-28'
-                  placeholder={t('pages.server.tunnel.form.port', {})}
+                  placeholder={t('common.form.port', {})}
                   value={port.port}
                   onChange={(value) =>
                     setDraft(draft.map((item, at) => (at === index ? { ...item, port: Number(value) } : item)))

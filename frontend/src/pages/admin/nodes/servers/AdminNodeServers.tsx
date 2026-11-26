@@ -83,18 +83,18 @@ export default function AdminNodeServers({ node }: { node: AdminNode }) {
     sendNodeServersPowerAction(node.uuid, { type: 'all' }, action)
       .then((successful) => {
         const failed = total - successful;
-        const pastTense = t(`common.enum.bulkActionServerAction.${ACTION_PAST_TENSE[action]}`, {});
+        const pastTense = t(`common.bulkActions.verb.${ACTION_PAST_TENSE[action]}`, {});
 
         if (failed === 0) {
           addToast(
-            t('pages.account.home.bulkActions.success', { servers: tItem('server', successful), action: pastTense }),
+            t('common.bulkActions.success', { items: tItem('server', successful), action: pastTense }),
             'success',
           );
         } else {
           addToast(
-            t('pages.account.home.bulkActions.partial', {
-              successfulServers: tItem('server', successful),
-              failedServers: tItem('server', failed),
+            t('common.bulkActions.partial', {
+              successfulItems: tItem('server', successful),
+              failedItems: tItem('server', failed),
               action: pastTense,
             }),
             'warning',

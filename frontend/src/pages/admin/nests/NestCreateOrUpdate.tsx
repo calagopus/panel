@@ -25,7 +25,7 @@ type NestFormValues = z.infer<typeof adminNestUpdateSchema>;
 export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.infer<typeof adminNestSchema> }) {
   const [openModal, setOpenModal] = useState<'delete' | null>(null);
   const [deleteEggs, setDeleteEggs] = useState(false);
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
 
   const form = useFormEngine<NestFormValues>('admin.nests.createOrUpdate', {
     schema: adminNestUpdateSchema.unwrap(),
@@ -100,7 +100,9 @@ export default function NestCreateOrUpdate({ contextNest }: { contextNest?: z.in
             <AdminCan action='nests.delete' cantDelete>
               <ConditionalTooltip
                 enabled={nestServers > 0}
-                label={t('pages.admin.nests.tabs.general.page.tooltip.deleteBlocked', { count: String(nestServers) })}
+                label={t('pages.admin.nests.tabs.general.page.tooltip.deleteBlocked', {
+                  items: tItem('server', nestServers),
+                })}
               >
                 <Button color='red' onClick={() => setOpenModal('delete')} loading={loading} disabled={nestServers > 0}>
                   {t('common.button.delete', {})}

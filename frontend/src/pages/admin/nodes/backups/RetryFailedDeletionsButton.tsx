@@ -22,7 +22,7 @@ export default function RetryFailedDeletionsButton({
   onRetry: (force: boolean) => Promise<number>;
   action?: string;
 }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,7 +37,7 @@ export default function RetryFailedDeletionsButton({
   const doRetry = async () => {
     const queued = await onRetry(force);
 
-    addToast(t('common.toast.failedDeletionRetryStarted', { count: queued }), 'success');
+    addToast(t('common.toast.failedDeletionRetryStarted', { items: tItem('backup', queued) }), 'success');
     doClose();
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.backups.all() });
   };
@@ -56,7 +56,9 @@ export default function RetryFailedDeletionsButton({
         onConfirmed={doRetry}
       >
         <Stack>
-          <Text size='sm'>{t('common.modal.retryFailedDeletions.content', { count: failedDeletions }).md()}</Text>
+          <Text size='sm'>
+            {t('common.modal.retryFailedDeletions.content', { items: tItem('backup', failedDeletions) }).md()}
+          </Text>
 
           <Switch
             label={t('common.form.force', {})}

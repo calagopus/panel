@@ -74,8 +74,8 @@ export default function SecurityKeyDeleteModal({ securityKey, total, ...props }:
       <Stack>
         <HiddenUsernameInput username={user?.username ?? ''} />
         <Text>
-          {t('pages.account.securityKeys.modal.deleteSecurityKey.content', {
-            key: securityKey.name,
+          {t('common.modal.deleteFromAccount.content', {
+            name: securityKey.name,
           }).md()}
         </Text>
 

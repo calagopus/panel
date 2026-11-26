@@ -201,7 +201,6 @@ function EggsContainer({ contextNest }: { contextNest: z.infer<typeof adminNestS
       <ImportOverlay
         visible={canCreate && isDragging}
         title={t('pages.admin.nests.tabs.eggs.page.dropzone.title', {})}
-        subtitle={t('pages.admin.nests.tabs.eggs.page.dropzone.subtitle', {})}
       />
 
       <SelectionArea {...selectionAreaProps}>

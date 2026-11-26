@@ -15,7 +15,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
 export default function DirectoryNameModal({ ...props }: ModalProps) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const [_, setSearchParams] = useSearchParams();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
@@ -53,7 +53,7 @@ export default function DirectoryNameModal({ ...props }: ModalProps) {
       />
 
       <FilePathPreview
-        label={t('pages.server.files.modal.createDirectory.createdAs', {})}
+        label={(path) => tReact('pages.server.files.modal.createDirectory.createdAs', { path })}
         path={resolve(browsingDirectory, form.values.name)}
       />
 

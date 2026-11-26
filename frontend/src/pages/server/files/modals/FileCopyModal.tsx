@@ -36,7 +36,7 @@ type CopyValues = {
 };
 
 export default function FileCopyModal({ file, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const browsingDirectory = useFileManager((state) => state.browsingDirectory);
@@ -194,7 +194,10 @@ export default function FileCopyModal({ file, ...props }: Props) {
         />
       )}
 
-      <FilePathPreview label={t('pages.server.files.modal.copyFile.createdAs', {})} path={previewPath} />
+      <FilePathPreview
+        label={(path) => tReact('pages.server.files.modal.copyFile.createdAs', { path })}
+        path={previewPath}
+      />
 
       {conflict && (
         <Alert color='yellow' icon={faTriangleExclamation} className='mt-3'>

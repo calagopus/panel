@@ -12,7 +12,6 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 export interface BulkYamlConfigLabels {
   title: string;
   applyButton: string;
-  invalidYaml: (error: string) => string;
   applied: (count: number) => string;
 }
 
@@ -36,7 +35,7 @@ export default function BulkYamlConfigModal({
     try {
       parsed = load(yaml) as object;
     } catch (err) {
-      addToast(labels.invalidYaml((err as Error).message), 'error');
+      addToast(t('common.toast.invalidYaml', { error: (err as Error).message }), 'error');
       return;
     }
 

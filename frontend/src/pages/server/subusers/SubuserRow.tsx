@@ -57,8 +57,8 @@ const SubuserRow = forwardRef<HTMLTableRowElement, SubuserRowProps>(function Sub
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.server.subusers.modal.removeSubuser.content', {
-          username: subuser.user.username,
+        {t('common.modal.removeFromServer.content', {
+          name: subuser.user.username,
         }).md()}
       </ConfirmationModal>
 

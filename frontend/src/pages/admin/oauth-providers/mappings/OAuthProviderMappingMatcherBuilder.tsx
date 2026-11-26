@@ -125,13 +125,6 @@ export default function OAuthProviderMappingMatcherBuilder({
       withNotChild={(node, child) => ({ ...node, matcher: child }) as Matcher}
       emptyNode={{ type: 'none' }}
       renderLeaf={renderLeaf}
-      labels={{
-        type: t(`${form}.matcherType`, {}),
-        allMustMatch: t('pages.admin.oAuthProviders.tabs.mappings.page.matcher.allMustMatch', {}),
-        anyMustMatch: t('pages.admin.oAuthProviders.tabs.mappings.page.matcher.anyMustMatch', {}),
-        mustNotMatch: t('pages.admin.oAuthProviders.tabs.mappings.page.matcher.mustNotMatch', {}),
-        addChild: t('pages.admin.oAuthProviders.tabs.mappings.page.button.addMatcher', {}),
-      }}
     />
   );
 }

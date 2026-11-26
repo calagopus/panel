@@ -50,9 +50,9 @@ export default function NodeDeviceRow({ node, device }: { node: AdminNode; devic
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.nodes.tabs.devices.page.modal.remove.content', {
-          device: device.device.name,
-          name: node.name,
+        {t('common.modal.removeDevice.content', {
+          name: device.device.name,
+          parent: node.name,
         }).md()}
       </ConfirmationModal>
 

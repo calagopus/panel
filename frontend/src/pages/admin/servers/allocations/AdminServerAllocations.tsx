@@ -58,7 +58,7 @@ export default function AdminServerAllocations({ server }: { server: AdminServer
         <Group>
           <AdminCan action='servers.allocations'>
             <Button onClick={() => setOpenModal('reassign')} leftSection={<FontAwesomeIcon icon={faArrowsRotate} />}>
-              {t('pages.admin.servers.tabs.allocations.page.button.reassign', {})}
+              {t('common.button.reassign', {})}
             </Button>
           </AdminCan>
           <AdminCan action={['nodes.read', 'nodes.allocations']}>
@@ -75,7 +75,7 @@ export default function AdminServerAllocations({ server }: { server: AdminServer
         opened={openModal === 'reassign'}
         onClose={() => setOpenModal(null)}
         title={t('pages.admin.servers.tabs.allocations.page.modal.reassign.title', {})}
-        confirm={t('pages.admin.servers.tabs.allocations.page.button.reassign', {})}
+        confirm={t('common.button.reassign', {})}
         onConfirmed={doReassign}
       >
         {t('pages.admin.servers.tabs.allocations.page.modal.reassign.content', { server: server.name }).md()}

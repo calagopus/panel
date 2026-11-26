@@ -25,7 +25,7 @@ import NetworkSubNavigation from './NetworkSubNavigation.tsx';
 import ServerTunnel from './tunnel/ServerTunnel.tsx';
 
 export default function ServerNetwork() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const canReadAllocations = useServerCan('allocations.read');
@@ -82,8 +82,8 @@ export default function ServerNetwork() {
   return (
     <ServerContentContainer
       title={t('pages.server.network.allocations.title', {})}
-      subtitle={t('pages.server.network.subtitle', {
-        current: allocations?.total ?? '…',
+      subtitle={t('common.label.limitUsage.assigned', {
+        current: allocations?.total ?? '...',
         max: server.featureLimits.allocations,
       })}
       search={search}
@@ -95,7 +95,9 @@ export default function ServerNetwork() {
             label={
               !selfAssignEnabled
                 ? t('pages.server.network.tooltip.selfAssignDisabled', {})
-                : t('pages.server.network.tooltip.limitReached', { max: server.featureLimits.allocations })
+                : t('common.tooltip.limitReached.server', {
+                    items: tItem('serverAllocation', server.featureLimits.allocations),
+                  })
             }
           >
             <Button

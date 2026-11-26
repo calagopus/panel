@@ -55,7 +55,7 @@ const SshKeyRow = forwardRef<HTMLTableRowElement, SshKeyRowProps>(function SshKe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.sshKeys.modal.deleteSshKey.content', {
+        {t('common.modal.deleteFromAccount.content', {
           name: sshKey.name,
         }).md()}
       </ConfirmationModal>

@@ -50,9 +50,9 @@ export default function ServerDeviceRow({ server, device }: { server: AdminServe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.admin.servers.tabs.devices.page.modal.remove.content', {
-          device: device.device.name,
-          name: server.name,
+        {t('common.modal.removeDevice.content', {
+          name: device.device.name,
+          parent: server.name,
         }).md()}
       </ConfirmationModal>
 

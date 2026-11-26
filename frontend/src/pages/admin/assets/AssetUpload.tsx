@@ -37,12 +37,7 @@ export default function AssetUpload({
 
   return (
     <>
-      <UploadDropOverlay
-        visible={isDragging}
-        blur
-        title={t('pages.admin.assets.dropzone.title', {})}
-        subtitle={t('pages.admin.assets.dropzone.subtitle', {})}
-      />
+      <UploadDropOverlay visible={isDragging} blur title={t('pages.admin.assets.dropzone.title', {})} />
 
       <Button
         onClick={() => fileInputRef.current?.click()}

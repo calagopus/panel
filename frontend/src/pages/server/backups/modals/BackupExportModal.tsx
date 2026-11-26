@@ -30,7 +30,7 @@ type Props = ModalProps & {
 };
 
 export default function BackupExportModal({ backup, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const navigate = useNavigate();
@@ -142,13 +142,16 @@ export default function BackupExportModal({ backup, ...props }: Props) {
       </Stack>
 
       <p className='mt-2 text-sm md:text-base break-all'>
-        <span>{t('pages.server.files.modal.createArchive.createdAs', {})}</span>
-        <Code>
-          /home/container/
-          <span className='text-(--mantine-color-cyan-text)'>
-            {join(form.values.directory, `${form.values.name}${extension}`).replace(/^(\.\.\/|\/)+/, '')}
-          </span>
-        </Code>
+        {tReact('pages.server.files.modal.createArchive.createdAs', {
+          path: (
+            <Code>
+              /home/container/
+              <span className='text-(--mantine-color-cyan-text)'>
+                {join(form.values.directory, `${form.values.name}${extension}`).replace(/^(\.\.\/|\/)+/, '')}
+              </span>
+            </Code>
+          ),
+        })}
       </p>
 
       <ModalFooter>

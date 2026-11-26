@@ -209,8 +209,8 @@ export default function AdminOverviewHealth() {
                   <div className='mt-4' />
                   <Table
                     columns={[
-                      t('pages.admin.home.tabs.health.page.table.ip', {}),
-                      t('pages.admin.home.tabs.health.page.table.users', {}),
+                      t('common.table.columns.ip', {}),
+                      t('common.table.columns.users', {}),
                       t('pages.admin.home.tabs.health.page.table.sessions', {}),
                       t('pages.admin.home.tabs.health.page.table.hint', {}),
                     ]}

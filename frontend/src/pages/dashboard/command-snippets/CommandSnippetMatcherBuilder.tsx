@@ -54,8 +54,6 @@ interface CommandSnippetMatcherBuilderProps {
 }
 
 export default function CommandSnippetMatcherBuilder({ matcher, onChange }: CommandSnippetMatcherBuilderProps) {
-  const { t } = useTranslations();
-
   return (
     <RecursiveGroupBuilder<Matcher>
       node={matcher}
@@ -68,13 +66,6 @@ export default function CommandSnippetMatcherBuilder({ matcher, onChange }: Comm
       withNotChild={(node, child) => ({ ...node, matcher: child }) as Matcher}
       emptyNode={{ type: 'eggs', eggs: [] }}
       renderLeaf={(node, change) => node.type === 'eggs' && <EggsLeaf node={node} onChange={change} />}
-      labels={{
-        type: t('pages.account.commandSnippets.form.matcherType', {}),
-        allMustMatch: t('pages.account.commandSnippets.matcher.allMustMatch', {}),
-        anyMustMatch: t('pages.account.commandSnippets.matcher.anyMustMatch', {}),
-        mustNotMatch: t('pages.account.commandSnippets.matcher.mustNotMatch', {}),
-        addChild: t('pages.account.commandSnippets.button.addMatcher', {}),
-      }}
     />
   );
 }

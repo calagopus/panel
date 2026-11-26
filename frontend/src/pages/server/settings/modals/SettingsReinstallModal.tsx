@@ -26,7 +26,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
 export default function SettingsReinstallModal({ ...props }: ModalProps) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const updateServer = useServerStore((state) => state.updateServer);
@@ -58,7 +58,7 @@ export default function SettingsReinstallModal({ ...props }: ModalProps) {
 
   const createGate = useBackupCreateGate(props.opened && canCreateBackup);
   const backupBlockedReason = createGate.blocked
-    ? t('pages.server.backups.tooltip.limitReached', { max: server.featureLimits.backups })
+    ? t('common.tooltip.limitReached.server', { items: tItem('backup', server.featureLimits.backups) })
     : null;
 
   const createBackupAndWait = async () => {

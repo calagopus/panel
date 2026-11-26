@@ -48,7 +48,7 @@ export default function PwaImageFields({ form, path, assetUrls }: Props) {
         {...form.getInputProps(`${path}.sizes`)}
       />
       <TextInput
-        label={t('pages.admin.settings.tabs.metadata.page.form.imageType', {})}
+        label={t('common.form.type', {})}
         placeholder='image/png'
         key={form.key(`${path}.type`)}
         {...form.getInputProps(`${path}.type`)}

@@ -16,7 +16,7 @@ interface NewDirectoryModalProps extends Omit<ModalProps, 'onSubmit'> {
 }
 
 export default function NewDirectoryModal({ currentDirectory, onNavigate, ...props }: NewDirectoryModalProps) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { form, handleClose, handleSubmit, loading, isDirty } = useModalForm<
     z.infer<typeof assetDirectoryCreateSchema>
   >({
@@ -45,11 +45,14 @@ export default function NewDirectoryModal({ currentDirectory, onNavigate, ...pro
       />
 
       <p className='mt-2 text-sm break-all'>
-        <span>{t('pages.admin.assets.modal.createDirectory.createdAs', {})}</span>
-        <Code>
-          assets/
-          <span className='text-(--mantine-color-cyan-text)'>{join(currentDirectory, form.values.name)}</span>
-        </Code>
+        {tReact('pages.admin.assets.modal.createDirectory.createdAs', {
+          path: (
+            <Code>
+              assets/
+              <span className='text-(--mantine-color-cyan-text)'>{join(currentDirectory, form.values.name)}</span>
+            </Code>
+          ),
+        })}
       </p>
 
       <ModalFooter>

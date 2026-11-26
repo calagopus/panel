@@ -66,7 +66,7 @@ function MountEggRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.mounts.tabs.eggs.page.modal.remove.content', { mount: mount.name, name: egg.name }).md()}
+        {t('common.modal.removeMount.content', { name: mount.name, parent: egg.name }).md()}
       </ConfirmationModal>
 
       <ContextMenu

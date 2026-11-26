@@ -361,9 +361,9 @@ export const eggConfigurationDeploymentTypeLabelMapping: Record<
 export const eggConfigurationMatcherLabelMapping: Record<AdminEggConfigurationMatcher['type'], () => string> = {
   never: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.never', {}),
   all: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.all', {}),
-  and: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.and', {}),
-  or: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.or', {}),
-  not: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.not', {}),
+  and: () => getTranslations().t('common.enum.matcherType.and', {}),
+  or: () => getTranslations().t('common.enum.matcherType.or', {}),
+  not: () => getTranslations().t('common.enum.matcherType.not', {}),
   eggs: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.eggs', {}),
   nests: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.nests', {}),
   nodes: () => getTranslations().t('pages.admin.eggConfigurations.tabs.general.page.enum.matcherType.nodes', {}),
@@ -394,9 +394,9 @@ export function eggConfigurationMatcherSummary(matcher: AdminEggConfigurationMat
 export const commandSnippetMatcherLabelMapping: Record<UserCommandSnippetMatcher['type'], () => string> = {
   never: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.never', {}),
   all: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.all', {}),
-  and: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.and', {}),
-  or: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.or', {}),
-  not: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.not', {}),
+  and: () => getTranslations().t('common.enum.matcherType.and', {}),
+  or: () => getTranslations().t('common.enum.matcherType.or', {}),
+  not: () => getTranslations().t('common.enum.matcherType.not', {}),
   eggs: () => getTranslations().t('pages.account.commandSnippets.enum.matcherType.eggs', {}),
 };
 
@@ -422,9 +422,9 @@ export const teamMemberManagementLabelMapping: Record<z.infer<typeof userTeamMem
 export const oauthProviderMappingMatcherLabelMapping: Record<AdminOAuthProviderMappingMatcher['type'], () => string> = {
   none: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.none', {}),
   never: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.never', {}),
-  and: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.and', {}),
-  or: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.or', {}),
-  not: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.not', {}),
+  and: () => getTranslations().t('common.enum.matcherType.and', {}),
+  or: () => getTranslations().t('common.enum.matcherType.or', {}),
+  not: () => getTranslations().t('common.enum.matcherType.not', {}),
   scopes: () => getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.scopes', {}),
   field_exists: () =>
     getTranslations().t('pages.admin.oAuthProviders.tabs.mappings.page.enum.matcherType.fieldExists', {}),

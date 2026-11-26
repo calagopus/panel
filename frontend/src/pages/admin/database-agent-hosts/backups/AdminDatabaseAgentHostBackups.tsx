@@ -83,7 +83,6 @@ export default function AdminDatabaseAgentHostBackups({
             backup={backup}
             showSource
             showFiles={false}
-            downloadStartedMessage={t('pages.admin.databaseAgentHosts.tabs.backups.page.toast.downloadStarted', {})}
             registry={window.extensionContext.extensionRegistry.pages.admin.databaseAgentHosts.view.backups.contextMenu}
             registryProps={{ databaseAgentHost, backup }}
           />

@@ -39,7 +39,7 @@ import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useGlobalStore } from '@/stores/global.ts';
 
 export default function OobeFinished() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { user } = useAuth();
   const settings = useGlobalStore((state) => state.settings);
   const setSettings = useGlobalStore((state) => state.setSettings);
@@ -140,9 +140,7 @@ export default function OobeFinished() {
               </Text>
               {eggRepositories.items.length > 0 && (
                 <Text size='xs' c='dimmed'>
-                  {t('pages.oobe.finished.items.eggRepositories.subtitle', {
-                    count: eggRepositories.items.length,
-                  })}
+                  {tItem('repository', eggRepositories.items.length)}
                 </Text>
               )}
             </div>

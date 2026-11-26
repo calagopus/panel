@@ -117,7 +117,7 @@ export default function ServerStats() {
 
   const overlayIcon = statsPending ? <Spinner size={24} /> : <FontAwesomeIcon icon={faPowerOff} className='text-2xl' />;
   const overlayLabel = statsPending
-    ? t('pages.server.console.stats.connecting', {})
+    ? t('common.enum.connectionStatus.connecting', {})
     : offline
       ? t('pages.server.console.stats.offline', {})
       : undefined;

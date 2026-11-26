@@ -15,7 +15,7 @@ import SecurityKeyCreateModal from './modals/SecurityKeyCreateModal.tsx';
 import SecurityKeyRow from './SecurityKeyRow.tsx';
 
 export default function DashboardSecurityKeys() {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const settings = useGlobalStore((state) => state.settings);
 
   const [openModal, setOpenModal] = useState<'create' | null>(null);
@@ -36,7 +36,7 @@ export default function DashboardSecurityKeys() {
   return (
     <AccountContentContainer
       title={t('pages.account.securityKeys.title', {})}
-      subtitle={t('pages.account.securityKeys.subtitle', {
+      subtitle={t('common.label.limitUsage.created', {
         current: securityKeys?.total ?? 0,
         max: settings.user.maxSecurityKeyCount,
       })}
@@ -48,7 +48,9 @@ export default function DashboardSecurityKeys() {
             settings.webauthn?.enabled === false
               ? t('pages.account.securityKeys.tooltip.disabled', {})
               : (securityKeys?.total ?? 0) >= settings.user.maxSecurityKeyCount
-                ? t('pages.account.securityKeys.tooltip.limitReached', { max: settings.user.maxSecurityKeyCount })
+                ? t('common.tooltip.limitReached.account', {
+                    items: tItem('securityKey', settings.user.maxSecurityKeyCount),
+                  })
                 : t('pages.account.securityKeys.tooltip.secureContextRequired', {})
           }
           enabled={

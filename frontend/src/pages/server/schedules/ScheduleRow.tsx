@@ -88,7 +88,7 @@ const ScheduleRow = forwardRef<HTMLTableRowElement, ScheduleRowProps>(function S
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.server.schedules.modal.deleteSchedule.content', { name: schedule.name })}
+        {t('common.modal.deleteFromServer.content', { name: schedule.name }).md()}
       </ConfirmationModal>
 
       <ScheduleDuplicateModal

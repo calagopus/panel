@@ -80,10 +80,7 @@ export default function FileUpload({ showOverlay = true }: { showOverlay?: boole
               ? t('pages.server.files.dropzone.noPermission', {})
               : t('pages.server.files.dropzone.readOnly', {})
         }
-        subtitle={t(
-          canUpload ? 'pages.server.files.dropzone.subtitle' : 'pages.server.files.dropzone.blockedSubtitle',
-          {},
-        )}
+        subtitle={canUpload ? undefined : t('pages.server.files.dropzone.blockedSubtitle', {})}
       />
     </>
   );

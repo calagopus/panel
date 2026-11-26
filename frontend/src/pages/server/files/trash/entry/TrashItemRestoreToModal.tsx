@@ -26,7 +26,7 @@ type Props = ModalProps & {
 };
 
 export default function TrashItemRestoreToModal({ entry, targets, onFinished, ...props }: Props) {
-  const { t } = useTranslations();
+  const { t, tReact } = useTranslations();
   const { addToast } = useToast();
   const server = useServerStore((state) => state.server);
   const addRestoredToast = useTrashItemRestoredToast(entry.uuid, onFinished);
@@ -109,7 +109,7 @@ export default function TrashItemRestoreToModal({ entry, targets, onFinished, ..
                   {...form.getInputProps(`names.${i}`)}
                 />
                 <FilePathPreview
-                  label={t('pages.server.files.trash.modal.restoreTo.restoredAs', {})}
+                  label={(path) => tReact('pages.server.files.trash.modal.restoreTo.restoredAs', { path })}
                   path={resolve('/', form.values.destination, form.values.names[i] ?? '')}
                 />
               </div>

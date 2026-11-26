@@ -62,8 +62,8 @@ function SystemBackupPolicyLocationRow({
         confirm={t('common.button.remove', {})}
         onConfirmed={doRemove}
       >
-        {t('pages.admin.systemBackupPolicies.tabs.locations.page.modal.remove.content', {
-          policy: systemBackupPolicy.name,
+        {t('common.modal.removeFrom.content', {
+          parent: systemBackupPolicy.name,
           name: location.name,
         }).md()}
       </ConfirmationModal>

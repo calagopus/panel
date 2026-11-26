@@ -124,7 +124,7 @@ const ApiKeyRow = forwardRef<HTMLTableRowElement, ApiKeyRowProps>(function ApiKe
         confirm={t('common.button.delete', {})}
         onConfirmed={doDelete}
       >
-        {t('pages.account.apiKeys.modal.deleteApiKey.content', {
+        {t('common.modal.deleteFromAccount.content', {
           name: apiKey.name,
         }).md()}
       </ConfirmationModal>

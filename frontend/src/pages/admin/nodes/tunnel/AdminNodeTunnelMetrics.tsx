@@ -137,7 +137,7 @@ function PeerRow({ peer }: { peer: Peer }) {
 }
 
 export default function AdminNodeTunnelMetrics({ nodeUuid }: { nodeUuid: string }) {
-  const { t } = useTranslations();
+  const { t, tItem } = useTranslations();
   const { addToast } = useToast();
 
   const [live, setLive] = useState<z.infer<typeof adminNodeTunnelMetricsSchema> | null>(null);
@@ -203,13 +203,17 @@ export default function AdminNodeTunnelMetrics({ nodeUuid }: { nodeUuid: string 
           icon={faPlug}
           label={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.frontends', {})}
           value={String(data.node.frontends)}
-          details={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.flowsOpen', { count: data.node.localFlowsOpen })}
+          details={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.flowsOpen', {
+            flows: tItem('flow', data.node.localFlowsOpen),
+          })}
         />
         <StatCard
           icon={faTrash}
           label={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.localDrops', {})}
           value={String(data.node.localDrops)}
-          details={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.frozenFlows', { count: data.node.frozenFlows })}
+          details={t('pages.admin.nodes.tabs.tunnel.page.metrics.stat.frozenFlows', {
+            flows: tItem('flow', data.node.frozenFlows),
+          })}
         />
       </div>
 
@@ -230,7 +234,7 @@ export default function AdminNodeTunnelMetrics({ nodeUuid }: { nodeUuid: string 
           columns={[
             column(t('pages.admin.nodes.tabs.tunnel.page.metrics.column.peer', {})),
             column(t('pages.admin.nodes.tabs.tunnel.page.metrics.column.role', {})),
-            column(t('pages.admin.nodes.tabs.tunnel.page.metrics.column.address', {})),
+            column(t('common.table.columns.address', {})),
             column(
               t('pages.admin.nodes.tabs.tunnel.page.metrics.column.path', {}),
               t('pages.admin.nodes.tabs.tunnel.page.metrics.hint.rttMtu', {}),

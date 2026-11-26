@@ -171,7 +171,7 @@ export default function OobeNodeConfigure({ onNext, onBack, canGoBack, skipFrom,
             leftSection={<FontAwesomeIcon icon={faCheck} />}
             onClick={() => verifyNode()}
           >
-            {t('pages.oobe.nodeConfiguration.button.verify', {})}
+            {t('common.button.verifyConnection', {})}
           </Button>
         )}
       </div>
