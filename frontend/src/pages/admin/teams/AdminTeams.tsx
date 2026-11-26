@@ -9,6 +9,7 @@ import Table from '@/elements/data-display/Table.tsx';
 import { queryKeys } from '@/lib/queryKeys.ts';
 import { teamTableColumns } from '@/lib/tableColumns.ts';
 import TeamCreateOrUpdate from '@/pages/admin/teams/TeamCreateOrUpdate.tsx';
+import TeamLookupPopover from '@/pages/admin/teams/TeamLookupPopover.tsx';
 import TeamRow from '@/pages/admin/teams/TeamRow.tsx';
 import TeamView from '@/pages/admin/teams/TeamView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
@@ -39,15 +40,18 @@ function TeamsContainer() {
       search={search}
       setSearch={setSearch}
       contentRight={
-        <AdminCan action='teams.create'>
-          <Button
-            onClick={() => navigate('/admin/teams/new')}
-            color='blue'
-            leftSection={<FontAwesomeIcon icon={faPlus} />}
-          >
-            {t('common.button.create', {})}
-          </Button>
-        </AdminCan>
+        <>
+          <TeamLookupPopover />
+          <AdminCan action='teams.create'>
+            <Button
+              onClick={() => navigate('/admin/teams/new')}
+              color='blue'
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+            >
+              {t('common.button.create', {})}
+            </Button>
+          </AdminCan>
+        </>
       }
     >
       <Table

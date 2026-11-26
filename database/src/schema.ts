@@ -1033,6 +1033,8 @@ export const nodeAllocationsTable = pgTable(
   (cols) => [
     index('allocations_node_uuid_ip_inet_port_idx').on(cols.node_uuid, cols.ip, cols.port),
     uniqueIndex('allocations_node_uuid_ip_port_idx').on(cols.node_uuid, sql`host(${cols.ip})`, cols.port),
+    index('allocations_ip_port_idx').on(sql`host(${cols.ip})`, cols.port),
+    index('allocations_ip_alias_idx').on(cols.ip_alias),
   ],
 );
 

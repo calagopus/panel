@@ -2,6 +2,8 @@ use super::State;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _server_;
+mod database_instances;
+mod databases;
 mod deploy;
 mod external;
 
@@ -336,6 +338,8 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(post::route))
         .nest("/{server}", _server_::router(state))
         .nest("/external", external::router(state))
+        .nest("/databases", databases::router(state))
+        .nest("/database-instances", database_instances::router(state))
         .nest("/deploy", deploy::router(state))
         .with_state(state.clone())
 }

@@ -102,6 +102,9 @@ impl SystemBackupPolicyServer {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) =
+            super::server::Server::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -110,14 +113,17 @@ impl SystemBackupPolicyServer {
                 JOIN servers ON servers.uuid = system_backup_policy_servers.server_uuid
                 WHERE
                     system_backup_policy_servers.system_backup_policy_uuid = $1
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = super::server::Server::allocation_search_sql(3),
             ),
             "system_backup_policy_servers.created, system_backup_policy_servers.system_backup_policy_uuid, system_backup_policy_servers.server_uuid",
         )
         .bind(system_backup_policy_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }

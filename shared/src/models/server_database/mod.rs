@@ -172,6 +172,28 @@ impl ServerDatabase {
         row.try_map(|row| Self::map(None, &row))
     }
 
+    pub async fn by_name_or_username(
+        database: &crate::database::Database,
+        identifier: &str,
+    ) -> Result<Option<Self>, crate::database::DatabaseError> {
+        let row = sqlx::query(sqlx::AssertSqlSafe(format!(
+            r#"
+            SELECT {}
+            FROM server_databases
+            JOIN database_hosts ON database_hosts.uuid = server_databases.database_host_uuid
+            WHERE server_databases.username = $1 OR server_databases.name = $1
+            ORDER BY server_databases.username = $1 DESC
+            LIMIT 1
+            "#,
+            Self::columns_sql(None)
+        )))
+        .bind(identifier)
+        .fetch_optional(database.read())
+        .await?;
+
+        row.try_map(|row| Self::map(None, &row))
+    }
+
     pub async fn by_database_host_uuid_with_pagination(
         database: &crate::database::Database,
         database_host_uuid: uuid::Uuid,

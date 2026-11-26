@@ -3533,22 +3533,29 @@
         "users": {
           "title": "Benutzer",
           "resourceName": "Benutzer",
-          "externalIdLookup": {
-            "button": "Über externe ID suchen",
-            "modal": {
-              "title": "Über externe ID suchen",
-              "form": {
-                "externalIdPlaceholder": "z. B. my-user-001",
-                "search": "Suchen"
-              },
-              "result": {
-                "title": "Benutzer gefunden",
-                "username": "Benutzername",
-                "email": "E-Mail",
-                "role": "Rolle",
-                "viewUser": "Benutzer anzeigen"
-              },
-              "notFound": "Kein Benutzer mit dieser externen ID gefunden."
+          "lookup": {
+            "button": "Nachschlagen",
+            "mode": {
+              "externalId": "Externe ID",
+              "oauth": "OAuth"
+            },
+            "form": {
+              "externalIdPlaceholder": "z. B. my-user-001",
+              "oauthProvider": "OAuth-Anbieter",
+              "identifierPlaceholder": "z. B. E-Mail oder Benutzername",
+              "search": "Suchen"
+            },
+            "result": {
+              "title": "Benutzer gefunden",
+              "username": "Benutzername",
+              "email": "E-Mail",
+              "role": "Rolle",
+              "identifier": "Kennung",
+              "viewUser": "Benutzer anzeigen"
+            },
+            "notFound": {
+              "externalId": "Kein Benutzer mit dieser externen ID gefunden.",
+              "oauth": "Bei diesem Anbieter ist kein Benutzer mit dieser Kennung verknüpft."
             }
           },
           "tooltip": {
@@ -4387,22 +4394,34 @@
             "nothingToDo": "Jeder ausgewählte Server befindet sich bereits in diesem Zustand.",
             "transferMixedNodes": "Nur Server auf derselben Node können zusammen transferiert werden."
           },
-          "externalIdLookup": {
-            "button": "Über externe ID suchen",
-            "modal": {
-              "title": "Über externe ID suchen",
-              "form": {
-                "externalIdPlaceholder": "z. B. my-server-001",
-                "search": "Suchen"
-              },
-              "result": {
-                "title": "Server gefunden",
-                "name": "Name",
-                "owner": "Besitzer",
-                "node": "Node",
-                "viewServer": "Server anzeigen"
-              },
-              "notFound": "Kein Server mit dieser externen ID gefunden."
+          "lookup": {
+            "button": "Nachschlagen",
+            "mode": {
+              "externalId": "Externe ID",
+              "database": "Datenbank",
+              "databaseInstance": "Datenbankinstanz"
+            },
+            "form": {
+              "externalIdPlaceholder": "z. B. my-server-001",
+              "database": "Datenbankname oder Benutzername",
+              "databasePlaceholder": "z. B. u1a2b3c4d_AbCdEfGhIj",
+              "databaseInstance": "Datenbankinstanz-ID",
+              "databaseInstancePlaceholder": "Containername auf dem Datenbank-Agent-Host",
+              "search": "Suchen"
+            },
+            "result": {
+              "title": "Server gefunden",
+              "name": "Name",
+              "owner": "Besitzer",
+              "node": "Node",
+              "database": "Datenbank",
+              "databaseInstance": "Datenbankinstanz",
+              "viewServer": "Server anzeigen"
+            },
+            "notFound": {
+              "externalId": "Kein Server mit dieser externen ID gefunden.",
+              "database": "Keine Datenbank mit diesem Namen oder Benutzernamen gefunden.",
+              "databaseInstance": "Keine Datenbankinstanz mit dieser ID gefunden."
             }
           },
           "tabs": {
@@ -6327,6 +6346,19 @@
         "teams": {
           "title": "Teams",
           "resourceName": "Team",
+          "lookup": {
+            "button": "Nachschlagen",
+            "mode": {
+              "server": "Server"
+            },
+            "result": {
+              "title": "Team gefunden",
+              "name": "Name",
+              "owner": "Besitzer",
+              "viewTeam": "Team anzeigen"
+            },
+            "notFound": "Dieser Server gehört zu keinem Team."
+          },
           "tabs": {
             "general": {
               "page": {

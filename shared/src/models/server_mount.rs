@@ -183,20 +183,26 @@ impl ServerMount {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) =
+            super::server::Server::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
                 r#"
                 FROM server_mounts
                 JOIN servers ON servers.uuid = server_mounts.server_uuid
-                WHERE server_mounts.mount_uuid = $1 AND {search}
+                WHERE server_mounts.mount_uuid = $1 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = super::server::Server::allocation_search_sql(3),
             ),
             "server_mounts.created, server_mounts.server_uuid",
         )
         .bind(mount_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }

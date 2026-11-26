@@ -1,6 +1,5 @@
-import { faFingerprint, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import getUsers from '@/api/admin/users/getUsers.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -13,14 +12,13 @@ import UserView from '@/pages/admin/users/UserView.tsx';
 import { useSearchablePaginatedTable } from '@/plugins/resource/useSearchablePaginatedTable.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import AdminPermissionGuard from '@/routers/guards/AdminPermissionGuard.tsx';
-import ExternalIdLookupModal from './modals/ExternalIdLookupModal.tsx';
 import UserCreateOrUpdate from './UserCreateOrUpdate.tsx';
+import UserLookupPopover from './UserLookupPopover.tsx';
 import UserRow from './UserRow.tsx';
 
 function UsersContainer() {
   const navigate = useNavigate();
   const { t } = useTranslations();
-  const [lookupOpen, setLookupOpen] = useState(false);
 
   const {
     data: users,
@@ -43,16 +41,7 @@ function UsersContainer() {
       setSearch={setSearch}
       contentRight={
         <>
-          <ExternalIdLookupModal opened={lookupOpen} onClose={() => setLookupOpen(false)} />
-          <AdminCan action='users.read'>
-            <Button
-              onClick={() => setLookupOpen(true)}
-              variant='default'
-              leftSection={<FontAwesomeIcon icon={faFingerprint} />}
-            >
-              {t('pages.admin.users.externalIdLookup.button', {})}
-            </Button>
-          </AdminCan>
+          <UserLookupPopover />
           <AdminCan action='users.create'>
             <Button
               onClick={() => navigate('/admin/users/new')}

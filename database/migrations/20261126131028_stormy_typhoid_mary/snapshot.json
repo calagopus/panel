@@ -1,0 +1,108 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "80219ac4-c2bb-404e-9886-d33d503dfa4a",
+  "prevIds": [
+    "a2e21fd8-c126-4f7a-95c7-5c7e4169b202"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "node_allocations",
+        "allocations_ip_port_idx"
+      ],
+      "writes": [
+        "s|idx|public.allocations_ip_port_idx",
+        "n|idx|public.allocations_ip_port_idx",
+        "e|idx|public.allocations_ip_port_idx",
+        "n|rel|public.allocations_ip_port_idx"
+      ],
+      "reads": [
+        "n|tbl|public.node_allocations",
+        "n|sch|public",
+        "n|col|public.node_allocations.port"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "node_allocations",
+        "allocations_ip_alias_idx"
+      ],
+      "writes": [
+        "s|idx|public.allocations_ip_alias_idx",
+        "n|idx|public.allocations_ip_alias_idx",
+        "e|idx|public.allocations_ip_alias_idx",
+        "n|rel|public.allocations_ip_alias_idx"
+      ],
+      "reads": [
+        "n|tbl|public.node_allocations",
+        "n|sch|public",
+        "n|col|public.node_allocations.ip_alias"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_allocations",
+        "name": "allocations_ip_port_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "host(\"ip\")",
+            "isExpression": true,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "port",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "node_allocations",
+        "name": "allocations_ip_alias_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "ip_alias",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

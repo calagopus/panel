@@ -3411,22 +3411,29 @@ const baseTranslations = defineTranslations({
         users: {
           title: 'Users',
           resourceName: 'User',
-          externalIdLookup: {
-            button: 'Find by External ID',
-            modal: {
-              title: 'Look Up by External ID',
-              form: {
-                externalIdPlaceholder: 'e.g. my-user-001',
-                search: 'Search',
-              },
-              result: {
-                title: 'User Found',
-                username: 'Username',
-                email: 'Email',
-                role: 'Role',
-                viewUser: 'View User',
-              },
-              notFound: 'No user found with that external ID.',
+          lookup: {
+            button: 'Look Up',
+            mode: {
+              externalId: 'External ID',
+              oauth: 'OAuth',
+            },
+            form: {
+              externalIdPlaceholder: 'e.g. my-user-001',
+              oauthProvider: 'OAuth Provider',
+              identifierPlaceholder: 'e.g. email or username',
+              search: 'Search',
+            },
+            result: {
+              title: 'User Found',
+              username: 'Username',
+              email: 'Email',
+              role: 'Role',
+              identifier: 'Identifier',
+              viewUser: 'View User',
+            },
+            notFound: {
+              externalId: 'No user found with that external ID.',
+              oauth: 'No user is linked to that identifier on this provider.',
             },
           },
           tooltip: {
@@ -4299,22 +4306,34 @@ const baseTranslations = defineTranslations({
             nothingToDo: 'Every selected server is already in that state.',
             transferMixedNodes: 'Only servers on the same node can be transferred together.',
           },
-          externalIdLookup: {
-            button: 'Find by External ID',
-            modal: {
-              title: 'Look Up by External ID',
-              form: {
-                externalIdPlaceholder: 'e.g. my-server-001',
-                search: 'Search',
-              },
-              result: {
-                title: 'Server Found',
-                name: 'Name',
-                owner: 'Owner',
-                node: 'Node',
-                viewServer: 'View Server',
-              },
-              notFound: 'No server found with that external ID.',
+          lookup: {
+            button: 'Look Up',
+            mode: {
+              externalId: 'External ID',
+              database: 'Database',
+              databaseInstance: 'Database Instance',
+            },
+            form: {
+              externalIdPlaceholder: 'e.g. my-server-001',
+              database: 'Database Name or Username',
+              databasePlaceholder: 'e.g. u1a2b3c4d_AbCdEfGhIj',
+              databaseInstance: 'Database Instance ID',
+              databaseInstancePlaceholder: 'Container name on the database agent host',
+              search: 'Search',
+            },
+            result: {
+              title: 'Server Found',
+              name: 'Name',
+              owner: 'Owner',
+              node: 'Node',
+              database: 'Database',
+              databaseInstance: 'Database Instance',
+              viewServer: 'View Server',
+            },
+            notFound: {
+              externalId: 'No server found with that external ID.',
+              database: 'No database found with that name or username.',
+              databaseInstance: 'No database instance found with that ID.',
             },
           },
           tabs: {
@@ -6339,6 +6358,19 @@ const baseTranslations = defineTranslations({
         teams: {
           title: 'Teams',
           resourceName: 'Team',
+          lookup: {
+            button: 'Look Up',
+            mode: {
+              server: 'Server',
+            },
+            result: {
+              title: 'Team Found',
+              name: 'Name',
+              owner: 'Owner',
+              viewTeam: 'View Team',
+            },
+            notFound: 'This server is not part of a team.',
+          },
           tabs: {
             general: {
               page: {

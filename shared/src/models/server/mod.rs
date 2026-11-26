@@ -898,6 +898,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -910,14 +912,17 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE servers.owner_uuid = $1 AND {search}
+                WHERE servers.owner_uuid = $1 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(owner_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -931,6 +936,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
@@ -944,16 +951,19 @@ impl Server {
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 {access_joins}
-                WHERE servers.team_uuid = $2 AND {search}
+                WHERE servers.team_uuid = $2 AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 search = super::search_sql(3, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(4),
             ),
             "servers.created, servers.uuid",
         )
         .bind(user_uuid)
         .bind(team_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -967,6 +977,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -979,15 +991,18 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE servers.owner_uuid = $1 AND servers.team_uuid IS DISTINCT FROM $2 AND {search}
+                WHERE servers.owner_uuid = $1 AND servers.team_uuid IS DISTINCT FROM $2 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(3, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(4),
             ),
             "servers.created, servers.uuid",
         )
         .bind(owner_uuid)
         .bind(team_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1000,6 +1015,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
@@ -1015,11 +1032,12 @@ impl Server {
                 {access_joins}
                 WHERE servers.uuid = ANY($2)
                     AND ({accessible} OR $4)
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(5),
             ),
             "array_position($2, servers.uuid), servers.created",
         )
@@ -1027,6 +1045,8 @@ impl Server {
         .bind(server_order)
         .bind(search)
         .bind(permissions.has_admin_permission("servers.read").is_ok())
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1038,6 +1058,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
@@ -1053,16 +1075,19 @@ impl Server {
                 {access_joins}
                 WHERE
                     servers.uuid IN ({accessible_uuids})
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 accessible_uuids = Self::ACCESSIBLE_UUIDS_SQL,
                 search = super::search_sql(2, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(user_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1099,6 +1124,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             format!("{}, {}", Self::columns_sql(None), Self::ACCESS_COLUMNS_SQL),
             format!(
@@ -1114,16 +1141,19 @@ impl Server {
                 {access_joins}
                 WHERE
                     NOT {accessible}
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(2, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(user_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1139,6 +1169,8 @@ impl Server {
         search: Option<&str>,
         exclude: &HashSet<(uuid::Uuid, uuid::Uuid)>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         let (excluded_egg_uuids, excluded_node_uuids): (Vec<_>, Vec<_>) =
             exclude.iter().copied().unzip();
 
@@ -1163,11 +1195,12 @@ impl Server {
                     AND servers.destination_node_uuid IS NULL
                     AND servers.status IS NULL
                     AND (servers.egg_uuid, servers.node_uuid) NOT IN (SELECT * FROM UNNEST($4::uuid[], $5::uuid[]))
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 accessible_uuids = Self::ACCESSIBLE_UUIDS_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(6),
             ),
             "servers.created, servers.uuid",
         )
@@ -1176,6 +1209,8 @@ impl Server {
         .bind(search)
         .bind(excluded_egg_uuids)
         .bind(excluded_node_uuids)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1189,6 +1224,8 @@ impl Server {
         search: Option<&str>,
         exclude: &HashSet<(uuid::Uuid, uuid::Uuid)>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         let (excluded_egg_uuids, excluded_node_uuids): (Vec<_>, Vec<_>) =
             exclude.iter().copied().unzip();
 
@@ -1213,11 +1250,12 @@ impl Server {
                     AND servers.destination_node_uuid IS NULL
                     AND servers.status IS NULL
                     AND (servers.egg_uuid, servers.node_uuid) NOT IN (SELECT * FROM UNNEST($4::uuid[], $5::uuid[]))
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 access_joins = Self::ACCESS_JOINS_SQL,
                 accessible = Self::ACCESSIBLE_SQL,
                 search = super::search_sql(3, &["servers.name", "users.username", "users.email"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(6),
             ),
             "servers.created, servers.uuid",
         )
@@ -1226,6 +1264,8 @@ impl Server {
         .bind(search)
         .bind(excluded_egg_uuids)
         .bind(excluded_node_uuids)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1269,6 +1309,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -1281,14 +1323,17 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE servers.node_uuid = $1 AND {search}
+                WHERE servers.node_uuid = $1 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(node_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1300,6 +1345,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -1313,14 +1360,17 @@ impl Server {
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
                 WHERE servers.node_uuid = $1 AND servers.destination_node_uuid IS NOT NULL
-                    AND {search}
+                    AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(node_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1332,6 +1382,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -1344,14 +1396,17 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE servers.egg_uuid = $1 AND {search}
+                WHERE servers.egg_uuid = $1 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(egg_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -1363,6 +1418,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -1375,16 +1432,64 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE servers.backup_configuration_uuid = $1 AND {search}
+                WHERE servers.backup_configuration_uuid = $1 AND ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(2, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(3),
             ),
             "servers.created, servers.uuid",
         )
         .bind(backup_configuration_uuid)
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
+    }
+
+    /// Splits an admin search term into an allocation host (IP or alias) and optional port, so
+    /// `1.2.3.4`, `1.2.3.4:25565`, `[::1]:25565` and `play.example.com:25565` match exactly.
+    fn parse_allocation_search(search: &str) -> (compact_str::CompactString, Option<i32>) {
+        if let Some(ip) = crate::net::host_to_ip(search) {
+            return (ip.to_compact_string(), None);
+        }
+
+        if let Some((host, port)) = search.rsplit_once(':')
+            && let Ok(port) = port.parse::<u16>()
+        {
+            if let Some(ip) = crate::net::host_to_ip(host) {
+                return (ip.to_compact_string(), Some(port.into()));
+            }
+
+            if !host.contains(':') {
+                return (host.into(), Some(port.into()));
+            }
+        }
+
+        (search.into(), None)
+    }
+
+    /// The `$host_param`/`$host_param + 1` binds for [`Self::allocation_search_sql`].
+    pub(crate) fn allocation_search_binds(
+        search: Option<&str>,
+    ) -> (Option<compact_str::CompactString>, Option<i32>) {
+        let (host, port) = search.map(Self::parse_allocation_search).unzip();
+
+        (host, port.flatten())
+    }
+
+    pub(crate) fn allocation_search_sql(host_param: u8) -> compact_str::CompactString {
+        compact_str::format_compact!(
+            r#"servers.uuid IN (
+                SELECT server_allocations.server_uuid
+                FROM node_allocations
+                JOIN server_allocations ON server_allocations.allocation_uuid = node_allocations.uuid
+                WHERE
+                    (host(node_allocations.ip) = ${host_param} OR node_allocations.ip_alias = ${host_param})
+                    AND (${port_param}::int4 IS NULL OR node_allocations.port = ${port_param})
+            )"#,
+            port_param = host_param + 1,
+        )
     }
 
     pub async fn all_with_pagination(
@@ -1393,6 +1498,8 @@ impl Server {
         per_page: i64,
         search: Option<&str>,
     ) -> Result<super::Pagination<Self>, crate::database::DatabaseError> {
+        let (allocation_host, allocation_port) = Self::allocation_search_binds(search);
+
         super::PaginatedQueryBuilder::new(
             Self::columns_sql(None),
             format!(
@@ -1405,13 +1512,16 @@ impl Server {
                 JOIN nest_eggs ON nest_eggs.uuid = servers.egg_uuid
                 JOIN nests ON nests.uuid = nest_eggs.nest_uuid
                 LEFT JOIN teams ON teams.uuid = servers.team_uuid
-                WHERE {search}
+                WHERE ({search} OR {allocation_search})
                 "#,
                 search = super::search_sql(1, &["servers.name"], &["servers.uuid"]),
+                allocation_search = Self::allocation_search_sql(2),
             ),
             "servers.created, servers.uuid",
         )
         .bind(search)
+        .bind(allocation_host)
+        .bind(allocation_port)
         .fetch(database, page, per_page)
         .await
     }
@@ -3858,7 +3968,8 @@ pub struct ApiServer {
 #[cfg(test)]
 mod tests {
     use super::{
-        ServerAccess, is_path_ignored, is_path_ignored_subtree, merge_access, validate_labels,
+        Server, ServerAccess, is_path_ignored, is_path_ignored_subtree, merge_access,
+        validate_labels,
     };
     use crate::ignore_list::IgnoreList;
     use compact_str::CompactString;
@@ -4198,6 +4309,91 @@ mod tests {
                 validate_labels(&labels(&[("key", &value)]), &()).is_err(),
                 "{value:?}"
             );
+        }
+    }
+
+    // Server::parse_allocation_search
+    fn parsed(search: &str) -> (String, Option<i32>) {
+        let (host, port) = Server::parse_allocation_search(search);
+
+        (host.to_string(), port)
+    }
+
+    #[test]
+    fn an_ipv4_address_or_alias_is_split_from_its_port() {
+        for (search, host, port) in [
+            ("1.2.3.4", "1.2.3.4", None),
+            ("1.2.3.4:25565", "1.2.3.4", Some(25565)),
+            ("play.example.com", "play.example.com", None),
+            ("play.example.com:25565", "play.example.com", Some(25565)),
+        ] {
+            assert_eq!(parsed(search), (host.to_string(), port), "{search}");
+        }
+    }
+
+    #[test]
+    fn a_bare_ipv6_address_is_never_read_as_host_and_port() {
+        for (search, host) in [
+            ("::1", "::1"),
+            ("2001:db8::1", "2001:db8::1"),
+            ("fe80::1:8080", "fe80::1:8080"),
+        ] {
+            assert_eq!(parsed(search), (host.to_string(), None), "{search}");
+        }
+    }
+
+    #[test]
+    fn a_bracketed_ipv6_address_is_unwrapped_with_or_without_a_port() {
+        for (search, host, port) in [
+            ("[::1]", "::1", None),
+            ("[::1]:25565", "::1", Some(25565)),
+            ("[fe80::1:8080]:80", "fe80::1:8080", Some(80)),
+        ] {
+            assert_eq!(parsed(search), (host.to_string(), port), "{search}");
+        }
+    }
+
+    #[test]
+    fn ipv6_addresses_come_back_in_the_canonical_form_postgres_prints() {
+        for (search, host, port) in [
+            (
+                "2001:0DB8:0000:0000:0000:0000:0000:0001",
+                "2001:db8::1",
+                None,
+            ),
+            ("2001:db8:0:0:0:0:0:1", "2001:db8::1", None),
+            (
+                "[2001:0db8:0:0:0:0:0:0001]:25565",
+                "2001:db8::1",
+                Some(25565),
+            ),
+        ] {
+            assert_eq!(parsed(search), (host.to_string(), port), "{search}");
+        }
+    }
+
+    #[test]
+    fn the_port_is_accepted_up_to_65535() {
+        assert_eq!(
+            parsed("1.2.3.4:65535"),
+            ("1.2.3.4".to_string(), Some(65535))
+        );
+        assert_eq!(parsed("[::1]:65535"), ("::1".to_string(), Some(65535)));
+    }
+
+    #[test]
+    fn anything_that_is_not_an_address_or_alias_with_a_valid_port_is_returned_whole() {
+        for search in [
+            "survival",
+            "1.2.3.4:65536",
+            "[::1]:65536",
+            "1.2.3.4:abc",
+            "1.2.3.4:-1",
+            "1.2.3.4:",
+            "play.example.com:99999",
+            "play.example.com:port",
+        ] {
+            assert_eq!(parsed(search), (search.to_string(), None), "{search}");
         }
     }
 }
