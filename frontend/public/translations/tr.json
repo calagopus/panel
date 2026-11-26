@@ -1116,8 +1116,6 @@
           },
           "details": {
             "address": "Adres",
-            "networkIn": "Ağ (Giriş)",
-            "networkOut": "Ağ (Çıkış)",
             "normalizeCpuLoad": "İşlemci Kullanımını %100 Üzerinden Göster"
           },
           "power": {

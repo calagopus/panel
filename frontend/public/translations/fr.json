@@ -3292,8 +3292,6 @@
           },
           "details": {
             "address": "Adresse",
-            "networkIn": "Réseau (entrant)",
-            "networkOut": "Réseau (sortant)",
             "normalizeCpuLoad": "Normaliser la charge CPU (max 100%)"
           },
           "power": {

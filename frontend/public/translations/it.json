@@ -670,8 +670,6 @@
           "details": {
             "address": "Indirizzo",
             "port": "Porta",
-            "networkIn": "Rete (In)",
-            "networkOut": "Rete (Out)",
             "normalizeCpuLoad": "Normalizza carico CPU (spostato al massimo 100%)"
           },
           "power": {

@@ -1677,23 +1677,6 @@
         "users": {
           "title": "Użytkownicy",
           "resourceName": "Użytkownik",
-          "externalIdLookup": {
-            "button": "Szukaj według zewnętrznego ID",
-            "modal": {
-              "title": "Znajdź według zewnętrznego ID",
-              "form": {
-                "externalIdPlaceholder": "np. moj-użytkownik 001",
-                "search": "Wyszukaj"
-              },
-              "result": {
-                "title": "Znaleziono użytkownika",
-                "username": "Nazwa użytkownika",
-                "role": "Rola",
-                "viewUser": "Zobacz użytkownika"
-              },
-              "notFound": "Nie znaleziono użytkownika z tym zewnętrznym ID."
-            }
-          },
           "tooltip": {
             "twoFactorEnabled": "2FA włączone",
             "twoFactorDisabled": "2FA wyłączone"
@@ -2016,24 +1999,6 @@
         "servers": {
           "title": "Serwery",
           "resourceName": "Serwer",
-          "externalIdLookup": {
-            "button": "Szukaj według zewnętrznego ID",
-            "modal": {
-              "title": "Znajdź według zewnętrznego ID",
-              "form": {
-                "externalIdPlaceholder": "np. moj-serwer-001",
-                "search": "Wyszukaj"
-              },
-              "result": {
-                "title": "Znaleziono serwer",
-                "name": "Nazwa",
-                "owner": "Właściciel",
-                "node": "Węzeł",
-                "viewServer": "Zobacz serwer"
-              },
-              "notFound": "Nie znaleziono serwera z tym zewnętrznym ID."
-            }
-          },
           "tabs": {
             "overview": {
               "title": "Podsumowanie",
@@ -2761,9 +2726,6 @@
           "details": {
             "address": "Adres",
             "normalizeCpuLoad": "Normalizuj obciążenie procesora (przeniesione do maks. 100%)"
-          },
-          "stats": {
-            "offline": "Serwer jest wyłączony"
           },
           "socketConnected": "Połączono ({ping}ms ping)",
           "socketDisconnected": "Rozłączono"

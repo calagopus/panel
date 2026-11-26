@@ -1056,8 +1056,6 @@
           },
           "details": {
             "address": "Adress",
-            "networkIn": "Nätverk (in)",
-            "networkOut": "Nätverk (ut)",
             "normalizeCpuLoad": "Normalisera CPU-belastning (skiftad till max 100%)"
           },
           "power": {

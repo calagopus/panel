@@ -2162,24 +2162,6 @@
         "users": {
           "title": "使用者",
           "resourceName": "使用者",
-          "externalIdLookup": {
-            "button": "依外部 ID 尋找",
-            "modal": {
-              "title": "依外部 ID 查詢",
-              "form": {
-                "externalIdPlaceholder": "例如:my-user-001",
-                "search": "搜尋"
-              },
-              "result": {
-                "title": "已找到使用者",
-                "username": "使用者名稱",
-                "email": "電子郵件",
-                "role": "角色",
-                "viewUser": "查看使用者"
-              },
-              "notFound": "找不到符合該外部 ID 的使用者。"
-            }
-          },
           "tooltip": {
             "admin": "管理員",
             "twoFactorEnabled": "2FA 已啟用",
@@ -2733,24 +2715,6 @@
             "unsuspend": "恢復伺服器",
             "clearState": "清除伺服器狀態",
             "delete": "刪除伺服器"
-          },
-          "externalIdLookup": {
-            "button": "依外部ID尋找",
-            "modal": {
-              "title": "依外部ID查詢",
-              "form": {
-                "externalIdPlaceholder": "例如：my-server-001",
-                "search": "搜尋"
-              },
-              "result": {
-                "title": "已找到伺服器",
-                "name": "名稱",
-                "owner": "擁有者",
-                "node": "節點",
-                "viewServer": "查看伺服器"
-              },
-              "notFound": "找不到符合該外部ID的伺服器。"
-            }
           },
           "tabs": {
             "overview": {
@@ -4247,8 +4211,6 @@
           "details": {
             "address": "位址",
             "port": "連接埠",
-            "networkIn": "網路（傳入）",
-            "networkOut": "網路（傳出）",
             "normalizeCpuLoad": "正規化 CPU 負載（偏移到最大 100%）"
           },
           "power": {
@@ -4258,9 +4220,6 @@
                 "content": "強制停止伺服器可能導致資料損毀。"
               }
             }
-          },
-          "stats": {
-            "offline": "伺服器離線"
           },
           "socketConnected": "已連線（{ping}ms ping）",
           "socketDisconnected": "已中斷連線"

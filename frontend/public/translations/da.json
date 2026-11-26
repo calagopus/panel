@@ -2379,24 +2379,6 @@
         "users": {
           "title": "Brugere",
           "resourceName": "Bruger",
-          "externalIdLookup": {
-            "button": "Find via eksternt ID",
-            "modal": {
-              "title": "Slå op via eksternt ID",
-              "form": {
-                "externalIdPlaceholder": "f.eks. my-user-001",
-                "search": "Søg"
-              },
-              "result": {
-                "title": "Bruger fundet",
-                "username": "Brugernavn",
-                "email": "E-mail",
-                "role": "Rolle",
-                "viewUser": "Vis bruger"
-              },
-              "notFound": "Ingen bruger fundet med det eksterne ID."
-            }
-          },
           "tooltip": {
             "twoFactorEnabled": "2FA aktiveret",
             "twoFactorDisabled": "2FA deaktiveret"
@@ -3064,23 +3046,6 @@
               "deleteContent": "Er du sikker på, at du vil slette **{servers}** og alt på dem permanent? Dette kan ikke fortrydes."
             },
             "nothingToDo": "Alle valgte servere er allerede i den tilstand."
-          },
-          "externalIdLookup": {
-            "button": "Find via eksternt ID",
-            "modal": {
-              "title": "Slå op via eksternt ID",
-              "form": {
-                "externalIdPlaceholder": "f.eks. my-server-001",
-                "search": "Søg"
-              },
-              "result": {
-                "title": "Server fundet",
-                "name": "Navn",
-                "owner": "Ejer",
-                "viewServer": "Vis server"
-              },
-              "notFound": "Ingen server fundet med det eksterne ID."
-            }
           },
           "tabs": {
             "overview": {
@@ -4574,8 +4539,6 @@
           },
           "details": {
             "address": "Adresse",
-            "networkIn": "Netværk (ind)",
-            "networkOut": "Netværk (ud)",
             "normalizeCpuLoad": "Normalisér CPU-belastning (skaleret til maks. 100%)"
           },
           "power": {
@@ -4585,9 +4548,6 @@
                 "content": "Tvungen stop af en server kan føre til datakorruption."
               }
             }
-          },
-          "stats": {
-            "offline": "Serveren er offline"
           },
           "socketConnected": "Forbundet ({ping} ms ping)",
           "socketDisconnected": "Afbrudt"

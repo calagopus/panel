@@ -543,7 +543,6 @@
         "truncateDirectory": "Törölni szeretné a szerver összes fájlját, mielőtt végrehajtja ezt a műveletet? Ez a művelet visszafordíthatatlan.",
         "rule": {
           "invalidCharacters": "Olyan karaktereket tartalmaz, amelyek itt nem megengedettek.",
-          "username": "3–48 karakter, kizárólag betűk, számok és aláhúzójelek.",
           "databaseName": "Legfeljebb 31 karakter, kizárólag betűk, számok és aláhúzójelek.",
           "databaseInstanceIdentifier": "2–23 karakter, kizárólag betűk és számok.",
           "captchaSiteKey": "Kizárólag betűk, számok, kötőjelek és aláhúzójelek.",
