@@ -5157,8 +5157,7 @@
             "popout": "Separar consola"
           },
           "popout": {
-            "windowTitle": "Consola",
-            "returnHint": "Esta consola se está ejecutando en su propia ventana. Puedes cerrarla en cualquier momento."
+            "windowTitle": "Consola"
           },
           "drawer": {
             "commandHistory": {

@@ -4500,8 +4500,7 @@
             "popout": "Åbn konsollen i eget vindue"
           },
           "popout": {
-            "windowTitle": "Konsol",
-            "returnHint": "Denne konsol kører i sit eget vindue. Du kan lukke det når som helst."
+            "windowTitle": "Konsol"
           },
           "drawer": {
             "commandHistory": {
