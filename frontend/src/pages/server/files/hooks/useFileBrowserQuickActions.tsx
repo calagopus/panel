@@ -16,9 +16,10 @@ import { join } from 'pathe';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router';
 import { handleRawCopyToClipboard } from '@/lib/clipboard/copy.ts';
 import { hasIncompleteUploads } from '@/lib/files/stagingUploads.ts';
-import { isVirtualRoot } from '@/lib/files/virtualRoot.ts';
+import { isVirtualRoot, virtualRootOf } from '@/lib/files/virtualRoot.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { useQuickActions } from '@/plugins/quick-actions/useQuickActions.ts';
+import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useToast } from '@/providers/ToastProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useFileManagerApi } from '@/stores/fileManager.ts';
@@ -37,6 +38,7 @@ export function useFileBrowserQuickActions({
   const [, setSearchParams] = useSearchParams();
   const server = useServerStore((state) => state.server);
   const store = useFileManagerApi();
+  const canReadBackups = useServerCan('backups.read');
 
   const page = CORE_QUICK_ACTION_CATEGORIES.page;
   const isWritable = () => store.getState().browsingWritableDirectory;
@@ -156,8 +158,8 @@ export function useFileBrowserQuickActions({
       category: page,
       label: () => t('pages.server.files.quickAction.exitBackup', {}),
       icon: faDoorOpen,
-      isVisible: () => store.getState().browsingBackup !== null,
-      perform: () => navigate(`/server/${server.uuidShort}/files`),
+      isVisible: () => virtualRootOf(store.getState().browsingDirectory)?.type === 'backup',
+      perform: () => navigate(`/server/${server.uuidShort}/${canReadBackups ? 'backups' : 'files'}`),
     },
     {
       id: 'files.openTrash',

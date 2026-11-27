@@ -31,10 +31,11 @@ import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Title from '@/elements/typography/Title.tsx';
 import { isOpenableFile } from '@/lib/files/files.ts';
-import { isVirtualRoot } from '@/lib/files/virtualRoot.ts';
+import { isVirtualRoot, virtualRootOf } from '@/lib/files/virtualRoot.ts';
 import { CORE_QUICK_ACTION_CATEGORIES } from '@/lib/quickActions/coreQuickActions.tsx';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage.ts';
 import { serverDirectoryEntrySchema } from '@/lib/schemas/server/files.ts';
+import BackupBrowseHeader from '@/pages/server/files/BackupBrowseHeader.tsx';
 import FileBreadcrumbs from '@/pages/server/files/FileBreadcrumbs.tsx';
 import { useDuplicateFile } from '@/pages/server/files/hooks/useDuplicateFile.ts';
 import { useFileBrowserQuickActions } from '@/pages/server/files/hooks/useFileBrowserQuickActions.tsx';
@@ -42,6 +43,7 @@ import { useFileTooLargeToast } from '@/pages/server/files/hooks/useFileTooLarge
 import useFileUploadSocket from '@/pages/server/files/hooks/useFileUploadSocket.ts';
 import IncompleteUploadsBanner from '@/pages/server/files/IncompleteUploadsBanner.tsx';
 import FileActionBar from '@/pages/server/files/list/FileActionBar.tsx';
+import FileBrowserError from '@/pages/server/files/list/FileBrowserError.tsx';
 import FileDiskUsageBar from '@/pages/server/files/list/FileDiskUsageBar.tsx';
 import FileInfiniteScrollSentinel from '@/pages/server/files/list/FileInfiniteScrollSentinel.tsx';
 import FileMassContextMenu from '@/pages/server/files/list/FileMassContextMenu.tsx';
@@ -389,75 +391,85 @@ function FileBrowser() {
             disabled={anyActing}
           >
             <div ref={tableAnchorRef}>
-              <Table
-                columns={columns}
-                loading={isLoading}
-                pagination={browsingEntries}
-                error={browsingError}
-                allowSelect={false}
-                empty={
-                  searchInfo ? undefined : (
-                    <EmptyState
-                      flush
-                      icon={faFolderOpen}
-                      title={t('pages.server.files.empty.title', {})}
-                      description={
-                        canCreate
-                          ? t('pages.server.files.empty.description', {})
-                          : t('pages.server.files.empty.descriptionReadOnly', {})
-                      }
-                    />
-                  )
-                }
-              >
-                {showParentDirectoryRow && <FileParentDirectoryRow />}
-
-                {paddingTop > 0 && (
-                  <TableRow>
-                    <TableData colSpan={columns.length} style={{ height: paddingTop, padding: 0, border: 'none' }} />
-                  </TableRow>
-                )}
-
-                {virtualRows.map((virtualRow) => {
-                  const row = rows[virtualRow.index];
-                  if (!row) return null;
-                  const entry = row.entry;
-                  if (row.preview) {
-                    return (
-                      <TableRow key={virtualRow.key} ref={rowVirtualizer.measureElement} data-index={virtualRow.index}>
-                        <TableData colSpan={columns.length} className='max-w-0 px-4 py-2'>
-                          <FileSearchPreview
-                            file={entry}
-                            path={row.path}
-                            matches={searchInfo?.contentMatches?.[row.path]}
-                          />
-                        </TableData>
-                      </TableRow>
-                    );
+              {browsingError ? (
+                <FileBrowserError />
+              ) : (
+                <Table
+                  columns={columns}
+                  loading={isLoading}
+                  pagination={browsingEntries}
+                  allowSelect={false}
+                  empty={
+                    searchInfo ? undefined : (
+                      <EmptyState
+                        flush
+                        icon={faFolderOpen}
+                        title={t('pages.server.files.empty.title', {})}
+                        description={
+                          canCreate
+                            ? t('pages.server.files.empty.description', {})
+                            : t('pages.server.files.empty.descriptionReadOnly', {})
+                        }
+                      />
+                    )
                   }
+                >
+                  {showParentDirectoryRow && <FileParentDirectoryRow />}
 
-                  return (
-                    <SelectableFileRow
-                      key={virtualRow.key}
-                      measureElement={rowVirtualizer.measureElement}
-                      dataIndex={virtualRow.index}
-                      file={entry}
-                      handleOpen={openFile}
-                      openMassMenu={openMassMenu}
-                      clickOnce={clickOnce}
-                      preferPhysicalSize={preferPhysicalSize}
-                    />
-                  );
-                })}
+                  {paddingTop > 0 && (
+                    <TableRow>
+                      <TableData colSpan={columns.length} style={{ height: paddingTop, padding: 0, border: 'none' }} />
+                    </TableRow>
+                  )}
 
-                {paddingBottom > 0 && (
-                  <TableRow>
-                    <TableData colSpan={columns.length} style={{ height: paddingBottom, padding: 0, border: 'none' }} />
-                  </TableRow>
-                )}
+                  {virtualRows.map((virtualRow) => {
+                    const row = rows[virtualRow.index];
+                    if (!row) return null;
+                    const entry = row.entry;
+                    if (row.preview) {
+                      return (
+                        <TableRow
+                          key={virtualRow.key}
+                          ref={rowVirtualizer.measureElement}
+                          data-index={virtualRow.index}
+                        >
+                          <TableData colSpan={columns.length} className='max-w-0 px-4 py-2'>
+                            <FileSearchPreview
+                              file={entry}
+                              path={row.path}
+                              matches={searchInfo?.contentMatches?.[row.path]}
+                            />
+                          </TableData>
+                        </TableRow>
+                      );
+                    }
 
-                {!searchInfo && <FileInfiniteScrollSentinel colSpan={columns.length} />}
-              </Table>
+                    return (
+                      <SelectableFileRow
+                        key={virtualRow.key}
+                        measureElement={rowVirtualizer.measureElement}
+                        dataIndex={virtualRow.index}
+                        file={entry}
+                        handleOpen={openFile}
+                        openMassMenu={openMassMenu}
+                        clickOnce={clickOnce}
+                        preferPhysicalSize={preferPhysicalSize}
+                      />
+                    );
+                  })}
+
+                  {paddingBottom > 0 && (
+                    <TableRow>
+                      <TableData
+                        colSpan={columns.length}
+                        style={{ height: paddingBottom, padding: 0, border: 'none' }}
+                      />
+                    </TableRow>
+                  )}
+
+                  {!searchInfo && <FileInfiniteScrollSentinel colSpan={columns.length} />}
+                </Table>
+              )}
             </div>
           </SelectionArea>
         )}
@@ -484,12 +496,22 @@ function ServerFilesComponent() {
   const serverUuid = useServerStore((state) => state.server.uuid);
   const doOpenModal = useFileManagerStore((state) => state.doOpenModal);
   const browsingDirectory = useFileManagerStore((state) => state.browsingDirectory);
+  const browsingBackupName = useFileManagerStore((state) => state.browsingBackup?.name);
   const resetEntries = useFileManagerStore((state) => state.resetEntries);
   const setSearchInfo = useFileManagerStore((state) => state.setSearchInfo);
   const [, setSearchParams] = useSearchParams();
-  const [view, setView] = useState<FileManagerView>(getStoredFileManagerView);
+  const [storedView, setView] = useState<FileManagerView>(getStoredFileManagerView);
+  const backupUuid = useMemo(() => {
+    const root = virtualRootOf(browsingDirectory);
+    return root?.type === 'backup' ? root.uuid : null;
+  }, [browsingDirectory]);
+  const view: FileManagerView = backupUuid ? 'list' : storedView;
   const viewTitle = t(view === 'tree' ? 'pages.server.files.view.tree' : 'pages.server.files.view.list', {});
-  const titleHoisted = useNavbarPageHeader({ title: viewTitle });
+  const titleHoisted = useNavbarPageHeader(
+    backupUuid
+      ? { title: browsingBackupName ?? backupUuid, subtitle: t('pages.server.backups.title', {}) }
+      : { title: viewTitle },
+  );
   const desktop = usePageBreakpoint('lg');
   const settingsBesideTitle = !titleHoisted || desktop;
   const [fileTreeVisible, setFileTreeVisible] = useState(() => getStoredFileTreeVisibility(serverUuid));
@@ -533,7 +555,7 @@ function ServerFilesComponent() {
       category: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => t('pages.server.files.quickAction.switchToList', {}),
       icon: faFolderOpen,
-      isVisible: () => view !== 'list',
+      isVisible: () => !backupUuid && view !== 'list',
       perform: () => changeView('list'),
     },
     {
@@ -541,7 +563,7 @@ function ServerFilesComponent() {
       category: CORE_QUICK_ACTION_CATEGORIES.page,
       label: () => t('pages.server.files.quickAction.switchToTree', {}),
       icon: faCode,
-      isVisible: () => view !== 'tree',
+      isVisible: () => !backupUuid && view !== 'tree',
       perform: () => changeView('tree'),
     },
   ]);
@@ -564,65 +586,73 @@ function ServerFilesComponent() {
       <FileUpload showOverlay={view === 'list'} />
       <FileActionBar />
 
-      <Group justify='space-between' align='center' mb='md'>
-        {settingsBesideTitle && (
-          <Group>
-            <Title order={1}>{viewTitle}</Title>
-            <FileSettings />
-          </Group>
-        )}
-
-        <Group>
-          {!settingsBesideTitle && <FileSettings />}
-          {view === 'tree' && (
-            <Tooltip label={t('pages.server.files.tooltip.advancedSearch', {})}>
-              <ActionIcon
-                type='button'
-                variant='subtle'
-                color='gray'
-                aria-label={t('pages.server.files.tooltip.advancedSearch', {})}
-                onClick={() => doOpenModal('search')}
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </ActionIcon>
-            </Tooltip>
+      {backupUuid ? (
+        <BackupBrowseHeader showTitle={settingsBesideTitle} />
+      ) : (
+        <Group justify='space-between' align='center' mb='md'>
+          {settingsBesideTitle && (
+            <Group>
+              <Title order={1}>{viewTitle}</Title>
+              <FileSettings />
+            </Group>
           )}
 
-          <SegmentedControl
-            value={view}
-            onChange={changeView}
-            styles={{ label: { padding: 0 } }}
-            data={[
-              {
-                value: 'list',
-                label: (
-                  <Tooltip label={t('pages.server.files.view.list', {})}>
-                    <span className='block' style={{ padding: 'var(--sc-padding)' }}>
-                      <FontAwesomeIcon icon={faFolderOpen} aria-label={t('pages.server.files.view.list', {})} />
-                    </span>
-                  </Tooltip>
-                ),
-              },
-              {
-                value: 'tree',
-                label: (
-                  <Tooltip label={t('pages.server.files.view.tree', {})}>
-                    <span className='block' style={{ padding: 'var(--sc-padding)' }}>
-                      <FontAwesomeIcon icon={faCode} aria-label={t('pages.server.files.view.tree', {})} />
-                    </span>
-                  </Tooltip>
-                ),
-              },
-            ]}
-          />
+          <Group>
+            {!settingsBesideTitle && <FileSettings />}
+            {view === 'tree' && (
+              <Tooltip label={t('pages.server.files.tooltip.advancedSearch', {})}>
+                <ActionIcon
+                  type='button'
+                  variant='subtle'
+                  color='gray'
+                  aria-label={t('pages.server.files.tooltip.advancedSearch', {})}
+                  onClick={() => doOpenModal('search')}
+                >
+                  <FontAwesomeIcon icon={faSearch} />
+                </ActionIcon>
+              </Tooltip>
+            )}
 
-          <FileOperationsProgress />
-          <FileToolbar onCreateFile={createTreeFile} />
+            <SegmentedControl
+              value={view}
+              onChange={changeView}
+              styles={{ label: { padding: 0 } }}
+              data={[
+                {
+                  value: 'list',
+                  label: (
+                    <Tooltip label={t('pages.server.files.view.list', {})}>
+                      <span className='block' style={{ padding: 'var(--sc-padding)' }}>
+                        <FontAwesomeIcon icon={faFolderOpen} aria-label={t('pages.server.files.view.list', {})} />
+                      </span>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  value: 'tree',
+                  label: (
+                    <Tooltip label={t('pages.server.files.view.tree', {})}>
+                      <span className='block' style={{ padding: 'var(--sc-padding)' }}>
+                        <FontAwesomeIcon icon={faCode} aria-label={t('pages.server.files.view.tree', {})} />
+                      </span>
+                    </Tooltip>
+                  ),
+                },
+              ]}
+            />
+
+            <FileOperationsProgress />
+            <FileToolbar onCreateFile={createTreeFile} />
+          </Group>
         </Group>
-      </Group>
+      )}
 
-      <IncompleteUploadsBanner />
-      <FileDiskUsageBar />
+      {!backupUuid && (
+        <>
+          <IncompleteUploadsBanner />
+          <FileDiskUsageBar />
+        </>
+      )}
 
       {view === 'list' ? (
         <FileBrowser />
@@ -640,7 +670,7 @@ function ServerFilesComponent() {
               ref={treeWorkspaceRef}
               onDirtyStateChange={setTreeDirty}
               key={serverUuid}
-              initialDirectory={treeInitialDirectory}
+              initialDirectory={virtualRootOf(treeInitialDirectory)?.type === 'backup' ? '/' : treeInitialDirectory}
               fileTreeVisible={fileTreeVisible}
               onToggleFileTree={toggleFileTree}
             />

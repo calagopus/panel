@@ -6,7 +6,7 @@ import { create, StoreApi } from 'zustand';
 import { createContext } from 'zustand-utils';
 import type { FileMoveGroup } from '@/pages/server/files/list/fileMove.ts';
 import type { TrashItemConflict } from '@/pages/server/files/trash/entry/trashItems.ts';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, getHttpStatus, httpErrorToHuman } from '@/api/axios.ts';
 import { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
 import searchFiles from '@/api/server/files/searchFiles.ts';
 import statFiles from '@/api/server/files/statFiles.ts';
@@ -109,6 +109,7 @@ export interface FileManagerStore {
   stagingUploadsNow: number;
   setStagingUploadsNow: (now: number) => void;
   browsingError: string | null;
+  browsingErrorStatus: number | null;
   setBrowsingError: (error: string | null) => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
@@ -428,7 +429,8 @@ export const createFileManagerStore = (
       stagingUploadsNow: Date.now(),
       setStagingUploadsNow: (now) => set({ stagingUploadsNow: now }),
       browsingError: null,
-      setBrowsingError: (error) => set({ browsingError: error }),
+      browsingErrorStatus: null,
+      setBrowsingError: (error) => set({ browsingError: error, browsingErrorStatus: null }),
       hasNextPage: false,
       isFetchingNextPage: false,
       fetchNextPage: () => undefined,
@@ -456,7 +458,12 @@ export const createFileManagerStore = (
           return { collapsedSearchPreviews };
         }),
       setSearchInfo: (info) =>
-        set((state) => ({ searchInfo: info, browsingError: null, searchGeneration: state.searchGeneration + 1 })),
+        set((state) => ({
+          searchInfo: info,
+          browsingError: null,
+          browsingErrorStatus: null,
+          searchGeneration: state.searchGeneration + 1,
+        })),
       searchGeneration: 0,
       beginSearch: () => {
         const generation = get().searchGeneration + 1;
@@ -474,6 +481,7 @@ export const createFileManagerStore = (
           },
           browsingEntries: { total: entries.length, page: 1, perPage: entries.length, data: entries },
           browsingError: null,
+          browsingErrorStatus: null,
           searchGeneration: state.searchGeneration + 1,
         })),
 
@@ -587,7 +595,8 @@ export const createFileManagerStore = (
               });
             })
             .catch((error) => {
-              if (isCurrent()) set({ browsingError: httpErrorToHuman(error) });
+              if (isCurrent())
+                set({ browsingError: httpErrorToHuman(error), browsingErrorStatus: getHttpStatus(error) });
             });
 
           return;

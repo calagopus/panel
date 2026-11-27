@@ -16,7 +16,6 @@ import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
 import deleteBackup from '@/api/server/backups/deleteBackup.ts';
-import downloadBackup from '@/api/server/backups/downloadBackup.ts';
 import updateBackup from '@/api/server/backups/updateBackup.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import BackupRetentionStatusBadge from '@/elements/data-display/BackupRetentionStatusBadge.tsx';
@@ -31,13 +30,12 @@ import ContextMenu, { ContextMenuToggle } from '@/elements/overlays/ContextMenu.
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import FormattedTimestamp from '@/elements/time/FormattedTimestamp.tsx';
 import Code from '@/elements/typography/Code.tsx';
-import { serverBackupKindLabelMapping, streamingArchiveFormatLabelMapping } from '@/lib/enums.ts';
+import { serverBackupKindLabelMapping } from '@/lib/enums.ts';
 import { bytesProgressString, bytesToString } from '@/lib/format/size.ts';
-import { downloadUrl } from '@/lib/network/url.ts';
 import { queryKeys } from '@/lib/queryKeys.ts';
-import { streamingArchiveFormat } from '@/lib/schemas/generic.ts';
 import { serverBackupSchema } from '@/lib/schemas/server/backups.ts';
 import { applyBackupUpdate } from '@/pages/server/backups/backupCache.ts';
+import { useBackupDownload } from '@/pages/server/backups/useBackupDownload.ts';
 import DatabaseInstanceBackupRestoreModal from '@/pages/server/databases/instances/modals/DatabaseInstanceBackupRestoreModal.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { structuredArg } from '@/plugins/websocket/args.ts';
@@ -66,7 +64,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   ref,
 ) {
   const { t, tItem } = useTranslations();
-  const { addToast, addPendingToast } = useToast();
+  const { addToast } = useToast();
 
   const server = useServerStore((state) => state.server);
   const socketInstance = useServerStore((state) => state.socketInstance);
@@ -79,20 +77,8 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   const [openModal, setOpenModal] = useState<
     'edit' | 'restore' | 'restoreDatabase' | 'export' | 'delete' | 'metadata' | null
   >(null);
+  const download = useBackupDownload(backup);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
-
-  const doDownload = (archiveFormat: z.infer<typeof streamingArchiveFormat>) => {
-    const pendingToast = addPendingToast(t('common.toast.preparingDownload', {}));
-
-    return downloadBackup(server.uuid, backup.uuid, archiveFormat)
-      .then(({ url }) => {
-        pendingToast.settle(t('common.toast.downloadStarted', {}), 'success');
-        downloadUrl(url, () => addToast(t('common.toast.downloadFailed', {}), 'error'));
-      })
-      .catch((msg) => {
-        pendingToast.settle(httpErrorToHuman(msg), 'error');
-      });
-  };
 
   const listenForBackupDeleted = (uuid: string) => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -174,7 +160,6 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   const isFailed = !backup.isSuccessful && !!backup.completed;
   const isDeleting = backup.deletionStatus === 'deleting';
   const isDeleteFailed = backup.deletionStatus === 'failed';
-  const streamingDownload = backup.kind === 'server' && backup.isStreaming;
 
   return (
     <>
@@ -263,17 +248,9 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
             icon: faFileArrowDown,
             label: t('common.button.download', {}),
             hidden: !backup.completed || isFailed || isDeleting || isDeleteFailed,
-            onClick: !streamingDownload ? () => doDownload('tar_gz') : undefined,
+            onClick: !download.streaming ? () => download.doDownload('tar_gz') : undefined,
             color: 'gray',
-            items: streamingDownload
-              ? Object.entries(streamingArchiveFormatLabelMapping).map(([mime, label]) => ({
-                  type: 'action',
-                  icon: faFileArrowDown,
-                  label: t('common.button.downloadAs', { format: label }),
-                  onClick: () => doDownload(mime as z.infer<typeof streamingArchiveFormat>),
-                  color: 'gray',
-                }))
-              : [],
+            items: download.formatItems,
             canAccess: useServerCan('backups.download'),
           },
           {

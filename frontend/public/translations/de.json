@@ -6637,6 +6637,18 @@
             "description": "In diesem Verzeichnis ist noch nichts. Lade Dateien hoch oder erstelle neue, um es zu füllen.",
             "descriptionReadOnly": "In diesem Verzeichnis ist noch nichts."
           },
+          "missing": {
+            "title": "Verzeichnis nicht gefunden",
+            "description": "`{directory}` existiert nicht. Es wurde möglicherweise verschoben, umbenannt oder gelöscht."
+          },
+          "backupUnavailable": {
+            "title": "Auf das Backup kann nicht zugegriffen werden",
+            "description": "Die Dateien in diesem Backup können nicht geöffnet werden. Das Archiv fehlt möglicherweise oder ist beschädigt, oder der Speicher, auf dem es liegt, ist gerade nicht erreichbar."
+          },
+          "trashEntryUnavailable": {
+            "title": "Auf das Element im Papierkorb kann nicht zugegriffen werden",
+            "description": "Dieses Element ist nicht mehr im Papierkorb. Es wurde möglicherweise wiederhergestellt, endgültig gelöscht oder ist abgelaufen."
+          },
           "title": "Dateien",
           "editorNotFound": {
             "title": "Nicht gefunden",
@@ -6740,6 +6752,9 @@
             "emptyTrash": "Papierkorb leeren",
             "backToFiles": "Zurück zu den Dateien",
             "backToTrash": "Zurück zum Papierkorb",
+            "backToBackups": "Zurück zu den Backups",
+            "parentDirectory": "Übergeordnetes Verzeichnis",
+            "goToRoot": "Zum Stammverzeichnis",
             "restoreTo": "Wiederherstellen nach...",
             "remoteCopy": "Remote-Kopie",
             "search": "Suchen",

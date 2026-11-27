@@ -604,7 +604,7 @@ function FileEditorComponent() {
 
       {loading ? (
         <div className='w-full h-full flex items-center justify-center'>
-          <Spinner size={75} />
+          <Spinner size={48} />
         </div>
       ) : (
         <div ref={contentWrapRef} className='flex flex-col relative'>

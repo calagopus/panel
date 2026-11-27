@@ -2,7 +2,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@t
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { useStore } from 'zustand';
-import { getEmptyPaginationSet, httpErrorToHuman } from '@/api/axios.ts';
+import { getEmptyPaginationSet, getHttpStatus, httpErrorToHuman } from '@/api/axios.ts';
 import getBackup from '@/api/server/backups/getBackup.ts';
 import loadDirectory, { DirectoryResponse } from '@/api/server/files/loadDirectory.ts';
 import getTrashEntry from '@/api/server/files/trash/getTrashEntry.ts';
@@ -107,7 +107,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    if (browsingBackupError) {
+    if (browsingBackupError && getHttpStatus(browsingBackupError) !== 404) {
       addToast(httpErrorToHuman(browsingBackupError), 'error');
     }
   }, [browsingBackupError]);
@@ -120,13 +120,13 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    if (browsingTrashEntryError) {
+    if (browsingTrashEntryError && getHttpStatus(browsingTrashEntryError) !== 404) {
       addToast(httpErrorToHuman(browsingTrashEntryError), 'error');
     }
   }, [browsingTrashEntryError]);
 
   useEffect(() => {
-    if (directoryError) {
+    if (directoryError && getHttpStatus(directoryError) !== 404) {
       addToast(httpErrorToHuman(directoryError), 'error');
     }
   }, [directoryError]);
@@ -194,6 +194,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
         store.setState({
           browsingEntries: getEmptyPaginationSet(),
           browsingError: httpErrorToHuman(directoryError),
+          browsingErrorStatus: getHttpStatus(directoryError),
         });
       }
       return;
@@ -202,6 +203,7 @@ const FileManagerProvider = ({ children }: { children: ReactNode }) => {
     store.setState({
       browsingEntries: data.entries,
       browsingError: null,
+      browsingErrorStatus: null,
       browsingPrimaryFilesystem: data.isFilesystemPrimary,
       browsingWritableDirectory: data.isFilesystemWritable,
       browsingFastDirectory: data.isFilesystemFast,

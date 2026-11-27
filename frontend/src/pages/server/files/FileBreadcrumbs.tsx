@@ -1,4 +1,4 @@
-import { faDoorOpen, faMagnifyingGlassChart, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faBoxArchive, faDoorOpen, faMagnifyingGlassChart, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { join } from 'pathe';
@@ -63,7 +63,15 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
     );
 
   const items: ReactNode[] = [
-    virtualRoot?.type === 'backup' ? 'backups' : virtualRoot?.type === 'trash' ? 'trash' : 'home',
+    virtualRoot?.type === 'backup' ? (
+      <Tooltip key='prefix' label={t('pages.server.backups.title', {})}>
+        <FontAwesomeIcon icon={faBoxArchive} className='text-(--mantine-color-dimmed)' />
+      </Tooltip>
+    ) : virtualRoot?.type === 'trash' ? (
+      'trash'
+    ) : (
+      'home'
+    ),
     <NavLink
       key='first-segment'
       to={
@@ -119,14 +127,9 @@ export default function FileBreadcrumbs({ path, inFileEditor }: { path: string; 
 
       {!inFileEditor && (
         <div className='flex flex-row space-x-2'>
-          <NavLink
-            to={`/server/${server?.uuidShort}/files${virtualRoot?.type === 'trash' ? '/trash' : ''}`}
-            hidden={!virtualRoot}
-          >
+          <NavLink to={`/server/${server?.uuidShort}/files/trash`} hidden={virtualRoot?.type !== 'trash'}>
             <Button variant='light' leftSection={<FontAwesomeIcon icon={faDoorOpen} />}>
-              {virtualRoot?.type === 'trash'
-                ? t('pages.server.files.button.backToTrash', {})
-                : t('pages.server.files.button.exitBackup', {})}
+              {t('pages.server.files.button.backToTrash', {})}
             </Button>
           </NavLink>
           <span className='flex flex-row space-x-2'>

@@ -6660,6 +6660,20 @@ const baseTranslations = defineTranslations({
             description: 'There is nothing in this directory yet. Upload files or create new ones to fill it.',
             descriptionReadOnly: 'There is nothing in this directory yet.',
           },
+          missing: {
+            title: 'Directory Not Found',
+            description: '`{directory}` does not exist. It may have been moved, renamed or deleted.',
+          },
+          backupUnavailable: {
+            title: 'Backup Cannot Be Accessed',
+            description:
+              "The files in this backup can't be opened. Its archive may be missing or damaged, or the storage it lives on can't be reached right now.",
+          },
+          trashEntryUnavailable: {
+            title: 'Trash Item Cannot Be Accessed',
+            description:
+              'This item is no longer in the trash. It may have been restored, deleted permanently or expired.',
+          },
           title: 'Files',
           editorNotFound: {
             title: 'Not Found',
@@ -6764,6 +6778,9 @@ const baseTranslations = defineTranslations({
             emptyTrash: 'Empty Trash',
             backToFiles: 'Back to Files',
             backToTrash: 'Back to Trash',
+            backToBackups: 'Back to Backups',
+            parentDirectory: 'Parent Directory',
+            goToRoot: 'Go to Root',
             restoreTo: 'Restore to...',
             remoteCopy: 'Remote Copy',
             search: 'Search',
