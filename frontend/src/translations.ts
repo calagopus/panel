@@ -6518,7 +6518,6 @@ const baseTranslations = defineTranslations({
           },
           popout: {
             windowTitle: 'Console',
-            returnHint: 'This console is running in its own window. You can close it at any time.',
           },
           drawer: {
             commandHistory: {

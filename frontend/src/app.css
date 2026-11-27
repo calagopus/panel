@@ -16,6 +16,16 @@
 @custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
 @custom-variant light (&:where([data-mantine-color-scheme="light"], [data-mantine-color-scheme="light"] *));
 
+/* full-window fixed layer; html's stable scrollbar gutter would otherwise leave an empty strip on the right */
+@utility fixed-viewport {
+  position: fixed;
+  inset: 0;
+}
+
+html:has(.fixed-viewport) {
+  scrollbar-gutter: auto;
+}
+
 @font-face {
   font-family: 'Helvetica';
   font-style: normal;

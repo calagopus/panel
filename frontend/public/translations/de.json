@@ -6500,8 +6500,7 @@
             "popout": "Konsole in separatem Fenster öffnen"
           },
           "popout": {
-            "windowTitle": "Konsole",
-            "returnHint": "Diese Konsole läuft in einem eigenen Fenster. Du kannst es jederzeit schließen."
+            "windowTitle": "Konsole"
           },
           "drawer": {
             "commandHistory": {

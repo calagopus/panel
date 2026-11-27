@@ -20,7 +20,7 @@ function UploadDropOverlay({ visible, title, subtitle, blur = false, blocked = f
   return (
     <div
       className={classNames(
-        'pointer-events-none fixed inset-0 z-100 flex items-center justify-center',
+        'pointer-events-none fixed-viewport z-100 flex items-center justify-center',
         blur ? 'backdrop-blur-md bg-black/20' : 'bg-black/50',
       )}
     >

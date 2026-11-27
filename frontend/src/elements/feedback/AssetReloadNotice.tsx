@@ -24,7 +24,7 @@ export default function AssetReloadNotice() {
     <div
       role='status'
       aria-live='polite'
-      className='fixed inset-0 z-1000 flex items-center justify-center p-6 bg-(--mantine-color-body)/85 backdrop-blur-sm animate-fade-in motion-reduce:animate-none'
+      className='fixed-viewport z-1000 flex items-center justify-center p-6 bg-(--mantine-color-body)/85 backdrop-blur-sm animate-fade-in motion-reduce:animate-none'
     >
       <div className='flex flex-col items-center text-center gap-4 max-w-sm'>
         <div className='w-12 h-12 flex items-center justify-center'>
