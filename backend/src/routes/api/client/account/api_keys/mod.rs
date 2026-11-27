@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _api_key_;
 mod identifier;
+mod current;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
