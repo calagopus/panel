@@ -5332,8 +5332,7 @@
             "popout": "コンソールを別ウィンドウで表示"
           },
           "popout": {
-            "windowTitle": "コンソール",
-            "returnHint": "このコンソールは別ウィンドウで動作しています。いつでも閉じることができます。"
+            "windowTitle": "コンソール"
           },
           "drawer": {
             "commandHistory": {

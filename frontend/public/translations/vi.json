@@ -5798,8 +5798,7 @@
             "popout": "Mở Console riêng"
           },
           "popout": {
-            "windowTitle": "Bảng Điều Khiển",
-            "returnHint": "Bảng điều khiển này đang chạy trong cửa sổ riêng. Bạn có thể đóng nó bất cứ lúc nào."
+            "windowTitle": "Bảng Điều Khiển"
           },
           "drawer": {
             "commandHistory": {
@@ -5876,9 +5875,6 @@
               "average": "Trung bình",
               "peak": "Đỉnh",
               "limit": "Giới hạn"
-            },
-            "summary": {
-              "peak": "Đỉnh {value}"
             },
             "unavailable": {
               "title": "Không có lịch sử tài nguyên",
