@@ -3,6 +3,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 mod _api_key_;
 mod identifier;
+mod current;
 
 mod get {
     use axum::{extract::Query, http::StatusCode};
@@ -233,6 +234,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(post::route))
         .nest("/identifier", identifier::router(state))
+        .nest("/current", current::router(state))
         .nest("/{api_key}", _api_key_::router(state))
         .with_state(state.clone())
 }
