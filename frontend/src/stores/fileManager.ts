@@ -155,6 +155,8 @@ export interface FileManagerStore {
   setEditorEngine: (engine: 'monaco' | 'pierre') => void;
   editorPreviewTabs: boolean;
   setEditorPreviewTabs: (state: boolean) => void;
+  markdownPreviewMode: MarkdownPreviewMode;
+  setMarkdownPreviewMode: (mode: MarkdownPreviewMode) => void;
   alwaysOverwrite: boolean;
   setAlwaysOverwrite: (state: boolean) => void;
   vscodeUriScheme: string;
@@ -219,10 +221,13 @@ export type FileManagerSettingField =
   | 'editorFontSize'
   | 'editorEngine'
   | 'editorPreviewTabs'
+  | 'markdownPreviewMode'
   | 'alwaysOverwrite'
   | 'vscodeUriScheme'
   | 'imageViewerSmoothing'
   | 'audioPlayerVolume';
+
+export type MarkdownPreviewMode = 'edit' | 'split' | 'preview';
 
 export const EDITOR_FONT_SIZE_DEFAULT = 14;
 export const EDITOR_FONT_SIZE_MIN = 6;
@@ -255,6 +260,11 @@ const userSettingFields: {
     fallback: () => (window.matchMedia('(pointer: coarse)').matches ? 'pierre' : 'monaco'),
   },
   editorPreviewTabs: { key: 'file_manager::editor_preview_tabs', schema: booleanSchema, fallback: () => true },
+  markdownPreviewMode: {
+    key: 'file_manager::markdown_preview_mode',
+    schema: z.enum(['edit', 'split', 'preview']),
+    fallback: () => 'edit',
+  },
   alwaysOverwrite: { key: 'file_manager::always_overwrite', schema: booleanSchema, fallback: () => false },
   vscodeUriScheme: {
     key: 'file_manager::vscode_uri_scheme',
@@ -506,6 +516,11 @@ export const createFileManagerStore = (
       setEditorPreviewTabs: (state) => {
         writeUserSettingField('editorPreviewTabs', state);
         set({ editorPreviewTabs: state });
+      },
+      markdownPreviewMode: readUserSettingField('markdownPreviewMode'),
+      setMarkdownPreviewMode: (mode) => {
+        writeUserSettingField('markdownPreviewMode', mode);
+        set({ markdownPreviewMode: mode });
       },
       alwaysOverwrite: readUserSettingField('alwaysOverwrite'),
       setAlwaysOverwrite: (state) => {

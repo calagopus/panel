@@ -6673,6 +6673,13 @@ const baseTranslations = defineTranslations({
             list: 'List',
             tree: 'Tree',
           },
+          markdown: {
+            edit: 'Edit',
+            split: 'Split',
+            preview: 'Preview',
+            image: 'Image',
+            loadImages: 'Load remote images',
+          },
           searchPreview: {
             expand: 'Expand content preview for {file}',
             collapse: 'Collapse content preview for {file}',

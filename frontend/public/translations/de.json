@@ -6649,6 +6649,13 @@
             "list": "Liste",
             "tree": "Baum"
           },
+          "markdown": {
+            "edit": "Bearbeiten",
+            "split": "Geteilt",
+            "preview": "Vorschau",
+            "image": "Bild",
+            "loadImages": "Externe Bilder laden"
+          },
           "searchPreview": {
             "expand": "Inhaltsvorschau für {file} ausklappen",
             "collapse": "Inhaltsvorschau für {file} einklappen",

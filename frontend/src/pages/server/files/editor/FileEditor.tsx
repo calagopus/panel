@@ -58,6 +58,7 @@ function FileEditorComponent() {
     browsingWritableDirectory,
     browsingDirectory,
     setBrowsingDirectory,
+    markdownPreviewMode,
   } = useFileManager(
     useShallow((state) => ({
       editorEngine: state.editorEngine,
@@ -65,6 +66,7 @@ function FileEditorComponent() {
       browsingWritableDirectory: state.browsingWritableDirectory,
       browsingDirectory: state.browsingDirectory,
       setBrowsingDirectory: state.setBrowsingDirectory,
+      markdownPreviewMode: state.markdownPreviewMode,
     })),
   );
 
@@ -289,7 +291,7 @@ function FileEditorComponent() {
     extraObserveRef: contentWrapRef,
     useVisualViewportInset: true,
     minHeightFraction: 0.6,
-    deps: [loading, getParent, params.action, fileName],
+    deps: [loading, getParent, params.action, fileName, markdownPreviewMode],
   });
 
   const saveShortcutRef = useRef(() => void 0);

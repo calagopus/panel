@@ -1,4 +1,5 @@
 import { useMergedRef } from '@mantine/hooks';
+import classNames from 'classnames';
 import { RefObject, useId } from 'react';
 import { FileEditorActionContext } from 'shared/src/registries/pages/server/files';
 import { useShallow } from 'zustand/react/shallow';
@@ -11,11 +12,14 @@ import PierreEditor, {
 import { fileModelUri } from '@/lib/editor/fileModelUri.ts';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco.ts';
 import { type OnMount } from '@/lib/editor/monacoLoader.ts';
+import { isMarkdownFile } from '@/lib/files/files.ts';
 import useEditorFontSizeZoom from '@/pages/server/files/hooks/useEditorFontSizeZoom.ts';
+import { usePageBreakpoint } from '@/plugins/viewport/usePageBreakpoint.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import { addEditorSaveAction } from './addEditorSaveAction.ts';
+import FileMarkdownPreview from './FileMarkdownPreview.tsx';
 import { FileAudioPreview, FileImagePreview } from './FileMediaPreview.tsx';
 
 type FileEditorAction = (typeof window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions)[number];
@@ -69,18 +73,73 @@ export default function FileEditorContent({
   const instanceId = useId();
   const serverUuid = useServerStore((state) => state.server.uuid);
   const modelPath = fileModelUri(serverUuid, context?.path ?? fileName, instanceId);
-  const { editorEngine, editorLineOverflow, editorFontSize, editorMinimap } = useFileManager(
+  const { editorEngine, editorLineOverflow, editorFontSize, editorMinimap, markdownPreviewMode } = useFileManager(
     useShallow((state) => ({
       editorEngine: state.editorEngine,
       editorLineOverflow: state.editorLineOverflow,
       editorFontSize: state.editorFontSize,
       editorMinimap: state.editorMinimap,
+      markdownPreviewMode: state.markdownPreviewMode,
     })),
   );
   const mergedContainerRef = useMergedRef(containerRef, useEditorFontSizeZoom());
+  const wide = usePageBreakpoint('md');
+  const markdownPreview = !matchedFileEditorAction && action === 'edit' && isMarkdownFile(fileName);
+
+  const editor =
+    editorEngine === 'pierre' ? (
+      <PierreEditor
+        height='100%'
+        width='100%'
+        path={modelPath}
+        defaultValue={content}
+        readOnly={readOnly}
+        wordWrap={editorLineOverflow}
+        fontSize={editorFontSize}
+        onChange={handleContentChange}
+        onChangeEvent={handlePierreChangeEvent}
+        onSelectionChange={handlePierreSelectionChange}
+        onMount={(editor) => {
+          pierreEditorRef.current = editor;
+          attachPierreEditor(editor);
+        }}
+      />
+    ) : (
+      <MonacoEditor
+        height='100%'
+        width='100%'
+        defaultValue={content}
+        path={modelPath}
+        options={{
+          readOnly,
+          stickyScroll: { enabled: false },
+          minimap: { enabled: editorMinimap },
+          wordWrap: editorLineOverflow ? 'on' : 'off',
+          fontSize: editorFontSize,
+          codeLens: false,
+          scrollBeyondLastLine: false,
+          smoothScrolling: false,
+          inertialScroll: true,
+          fixedOverflowWidgets: true,
+        }}
+        onMount={(editor, monaco) => {
+          editorRef.current = editor;
+          attachEditor(editor);
+          editor.onDidChangeModelContent(() => {
+            handleContentChange(editor.getValue());
+          });
+          addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveShortcutRef.current());
+          registerTomlLanguage(monaco);
+          registerHoconLanguage(monaco);
+        }}
+      />
+    );
 
   return (
-    <div ref={mergedContainerRef} className='flex max-w-full w-full z-1 absolute'>
+    <div
+      ref={mergedContainerRef}
+      className={classNames('flex max-w-full w-full z-1 absolute', markdownPreview && !wide && 'flex-col')}
+    >
       {matchedFileEditorAction?.contentType === 'string' ? (
         <matchedFileEditorAction.content
           content={content}
@@ -103,52 +162,27 @@ export default function FileEditorContent({
         <FileImagePreview src={content} name={fileName} />
       ) : action === 'audio' ? (
         <FileAudioPreview src={content} />
-      ) : editorEngine === 'pierre' ? (
-        <PierreEditor
-          height='100%'
-          width='100%'
-          path={modelPath}
-          defaultValue={content}
-          readOnly={readOnly}
-          wordWrap={editorLineOverflow}
-          fontSize={editorFontSize}
-          onChange={handleContentChange}
-          onChangeEvent={handlePierreChangeEvent}
-          onSelectionChange={handlePierreSelectionChange}
-          onMount={(editor) => {
-            pierreEditorRef.current = editor;
-            attachPierreEditor(editor);
-          }}
-        />
+      ) : markdownPreview ? (
+        <>
+          <div className={classNames('min-h-0 min-w-0 flex-1', markdownPreviewMode === 'preview' && 'hidden')}>
+            {editor}
+          </div>
+          {markdownPreviewMode !== 'edit' && (
+            <div
+              className={classNames(
+                'min-h-0 min-w-0 flex-1',
+                markdownPreviewMode === 'split' &&
+                  (wide
+                    ? 'border-l border-(--mantine-color-default-border)'
+                    : 'border-t border-(--mantine-color-default-border)'),
+              )}
+            >
+              <FileMarkdownPreview content={content} />
+            </div>
+          )}
+        </>
       ) : (
-        <MonacoEditor
-          height='100%'
-          width='100%'
-          defaultValue={content}
-          path={modelPath}
-          options={{
-            readOnly,
-            stickyScroll: { enabled: false },
-            minimap: { enabled: editorMinimap },
-            wordWrap: editorLineOverflow ? 'on' : 'off',
-            fontSize: editorFontSize,
-            codeLens: false,
-            scrollBeyondLastLine: false,
-            smoothScrolling: false,
-            inertialScroll: true,
-            fixedOverflowWidgets: true,
-          }}
-          onMount={(editor, monaco) => {
-            editorRef.current = editor;
-            attachEditor(editor);
-            editor.onDidChangeModelContent(() => {
-              handleContentChange(editor.getValue());
-            });
-            addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveShortcutRef.current());
-            registerTomlLanguage(monaco);
-            registerHoconLanguage(monaco);
-          }}
-        />
+        editor
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { Table, Text, Title, TitleOrder } from '@mantine/core';
 import { Fragment, ReactNode, startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Markdown, { Components } from 'react-markdown';
+import Markdown, { Components, ExtraProps } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   getTranslationMapping,
@@ -90,7 +90,7 @@ const detectBrowserLanguage = (languages: string[]): string | null => {
 
 const Header =
   ({ order }: { order: TitleOrder }) =>
-  (props: React.ComponentProps<typeof Title>) => <Title order={order} {...props} />;
+  ({ node: _node, ...props }: React.ComponentProps<typeof Title> & ExtraProps) => <Title order={order} {...props} />;
 
 export const markdownComponents: Components = {
   a: SafeMarkdownLink,
@@ -125,7 +125,7 @@ export const markdownComponents: Components = {
     </Text>
   ),
   em: ({ children }) => (
-    <Text component='span' td='italic' inherit>
+    <Text component='span' fs='italic' inherit>
       {children}
     </Text>
   ),

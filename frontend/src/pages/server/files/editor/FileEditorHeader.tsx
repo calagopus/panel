@@ -11,12 +11,14 @@ import Group from '@/elements/layout/Group.tsx';
 import Menu from '@/elements/overlays/Menu.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import Title from '@/elements/typography/Title.tsx';
+import { isMarkdownFile } from '@/lib/files/files.ts';
 import { useFileManager } from '@/providers/FileManagerProvider.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import FileConnectButton from '../FileConnectButton.tsx';
 import { CollabParticipant } from '../hooks/useFileCollab.ts';
 import FileEditorSettings from './FileEditorSettings.tsx';
 import FileImageViewerSettings from './FileImageViewerSettings.tsx';
+import FileMarkdownModeControl from './FileMarkdownModeControl.tsx';
 
 type FileEditorAction = (typeof window.extensionContext.extensionRegistry.pages.server.files.fileEditorActions)[number];
 
@@ -68,6 +70,7 @@ export default function FileEditorHeader({
         ) : action === 'image' ? (
           <FileImageViewerSettings />
         ) : null}
+        {!matchedFileEditorAction && action === 'edit' && isMarkdownFile(fileName) && <FileMarkdownModeControl />}
       </Group>
       {matchedFileEditorAction?.header.rightSection ? (
         <matchedFileEditorAction.header.rightSection />

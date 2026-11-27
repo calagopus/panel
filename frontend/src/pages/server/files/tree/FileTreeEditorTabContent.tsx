@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AvatarGroup } from '@mantine/core';
 import { AxiosError } from 'axios';
+import classNames from 'classnames';
 import { join } from 'pathe';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -28,10 +29,13 @@ import Title from '@/elements/typography/Title.tsx';
 import { fileModelUri } from '@/lib/editor/fileModelUri.ts';
 import { registerHoconLanguage, registerTomlLanguage } from '@/lib/editor/monaco.ts';
 import { readFileDraft, removeFileDraft } from '@/lib/files/fileDrafts.ts';
+import { isMarkdownFile } from '@/lib/files/files.ts';
 import FileRevisionsDrawer from '@/pages/server/files/drawers/FileRevisionsDrawer.tsx';
 import { addEditorSaveAction } from '@/pages/server/files/editor/addEditorSaveAction.ts';
 import FileEditorSettings from '@/pages/server/files/editor/FileEditorSettings.tsx';
 import FileImageViewerSettings from '@/pages/server/files/editor/FileImageViewerSettings.tsx';
+import FileMarkdownModeControl from '@/pages/server/files/editor/FileMarkdownModeControl.tsx';
+import FileMarkdownPreview from '@/pages/server/files/editor/FileMarkdownPreview.tsx';
 import { FileAudioPreview, FileImagePreview } from '@/pages/server/files/editor/FileMediaPreview.tsx';
 import FileSqliteQuery from '@/pages/server/files/editor/FileSqliteQuery.tsx';
 import { findFileEditorAction } from '@/pages/server/files/editor/useFileEditorPresentation.ts';
@@ -99,12 +103,13 @@ export default function FileTreeEditorTabContent({
   const canReadContent = useServerCan('files.read-content');
   const canUpdate = useServerCan('files.update');
   const canQuerySqlite = useServerCan('files.query-raw');
-  const { editorMinimap, editorLineOverflow, editorFontSize, editorEngine } = useFileManagerStore(
+  const { editorMinimap, editorLineOverflow, editorFontSize, editorEngine, markdownPreviewMode } = useFileManagerStore(
     useShallow((state) => ({
       editorMinimap: state.editorMinimap,
       editorLineOverflow: state.editorLineOverflow,
       editorFontSize: state.editorFontSize,
       editorEngine: state.editorEngine,
+      markdownPreviewMode: state.markdownPreviewMode,
     })),
   );
   const [loading, setLoading] = useState(!['new', 'sqlite'].includes(selection.action));
@@ -466,6 +471,58 @@ export default function FileTreeEditorTabContent({
     !collab.conflict?.deleted;
   const showHistoryAction = canReadContent && selection.action === 'edit' && selection.primary && !compressed;
 
+  const markdownPreview = !matchedAction && selection.action === 'edit' && isMarkdownFile(selection.file.name);
+  const editor =
+    editorEngine === 'pierre' ? (
+      <PierreEditor
+        key={filePath}
+        height='100%'
+        width='100%'
+        path={modelPath}
+        defaultValue={content}
+        readOnly={!canEdit}
+        wordWrap={editorLineOverflow}
+        fontSize={editorFontSize}
+        onChange={updateContent}
+        onChangeEvent={collab.handlePierreChangeEvent}
+        onSelectionChange={collab.handlePierreSelectionChange}
+        onMount={(editor) => {
+          pierreEditorRef.current = editor;
+          focusEditorRef.current = () => editor.focus();
+          collab.attachPierreEditor(editor);
+        }}
+      />
+    ) : (
+      <MonacoEditor
+        key={filePath}
+        height='100%'
+        width='100%'
+        path={modelPath}
+        value={content}
+        options={{
+          readOnly: !canEdit,
+          automaticLayout: true,
+          stickyScroll: { enabled: false },
+          minimap: { enabled: editorMinimap },
+          wordWrap: editorLineOverflow ? 'on' : 'off',
+          fontSize: editorFontSize,
+          codeLens: false,
+          scrollBeyondLastLine: false,
+          smoothScrolling: false,
+          fixedOverflowWidgets: true,
+          dropIntoEditor: { enabled: false },
+        }}
+        onChange={(value) => updateContent(value ?? '')}
+        onMount={(editor, monaco) => {
+          focusEditorRef.current = () => editor.focus();
+          collab.attachEditor(editor);
+          addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveRef.current());
+          registerTomlLanguage(monaco);
+          registerHoconLanguage(monaco);
+        }}
+      />
+    );
+
   return (
     <div className={`flex min-h-0 w-full min-w-0 flex-1 flex-col ${visible ? '' : 'hidden'}`}>
       <div
@@ -483,6 +540,7 @@ export default function FileTreeEditorTabContent({
           ) : selection.action === 'image' ? (
             <FileImageViewerSettings />
           ) : null}
+          {markdownPreview && <FileMarkdownModeControl />}
         </Group>
 
         <Group wrap='nowrap' gap='xs' className='shrink-0'>
@@ -638,54 +696,27 @@ export default function FileTreeEditorTabContent({
             <FileImagePreview src={content} name={selection.file.name} />
           ) : selection.action === 'audio' && content ? (
             <FileAudioPreview src={content} />
-          ) : editorEngine === 'pierre' ? (
-            <PierreEditor
-              key={filePath}
-              height='100%'
-              width='100%'
-              path={modelPath}
-              defaultValue={content}
-              readOnly={!canEdit}
-              wordWrap={editorLineOverflow}
-              fontSize={editorFontSize}
-              onChange={updateContent}
-              onChangeEvent={collab.handlePierreChangeEvent}
-              onSelectionChange={collab.handlePierreSelectionChange}
-              onMount={(editor) => {
-                pierreEditorRef.current = editor;
-                focusEditorRef.current = () => editor.focus();
-                collab.attachPierreEditor(editor);
-              }}
-            />
+          ) : markdownPreview ? (
+            <div className='@container h-full'>
+              <div className='flex h-full flex-col @3xl:flex-row'>
+                <div className={classNames('min-h-0 min-w-0 flex-1', markdownPreviewMode === 'preview' && 'hidden')}>
+                  {editor}
+                </div>
+                {markdownPreviewMode !== 'edit' && (
+                  <div
+                    className={classNames(
+                      'min-h-0 min-w-0 flex-1',
+                      markdownPreviewMode === 'split' &&
+                        'border-t border-(--mantine-color-default-border) @3xl:border-t-0 @3xl:border-l',
+                    )}
+                  >
+                    <FileMarkdownPreview content={content} />
+                  </div>
+                )}
+              </div>
+            </div>
           ) : (
-            <MonacoEditor
-              key={filePath}
-              height='100%'
-              width='100%'
-              path={modelPath}
-              value={content}
-              options={{
-                readOnly: !canEdit,
-                automaticLayout: true,
-                stickyScroll: { enabled: false },
-                minimap: { enabled: editorMinimap },
-                wordWrap: editorLineOverflow ? 'on' : 'off',
-                fontSize: editorFontSize,
-                codeLens: false,
-                scrollBeyondLastLine: false,
-                smoothScrolling: false,
-                fixedOverflowWidgets: true,
-                dropIntoEditor: { enabled: false },
-              }}
-              onChange={(value) => updateContent(value ?? '')}
-              onMount={(editor, monaco) => {
-                focusEditorRef.current = () => editor.focus();
-                collab.attachEditor(editor);
-                addEditorSaveAction(editor, monaco, t('common.button.save', {}), () => saveRef.current());
-                registerTomlLanguage(monaco);
-                registerHoconLanguage(monaco);
-              }}
-            />
+            editor
           )}
         </div>
       </div>

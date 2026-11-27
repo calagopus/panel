@@ -61,6 +61,10 @@ export function isViewableImage(file: z.infer<typeof serverDirectoryEntrySchema>
   return file.mime.startsWith('image/') && /^image\/(?!svg\+xml)/.test(file.mime);
 }
 
+export function isMarkdownFile(name: string) {
+  return /\.(md|markdown)$/i.test(name);
+}
+
 export function isListenableAudio(file: z.infer<typeof serverDirectoryEntrySchema>) {
   if (file.size > getGlobalStore().settings.server.maxFileManagerViewSize) {
     return false;
