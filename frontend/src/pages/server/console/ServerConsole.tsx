@@ -25,6 +25,8 @@ export default function ServerConsole() {
   const keyboardInset = useVisualViewportBottomInset();
   const titleHoisted = useNavbarPageHeader({ title: server.name, subtitle: server.description || undefined });
   const detailsInInfobar = usePageBreakpoint('md');
+  const hasDesktopSidebar = usePageBreakpoint('lg');
+  const alignWithNavbar = titleHoisted && !hasDesktopSidebar;
 
   const infobarSentinelRef = useRef<HTMLDivElement>(null);
   const [infobarStuck, setInfobarStuck] = useState(false);
@@ -47,8 +49,10 @@ export default function ServerConsole() {
   useEffect(() => {
     if (!titleHoisted || !infobarSentinelRef.current) return;
 
-    const observer = new IntersectionObserver(([entry]) =>
-      setInfobarStuck(!entry.isIntersecting && entry.boundingClientRect.top < 0),
+    const stickyTop = 0.75 * (Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+    const observer = new IntersectionObserver(
+      ([entry]) => setInfobarStuck(!entry.isIntersecting && entry.boundingClientRect.top < stickyTop),
+      { rootMargin: `-${stickyTop}px 0px 0px 0px` },
     );
     observer.observe(infobarSentinelRef.current);
 
@@ -59,7 +63,7 @@ export default function ServerConsole() {
     <Group
       justify='space-between'
       wrap={detailsInInfobar ? 'nowrap' : 'wrap'}
-      className={classNames({ 'min-h-12 lg:min-h-0': titleHoisted })}
+      className={classNames({ 'min-h-12': alignWithNavbar && !detailsInInfobar })}
     >
       <div
         className={classNames('min-w-0 flex-1 flex-col gap-1', titleHoisted && !detailsInInfobar ? 'hidden' : 'flex')}
@@ -71,7 +75,7 @@ export default function ServerConsole() {
         {detailsInInfobar && <ServerIndicators />}
       </div>
       <ServerCan action={['control.start', 'control.stop', 'control.restart']} matchAny>
-        <ServerPowerControls />
+        <ServerPowerControls hideIcons={alignWithNavbar && infobarStuck && !detailsInInfobar} />
       </ServerCan>
     </Group>
   );
@@ -93,7 +97,11 @@ export default function ServerConsole() {
         )}
       >
         {detailsInInfobar ? (
-          <Card px='md' py='sm'>
+          <Card
+            px='md'
+            py={alignWithNavbar ? 5 : 'sm'}
+            className={classNames({ 'min-h-12 justify-center': alignWithNavbar })}
+          >
             {infobar}
           </Card>
         ) : (

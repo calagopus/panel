@@ -12,7 +12,7 @@ import { SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-export default function ServerPowerControls() {
+export default function ServerPowerControls({ hideIcons = false }: { hideIcons?: boolean }) {
   const { t } = useTranslations();
   const [open, setOpen] = useState(false);
   const { server, state, socketInstance, socketConnected } = useServerStore(
@@ -71,7 +71,7 @@ export default function ServerPowerControls() {
           loading={state === 'starting'}
           onClick={() => onButtonClick('start')}
           className='flex-1 min-w-fit'
-          leftSection={<FontAwesomeIcon icon={faPlay} size='sm' />}
+          leftSection={hideIcons ? undefined : <FontAwesomeIcon icon={faPlay} size='sm' />}
         >
           {t('common.enum.serverPowerAction.start', {})}
         </Button>
@@ -82,7 +82,7 @@ export default function ServerPowerControls() {
           disabled={!socketConnected || !state || !!server.status || server.isSuspended || server.isTransferring}
           onClick={() => onButtonClick('restart')}
           className='flex-1 min-w-fit'
-          leftSection={<FontAwesomeIcon icon={faRotateRight} size='sm' />}
+          leftSection={hideIcons ? undefined : <FontAwesomeIcon icon={faRotateRight} size='sm' />}
         >
           {t('common.enum.serverPowerAction.restart', {})}
         </Button>
@@ -95,7 +95,7 @@ export default function ServerPowerControls() {
           }
           onClick={() => onButtonClick(killable ? 'kill' : 'stop')}
           className='flex-1 min-w-fit'
-          leftSection={<FontAwesomeIcon icon={killable ? faSkull : faStop} size='sm' />}
+          leftSection={hideIcons ? undefined : <FontAwesomeIcon icon={killable ? faSkull : faStop} size='sm' />}
         >
           {killable ? t('common.enum.serverPowerAction.kill', {}) : t('common.enum.serverPowerAction.stop', {})}
         </Button>
