@@ -168,90 +168,92 @@ export default function DashboardHomeGrouped() {
     >
       <ServerGroupCreateModal opened={openModal === 'create'} onClose={() => setOpenModal(null)} />
 
-      <DashboardHomeTitle />
+      <DashboardHomeTitle>
+        <BulkActionBar
+          selectedCount={selectedServers.size}
+          onClear={() => setSelectedServers(new ObjectSet('uuid'))}
+          onAction={onBulkAction}
+          loading={bulkActionLoading}
+        />
 
-      <BulkActionBar
-        selectedCount={selectedServers.size}
-        onClear={() => setSelectedServers(new ObjectSet('uuid'))}
-        onAction={onBulkAction}
-        loading={bulkActionLoading}
-      />
-
-      {loading ? (
-        <Spinner.Centered />
-      ) : error ? (
-        <ErrorState error={httpErrorToHuman(error)} onRetry={loadGroups} />
-      ) : serverGroups.length === 0 ? (
-        <EmptyState
-          icon={faLayerGroup}
-          title={t('pages.account.home.tabs.groupedServers.page.empty.title', {})}
-          description={t('pages.account.home.tabs.groupedServers.page.empty.description', {})}
-        >
-          {createGroupButton}
-        </EmptyState>
-      ) : (
-        <DndBoard
-          collisionDetection={collisionDetection}
-          describeItem={describeItem}
-          {...dndHandlers}
-          renderOverlay={() =>
-            activeServerGroup ? (
-              <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
-                <MemoizedServerGroupItem
-                  serverGroup={activeServerGroup}
-                  dragHandleProps={{
-                    style: { cursor: 'grabbing' },
-                  }}
-                  sKeyPressedRef={sKeyPressedRef}
-                />
+        {loading ? (
+          <Spinner.Centered />
+        ) : error ? (
+          <ErrorState error={httpErrorToHuman(error)} onRetry={loadGroups} />
+        ) : serverGroups.length === 0 ? (
+          <EmptyState
+            icon={faLayerGroup}
+            title={t('pages.account.home.tabs.groupedServers.page.empty.title', {})}
+            description={t('pages.account.home.tabs.groupedServers.page.empty.description', {})}
+          >
+            {createGroupButton}
+          </EmptyState>
+        ) : (
+          <DndBoard
+            collisionDetection={collisionDetection}
+            describeItem={describeItem}
+            {...dndHandlers}
+            renderOverlay={() =>
+              activeServerGroup ? (
+                <div style={{ cursor: 'grabbing', opacity: 0.95 }} className='shadow-xl rounded-lg'>
+                  <MemoizedServerGroupItem
+                    serverGroup={activeServerGroup}
+                    dragHandleProps={{
+                      style: { cursor: 'grabbing' },
+                    }}
+                    sKeyPressedRef={sKeyPressedRef}
+                  />
+                </div>
+              ) : activeServer ? (
+                <div style={{ cursor: 'grabbing' }} className='shadow-xl rounded-xl'>
+                  <MemoizedServerItem
+                    server={activeServer}
+                    showContextMenu
+                    showForeignServerBadge
+                    isSelected={selectedServers.has(activeServer)}
+                    onGroupRemove={() => null}
+                  />
+                </div>
+              ) : null
+            }
+          >
+            <DndSortableList id={SERVER_GROUPS_CONTAINER_ID} items={serverGroupUuids}>
+              <div className='flex flex-col gap-3'>
+                {sortedServerGroups.map((serverGroup) => (
+                  <SortableItem
+                    key={serverGroup.uuid}
+                    id={serverGroup.uuid}
+                    renderItem={({ dragHandleProps }) => (
+                      <MemoizedServerGroupItem
+                        serverGroup={serverGroup}
+                        dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
+                        selectedServers={selectedServers}
+                        onServerSelectionChange={handleServerSelectionChange}
+                        onServersSelectionChange={handleServersSelectionChange}
+                        onServerClick={handleServerClick}
+                        sKeyPressedRef={sKeyPressedRef}
+                        isDropTarget={
+                          blockedTarget?.groupUuid === serverGroup.uuid || placement?.groupUuid === serverGroup.uuid
+                        }
+                        dropBlockedReason={blockedTarget?.groupUuid === serverGroup.uuid ? blockedTarget.reason : null}
+                        adoptedServer={placement?.groupUuid === serverGroup.uuid ? activeServer : null}
+                        adoptedDndId={placement?.groupUuid === serverGroup.uuid ? activeServerDndId : null}
+                        adoptedIndex={placement?.groupUuid === serverGroup.uuid ? placement.index : null}
+                        hiddenDndId={
+                          placement && activeServerSourceUuid === serverGroup.uuid ? activeServerDndId : null
+                        }
+                        pendingServer={pendingMove?.groupUuid === serverGroup.uuid ? pendingMove.server : null}
+                      />
+                    )}
+                  />
+                ))}
               </div>
-            ) : activeServer ? (
-              <div style={{ cursor: 'grabbing' }} className='shadow-xl rounded-xl'>
-                <MemoizedServerItem
-                  server={activeServer}
-                  showContextMenu
-                  showForeignServerBadge
-                  isSelected={selectedServers.has(activeServer)}
-                  onGroupRemove={() => null}
-                />
-              </div>
-            ) : null
-          }
-        >
-          <DndSortableList id={SERVER_GROUPS_CONTAINER_ID} items={serverGroupUuids}>
-            <div className='flex flex-col gap-3'>
-              {sortedServerGroups.map((serverGroup) => (
-                <SortableItem
-                  key={serverGroup.uuid}
-                  id={serverGroup.uuid}
-                  renderItem={({ dragHandleProps }) => (
-                    <MemoizedServerGroupItem
-                      serverGroup={serverGroup}
-                      dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
-                      selectedServers={selectedServers}
-                      onServerSelectionChange={handleServerSelectionChange}
-                      onServersSelectionChange={handleServersSelectionChange}
-                      onServerClick={handleServerClick}
-                      sKeyPressedRef={sKeyPressedRef}
-                      isDropTarget={
-                        blockedTarget?.groupUuid === serverGroup.uuid || placement?.groupUuid === serverGroup.uuid
-                      }
-                      dropBlockedReason={blockedTarget?.groupUuid === serverGroup.uuid ? blockedTarget.reason : null}
-                      adoptedServer={placement?.groupUuid === serverGroup.uuid ? activeServer : null}
-                      adoptedDndId={placement?.groupUuid === serverGroup.uuid ? activeServerDndId : null}
-                      adoptedIndex={placement?.groupUuid === serverGroup.uuid ? placement.index : null}
-                      hiddenDndId={placement && activeServerSourceUuid === serverGroup.uuid ? activeServerDndId : null}
-                      pendingServer={pendingMove?.groupUuid === serverGroup.uuid ? pendingMove.server : null}
-                    />
-                  )}
-                />
-              ))}
-            </div>
-          </DndSortableList>
-        </DndBoard>
-      )}
+            </DndSortableList>
+          </DndBoard>
+        )}
 
-      {serverGroups.length > 0 && <div className='flex justify-center mt-4'>{createGroupButton}</div>}
+        {serverGroups.length > 0 && <div className='flex justify-center mt-4'>{createGroupButton}</div>}
+      </DashboardHomeTitle>
     </AccountContentContainer>
   );
 }

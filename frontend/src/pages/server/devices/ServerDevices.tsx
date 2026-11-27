@@ -52,59 +52,61 @@ export default function ServerDevices() {
       setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.server.devices.container}
     >
-      <MountsSubNavigation />
+      <MountsSubNavigation>
+        <DeviceActionBar selectedDevices={selectedDevices} clearSelection={clearSelection} />
 
-      <DeviceActionBar selectedDevices={selectedDevices} clearSelection={clearSelection} />
-
-      <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
-        <Table
-          columns={[
-            ...(canSelect
-              ? [
-                  tableSelectionHeader({
-                    checked: allSelected,
-                    indeterminate: selectedDevices.size > 0 && !allSelected,
-                    onChange: (checked) => (checked ? selectAll() : clearSelection()),
-                  }),
-                ]
-              : []),
-            t('common.table.columns.name', {}),
-            t('common.table.columns.description', {}),
-            t('common.table.columns.target', {}),
-            t('pages.server.devices.table.columns.attached', {}),
-            t('pages.admin.devices.tabs.general.page.form.permissions', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={devices}
-          onPageSelect={setPage}
-          onPerPageSelect={setPerPage}
-          error={error}
-          empty={
-            debouncedSearch ? undefined : (
-              <EmptyState
-                flush
-                icon={faMicrochip}
-                title={t('pages.server.devices.empty.title', {})}
-                description={t('pages.server.devices.empty.description', {})}
-              />
-            )
-          }
-        >
-          {devices?.data.map((device) => (
-            <SelectionArea.Selectable key={device.uuid} item={device}>
-              {(innerRef: Ref<HTMLElement>) => (
-                <DeviceRow
-                  contextDevice={device}
-                  ref={innerRef as Ref<HTMLTableRowElement>}
-                  isSelected={selectedDevices.has(device.uuid)}
-                  onSelectionChange={canSelect ? (selected, range) => toggleDevice(device, selected, range) : undefined}
+        <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
+          <Table
+            columns={[
+              ...(canSelect
+                ? [
+                    tableSelectionHeader({
+                      checked: allSelected,
+                      indeterminate: selectedDevices.size > 0 && !allSelected,
+                      onChange: (checked) => (checked ? selectAll() : clearSelection()),
+                    }),
+                  ]
+                : []),
+              t('common.table.columns.name', {}),
+              t('common.table.columns.description', {}),
+              t('common.table.columns.target', {}),
+              t('pages.server.devices.table.columns.attached', {}),
+              t('pages.admin.devices.tabs.general.page.form.permissions', {}),
+              '',
+            ]}
+            loading={loading}
+            pagination={devices}
+            onPageSelect={setPage}
+            onPerPageSelect={setPerPage}
+            error={error}
+            empty={
+              debouncedSearch ? undefined : (
+                <EmptyState
+                  flush
+                  icon={faMicrochip}
+                  title={t('pages.server.devices.empty.title', {})}
+                  description={t('pages.server.devices.empty.description', {})}
                 />
-              )}
-            </SelectionArea.Selectable>
-          ))}
-        </Table>
-      </SelectionArea>
+              )
+            }
+          >
+            {devices?.data.map((device) => (
+              <SelectionArea.Selectable key={device.uuid} item={device}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <DeviceRow
+                    contextDevice={device}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    isSelected={selectedDevices.has(device.uuid)}
+                    onSelectionChange={
+                      canSelect ? (selected, range) => toggleDevice(device, selected, range) : undefined
+                    }
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
+        </SelectionArea>
+      </MountsSubNavigation>
     </ServerContentContainer>
   );
 }

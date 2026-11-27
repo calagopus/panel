@@ -276,143 +276,143 @@ export default function ServerFirewall() {
 
           <ImportOverlay visible={isDragging} title={t('pages.server.firewall.dropzone.title', {})} />
 
-          <NetworkSubNavigation />
+          <NetworkSubNavigation>
+            <Stack>
+              {data.supported === false && (
+                <Alert color='red' icon={faExclamationTriangle}>
+                  {t('pages.server.firewall.alert.notEnforced', {}).md()}
+                </Alert>
+              )}
 
-          <Stack>
-            {data.supported === false && (
-              <Alert color='red' icon={faExclamationTriangle}>
-                {t('pages.server.firewall.alert.notEnforced', {}).md()}
-              </Alert>
-            )}
+              {data.supported === null && (
+                <Alert color='gray' icon={faExclamationTriangle}>
+                  {t('pages.server.firewall.alert.unknownEnforcement', {})}
+                </Alert>
+              )}
 
-            {data.supported === null && (
-              <Alert color='gray' icon={faExclamationTriangle}>
-                {t('pages.server.firewall.alert.unknownEnforcement', {})}
-              </Alert>
-            )}
-
-            {(dirty || defaultAllow || shadowed.length > 0 || unallocatedPorts.length > 0) && (
-              <Alert color='yellow' icon={faExclamationTriangle}>
-                <Stack gap='xs'>
-                  {dirty && <span>{t('pages.server.firewall.alert.unsaved', {})}</span>}
-                  {defaultAllow && (
-                    <Group gap='sm' align='center' wrap='nowrap'>
-                      <span className='flex-1'>{t('pages.server.firewall.alert.fallthrough', {}).md()}</span>
-                      <ServerCan action='firewall.update'>
-                        <Button
-                          size='xs'
-                          variant='default'
-                          className='shrink-0'
-                          leftSection={<FontAwesomeIcon icon={faBan} />}
-                          onClick={() => appendRule(denyAllRule)}
-                        >
-                          {t('pages.server.firewall.button.addDenyAll', {})}
-                        </Button>
-                      </ServerCan>
-                    </Group>
-                  )}
-                  {shadowed.length === 1 && (
-                    <span>{t('pages.server.firewall.alert.shadowed', { position: shadowed[0] })}</span>
-                  )}
-                  {shadowed.length > 1 && (
-                    <span>{t('pages.server.firewall.alert.shadowedMany', { positions: shadowed.join(', ') })}</span>
-                  )}
-                  {unallocatedPorts.length > 0 && (
-                    <span>
-                      {t('pages.server.firewall.alert.unallocatedPorts', {
-                        ports: formatPortRanges(unallocatedPorts).join(', '),
-                      }).md()}
-                    </span>
-                  )}
-                </Stack>
-              </Alert>
-            )}
-
-            <Alert color='gray'>{t('pages.server.firewall.alert.limitations', {})}</Alert>
-
-            {rules.length === 0 ? (
-              <EmptyState
-                icon={faShieldHalved}
-                title={t('pages.server.firewall.empty.title', {})}
-                description={
-                  canUpdate
-                    ? t('pages.server.firewall.empty.description', {})
-                    : t('pages.server.firewall.empty.descriptionReadOnly', {})
-                }
-              >
-                <ServerCan action='firewall.update'>
-                  <ConditionalTooltip
-                    enabled={rules.length >= maxRuleCount}
-                    label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
-                  >
-                    <Button
-                      disabled={rules.length >= maxRuleCount}
-                      onClick={() => setCreating(true)}
-                      leftSection={<FontAwesomeIcon icon={faPlus} />}
-                    >
-                      {t('pages.server.firewall.button.createFirstRule', {})}
-                    </Button>
-                  </ConditionalTooltip>
-                </ServerCan>
-              </EmptyState>
-            ) : (
-              <DndContainer
-                items={rules}
-                modifiers={[restrictToVerticalAxis]}
-                callbacks={{ onDragEnd: replace }}
-                renderOverlay={(active) =>
-                  active ? (
-                    <div style={{ cursor: 'grabbing' }}>
-                      <FirewallRuleCard rule={active.rule} position={1} editable />
-                    </div>
-                  ) : null
-                }
-              >
-                {(items) => (
-                  <Stack gap='md'>
-                    {items.map((item, index) => (
-                      <SortableItem
-                        key={item.id}
-                        id={item.id}
-                        disabled={!canUpdate || creating || editing !== null || deleting !== null}
-                        renderItem={({ dragHandleProps }) => (
-                          <FirewallRuleCard
-                            rule={item.rule}
-                            position={index + 1}
-                            editable={canUpdate}
-                            shadowed={shadowed.includes(index + 1)}
-                            dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
-                            onEdit={() => setEditing(item)}
-                            onDuplicate={() => duplicateRule(item.id)}
-                            onDelete={() => setDeleting(item)}
-                          />
-                        )}
-                      />
-                    ))}
+              {(dirty || defaultAllow || shadowed.length > 0 || unallocatedPorts.length > 0) && (
+                <Alert color='yellow' icon={faExclamationTriangle}>
+                  <Stack gap='xs'>
+                    {dirty && <span>{t('pages.server.firewall.alert.unsaved', {})}</span>}
+                    {defaultAllow && (
+                      <Group gap='sm' align='center' wrap='nowrap'>
+                        <span className='flex-1'>{t('pages.server.firewall.alert.fallthrough', {}).md()}</span>
+                        <ServerCan action='firewall.update'>
+                          <Button
+                            size='xs'
+                            variant='default'
+                            className='shrink-0'
+                            leftSection={<FontAwesomeIcon icon={faBan} />}
+                            onClick={() => appendRule(denyAllRule)}
+                          >
+                            {t('pages.server.firewall.button.addDenyAll', {})}
+                          </Button>
+                        </ServerCan>
+                      </Group>
+                    )}
+                    {shadowed.length === 1 && (
+                      <span>{t('pages.server.firewall.alert.shadowed', { position: shadowed[0] })}</span>
+                    )}
+                    {shadowed.length > 1 && (
+                      <span>{t('pages.server.firewall.alert.shadowedMany', { positions: shadowed.join(', ') })}</span>
+                    )}
+                    {unallocatedPorts.length > 0 && (
+                      <span>
+                        {t('pages.server.firewall.alert.unallocatedPorts', {
+                          ports: formatPortRanges(unallocatedPorts).join(', '),
+                        }).md()}
+                      </span>
+                    )}
                   </Stack>
-                )}
-              </DndContainer>
-            )}
+                </Alert>
+              )}
 
-            {rules.length > 0 && (
-              <ServerCan action='firewall.update'>
-                <Group justify='center'>
-                  <ConditionalTooltip
-                    enabled={rules.length >= maxRuleCount}
-                    label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
-                  >
-                    <Button
-                      disabled={rules.length >= maxRuleCount}
-                      onClick={() => setCreating(true)}
-                      leftSection={<FontAwesomeIcon icon={faPlus} />}
+              <Alert color='gray'>{t('pages.server.firewall.alert.limitations', {})}</Alert>
+
+              {rules.length === 0 ? (
+                <EmptyState
+                  icon={faShieldHalved}
+                  title={t('pages.server.firewall.empty.title', {})}
+                  description={
+                    canUpdate
+                      ? t('pages.server.firewall.empty.description', {})
+                      : t('pages.server.firewall.empty.descriptionReadOnly', {})
+                  }
+                >
+                  <ServerCan action='firewall.update'>
+                    <ConditionalTooltip
+                      enabled={rules.length >= maxRuleCount}
+                      label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
                     >
-                      {t('pages.server.firewall.button.addRule', {})}
-                    </Button>
-                  </ConditionalTooltip>
-                </Group>
-              </ServerCan>
-            )}
-          </Stack>
+                      <Button
+                        disabled={rules.length >= maxRuleCount}
+                        onClick={() => setCreating(true)}
+                        leftSection={<FontAwesomeIcon icon={faPlus} />}
+                      >
+                        {t('pages.server.firewall.button.createFirstRule', {})}
+                      </Button>
+                    </ConditionalTooltip>
+                  </ServerCan>
+                </EmptyState>
+              ) : (
+                <DndContainer
+                  items={rules}
+                  modifiers={[restrictToVerticalAxis]}
+                  callbacks={{ onDragEnd: replace }}
+                  renderOverlay={(active) =>
+                    active ? (
+                      <div style={{ cursor: 'grabbing' }}>
+                        <FirewallRuleCard rule={active.rule} position={1} editable />
+                      </div>
+                    ) : null
+                  }
+                >
+                  {(items) => (
+                    <Stack gap='md'>
+                      {items.map((item, index) => (
+                        <SortableItem
+                          key={item.id}
+                          id={item.id}
+                          disabled={!canUpdate || creating || editing !== null || deleting !== null}
+                          renderItem={({ dragHandleProps }) => (
+                            <FirewallRuleCard
+                              rule={item.rule}
+                              position={index + 1}
+                              editable={canUpdate}
+                              shadowed={shadowed.includes(index + 1)}
+                              dragHandleProps={dragHandleProps as unknown as ComponentProps<'button'>}
+                              onEdit={() => setEditing(item)}
+                              onDuplicate={() => duplicateRule(item.id)}
+                              onDelete={() => setDeleting(item)}
+                            />
+                          )}
+                        />
+                      ))}
+                    </Stack>
+                  )}
+                </DndContainer>
+              )}
+
+              {rules.length > 0 && (
+                <ServerCan action='firewall.update'>
+                  <Group justify='center'>
+                    <ConditionalTooltip
+                      enabled={rules.length >= maxRuleCount}
+                      label={t('common.tooltip.limitReached.server', { items: tItem('firewallRule', maxRuleCount) })}
+                    >
+                      <Button
+                        disabled={rules.length >= maxRuleCount}
+                        onClick={() => setCreating(true)}
+                        leftSection={<FontAwesomeIcon icon={faPlus} />}
+                      >
+                        {t('pages.server.firewall.button.addRule', {})}
+                      </Button>
+                    </ConditionalTooltip>
+                  </Group>
+                </ServerCan>
+              )}
+            </Stack>
+          </NetworkSubNavigation>
         </ServerContentContainer>
       )}
     </ResourceView>

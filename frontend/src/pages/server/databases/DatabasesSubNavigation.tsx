@@ -1,11 +1,12 @@
 import { faDatabase, faServer } from '@fortawesome/free-solid-svg-icons';
+import { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 import { useDatabaseRelevance } from './useDatabaseRelevance.ts';
 
-export default function DatabasesSubNavigation() {
+export default function DatabasesSubNavigation({ children }: { children?: ReactNode }) {
   const { t } = useTranslations();
   const location = useLocation();
   const server = useServerStore((state) => state.server);
@@ -34,6 +35,8 @@ export default function DatabasesSubNavigation() {
           hidden: !location.pathname.endsWith(instancesLink) && !agentRelevant,
         },
       ]}
-    />
+    >
+      {children}
+    </SubNavigation>
   );
 }

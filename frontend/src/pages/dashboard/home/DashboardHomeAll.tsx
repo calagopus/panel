@@ -101,111 +101,111 @@ export default function DashboardHomeAll() {
       title={t('pages.account.home.title', {})}
       registry={window.extensionContext.extensionRegistry.pages.dashboard.home.containerAll}
     >
-      <DashboardHomeTitle />
-
-      <Group mb='md' justify='space-between'>
-        <Group wrap='nowrap' className='w-full md:w-auto'>
-          <Checkbox
-            aria-label={t('common.button.selectAll', {})}
-            title={t('common.button.selectAll', {})}
-            className='shrink-0'
-            checked={allSelected}
-            indeterminate={selectedPageCount > 0 && !allSelected}
-            disabled={loading || !servers?.data.length}
-            onChange={(e) => {
-              const checked = e.currentTarget.checked;
-              setSelectedServers((previous) => {
-                const next = previous.clone();
-                for (const server of servers?.data ?? []) {
-                  if (checked) {
-                    next.add(server);
-                  } else {
-                    next.delete(server);
+      <DashboardHomeTitle>
+        <Group mb='md' justify='space-between'>
+          <Group wrap='nowrap' className='w-full md:w-auto'>
+            <Checkbox
+              aria-label={t('common.button.selectAll', {})}
+              title={t('common.button.selectAll', {})}
+              className='shrink-0'
+              checked={allSelected}
+              indeterminate={selectedPageCount > 0 && !allSelected}
+              disabled={loading || !servers?.data.length}
+              onChange={(e) => {
+                const checked = e.currentTarget.checked;
+                setSelectedServers((previous) => {
+                  const next = previous.clone();
+                  for (const server of servers?.data ?? []) {
+                    if (checked) {
+                      next.add(server);
+                    } else {
+                      next.delete(server);
+                    }
                   }
-                }
-                return next;
-              });
-            }}
-          />
-          <TextInput
-            placeholder={t('common.input.search', {})}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              const firstServer = servers?.data[0];
-              if (e.key === 'Enter' && firstServer && !loading && search === debouncedSearch) {
-                e.preventDefault();
-                navigate(`/server/${firstServer.uuidShort}`);
-              }
-            }}
-            className='flex-1 min-w-0 md:w-62.5'
-          />
-        </Group>
-        <AdminCan action='servers.read'>
-          <Switch
-            label={t('pages.account.home.tabs.allServers.page.input.showOtherUsersServers', {})}
-            checked={serverListShowOthers}
-            onChange={(e) => {
-              setPage(1);
-              setServerListShowOthers(e.currentTarget.checked);
-            }}
-          />
-        </AdminCan>
-      </Group>
-      {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
-        <>
-          <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
-          <Divider my='md' />
-        </>
-      )}
-      {loading && !servers ? (
-        <Spinner.Centered />
-      ) : error && !servers ? (
-        <ErrorState error={error} onRetry={refetch} />
-      ) : servers?.total === 0 ? (
-        debouncedSearch ? (
-          <NoItems />
-        ) : (
-          <EmptyState
-            icon={faServer}
-            title={t('pages.account.home.empty.title', {})}
-            description={t('pages.account.home.empty.description', {})}
-          />
-        )
-      ) : (
-        <div
-          className={classNames(
-            'gap-4 grid md:grid-cols-2',
-            loading && 'opacity-50 pointer-events-none transition-opacity',
-          )}
-        >
-          {servers?.data.map((server) => (
-            <ServerItem
-              key={server.uuid}
-              server={server}
-              showContextMenu
-              showGroupAddButton
-              showForeignServerBadge
-              isSelected={selectedServers.has(server.uuid)}
-              onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
-              onClick={(e) => handleServerClick(server, e)}
-              sKeyPressedRef={sKeyPressedRef}
+                  return next;
+                });
+              }}
             />
-          ))}
-        </div>
-      )}
-      <BulkActionBar
-        selectedCount={selectedServers.size}
-        onClear={() => setSelectedServers(new ObjectSet('uuid'))}
-        onAction={onBulkAction}
-        loading={bulkActionLoading}
-      />
-      {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
-        <>
-          <Divider my='md' />
-          <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
-        </>
-      )}
+            <TextInput
+              placeholder={t('common.input.search', {})}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                const firstServer = servers?.data[0];
+                if (e.key === 'Enter' && firstServer && !loading && search === debouncedSearch) {
+                  e.preventDefault();
+                  navigate(`/server/${firstServer.uuidShort}`);
+                }
+              }}
+              className='flex-1 min-w-0 md:w-62.5'
+            />
+          </Group>
+          <AdminCan action='servers.read'>
+            <Switch
+              label={t('pages.account.home.tabs.allServers.page.input.showOtherUsersServers', {})}
+              checked={serverListShowOthers}
+              onChange={(e) => {
+                setPage(1);
+                setServerListShowOthers(e.currentTarget.checked);
+              }}
+            />
+          </AdminCan>
+        </Group>
+        {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
+          <>
+            <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
+            <Divider my='md' />
+          </>
+        )}
+        {loading && !servers ? (
+          <Spinner.Centered />
+        ) : error && !servers ? (
+          <ErrorState error={error} onRetry={refetch} />
+        ) : servers?.total === 0 ? (
+          debouncedSearch ? (
+            <NoItems />
+          ) : (
+            <EmptyState
+              icon={faServer}
+              title={t('pages.account.home.empty.title', {})}
+              description={t('pages.account.home.empty.description', {})}
+            />
+          )
+        ) : (
+          <div
+            className={classNames(
+              'gap-4 grid md:grid-cols-2',
+              loading && 'opacity-50 pointer-events-none transition-opacity',
+            )}
+          >
+            {servers?.data.map((server) => (
+              <ServerItem
+                key={server.uuid}
+                server={server}
+                showContextMenu
+                showGroupAddButton
+                showForeignServerBadge
+                isSelected={selectedServers.has(server.uuid)}
+                onSelectionChange={(selected) => handleServerSelectionChange(server, selected)}
+                onClick={(e) => handleServerClick(server, e)}
+                sKeyPressedRef={sKeyPressedRef}
+              />
+            ))}
+          </div>
+        )}
+        <BulkActionBar
+          selectedCount={selectedServers.size}
+          onClear={() => setSelectedServers(new ObjectSet('uuid'))}
+          onAction={onBulkAction}
+          loading={bulkActionLoading}
+        />
+        {(servers?.total ?? 0) > (servers?.perPage ?? 0) && (
+          <>
+            <Divider my='md' />
+            <Pagination data={servers ?? getEmptyPaginationSet()} onPageSelect={setPage} />
+          </>
+        )}
+      </DashboardHomeTitle>
     </AccountContentContainer>
   );
 }

@@ -1,44 +1,45 @@
 import { faServer } from '@fortawesome/free-solid-svg-icons';
+import { ReactNode } from 'react';
 import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useStartOnGroupedServers } from '@/plugins/server/useStartOnGroupedServers.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 
-export default function DashboardHomeTitle() {
+export default function DashboardHomeTitle({ children }: { children?: ReactNode }) {
   const { t } = useTranslations();
   const [startOnGroupedServers] = useStartOnGroupedServers();
 
   return (
-    <>
-      <SubNavigation
-        baseUrl='/'
-        items={
-          startOnGroupedServers
-            ? [
-                {
-                  name: t('pages.account.home.tabs.groupedServers.title', {}),
-                  icon: faServer,
-                  link: '/',
-                },
-                {
-                  name: t('pages.account.home.tabs.allServers.title', {}),
-                  icon: faServer,
-                  link: '/all',
-                },
-              ]
-            : [
-                {
-                  name: t('pages.account.home.tabs.allServers.title', {}),
-                  icon: faServer,
-                  link: '/',
-                },
-                {
-                  name: t('pages.account.home.tabs.groupedServers.title', {}),
-                  icon: faServer,
-                  link: '/grouped',
-                },
-              ]
-        }
-      />
-    </>
+    <SubNavigation
+      baseUrl='/'
+      items={
+        startOnGroupedServers
+          ? [
+              {
+                name: t('pages.account.home.tabs.groupedServers.title', {}),
+                icon: faServer,
+                link: '/',
+              },
+              {
+                name: t('pages.account.home.tabs.allServers.title', {}),
+                icon: faServer,
+                link: '/all',
+              },
+            ]
+          : [
+              {
+                name: t('pages.account.home.tabs.allServers.title', {}),
+                icon: faServer,
+                link: '/',
+              },
+              {
+                name: t('pages.account.home.tabs.groupedServers.title', {}),
+                icon: faServer,
+                link: '/grouped',
+              },
+            ]
+      }
+    >
+      {children}
+    </SubNavigation>
   );
 }

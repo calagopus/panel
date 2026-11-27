@@ -40,20 +40,20 @@ export default function ServerSystemBackups() {
       setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.server.backups.system.container}
     >
-      <BackupsSubNavigation />
-
-      <Table
-        columns={columns.headers}
-        loading={loading}
-        pagination={backups}
-        onPageSelect={setPage}
-        onPerPageSelect={setPerPage}
-        error={error}
-      >
-        {backups?.data.map((backup) => (
-          <BackupRow backup={backup} columns={columns} key={backup.uuid} readOnly />
-        ))}
-      </Table>
+      <BackupsSubNavigation>
+        <Table
+          columns={columns.headers}
+          loading={loading}
+          pagination={backups}
+          onPageSelect={setPage}
+          onPerPageSelect={setPerPage}
+          error={error}
+        >
+          {backups?.data.map((backup) => (
+            <BackupRow backup={backup} columns={columns} key={backup.uuid} readOnly />
+          ))}
+        </Table>
+      </BackupsSubNavigation>
     </ServerContentContainer>
   );
 }

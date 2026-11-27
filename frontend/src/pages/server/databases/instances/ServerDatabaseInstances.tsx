@@ -100,93 +100,93 @@ export default function ServerDatabaseInstances() {
     >
       <DatabaseInstanceCreateModal opened={createOpen} onClose={() => setCreateOpen(false)} />
 
-      <DatabasesSubNavigation />
+      <DatabasesSubNavigation>
+        <DatabaseInstanceActionBar
+          selectedInstances={selectedInstances}
+          clearSelection={clearSelection}
+          onFinished={refetch}
+        />
 
-      <DatabaseInstanceActionBar
-        selectedInstances={selectedInstances}
-        clearSelection={clearSelection}
-        onFinished={refetch}
-      />
-
-      <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
-        <Table
-          columns={[
-            ...(canSelect
-              ? [
-                  tableSelectionHeader({
-                    checked: allSelected,
-                    indeterminate: selectedInstances.size > 0 && !allSelected,
-                    onChange: (checked) => (checked ? selectAll() : clearSelection()),
-                  }),
-                ]
-              : []),
-            t('common.table.columns.name', {}),
-            t('common.table.columns.type', {}),
-            t('common.table.columns.address', {}),
-            t('common.form.memory', {}),
-            t('common.form.disk', {}),
-            t('pages.server.databases.table.columns.locked', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={data}
-          onPageSelect={setPage}
-          onPerPageSelect={setPerPage}
-          error={error}
-          empty={
-            debouncedSearch ? undefined : (
-              <EmptyState
-                flush
-                icon={faServer}
-                title={t('pages.server.databases.instance.empty.title', {})}
-                description={
-                  !canCreate
-                    ? t('pages.server.databases.instance.empty.descriptionReadOnly', {})
-                    : noTemplates
-                      ? t('pages.server.databases.instance.empty.descriptionUnavailable', {})
-                      : t('pages.server.databases.instance.empty.description', {})
-                }
-              >
-                {noTemplates ? null : (
-                  <ServerCan action='database-instances.create'>
-                    <ConditionalTooltip
-                      enabled={full}
-                      label={t('common.tooltip.limitReached.server', {
-                        items: tItem('database', server.featureLimits.databases),
-                      })}
-                    >
-                      <Button
-                        disabled={full}
-                        onClick={() => setCreateOpen(true)}
-                        color='blue'
-                        leftSection={<FontAwesomeIcon icon={faPlus} />}
-                      >
-                        {t('pages.server.databases.instance.button.createFirstInstance', {})}
-                      </Button>
-                    </ConditionalTooltip>
-                  </ServerCan>
-                )}
-              </EmptyState>
-            )
-          }
-        >
-          {data?.data.map((instance) => (
-            <SelectionArea.Selectable key={instance.uuid} item={instance}>
-              {(innerRef: Ref<HTMLElement>) => (
-                <DatabaseInstanceRow
-                  instance={instance}
-                  ref={innerRef as Ref<HTMLTableRowElement>}
-                  isSelected={selectedInstances.has(instance.uuid)}
-                  onSelectionChange={
-                    canSelect ? (selected, range) => toggleInstance(instance, selected, range) : undefined
+        <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
+          <Table
+            columns={[
+              ...(canSelect
+                ? [
+                    tableSelectionHeader({
+                      checked: allSelected,
+                      indeterminate: selectedInstances.size > 0 && !allSelected,
+                      onChange: (checked) => (checked ? selectAll() : clearSelection()),
+                    }),
+                  ]
+                : []),
+              t('common.table.columns.name', {}),
+              t('common.table.columns.type', {}),
+              t('common.table.columns.address', {}),
+              t('common.form.memory', {}),
+              t('common.form.disk', {}),
+              t('pages.server.databases.table.columns.locked', {}),
+              '',
+            ]}
+            loading={loading}
+            pagination={data}
+            onPageSelect={setPage}
+            onPerPageSelect={setPerPage}
+            error={error}
+            empty={
+              debouncedSearch ? undefined : (
+                <EmptyState
+                  flush
+                  icon={faServer}
+                  title={t('pages.server.databases.instance.empty.title', {})}
+                  description={
+                    !canCreate
+                      ? t('pages.server.databases.instance.empty.descriptionReadOnly', {})
+                      : noTemplates
+                        ? t('pages.server.databases.instance.empty.descriptionUnavailable', {})
+                        : t('pages.server.databases.instance.empty.description', {})
                   }
-                  onClick={(e) => handleInstanceClick(instance, e)}
-                />
-              )}
-            </SelectionArea.Selectable>
-          ))}
-        </Table>
-      </SelectionArea>
+                >
+                  {noTemplates ? null : (
+                    <ServerCan action='database-instances.create'>
+                      <ConditionalTooltip
+                        enabled={full}
+                        label={t('common.tooltip.limitReached.server', {
+                          items: tItem('database', server.featureLimits.databases),
+                        })}
+                      >
+                        <Button
+                          disabled={full}
+                          onClick={() => setCreateOpen(true)}
+                          color='blue'
+                          leftSection={<FontAwesomeIcon icon={faPlus} />}
+                        >
+                          {t('pages.server.databases.instance.button.createFirstInstance', {})}
+                        </Button>
+                      </ConditionalTooltip>
+                    </ServerCan>
+                  )}
+                </EmptyState>
+              )
+            }
+          >
+            {data?.data.map((instance) => (
+              <SelectionArea.Selectable key={instance.uuid} item={instance}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <DatabaseInstanceRow
+                    instance={instance}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    isSelected={selectedInstances.has(instance.uuid)}
+                    onSelectionChange={
+                      canSelect ? (selected, range) => toggleInstance(instance, selected, range) : undefined
+                    }
+                    onClick={(e) => handleInstanceClick(instance, e)}
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
+        </SelectionArea>
+      </DatabasesSubNavigation>
     </ServerContentContainer>
   );
 }

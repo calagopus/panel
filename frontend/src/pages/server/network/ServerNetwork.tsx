@@ -114,69 +114,69 @@ export default function ServerNetwork() {
       }
       registry={window.extensionContext.extensionRegistry.pages.server.network.container}
     >
-      <NetworkSubNavigation />
+      <NetworkSubNavigation>
+        <AllocationActionBar
+          selectedAllocations={selectedAllocations}
+          clearSelection={clearSelection}
+          onFinished={refetch}
+        />
 
-      <AllocationActionBar
-        selectedAllocations={selectedAllocations}
-        clearSelection={clearSelection}
-        onFinished={refetch}
-      />
-
-      <SelectionArea {...selectionAreaProps} disabled={!canDelete}>
-        <Table
-          columns={[
-            ...(canDelete
-              ? [
-                  tableSelectionHeader({
-                    checked: allSelected,
-                    indeterminate: selectedAllocations.size > 0 && !allSelected,
-                    onChange: (checked) => (checked ? selectAll() : clearSelection()),
-                  }),
-                ]
-              : []),
-            '',
-            t('pages.server.network.table.columns.hostname', {}),
-            t('pages.server.network.table.columns.port', {}),
-            t('common.table.columns.notes', {}),
-            t('common.table.columns.created', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={allocations}
-          onPageSelect={setPage}
-          onPerPageSelect={setPerPage}
-          error={error}
-          empty={
-            debouncedSearch ? undefined : (
-              <EmptyState
-                flush
-                icon={faNetworkWired}
-                title={t('pages.server.network.empty.title', {})}
-                description={
-                  selfAssignEnabled
-                    ? t('pages.server.network.empty.description', {})
-                    : t('pages.server.network.empty.descriptionAdminOnly', {})
-                }
-              />
-            )
-          }
-        >
-          {allocations?.data.map((allocation) => (
-            <SelectionArea.Selectable key={allocation.uuid} item={allocation}>
-              {(innerRef: Ref<HTMLElement>) => (
-                <AllocationRow
-                  allocation={allocation}
-                  ref={innerRef as Ref<HTMLTableRowElement>}
-                  isSelected={selectedAllocations.has(allocation.uuid)}
-                  onSelectionChange={
-                    canDelete ? (selected, range) => toggleAllocation(allocation, selected, range) : undefined
+        <SelectionArea {...selectionAreaProps} disabled={!canDelete}>
+          <Table
+            columns={[
+              ...(canDelete
+                ? [
+                    tableSelectionHeader({
+                      checked: allSelected,
+                      indeterminate: selectedAllocations.size > 0 && !allSelected,
+                      onChange: (checked) => (checked ? selectAll() : clearSelection()),
+                    }),
+                  ]
+                : []),
+              '',
+              t('pages.server.network.table.columns.hostname', {}),
+              t('pages.server.network.table.columns.port', {}),
+              t('common.table.columns.notes', {}),
+              t('common.table.columns.created', {}),
+              '',
+            ]}
+            loading={loading}
+            pagination={allocations}
+            onPageSelect={setPage}
+            onPerPageSelect={setPerPage}
+            error={error}
+            empty={
+              debouncedSearch ? undefined : (
+                <EmptyState
+                  flush
+                  icon={faNetworkWired}
+                  title={t('pages.server.network.empty.title', {})}
+                  description={
+                    selfAssignEnabled
+                      ? t('pages.server.network.empty.description', {})
+                      : t('pages.server.network.empty.descriptionAdminOnly', {})
                   }
                 />
-              )}
-            </SelectionArea.Selectable>
-          ))}
-        </Table>
-      </SelectionArea>
+              )
+            }
+          >
+            {allocations?.data.map((allocation) => (
+              <SelectionArea.Selectable key={allocation.uuid} item={allocation}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <AllocationRow
+                    allocation={allocation}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    isSelected={selectedAllocations.has(allocation.uuid)}
+                    onSelectionChange={
+                      canDelete ? (selected, range) => toggleAllocation(allocation, selected, range) : undefined
+                    }
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
+        </SelectionArea>
+      </NetworkSubNavigation>
     </ServerContentContainer>
   );
 }

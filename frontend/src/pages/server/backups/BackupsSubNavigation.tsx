@@ -1,5 +1,6 @@
 import { faBoxArchive, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useQuery } from '@tanstack/react-query';
+import { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import getSystemBackups from '@/api/server/backups/getSystemBackups.ts';
 import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
@@ -7,7 +8,7 @@ import { queryKeys } from '@/lib/queryKeys.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-export default function BackupsSubNavigation() {
+export default function BackupsSubNavigation({ children }: { children?: ReactNode }) {
   const { t } = useTranslations();
   const location = useLocation();
   const server = useServerStore((state) => state.server);
@@ -38,6 +39,8 @@ export default function BackupsSubNavigation() {
           hidden: !location.pathname.endsWith(systemLink) && (systemBackups?.total ?? 0) === 0,
         },
       ]}
-    />
+    >
+      {children}
+    </SubNavigation>
   );
 }

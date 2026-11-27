@@ -1,10 +1,11 @@
 import { faNetworkWired, faShareNodes, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+import { ReactNode } from 'react';
 import SubNavigation from '@/elements/navigation/SubNavigation.tsx';
 import { useServerCan } from '@/plugins/usePermissions.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
 import { useServerStore } from '@/stores/server.ts';
 
-export default function NetworkSubNavigation() {
+export default function NetworkSubNavigation({ children }: { children?: ReactNode }) {
   const { t } = useTranslations();
   const server = useServerStore((state) => state.server);
 
@@ -38,6 +39,8 @@ export default function NetworkSubNavigation() {
           hidden: !canReadTunnel || server.eggConfiguration?.privateNetworkEnabled === false,
         },
       ]}
-    />
+    >
+      {children}
+    </SubNavigation>
   );
 }

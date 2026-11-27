@@ -95,88 +95,88 @@ export default function ServerDatabases() {
     >
       <DatabaseCreateModal opened={createOpen} onClose={() => setCreateOpen(false)} />
 
-      <DatabasesSubNavigation />
+      <DatabasesSubNavigation>
+        <DatabaseActionBar selectedDatabases={selectedDatabases} clearSelection={clearSelection} onFinished={refetch} />
 
-      <DatabaseActionBar selectedDatabases={selectedDatabases} clearSelection={clearSelection} onFinished={refetch} />
-
-      <SelectionArea {...selectionAreaProps} disabled={!canDelete}>
-        <Table
-          columns={[
-            ...(canDelete
-              ? [
-                  tableSelectionHeader({
-                    checked: allSelected,
-                    indeterminate: selectedDatabases.size > 0 && !allSelected,
-                    onChange: (checked) => (checked ? selectAll() : clearSelection()),
-                  }),
-                ]
-              : []),
-            t('common.table.columns.name', {}),
-            t('common.table.columns.type', {}),
-            t('common.table.columns.address', {}),
-            t('common.table.columns.username', {}),
-            t('common.table.columns.size', {}),
-            t('pages.server.databases.table.columns.locked', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={data}
-          onPageSelect={setPage}
-          onPerPageSelect={setPerPage}
-          error={error}
-          empty={
-            debouncedSearch ? undefined : (
-              <EmptyState
-                flush
-                icon={faDatabase}
-                title={t('pages.server.databases.empty.title', {})}
-                description={
-                  !canCreate
-                    ? t('pages.server.databases.empty.descriptionReadOnly', {})
-                    : noHosts
-                      ? t('pages.server.databases.empty.descriptionUnavailable', {})
-                      : t('pages.server.databases.empty.description', {})
-                }
-              >
-                {noHosts ? null : (
-                  <ServerCan action='databases.create'>
-                    <ConditionalTooltip
-                      enabled={full}
-                      label={t('common.tooltip.limitReached.server', {
-                        items: tItem('database', server.featureLimits.databases),
-                      })}
-                    >
-                      <Button
-                        disabled={full}
-                        onClick={() => setCreateOpen(true)}
-                        color='blue'
-                        leftSection={<FontAwesomeIcon icon={faPlus} />}
-                      >
-                        {t('pages.server.databases.button.createFirstDatabase', {})}
-                      </Button>
-                    </ConditionalTooltip>
-                  </ServerCan>
-                )}
-              </EmptyState>
-            )
-          }
-        >
-          {data?.data.map((database) => (
-            <SelectionArea.Selectable key={database.uuid} item={database}>
-              {(innerRef: Ref<HTMLElement>) => (
-                <DatabaseRow
-                  database={database}
-                  ref={innerRef as Ref<HTMLTableRowElement>}
-                  isSelected={selectedDatabases.has(database.uuid)}
-                  onSelectionChange={
-                    canDelete ? (selected, range) => toggleDatabase(database, selected, range) : undefined
+        <SelectionArea {...selectionAreaProps} disabled={!canDelete}>
+          <Table
+            columns={[
+              ...(canDelete
+                ? [
+                    tableSelectionHeader({
+                      checked: allSelected,
+                      indeterminate: selectedDatabases.size > 0 && !allSelected,
+                      onChange: (checked) => (checked ? selectAll() : clearSelection()),
+                    }),
+                  ]
+                : []),
+              t('common.table.columns.name', {}),
+              t('common.table.columns.type', {}),
+              t('common.table.columns.address', {}),
+              t('common.table.columns.username', {}),
+              t('common.table.columns.size', {}),
+              t('pages.server.databases.table.columns.locked', {}),
+              '',
+            ]}
+            loading={loading}
+            pagination={data}
+            onPageSelect={setPage}
+            onPerPageSelect={setPerPage}
+            error={error}
+            empty={
+              debouncedSearch ? undefined : (
+                <EmptyState
+                  flush
+                  icon={faDatabase}
+                  title={t('pages.server.databases.empty.title', {})}
+                  description={
+                    !canCreate
+                      ? t('pages.server.databases.empty.descriptionReadOnly', {})
+                      : noHosts
+                        ? t('pages.server.databases.empty.descriptionUnavailable', {})
+                        : t('pages.server.databases.empty.description', {})
                   }
-                />
-              )}
-            </SelectionArea.Selectable>
-          ))}
-        </Table>
-      </SelectionArea>
+                >
+                  {noHosts ? null : (
+                    <ServerCan action='databases.create'>
+                      <ConditionalTooltip
+                        enabled={full}
+                        label={t('common.tooltip.limitReached.server', {
+                          items: tItem('database', server.featureLimits.databases),
+                        })}
+                      >
+                        <Button
+                          disabled={full}
+                          onClick={() => setCreateOpen(true)}
+                          color='blue'
+                          leftSection={<FontAwesomeIcon icon={faPlus} />}
+                        >
+                          {t('pages.server.databases.button.createFirstDatabase', {})}
+                        </Button>
+                      </ConditionalTooltip>
+                    </ServerCan>
+                  )}
+                </EmptyState>
+              )
+            }
+          >
+            {data?.data.map((database) => (
+              <SelectionArea.Selectable key={database.uuid} item={database}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <DatabaseRow
+                    database={database}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    isSelected={selectedDatabases.has(database.uuid)}
+                    onSelectionChange={
+                      canDelete ? (selected, range) => toggleDatabase(database, selected, range) : undefined
+                    }
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
+        </SelectionArea>
+      </DatabasesSubNavigation>
     </ServerContentContainer>
   );
 }

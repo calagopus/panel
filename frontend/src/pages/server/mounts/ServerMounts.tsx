@@ -59,59 +59,59 @@ export default function ServerMounts() {
       setSearch={setSearch}
       registry={window.extensionContext.extensionRegistry.pages.server.mounts.container}
     >
-      <MountsSubNavigation />
+      <MountsSubNavigation>
+        <MountActionBar selectedMounts={selectedMounts} clearSelection={clearSelection} />
 
-      <MountActionBar selectedMounts={selectedMounts} clearSelection={clearSelection} />
-
-      <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
-        <Table
-          columns={[
-            ...(canSelect
-              ? [
-                  tableSelectionHeader({
-                    checked: allSelected,
-                    indeterminate: selectedMounts.size > 0 && !allSelected,
-                    onChange: (checked) => (checked ? selectAll() : clearSelection()),
-                  }),
-                ]
-              : []),
-            t('common.table.columns.name', {}),
-            t('common.table.columns.description', {}),
-            t('common.table.columns.target', {}),
-            t('pages.server.mounts.table.columns.mounted', {}),
-            t('common.readOnly', {}),
-            '',
-          ]}
-          loading={loading}
-          pagination={mounts}
-          onPageSelect={setPage}
-          onPerPageSelect={setPerPage}
-          error={error}
-          empty={
-            debouncedSearch ? undefined : (
-              <EmptyState
-                flush
-                icon={faFolderTree}
-                title={t('pages.server.mounts.empty.title', {})}
-                description={t('pages.server.mounts.empty.description', {})}
-              />
-            )
-          }
-        >
-          {mounts?.data.map((mount) => (
-            <SelectionArea.Selectable key={mount.uuid} item={mount}>
-              {(innerRef: Ref<HTMLElement>) => (
-                <MountRow
-                  contextMount={mount}
-                  ref={innerRef as Ref<HTMLTableRowElement>}
-                  isSelected={selectedMounts.has(mount.uuid)}
-                  onSelectionChange={canSelect ? (selected, range) => toggleMount(mount, selected, range) : undefined}
+        <SelectionArea {...selectionAreaProps} disabled={!canSelect}>
+          <Table
+            columns={[
+              ...(canSelect
+                ? [
+                    tableSelectionHeader({
+                      checked: allSelected,
+                      indeterminate: selectedMounts.size > 0 && !allSelected,
+                      onChange: (checked) => (checked ? selectAll() : clearSelection()),
+                    }),
+                  ]
+                : []),
+              t('common.table.columns.name', {}),
+              t('common.table.columns.description', {}),
+              t('common.table.columns.target', {}),
+              t('pages.server.mounts.table.columns.mounted', {}),
+              t('common.readOnly', {}),
+              '',
+            ]}
+            loading={loading}
+            pagination={mounts}
+            onPageSelect={setPage}
+            onPerPageSelect={setPerPage}
+            error={error}
+            empty={
+              debouncedSearch ? undefined : (
+                <EmptyState
+                  flush
+                  icon={faFolderTree}
+                  title={t('pages.server.mounts.empty.title', {})}
+                  description={t('pages.server.mounts.empty.description', {})}
                 />
-              )}
-            </SelectionArea.Selectable>
-          ))}
-        </Table>
-      </SelectionArea>
+              )
+            }
+          >
+            {mounts?.data.map((mount) => (
+              <SelectionArea.Selectable key={mount.uuid} item={mount}>
+                {(innerRef: Ref<HTMLElement>) => (
+                  <MountRow
+                    contextMount={mount}
+                    ref={innerRef as Ref<HTMLTableRowElement>}
+                    isSelected={selectedMounts.has(mount.uuid)}
+                    onSelectionChange={canSelect ? (selected, range) => toggleMount(mount, selected, range) : undefined}
+                  />
+                )}
+              </SelectionArea.Selectable>
+            ))}
+          </Table>
+        </SelectionArea>
+      </MountsSubNavigation>
     </ServerContentContainer>
   );
 }

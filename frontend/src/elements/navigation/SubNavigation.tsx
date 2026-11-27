@@ -1,5 +1,6 @@
-import { Tabs } from '@mantine/core';
-import React, { createContext, ReactNode, useContext, useMemo } from 'react';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { Menu, Tabs } from '@mantine/core';
+import React, { createContext, ReactNode, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { NavLink, Route, Routes, useLocation, useNavigate } from 'react-router';
 import { HookableComponentBase, makeComponentHookable } from 'shared';
 import { SubNavigationRegistry } from 'shared/src/registries/slices/subNavigation.ts';
@@ -37,6 +38,7 @@ type SubNavigationProps<P = unknown> = {
   baseUrl: string;
   items: ItemProp[];
   hideWhenSingle?: boolean;
+  children?: ReactNode;
 } & ({ registry: SubNavigationRegistry<P>; registryProps: P } | { registry?: never; registryProps?: never });
 
 function useVisibleItems(items: ItemProp[]): ItemProp[] {
@@ -88,12 +90,85 @@ function SubNavigationItem({ baseUrl, item }: { baseUrl: string; item: ItemProp 
   );
 }
 
+function SubNavigationMenu({
+  baseUrl,
+  items,
+  activeItem,
+}: {
+  baseUrl: string;
+  items: ItemProp[];
+  activeItem: ItemProp;
+}) {
+  return (
+    <Menu position='bottom-start'>
+      <Menu.Target>
+        <Tabs.Tab
+          value={resolveString(activeItem.name)}
+          leftSection={<Icon icon={activeItem.icon} />}
+          rightSection={<Icon icon={faChevronDown} />}
+        >
+          {resolveString(activeItem.name)}
+        </Tabs.Tab>
+      </Menu.Target>
+      <Menu.Dropdown>
+        {items.map((item) => (
+          <Menu.Item
+            key={resolveString(item.name)}
+            component={NavLink}
+            to={itemPath(baseUrl, item)}
+            end={item.end ?? true}
+            leftSection={<Icon icon={item.icon} />}
+            className='sub-navigation-menu-item'
+            mod={{ active: item === activeItem }}
+          >
+            {resolveString(item.name)}
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
+function useCollapsedTabs(enabled: boolean, itemsKey: string) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const fullWidth = useRef(0);
+  const measuredKey = useRef<string | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || !enabled) return;
+
+    const update = () => {
+      if (!collapsed) {
+        const last = listRef.current?.lastElementChild as HTMLElement | null | undefined;
+        fullWidth.current = last ? last.offsetLeft + last.offsetWidth : 0;
+        measuredKey.current = itemsKey;
+      } else if (measuredKey.current !== itemsKey) {
+        setCollapsed(false);
+        return;
+      }
+
+      setCollapsed(fullWidth.current > root.clientWidth);
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [collapsed, enabled, itemsKey]);
+
+  return { rootRef, listRef, collapsed };
+}
+
 function SubNavigation<P>({
   baseUrl,
   items: baseItems,
   hideWhenSingle,
   registry,
   registryProps,
+  children,
 }: SubNavigationProps<P>) {
   const location = useLocation();
   const depth = useContext(SubNavigationDepthContext) + 1;
@@ -137,26 +212,50 @@ function SubNavigation<P>({
       })
       .sort((a, b) => (b.path?.length ?? b.link?.length ?? 0) - (a.path?.length ?? a.link?.length ?? 0))[0] ?? items[0];
 
+  const activeValue = resolveString(activeItem?.name) ?? null;
+  const { rootRef, listRef, collapsed } = useCollapsedTabs(
+    tabsShown,
+    visibleItems.map((item) => resolveString(item.name)).join('\n'),
+  );
+
   return (
     <SubNavigationDepthContext.Provider value={depth}>
-      {tabsShown && (
-        <Tabs my='xs' value={resolveString(activeItem?.name) ?? resolveString(items[0].name)}>
-          <Tabs.List>
-            {visibleItems.map((item) => (
-              <SubNavigationItem key={resolveString(item.name)} baseUrl={baseUrl} item={item} />
-            ))}
+      <Tabs
+        ref={rootRef}
+        variant='outline'
+        radius='md'
+        my={tabsShown ? 'xs' : undefined}
+        value={activeValue}
+        classNames={{ root: 'sub-navigation', list: 'sub-navigation-list', tab: 'sub-navigation-tab' }}
+      >
+        {tabsShown && (
+          <Tabs.List ref={listRef}>
+            {collapsed && activeItem ? (
+              <SubNavigationMenu baseUrl={baseUrl} items={visibleItems} activeItem={activeItem} />
+            ) : (
+              visibleItems.map((item) => (
+                <SubNavigationItem key={resolveString(item.name)} baseUrl={baseUrl} item={item} />
+              ))
+            )}
           </Tabs.List>
-        </Tabs>
-      )}
-      {pathItems.length > 0 && (
-        <Routes>
-          {pathItems.map((item) => (
-            <Route key={item.path} element={<AdminPermissionGuard permission={item.permission ?? []} />}>
-              <Route path={item.path} element={item.element} />
-            </Route>
-          ))}
-        </Routes>
-      )}
+        )}
+        <Tabs.Panel
+          value={activeValue}
+          p={tabsShown ? { base: 'sm', md: 'md' } : undefined}
+          className={tabsShown ? 'sub-navigation-panel' : undefined}
+        >
+          {pathItems.length > 0 && (
+            <Routes>
+              {pathItems.map((item) => (
+                <Route key={item.path} element={<AdminPermissionGuard permission={item.permission ?? []} />}>
+                  <Route path={item.path} element={item.element} />
+                </Route>
+              ))}
+            </Routes>
+          )}
+          {children}
+        </Tabs.Panel>
+      </Tabs>
     </SubNavigationDepthContext.Provider>
   );
 }

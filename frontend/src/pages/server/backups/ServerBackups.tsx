@@ -506,9 +506,7 @@ export default function ServerBackups({
       contentRight={isEmpty ? undefined : createControl}
       registry={window.extensionContext.extensionRegistry.pages.server.backups.container}
     >
-      <BackupsSubNavigation />
-
-      {body}
+      <BackupsSubNavigation>{body}</BackupsSubNavigation>
     </ServerContentContainer>
   );
 }

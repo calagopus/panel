@@ -293,6 +293,51 @@ html:has(.fixed-viewport) {
   }
 }
 
+.sub-navigation .sub-navigation-list {
+  z-index: 1;
+  flex-wrap: nowrap;
+}
+
+.sub-navigation .sub-navigation-tab {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .sub-navigation .sub-navigation-tab:not([data-active]):hover {
+    background-color: var(--mantine-color-gray-light-hover);
+  }
+}
+
+.sub-navigation .sub-navigation-list::before,
+.sub-navigation .sub-navigation-tab[data-active]::before,
+.sub-navigation .sub-navigation-tab[data-active]::after {
+  display: none;
+}
+
+.sub-navigation .sub-navigation-tab[data-active],
+.sub-navigation-menu-item[data-active] {
+  color: var(--mantine-color-blue-outline);
+}
+
+[data-mantine-color-scheme='dark'] .sub-navigation .sub-navigation-tab[data-active],
+[data-mantine-color-scheme='dark'] .sub-navigation-menu-item[data-active] {
+  color: var(--mantine-color-blue-light-color);
+}
+
+.sub-navigation .sub-navigation-panel {
+  margin-top: calc(-0.0625rem * var(--mantine-scale));
+  border: calc(0.0625rem * var(--mantine-scale)) solid var(--tab-border-color);
+  border-radius: var(--tabs-radius);
+}
+
+.sub-navigation:has(
+    > .sub-navigation-list > :first-child[data-active],
+    > .sub-navigation-list > :first-child > [data-active]
+  )
+  > .sub-navigation-panel {
+  border-top-left-radius: 0;
+}
+
 :root[data-mantine-color-scheme='light'] {
   --mantine-color-body: #f0eff0;
 

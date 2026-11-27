@@ -342,60 +342,60 @@ export default function ServerTunnel() {
             {t('pages.server.tunnel.modal.leave.content', {}).md()}
           </ConfirmationModal>
 
-          <NetworkSubNavigation />
+          <NetworkSubNavigation>
+            <Stack>
+              {!view.supported && (
+                <Alert color='red' icon={faExclamationTriangle}>
+                  {(view.tunnel
+                    ? t('pages.server.tunnel.alert.nodeLeftNetwork', {})
+                    : t('pages.server.tunnel.alert.nodeNotOnNetwork', {})
+                  ).md()}
+                </Alert>
+              )}
 
-          <Stack>
-            {!view.supported && (
-              <Alert color='red' icon={faExclamationTriangle}>
-                {(view.tunnel
-                  ? t('pages.server.tunnel.alert.nodeLeftNetwork', {})
-                  : t('pages.server.tunnel.alert.nodeNotOnNetwork', {})
-                ).md()}
-              </Alert>
-            )}
-
-            {!view.tunnel ? (
-              <EmptyState
-                icon={faShareNodes}
-                title={t('pages.server.tunnel.empty.title', {})}
-                description={
-                  canCreate
-                    ? t('pages.server.tunnel.empty.description', {})
-                    : t('pages.server.tunnel.empty.descriptionReadOnly', {})
-                }
-              >
-                <ServerCan action='connections.create'>
-                  <ConditionalTooltip
-                    enabled={!view.supported}
-                    label={t('pages.server.tunnel.tooltip.nodeNotOnNetwork', {})}
-                  >
-                    <Button
-                      disabled={!view.supported}
-                      onClick={() => setJoining(true)}
-                      leftSection={<FontAwesomeIcon icon={faRightToBracket} />}
-                    >
-                      {t('pages.server.tunnel.button.join', {})}
-                    </Button>
-                  </ConditionalTooltip>
-                </ServerCan>
-              </EmptyState>
-            ) : (
-              <>
-                <Alert color='gray'>{t('pages.server.tunnel.alert.bypassesFirewall', {})}</Alert>
-
-                <TunnelCanvas
-                  nodes={nodes}
-                  items={canvasItems}
-                  hint={
-                    view.outgoing.length === 0 && view.incoming.length === 0
-                      ? canCreate && t('pages.server.tunnel.outgoing.empty', {})
-                      : t('pages.server.tunnel.canvas.hint', {})
+              {!view.tunnel ? (
+                <EmptyState
+                  icon={faShareNodes}
+                  title={t('pages.server.tunnel.empty.title', {})}
+                  description={
+                    canCreate
+                      ? t('pages.server.tunnel.empty.description', {})
+                      : t('pages.server.tunnel.empty.descriptionReadOnly', {})
                   }
-                  onPan={hideContextMenu}
-                />
-              </>
-            )}
-          </Stack>
+                >
+                  <ServerCan action='connections.create'>
+                    <ConditionalTooltip
+                      enabled={!view.supported}
+                      label={t('pages.server.tunnel.tooltip.nodeNotOnNetwork', {})}
+                    >
+                      <Button
+                        disabled={!view.supported}
+                        onClick={() => setJoining(true)}
+                        leftSection={<FontAwesomeIcon icon={faRightToBracket} />}
+                      >
+                        {t('pages.server.tunnel.button.join', {})}
+                      </Button>
+                    </ConditionalTooltip>
+                  </ServerCan>
+                </EmptyState>
+              ) : (
+                <>
+                  <Alert color='gray'>{t('pages.server.tunnel.alert.bypassesFirewall', {})}</Alert>
+
+                  <TunnelCanvas
+                    nodes={nodes}
+                    items={canvasItems}
+                    hint={
+                      view.outgoing.length === 0 && view.incoming.length === 0
+                        ? canCreate && t('pages.server.tunnel.outgoing.empty', {})
+                        : t('pages.server.tunnel.canvas.hint', {})
+                    }
+                    onPan={hideContextMenu}
+                  />
+                </>
+              )}
+            </Stack>
+          </NetworkSubNavigation>
         </ServerContentContainer>
       )}
     </ResourceView>
