@@ -6565,6 +6565,7 @@ const baseTranslations = defineTranslations({
             networkDetails: '{total} total · {packets} pps',
             diskDetails: '{total} total · {ops} IOPS',
             normalizeCpuLoad: 'Normalize CPU Load (shifted to max 100%)',
+            offline: 'Start the server to see live usage.',
           },
           power: {
             modal: {
@@ -6602,8 +6603,14 @@ const baseTranslations = defineTranslations({
               limit: 'Limit',
             },
             summary: {
-              peak: 'Peak {value}',
-              diskIo: '{read} read · {written} written',
+              running: 'Running',
+              latest: 'Latest',
+              total: 'Total',
+              networkTraffic: 'Network Traffic',
+              received: 'Received',
+              sent: 'Sent',
+              read: 'Read',
+              written: 'Written',
             },
             unavailable: {
               title: 'Resource History Unavailable',

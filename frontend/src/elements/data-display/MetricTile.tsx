@@ -36,7 +36,8 @@ export default function MetricTile({
   action,
   popover,
   chart,
-  chartVisible = true,
+  overlayIcon,
+  overlayLabel,
 }: {
   icon: IconLike;
   label: string;
@@ -51,7 +52,8 @@ export default function MetricTile({
   action?: ReactNode;
   popover?: ReactNode;
   chart?: ReactNode;
-  chartVisible?: boolean;
+  overlayIcon?: ReactNode;
+  overlayLabel?: string;
 }) {
   const shownProgress = loading ? null : progress;
 
@@ -63,9 +65,9 @@ export default function MetricTile({
       progress={shownProgress}
       total={total}
       progressColor={usageColor(shownProgress, total)}
-      progressMargin={chart ? 0 : 'md'}
+      progressMargin={chart && !overlayLabel ? 0 : 'md'}
     >
-      <div className={classNames('flex flex-col gap-1 px-4 pt-3', !chart && 'pb-3')}>
+      <div className={classNames('flex flex-col gap-1 px-4 pt-3', !chart && !overlayLabel && 'pb-3')}>
         <h3 className='flex min-w-0 items-center text-sm text-(--mantine-color-dimmed)'>
           <span className='mr-2 flex shrink-0 items-center'>
             <Icon icon={icon} />
@@ -129,10 +131,17 @@ export default function MetricTile({
             </div>
           ))}
       </div>
-      {chart && (
-        <div className='relative mt-2 min-h-16 flex-1 xl:min-h-8'>
-          {chartVisible && <div className='absolute inset-0'>{chart}</div>}
+      {overlayLabel ? (
+        <div className='flex min-h-28 flex-1 flex-col items-center justify-center gap-2 px-4 py-3 text-center text-(--mantine-color-dimmed) xl:min-h-8'>
+          {overlayIcon}
+          <span className='text-sm'>{overlayLabel}</span>
         </div>
+      ) : (
+        chart && (
+          <div className='relative mt-2 min-h-16 flex-1 xl:min-h-8'>
+            <div className='absolute inset-0'>{chart}</div>
+          </div>
+        )
       )}
     </Card>
   );

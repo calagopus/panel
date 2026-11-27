@@ -9,7 +9,7 @@ import {
   faPowerOff,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import StatCard from '@/elements/data-display/StatCard.tsx';
+import SummaryTile from '@/elements/data-display/SummaryTile.tsx';
 import { formatBytes, formatPercent } from '@/lib/chart.ts';
 import { bytesToString } from '@/lib/format/size.ts';
 import { useTranslations } from '@/providers/TranslationProvider.tsx';
@@ -18,10 +18,11 @@ export function HistoryUptimeCard({ summary, loading }: ResourceHistoryProps) {
   const { t } = useTranslations();
 
   return (
-    <StatCard
+    <SummaryTile
       icon={faPowerOff}
       label={t('common.stat.uptime', {})}
       value={summary.uptime === null ? t('common.na', {}) : formatPercent(summary.uptime * 100)}
+      caption={summary.uptime === null ? null : t('pages.server.console.history.summary.running', {})}
       loading={loading && summary.uptime === null}
     />
   );
@@ -31,14 +32,21 @@ export function HistoryCpuCard({ summary, loading }: ResourceHistoryProps) {
   const { t } = useTranslations();
 
   return (
-    <StatCard
+    <SummaryTile
       icon={faMicrochip}
       label={t('common.stat.cpu', {})}
       value={summary.cpuAverage === null ? t('common.na', {}) : formatPercent(summary.cpuAverage)}
-      details={
+      caption={summary.cpuAverage === null ? null : t('pages.server.console.history.series.average', {})}
+      rows={
         summary.cpuMax === null
           ? null
-          : t('pages.server.console.history.summary.peak', { value: formatPercent(summary.cpuMax) })
+          : [
+              {
+                key: 'peak',
+                label: t('pages.server.console.history.series.peak', {}),
+                value: formatPercent(summary.cpuMax),
+              },
+            ]
       }
       loading={loading && summary.cpuAverage === null}
     />
@@ -49,14 +57,21 @@ export function HistoryMemoryCard({ summary, loading }: ResourceHistoryProps) {
   const { t } = useTranslations();
 
   return (
-    <StatCard
+    <SummaryTile
       icon={faMemory}
       label={t('common.stat.memoryUsage', {})}
       value={summary.memoryAverage === null ? t('common.na', {}) : formatBytes(summary.memoryAverage)}
-      details={
+      caption={summary.memoryAverage === null ? null : t('pages.server.console.history.series.average', {})}
+      rows={
         summary.memoryMax === null
           ? null
-          : t('pages.server.console.history.summary.peak', { value: formatBytes(summary.memoryMax) })
+          : [
+              {
+                key: 'peak',
+                label: t('pages.server.console.history.series.peak', {}),
+                value: formatBytes(summary.memoryMax),
+              },
+            ]
       }
       loading={loading && summary.memoryAverage === null}
     />
@@ -65,36 +80,43 @@ export function HistoryMemoryCard({ summary, loading }: ResourceHistoryProps) {
 
 export function HistoryNetworkCard({ summary, loading }: ResourceHistoryProps) {
   const { t } = useTranslations();
+  const empty = summary.networkRxBytes === null || summary.networkTxBytes === null;
 
   return (
-    <StatCard
+    <SummaryTile
       icon={faCloudDownload}
-      label={t('common.stat.network', {})}
+      label={t('pages.server.console.history.summary.networkTraffic', {})}
       value={
-        summary.networkRxBytes === null || summary.networkTxBytes === null ? (
-          t('common.na', {})
-        ) : (
-          <span className='inline-flex items-center gap-2'>
-            <span className='inline-flex items-center gap-1'>
-              <FontAwesomeIcon
-                icon={faArrowDown}
-                size='xs'
-                className='text-(--mantine-color-dimmed)'
-                title={t('common.stat.inbound', {})}
-              />
-              {bytesToString(summary.networkRxBytes, 1, true)}
-            </span>
-            <span className='inline-flex items-center gap-1'>
-              <FontAwesomeIcon
-                icon={faArrowUp}
-                size='xs'
-                className='text-(--mantine-color-dimmed)'
-                title={t('common.stat.outbound', {})}
-              />
-              {bytesToString(summary.networkTxBytes, 1, true)}
-            </span>
-          </span>
-        )
+        empty
+          ? t('common.na', {})
+          : bytesToString((summary.networkRxBytes ?? 0) + (summary.networkTxBytes ?? 0), 1, true)
+      }
+      caption={empty ? null : t('pages.server.console.history.summary.total', {})}
+      rows={
+        empty
+          ? null
+          : [
+              {
+                key: 'received',
+                label: (
+                  <>
+                    <FontAwesomeIcon icon={faArrowDown} size='xs' />
+                    {t('pages.server.console.history.summary.received', {})}
+                  </>
+                ),
+                value: bytesToString(summary.networkRxBytes ?? 0, 1, true),
+              },
+              {
+                key: 'sent',
+                label: (
+                  <>
+                    <FontAwesomeIcon icon={faArrowUp} size='xs' />
+                    {t('pages.server.console.history.summary.sent', {})}
+                  </>
+                ),
+                value: bytesToString(summary.networkTxBytes ?? 0, 1, true),
+              },
+            ]
       }
       loading={loading && summary.networkRxBytes === null}
     />
@@ -105,17 +127,26 @@ export function HistoryDiskCard({ summary, loading }: ResourceHistoryProps) {
   const { t } = useTranslations();
 
   return (
-    <StatCard
+    <SummaryTile
       icon={faHardDrive}
       label={t('common.stat.diskUsage', {})}
       value={summary.disk === null ? t('common.na', {}) : formatBytes(summary.disk)}
-      details={
+      caption={summary.disk === null ? null : t('pages.server.console.history.summary.latest', {})}
+      rows={
         summary.diskReadBytes === null || summary.diskWriteBytes === null
           ? null
-          : t('pages.server.console.history.summary.diskIo', {
-              read: bytesToString(summary.diskReadBytes, 1, true),
-              written: bytesToString(summary.diskWriteBytes, 1, true),
-            })
+          : [
+              {
+                key: 'read',
+                label: t('pages.server.console.history.summary.read', {}),
+                value: bytesToString(summary.diskReadBytes, 1, true),
+              },
+              {
+                key: 'written',
+                label: t('pages.server.console.history.summary.written', {}),
+                value: bytesToString(summary.diskWriteBytes, 1, true),
+              },
+            ]
       }
       loading={loading && summary.disk === null}
     />

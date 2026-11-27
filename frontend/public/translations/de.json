@@ -6543,7 +6543,8 @@
             "port": "Port",
             "networkDetails": "{total} gesamt · {packets} Pakete/s",
             "diskDetails": "{total} gesamt · {ops} IOPS",
-            "normalizeCpuLoad": "Normalisiere CPU-Last (skaliert auf max. 100%)"
+            "normalizeCpuLoad": "Normalisiere CPU-Last (skaliert auf max. 100%)",
+            "offline": "Starte den Server, um die aktuelle Auslastung zu sehen."
           },
           "power": {
             "modal": {
@@ -6581,8 +6582,14 @@
               "limit": "Limit"
             },
             "summary": {
-              "peak": "Spitze {value}",
-              "diskIo": "{read} gelesen · {written} geschrieben"
+              "running": "Gelaufen",
+              "latest": "Zuletzt",
+              "total": "Gesamt",
+              "networkTraffic": "Netzwerkverkehr",
+              "received": "Empfangen",
+              "sent": "Gesendet",
+              "read": "Gelesen",
+              "written": "Geschrieben"
             },
             "unavailable": {
               "title": "Ressourcenverlauf nicht verfügbar",

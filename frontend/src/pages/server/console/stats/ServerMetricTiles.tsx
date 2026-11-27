@@ -5,6 +5,7 @@ import {
   faHardDrive,
   faMemory,
   faMicrochip,
+  faPowerOff,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import StreamChart from '@/elements/charts/StreamChart.tsx';
@@ -25,7 +26,8 @@ export default function ServerMetricTiles() {
   const [doNormalizeCpuLoad] = useUserSetting(NORMALIZE_CPU_LOAD_KEY, normalizeCpuLoadSchema, false);
   const { stats, statsPending, offline, rates, cpu, memory, network, diskIo } = useServerMetrics();
 
-  const offlineLabel = t('common.enum.serverState.offline', {});
+  const overlayIcon = offline ? <FontAwesomeIcon icon={faPowerOff} className='text-2xl' /> : undefined;
+  const overlayLabel = offline ? t('pages.server.console.details.offline', {}) : undefined;
   const unlimited = t('common.unlimited', {});
   const cpuLimitAbsolute = stats?.cpuLimitAbsolute || 100;
   const formatCpu = doNormalizeCpuLoad
@@ -42,7 +44,7 @@ export default function ServerMetricTiles() {
         loading={statsPending}
         value={
           offline
-            ? offlineLabel
+            ? null
             : doNormalizeCpuLoad
               ? `${(((stats?.cpuAbsolute || 0) / cpuLimitAbsolute) * 100).toFixed(2)}%`
               : `${(stats?.cpuAbsolute || 0).toFixed(2)}%`
@@ -53,7 +55,8 @@ export default function ServerMetricTiles() {
         action={<HistoryLink />}
         popover={<CpuLoadSettings />}
         chart={<StreamChart {...cpu.props} format={formatCpu} compact />}
-        chartVisible={!offline}
+        overlayIcon={overlayIcon}
+        overlayLabel={overlayLabel}
       />
 
       <MetricTile
@@ -62,20 +65,21 @@ export default function ServerMetricTiles() {
         order={50}
         className='xl:flex-[1_0_auto]'
         loading={statsPending}
-        value={offline ? offlineLabel : bytesToString(stats?.memoryBytes || 0)}
+        value={offline ? null : bytesToString(stats?.memoryBytes || 0)}
         limit={server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : unlimited}
         progress={offline ? null : stats?.memoryBytes}
         total={mbToBytes(server.limits.memory)}
         action={<HistoryLink />}
         chart={<StreamChart {...memory.props} compact />}
-        chartVisible={!offline}
+        overlayIcon={overlayIcon}
+        overlayLabel={overlayLabel}
       />
 
       <MetricTile
         icon={faHardDrive}
         label={t('common.stat.diskUsage', {})}
         order={60}
-        className={stats?.disk || statsPending ? 'xl:flex-[1_0_auto]' : 'xl:shrink-0'}
+        className={stats?.disk || statsPending || offline ? 'xl:flex-[1_0_auto]' : 'xl:shrink-0'}
         loading={statsPending}
         value={bytesToString(stats?.diskBytes || 0)}
         limit={server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : unlimited}
@@ -105,7 +109,8 @@ export default function ServerMetricTiles() {
               ]
         }
         chart={(stats?.disk || statsPending) && <StreamChart {...diskIo.props} compact />}
-        chartVisible={!offline}
+        overlayIcon={overlayIcon}
+        overlayLabel={overlayLabel}
       />
 
       <MetricTile
@@ -114,7 +119,6 @@ export default function ServerMetricTiles() {
         order={70}
         className='xl:flex-[1_0_auto]'
         loading={statsPending}
-        value={offline ? offlineLabel : null}
         action={<HistoryLink />}
         rows={
           offline
@@ -151,7 +155,8 @@ export default function ServerMetricTiles() {
               ]
         }
         chart={<StreamChart {...network.props} compact />}
-        chartVisible={!offline}
+        overlayIcon={overlayIcon}
+        overlayLabel={overlayLabel}
       />
 
       <ExtensionSlot

@@ -64,6 +64,7 @@ export class ResourceHistoryRegistry implements Registry {
   public rangeInterceptors: RangeInterceptor[] = [];
   /**
    * The stat row above the charts.
+   * `SummaryTile` from `@/elements/data-display/SummaryTile.tsx` matches the stock ones.
    * @since 1.2.9
    */
   public summaryCards: ResourceHistoryItem[] = [];
