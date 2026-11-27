@@ -21,8 +21,8 @@ import TagsInput from '@/elements/input/TagsInput.tsx';
 import TextArea from '@/elements/input/TextArea.tsx';
 import TextInput from '@/elements/input/TextInput.tsx';
 import TimezoneInput from '@/elements/input/TimezoneInput.tsx';
-import Divider from '@/elements/layout/Divider.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
+import { DividerHeader } from './DividerHeader.tsx';
 import { FieldDef, FieldOption, resolveString } from './types.ts';
 
 interface Props<T extends Record<string, unknown>> {
@@ -59,23 +59,7 @@ export function FormField<T extends Record<string, unknown>>({ form, field }: Pr
   if (field.when && !field.when(form.values)) return null;
 
   if (field.type === 'divider') {
-    if (field.switchName) {
-      const f = form as UseFormReturnType<Record<string, unknown>>;
-      return (
-        <div className='col-span-full flex items-center gap-4'>
-          <Divider className='flex-1' label={resolveString(field.label)} labelPosition='left' />
-          <Switch
-            label={resolveString(field.switchLabel)}
-            labelPosition='left'
-            key={f.key(field.switchName)}
-            {...f.getInputProps(field.switchName, { type: 'checkbox' })}
-            {...field.switchProps}
-          />
-        </div>
-      );
-    }
-
-    return <Divider className='col-span-full' label={resolveString(field.label)} labelPosition='left' />;
+    return <DividerHeader form={form} field={field} className='col-span-full' />;
   }
 
   const colSpanClass = field.colSpan === 'full' ? 'col-span-full' : undefined;

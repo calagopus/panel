@@ -154,6 +154,8 @@ export interface DividerFieldDef<T extends Record<string, unknown>> {
   switchName?: string;
   switchLabel?: LazyString;
   switchProps?: Partial<SwitchProps>;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
   advanced?: boolean;
   when?: (values: T) => boolean;
 }

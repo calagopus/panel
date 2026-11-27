@@ -8,6 +8,7 @@ export type {
   ColSpan,
   CustomFieldDef,
   DateFieldDef,
+  DividerFieldDef,
   FieldDef,
   FieldOption,
   FieldTransform,
