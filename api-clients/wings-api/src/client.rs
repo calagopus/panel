@@ -450,6 +450,20 @@ impl WingsClient {
         .await
     }
 
+    pub async fn delete_servers_server_backup_restore(
+        &self,
+        server: uuid::Uuid,
+    ) -> Result<super::servers_server_backup_restore::delete::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::DELETE,
+            format!("/api/servers/{server}/backup/restore"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
     pub async fn delete_servers_server_backup_backup(
         &self,
         server: uuid::Uuid,
@@ -459,6 +473,21 @@ impl WingsClient {
             self,
             Method::DELETE,
             format!("/api/servers/{server}/backup/{backup}"),
+            None::<&()>,
+            None,
+        )
+        .await
+    }
+
+    pub async fn post_servers_server_backup_backup_abort(
+        &self,
+        server: uuid::Uuid,
+        backup: uuid::Uuid,
+    ) -> Result<super::servers_server_backup_backup_abort::post::Response, ApiHttpError> {
+        request_impl(
+            self,
+            Method::POST,
+            format!("/api/servers/{server}/backup/{backup}/abort"),
             None::<&()>,
             None,
         )

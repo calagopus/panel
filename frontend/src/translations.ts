@@ -6467,8 +6467,14 @@ const baseTranslations = defineTranslations({
           toast: {
             installCancelled: 'Server install cancelled.',
             transferCancelled: 'Server transfer cancelled.',
+            restoreCancelled: 'Backup restore cancelled.',
           },
           modal: {
+            abortBackupRestore: {
+              title: 'Cancel Backup Restore',
+              content:
+                'Cancelling stops the restore where it is, leaving the server files **partially restored**. The server stays locked until you acknowledge the failed restore.',
+            },
             sshDetails: {
               title: 'SSH Details',
               form: {
@@ -8644,6 +8650,7 @@ const baseTranslations = defineTranslations({
             sourceDeleted: '{name} (deleted)',
           },
           button: {
+            abort: 'Abort',
             browse: 'Browse',
             exportToFiles: 'Export to Files',
             createBackup: 'Create Backup',
@@ -8684,6 +8691,13 @@ const baseTranslations = defineTranslations({
             },
             exportBackup: {
               title: 'Export Backup to Files',
+            },
+            abortBackup: {
+              title: 'Abort Backup',
+              content: 'Abort creating **{name}**? The backup is marked as failed.',
+              toast: {
+                aborted: 'Backup aborted.',
+              },
             },
             deleteBackups: {
               title: 'Confirm Backup Deletion',

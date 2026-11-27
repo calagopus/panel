@@ -16,6 +16,7 @@ export const serverBackupSchema = z.looseObject({
   isLocked: z.boolean(),
   isBrowsable: z.boolean(),
   isStreaming: z.boolean(),
+  isAbortable: z.boolean(),
   checksum: z.string().nullable(),
   bytes: z.number(),
   files: z.number(),

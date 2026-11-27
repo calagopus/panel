@@ -105,87 +105,90 @@ mod get {
                 .ok();
         }
 
-        let mut parts = Vec::new();
-        parts.reserve_exact(part_count as usize);
+        tokio::spawn(async move {
+            let mut parts = Vec::new();
+            parts.reserve_exact(part_count as usize);
 
-        let compression_type = s3_configuration.compression_type;
-        let (client, bucket) = s3_configuration.into_client();
+            let compression_type = s3_configuration.compression_type;
+            let (client, bucket) = s3_configuration.into_client();
 
-        let (file_path, upload_id) = match (&backup.0.upload_path, &backup.0.upload_id) {
-            (Some(upload_path), Some(upload_id)) => (upload_path.clone(), upload_id.clone()),
-            _ => {
-                let file_path = backup.0.s3_path(server_uuid, compression_type);
-                let content_type = ServerBackup::s3_content_type(&file_path);
+            let (file_path, upload_id) = match (&backup.0.upload_path, &backup.0.upload_id) {
+                (Some(upload_path), Some(upload_id)) => (upload_path.clone(), upload_id.clone()),
+                _ => {
+                    let file_path = backup.0.s3_path(server_uuid, compression_type);
+                    let content_type = ServerBackup::s3_content_type(&file_path);
 
-                let multipart = match client
-                    .create_multipart_upload()
+                    let multipart = match client
+                        .create_multipart_upload()
+                        .bucket(&*bucket)
+                        .key(&*file_path)
+                        .content_type(content_type)
+                        .send()
+                        .await
+                    {
+                        Ok(multipart) => multipart,
+                        Err(err) => {
+                            tracing::error!(
+                                backup = %backup.0.uuid,
+                                location = %node.0.location.name,
+                                "failed to initiate multipart upload: {:#?}",
+                                err
+                            );
+
+                            return ApiResponse::error("failed to initiate multipart upload")
+                                .with_status(StatusCode::EXPECTATION_FAILED)
+                                .ok();
+                        }
+                    };
+
+                    let upload_id = match multipart.upload_id() {
+                        Some(upload_id) => upload_id,
+                        None => {
+                            tracing::error!(
+                                backup = %backup.0.uuid,
+                                location = %node.0.location.name,
+                                "S3 did not return an upload_id"
+                            );
+
+                            return ApiResponse::error("failed to initiate multipart upload")
+                                .with_status(StatusCode::EXPECTATION_FAILED)
+                                .ok();
+                        }
+                    };
+
+                    sqlx::query!(
+                        "UPDATE server_backups
+                        SET upload_id = $1, upload_path = $2
+                        WHERE server_backups.uuid = $3",
+                        upload_id,
+                        &file_path,
+                        backup.0.uuid
+                    )
+                    .execute(state.database.write())
+                    .await?;
+
+                    (file_path, upload_id.into())
+                }
+            };
+
+            let presigning_config = PresigningConfig::expires_in(Duration::from_hours(2))?;
+
+            for i in 0..part_count {
+                let presigned = client
+                    .upload_part()
                     .bucket(&*bucket)
                     .key(&*file_path)
-                    .content_type(content_type)
-                    .send()
-                    .await
-                {
-                    Ok(multipart) => multipart,
-                    Err(err) => {
-                        tracing::error!(
-                            backup = %backup.0.uuid,
-                            location = %node.0.location.name,
-                            "failed to initiate multipart upload: {:#?}",
-                            err
-                        );
+                    .upload_id(&*upload_id)
+                    .part_number((params.from_part + i) as i32)
+                    .presigned(presigning_config.clone())
+                    .await?;
 
-                        return ApiResponse::error("failed to initiate multipart upload")
-                            .with_status(StatusCode::EXPECTATION_FAILED)
-                            .ok();
-                    }
-                };
-
-                let upload_id = match multipart.upload_id() {
-                    Some(upload_id) => upload_id,
-                    None => {
-                        tracing::error!(
-                            backup = %backup.0.uuid,
-                            location = %node.0.location.name,
-                            "S3 did not return an upload_id"
-                        );
-
-                        return ApiResponse::error("failed to initiate multipart upload")
-                            .with_status(StatusCode::EXPECTATION_FAILED)
-                            .ok();
-                    }
-                };
-
-                sqlx::query!(
-                    "UPDATE server_backups
-                    SET upload_id = $1, upload_path = $2
-                    WHERE server_backups.uuid = $3",
-                    upload_id,
-                    &file_path,
-                    backup.0.uuid
-                )
-                .execute(state.database.write())
-                .await?;
-
-                (file_path, upload_id.into())
+                parts.push(presigned.uri().to_string());
             }
-        };
 
-        let presigning_config = PresigningConfig::expires_in(Duration::from_hours(2))?;
-
-        for i in 0..part_count {
-            let presigned = client
-                .upload_part()
-                .bucket(&*bucket)
-                .key(&*file_path)
-                .upload_id(&*upload_id)
-                .part_number((params.from_part + i) as i32)
-                .presigned(presigning_config.clone())
-                .await?;
-
-            parts.push(presigned.uri().to_string());
-        }
-
-        ApiResponse::new_serialized(Response { parts, part_size }).ok()
+            ApiResponse::new_serialized(Response { parts, part_size }).ok()
+        })
+        .await?
     }
 }
 

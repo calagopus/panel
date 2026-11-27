@@ -1,4 +1,5 @@
 import {
+  faCancel,
   faFileArrowDown,
   faFileExport,
   faInfo,
@@ -15,6 +16,7 @@ import { forwardRef, useMemo, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import abortBackup from '@/api/server/backups/abortBackup.ts';
 import deleteBackup from '@/api/server/backups/deleteBackup.ts';
 import updateBackup from '@/api/server/backups/updateBackup.ts';
 import Button from '@/elements/buttons/Button.tsx';
@@ -75,7 +77,7 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
   const canReadDatabaseInstances = useServerCan('database-instances.read');
 
   const [openModal, setOpenModal] = useState<
-    'edit' | 'restore' | 'restoreDatabase' | 'export' | 'delete' | 'metadata' | null
+    'edit' | 'restore' | 'restoreDatabase' | 'export' | 'abort' | 'delete' | 'metadata' | null
   >(null);
   const download = useBackupDownload(backup);
   const metadataJson = useMemo(() => JSON.stringify(backup.metadata, null, 2), [backup.metadata]);
@@ -128,6 +130,16 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
           'success',
         );
         applyBackupUpdate(queryClient, server.uuid, [backup], { locked });
+      })
+      .catch((msg) => {
+        addToast(httpErrorToHuman(msg), 'error');
+      });
+
+  const doAbort = () =>
+    abortBackup(server.uuid, backup.uuid)
+      .then(() => {
+        setOpenModal(null);
+        addToast(t('pages.server.backups.modal.abortBackup.toast.aborted', {}), 'success');
       })
       .catch((msg) => {
         addToast(httpErrorToHuman(msg), 'error');
@@ -188,6 +200,18 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
           </Button>
         </ModalFooter>
       </Modal>
+
+      <ConfirmationModal
+        opened={openModal === 'abort'}
+        onClose={() => setOpenModal(null)}
+        title={t('pages.server.backups.modal.abortBackup.title', {})}
+        confirm={t('pages.server.backups.button.abort', {})}
+        onConfirmed={doAbort}
+      >
+        {t('pages.server.backups.modal.abortBackup.content', {
+          name: backup.name,
+        }).md()}
+      </ConfirmationModal>
 
       <ConfirmationModal
         opened={openModal === 'delete'}
@@ -283,6 +307,15 @@ const BackupRow = forwardRef<HTMLTableRowElement, BackupRowProps>(function Backu
             hidden: backup.kind !== 'server' || Object.keys(backup.metadata).length === 0,
             onClick: () => setOpenModal('metadata'),
             color: 'gray',
+          },
+          {
+            type: 'action',
+            icon: faCancel,
+            label: t('pages.server.backups.button.abort', {}),
+            hidden: readOnly || !!backup.completed || !backup.isAbortable,
+            onClick: () => setOpenModal('abort'),
+            color: 'red',
+            canAccess: useServerCan('backups.create'),
           },
           {
             type: 'action',

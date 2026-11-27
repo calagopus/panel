@@ -277,6 +277,12 @@ nestify::nest! {
     }
 }
 
+#[derive(Debug, ToSchema, Deserialize, Serialize, Clone, Copy)]
+pub enum ExecutorKind {
+    #[serde(rename = "docker")]
+    Docker,
+}
+
 nestify::nest! {
     #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct FilesystemOperation {
     }
@@ -1519,6 +1525,22 @@ pub mod servers_server_backup {
         pub type Response = Response202;
     }
 }
+pub mod servers_server_backup_restore {
+    use super::*;
+
+    pub mod delete {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response409 = ApiError;
+
+        pub type Response = Response200;
+    }
+}
 pub mod servers_server_backup_backup {
     use super::*;
 
@@ -1533,6 +1555,24 @@ pub mod servers_server_backup_backup {
         pub type Response404 = ApiError;
 
         pub type Response = Response202;
+    }
+}
+pub mod servers_server_backup_backup_abort {
+    use super::*;
+
+    pub mod post {
+        use super::*;
+
+        nestify::nest! {
+            #[derive(Debug, ToSchema, Deserialize, Serialize, Clone)] pub struct Response200 {
+            }
+        }
+
+        pub type Response409 = ApiError;
+
+        pub type Response417 = ApiError;
+
+        pub type Response = Response200;
     }
 }
 pub mod servers_server_backup_backup_restore {
@@ -1558,6 +1598,8 @@ pub mod servers_server_backup_backup_restore {
         }
 
         pub type Response404 = ApiError;
+
+        pub type Response409 = ApiError;
 
         pub type Response = Response202;
     }

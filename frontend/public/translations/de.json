@@ -6452,9 +6452,14 @@
           },
           "toast": {
             "installCancelled": "Server-Installation abgebrochen.",
-            "transferCancelled": "Server-Transfer abgebrochen."
+            "transferCancelled": "Server-Transfer abgebrochen.",
+            "restoreCancelled": "Backup-Wiederherstellung abgebrochen."
           },
           "modal": {
+            "abortBackupRestore": {
+              "title": "Backup-Wiederherstellung abbrechen",
+              "content": "Ein Abbruch stoppt die Wiederherstellung an der aktuellen Stelle, die Serverdateien bleiben **teilweise wiederhergestellt**. Der Server bleibt gesperrt, bis du die fehlgeschlagene Wiederherstellung bestätigst."
+            },
             "sshDetails": {
               "title": "SSH-Details",
               "form": {
@@ -8562,6 +8567,7 @@
             "sourceDeleted": "{name} (gelöscht)"
           },
           "button": {
+            "abort": "Abbrechen",
             "browse": "Durchsuchen",
             "exportToFiles": "In Dateien exportieren",
             "createBackup": "Backup erstellen",
@@ -8602,6 +8608,13 @@
             },
             "exportBackup": {
               "title": "Backup in Dateien exportieren"
+            },
+            "abortBackup": {
+              "title": "Backup abbrechen",
+              "content": "Erstellung von **{name}** abbrechen? Das Backup wird als fehlgeschlagen markiert.",
+              "toast": {
+                "aborted": "Backup abgebrochen."
+              }
             },
             "deleteBackups": {
               "title": "Löschen der Backups bestätigen",

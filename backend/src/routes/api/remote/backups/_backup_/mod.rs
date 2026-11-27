@@ -129,7 +129,7 @@ mod post {
         backup: GetBackup,
         axum::Json(mut data): axum::Json<Payload>,
     ) -> ApiResponseResult {
-        if backup.disk == BackupDisk::S3 {
+        if backup.disk == BackupDisk::S3 && (data.successful || backup.upload_id.is_some()) {
             let upload_id = match &backup.upload_id {
                 Some(id) => id,
                 None => {

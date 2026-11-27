@@ -65,6 +65,11 @@ impl BackupDisk {
             BackupDisk::Kopia => wings_api::BackupAdapter::Kopia,
         }
     }
+
+    #[inline]
+    pub fn is_abortable(self) -> bool {
+        !matches!(self, BackupDisk::Btrfs | BackupDisk::Zfs)
+    }
 }
 
 #[derive(Debug, ToSchema, Serialize, Deserialize, Type, PartialEq, Eq, Hash, Clone, Copy)]
@@ -1741,6 +1746,7 @@ impl ServerBackup {
             is_locked: self.locked,
             is_browsable: self.browsable,
             is_streaming: self.streaming,
+            is_abortable: self.disk.is_abortable(),
             is_shared: self.shared,
             checksum: self.checksum,
             bytes: self.bytes,
@@ -1794,6 +1800,7 @@ impl IntoAdminApiObject for ServerBackup {
                 is_locked: self.locked,
                 is_browsable: self.browsable,
                 is_streaming: self.streaming,
+                is_abortable: self.disk.is_abortable(),
                 is_shared: self.shared,
                 checksum: self.checksum,
                 bytes: self.bytes,
@@ -1850,6 +1857,7 @@ impl IntoApiObject for ServerBackup {
                 is_locked: self.locked,
                 is_browsable: self.browsable,
                 is_streaming: self.streaming,
+                is_abortable: self.disk.is_abortable(),
                 checksum: self.checksum,
                 bytes: self.bytes,
                 files: self.files,
@@ -3232,6 +3240,7 @@ pub struct AdminApiNodeServerBackup {
     pub is_locked: bool,
     pub is_browsable: bool,
     pub is_streaming: bool,
+    pub is_abortable: bool,
     pub is_shared: bool,
 
     pub checksum: Option<compact_str::CompactString>,
@@ -3267,6 +3276,7 @@ pub struct AdminApiServerBackup {
     pub is_locked: bool,
     pub is_browsable: bool,
     pub is_streaming: bool,
+    pub is_abortable: bool,
     pub is_shared: bool,
 
     pub checksum: Option<compact_str::CompactString>,
@@ -3307,6 +3317,7 @@ pub struct ApiServerBackup {
     pub is_locked: bool,
     pub is_browsable: bool,
     pub is_streaming: bool,
+    pub is_abortable: bool,
 
     pub checksum: Option<compact_str::CompactString>,
     pub bytes: i64,

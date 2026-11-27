@@ -12,6 +12,7 @@ use shared::{
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+mod abort;
 mod download;
 mod export;
 mod query;
@@ -323,6 +324,7 @@ pub fn router(state: &State) -> OpenApiRouter<State> {
         .routes(routes!(get::route))
         .routes(routes!(delete::route))
         .routes(routes!(patch::route))
+        .nest("/abort", abort::router(state))
         .nest("/download", download::router(state))
         .nest("/export", export::router(state))
         .nest("/query", query::router(state))

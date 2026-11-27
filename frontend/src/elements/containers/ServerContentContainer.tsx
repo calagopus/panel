@@ -6,11 +6,13 @@ import { ContainerRegistry, makeComponentHookable } from 'shared';
 import { useShallow } from 'zustand/react/shallow';
 import cancelTransfer from '@/api/admin/servers/cancelTransfer.ts';
 import { httpErrorToHuman } from '@/api/axios.ts';
+import abortBackupRestore from '@/api/server/backups/abortBackupRestore.ts';
 import cancelServerInstall from '@/api/server/settings/cancelServerInstall.ts';
 import Button from '@/elements/buttons/Button.tsx';
 import DismissibleAnnouncementAlert from '@/elements/DismissibleAnnouncementAlert.tsx';
 import Notification from '@/elements/feedback/Notification.tsx';
 import Progress from '@/elements/feedback/Progress.tsx';
+import ConfirmationModal from '@/elements/modals/ConfirmationModal.tsx';
 import Tooltip from '@/elements/overlays/Tooltip.tsx';
 import { bytesProgressString } from '@/lib/format/size.ts';
 import { SocketRequest } from '@/plugins/websocket/useWebsocketEvent.ts';
@@ -102,11 +104,18 @@ function ServerContentContainer(props: Props) {
   const { id } = useCurrentWindow();
   const { addToast } = useToast();
 
-  const [abortLoading, setAbortLoading] = useState<'install' | 'transfer' | null>(null);
+  const [abortLoading, setAbortLoading] = useState<'install' | 'transfer' | 'restore' | null>(null);
+  const [openModal, setOpenModal] = useState<'abortRestore' | null>(null);
 
   useEffect(() => {
     if (!server?.status && abortLoading === 'install') {
       addToast(t('pages.server.console.toast.installCancelled', {}), 'success');
+      setAbortLoading(null);
+    }
+  }, [abortLoading, server?.status]);
+
+  useEffect(() => {
+    if (server?.status !== 'restoring_backup' && abortLoading === 'restore') {
       setAbortLoading(null);
     }
   }, [abortLoading, server?.status]);
@@ -118,6 +127,24 @@ function ServerContentContainer(props: Props) {
       .then((instantCancel) => {
         if (instantCancel) {
           updateServer({ status: null });
+        }
+      })
+      .catch((err) => {
+        addToast(httpErrorToHuman(err), 'error');
+        setAbortLoading(null);
+      });
+  };
+
+  const doAbortRestore = () => {
+    setAbortLoading('restore');
+
+    return abortBackupRestore(server.uuid)
+      .then((instantAbort) => {
+        setOpenModal(null);
+        addToast(t('pages.server.console.toast.restoreCancelled', {}), 'success');
+
+        if (instantAbort) {
+          updateServer({ status: 'backup_restore_failed' });
         }
       })
       .catch((err) => {
@@ -143,6 +170,16 @@ function ServerContentContainer(props: Props) {
 
   return (
     <ContentContainer title={`${title} | ${server.name}`}>
+      <ConfirmationModal
+        opened={openModal === 'abortRestore'}
+        onClose={() => setOpenModal(null)}
+        title={t('pages.server.console.modal.abortBackupRestore.title', {})}
+        confirm={t('common.button.cancel', {})}
+        onConfirmed={doAbortRestore}
+      >
+        {t('pages.server.console.modal.abortBackupRestore.content', {}).md()}
+      </ConfirmationModal>
+
       {!id &&
         serverAnnouncements.map((announcement) => (
           <DismissibleAnnouncementAlert key={announcement.uuid} announcement={announcement} />
@@ -194,10 +231,24 @@ function ServerContentContainer(props: Props) {
       ) : server.status === 'restoring_backup' ? (
         <div className='mt-2 px-4 lg:px-6 mb-4'>
           <Notification loading>
-            <span className='flex flex-row items-center'>
-              {t('pages.server.console.notification.restoringBackup', {})}
-              <EstimatedTimeArrival className='ml-1' progress={backupRestoreProgress} total={backupRestoreTotal} />
-            </span>
+            <div className='flex flex-row items-center justify-between'>
+              <span className='flex flex-row items-center'>
+                {t('pages.server.console.notification.restoringBackup', {})}
+                <EstimatedTimeArrival className='ml-1' progress={backupRestoreProgress} total={backupRestoreTotal} />
+              </span>
+
+              <ServerCan action='backups.restore'>
+                <Button
+                  className='ml-4 min-w-fit'
+                  leftSection={<FontAwesomeIcon icon={faCancel} />}
+                  variant='subtle'
+                  loading={abortLoading === 'restore'}
+                  onClick={() => setOpenModal('abortRestore')}
+                >
+                  {t('common.button.cancel', {})}
+                </Button>
+              </ServerCan>
+            </div>
 
             <Tooltip
               label={`${bytesProgressString(backupRestoreProgress, backupRestoreTotal)} · ${tItem('file', backupRestoreFiles)}`}

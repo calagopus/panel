@@ -64,6 +64,7 @@ pub async fn auth(
         "/api/client/servers/{server}",
         "/api/client/servers/{server}/websocket",
         "/api/client/servers/{server}/settings/install/cancel",
+        "/api/client/servers/{server}/backups/restore",
         "/api/client/servers/{server}/backups/unlock",
     ];
 
