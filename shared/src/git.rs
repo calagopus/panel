@@ -534,7 +534,7 @@ impl GitCredentials {
 
                 if let GitCredentials::Password { username, password } = &self {
                     transport
-                        .set_identity(gix::sec::identity::Account {
+                        .set_credentials(gix::sec::identity::Credentials::UsernamePassword {
                             username: username.to_string(),
                             password: password.to_string(),
                             oauth_refresh_token: None,

@@ -3365,7 +3365,7 @@ mod tests {
         )
     }
 
-    fn issues<'a>(findings: &'a Findings) -> impl Iterator<Item = &'a Issue> {
+    fn issues(findings: &Findings) -> impl Iterator<Item = &Issue> {
         findings
             .pending
             .iter()
